@@ -88,7 +88,10 @@ const UseCases = () => {
           <div 
             ref={scrollRef}
             className="flex overflow-x-auto snap-x snap-mandatory gap-6 py-4 px-1 pb-6 scrollbar-hide"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            style={{ 
+              scrollbarWidth: 'none', 
+              msOverflowStyle: 'none'
+            }}
           >
             {useCases.map((useCase, index) => (
               <div 
@@ -112,15 +115,18 @@ const UseCases = () => {
         </div>
       </div>
 
-      <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
+      {/* Use CSS classes instead of inline style tag with JSX */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `
+      }} />
     </section>
   );
 };
