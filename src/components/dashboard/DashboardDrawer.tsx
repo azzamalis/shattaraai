@@ -48,7 +48,7 @@ export function DashboardDrawer({
               <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
                 <Link to="/recent">
                   <Clock size={18} className="mr-2" />
-                  <span>Recent Documents</span>
+                  <span>Recents</span>
                 </Link>
               </Button>
             </div>
