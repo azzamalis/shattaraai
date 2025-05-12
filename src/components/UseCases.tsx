@@ -25,32 +25,32 @@ const UseCases = () => {
   
   const useCases = [
     {
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644',
       title: 'University Students',
       subtitle: 'Ace your exams with AI-enhanced study tools'
     }, 
     {
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7',
       title: 'High School Prep',
       subtitle: 'Build strong foundations for academic success'
     }, 
     {
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1546521343-4eb2c01aa44b',
       title: 'Language Learning',
       subtitle: 'Master vocabulary and grammar effortlessly'
     }, 
     {
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2',
       title: 'Professional Certifications',
       subtitle: 'Prepare for industry exams and advance your career'
     }, 
     {
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3',
       title: 'Continuous Learning',
       subtitle: 'Stay sharp with lifelong educational support'
     }, 
     {
-      image: '/placeholder.svg',
+      image: 'https://images.unsplash.com/photo-1532619675605-1ede6c2ed2b0',
       title: 'Research Support',
       subtitle: 'Organize and study complex research materials'
     }
