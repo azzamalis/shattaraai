@@ -20,7 +20,7 @@ const Terms = () => {
         <PDFViewer 
           title="Terms of Service" 
           description="Our Terms of Service PDF is currently being prepared. Once uploaded, you'll be able to view and download it from this page."
-          pdfPlaceholder={true}
+          pdfPlaceholder={false}
           pdfPath="/terms-of-service.pdf"
         />
       </section>

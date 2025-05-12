@@ -20,7 +20,7 @@ const Privacy = () => {
         <PDFViewer 
           title="Privacy Policy" 
           description="Our Privacy Policy PDF is currently being prepared. Once uploaded, you'll be able to view and download it from this page."
-          pdfPlaceholder={true}
+          pdfPlaceholder={false}
           pdfPath="/privacy-policy.pdf"
         />
       </section>
