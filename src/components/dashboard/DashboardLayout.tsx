@@ -12,7 +12,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children, className }: DashboardLayoutProps) {
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full bg-dark-deeper">
+      <div className="flex min-h-screen w-full bg-[#222222]">
         <AppSidebar />
         <SidebarInset className={cn("p-0", className)}>
           {children}

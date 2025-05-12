@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,7 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="flex items-center border-b border-gray-300 bg-dark-deeper p-4 sticky top-0 z-10">
+      <header className="flex items-center border-b border-white/20 bg-[#222222] p-4 sticky top-0 z-10">
         <div className="grid grid-cols-3 w-full items-center">
           {/* Left section with logo when sidebar is collapsed */}
           <div className="flex items-center">
