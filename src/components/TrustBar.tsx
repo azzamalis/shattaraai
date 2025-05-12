@@ -1,28 +1,74 @@
 
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const TrustBar = () => {
-  // In a real application, these would be actual company logos
-  const logos = Array(8).fill('/placeholder.svg');
-
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4 md:px-6 text-center">
-        <h3 className="text-2xl font-semibold mb-10">
-          Loved by over 1 million learners
-        </h3>
-        
-        <div className="relative overflow-hidden">
-          <div className="flex animate-marquee space-x-12">
-            {logos.concat(logos).map((logo, index) => (
-              <div key={index} className="flex-shrink-0 w-32 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-                <img 
-                  src={logo} 
-                  alt={`Partner company ${index % logos.length + 1}`}
-                  className="w-full h-auto"
-                />
-              </div>
-            ))}
+    <section className="py-16 bg-background">
+      <div className="group relative m-auto max-w-5xl px-6">
+        <div className="absolute inset-0 z-10 flex scale-95 items-center justify-center opacity-0 duration-500 group-hover:scale-100 group-hover:opacity-100">
+          <Link to="#" className="block text-sm duration-150 hover:opacity-75">
+            <span>Loved by top universities across the Gulf</span>
+            <ChevronRight className="ml-1 inline-block size-3" />
+          </Link>
+        </div>
+        <div className="group-hover:blur-xs mx-auto mt-12 grid max-w-2xl grid-cols-4 gap-x-12 gap-y-8 transition-all duration-500 group-hover:opacity-50 sm:gap-x-16 sm:gap-y-14">
+          <div className="flex">
+            <img
+              className="mx-auto h-6 w-auto opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              src="https://upload.wikimedia.org/wikipedia/en/e/ea/KFUPM_Logo.svg"
+              alt="King Fahd University of Petroleum and Minerals"
+            />
+          </div>
+          <div className="flex">
+            <img
+              className="mx-auto h-6 w-auto opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              src="https://upload.wikimedia.org/wikipedia/en/f/f7/American_University_of_Sharjah_Logo.svg"
+              alt="American University of Sharjah"
+            />
+          </div>
+          <div className="flex">
+            <img
+              className="mx-auto h-6 w-auto opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              src="https://upload.wikimedia.org/wikipedia/commons/0/08/QU_Logo.svg"
+              alt="Qatar University"
+            />
+          </div>
+          <div className="flex">
+            <img
+              className="mx-auto h-6 w-auto opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              src="https://upload.wikimedia.org/wikipedia/commons/a/af/KSU_logo.svg"
+              alt="King Saud University"
+            />
+          </div>
+          <div className="flex">
+            <img
+              className="mx-auto h-6 w-auto opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              src="https://upload.wikimedia.org/wikipedia/commons/2/2d/UAEU_Logo.svg"
+              alt="United Arab Emirates University"
+            />
+          </div>
+          <div className="flex">
+            <img
+              className="mx-auto h-6 w-auto opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              src="https://www.ku.edu.kw/images/logo.svg"
+              alt="Kuwait University"
+            />
+          </div>
+          <div className="flex">
+            <img
+              className="mx-auto h-6 w-auto opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              src="https://upload.wikimedia.org/wikipedia/en/e/e0/King_Abdullah_University_of_Science_and_Technology_logo.svg"
+              alt="King Abdullah University of Science and Technology"
+            />
+          </div>
+          <div className="flex">
+            <img
+              className="mx-auto h-6 w-auto opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              src="https://upload.wikimedia.org/wikipedia/commons/5/59/New_SQU_Logo.svg"
+              alt="Sultan Qaboos University"
+            />
           </div>
         </div>
       </div>
