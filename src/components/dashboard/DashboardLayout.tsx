@@ -40,23 +40,25 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
       onOpenChange={handleSidebarChange}
     >
       <div className="flex h-screen w-full overflow-hidden bg-[#111111]">
-        {/* Sidebar is configured in AppSidebar.tsx */}
+        {/* Sidebar component */}
         <AppSidebar />
         
         {/* Main content area */}
-        <div className="flex-1 relative overflow-auto">
-          {/* The floating trigger button that appears only when sidebar is collapsed */}
+        <main className="flex-1 relative overflow-auto">
+          {/* Toggle button appears only when sidebar is collapsed */}
           <SidebarToggleButton />
-          <SidebarInset className={cn("h-full overflow-auto", className)}>
+          
+          {/* Main content */}
+          <div className={cn("h-full overflow-auto", className)}>
             {children}
-          </SidebarInset>
-        </div>
+          </div>
+        </main>
       </div>
     </SidebarProvider>
   );
 }
 
-// Extract the toggle button to its own component for clarity
+// Separate component for the toggle button
 function SidebarToggleButton() {
   const { state, setOpen } = useSidebar();
   
