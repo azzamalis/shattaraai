@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { AppSidebar } from './AppSidebar';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarInset, useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { PanelLeft } from 'lucide-react';
@@ -34,9 +34,8 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
 
 // Extract the toggle button to its own component for clarity
 function SidebarToggleButton() {
-  const { state, setOpen } = React.useContext(
-    require('@/components/ui/sidebar').SidebarContext
-  );
+  // Use the proper useSidebar hook instead of directly accessing the context
+  const { state, setOpen } = useSidebar();
   
   // Only show the toggle button when the sidebar is collapsed
   if (state === "expanded") return null;
