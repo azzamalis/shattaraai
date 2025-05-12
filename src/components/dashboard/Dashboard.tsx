@@ -1,9 +1,12 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Box } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 export function Dashboard() {
   return <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-6 bg-[#222222]">
@@ -22,31 +25,58 @@ export function Dashboard() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {/* Upload Document Card */}
-            <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center">
-              <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
-                <Upload className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-white mb-2">Upload</CardTitle>
-              <CardDescription className="text-gray-400">Import a PDF, Word, or text file</CardDescription>
-            </Card>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center cursor-pointer">
+                    <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
+                      <Upload className="h-8 w-8 text-white" />
+                    </div>
+                    <CardTitle className="text-white mb-2">Upload</CardTitle>
+                    <CardDescription className="text-gray-400">Import a PDF, Word, or text file</CardDescription>
+                  </Card>
+                </TooltipTrigger>
+                <TooltipContent className="bg-[#1A1A1A] text-white border-white/10">
+                  <p>Support file types: PDF, PPT, DOCX, TXT, Audio, Video</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             
             {/* Paste Text Card */}
-            <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center">
-              <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
-                <FileText className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-white mb-2">Paste</CardTitle>
-              <CardDescription className="text-gray-400">Paste your text or web URL</CardDescription>
-            </Card>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center cursor-pointer">
+                    <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
+                      <FileText className="h-8 w-8 text-white" />
+                    </div>
+                    <CardTitle className="text-white mb-2">Paste</CardTitle>
+                    <CardDescription className="text-gray-400">Paste your text or web URL</CardDescription>
+                  </Card>
+                </TooltipTrigger>
+                <TooltipContent className="bg-[#1A1A1A] text-white border-white/10">
+                  <p>YouTube Link, Website URL, Docx, Video link, etc.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             
             {/* Record Audio Card */}
-            <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center">
-              <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
-                <Mic className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-white mb-2">Record</CardTitle>
-              <CardDescription className="text-gray-400">Capture audio for transcription</CardDescription>
-            </Card>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center cursor-pointer">
+                    <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
+                      <Mic className="h-8 w-8 text-white" />
+                    </div>
+                    <CardTitle className="text-white mb-2">Record</CardTitle>
+                    <CardDescription className="text-gray-400">Capture audio for transcription</CardDescription>
+                  </Card>
+                </TooltipTrigger>
+                <TooltipContent className="bg-[#1A1A1A] text-white border-white/10">
+                  <p>Record your lectures in real-time</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           
           {/* AI Assistant Input with Send icon */}
