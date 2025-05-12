@@ -1,11 +1,14 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
+
 const SignUp = () => {
-  return <div className="min-h-screen flex flex-col bg-dark text-white">
+  return (
+    <div className="min-h-screen flex flex-col bg-dark text-white">
       <header className="w-full px-4 py-6">
         <div className="container mx-auto flex justify-between items-center">
           <Link to="/" className="flex items-center">
@@ -32,21 +35,39 @@ const SignUp = () => {
             <form className="space-y-5">
               <div className="space-y-2">
                 <label htmlFor="name" className="text-sm font-medium">Full Name</label>
-                <Input id="name" type="text" placeholder="Enter your name" className="bg-dark border-zinc-700 text-white" />
+                <Input 
+                  id="name" 
+                  type="text" 
+                  placeholder="Enter your name" 
+                  className="bg-dark border-zinc-700 text-white"
+                />
               </div>
               
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">Email Address</label>
-                <Input id="email" type="email" placeholder="Enter your email" className="bg-dark border-zinc-700 text-white" />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  className="bg-dark border-zinc-700 text-white"
+                />
               </div>
               
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium">Password</label>
-                <Input id="password" type="password" placeholder="Create a password" className="bg-dark border-zinc-700 text-white" />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  placeholder="Create a password" 
+                  className="bg-dark border-zinc-700 text-white"
+                />
                 <p className="text-xs text-gray-400">Must be at least 8 characters</p>
               </div>
               
-              <Button type="submit" className="w-full bg-primary hover:bg-primary-light text-white">
+              <Button 
+                type="submit" 
+                className="w-full bg-primary hover:bg-primary-light text-white"
+              >
                 Create Account
               </Button>
             </form>
@@ -62,6 +83,8 @@ const SignUp = () => {
           </div>
         </div>
       </main>
-    </div>;
+    </div>
+  );
 };
+
 export default SignUp;
