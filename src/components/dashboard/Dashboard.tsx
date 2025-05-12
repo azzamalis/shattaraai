@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, FileText, Plus, Search, Upload, Send, Mic } from 'lucide-react';
+import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Cube } from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
 import Logo from '@/components/Logo';
 
@@ -102,40 +102,33 @@ export function Dashboard() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">My Spaces</h2>
               <Button 
-                variant="outline" 
-                className="bg-primary hover:bg-primary-light text-white border-none flex items-center"
+                className="bg-primary hover:bg-primary-light text-white border-none flex items-center gap-2"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="h-4 w-4" />
                 Create Space
               </Button>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors">
-                <CardHeader>
-                  <CardTitle className="text-white">Physics</CardTitle>
-                  <CardDescription className="text-gray-400">Classical mechanics and kinematics</CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <p className="text-gray-500 text-sm">3 documents • Last updated 2 days ago</p>
-                </CardFooter>
+              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors p-4">
+                <div className="flex items-center">
+                  <Cube className="h-5 w-5 text-white mr-3" />
+                  <CardTitle className="text-white text-xl">Azzam's Space</CardTitle>
+                </div>
               </Card>
               
-              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors">
-                <CardHeader>
-                  <CardTitle className="text-white">Mathematics</CardTitle>
-                  <CardDescription className="text-gray-400">Calculus and linear algebra</CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <p className="text-gray-500 text-sm">5 documents • Last updated 1 week ago</p>
-                </CardFooter>
+              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors p-4">
+                <div className="flex items-center">
+                  <Cube className="h-5 w-5 text-white mr-3" />
+                  <CardTitle className="text-white text-xl">Untitled Space</CardTitle>
+                </div>
               </Card>
               
-              <Card className="flex items-center justify-center bg-transparent border-white/20 border-dashed h-[168px] hover:border-primary transition-colors">
-                <Button variant="ghost" className="text-primary flex flex-col items-center">
-                  <Plus className="h-10 w-10 mb-2" />
-                  <span>Add Space</span>
-                </Button>
+              <Card className="flex items-center justify-center border-white/20 border-dashed bg-transparent p-4 hover:border-primary transition-colors cursor-pointer h-[60px]">
+                <div className="flex items-center text-white">
+                  <Plus className="h-5 w-5 mr-2" />
+                  <span className="text-white text-lg font-medium">Add Space</span>
+                </div>
               </Card>
             </div>
           </div>
