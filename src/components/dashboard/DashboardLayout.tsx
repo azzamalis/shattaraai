@@ -1,8 +1,8 @@
 
-import React from 'react';
-import { AppSidebar } from './AppSidebar';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { DashboardHeader } from './DashboardHeader';
+import { DashboardDrawer } from './DashboardDrawer';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -10,14 +10,18 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, className }: DashboardLayoutProps) {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full bg-[#222222]">
-        <AppSidebar />
-        <SidebarInset className={cn("p-0", className)}>
-          {children}
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+    <div className="flex min-h-screen w-full flex-col bg-[#111]">
+      <DashboardHeader onOpenDrawer={() => setIsDrawerOpen(true)} />
+      <DashboardDrawer 
+        open={isDrawerOpen} 
+        onOpenChange={setIsDrawerOpen} 
+      />
+      <main className={cn("flex-1 p-0", className)}>
+        {children}
+      </main>
+    </div>
   );
 }

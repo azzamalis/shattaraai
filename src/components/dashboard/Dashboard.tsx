@@ -5,43 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Box } from 'lucide-react';
-import { useSidebar } from '@/components/ui/sidebar';
-import Logo from '@/components/Logo';
 
 export function Dashboard() {
-  const { state } = useSidebar();
-  const isExpanded = state === "expanded";
-
   return (
     <div className="flex flex-col h-full">
-      <header className="flex items-center border-b border-white/20 bg-[#222222] p-4 sticky top-0 z-10">
-        <div className="grid grid-cols-3 w-full items-center">
-          {/* Left section with logo when sidebar is collapsed */}
-          <div className="flex items-center">
-            {!isExpanded && (
-              <Logo className="h-10 w-auto" textColor="text-white" />
-            )}
-          </div>
-          
-          {/* Center section with search */}
-          <div className="flex justify-center">
-            <div className="relative w-64 lg:w-80">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-              <Input 
-                placeholder="Search or use /commands" 
-                className="pl-9 bg-dark h-9 border-gray-800 focus:border-primary text-white" 
-              />
-              <div className="absolute right-3 top-2.5 text-xs text-gray-500">⌘K</div>
-            </div>
-          </div>
-          
-          {/* Right section with upgrade button */}
-          <div className="flex justify-end">
-            <Button className="bg-primary hover:bg-primary-light text-white">Upgrade</Button>
-          </div>
-        </div>
-      </header>
-
       <main className="flex-1 overflow-auto p-6 bg-[#222222]">
         <div className="max-w-6xl mx-auto">
           {/* Practice with exams section - moved above the main heading */}
