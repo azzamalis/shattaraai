@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -108,6 +107,8 @@ const Onboarding = () => {
     { value: 'friends-family', label: 'Friends & Family' }
   ];
 
+  const selectItemClasses = "text-white hover:text-white hover:translate-y-[-1px] transition-all duration-200 hover:bg-primary hover:bg-opacity-90 focus:bg-primary focus:text-white focus:bg-opacity-90";
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-dark px-4 py-12">
       <div className="mb-8">
@@ -134,7 +135,11 @@ const Onboarding = () => {
               </SelectTrigger>
               <SelectContent className="bg-dark-deeper border-zinc-700 text-white">
                 {languages.map((lang) => (
-                  <SelectItem key={lang.value} value={lang.value} className="text-white hover:bg-zinc-800 focus:bg-zinc-800">
+                  <SelectItem 
+                    key={lang.value} 
+                    value={lang.value} 
+                    className={selectItemClasses}
+                  >
                     {lang.label}
                   </SelectItem>
                 ))}
@@ -155,9 +160,9 @@ const Onboarding = () => {
                 <SelectValue placeholder="I'm here for" />
               </SelectTrigger>
               <SelectContent className="bg-dark-deeper border-zinc-700 text-white">
-                <SelectItem value="student" className="text-white hover:bg-zinc-800 focus:bg-zinc-800">Student</SelectItem>
-                <SelectItem value="teacher" className="text-white hover:bg-zinc-800 focus:bg-zinc-800">Teacher</SelectItem>
-                <SelectItem value="work" className="text-white hover:bg-zinc-800 focus:bg-zinc-800">Work</SelectItem>
+                <SelectItem value="student" className={selectItemClasses}>Student</SelectItem>
+                <SelectItem value="teacher" className={selectItemClasses}>Teacher</SelectItem>
+                <SelectItem value="work" className={selectItemClasses}>Work</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -177,7 +182,7 @@ const Onboarding = () => {
                     <SelectItem 
                       key={option.value} 
                       value={option.value}
-                      className="text-white hover:bg-zinc-800 focus:bg-zinc-800"
+                      className={selectItemClasses}
                     >
                       {option.label}
                     </SelectItem>
@@ -201,7 +206,7 @@ const Onboarding = () => {
                   <SelectItem 
                     key={option.value} 
                     value={option.value}
-                    className="text-white hover:bg-zinc-800 focus:bg-zinc-800"
+                    className={selectItemClasses}
                   >
                     {option.label}
                   </SelectItem>
