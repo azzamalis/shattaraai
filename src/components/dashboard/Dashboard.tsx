@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Cube } from 'lucide-react';
+import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Box } from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
 import Logo from '@/components/Logo';
 
@@ -112,14 +111,14 @@ export function Dashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <Card className="bg-transparent border-white/20 hover:border-primary transition-colors p-4">
                 <div className="flex items-center">
-                  <Cube className="h-5 w-5 text-white mr-3" />
+                  <Box className="h-5 w-5 text-white mr-3" />
                   <CardTitle className="text-white text-xl">Azzam's Space</CardTitle>
                 </div>
               </Card>
               
               <Card className="bg-transparent border-white/20 hover:border-primary transition-colors p-4">
                 <div className="flex items-center">
-                  <Cube className="h-5 w-5 text-white mr-3" />
+                  <Box className="h-5 w-5 text-white mr-3" />
                   <CardTitle className="text-white text-xl">Untitled Space</CardTitle>
                 </div>
               </Card>
