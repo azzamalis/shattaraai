@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,12 +9,53 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
 import { Eye, EyeOff, LucideGithub } from 'lucide-react';
+import { toast } from 'sonner';
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    rememberMe: false
+  });
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, rememberMe: checked }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.email || !formData.password) {
+      toast.error("Missing credentials", {
+        description: "Please enter your email and password."
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success("Signed in successfully!", {
+        description: "Welcome back to Shattara AI!"
+      });
+      
+      // Navigate to home page or dashboard
+      navigate('/');
+    }, 1500);
   };
 
   return (
@@ -56,6 +98,7 @@ const SignIn = () => {
           <Button 
             variant="outline" 
             className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 text-white"
+            onClick={() => navigate('/onboarding')}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -74,7 +117,7 @@ const SignIn = () => {
           </div>
           
           {/* Login Form */}
-          <form className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-white">Email</Label>
               <Input 
@@ -82,6 +125,8 @@ const SignIn = () => {
                 type="email" 
                 placeholder="Enter your email" 
                 className="bg-dark border-zinc-700 text-white"
+                value={formData.email}
+                onChange={handleChange}
               />
             </div>
             
@@ -98,6 +143,8 @@ const SignIn = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••" 
                   className="bg-dark border-zinc-700 text-white pr-10"
+                  value={formData.password}
+                  onChange={handleChange}
                 />
                 <button 
                   type="button"
@@ -114,7 +161,12 @@ const SignIn = () => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <Checkbox id="remember" className="border-zinc-700 data-[state=checked]:bg-primary" />
+              <Checkbox 
+                id="remember" 
+                className="border-zinc-700 data-[state=checked]:bg-primary"
+                checked={formData.rememberMe}
+                onCheckedChange={handleCheckboxChange}
+              />
               <label
                 htmlFor="remember"
                 className="text-sm text-gray-400 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -126,8 +178,9 @@ const SignIn = () => {
             <Button 
               type="submit" 
               className="w-full bg-primary hover:bg-primary-light text-white py-6"
+              disabled={isSubmitting}
             >
-              Sign in
+              {isSubmitting ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
           
@@ -136,6 +189,15 @@ const SignIn = () => {
               Don't have an account?{' '}
               <Link to="/signup" className="text-primary hover:underline">
                 Sign up
+              </Link>
+            </p>
+          </div>
+          
+          <div className="mt-2 text-center">
+            <p className="text-gray-400 text-sm">
+              New user?{' '}
+              <Link to="/onboarding" className="text-primary hover:underline">
+                Go to onboarding
               </Link>
             </p>
           </div>

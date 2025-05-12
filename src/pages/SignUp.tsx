@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,12 +9,54 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    acceptTerms: false
+  });
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, acceptTerms: checked }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.password || !formData.acceptTerms) {
+      toast.error("Please complete all fields", {
+        description: "All fields are required to create an account."
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success("Account created successfully!", {
+        description: "Welcome to Shattara AI!"
+      });
+      
+      // Navigate to onboarding page
+      navigate('/onboarding');
+    }, 1500);
   };
 
   return (
@@ -57,6 +99,7 @@ const SignUp = () => {
           <Button 
             variant="outline" 
             className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 text-white"
+            onClick={() => navigate('/onboarding')}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -75,7 +118,7 @@ const SignUp = () => {
           </div>
           
           {/* Signup Form */}
-          <form className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-white">Full Name</Label>
               <Input 
@@ -83,6 +126,8 @@ const SignUp = () => {
                 type="text" 
                 placeholder="Enter your name" 
                 className="bg-dark border-zinc-700 text-white"
+                value={formData.name}
+                onChange={handleChange}
               />
             </div>
             
@@ -93,6 +138,8 @@ const SignUp = () => {
                 type="email" 
                 placeholder="Enter your email" 
                 className="bg-dark border-zinc-700 text-white"
+                value={formData.email}
+                onChange={handleChange}
               />
             </div>
             
@@ -104,6 +151,8 @@ const SignUp = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password" 
                   className="bg-dark border-zinc-700 text-white pr-10"
+                  value={formData.password}
+                  onChange={handleChange}
                 />
                 <button 
                   type="button"
@@ -121,7 +170,12 @@ const SignUp = () => {
             </div>
             
             <div className="flex items-start space-x-2">
-              <Checkbox id="terms" className="border-zinc-700 data-[state=checked]:bg-primary mt-1" />
+              <Checkbox 
+                id="terms" 
+                className="border-zinc-700 data-[state=checked]:bg-primary mt-1"
+                checked={formData.acceptTerms}
+                onCheckedChange={handleCheckboxChange}
+              />
               <label
                 htmlFor="terms"
                 className="text-sm text-gray-400 leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -136,8 +190,9 @@ const SignUp = () => {
             <Button 
               type="submit" 
               className="w-full bg-primary hover:bg-primary-light text-white py-6"
+              disabled={isSubmitting}
             >
-              Create Account
+              {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>
           
