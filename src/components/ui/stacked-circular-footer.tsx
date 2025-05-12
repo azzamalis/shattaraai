@@ -35,7 +35,7 @@ function StackedCircularFooter() {
                 <span className="sr-only">Facebook</span>
               </Button>
             </a>
-            <a href="https://twitter.com/azzamalis" target="_blank" rel="noopener noreferrer">
+            <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
                 <Twitter className="h-4 w-4" />
                 <span className="sr-only">Twitter</span>
