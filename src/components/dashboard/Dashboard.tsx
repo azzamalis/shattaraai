@@ -44,45 +44,45 @@ export function Dashboard() {
 
       <main className="flex-1 overflow-auto p-6 bg-[#222222]">
         <div className="max-w-6xl mx-auto">
+          {/* Practice with exams section - moved above the main heading */}
+          <div className="mb-8 flex justify-center">
+            <Button className="bg-transparent hover:bg-primary/10 text-white px-6 py-2 rounded-full border border-white/20 flex items-center gap-2">
+              <Badge className="bg-green-500 text-white mr-1 px-2 py-0.5 text-xs font-bold rounded-full">NEW</Badge>
+              Practice with exams
+              <BookOpen className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+          
           {/* Centered main heading with larger font size */}
           <h1 className="text-4xl font-bold text-white mb-12 text-center">What do you want to learn today?</h1>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {/* Upload Document Card */}
-            <Card className="bg-white border-gray-200 shadow-md hover:border-primary transition-colors flex flex-col items-center p-6 text-center">
-              <div className="mb-4 bg-gray-100 p-3 rounded-full">
-                <Upload className="h-8 w-8 text-primary" />
+            <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center">
+              <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
+                <Upload className="h-8 w-8 text-white" />
               </div>
-              <CardTitle className="text-gray-800 mb-2">Upload</CardTitle>
-              <CardDescription className="text-gray-600">Import a PDF, Word, or text file</CardDescription>
+              <CardTitle className="text-white mb-2">Upload</CardTitle>
+              <CardDescription className="text-gray-400">Import a PDF, Word, or text file</CardDescription>
             </Card>
             
             {/* Paste Text Card */}
-            <Card className="bg-white border-gray-200 shadow-md hover:border-primary transition-colors flex flex-col items-center p-6 text-center">
-              <div className="mb-4 bg-gray-100 p-3 rounded-full">
-                <FileText className="h-8 w-8 text-primary" />
+            <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center">
+              <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
+                <FileText className="h-8 w-8 text-white" />
               </div>
-              <CardTitle className="text-gray-800 mb-2">Paste</CardTitle>
-              <CardDescription className="text-gray-600">Paste your text or web URL</CardDescription>
+              <CardTitle className="text-white mb-2">Paste</CardTitle>
+              <CardDescription className="text-gray-400">Paste your text or web URL</CardDescription>
             </Card>
             
             {/* Record Audio Card */}
-            <Card className="bg-white border-gray-200 shadow-md hover:border-primary transition-colors flex flex-col items-center p-6 text-center">
-              <div className="mb-4 bg-gray-100 p-3 rounded-full">
-                <Mic className="h-8 w-8 text-primary" />
+            <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center">
+              <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
+                <Mic className="h-8 w-8 text-white" />
               </div>
-              <CardTitle className="text-gray-800 mb-2">Record</CardTitle>
-              <CardDescription className="text-gray-600">Capture audio for transcription</CardDescription>
+              <CardTitle className="text-white mb-2">Record</CardTitle>
+              <CardDescription className="text-gray-400">Capture audio for transcription</CardDescription>
             </Card>
-          </div>
-          
-          {/* New Practice with exams section */}
-          <div className="mb-8 flex justify-center">
-            <Button className="bg-white hover:bg-gray-100 text-gray-800 px-6 py-2 rounded-full shadow-md flex items-center gap-2">
-              <Badge className="bg-green-500 text-white mr-1 px-2 py-0.5 text-xs font-bold rounded-full">NEW</Badge>
-              Practice with exams
-              <BookOpen className="h-4 w-4 ml-1" />
-            </Button>
           </div>
           
           {/* AI Assistant Input with Send icon */}
@@ -90,7 +90,7 @@ export function Dashboard() {
             <div className="relative">
               <Input 
                 placeholder="Ask the AI assistant about any topic..." 
-                className="bg-white border-gray-300 focus:border-primary text-gray-800 pl-6 pr-12 py-6 text-base"
+                className="bg-transparent border-white/20 focus:border-primary text-white pl-6 pr-12 py-6 text-base"
               />
               <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary-light text-white h-9 w-9 p-0 flex items-center justify-center rounded-full">
                 <Send className="h-4 w-4" />
@@ -101,34 +101,37 @@ export function Dashboard() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">My Spaces</h2>
-              <Button variant="outline" className="border-gray-300 bg-white text-gray-800 hover:bg-white hover:text-primary hover:border-primary">
+              <Button 
+                variant="outline" 
+                className="bg-primary hover:bg-primary-light text-white border-none flex items-center"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Create Space
               </Button>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="bg-white border-gray-200 hover:border-primary transition-colors">
+              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors">
                 <CardHeader>
-                  <CardTitle className="text-gray-800">Physics</CardTitle>
-                  <CardDescription className="text-gray-600">Classical mechanics and kinematics</CardDescription>
+                  <CardTitle className="text-white">Physics</CardTitle>
+                  <CardDescription className="text-gray-400">Classical mechanics and kinematics</CardDescription>
                 </CardHeader>
                 <CardFooter>
                   <p className="text-gray-500 text-sm">3 documents • Last updated 2 days ago</p>
                 </CardFooter>
               </Card>
               
-              <Card className="bg-white border-gray-200 hover:border-primary transition-colors">
+              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors">
                 <CardHeader>
-                  <CardTitle className="text-gray-800">Mathematics</CardTitle>
-                  <CardDescription className="text-gray-600">Calculus and linear algebra</CardDescription>
+                  <CardTitle className="text-white">Mathematics</CardTitle>
+                  <CardDescription className="text-gray-400">Calculus and linear algebra</CardDescription>
                 </CardHeader>
                 <CardFooter>
                   <p className="text-gray-500 text-sm">5 documents • Last updated 1 week ago</p>
                 </CardFooter>
               </Card>
               
-              <Card className="flex items-center justify-center bg-white border-gray-200 border-dashed h-[168px] hover:border-primary transition-colors">
+              <Card className="flex items-center justify-center bg-transparent border-white/20 border-dashed h-[168px] hover:border-primary transition-colors">
                 <Button variant="ghost" className="text-primary flex flex-col items-center">
                   <Plus className="h-10 w-10 mb-2" />
                   <span>Add Space</span>
