@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { AppSidebar } from './AppSidebar';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { PanelLeft } from 'lucide-react';

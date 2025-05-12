@@ -11,7 +11,6 @@ import {
   SidebarMenu, 
   SidebarMenuButton, 
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
@@ -28,25 +27,37 @@ import {
   Box,
   History,
   User,
-  Chrome
+  Chrome,
+  X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function AppSidebar() {
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, setOpen } = useSidebar();
   const isExpanded = state === "expanded";
 
   return (
     <Sidebar 
       variant="sidebar" 
-      collapsible="offcanvas" // Changed from "icon" to "offcanvas" for drawer-like behavior
+      collapsible="offcanvas"
       className="bg-[#222222] border-r border-white/20"
     >
       <SidebarHeader className="flex items-center justify-between p-4 border-b border-white/20 bg-[#222222]">
         <div className="flex items-center gap-2">
           {isExpanded && <Logo className="h-10 w-auto" textColor="text-white" />}
         </div>
-        {!isMobile && <SidebarTrigger />}
+        {/* Add close button that's only visible when sidebar is expanded */}
+        {!isMobile && (
+          <Button
+            onClick={() => setOpen(false)}
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <X size={18} />
+            <span className="sr-only">Close sidebar</span>
+          </Button>
+        )}
       </SidebarHeader>
 
       <SidebarContent className="bg-[#222222]">
