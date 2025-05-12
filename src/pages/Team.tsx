@@ -40,7 +40,7 @@ const Team = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-center mb-2">Maya Rahman</h3>
+            <h3 className="text-xl font-semibold text-center mb-2">Noor Ali</h3>
             <p className="text-gray-400 text-center mb-4">Head of Education</p>
             <p className="text-gray-500 text-center">15+ years in curriculum development and educational psychology. Ensures our platform meets real learning needs.</p>
           </div>
