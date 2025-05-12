@@ -39,16 +39,18 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
       defaultOpen={initialOpen} 
       onOpenChange={handleSidebarChange}
     >
-      <div className="flex min-h-screen w-full bg-[#222222]">
-        {/* Sidebar will be hidden completely when collapsed */}
+      <div className="flex h-screen w-full overflow-hidden bg-[#111111]">
+        {/* Sidebar is configured in AppSidebar.tsx */}
         <AppSidebar />
         
-        {/* SidebarInset contains the main content */}
-        <SidebarInset className={cn("p-0 relative flex-1", className)}>
-          {/* The floating trigger button that appears when sidebar is collapsed */}
+        {/* Main content area */}
+        <div className="flex-1 relative overflow-auto">
+          {/* The floating trigger button that appears only when sidebar is collapsed */}
           <SidebarToggleButton />
-          {children}
-        </SidebarInset>
+          <SidebarInset className={cn("h-full overflow-auto", className)}>
+            {children}
+          </SidebarInset>
+        </div>
       </div>
     </SidebarProvider>
   );
@@ -56,7 +58,6 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
 
 // Extract the toggle button to its own component for clarity
 function SidebarToggleButton() {
-  // Use the proper useSidebar hook instead of directly accessing the context
   const { state, setOpen } = useSidebar();
   
   // Only show the toggle button when the sidebar is collapsed
@@ -68,7 +69,7 @@ function SidebarToggleButton() {
         console.log("Opening sidebar from toggle button, current state:", state);
         setOpen(true);
       }}
-      className="absolute top-4 left-4 z-50 bg-[#222222] border border-white/20 text-white hover:bg-primary/90"
+      className="fixed top-4 left-4 z-50 bg-[#222222] border border-white/20 text-white hover:bg-primary/90"
       size="icon"
       aria-label="Open sidebar"
     >

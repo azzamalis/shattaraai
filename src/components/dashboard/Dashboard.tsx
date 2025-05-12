@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,6 +10,11 @@ import Logo from '@/components/Logo';
 export function Dashboard() {
   const { state } = useSidebar();
   const isExpanded = state === "expanded";
+
+  // Add debug log to track sidebar state in the dashboard component
+  React.useEffect(() => {
+    console.log("Sidebar state in Dashboard:", state);
+  }, [state]);
 
   return (
     <div className="flex flex-col h-full">

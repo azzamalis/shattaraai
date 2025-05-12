@@ -36,6 +36,11 @@ export function AppSidebar() {
   const { state, isMobile, setOpen } = useSidebar();
   const isExpanded = state === "expanded";
 
+  // Add debug log to track sidebar state
+  React.useEffect(() => {
+    console.log("Sidebar state in AppSidebar:", state, "isMobile:", isMobile);
+  }, [state, isMobile]);
+
   return (
     <Sidebar 
       variant="sidebar" 
@@ -54,9 +59,9 @@ export function AppSidebar() {
               }}
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
+              className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
             >
-              <ChevronsLeft size={18} />
+              <ChevronsLeft size={20} />
               <span className="sr-only">Collapse sidebar</span>
             </Button>
           )}
