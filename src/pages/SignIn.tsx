@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -89,7 +88,7 @@ const SignIn = () => {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label htmlFor="password" className="text-white">Password</Label>
-                <Link to="#" className="text-sm text-primary hover:underline">
+                <Link to="/password-reset" className="text-sm text-primary hover:underline">
                   Forgot password?
                 </Link>
               </div>

@@ -14,6 +14,7 @@ import Terms from "./pages/Terms";
 import Careers from "./pages/Careers";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
+import PasswordReset from "./pages/PasswordReset";
 import React from "react";
 
 // Create a new QueryClient instance inside the component
@@ -36,6 +37,7 @@ const App = () => {
             <Route path="/careers" element={<Careers />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/password-reset" element={<PasswordReset />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
