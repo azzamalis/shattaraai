@@ -67,7 +67,7 @@ export function Dashboard() {
                       <Mic className="h-8 w-8 text-white" />
                     </div>
                     <CardTitle className="text-white mb-2">Record</CardTitle>
-                    <CardDescription className="text-gray-400">Capture audio for transcription</CardDescription>
+                    <CardDescription className="text-gray-400">Record Your Lecture</CardDescription>
                   </Card>
                 </TooltipTrigger>
                 <TooltipContent className="bg-[#1A1A1A] text-white border-white/10">
