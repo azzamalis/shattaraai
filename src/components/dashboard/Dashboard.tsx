@@ -1,14 +1,11 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Box } from 'lucide-react';
-
 export function Dashboard() {
-  return (
-    <div className="flex flex-col h-full">
+  return <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-6 bg-[#222222]">
         <div className="max-w-6xl mx-auto">
           {/* Practice with exams section - moved above the main heading */}
@@ -55,10 +52,7 @@ export function Dashboard() {
           {/* AI Assistant Input with Send icon */}
           <div className="mb-8">
             <div className="relative">
-              <Input 
-                placeholder="Ask the AI assistant about any topic..." 
-                className="bg-transparent border-white/20 focus:border-primary text-white pl-6 pr-12 py-6 text-base"
-              />
+              <Input placeholder="Ask the AI assistant about any topic..." className="bg-transparent border-white/20 focus:border-primary text-white pl-6 pr-12 py-6 text-base" />
               <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary-light text-white h-9 w-9 p-0 flex items-center justify-center rounded-full">
                 <Send className="h-4 w-4" />
               </Button>
@@ -68,12 +62,7 @@ export function Dashboard() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">My Spaces</h2>
-              <Button 
-                className="bg-primary hover:bg-primary-light text-white border-none flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Create Space
-              </Button>
+              
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -101,6 +90,5 @@ export function Dashboard() {
           </div>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 }
