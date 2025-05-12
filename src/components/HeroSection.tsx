@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/Button';
+import Button from '@/components/Button'; // Changed from { Button } to Button
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
