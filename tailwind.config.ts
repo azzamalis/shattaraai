@@ -72,6 +72,9 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			maxWidth: {
+				container: "1280px",
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
@@ -95,8 +98,8 @@ export default {
 					}
 				},
 				'marquee': {
-					'0%': { transform: 'translateX(0%)' },
-					'100%': { transform: 'translateX(-100%)' }
+					'from': { transform: 'translateX(0)' },
+					'to': { transform: 'translateX(calc(-100% - var(--gap)))' }
 				},
 				'slide-in': {
 					'0%': { transform: 'translateX(-100%)' },
@@ -118,7 +121,7 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'marquee': 'marquee 25s linear infinite',
+				'marquee': 'marquee var(--duration) linear infinite',
 				'slide-in': 'slide-in 0.3s ease-out',
 				'slide-out': 'slide-out 0.3s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
