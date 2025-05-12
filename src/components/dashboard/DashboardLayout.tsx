@@ -21,23 +21,30 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
     const sidebarCookie = cookies.find(cookie => cookie.trim().startsWith('sidebar:state='));
     if (sidebarCookie) {
       const sidebarState = sidebarCookie.split('=')[1];
+      console.log("Found sidebar cookie:", sidebarState);
       setInitialOpen(sidebarState === 'true');
     }
   }, []);
 
+  // Callback function to handle sidebar state changes
+  const handleSidebarChange = (open: boolean) => {
+    console.log("Sidebar state changed in provider:", open);
+    
+    // Set cookie to remember state
+    document.cookie = `sidebar:state=${open}; path=/; max-age=${60 * 60 * 24 * 7}`;
+  };
+
   return (
     <SidebarProvider 
       defaultOpen={initialOpen} 
-      onOpenChange={(open) => {
-        console.log("Sidebar state changed in provider:", open);
-      }}
+      onOpenChange={handleSidebarChange}
     >
       <div className="flex min-h-screen w-full bg-[#222222]">
         {/* Sidebar will be hidden completely when collapsed */}
         <AppSidebar />
         
         {/* SidebarInset contains the main content */}
-        <SidebarInset className={cn("p-0 relative", className)}>
+        <SidebarInset className={cn("p-0 relative flex-1", className)}>
           {/* The floating trigger button that appears when sidebar is collapsed */}
           <SidebarToggleButton />
           {children}
@@ -58,11 +65,12 @@ function SidebarToggleButton() {
   return (
     <Button 
       onClick={() => {
-        console.log("Opening sidebar, current state:", state);
+        console.log("Opening sidebar from toggle button, current state:", state);
         setOpen(true);
       }}
       className="absolute top-4 left-4 z-50 bg-[#222222] border border-white/20 text-white hover:bg-primary/90"
       size="icon"
+      aria-label="Open sidebar"
     >
       <PanelLeft size={18} />
       <span className="sr-only">Open sidebar</span>

@@ -42,25 +42,25 @@ export function AppSidebar() {
       collapsible="offcanvas"
       className="bg-[#222222] border-r border-white/20"
     >
-      <SidebarHeader className="flex items-center justify-between p-4 border-b border-white/20 bg-[#222222]">
-        <div className="flex items-center">
+      <SidebarHeader className="bg-[#222222] border-b border-white/20">
+        <div className="flex items-center justify-between h-16 px-4">
           {isExpanded && <Logo className="h-10 w-auto" textColor="text-white" />}
+          
+          {isExpanded && !isMobile && (
+            <Button
+              onClick={() => {
+                console.log("Closing sidebar from button, current state:", state);
+                setOpen(false);
+              }}
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
+            >
+              <ChevronsLeft size={18} />
+              <span className="sr-only">Collapse sidebar</span>
+            </Button>
+          )}
         </div>
-        {/* Add close button with double chevrons, only visible when sidebar is expanded and not on mobile */}
-        {isExpanded && !isMobile && (
-          <Button
-            onClick={() => {
-              console.log("Closing sidebar, current state:", state);
-              setOpen(false);
-            }}
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
-          >
-            <ChevronsLeft size={18} />
-            <span className="sr-only">Collapse sidebar</span>
-          </Button>
-        )}
       </SidebarHeader>
 
       <SidebarContent className="bg-[#222222]">
