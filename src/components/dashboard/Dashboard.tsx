@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BookOpen, FileText, Plus, Search } from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
+import Logo from '@/components/Logo';
 
 export function Dashboard() {
   const { state } = useSidebar();
@@ -12,21 +13,31 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="flex items-center justify-between border-b border-gray-800 bg-dark-deeper p-4 sticky top-0 z-10">
-        <div className="flex items-center gap-4">
-          {!isExpanded && <div className="w-10 h-8"><img src="/lovable-uploads/62e3dd77-6e9f-4134-9392-fc52478e7b24.png" alt="SHATTARA AI" className="h-full w-auto" /></div>}
-          <div className="relative w-64 lg:w-80">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-            <Input 
-              placeholder="Search or use /commands" 
-              className="pl-9 bg-dark h-9 border-gray-800 focus:border-primary text-white" 
-            />
-            <div className="absolute right-3 top-2.5 text-xs text-gray-500">⌘K</div>
+      <header className="flex items-center border-b border-gray-800 bg-dark-deeper p-4 sticky top-0 z-10">
+        <div className="grid grid-cols-3 w-full items-center">
+          {/* Left section with logo when sidebar is collapsed */}
+          <div className="flex items-center">
+            {!isExpanded && (
+              <Logo className="h-10 w-auto" textColor="text-white" />
+            )}
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" className="text-white">Help</Button>
-          <Button className="bg-primary hover:bg-primary-light text-white">Upgrade</Button>
+          
+          {/* Center section with search */}
+          <div className="flex justify-center">
+            <div className="relative w-64 lg:w-80">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <Input 
+                placeholder="Search or use /commands" 
+                className="pl-9 bg-dark h-9 border-gray-800 focus:border-primary text-white" 
+              />
+              <div className="absolute right-3 top-2.5 text-xs text-gray-500">⌘K</div>
+            </div>
+          </div>
+          
+          {/* Right section with upgrade button */}
+          <div className="flex justify-end">
+            <Button className="bg-primary hover:bg-primary-light text-white">Upgrade</Button>
+          </div>
         </div>
       </header>
 

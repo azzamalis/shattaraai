@@ -23,7 +23,6 @@ import {
   HelpCircle, 
   Home, 
   Plus, 
-  Search, 
   Settings, 
   User 
 } from 'lucide-react';
@@ -37,7 +36,7 @@ export function AppSidebar() {
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
-          {isExpanded && <Logo className="h-8" textColor="text-white" />}
+          {isExpanded && <Logo className="h-10 w-auto" textColor="text-white" />}
         </div>
         {!isMobile && <SidebarTrigger />}
       </SidebarHeader>

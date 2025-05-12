@@ -13,7 +13,12 @@ const Logo: React.FC<LogoProps> = ({ className, textColor = 'text-black' }) => {
       <img 
         src="/lovable-uploads/62e3dd77-6e9f-4134-9392-fc52478e7b24.png" 
         alt="SHATTARA AI" 
-        className="h-8 w-auto"
+        className="w-auto object-contain"
+        style={{ 
+          imageRendering: 'high-quality',
+          maxHeight: '100%',
+          minWidth: '120px'
+        }}
       />
     </div>
   );
