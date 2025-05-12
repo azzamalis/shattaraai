@@ -1,13 +1,10 @@
-
 import React from 'react';
 import { HeroSection } from '@/components/hero/HeroSection';
 import Footer from '@/components/Footer';
 import { ArrowRight, BookOpen, Layers, BarChart3, Zap, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 const Teachers = () => {
-  return (
-    <div className="min-h-screen bg-dark text-white">
+  return <div className="min-h-screen bg-dark text-white">
       <HeroSection />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
@@ -106,16 +103,14 @@ const Teachers = () => {
               engagement and test scores have never been higher."
             </blockquote>
             <cite className="not-italic">
-              <div className="font-semibold">Professor Huda Al-Mansouri</div>
-              <div className="text-gray-400">Mathematics Department, Qatar University</div>
+              <div className="font-semibold">Professor Huda M. Barak</div>
+              <div className="text-gray-400">Mathematics Department, Arab Open University</div>
             </cite>
           </div>
         </div>
       </section>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Teachers;
