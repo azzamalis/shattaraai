@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Box } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
 export function Dashboard() {
   return <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-6 bg-[#222222]">
@@ -33,7 +31,7 @@ export function Dashboard() {
                       <Upload className="h-8 w-8 text-white" />
                     </div>
                     <CardTitle className="text-white mb-2">Upload</CardTitle>
-                    <CardDescription className="text-gray-400">Import a PDF, Word, or text file</CardDescription>
+                    <CardDescription className="text-gray-400">File, Audio, Video</CardDescription>
                   </Card>
                 </TooltipTrigger>
                 <TooltipContent className="bg-[#1A1A1A] text-white border-white/10">
