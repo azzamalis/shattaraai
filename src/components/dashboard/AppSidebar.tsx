@@ -28,7 +28,7 @@ import {
   History,
   User,
   Chrome,
-  X
+  ChevronsLeft
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -46,16 +46,16 @@ export function AppSidebar() {
         <div className="flex items-center gap-2">
           {isExpanded && <Logo className="h-10 w-auto" textColor="text-white" />}
         </div>
-        {/* Add close button that's only visible when sidebar is expanded */}
-        {!isMobile && (
+        {/* Add close button with double chevrons, only visible when sidebar is expanded and not on mobile */}
+        {!isMobile && isExpanded && (
           <Button
             onClick={() => setOpen(false)}
             variant="ghost"
             size="icon"
             className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
           >
-            <X size={18} />
-            <span className="sr-only">Close sidebar</span>
+            <ChevronsLeft size={18} />
+            <span className="sr-only">Collapse sidebar</span>
           </Button>
         )}
       </SidebarHeader>
