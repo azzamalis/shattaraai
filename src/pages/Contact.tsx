@@ -73,7 +73,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1">Our Location</h3>
-                    <p className="text-gray-400">Digital Park Tower, Floor 12<br />Dubai Internet City<br />Dubai, UAE</p>
+                    <p className="text-gray-400">Madinah Main Highway Road<br />Al Faisaliyah District<br />Jeddah, KSA</p>
                   </div>
                 </div>
                 
@@ -83,7 +83,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1">Email Us</h3>
-                    <p className="text-gray-400">info@shattara.edu<br />support@shattara.edu</p>
+                    <p className="text-gray-400">help@shattara.ai<br />support@shattara.ai</p>
                   </div>
                 </div>
                 
@@ -93,7 +93,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1">Call Us</h3>
-                    <p className="text-gray-400">+971 4 123 4567<br />+971 50 987 6543</p>
+                    <p className="text-gray-400">+966 53 481 4860<br />+966 55 895 71721</p>
                   </div>
                 </div>
               </div>
@@ -109,7 +109,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1">Technical Support</h3>
-                    <p className="text-gray-400">support@shattara.edu<br />+971 4 123 4569</p>
+                    <p className="text-gray-400">support@shattara.ai<br />+966 53 481 4860</p>
                   </div>
                 </div>
                 
@@ -119,7 +119,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1">Partnership Inquiries</h3>
-                    <p className="text-gray-400">partnerships@shattara.edu<br />+971 4 123 4570</p>
+                    <p className="text-gray-400">partnerships@shattara.ai<br />+966 53 481 4860</p>
                   </div>
                 </div>
                 
@@ -129,7 +129,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1">Educational Resources</h3>
-                    <p className="text-gray-400">resources@shattara.edu<br />+971 4 123 4571</p>
+                    <p className="text-gray-400">resources@shattara.ai<br />+966 53 481 4860</p>
                   </div>
                 </div>
               </div>
