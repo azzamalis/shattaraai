@@ -19,7 +19,7 @@ export function DashboardHeader({ onOpenDrawer }: DashboardHeaderProps) {
             variant="ghost" 
             size="icon" 
             onClick={onOpenDrawer} 
-            className="text-white hover:bg-primary/10"
+            className="text-white hover:bg-white/10 hover:text-primary"
           >
             <Menu size={22} />
             <span className="sr-only">Toggle menu</span>
