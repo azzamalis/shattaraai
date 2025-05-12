@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '@/components/Button';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import HeroActionLink from './HeroActionLink';
 import { Code, Atom, Zap } from 'lucide-react';
+import EducationAnimation from './EducationAnimation';
 
 const transitionVariants = {
   item: {
@@ -138,12 +138,10 @@ const HeroContent = () => {
             />
             <div className="bg-dark/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/10 p-4 shadow-lg shadow-black/15">
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
-              <img
-                className="aspect-15/8 relative rounded-2xl"
-                src="/placeholder.svg"
-                alt="Shattara platform screenshot"
-                width="2700"
-                height="1440"
+              
+              {/* Replace static image with the p5.js animation */}
+              <EducationAnimation 
+                className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px]" 
               />
             </div>
           </div>
