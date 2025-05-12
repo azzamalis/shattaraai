@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check, ArrowDownToDot, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Link } from "react-router-dom"
 
 interface Feature {
   name: string
@@ -179,18 +180,20 @@ function PricingSection({ tiers, className }: PricingSectionProps) {
               </div>
 
               <div className="p-8 pt-0 mt-auto">
-                <Button
-                  className={cn(
-                    "w-full relative transition-all duration-300",
-                    tier.highlight
-                      ? buttonStyles.highlight
-                      : buttonStyles.default,
-                  )}
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    {tier.price.monthly === 0 ? "Get Started" : "Upgrade Now"}
-                  </span>
-                </Button>
+                <Link to="/signup">
+                  <Button
+                    className={cn(
+                      "w-full relative transition-all duration-300",
+                      tier.highlight
+                        ? buttonStyles.highlight
+                        : buttonStyles.default,
+                    )}
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {tier.price.monthly === 0 ? "Get Started" : "Upgrade Now"}
+                    </span>
+                  </Button>
+                </Link>
               </div>
             </div>
           ))}

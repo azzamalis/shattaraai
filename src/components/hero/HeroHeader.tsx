@@ -56,22 +56,28 @@ const HeroHeader = () => {
 
             <div className="mb-6 hidden w-full lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0">
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn(isScrolled && 'lg:hidden', 'text-white border-white/20 hover:border-primary hover:bg-primary/20')}>
-                  Login
-                </Button>
-                <Button
-                  size="sm"
-                  className={cn(isScrolled && 'lg:hidden')}>
-                  Sign Up
-                </Button>
-                <Button
-                  size="sm"
-                  className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                  Get Started
-                </Button>
+                <Link to="/signin">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(isScrolled && 'lg:hidden', 'text-white border-white/20 hover:border-primary hover:bg-primary/20')}>
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button
+                    size="sm"
+                    className={cn(isScrolled && 'lg:hidden')}>
+                    Sign Up
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button
+                    size="sm"
+                    className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                    Get Started
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
