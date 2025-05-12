@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+
+import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,11 +12,6 @@ export function Dashboard() {
   const { state } = useSidebar();
   const isExpanded = state === "expanded";
 
-  // Debug logging
-  useEffect(() => {
-    console.log("Sidebar state in Dashboard:", state);
-  }, [state]);
-
   return (
     <div className="flex flex-col h-full">
       <header className="flex items-center border-b border-white/20 bg-[#222222] p-4 sticky top-0 z-10">
@@ -23,7 +19,7 @@ export function Dashboard() {
           {/* Left section with logo when sidebar is collapsed */}
           <div className="flex items-center">
             {!isExpanded && (
-              <Logo className="h-10 w-auto ml-12 md:ml-0" textColor="text-white" />
+              <Logo className="h-10 w-auto" textColor="text-white" />
             )}
           </div>
           
