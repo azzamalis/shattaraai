@@ -43,13 +43,16 @@ export function AppSidebar() {
       className="bg-[#222222] border-r border-white/20"
     >
       <SidebarHeader className="flex items-center justify-between p-4 border-b border-white/20 bg-[#222222]">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           {isExpanded && <Logo className="h-10 w-auto" textColor="text-white" />}
         </div>
         {/* Add close button with double chevrons, only visible when sidebar is expanded and not on mobile */}
-        {!isMobile && isExpanded && (
+        {isExpanded && !isMobile && (
           <Button
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              console.log("Closing sidebar, current state:", state);
+              setOpen(false);
+            }}
             variant="ghost"
             size="icon"
             className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
