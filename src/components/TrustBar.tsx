@@ -2,13 +2,20 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
-const TrustBar = () => {
+interface TrustBarProps {
+  className?: string;
+}
+
+const TrustBar: React.FC<TrustBarProps> = ({ className }) => {
   return (
-    <section className="py-16 bg-background">
+    <section className={cn("pb-16 pt-16 md:pb-32", className)}>
       <div className="group relative m-auto max-w-5xl px-6">
         <div className="absolute inset-0 z-10 flex scale-95 items-center justify-center opacity-0 duration-500 group-hover:scale-100 group-hover:opacity-100">
-          <Link to="#" className="block text-sm duration-150 hover:opacity-75">
+          <Link
+            to="#"
+            className="block text-sm duration-150 hover:opacity-75 text-gray-300">
             <span>Loved by top universities across the Gulf</span>
             <ChevronRight className="ml-1 inline-block size-3" />
           </Link>

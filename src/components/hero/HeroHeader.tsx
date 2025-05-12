@@ -28,14 +28,15 @@ const HeroHeader = () => {
       <nav
         data-state={menuState ? 'active' : undefined}
         className="fixed z-20 w-full px-2 group">
-        <div className={cn('mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12', isScrolled && 'bg-background/50 max-w-4xl rounded-2xl border backdrop-blur-lg lg:px-5')}>
+        <div className={cn('mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12', 
+          isScrolled && 'bg-dark/50 max-w-4xl rounded-2xl border border-primary/10 backdrop-blur-lg lg:px-5')}>
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
             <div className="flex w-full justify-between lg:w-auto">
               <Link
                 to="/"
                 aria-label="home"
                 className="flex items-center space-x-2">
-                <Logo />
+                <Logo textColor="text-white" />
               </Link>
             </div>
 
@@ -45,7 +46,7 @@ const HeroHeader = () => {
                   <li key={index}>
                     <a
                       href={item.href}
-                      className="nav-link">
+                      className="nav-link text-white/80 hover:text-primary">
                       <span>{item.name}</span>
                     </a>
                   </li>
@@ -58,7 +59,7 @@ const HeroHeader = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className={cn(isScrolled && 'lg:hidden')}>
+                  className={cn(isScrolled && 'lg:hidden', 'text-white border-white/20 hover:border-primary hover:bg-primary/20')}>
                   Login
                 </Button>
                 <Button
