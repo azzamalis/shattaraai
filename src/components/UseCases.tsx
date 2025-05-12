@@ -115,7 +115,6 @@ const UseCases = () => {
         </div>
       </div>
 
-      {/* Use CSS classes instead of inline style tag with JSX */}
       <style dangerouslySetInnerHTML={{
         __html: `
           .scrollbar-hide::-webkit-scrollbar {
