@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Button from '@/components/Button';
 import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
+import { Menu, X } from 'lucide-react';
 
 const menuItems = [
   { name: 'The Team', href: '/team' },
@@ -24,10 +25,10 @@ const HeroHeader = () => {
   }, []);
   
   return (
-    <header>
+    <header className="relative">
       <nav
         data-state={menuState ? 'active' : undefined}
-        className="fixed z-20 w-full px-2 group">
+        className="fixed z-50 w-full px-2 group">
         <div className={cn('mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12', 
           isScrolled && 'bg-dark/50 max-w-4xl rounded-2xl border border-primary/10 backdrop-blur-lg lg:px-5')}>
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
@@ -38,8 +39,17 @@ const HeroHeader = () => {
                 className="flex items-center space-x-2">
                 <Logo textColor="text-white" />
               </Link>
+              
+              {/* Mobile menu toggle */}
+              <button
+                className="lg:hidden text-white"
+                onClick={() => setMenuState(!menuState)}
+              >
+                {menuState ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
 
+            {/* Desktop Navigation */}
             <div className="absolute inset-0 m-auto hidden size-fit lg:block">
               <ul className="flex gap-8 text-sm">
                 {menuItems.map((item, index) => (
@@ -53,6 +63,25 @@ const HeroHeader = () => {
                 ))}
               </ul>
             </div>
+
+            {/* Mobile Navigation */}
+            {menuState && (
+              <div className="absolute top-full left-0 w-full bg-dark/95 backdrop-blur-lg rounded-b-xl p-4 lg:hidden z-50">
+                <ul className="flex flex-col gap-4">
+                  {menuItems.map((item, index) => (
+                    <li key={index}>
+                      <Link
+                        to={item.href}
+                        className="text-white/80 hover:text-primary block py-2"
+                        onClick={() => setMenuState(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="mb-6 hidden w-full lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0">
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">

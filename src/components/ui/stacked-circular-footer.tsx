@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
@@ -15,8 +14,8 @@ function StackedCircularFooter() {
     <footer className="bg-dark-deeper text-white py-12">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center">
-          <div className="mb-8 rounded-full bg-primary/10 p-8">
-            <Logo textColor="text-white" />
+          <div className="mb-8 rounded-full bg-primary/10 p-4 flex items-center justify-center" style={{ width: '120px', height: '120px' }}>
+            <Logo textColor="text-white" className="scale-90" />
           </div>
           
           <nav className="mb-8 flex flex-wrap justify-center gap-6">
