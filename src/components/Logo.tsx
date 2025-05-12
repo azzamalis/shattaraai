@@ -15,7 +15,7 @@ const Logo: React.FC<LogoProps> = ({ className, textColor = 'text-black' }) => {
         alt="SHATTARA AI" 
         className="w-auto object-contain"
         style={{ 
-          imageRendering: 'high-quality',
+          imageRendering: 'crisp-edges', // Changed from 'high-quality' to a valid value
           maxHeight: '100%',
           minWidth: '120px'
         }}
