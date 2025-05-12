@@ -13,7 +13,7 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="flex items-center border-b border-gray-800 bg-dark-deeper p-4 sticky top-0 z-10">
+      <header className="flex items-center border-b border-gray-300 bg-dark-deeper p-4 sticky top-0 z-10">
         <div className="grid grid-cols-3 w-full items-center">
           {/* Left section with logo when sidebar is collapsed */}
           <div className="flex items-center">
@@ -41,32 +41,32 @@ export function Dashboard() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto p-6">
+      <main className="flex-1 overflow-auto p-6 bg-[#222222]">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold text-white mb-8">What do you want to learn today?</h1>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-            <Card className="bg-dark border-gray-800 shadow-md hover:border-primary transition-colors">
+            <Card className="bg-white border-gray-200 shadow-md hover:border-primary transition-colors">
               <CardHeader>
                 <FileText className="h-10 w-10 text-primary mb-2" />
-                <CardTitle className="text-white">Upload Document</CardTitle>
-                <CardDescription>Import a PDF, Word, or text file</CardDescription>
+                <CardTitle className="text-gray-800">Upload Document</CardTitle>
+                <CardDescription className="text-gray-600">Import a PDF, Word, or text file</CardDescription>
               </CardHeader>
             </Card>
             
-            <Card className="bg-dark border-gray-800 shadow-md hover:border-primary transition-colors">
+            <Card className="bg-white border-gray-200 shadow-md hover:border-primary transition-colors">
               <CardHeader>
                 <BookOpen className="h-10 w-10 text-primary mb-2" />
-                <CardTitle className="text-white">Link Resources</CardTitle>
-                <CardDescription>Connect websites, articles or books</CardDescription>
+                <CardTitle className="text-gray-800">Link Resources</CardTitle>
+                <CardDescription className="text-gray-600">Connect websites, articles or books</CardDescription>
               </CardHeader>
             </Card>
             
-            <Card className="bg-dark border-gray-800 shadow-md hover:border-primary transition-colors">
+            <Card className="bg-white border-gray-200 shadow-md hover:border-primary transition-colors">
               <CardHeader>
                 <Search className="h-10 w-10 text-primary mb-2" />
-                <CardTitle className="text-white">Explore Topics</CardTitle>
-                <CardDescription>Browse recommended learning paths</CardDescription>
+                <CardTitle className="text-gray-800">Explore Topics</CardTitle>
+                <CardDescription className="text-gray-600">Browse recommended learning paths</CardDescription>
               </CardHeader>
             </Card>
           </div>
@@ -75,7 +75,7 @@ export function Dashboard() {
             <div className="relative">
               <Input 
                 placeholder="Ask the AI assistant about any topic..." 
-                className="bg-dark border-gray-800 focus:border-primary text-white pl-4 pr-32 py-6 text-base"
+                className="bg-white border-gray-300 focus:border-primary text-gray-800 pl-4 pr-32 py-6 text-base"
               />
               <Button className="absolute right-2 top-2 bg-primary hover:bg-primary-light text-white">
                 Ask
@@ -86,34 +86,34 @@ export function Dashboard() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">My Spaces</h2>
-              <Button variant="outline" className="border-gray-700 text-white hover:bg-dark hover:text-primary hover:border-primary">
+              <Button variant="outline" className="border-gray-300 bg-white text-gray-800 hover:bg-white hover:text-primary hover:border-primary">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Space
               </Button>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="bg-dark border-gray-800 hover:border-primary transition-colors">
+              <Card className="bg-white border-gray-200 hover:border-primary transition-colors">
                 <CardHeader>
-                  <CardTitle className="text-white">Physics</CardTitle>
-                  <CardDescription>Classical mechanics and kinematics</CardDescription>
+                  <CardTitle className="text-gray-800">Physics</CardTitle>
+                  <CardDescription className="text-gray-600">Classical mechanics and kinematics</CardDescription>
                 </CardHeader>
                 <CardFooter>
-                  <p className="text-gray-400 text-sm">3 documents • Last updated 2 days ago</p>
+                  <p className="text-gray-500 text-sm">3 documents • Last updated 2 days ago</p>
                 </CardFooter>
               </Card>
               
-              <Card className="bg-dark border-gray-800 hover:border-primary transition-colors">
+              <Card className="bg-white border-gray-200 hover:border-primary transition-colors">
                 <CardHeader>
-                  <CardTitle className="text-white">Mathematics</CardTitle>
-                  <CardDescription>Calculus and linear algebra</CardDescription>
+                  <CardTitle className="text-gray-800">Mathematics</CardTitle>
+                  <CardDescription className="text-gray-600">Calculus and linear algebra</CardDescription>
                 </CardHeader>
                 <CardFooter>
-                  <p className="text-gray-400 text-sm">5 documents • Last updated 1 week ago</p>
+                  <p className="text-gray-500 text-sm">5 documents • Last updated 1 week ago</p>
                 </CardFooter>
               </Card>
               
-              <Card className="flex items-center justify-center bg-dark border-gray-800 border-dashed h-[168px] hover:border-primary transition-colors">
+              <Card className="flex items-center justify-center bg-white border-gray-200 border-dashed h-[168px] hover:border-primary transition-colors">
                 <Button variant="ghost" className="text-primary flex flex-col items-center">
                   <Plus className="h-10 w-10 mb-2" />
                   <span>Add Space</span>
