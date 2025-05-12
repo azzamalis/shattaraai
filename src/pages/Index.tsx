@@ -1,7 +1,6 @@
 
 import React from 'react';
-import Navbar from '@/components/Navbar';
-import { HeroSection } from '@/components/HeroSection';
+import { HeroSection } from '@/components/hero/HeroSection';
 import Features from '@/components/Features';
 import UseCases from '@/components/UseCases';
 import Testimonials from '@/components/Testimonials';
