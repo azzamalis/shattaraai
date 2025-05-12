@@ -1,4 +1,6 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -91,8 +93,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
-    font-family: 'Inter', sans-serif;
+    @apply bg-background text-foreground font-jakarta;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   }
 
   h1 {
@@ -119,6 +121,23 @@
   :focus-visible {
     @apply outline-none ring-2 ring-primary transition-shadow duration-200;
   }
+  
+  /* Custom scrollbar for dark theme */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-700 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-600;
+  }
 }
 
 @layer components {
@@ -132,6 +151,19 @@
 
   .nav-link:hover::after {
     @apply w-full;
+  }
+  
+  /* Glow effects for interactive elements */
+  .glow-effect {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+  
+  .glow-effect::after {
+    @apply content-[''] absolute inset-0 bg-primary opacity-0 blur-xl transition-opacity duration-300;
+  }
+  
+  .glow-effect:hover::after {
+    @apply opacity-20;
   }
 }
 

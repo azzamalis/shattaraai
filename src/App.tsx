@@ -16,6 +16,8 @@ import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import PasswordReset from "./pages/PasswordReset";
 import Onboarding from "./pages/Onboarding";
+import DashboardPage from "./pages/DashboardPage";
+import SpacePage from "./pages/SpacePage";
 import React from "react";
 
 // Create a new QueryClient instance inside the component
@@ -40,6 +42,11 @@ const App = () => {
             <Route path="/signin" element={<SignIn />} />
             <Route path="/password-reset" element={<PasswordReset />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            
+            {/* New dashboard routes */}
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/spaces/:id" element={<SpacePage />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

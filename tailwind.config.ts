@@ -21,6 +21,7 @@ export default {
 		extend: {
 			fontFamily: {
 				'inter': ['Inter', 'sans-serif'],
+				'jakarta': ['Plus Jakarta Sans', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -116,6 +117,16 @@ export default {
 				'float-up': {
 					'0%': { transform: 'translateY(0px)' },
 					'100%': { transform: 'translateY(-4px)' }
+				},
+				'pulse-glow': {
+					'0%, 100%': { 
+						opacity: '0.6',
+						transform: 'scale(1)'
+					},
+					'50%': { 
+						opacity: '1',
+						transform: 'scale(1.05)'
+					}
 				}
 			},
 			animation: {
@@ -125,7 +136,8 @@ export default {
 				'slide-in': 'slide-in 0.3s ease-out',
 				'slide-out': 'slide-out 0.3s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
-				'float-up': 'float-up 0.3s ease-out'
+				'float-up': 'float-up 0.3s ease-out',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite'
 			},
 			transitionProperty: {
 				'height': 'height',
