@@ -29,22 +29,30 @@ function StackedCircularFooter() {
           </nav>
           
           <div className="mb-8 flex space-x-4">
-            <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
-              <Facebook className="h-4 w-4" />
-              <span className="sr-only">Facebook</span>
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
-              <Twitter className="h-4 w-4" />
-              <span className="sr-only">Twitter</span>
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
-              <Instagram className="h-4 w-4" />
-              <span className="sr-only">Instagram</span>
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
-              <Linkedin className="h-4 w-4" />
-              <span className="sr-only">LinkedIn</span>
-            </Button>
+            <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
+                <Facebook className="h-4 w-4" />
+                <span className="sr-only">Facebook</span>
+              </Button>
+            </a>
+            <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
+                <Twitter className="h-4 w-4" />
+                <span className="sr-only">Twitter</span>
+              </Button>
+            </a>
+            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
+                <Instagram className="h-4 w-4" />
+                <span className="sr-only">Instagram</span>
+              </Button>
+            </a>
+            <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
+                <Linkedin className="h-4 w-4" />
+                <span className="sr-only">LinkedIn</span>
+              </Button>
+            </a>
           </div>
           
           <div className="mb-8 w-full max-w-md">
