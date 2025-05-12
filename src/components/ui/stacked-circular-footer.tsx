@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Logo from '@/components/Logo';
+import { Link } from 'react-router-dom';
 
 function StackedCircularFooter() {
   const currentYear = new Date().getFullYear();
@@ -19,12 +20,12 @@ function StackedCircularFooter() {
           </div>
           
           <nav className="mb-8 flex flex-wrap justify-center gap-6">
-            <a href="#team" className="text-gray-400 hover:text-primary transition-colors">The Team</a>
-            <a href="#teachers" className="text-gray-400 hover:text-primary transition-colors">For Teachers</a>
-            <a href="#privacy" className="text-gray-400 hover:text-primary transition-colors">Privacy</a>
-            <a href="#terms" className="text-gray-400 hover:text-primary transition-colors">Terms</a>
-            <a href="#careers" className="text-gray-400 hover:text-primary transition-colors">Careers</a>
-            <a href="#contact" className="text-gray-400 hover:text-primary transition-colors">Contact Us</a>
+            <Link to="/team" className="text-gray-400 hover:text-primary transition-colors">The Team</Link>
+            <Link to="/teachers" className="text-gray-400 hover:text-primary transition-colors">For Teachers</Link>
+            <Link to="/privacy" className="text-gray-400 hover:text-primary transition-colors">Privacy</Link>
+            <Link to="/terms" className="text-gray-400 hover:text-primary transition-colors">Terms</Link>
+            <Link to="/careers" className="text-gray-400 hover:text-primary transition-colors">Careers</Link>
+            <Link to="/contact" className="text-gray-400 hover:text-primary transition-colors">Contact Us</Link>
           </nav>
           
           <div className="mb-8 flex space-x-4">

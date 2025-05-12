@@ -6,9 +6,9 @@ import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
 
 const menuItems = [
-  { name: 'The Team', href: '#team' },
-  { name: 'For Teachers', href: '#teachers' },
-  { name: 'Contact Us', href: '#contact' },
+  { name: 'The Team', href: '/team' },
+  { name: 'For Teachers', href: '/teachers' },
+  { name: 'Contact Us', href: '/contact' },
 ];
 
 const HeroHeader = () => {
@@ -44,11 +44,11 @@ const HeroHeader = () => {
               <ul className="flex gap-8 text-sm">
                 {menuItems.map((item, index) => (
                   <li key={index}>
-                    <a
-                      href={item.href}
+                    <Link
+                      to={item.href}
                       className="nav-link text-white/80 hover:text-primary">
                       <span>{item.name}</span>
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
