@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 const menuItems = [
   { name: 'The Team', href: '#team' },
   { name: 'For Teachers', href: '#teachers' },
-  { name: 'The Newsletter', href: '#newsletter' },
+  { name: 'Contact Us', href: '#contact' },
 ];
 
 const HeroHeader = () => {
