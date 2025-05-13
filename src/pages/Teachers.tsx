@@ -1,8 +1,11 @@
+
 import React from 'react';
 import { HeroSection } from '@/components/hero/HeroSection';
 import Footer from '@/components/Footer';
 import { ArrowRight, BookOpen, Layers, BarChart3, Zap, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ZcalModal from '@/components/ZcalModal';
+
 const Teachers = () => {
   return <div className="min-h-screen bg-dark text-white">
       <HeroSection />
@@ -77,15 +80,20 @@ const Teachers = () => {
             </p>
           </div>
           
-          {/* CTA */}
+          {/* CTA with ZcalModal */}
           <div className="bg-primary/10 p-8 rounded-xl border border-primary/30">
             <h3 className="text-xl font-semibold mb-4">Ready to Transform Your Classroom?</h3>
             <p className="text-gray-400 mb-6">
               Join thousands of educators who are already using Shattara to revolutionize their teaching.
             </p>
-            <Button className="w-full bg-primary hover:bg-primary/90">
-              Request School Demo <ArrowRight className="ml-2 size-4" />
-            </Button>
+            <ZcalModal 
+              bookingUrl="https://cal.com/yourbookinglink/school-demo" 
+              title="Schedule a School Demo"
+            >
+              <Button className="w-full bg-primary hover:bg-primary/90">
+                Request School Demo <ArrowRight className="ml-2 size-4" />
+              </Button>
+            </ZcalModal>
           </div>
         </div>
         
