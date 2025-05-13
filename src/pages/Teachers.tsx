@@ -87,8 +87,11 @@ const Teachers = () => {
               Join thousands of educators who are already using Shattara to revolutionize their teaching.
             </p>
             <ZcalModal 
-              bookingUrl="https://cal.com/yourbookinglink/school-demo" 
+              bookingUrl="https://zcal.co/i/4vqAOC__?embed=1&embedType=iframe" 
               title="Schedule a School Demo"
+              embedHeight={966}
+              embedWidth={1096}
+              modalName="teacher_demo"
             >
               <Button className="w-full bg-primary hover:bg-primary/90">
                 Request School Demo <ArrowRight className="ml-2 size-4" />
@@ -122,3 +125,4 @@ const Teachers = () => {
     </div>;
 };
 export default Teachers;
+
