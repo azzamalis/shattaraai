@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { supabaseClient } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AnalyticsEvent {
   event_type: string;
@@ -12,11 +12,11 @@ export const useModalAnalytics = () => {
   const trackEvent = useCallback(async (eventData: AnalyticsEvent) => {
     try {
       // Get current authenticated user (if any)
-      const { data: { session } } = await supabaseClient.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
       
       // Track the event in the usage_events table
-      await supabaseClient
+      await supabase
         .from('usage_events')
         .insert({
           user_id: userId || null,
