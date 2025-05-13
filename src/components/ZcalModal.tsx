@@ -14,16 +14,20 @@ import { useToast } from '@/hooks/use-toast';
 
 interface ZcalModalProps {
   children: React.ReactNode;
-  bookingUrl: string;
+  bookingUrl?: string;
   title?: string;
   modalName?: string;
+  embedHeight?: number;
+  embedWidth?: number;
 }
 
 const ZcalModal = ({ 
   children, 
-  bookingUrl, 
+  bookingUrl = "https://zcal.co/i/4vqAOC__?embed=1&embedType=iframe", 
   title = "Schedule a Demo",
-  modalName = "school_demo" 
+  modalName = "school_demo",
+  embedHeight = 870,
+  embedWidth = 1096
 }: ZcalModalProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -52,7 +56,7 @@ const ZcalModal = ({
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       // Only accept messages from the Zcal domain
-      if (event.origin.includes('cal.com')) {
+      if (event.origin.includes('zcal.co')) {
         try {
           const data = event.data;
           if (data.type === 'booking_completed') {
@@ -90,14 +94,14 @@ const ZcalModal = ({
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] md:max-w-[700px] bg-[#111] text-white">
+      <DialogContent className="sm:max-w-[600px] md:max-w-[700px] lg:max-w-[1100px] bg-[#111] text-white">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-white">{title}</DialogTitle>
         </DialogHeader>
         
-        <div className="relative min-h-[500px] w-full mt-4">
+        <div className="relative w-full mt-4 flex justify-center">
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#111]">
+            <div className="absolute inset-0 flex items-center justify-center bg-[#111] z-10">
               <Loader2 className="h-8 w-8 animate-spin text-[#2323FF]" />
             </div>
           )}
@@ -119,8 +123,11 @@ const ZcalModal = ({
           ) : (
             <iframe
               src={bookingUrl}
-              frameBorder="0"
-              className="w-full h-[600px] bg-white rounded-md"
+              loading="lazy"
+              style={{ border: 'none', minWidth: '320px', minHeight: '544px', height: embedHeight, width: embedWidth }}
+              id="zcal-invite"
+              className="w-full bg-white rounded-md"
+              scrolling="no"
               onLoad={handleIframeLoad}
               onError={handleIframeError}
               title="Schedule a Demo"

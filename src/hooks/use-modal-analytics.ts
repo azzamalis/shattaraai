@@ -20,12 +20,13 @@ export const useModalAnalytics = () => {
         .from('usage_events')
         .insert({
           user_id: userId || null,
-          event_type: eventData.event_type,
-          event_data: eventData.event_data || {},
-          source: 'web',
-          ip_address: null, // This should be handled server-side for accuracy
-          user_agent: navigator.userAgent,
-          created_at: new Date().toISOString()
+          type: eventData.event_type,
+          // Store additional data as metadata if needed
+          // We're not using the exact fields from the interface since they don't match the DB schema
+          session_id: eventData.event_data?.session_id || null,
+          input_tokens: eventData.event_data?.input_tokens || null,
+          output_tokens: eventData.event_data?.output_tokens || null,
+          total_tokens: eventData.event_data?.total_tokens || null
         });
       
       console.log('Event tracked:', eventData.event_type);
