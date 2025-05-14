@@ -1,11 +1,26 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Box } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { PasteContentModal } from '@/components/dashboard/PasteContentModal';
+import { toast } from "sonner";
+
 export function Dashboard() {
+  const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
+
+  const handlePasteSubmit = (data: { url?: string; text?: string }) => {
+    // Handle the submitted data here
+    if (data.url) {
+      toast.success("URL content added successfully");
+    } else if (data.text) {
+      toast.success("Text content added successfully");
+    }
+  };
+
   return <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-6 bg-[#222222]">
         <div className="max-w-6xl mx-auto">
@@ -44,7 +59,10 @@ export function Dashboard() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center cursor-pointer">
+                  <Card 
+                    className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center cursor-pointer"
+                    onClick={() => setIsPasteModalOpen(true)}
+                  >
                     <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
                       <FileText className="h-8 w-8 text-white" />
                     </div>
@@ -118,5 +136,12 @@ export function Dashboard() {
           </div>
         </div>
       </main>
+
+      {/* Paste Content Modal */}
+      <PasteContentModal 
+        isOpen={isPasteModalOpen}
+        onClose={() => setIsPasteModalOpen(false)}
+        onSubmit={handlePasteSubmit}
+      />
     </div>;
 }
