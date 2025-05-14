@@ -61,7 +61,7 @@ export function DashboardDrawer({
               <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
                 <Link to="/spaces/1">
                   <Box size={18} className="mr-2" />
-                  <span>Azzam's Space</span>
+                  <span>Azzam's Room</span>
                 </Link>
               </Button>
               <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
