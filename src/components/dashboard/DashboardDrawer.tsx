@@ -56,7 +56,7 @@ export function DashboardDrawer({
           
           {/* Spaces Section */}
           <div className="px-4 py-2">
-            <h3 className="text-white/70 text-xs font-medium mb-2 px-2">Spaces</h3>
+            <h3 className="text-white/70 text-xs font-medium mb-2 px-2">Rooms</h3>
             <div className="space-y-1">
               <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
                 <Link to="/spaces/1">
