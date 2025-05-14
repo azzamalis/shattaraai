@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '@/components/Button';
@@ -5,6 +6,7 @@ import { AnimatedGroup } from '@/components/ui/animated-group';
 import HeroActionLink from './HeroActionLink';
 import { Code, Atom, Zap } from 'lucide-react';
 import EducationAnimation from './EducationAnimation';
+import { scrollToElement } from '@/lib/scrollUtils';
 
 const transitionVariants = {
   item: {
@@ -27,6 +29,11 @@ const transitionVariants = {
 };
 
 const HeroContent = () => {
+  const handleFeatureClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    scrollToElement('features');
+  };
+
   return (
     <section>
       <div className="relative pt-24 md:pt-36">
@@ -72,7 +79,7 @@ const HeroContent = () => {
         <div className="mx-auto max-w-7xl px-6 relative z-10">
           <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
             <AnimatedGroup variants={transitionVariants}>
-              <HeroActionLink to="#features" text="AI-Powered Learning Platform" />
+              <HeroActionLink to="/signup" text="AI-Powered Learning Platform" />
   
               <h1
                 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] bg-gradient-to-br from-white to-white/50 bg-clip-text text-transparent">
@@ -109,16 +116,15 @@ const HeroContent = () => {
                   </Button>
                 </Link>
               </div>
-              <Link to="/#features">
-                <Button
-                  key={2}
-                  variant="outline"
-                  size="lg"
-                  className="h-11 rounded-xl px-5 border-white/20 text-white hover:border-primary hover:bg-primary/20">
-                  <Atom className="size-4 mr-1" />
-                  <span className="text-nowrap">See features</span>
-                </Button>
-              </Link>
+              <Button
+                key={2}
+                variant="outline"
+                size="lg"
+                className="h-11 rounded-xl px-5 border-white/20 text-white hover:border-primary hover:bg-primary/20"
+                onClick={handleFeatureClick}>
+                <Atom className="size-4 mr-1" />
+                <span className="text-nowrap">See features</span>
+              </Button>
             </AnimatedGroup>
           </div>
         </div>

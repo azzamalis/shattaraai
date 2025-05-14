@@ -1,7 +1,7 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface HeroActionLinkProps {
   to: string;
@@ -9,9 +9,27 @@ interface HeroActionLinkProps {
 }
 
 const HeroActionLink: React.FC<HeroActionLinkProps> = ({ to, text }) => {
+  const [authPath, setAuthPath] = useState<string>(to);
+  
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        // User is already logged in, direct to dashboard
+        setAuthPath('/dashboard');
+      } else {
+        // User is not logged in, keep original path (signup)
+        setAuthPath(to);
+      }
+    };
+    
+    checkAuth();
+  }, [to]);
+
   return (
     <Link
-      to={to}
+      to={authPath}
       className="hover:bg-background/5 group mx-auto flex w-fit items-center gap-4 rounded-full border border-primary/20 p-1 pl-4 shadow-md shadow-primary/5 transition-all duration-300 bg-dark/30 backdrop-blur-sm">
       <span className="text-sm text-gray-300">{text}</span>
       <span className="block h-4 w-0.5 border-l bg-primary/50"></span>
