@@ -111,7 +111,7 @@ export function Dashboard() {
               <Card className="flex items-center justify-center border-white/20 border-dashed bg-transparent p-4 hover:border-primary transition-colors cursor-pointer h-[60px]">
                 <div className="flex items-center text-white">
                   <Plus className="h-5 w-5 mr-2" />
-                  <span className="text-white text-lg font-medium">Add Space</span>
+                  <span className="text-white text-lg font-medium">Add a Room</span>
                 </div>
               </Card>
             </div>
