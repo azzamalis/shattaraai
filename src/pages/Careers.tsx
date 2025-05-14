@@ -40,6 +40,11 @@ const Careers = () => {
     }
   ];
 
+  // Function to handle redirecting to the Tally form
+  const handleApplyRedirect = () => {
+    window.open('https://tally.so/r/w4q5AA', '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-dark text-white">
       <HeroSection />
@@ -138,7 +143,10 @@ const Careers = () => {
                   <h3 className="text-xl font-semibold mb-1">{job.title}</h3>
                   <p className="text-gray-400">{job.department} · {job.location} · {job.type}</p>
                 </div>
-                <Button className="self-start md:self-center">
+                <Button 
+                  className="self-start md:self-center"
+                  onClick={handleApplyRedirect}
+                >
                   Apply Now <ArrowRight className="ml-2 size-4" />
                 </Button>
               </div>
@@ -153,7 +161,11 @@ const Careers = () => {
             We're always looking for talented individuals. Send us your resume, and we'll 
             keep you in mind for future opportunities.
           </p>
-          <Button size="lg" className="bg-primary hover:bg-primary/90">
+          <Button 
+            size="lg" 
+            className="bg-primary hover:bg-primary/90"
+            onClick={handleApplyRedirect}
+          >
             Send General Application
           </Button>
         </div>
