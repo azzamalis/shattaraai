@@ -89,7 +89,7 @@ export function Dashboard() {
 
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">My Spaces</h2>
+              <h2 className="text-xl font-bold text-white">My Rooms</h2>
               
             </div>
             
