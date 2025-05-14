@@ -104,7 +104,7 @@ export function Dashboard() {
               <Card className="bg-transparent border-white/20 hover:border-primary transition-colors p-4">
                 <div className="flex items-center">
                   <Box className="h-5 w-5 text-white mr-3" />
-                  <CardTitle className="text-white text-xl">Untitled Space</CardTitle>
+                  <CardTitle className="text-white text-xl">Untitled Room</CardTitle>
                 </div>
               </Card>
               
