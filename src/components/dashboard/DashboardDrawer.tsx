@@ -73,7 +73,7 @@ export function DashboardDrawer({
               <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white border border-dashed border-white/20 rounded-md mt-2" asChild>
                 <Link to="/spaces/new">
                   <Plus size={18} className="mr-2" />
-                  <span>Add Space</span>
+                  <span>Add a Room</span>
                 </Link>
               </Button>
             </div>
