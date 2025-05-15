@@ -171,9 +171,7 @@ export function DashboardDrawer({
                   </Button>
                 </div>
                 
-                <div className="px-3 py-2 border-t border-white/10">
-                  <p className="text-xs text-gray-400">azzamsahlil5@gmail.com</p>
-                </div>
+                
               </PopoverContent>
             </Popover>
           </div>
