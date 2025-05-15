@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,8 @@ import {
   Moon,
   LogOut,
   ChevronUp,
-  ChevronsLeft
+  ChevronsLeft,
+  Send
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
@@ -26,6 +26,7 @@ import {
   PopoverTrigger 
 } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
+import { FeedbackModal } from './FeedbackModal';
 
 interface DashboardDrawerProps {
   open: boolean;
@@ -37,6 +38,7 @@ export function DashboardDrawer({
   onOpenChange
 }: DashboardDrawerProps) {
   const [darkMode, setDarkMode] = useState(true);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -110,11 +112,13 @@ export function DashboardDrawer({
           <div className="px-4 py-2">
             <h3 className="text-white/70 text-xs font-medium mb-2 px-2">Help & Tools</h3>
             <div className="space-y-1">
-              <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
-                <Link to="/feedback">
-                  <MessageCircle size={18} className="mr-2" />
-                  <span>Feedback</span>
-                </Link>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-white hover:bg-primary/10 hover:text-white"
+                onClick={() => setFeedbackModalOpen(true)}
+              >
+                <MessageCircle size={18} className="mr-2" />
+                <span>Feedback</span>
               </Button>
               <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
                 <Link to="/help">
