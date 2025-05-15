@@ -73,7 +73,7 @@ export function PasteContentModal({
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-3">
-            <Button variant="outline" className="border-white/10 text-grey-300 hover:bg-white/5" onClick={onClose}>
+            <Button variant="outline" className="border-white/10 text-white hover:bg-white/5" onClick={onClose}>
               Cancel
             </Button>
             <Button onClick={handleSubmit} disabled={isSubmitting || !url && !text} className="bg-primary hover:bg-primary/90 text-black font-medium">
