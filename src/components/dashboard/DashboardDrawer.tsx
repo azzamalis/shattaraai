@@ -3,36 +3,15 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
-import { 
-  Plus, 
-  History, 
-  Clock, 
-  Box, 
-  MessageCircle, 
-  Book, 
-  Chrome, 
-  Settings,
-  Tag,
-  Moon,
-  LogOut,
-  ChevronUp,
-  ChevronsLeft,
-  Send
-} from 'lucide-react';
+import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft, Send } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
 import { FeedbackModal } from './FeedbackModal';
-
 interface DashboardDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
 export function DashboardDrawer({
   open,
   onOpenChange
@@ -45,9 +24,7 @@ export function DashboardDrawer({
     console.log("Feedback button clicked");
     setFeedbackModalOpen(true);
   };
-
-  return (
-    <>
+  return <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="left" className="w-[300px] bg-[#222222] border-r border-white/20 p-0" closeButton={false}>
           {/* Header */}
@@ -119,11 +96,7 @@ export function DashboardDrawer({
             <div className="px-4 py-2">
               <h3 className="text-white/70 text-xs font-medium mb-2 px-2">Help & Tools</h3>
               <div className="space-y-1">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-white hover:bg-primary/10 hover:text-white"
-                  onClick={handleFeedbackClick}
-                >
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" onClick={handleFeedbackClick}>
                   <MessageCircle size={18} className="mr-2" />
                   <span>Feedback</span>
                 </Button>
@@ -160,16 +133,11 @@ export function DashboardDrawer({
                   <ChevronUp size={16} className="text-gray-400" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent 
-                className="w-[250px] bg-[#1A1A1A] border border-white/10 text-white p-0 mb-1 z-50"
-                align="end"
-                side="top"
-                sideOffset={5}
-              >
+              <PopoverContent className="w-[250px] bg-[#1A1A1A] border border-white/10 text-white p-0 mb-1 z-50" align="end" side="top" sideOffset={5}>
                 <div className="p-3 border-b border-white/10">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10 bg-[#ea384c]">
-                      <AvatarFallback>A</AvatarFallback>
+                      <AvatarFallback className="text-black">A</AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="font-medium">Azzam Sahlil</p>
@@ -195,11 +163,7 @@ export function DashboardDrawer({
                       <Moon size={16} className="mr-3 text-gray-300" />
                       <span>Dark mode</span>
                     </div>
-                    <Switch 
-                      checked={darkMode} 
-                      onCheckedChange={setDarkMode} 
-                      className="data-[state=checked]:bg-primary"
-                    />
+                    <Switch checked={darkMode} onCheckedChange={setDarkMode} className="data-[state=checked]:bg-primary" />
                   </div>
                   <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
                     <LogOut size={16} className="mr-3 text-gray-300" />
@@ -217,10 +181,6 @@ export function DashboardDrawer({
       </Sheet>
 
       {/* Render the FeedbackModal outside the Sheet component */}
-      <FeedbackModal 
-        open={feedbackModalOpen} 
-        onOpenChange={setFeedbackModalOpen} 
-      />
-    </>
-  );
+      <FeedbackModal open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
+    </>;
 }
