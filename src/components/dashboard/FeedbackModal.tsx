@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, Image, X } from 'lucide-react';
@@ -40,6 +40,11 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
       <DialogContent 
         className="w-[450px] bg-[#1A1A1A] border border-white/10 p-5 rounded-xl shadow-lg"
       >
+        <DialogTitle className="sr-only">Send Feedback</DialogTitle>
+        <DialogDescription className="sr-only">
+          Use this form to share your thoughts and feedback with us
+        </DialogDescription>
+        
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-medium text-white">Send Feedback</h2>
