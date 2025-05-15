@@ -1,17 +1,44 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
-import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, User, ChevronsLeft } from 'lucide-react';
+import { 
+  Plus, 
+  History, 
+  Clock, 
+  Box, 
+  MessageCircle, 
+  Book, 
+  Chrome, 
+  User, 
+  ChevronsLeft,
+  Settings,
+  Tag,
+  Moon,
+  LogOut,
+  ChevronUp
+} from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from '@/components/ui/popover';
+import { Switch } from '@/components/ui/switch';
+
 interface DashboardDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
 export function DashboardDrawer({
   open,
   onOpenChange
 }: DashboardDrawerProps) {
+  const [darkMode, setDarkMode] = useState(true);
+
   return <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-[300px] bg-[#222222] border-r border-white/20 p-0" closeButton={false}>
         {/* Header */}
@@ -105,17 +132,75 @@ export function DashboardDrawer({
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Footer with Profile Button and Dropdown */}
         <div className="border-t border-white/20 p-4 mt-auto bg-[#222222]">
-          <div className="flex items-center gap-3 text-white">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">
-              <User size={16} />
-            </div>
-            <div className="overflow-hidden">
-              <p className="truncate text-sm font-medium text-white">Free Plan</p>
-              <p className="truncate text-xs text-gray-400">user@shattara.ai</p>
-            </div>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="flex items-center justify-between w-full text-white hover:bg-white/10 p-2 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8 bg-[#ea384c]">
+                    <AvatarFallback>A</AvatarFallback>
+                  </Avatar>
+                  <div className="overflow-hidden text-left">
+                    <p className="truncate text-sm font-medium text-white">Azzam Sahlil</p>
+                    <p className="truncate text-xs text-gray-400">Free Plan</p>
+                  </div>
+                </div>
+                <ChevronUp size={16} className="text-gray-400" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent 
+              className="w-[250px] bg-[#1A1A1A] border border-white/10 text-white p-0 mb-1"
+              align="end"
+              side="top"
+              sideOffset={5}
+            >
+              <div className="p-3 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10 bg-[#ea384c]">
+                    <AvatarFallback>A</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">Azzam Sahlil</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="py-1">
+                <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Settings size={16} className="mr-3 text-gray-300" />
+                  <span>Settings</span>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Tag size={16} className="mr-3 text-gray-300" />
+                  <span>Pricing</span>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <History size={16} className="mr-3 text-gray-300" />
+                  <span>History</span>
+                </Button>
+                <div className="flex items-center justify-between px-3 py-2 hover:bg-white/10">
+                  <div className="flex items-center">
+                    <Moon size={16} className="mr-3 text-gray-300" />
+                    <span>Dark mode</span>
+                  </div>
+                  <Switch 
+                    checked={darkMode} 
+                    onCheckedChange={setDarkMode} 
+                    className="data-[state=checked]:bg-primary"
+                  />
+                </div>
+                <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <LogOut size={16} className="mr-3 text-gray-300" />
+                  <span>Log out</span>
+                </Button>
+              </div>
+              
+              <div className="px-3 py-2 border-t border-white/10">
+                <p className="text-xs text-gray-400">azzamsahlil5@gmail.com</p>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </SheetContent>
     </Sheet>;
