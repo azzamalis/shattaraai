@@ -166,7 +166,7 @@ export function DashboardDrawer({
                     <Switch checked={darkMode} onCheckedChange={setDarkMode} className="data-[state=checked]:bg-primary" />
                   </div>
                   <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
-                    <LogOut size={16} className="mr-3 text-red" />
+                    <LogOut size={16} className="mr-3 text-gray-300" />
                     <span>Log out</span>
                   </Button>
                 </div>
