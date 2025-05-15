@@ -39,7 +39,6 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
         className="w-[450px] bg-[#1A1A1A] border border-white/10 p-5 rounded-xl shadow-lg"
-        overlayClassName="bg-black/80"
       >
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
