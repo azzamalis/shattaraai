@@ -98,7 +98,7 @@ export function Dashboard() {
           {/* AI Assistant Input with Send icon */}
           <div className="mb-8">
             <div className="relative">
-              <Input placeholder="Ask the AI assistant about any topic..." className="bg-transparent border-white/20 focus:border-primary text-white pl-6 pr-12 py-6 text-base" />
+              <Input placeholder="Ask Shattara AI about any topic instead..." className="bg-transparent border-white/20 focus:border-primary text-white pl-6 pr-12 py-6 text-base" />
               <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary-light text-white h-9 w-9 p-0 flex items-center justify-center rounded-full">
                 <Send className="h-4 w-4" />
               </Button>
