@@ -104,7 +104,7 @@ export function DashboardHeader({
                         <span className="text-xs text-zinc-400">Billed annually</span>
                       </div>
                     </div>
-                    <div className="text-lg font-bold">$10<span className="text-sm font-normal text-zinc-400">/mo</span></div>
+                    <div className="text-lg font-bold">$12<span className="text-sm font-normal text-zinc-400">/mo</span></div>
                   </div>
                   
                   {/* Monthly plan */}
@@ -118,7 +118,7 @@ export function DashboardHeader({
                         <div className="text-xs text-zinc-400">Billed monthly</div>
                       </div>
                     </div>
-                    <div className="text-lg font-bold">$12<span className="text-sm font-normal text-zinc-400">/mo</span></div>
+                    <div className="text-lg font-bold">$20<span className="text-sm font-normal text-zinc-400">/mo</span></div>
                   </div>
                 </div>
                 
