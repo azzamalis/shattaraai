@@ -12,13 +12,12 @@ import {
   MessageCircle, 
   Book, 
   Chrome, 
-  User, 
-  ChevronsLeft,
   Settings,
   Tag,
   Moon,
   LogOut,
-  ChevronUp
+  ChevronUp,
+  ChevronsLeft
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
@@ -39,7 +38,8 @@ export function DashboardDrawer({
 }: DashboardDrawerProps) {
   const [darkMode, setDarkMode] = useState(true);
 
-  return <Sheet open={open} onOpenChange={onOpenChange}>
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-[300px] bg-[#222222] border-r border-white/20 p-0" closeButton={false}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/20">
@@ -53,7 +53,7 @@ export function DashboardDrawer({
         </div>
 
         {/* Content */}
-        <div className="flex flex-col h-full overflow-auto">
+        <div className="flex flex-col h-[calc(100%-130px)] overflow-auto">
           {/* Add Content Button */}
           <div className="px-4 pt-4 pb-2">
             <Button className="w-full justify-start gap-2 bg-primary hover:bg-primary-light text-white">
@@ -133,7 +133,7 @@ export function DashboardDrawer({
         </div>
 
         {/* Footer with Profile Button and Dropdown */}
-        <div className="border-t border-white/20 p-4 mt-auto bg-[#222222]">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-white/20 p-4 bg-[#222222]">
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" className="flex items-center justify-between w-full text-white hover:bg-white/10 p-2 rounded-lg">
@@ -150,7 +150,7 @@ export function DashboardDrawer({
               </Button>
             </PopoverTrigger>
             <PopoverContent 
-              className="w-[250px] bg-[#1A1A1A] border border-white/10 text-white p-0 mb-1"
+              className="w-[250px] bg-[#1A1A1A] border border-white/10 text-white p-0 mb-1 z-50"
               align="end"
               side="top"
               sideOffset={5}
@@ -203,5 +203,6 @@ export function DashboardDrawer({
           </Popover>
         </div>
       </SheetContent>
-    </Sheet>;
+    </Sheet>
+  );
 }
