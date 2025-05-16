@@ -79,6 +79,7 @@ export const AIChatInput = ({
           <form onSubmit={handleSubmit} className="flex items-center h-full">
             <div 
               className={`flex items-center gap-2 p-3 rounded-full bg-transparent border-2 border-white/20 hover:border-primary/50 transition-colors max-w-full w-full ${isActive ? 'shadow-[0_0_0_2px_rgba(35,35,255,0.2)]' : ''}`}
+              style={{ borderWidth: '2px', borderStyle: 'solid' }}
             >
               <PlaceholderText 
                 inputValue={inputValue}
