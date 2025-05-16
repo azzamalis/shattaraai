@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
-import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft } from 'lucide-react';
+import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, LogOut, ChevronUp, ChevronsLeft } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
@@ -188,26 +187,23 @@ export function DashboardDrawer({
                 </div>
                 
                 <div className="py-1">
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:text-white">
                     <Settings size={16} className="mr-3 text-gray-300" />
                     <span>Settings</span>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:text-white">
                     <Tag size={16} className="mr-3 text-gray-300" />
                     <span>Pricing</span>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:text-white">
                     <History size={16} className="mr-3 text-gray-300" />
                     <span>History</span>
                   </Button>
-                  <div className="flex items-center justify-between px-3 py-2 hover:bg-white/10">
-                    <div className="flex items-center">
-                      <Moon size={16} className="mr-3 text-gray-300" />
-                      <span>Dark mode</span>
-                    </div>
-                    <Switch checked={darkMode} onCheckedChange={setDarkMode} className="data-[state=checked]:bg-primary" />
+                  <div className="flex items-center px-3 py-2 hover:bg-white/10 cursor-pointer text-white">
+                    <Switch checked={darkMode} onCheckedChange={setDarkMode} className="data-[state=checked]:bg-primary mr-3" />
+                    <span className="text-sm">Dark mode</span>
                   </div>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:text-white">
                     <LogOut size={16} className="mr-3 text-gray-300" />
                     <span>Log out</span>
                   </Button>
