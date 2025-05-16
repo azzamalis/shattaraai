@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { PasteContentModal } from '@/components/dashboard/PasteContentModal';
 import { AIChatInput } from '@/components/ui/ai-chat-input';
 import { toast } from "sonner";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 export function Dashboard() {
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
@@ -32,13 +36,39 @@ export function Dashboard() {
     <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-[#222222]">
         <div className="max-w-6xl mx-auto">
-          {/* Practice with exams section - responsive padding */}
+          {/* Practice with exams section - with popover matching profile style */}
           <div className="mb-4 sm:mb-6 md:mb-8 flex justify-center">
-            <Button className="bg-transparent hover:bg-primary/10 text-white px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full border border-white/20 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
-              <Badge className="bg-green-500 text-white mr-1 px-1.5 sm:px-2 py-0.5 text-xs font-bold rounded-full">NEW</Badge>
-              Practice with exams
-              <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button className="bg-transparent hover:bg-primary/10 text-white px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full border border-white/20 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
+                  <Badge className="bg-green-500 text-white mr-1 px-1.5 sm:px-2 py-0.5 text-xs font-bold rounded-full">NEW</Badge>
+                  Practice with exams
+                  <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent 
+                className="w-[250px] bg-[#1A1A1A] border border-white/10 text-white p-0 z-50" 
+                align="center" 
+                sideOffset={5}
+              >
+                <div className="p-3 border-b border-white/10">
+                  <div className="flex items-center">
+                    <p className="font-medium">Select Room</p>
+                  </div>
+                </div>
+                
+                <div className="py-1">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white">
+                    <Box size={16} className="mr-3 text-gray-300" />
+                    <span>Azzam's Room</span>
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white">
+                    <Box size={16} className="mr-3 text-gray-300" />
+                    <span>Untitled Room</span>
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
           
           {/* Centered main heading with responsive font size */}
