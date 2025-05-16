@@ -67,7 +67,7 @@ const ExpandedControls = ({
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          setAiThinkingActive((a) => !a);
+          setAiThinkingActive(!aiThinkingActive);
         }}
       >
         <Atom
@@ -88,7 +88,7 @@ const ExpandedControls = ({
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          setDeepSearchActive((a) => !a);
+          setDeepSearchActive(!deepSearchActive);
         }}
         initial={false}
         animate={{
