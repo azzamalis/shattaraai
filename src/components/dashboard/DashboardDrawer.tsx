@@ -4,7 +4,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
-import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, LogOut, ChevronUp, ChevronsLeft } from 'lucide-react';
+import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
@@ -36,18 +36,6 @@ export function DashboardDrawer({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Add an effect to handle theme changes when darkMode state changes
-  useEffect(() => {
-    // Apply the theme class to the document element
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    } else {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
   // Update the hasSeenTutorial state when the tutorial modal is closed
   useEffect(() => {
     if (!tutorialModalOpen) {
@@ -68,11 +56,6 @@ export function DashboardDrawer({
     // After opening the tutorial, we can consider it as "seen" for the notification dot
     setHasSeenTutorial(true);
     localStorage.setItem('hasSeenTutorial', 'true');
-  };
-
-  // Handler for theme toggle
-  const handleThemeToggle = (checked: boolean) => {
-    setDarkMode(checked);
   };
 
   // Determine drawer width based on screen size
@@ -205,29 +188,26 @@ export function DashboardDrawer({
                 </div>
                 
                 <div className="py-1">
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:text-white">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
                     <Settings size={16} className="mr-3 text-gray-300" />
                     <span>Settings</span>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:text-white">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
                     <Tag size={16} className="mr-3 text-gray-300" />
                     <span>Pricing</span>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:text-white">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
                     <History size={16} className="mr-3 text-gray-300" />
                     <span>History</span>
                   </Button>
-                  <div className="flex items-center justify-between px-3 py-2 hover:bg-white/10 cursor-pointer">
+                  <div className="flex items-center justify-between px-3 py-2 hover:bg-white/10">
                     <div className="flex items-center">
-                      <Switch 
-                        checked={darkMode} 
-                        onCheckedChange={handleThemeToggle} 
-                        className="data-[state=checked]:bg-primary mr-3" 
-                      />
-                      <span className="text-sm">Dark mode</span>
+                      <Moon size={16} className="mr-3 text-gray-300" />
+                      <span>Dark mode</span>
                     </div>
+                    <Switch checked={darkMode} onCheckedChange={setDarkMode} className="data-[state=checked]:bg-primary" />
                   </div>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:text-white">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
                     <LogOut size={16} className="mr-3 text-gray-300" />
                     <span>Log out</span>
                   </Button>

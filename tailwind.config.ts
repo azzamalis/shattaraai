@@ -30,8 +30,8 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))',
+					DEFAULT: '#2323FF',
+					foreground: '#FFFFFF',
 					light: '#4949ff',
 				},
 				dark: {
@@ -39,7 +39,7 @@ export default {
 					deeper: '#000000',
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
+					DEFAULT: '#F4F6F8',
 					foreground: 'hsl(var(--accent-foreground))'
 				},
 				secondary: {
@@ -145,10 +145,5 @@ export default {
 			}
 		}
 	},
-	plugins: [
-		require("tailwindcss-animate"),
-		function({ addVariant }) {
-			addVariant('light', '.light &');
-		}
-	],
+	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
