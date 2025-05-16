@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Box } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { PasteContentModal } from '@/components/dashboard/PasteContentModal';
-import { AIChatInput } from '@/components/ui/ai-chat';
+import { AIChatInput } from '@/components/ui/ai-chat-input';
 import { toast } from "sonner";
 
 export function Dashboard() {
@@ -104,7 +104,7 @@ export function Dashboard() {
             </TooltipProvider>
           </div>
           
-          {/* AI Assistant Input with enhanced focus states */}
+          {/* AI Assistant Input with enhanced animation */}
           <div className="mb-6 sm:mb-8">
             <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
           </div>
