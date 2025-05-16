@@ -4,7 +4,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
-import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft, Send } from 'lucide-react';
+import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
@@ -35,6 +35,13 @@ export function DashboardDrawer({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Update the hasSeenTutorial state when the tutorial modal is closed
+  useEffect(() => {
+    if (!tutorialModalOpen) {
+      setHasSeenTutorial(localStorage.getItem('hasSeenTutorial') === 'true');
+    }
+  }, [tutorialModalOpen]);
 
   // Let's add a console log to verify the feedback button click is working
   const handleFeedbackClick = () => {

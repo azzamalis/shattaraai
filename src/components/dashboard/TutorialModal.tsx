@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -12,6 +12,13 @@ interface TutorialModalProps {
 export function TutorialModal({ open, onOpenChange }: TutorialModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = 5;
+
+  // Mark tutorial as seen when it's opened
+  useEffect(() => {
+    if (open) {
+      localStorage.setItem('hasSeenTutorial', 'true');
+    }
+  }, [open]);
 
   const tutorialSteps = [
     {
