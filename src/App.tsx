@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,7 +16,7 @@ import SignIn from "./pages/SignIn";
 import PasswordReset from "./pages/PasswordReset";
 import Onboarding from "./pages/Onboarding";
 import DashboardPage from "./pages/DashboardPage";
-import SpacePage from "./pages/SpacePage";
+import RoomPage from "./pages/RoomPage";
 import React from "react";
 
 // Create a new QueryClient instance inside the component
@@ -43,9 +42,9 @@ const App = () => {
             <Route path="/password-reset" element={<PasswordReset />} />
             <Route path="/onboarding" element={<Onboarding />} />
             
-            {/* New dashboard routes */}
+            {/* Dashboard routes */}
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/spaces/:id" element={<SpacePage />} />
+            <Route path="/rooms/:id" element={<RoomPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

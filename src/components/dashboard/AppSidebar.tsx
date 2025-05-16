@@ -83,30 +83,30 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-white/70">Spaces</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white/70">Rooms</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Azzam's Space" className="text-white hover:bg-primary/10 hover:text-white">
-                  <Link to="/spaces/1">
+                <SidebarMenuButton asChild tooltip="Azzam's Room" className="text-white hover:bg-primary/10 hover:text-white">
+                  <Link to="/rooms/1">
                     <Box size={18} />
-                    <span>Azzam's Space</span>
+                    <span>Azzam's Room</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Untitled Space" className="text-white hover:bg-primary/10 hover:text-white">
-                  <Link to="/spaces/2">
+                <SidebarMenuButton asChild tooltip="Untitled Room" className="text-white hover:bg-primary/10 hover:text-white">
+                  <Link to="/rooms/2">
                     <Box size={18} />
-                    <span>Untitled Space</span>
+                    <span>Untitled Room</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Add Space" className="text-white hover:bg-primary/10 hover:text-white border border-dashed border-white/20 rounded-md mt-2">
-                  <Link to="/spaces/new">
+                <SidebarMenuButton asChild tooltip="Add Room" className="text-white hover:bg-primary/10 hover:text-white border border-dashed border-white/20 rounded-md mt-2">
+                  <Link to="/rooms/new">
                     <Plus size={18} />
-                    <span>Add Space</span>
+                    <span>Add Room</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -133,24 +133,24 @@ export function DashboardDrawer({
               </div>
             </div>
             
-            {/* Spaces Section */}
+            {/* Rooms Section */}
             <div className="px-4 py-2">
               <h3 className="text-white/70 text-xs font-medium mb-2 px-2">Rooms</h3>
               <div className="space-y-1">
                 <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
-                  <Link to="/spaces/1">
+                  <Link to="/rooms/1">
                     <Box size={18} className="mr-2" />
                     <span>Azzam's Room</span>
                   </Link>
                 </Button>
                 <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
-                  <Link to="/spaces/2">
+                  <Link to="/rooms/2">
                     <Box size={18} className="mr-2" />
                     <span>Untitled Room</span>
                   </Link>
                 </Button>
                 <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white border border-dashed border-white/20 rounded-md mt-2" asChild>
-                  <Link to="/spaces/new">
+                  <Link to="/rooms/new">
                     <Plus size={18} className="mr-2" />
                     <span>Add a Room</span>
                   </Link>

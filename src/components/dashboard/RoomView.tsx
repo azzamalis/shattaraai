@@ -1,16 +1,15 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { MessageSquare, FileText, Grid, List, Plus } from 'lucide-react';
 
-interface SpaceViewProps {
+interface RoomViewProps {
   title: string;
   description: string;
   isEmpty?: boolean;
 }
 
-export function SpaceView({ title, description, isEmpty = true }: SpaceViewProps) {
+export function RoomView({ title, description, isEmpty = true }: RoomViewProps) {
   return (
     <div className="flex flex-col h-full">
       <header className="flex flex-col border-b border-gray-300 bg-dark-deeper p-6 sticky top-0 z-10">
@@ -22,7 +21,7 @@ export function SpaceView({ title, description, isEmpty = true }: SpaceViewProps
           <div className="flex items-center gap-2">
             <Button variant="outline" className="border-gray-300 bg-white text-gray-800 hover:bg-white hover:text-primary hover:border-primary">
               <MessageSquare className="mr-2 h-4 w-4" />
-              Space Chat
+              Room Chat
             </Button>
             <Button className="bg-primary hover:bg-primary-light text-white">
               <FileText className="mr-2 h-4 w-4" />
@@ -54,7 +53,7 @@ export function SpaceView({ title, description, isEmpty = true }: SpaceViewProps
             </div>
             <h2 className="text-xl font-bold text-white mb-2">No documents yet</h2>
             <p className="text-gray-400 max-w-md mb-6">
-              Start adding documents, links, or create content directly to begin building your learning space.
+              Start adding documents, links, or create content directly to begin building your learning room.
             </p>
             <Button className="bg-primary hover:bg-primary-light text-white">
               <Plus className="mr-2 h-4 w-4" />
@@ -77,4 +76,4 @@ export function SpaceView({ title, description, isEmpty = true }: SpaceViewProps
       </main>
     </div>
   );
-}
+} 
