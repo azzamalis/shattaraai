@@ -62,7 +62,7 @@ export const AIChatInput = ({
     <div className={`w-full mt-8 ${className || ""}`}>
       <motion.div
         ref={wrapperRef}
-        className="w-full"
+        className="w-full relative z-10"
         variants={containerVariants}
         animate={isActive || inputValue ? "expanded" : "collapsed"}
         initial="collapsed"
@@ -70,7 +70,8 @@ export const AIChatInput = ({
           overflow: "hidden", 
           borderRadius: 16, 
           background: "transparent",
-          marginBottom: 8
+          marginBottom: 8,
+          isolation: "isolate"
         }}
         onClick={handleActivate}
       >
@@ -79,7 +80,12 @@ export const AIChatInput = ({
           <form onSubmit={handleSubmit} className="flex items-center h-full">
             <div 
               className={`flex items-center gap-2 p-3 rounded-full bg-transparent border-2 border-white/20 hover:border-primary/50 transition-colors max-w-full w-full ${isActive ? 'shadow-[0_0_0_2px_rgba(35,35,255,0.2)]' : ''}`}
-              style={{ borderWidth: '2px', borderStyle: 'solid' }}
+              style={{ 
+                borderWidth: '2px', 
+                borderStyle: 'solid',
+                position: 'relative',
+                zIndex: 2
+              }}
             >
               <PlaceholderText 
                 inputValue={inputValue}
@@ -111,7 +117,11 @@ export const AIChatInput = ({
             }}
             initial="hidden"
             animate={isActive || inputValue ? "visible" : "hidden"}
-            style={{ marginTop: 8 }}
+            style={{ 
+              marginTop: 8,
+              position: 'relative',
+              zIndex: 1
+            }}
           >
             <InputControls.ExpandedControls 
               aiThinkingActive={aiThinkingActive}
