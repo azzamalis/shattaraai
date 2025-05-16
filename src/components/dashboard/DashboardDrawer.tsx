@@ -102,7 +102,13 @@ export function DashboardDrawer({
           <div className="flex flex-col h-[calc(100%-130px)] overflow-auto">
             {/* Add Content Button */}
             <div className="px-4 pt-4 pb-2">
-              <Button className="w-full justify-start gap-2 bg-primary hover:bg-primary-light text-white">
+              <Button 
+                className="w-full justify-start gap-2 bg-primary hover:bg-primary-light text-white"
+                onClick={() => {
+                  navigate('/dashboard');
+                  onOpenChange(false); // Close the drawer after navigation
+                }}
+              >
                 <Plus size={18} />
                 <span>Add Content</span>
               </Button>

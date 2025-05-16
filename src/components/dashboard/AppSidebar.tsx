@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Sidebar, 
@@ -30,11 +29,12 @@ import {
   User,
   Chrome
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export function AppSidebar() {
   const { state, isMobile } = useSidebar();
   const isExpanded = state === "expanded";
+  const navigate = useNavigate();
 
   return (
     <Sidebar variant="sidebar" collapsible="icon" className="bg-[#222222] border-r border-white/20">
@@ -48,7 +48,10 @@ export function AppSidebar() {
       <SidebarContent className="bg-[#222222]">
         <SidebarGroup>
           <div className="px-2">
-            <Button className="w-full justify-start gap-2 bg-primary hover:bg-primary-light text-white">
+            <Button 
+              className="w-full justify-start gap-2 bg-primary hover:bg-primary-light text-white"
+              onClick={() => navigate('/dashboard')}
+            >
               <Plus size={18} />
               {isExpanded && <span>Add Content</span>}
             </Button>
