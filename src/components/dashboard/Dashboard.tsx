@@ -21,32 +21,34 @@ export function Dashboard() {
     }
   };
 
-  return <div className="flex flex-col h-full">
-      <main className="flex-1 overflow-auto p-6 bg-[#222222]">
+  return (
+    <div className="flex flex-col h-full">
+      <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-[#222222]">
         <div className="max-w-6xl mx-auto">
-          {/* Practice with exams section - moved above the main heading */}
-          <div className="mb-8 flex justify-center">
-            <Button className="bg-transparent hover:bg-primary/10 text-white px-6 py-2 rounded-full border border-white/20 flex items-center gap-2">
-              <Badge className="bg-green-500 text-white mr-1 px-2 py-0.5 text-xs font-bold rounded-full">NEW</Badge>
+          {/* Practice with exams section - responsive padding */}
+          <div className="mb-4 sm:mb-6 md:mb-8 flex justify-center">
+            <Button className="bg-transparent hover:bg-primary/10 text-white px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full border border-white/20 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
+              <Badge className="bg-green-500 text-white mr-1 px-1.5 sm:px-2 py-0.5 text-xs font-bold rounded-full">NEW</Badge>
               Practice with exams
-              <BookOpen className="h-4 w-4 ml-1" />
+              <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
             </Button>
           </div>
           
-          {/* Centered main heading with larger font size */}
-          <h1 className="text-4xl font-bold text-white mb-12 text-center">What do you want to learn today?</h1>
+          {/* Centered main heading with responsive font size */}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 sm:mb-8 md:mb-12 text-center">What do you want to learn today?</h1>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {/* Responsive grid for cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
             {/* Upload Document Card */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center cursor-pointer">
-                    <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
-                      <Upload className="h-8 w-8 text-white" />
+                  <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer">
+                    <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full">
+                      <Upload className="h-6 w-6 md:h-8 md:w-8 text-white" />
                     </div>
-                    <CardTitle className="text-white mb-2">Upload</CardTitle>
-                    <CardDescription className="text-gray-400">File, Audio, Video</CardDescription>
+                    <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Upload</CardTitle>
+                    <CardDescription className="text-gray-400 text-xs md:text-sm">File, Audio, Video</CardDescription>
                   </Card>
                 </TooltipTrigger>
                 <TooltipContent className="bg-[#1A1A1A] text-white border-white/10">
@@ -60,14 +62,14 @@ export function Dashboard() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Card 
-                    className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center cursor-pointer"
+                    className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer"
                     onClick={() => setIsPasteModalOpen(true)}
                   >
-                    <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
-                      <FileText className="h-8 w-8 text-white" />
+                    <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full">
+                      <FileText className="h-6 w-6 md:h-8 md:w-8 text-white" />
                     </div>
-                    <CardTitle className="text-white mb-2">Paste</CardTitle>
-                    <CardDescription className="text-gray-400">YouTube, Website, Text</CardDescription>
+                    <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Paste</CardTitle>
+                    <CardDescription className="text-gray-400 text-xs md:text-sm">YouTube, Website, Text</CardDescription>
                   </Card>
                 </TooltipTrigger>
                 <TooltipContent className="bg-[#1A1A1A] text-white border-white/10">
@@ -80,12 +82,12 @@ export function Dashboard() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-6 text-center cursor-pointer">
-                    <div className="mb-4 bg-transparent border border-white/10 p-3 rounded-full">
-                      <Mic className="h-8 w-8 text-white" />
+                  <Card className="bg-transparent border-white/20 hover:border-primary transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer">
+                    <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full">
+                      <Mic className="h-6 w-6 md:h-8 md:w-8 text-white" />
                     </div>
-                    <CardTitle className="text-white mb-2">Record</CardTitle>
-                    <CardDescription className="text-gray-400">Record Your Lecture</CardDescription>
+                    <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Record</CardTitle>
+                    <CardDescription className="text-gray-400 text-xs md:text-sm">Record Your Lecture</CardDescription>
                   </Card>
                 </TooltipTrigger>
                 <TooltipContent className="bg-[#1A1A1A] text-white border-white/10">
@@ -95,41 +97,46 @@ export function Dashboard() {
             </TooltipProvider>
           </div>
           
-          {/* AI Assistant Input with Send icon */}
-          <div className="mb-8">
+          {/* AI Assistant Input with Send icon - responsive padding */}
+          <div className="mb-6 sm:mb-8">
             <div className="relative">
-              <Input placeholder="Ask Shattara AI about any topic instead..." className="bg-transparent border-white/20 focus:border-primary text-white pl-6 pr-12 py-6 text-base" />
-              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary-light text-white h-9 w-9 p-0 flex items-center justify-center rounded-full">
-                <Send className="h-4 w-4" />
+              <Input 
+                placeholder="Ask Shattara AI about any topic instead..." 
+                className="bg-transparent border-white/20 focus:border-primary text-white pl-4 sm:pl-6 pr-10 sm:pr-12 py-5 sm:py-6 text-sm sm:text-base"
+              />
+              <Button 
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary-light text-white h-8 w-8 sm:h-9 sm:w-9 p-0 flex items-center justify-center rounded-full"
+              >
+                <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
 
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">My Rooms</h2>
-              
+          {/* My Rooms section - responsive spacing and grid */}
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-white">My Rooms</h2>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors p-3 sm:p-4">
                 <div className="flex items-center">
-                  <Box className="h-5 w-5 text-white mr-3" />
-                  <CardTitle className="text-white text-xl">Azzam's Room</CardTitle>
+                  <Box className="h-4 w-4 sm:h-5 sm:w-5 text-white mr-2 sm:mr-3" />
+                  <CardTitle className="text-white text-base sm:text-lg md:text-xl">Azzam's Room</CardTitle>
                 </div>
               </Card>
               
-              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors p-4">
+              <Card className="bg-transparent border-white/20 hover:border-primary transition-colors p-3 sm:p-4">
                 <div className="flex items-center">
-                  <Box className="h-5 w-5 text-white mr-3" />
-                  <CardTitle className="text-white text-xl">Untitled Room</CardTitle>
+                  <Box className="h-4 w-4 sm:h-5 sm:w-5 text-white mr-2 sm:mr-3" />
+                  <CardTitle className="text-white text-base sm:text-lg md:text-xl">Untitled Room</CardTitle>
                 </div>
               </Card>
               
-              <Card className="flex items-center justify-center border-white/20 border-dashed bg-transparent p-4 hover:border-primary transition-colors cursor-pointer h-[60px]">
+              <Card className="flex items-center justify-center border-white/20 border-dashed bg-transparent p-3 sm:p-4 hover:border-primary transition-colors cursor-pointer h-[50px] sm:h-[60px]">
                 <div className="flex items-center text-white">
-                  <Plus className="h-5 w-5 mr-2" />
-                  <span className="text-white text-lg font-medium">Add a Room</span>
+                  <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+                  <span className="text-white text-base sm:text-lg font-medium">Add a Room</span>
                 </div>
               </Card>
             </div>
@@ -143,5 +150,6 @@ export function Dashboard() {
         onClose={() => setIsPasteModalOpen(false)}
         onSubmit={handlePasteSubmit}
       />
-    </div>;
+    </div>
+  );
 }

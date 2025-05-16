@@ -11,10 +11,21 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, className }: DashboardLayoutProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  
+  // Handle screen resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Use useEffect to add 'overflow-hidden' to body when drawer is open on mobile
   useEffect(() => {
-    if (isDrawerOpen && window.innerWidth < 768) {
+    if (isDrawerOpen && isMobile) {
       document.body.classList.add('overflow-hidden');
     } else {
       document.body.classList.remove('overflow-hidden');
@@ -24,7 +35,7 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
     return () => {
       document.body.classList.remove('overflow-hidden');
     };
-  }, [isDrawerOpen]);
+  }, [isDrawerOpen, isMobile]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-[#111]">
@@ -36,7 +47,7 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
       <main 
         className={cn(
           "flex-1 transition-all duration-300 ease-in-out", 
-          isDrawerOpen ? "md:ml-[300px]" : "ml-0",
+          isDrawerOpen ? "lg:ml-[300px]" : "ml-0",
           className
         )}
       >

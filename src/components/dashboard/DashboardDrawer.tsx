@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
@@ -18,19 +19,37 @@ export function DashboardDrawer({
 }: DashboardDrawerProps) {
   const [darkMode, setDarkMode] = useState(true);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Let's add a console log to verify the feedback button click is working
   const handleFeedbackClick = () => {
     console.log("Feedback button clicked");
     setFeedbackModalOpen(true);
   };
+
+  // Determine drawer width based on screen size
+  const getDrawerWidth = () => {
+    if (windowWidth < 640) return 'w-[85vw]';
+    if (windowWidth < 768) return 'w-[350px]';
+    return 'w-[300px]';
+  };
+
   return <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className="w-[300px] bg-[#222222] border-r border-white/20 p-0" closeButton={false}>
+        <SheetContent side="left" className={`${getDrawerWidth()} bg-[#222222] border-r border-white/20 p-0`} closeButton={false}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/20">
             <div className="flex items-center gap-2">
-              <Logo className="h-10 w-auto" textColor="text-white" />
+              <Logo className="h-8 md:h-10 w-auto" textColor="text-white" />
             </div>
             <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-white hover:bg-white/10 hover:text-primary">
               <ChevronsLeft size={22} />
@@ -38,7 +57,7 @@ export function DashboardDrawer({
             </Button>
           </div>
 
-          {/* Content */}
+          {/* Content - Make scrollable for small screens */}
           <div className="flex flex-col h-[calc(100%-130px)] overflow-auto">
             {/* Add Content Button */}
             <div className="px-4 pt-4 pb-2">
@@ -170,8 +189,6 @@ export function DashboardDrawer({
                     <span>Log out</span>
                   </Button>
                 </div>
-                
-                
               </PopoverContent>
             </Popover>
           </div>
