@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Box } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { PasteContentModal } from '@/components/dashboard/PasteContentModal';
-import { AIChatInput } from '@/components/ui/ai-chat-input';
+import { AIChatInput } from '@/components/ui/ai-chat';
 import { toast } from "sonner";
 
 export function Dashboard() {
