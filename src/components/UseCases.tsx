@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -25,22 +24,22 @@ const UseCases = () => {
   
   const useCases = [
     {
-      image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644',
+      image: '/images/university_students.png',
       title: 'University Students',
       subtitle: 'Ace your exams with AI-enhanced study tools'
     }, 
     {
-      image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7',
+      image: '/images/high_school_prep.png',
       title: 'High School Prep',
       subtitle: 'Build strong foundations for academic success'
     }, 
     {
-      image: 'https://images.unsplash.com/photo-1546521343-4eb2c01aa44b',
+      image: '/images/language_learning.png',
       title: 'Language Learning',
       subtitle: 'Master vocabulary and grammar effortlessly'
     }, 
     {
-      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2',
+      image: '/images/professional_certifications.png',
       title: 'Professional Certifications',
       subtitle: 'Prepare for industry exams and advance your career'
     }, 
