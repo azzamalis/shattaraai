@@ -85,6 +85,45 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+
+    --primary: 25 100% 50%;  /* Warm orange #FF7A00 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 93%;  /* #ECECEC */
+    --secondary-foreground: 0 0% 0%;
+
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 25 100% 50%;  /* Warm orange */
+
+    --sidebar-background: 0 0% 97%;  /* #F8F8F8 */
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 25 100% 50%;  /* Warm orange */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 93%;  /* #ECECEC */
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 87%;
+    --sidebar-ring: 25 100% 50%;  /* Warm orange */
+  }
 }
 
 @layer base {
@@ -132,11 +171,11 @@
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-700 rounded-full;
+    @apply bg-gray-700 dark:bg-gray-700 light:bg-gray-300 rounded-full;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-600;
+    @apply bg-gray-600 dark:bg-gray-600 light:bg-gray-400;
   }
 }
 
@@ -175,5 +214,14 @@
   
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+  
+  /* Light and dark mode specific utility classes */
+  .light-only {
+    @apply dark:hidden;
+  }
+  
+  .dark-only {
+    @apply light:hidden;
   }
 }
