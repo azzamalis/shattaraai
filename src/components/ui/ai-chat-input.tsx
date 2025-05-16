@@ -1,15 +1,19 @@
+
 "use client";
 
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Atom, Mic, Globe, Paperclip, Send } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+
 const PLACEHOLDERS = ["Ask Shattara AI about any topic...", "How can I prepare for my biology exam?", "Create flashcards about neural networks", "Explain quantum physics in simple terms", "Summarize this research paper", "Prepare a study plan for my finals"];
+
 interface AIChatInputProps {
   onSubmit?: (value: string) => void;
   className?: string;
   initialIsActive?: boolean;
 }
+
 const AIChatInput = ({
   onSubmit,
   className,
@@ -47,12 +51,14 @@ const AIChatInput = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [inputValue]);
+
   const handleActivate = () => {
     setIsActive(true);
     setTimeout(() => {
       inputRef.current?.focus();
     }, 10);
   };
+
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!inputValue.trim()) return;
@@ -61,6 +67,7 @@ const AIChatInput = ({
     }
     setInputValue("");
   };
+
   const containerVariants = {
     collapsed: {
       height: 68,
@@ -83,6 +90,7 @@ const AIChatInput = ({
       }
     }
   };
+
   const placeholderContainerVariants = {
     initial: {},
     animate: {
@@ -97,6 +105,7 @@ const AIChatInput = ({
       }
     }
   };
+
   const letterVariants = {
     initial: {
       opacity: 0,
@@ -140,16 +149,26 @@ const AIChatInput = ({
       }
     }
   };
-  return <div className={`w-full py-4 ${className || ""}`}>
-      <motion.div ref={wrapperRef} className="w-full" variants={containerVariants} animate={isActive || inputValue ? "expanded" : "collapsed"} initial="collapsed" style={{
-      overflow: "hidden",
-      borderRadius: 16,
-      background: "transparent",
-      // Custom border styling to ensure visibility in unfocused state
-      borderStyle: "solid",
-      borderWidth: "1px",
-      borderColor: isActive || inputValue ? "rgba(35, 35, 255, 0.4)" : "rgba(255, 255, 255, 0.1)"
-    }} onClick={handleActivate}>
+
+  return (
+    <div className={`w-full py-4 ${className || ""}`}>
+      <motion.div 
+        ref={wrapperRef} 
+        className="w-full" 
+        variants={containerVariants} 
+        animate={isActive || inputValue ? "expanded" : "collapsed"} 
+        initial="collapsed" 
+        style={{
+          overflow: "hidden",
+          borderRadius: 16,
+          background: "transparent",
+          // Custom border styling to ensure visibility in unfocused state
+          borderStyle: "solid",
+          borderWidth: "1px",
+          borderColor: isActive || inputValue ? "rgba(35, 35, 255, 0.4)" : "rgba(255, 255, 255, 0.1)"
+        }} 
+        onClick={handleActivate}
+      >
         <div className="flex flex-col items-stretch w-full h-full">
           {/* Input Form */}
           <form onSubmit={handleSubmit} className="flex items-center h-full">
@@ -161,10 +180,17 @@ const AIChatInput = ({
   
               {/* Text Input & Placeholder */}
               <div className="relative flex-1">
-                <input ref={inputRef} type="text" value={inputValue} onChange={e => setInputValue(e.target.value)} className="flex-1 border-0 outline-0 rounded-md py-2 text-base bg-transparent w-full font-normal text-white" style={{
-                position: "relative",
-                zIndex: 1
-              }} onFocus={handleActivate} />
+                <input 
+                  ref={inputRef} 
+                  type="text" 
+                  value={inputValue} 
+                  onChange={e => setInputValue(e.target.value)} 
+                  className="flex-1 border-0 outline-none rounded-md py-2 text-base bg-transparent w-full font-normal text-white focus:outline-none focus:ring-0 focus:border-0"
+                  style={{
+                    position: "relative",
+                    zIndex: 1
+                  }} 
+                />
                 <div className="absolute left-0 top-0 w-full h-full pointer-events-none flex items-center px-3 py-2">
                   <AnimatePresence mode="wait">
                     {showPlaceholder && !isActive && !inputValue && <motion.span key={placeholderIndex} className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 select-none pointer-events-none" style={{
@@ -245,6 +271,8 @@ const AIChatInput = ({
           </motion.div>
         </div>
       </motion.div>
-    </div>;
+    </div>
+  );
 };
+
 export { AIChatInput };
