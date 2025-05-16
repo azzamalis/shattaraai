@@ -72,7 +72,7 @@ export const AIChatInput = ({
           background: "transparent",
           marginBottom: 8,
           isolation: "isolate",
-          padding: "4px 0" // Added vertical padding to create space for the border
+          padding: "8px 0", // Increased vertical padding to create more space for the border
         }}
         onClick={handleActivate}
       >
@@ -80,13 +80,15 @@ export const AIChatInput = ({
           {/* Input Form */}
           <form onSubmit={handleSubmit} className="flex items-center h-full">
             <div 
-              className={`flex items-center gap-2 p-3 rounded-full bg-transparent border-2 border-white/20 hover:border-primary/50 transition-colors max-w-full w-full ${isActive ? 'shadow-[0_0_0_2px_rgba(35,35,255,0.2)]' : ''}`}
+              className={`flex items-center gap-2 p-3 rounded-full bg-transparent border-2 hover:border-primary/50 transition-colors max-w-full w-full ${isActive ? 'shadow-[0_0_0_2px_rgba(35,35,255,0.2)]' : ''}`}
               style={{ 
                 borderWidth: '2px', 
                 borderStyle: 'solid',
+                borderColor: isActive ? 'rgba(35,35,255,0.5)' : 'rgba(255,255,255,0.2)', 
                 position: 'relative',
                 zIndex: 2,
-                margin: "2px 0" // Added vertical margin to the input container
+                margin: "4px 0", // Increased vertical margin to the input container
+                boxShadow: isActive ? '0 0 0 2px rgba(35,35,255,0.2)' : 'none',
               }}
             >
               <PlaceholderText 
