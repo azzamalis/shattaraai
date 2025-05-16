@@ -9,6 +9,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
 import { FeedbackModal } from './FeedbackModal';
+import { TutorialModal } from './TutorialModal';
+
 interface DashboardDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -19,7 +21,11 @@ export function DashboardDrawer({
 }: DashboardDrawerProps) {
   const [darkMode, setDarkMode] = useState(true);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [hasSeenTutorial, setHasSeenTutorial] = useState(() => {
+    return localStorage.getItem('hasSeenTutorial') === 'true';
+  });
 
   useEffect(() => {
     const handleResize = () => {
@@ -34,6 +40,15 @@ export function DashboardDrawer({
   const handleFeedbackClick = () => {
     console.log("Feedback button clicked");
     setFeedbackModalOpen(true);
+  };
+
+  const handleTutorialClick = () => {
+    console.log("Tutorial button clicked");
+    setTutorialModalOpen(true);
+    
+    // After opening the tutorial, we can consider it as "seen" for the notification dot
+    setHasSeenTutorial(true);
+    localStorage.setItem('hasSeenTutorial', 'true');
   };
 
   // Determine drawer width based on screen size
@@ -119,11 +134,12 @@ export function DashboardDrawer({
                   <MessageCircle size={18} className="mr-2" />
                   <span>Feedback</span>
                 </Button>
-                <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
-                  <Link to="/help">
-                    <Book size={18} className="mr-2" />
-                    <span>Quick Guide</span>
-                  </Link>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white relative" onClick={handleTutorialClick}>
+                  <Book size={18} className="mr-2" />
+                  <span>Quick Guide</span>
+                  {!hasSeenTutorial && (
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-green-500"></span>
+                  )}
                 </Button>
                 <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
                   <Link to="/extension">
@@ -197,5 +213,8 @@ export function DashboardDrawer({
 
       {/* Render the FeedbackModal outside the Sheet component */}
       <FeedbackModal open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
+      
+      {/* Render the TutorialModal outside the Sheet component */}
+      <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
     </>;
 }
