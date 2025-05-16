@@ -71,7 +71,8 @@ export const AIChatInput = ({
           borderRadius: 16, 
           background: "transparent",
           marginBottom: 8,
-          isolation: "isolate"
+          isolation: "isolate",
+          padding: "4px 0" // Added vertical padding to create space for the border
         }}
         onClick={handleActivate}
       >
@@ -84,7 +85,8 @@ export const AIChatInput = ({
                 borderWidth: '2px', 
                 borderStyle: 'solid',
                 position: 'relative',
-                zIndex: 2
+                zIndex: 2,
+                margin: "2px 0" // Added vertical margin to the input container
               }}
             >
               <PlaceholderText 
