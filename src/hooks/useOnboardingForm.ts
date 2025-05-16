@@ -48,7 +48,7 @@ export const useOnboardingForm = () => {
       
       // Navigate to home page or dashboard after onboarding
       setTimeout(() => {
-        navigate('/');
+        navigate('/dashboard');
       }, 1500);
     } else {
       toast.error("Please complete all fields", {

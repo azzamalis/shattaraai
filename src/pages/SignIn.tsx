@@ -54,8 +54,8 @@ const SignIn = () => {
         description: "Welcome back to Shattara AI!"
       });
 
-      // Navigate to home page or dashboard
-      navigate('/');
+      // Navigate to dashboard instead of home
+      navigate('/dashboard');
     }, 1500);
   };
   return <div className="flex min-h-screen bg-dark">

@@ -1,15 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
 import { FeedbackModal } from './FeedbackModal';
 import { TutorialModal } from './TutorialModal';
+import { toast } from 'sonner';
 
 interface DashboardDrawerProps {
   open: boolean;
@@ -19,6 +19,7 @@ export function DashboardDrawer({
   open,
   onOpenChange
 }: DashboardDrawerProps) {
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(true);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
@@ -56,6 +57,24 @@ export function DashboardDrawer({
     // After opening the tutorial, we can consider it as "seen" for the notification dot
     setHasSeenTutorial(true);
     localStorage.setItem('hasSeenTutorial', 'true');
+  };
+
+  // Add logout handler
+  const handleLogout = () => {
+    // Clear any stored auth data
+    localStorage.removeItem('hasSeenTutorial');
+    // Add any other auth-related cleanup here
+    
+    // Close the drawer
+    onOpenChange(false);
+    
+    // Show success message
+    toast.success("Logged out successfully", {
+      description: "You have been logged out of your account."
+    });
+    
+    // Navigate to home page
+    navigate('/');
   };
 
   // Determine drawer width based on screen size
@@ -207,7 +226,11 @@ export function DashboardDrawer({
                     </div>
                     <Switch checked={darkMode} onCheckedChange={setDarkMode} className="data-[state=checked]:bg-primary" />
                   </div>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start px-3 py-2 text-white hover:bg-white/10"
+                    onClick={handleLogout}
+                  >
                     <LogOut size={16} className="mr-3 text-gray-300" />
                     <span>Log out</span>
                   </Button>
