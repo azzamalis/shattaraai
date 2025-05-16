@@ -207,20 +207,20 @@ export function DashboardDrawer({
                 </div>
                 
                 <div className="py-1">
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white">
                     <Settings size={16} className="mr-3 text-gray-300" />
                     <span>Settings</span>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white">
                     <Tag size={16} className="mr-3 text-gray-300" />
                     <span>Pricing</span>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10">
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white">
                     <History size={16} className="mr-3 text-gray-300" />
                     <span>History</span>
                   </Button>
                   <div className="flex items-center justify-between px-3 py-2 hover:bg-white/10">
-                    <div className="flex items-center">
+                    <div className="flex items-center text-white">
                       <Moon size={16} className="mr-3 text-gray-300" />
                       <span>Dark mode</span>
                     </div>
@@ -228,7 +228,7 @@ export function DashboardDrawer({
                   </div>
                   <Button 
                     variant="ghost" 
-                    className="w-full justify-start px-3 py-2 text-white hover:bg-white/10"
+                    className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white"
                     onClick={handleLogout}
                   >
                     <LogOut size={16} className="mr-3 text-gray-300" />
