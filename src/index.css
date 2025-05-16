@@ -171,11 +171,19 @@
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-700 dark:bg-gray-700 light:bg-gray-300 rounded-full;
+    @apply bg-gray-700 dark:bg-gray-700 rounded-full;
+  }
+  
+  .light ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-600 dark:bg-gray-600 light:bg-gray-400;
+    @apply bg-gray-600 dark:bg-gray-600;
+  }
+  
+  .light ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
   }
 }
 
