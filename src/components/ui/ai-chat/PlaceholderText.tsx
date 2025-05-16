@@ -44,7 +44,7 @@ export const PlaceholderText = ({
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
-        className="flex-1 border-0 outline-0 rounded-md py-2 text-base bg-transparent w-full font-normal text-white"
+        className="flex-1 border-0 outline-none rounded-md py-2 text-base bg-transparent w-full font-normal text-white focus:outline-none focus:ring-0"
         style={{ position: "relative", zIndex: 1 }}
         onFocus={handleActivate}
       />

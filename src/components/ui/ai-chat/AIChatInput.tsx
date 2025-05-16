@@ -59,7 +59,7 @@ export const AIChatInput = ({
   };
  
   return (
-    <div className={`w-full mt-4 ${className || ""}`}>
+    <div className={`w-full mt-8 ${className || ""}`}>
       <motion.div
         ref={wrapperRef}
         className="w-full"
@@ -78,7 +78,7 @@ export const AIChatInput = ({
           {/* Input Form */}
           <form onSubmit={handleSubmit} className="flex items-center h-full">
             <div 
-              className={`flex items-center gap-2 p-3 rounded-full bg-transparent border border-white/20 hover:border-primary/50 focus-within:border-primary/70 transition-colors max-w-full w-full ${isActive ? 'shadow-[0_0_0_2px_rgba(35,35,255,0.2)]' : ''}`}
+              className={`flex items-center gap-2 p-3 rounded-full bg-transparent border border-white/20 hover:border-primary/50 transition-colors max-w-full w-full ${isActive ? 'shadow-[0_0_0_2px_rgba(35,35,255,0.2)]' : ''}`}
             >
               <PlaceholderText 
                 inputValue={inputValue}
