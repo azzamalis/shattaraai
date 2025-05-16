@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, FileText, Plus, Search, Upload, Send, Mic, Box } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { PasteContentModal } from '@/components/dashboard/PasteContentModal';
+import { AIChatInput } from '@/components/ui/ai-chat-input';
 import { toast } from "sonner";
 
 export function Dashboard() {
@@ -19,6 +20,12 @@ export function Dashboard() {
     } else if (data.text) {
       toast.success("Text content added successfully");
     }
+  };
+
+  const handleAISubmit = (value: string) => {
+    toast.success("Your question was submitted");
+    console.log("AI query:", value);
+    // Here you would typically send the query to your AI backend
   };
 
   return (
@@ -97,19 +104,9 @@ export function Dashboard() {
             </TooltipProvider>
           </div>
           
-          {/* AI Assistant Input with Send icon - responsive padding */}
+          {/* AI Assistant Input with enhanced animation */}
           <div className="mb-6 sm:mb-8">
-            <div className="relative">
-              <Input 
-                placeholder="Ask Shattara AI about any topic instead..." 
-                className="bg-transparent border-white/20 focus:border-primary text-white pl-4 sm:pl-6 pr-10 sm:pr-12 py-5 sm:py-6 text-sm sm:text-base"
-              />
-              <Button 
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary-light text-white h-8 w-8 sm:h-9 sm:w-9 p-0 flex items-center justify-center rounded-full"
-              >
-                <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </Button>
-            </div>
+            <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
           </div>
 
           {/* My Rooms section - responsive spacing and grid */}
