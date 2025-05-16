@@ -104,7 +104,7 @@ export function Dashboard() {
             </TooltipProvider>
           </div>
           
-          {/* AI Assistant Input with enhanced animation */}
+          {/* AI Assistant Input with enhanced focus states */}
           <div className="mb-6 sm:mb-8">
             <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
           </div>

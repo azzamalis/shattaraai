@@ -82,12 +82,10 @@ const AIChatInput = ({ onSubmit, className, initialIsActive = false }: AIChatInp
   const containerVariants = {
     collapsed: {
       height: 64,
-      boxShadow: "0 2px 8px 0 rgba(0,0,0,0.08)",
       transition: { type: "spring", stiffness: 120, damping: 18 },
     },
     expanded: {
       height: 110,
-      boxShadow: "0 8px 32px 0 rgba(0,0,0,0.16)",
       transition: { type: "spring", stiffness: 120, damping: 18 },
     },
   };
@@ -127,21 +125,28 @@ const AIChatInput = ({ onSubmit, className, initialIsActive = false }: AIChatInp
   };
  
   return (
-    <div className={`w-full ${className || ""}`}>
+    <div className={`w-full mt-4 ${className || ""}`}>
       <motion.div
         ref={wrapperRef}
         className="w-full"
         variants={containerVariants}
         animate={isActive || inputValue ? "expanded" : "collapsed"}
         initial="collapsed"
-        style={{ overflow: "hidden", borderRadius: 16, background: "transparent" }}
+        style={{ 
+          overflow: "hidden", 
+          borderRadius: 16, 
+          background: "transparent",
+          marginBottom: 8
+        }}
         onClick={handleActivate}
       >
         <div className="flex flex-col items-stretch w-full h-full">
           {/* Input Form */}
           <form onSubmit={handleSubmit} className="flex items-center h-full">
             {/* Input Row */}
-            <div className="flex items-center gap-2 p-3 rounded-full bg-transparent border border-white/20 hover:border-primary/50 transition-colors max-w-full w-full">
+            <div 
+              className={`flex items-center gap-2 p-3 rounded-full bg-transparent border border-white/20 hover:border-primary/50 focus-within:border-primary/70 transition-colors max-w-full w-full ${isActive ? 'shadow-[0_0_0_2px_rgba(35,35,255,0.2)]' : ''}`}
+            >
               <button
                 className="p-2 rounded-full hover:bg-white/5 transition"
                 title="Attach file"
