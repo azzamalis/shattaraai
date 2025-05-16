@@ -1,3 +1,4 @@
+// Test commit - UseCases component for educational platform
 import React, { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
