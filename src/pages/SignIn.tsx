@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,9 +20,13 @@ export default function SignIn() {
   // Get the page the user was trying to visit before being redirected to sign in
   const from = location.state?.from?.pathname || '/dashboard';
   
+  // Add console logs to debug the authentication and redirection states
+  console.log("SignIn Page - Auth State:", { user, from });
+  
   // If already authenticated, redirect to dashboard
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
+      console.log("User is authenticated, redirecting to:", from);
       navigate(from, { replace: true });
     }
   }, [user, navigate, from]);

@@ -7,6 +7,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
 
+  // Add console logs to debug the authentication state
+  console.log("Protected Route - Auth State:", { user, isLoading, path: location.pathname });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#111]">

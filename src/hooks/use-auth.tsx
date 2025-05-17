@@ -25,9 +25,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("AuthProvider initialized - Setting up auth state listener");
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.email);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
@@ -44,6 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log("Got existing session:", currentSession?.user?.email);
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       
@@ -55,11 +59,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
     
     return () => {
+      console.log("Unsubscribing from auth state changes");
       subscription.unsubscribe();
     };
   }, []);
   
   const fetchProfile = async (userId: string) => {
+    console.log("Fetching profile for user:", userId);
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -67,11 +73,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .single();
       
     if (!error && data) {
+      console.log("Profile fetched:", data);
       setProfile(data);
+    } else if (error) {
+      console.error("Error fetching profile:", error);
     }
   };
   
   const signIn = async (email: string, password: string) => {
+    console.log("Signing in user:", email);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error };
   };
