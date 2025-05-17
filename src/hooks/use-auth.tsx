@@ -1,5 +1,5 @@
 
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   // Create a ref to track if we've already fetched the profile to avoid duplicates
-  const profileFetchedRef = React.useRef<Record<string, boolean>>({});
+  const profileFetchedRef = useRef<Record<string, boolean>>({});
 
   useEffect(() => {
     console.log("AuthProvider initialized - Setting up auth state listener");
