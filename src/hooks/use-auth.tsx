@@ -26,16 +26,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Create a ref to track if we've already fetched the profile to avoid duplicates
   const profileFetchedRef = useRef<Record<string, boolean>>({});
+  // Create a ref to track auth subscription to prevent memory leaks
+  const authSubscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
 
   useEffect(() => {
     console.log("AuthProvider initialized - Setting up auth state listener");
-    let isSubscribed = true;
+    let isActive = true;
     
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
         console.log("Auth state changed:", event, currentSession?.user?.email);
-        if (!isSubscribed) return;
+        if (!isActive) return;
         
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
@@ -47,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           
           // Use setTimeout to prevent potential deadlock
           setTimeout(() => {
-            if (isSubscribed) {
+            if (isActive) {
               fetchProfile(currentSession.user.id);
             }
           }, 0);
@@ -57,77 +59,121 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
     
+    // Save subscription reference for cleanup
+    authSubscriptionRef.current = subscription;
+    
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      if (!isSubscribed) return;
-      
-      console.log("Got existing session:", currentSession?.user?.email);
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      
-      if (currentSession?.user && !profileFetchedRef.current[currentSession.user.id]) {
-        profileFetchedRef.current[currentSession.user.id] = true;
-        fetchProfile(currentSession.user.id);
+    const checkSession = async () => {
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        
+        if (!isActive) return;
+        
+        console.log("Got existing session:", currentSession?.user?.email);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (currentSession?.user && !profileFetchedRef.current[currentSession.user.id]) {
+          profileFetchedRef.current[currentSession.user.id] = true;
+          fetchProfile(currentSession.user.id);
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
       }
-      
-      setIsLoading(false);
-    });
+    };
+    
+    checkSession();
     
     return () => {
-      console.log("Unsubscribing from auth state changes");
-      isSubscribed = false;
-      subscription.unsubscribe();
+      console.log("Cleaning up auth state listener");
+      isActive = false;
+      if (authSubscriptionRef.current) {
+        authSubscriptionRef.current.unsubscribe();
+        authSubscriptionRef.current = null;
+      }
     };
   }, []);
   
   const fetchProfile = async (userId: string) => {
     console.log("Fetching profile for user:", userId);
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+        
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return;
+      }
       
-    if (!error && data) {
-      console.log("Profile fetched:", data);
-      setProfile(data);
-    } else if (error) {
-      console.error("Error fetching profile:", error);
+      if (data) {
+        console.log("Profile fetched:", data);
+        setProfile(data);
+      } else {
+        console.log("No profile found, might be a new user");
+      }
+    } catch (error) {
+      console.error("Exception fetching profile:", error);
     }
   };
   
   const signIn = async (email: string, password: string) => {
     console.log("Signing in user:", email);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error };
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error };
+    } catch (e) {
+      console.error("Exception during sign in:", e);
+      return { error: e };
+    }
   };
   
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
-    const { error } = await supabase.auth.signUp({ 
-      email, 
-      password,
-      options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName
+    try {
+      const { error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName
+          }
         }
-      }
-    });
-    return { error };
+      });
+      return { error };
+    } catch (e) {
+      console.error("Exception during sign up:", e);
+      return { error: e };
+    }
   };
   
   const signOut = async () => {
-    await supabase.auth.signOut();
     // Clear our tracking ref on signout
     profileFetchedRef.current = {};
-    navigate('/signin');
+    try {
+      await supabase.auth.signOut();
+      navigate('/signin');
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
   
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/password-reset`,
-    });
-    return { error };
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/password-reset`,
+      });
+      return { error };
+    } catch (e) {
+      console.error("Exception during password reset:", e);
+      return { error: e };
+    }
   };
   
   return (

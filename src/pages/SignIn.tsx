@@ -13,6 +13,7 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,20 +22,22 @@ export default function SignIn() {
   const from = location.state?.from?.pathname || '/dashboard';
   
   // Add console logs to debug the authentication and redirection states
-  console.log("SignIn Page - Auth State:", { user, from });
+  console.log("SignIn Page - Auth State:", { user, from, redirecting });
   
-  // If already authenticated, redirect to dashboard
+  // If already authenticated, redirect to dashboard with a slight delay
   useEffect(() => {
-    if (user) {
+    if (user && !redirecting) {
       console.log("User is authenticated, redirecting to:", from);
+      setRedirecting(true);
+      
       // Add a slight delay to prevent potential race conditions
       const redirectTimer = setTimeout(() => {
         navigate(from, { replace: true });
-      }, 50);
+      }, 200);
       
       return () => clearTimeout(redirectTimer);
     }
-  }, [user, navigate, from]);
+  }, [user, navigate, from, redirecting]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,15 +49,21 @@ export default function SignIn() {
     
     setLoading(true);
     
-    const { error } = await signIn(email, password);
-    
-    if (error) {
-      console.error('Error signing in:', error);
-      toast.error(error.message || 'Failed to sign in');
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        console.error('Error signing in:', error);
+        toast.error(error.message || 'Failed to sign in');
+        setLoading(false);
+      } else {
+        toast.success('Signed in successfully');
+        // Navigation happens automatically via Auth state change
+      }
+    } catch (error) {
+      console.error('Exception during sign in:', error);
+      toast.error('An unexpected error occurred');
       setLoading(false);
-    } else {
-      toast.success('Signed in successfully');
-      // Navigate happens automatically via Auth state change
     }
   };
 
@@ -107,12 +116,17 @@ export default function SignIn() {
             <Button 
               type="submit" 
               className="w-full bg-primary hover:bg-primary-light" 
-              disabled={loading}
+              disabled={loading || redirecting}
             >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Signing in...
+                </>
+              ) : redirecting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Redirecting...
                 </>
               ) : (
                 'Sign in'
