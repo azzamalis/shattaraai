@@ -5,19 +5,26 @@ import { Search, Menu } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { CommandModal } from './CommandModal';
 import { UpgradeModal } from './UpgradeModal';
+
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
 }
-export function DashboardHeader({
-  onOpenDrawer
-}: DashboardHeaderProps) {
+
+export function DashboardHeader({ onOpenDrawer }: DashboardHeaderProps) {
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  return <header className="flex items-center bg-[#222222] p-4 sticky top-0 z-10">
+
+  return (
+    <header className="flex items-center bg-[#222222] p-4 sticky top-0 z-10">
       <div className="grid grid-cols-3 w-full items-center">
         {/* Left section */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onOpenDrawer} className="text-white hover:bg-white/10 hover:text-primary">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onOpenDrawer} 
+            className="text-white hover:bg-white/10 hover:text-primary"
+          >
             <Menu size={22} />
             <span className="sr-only">Toggle menu</span>
           </Button>
@@ -32,7 +39,10 @@ export function DashboardHeader({
           {/* Upgrade button */}
           <Dialog open={upgradeOpen} onOpenChange={setUpgradeOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-transparent border-2 border-primary hover:bg-primary/5 transition-all rounded-full px-8 py-5 h-9 shadow-[0_2px_8px_rgba(var(--primary),0.25)] hover:shadow-[0_2px_12px_rgba(var(--primary),0.35)] text-primary-foreground">
+              <Button 
+                variant="outline" 
+                className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-full px-8 py-5 h-9 shadow-[0_2px_8px_rgba(var(--primary),0.25)] hover:shadow-[0_2px_12px_rgba(var(--primary),0.35)]"
+              >
                 Upgrade
               </Button>
             </DialogTrigger>
@@ -42,7 +52,10 @@ export function DashboardHeader({
           {/* Command button */}
           <Dialog open={commandOpen} onOpenChange={setCommandOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-[#1A1A1A] border-none hover:bg-[#252525] rounded-full px-6 py-5 h-9 flex items-center justify-center gap-1.5 min-w-[120px] text-gray-200">
+              <Button
+                variant="outline"
+                className="bg-[#1A1A1A] border-none text-gray-400 hover:text-white hover:bg-[#252525] rounded-full px-6 py-5 h-9 flex items-center justify-center gap-1.5 min-w-[120px]"
+              >
                 <Search className="h-4 w-4" />
                 <span className="text-sm font-medium mx-0.5">⌘</span>
                 <span className="text-sm font-medium">K</span>
@@ -52,5 +65,6 @@ export function DashboardHeader({
           </Dialog>
         </div>
       </div>
-    </header>;
+    </header>
+  );
 }
