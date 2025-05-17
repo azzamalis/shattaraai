@@ -34,9 +34,16 @@ export function useLearningSpaces() {
     }) => {
       setIsCreating(true);
       
+      // Get the current user
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) {
+        throw new Error('User not authenticated');
+      }
+      
       const { data, error } = await supabase
         .from('learning_spaces')
         .insert({
+          user_id: session.user.id,
           title,
           description,
           is_public: isPublic
