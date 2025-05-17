@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Logo from '@/components/Logo';
@@ -23,8 +22,16 @@ const Onboarding = () => {
       </div>
       
       <div className="mt-6 text-center">
-        <p className="text-gray-400 text-sm">
-          Already set up? <Link to="/signin" className="text-primary hover:underline">Sign in</Link>
+        <p className="text-slate-400 text-sm">
+          Already set up?{' '}
+          <Link 
+            to="/signin" 
+            className="text-white font-medium relative after:absolute 
+              after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full 
+              after:bg-white after:transition-all after:duration-300"
+          >
+            Sign in
+          </Link>
         </p>
       </div>
     </div>

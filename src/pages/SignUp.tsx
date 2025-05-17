@@ -97,7 +97,7 @@ const SignUp = () => {
           {/* Google Sign-up Button */}
           <Button 
             variant="outline" 
-            className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 text-white"
+            className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 text-white hover:text-white"
             onClick={() => navigate('/onboarding')}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -180,9 +180,23 @@ const SignUp = () => {
                 className="text-sm text-gray-400 leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 I agree to the{' '}
-                <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
+                <Link 
+                  to="/terms" 
+                  className="text-white font-medium relative after:absolute 
+                    after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full 
+                    after:bg-white after:transition-all after:duration-300"
+                >
+                  Terms of Service
+                </Link>
                 {' '}and{' '}
-                <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                <Link 
+                  to="/privacy" 
+                  className="text-white font-medium relative after:absolute 
+                    after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full 
+                    after:bg-white after:transition-all after:duration-300"
+                >
+                  Privacy Policy
+                </Link>
               </label>
             </div>
             
@@ -196,9 +210,14 @@ const SignUp = () => {
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm">
+            <p className="text-slate-400 text-sm">
               Already have an account?{' '}
-              <Link to="/signin" className="text-primary hover:underline">
+              <Link 
+                to="/signin" 
+                className="text-white font-medium relative after:absolute 
+                  after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full 
+                  after:bg-white after:transition-all after:duration-300"
+              >
                 Sign in
               </Link>
             </p>

@@ -1,17 +1,56 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardDrawer } from './DashboardDrawer';
+import { Room, RoomHandlers } from '@/lib/types';
+import { toast } from 'sonner';
 
 interface DashboardLayoutProps {
-  children: React.ReactNode;
+  children: React.ReactElement<RoomHandlers & { rooms: Room[] }>;
   className?: string;
 }
 
 export function DashboardLayout({ children, className }: DashboardLayoutProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  
+  // Room state management
+  const [rooms, setRooms] = useState<Room[]>([
+    { id: "1", name: "Azzam's Room", lastActive: "12:00 PM" },
+    { id: "2", name: "Untitled Room", lastActive: "12:00 PM" },
+    { id: "3", name: "Project 'Neom'", lastActive: "12:00 PM" },
+  ]);
+
+  // Room handlers
+  const handleAddRoom = () => {
+    const newRoom: Room = {
+      id: (rooms.length + 1).toString(),
+      name: "New Room",
+      lastActive: "Just now"
+    };
+    setRooms(prevRooms => [...prevRooms, newRoom]);
+    toast.success("New room created successfully");
+  };
+
+  const handleEditRoom = (roomId: string, newName: string) => {
+    setRooms(prevRooms => 
+      prevRooms.map(room => 
+        room.id === roomId ? { ...room, name: newName } : room
+      )
+    );
+    toast.success("Room name updated successfully");
+  };
+
+  const handleDeleteRoom = (roomId: string) => {
+    setRooms(prevRooms => prevRooms.filter(room => room.id !== roomId));
+    toast.success("Room deleted successfully");
+  };
+
+  const roomHandlers: RoomHandlers = {
+    onAddRoom: handleAddRoom,
+    onEditRoom: handleEditRoom,
+    onDeleteRoom: handleDeleteRoom
+  };
   
   // Handle screen resize
   useEffect(() => {
@@ -37,12 +76,20 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
     };
   }, [isDrawerOpen, isMobile]);
 
+  // Clone children with room props
+  const childWithProps = React.cloneElement(children, {
+    rooms,
+    ...roomHandlers
+  });
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-[#111]">
       <DashboardHeader onOpenDrawer={() => setIsDrawerOpen(true)} />
       <DashboardDrawer 
         open={isDrawerOpen} 
-        onOpenChange={setIsDrawerOpen} 
+        onOpenChange={setIsDrawerOpen}
+        rooms={rooms}
+        {...roomHandlers}
       />
       <main 
         className={cn(
@@ -51,7 +98,7 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
           className
         )}
       >
-        {children}
+        {childWithProps}
       </main>
     </div>
   );

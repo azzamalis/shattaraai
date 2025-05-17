@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -87,9 +86,14 @@ const PasswordReset = () => {
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm">
+            <p className="text-slate-400 text-sm">
               Remember your password?{' '}
-              <Link to="/signin" className="text-primary hover:underline">
+              <Link 
+                to="/signin" 
+                className="text-white font-medium relative after:absolute 
+                  after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full 
+                  after:bg-white after:transition-all after:duration-300"
+              >
                 Back to sign in
               </Link>
             </p>

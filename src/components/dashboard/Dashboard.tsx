@@ -10,16 +10,28 @@ import { AIChatInput } from '@/components/ui/ai-chat-input';
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
-export function Dashboard() {
+import { RoomCard } from './RoomCard';
+import { Room, RoomHandlers } from '@/lib/types';
+
+interface DashboardProps extends RoomHandlers {
+  rooms: Room[];
+}
+
+export function Dashboard({ rooms, onAddRoom, onEditRoom, onDeleteRoom }: DashboardProps) {
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
-  const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: string;
+    type: 'room' | 'card';
+    name: string;
+    parentName?: string;
+  } | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("Python Language");
+
   const handlePasteSubmit = (data: {
     url?: string;
     text?: string;
@@ -36,13 +48,30 @@ export function Dashboard() {
     console.log("AI query:", value);
     // Here you would typically send the query to your AI backend
   };
-  const handleDeleteClick = (roomName: string) => {
-    setRoomToDelete(roomName);
-    setDeleteModalOpen(true);
+  const handleDeleteClick = (roomId: string) => {
+    const room = rooms.find(r => r.id === roomId);
+    if (room) {
+      setItemToDelete({
+        id: room.id,
+        type: 'room',
+        name: room.name
+      });
+      setDeleteModalOpen(true);
+    }
   };
   const handleDeleteConfirm = () => {
-    toast.success(`"${title}" has been deleted`);
-    // Add your delete logic here
+    if (!itemToDelete) return;
+
+    if (itemToDelete.type === 'room') {
+      onDeleteRoom(itemToDelete.id);
+      toast.success(`"${itemToDelete.name}" has been deleted`);
+    } else if (itemToDelete.type === 'card') {
+      // Handle card deletion here when implemented
+      toast.success(`"${itemToDelete.name}" has been deleted from ${itemToDelete.parentName}`);
+    }
+
+    setItemToDelete(null);
+    setDeleteModalOpen(false);
   };
   const handleMenuClick = (e: React.MouseEvent, cardId: string) => {
     e.stopPropagation();
@@ -56,11 +85,26 @@ export function Dashboard() {
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     setMenuOpen(false);
+    // Set up card deletion
+    setItemToDelete({
+      id: 'python-card',
+      type: 'card',
+      name: title,
+      parentName: "Azzam's Space"
+    });
     setDeleteModalOpen(true);
   };
   const handleSaveTitle = () => {
     // Add your save logic here
     toast.success("Title updated successfully");
+  };
+  const handleEditRoom = (roomId: string, newName: string) => {
+    onEditRoom(roomId, newName);
+    toast.success("Room name updated successfully");
+  };
+  const handleAddRoom = () => {
+    onAddRoom();
+    toast.success("New room created successfully");
   };
   return <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-[#222222]">
@@ -71,7 +115,7 @@ export function Dashboard() {
               <PopoverTrigger asChild>
                 <Button className="bg-transparent hover:bg-white/5 text-white px-4 py-2 rounded-full flex items-center gap-2 border border-white/20">
                   <div className="flex items-center gap-2">
-                    <Badge className="bg-primary/20 text-white font-medium text-xs px-2 py-0.5 pointer-events-none">
+                    <Badge className="bg-[#00A3FF]/20 text-[#00A3FF] font-medium text-xs px-2 py-0.5 pointer-events-none">
                       NEW
                     </Badge>
                     <span>Practice with exams</span>
@@ -174,67 +218,74 @@ export function Dashboard() {
           </div>
 
           {/* My Rooms section */}
-          <div className="mb-6 sm:mb-8">
-            <h2 className="text-lg font-medium text-white mb-4">My Rooms</h2>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {/* Left Column */}
-              <div className="space-y-2">
-                {/* Azzam's Room */}
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[#141414] hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <Box className="h-4 w-4 text-white/60" />
-                    <span className="text-white text-sm">Azzam's Room</span>
-                  </div>
-                  <button onClick={e => {
-                  e.stopPropagation();
-                  handleDeleteClick("Azzam's Room");
-                }} className="p-1">
-                    <Trash2 className="h-4 w-4 text-red-700" />
-                  </button>
-                </div>
+          <div className="max-w-7xl mx-auto p-4 sm:p-6">
+            <h2 className="text-xl text-white mb-4">My rooms</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {rooms.map(room => (
+                <RoomCard
+                  key={room.id}
+                  id={room.id}
+                  name={room.name}
+                  formattedDate={`Last active: ${room.lastActive}`}
+                  onEdit={handleEditRoom}
+                  onDelete={handleDeleteClick}
+                />
+              ))}
 
-                {/* Untitled Room */}
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[#141414] hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <Box className="h-4 w-4 text-white/60" />
-                    <span className="text-white text-sm">Untitled Room</span>
-                  </div>
-                  <button onClick={e => {
-                  e.stopPropagation();
-                  handleDeleteClick("Untitled Room");
-                }} className="p-1">
-                    <Trash2 className="h-4 w-4 text-red-700" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div className="space-y-2">
-                {/* Project 'Neom' */}
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[#141414] hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <Box className="h-4 w-4 text-white/60" />
-                    <span className="text-white text-sm">Project 'Neom'</span>
-                  </div>
-                  <button onClick={e => {
-                  e.stopPropagation();
-                  handleDeleteClick("Project 'Neom'");
-                }} className="p-1">
-                    <Trash2 className="h-4 w-4 text-red-700" />
-                  </button>
-                </div>
-
-                {/* Add Room Button */}
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[#141414] hover:bg-[#1A1A1A] transition-colors cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <Plus className="h-4 w-4 text-white/60" />
-                    <span className="text-white text-sm">Add a Room</span>
-                  </div>
-                </div>
-              </div>
+              {/* Add Room Button */}
+              <RoomCard
+                isAddButton
+                onAdd={handleAddRoom}
+              />
             </div>
           </div>
+
+          {/* Delete Confirmation Modal */}
+          <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+            <DialogContent className="bg-[#1A1A1A] text-white border-white/10 p-6 rounded-lg shadow-xl">
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-full bg-red-500/10">
+                  <Trash2 className="h-5 w-5 text-red-500" />
+                </div>
+                <h2 className="text-xl font-semibold">
+                  Delete {itemToDelete?.type === 'card' ? 'Card' : 'Room'}
+                </h2>
+              </div>
+
+              {/* Message */}
+              <p className="text-gray-400 mb-6">
+                Are you sure you want to delete "<span className="text-white">{itemToDelete?.name}</span>"?
+                {itemToDelete?.type === 'card' && itemToDelete?.parentName && (
+                  <span className="block mt-1 text-sm">
+                    This card will be removed from <span className="text-white">{itemToDelete.parentName}</span>
+                  </span>
+                )}
+                <br />
+                <span className="text-sm opacity-75">This action cannot be undone.</span>
+              </p>
+
+              {/* Buttons */}
+              <div className="flex justify-end items-center gap-3">
+                <DialogClose asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="text-gray-400 hover:text-white hover:bg-white/5
+                      px-4 py-2 transition-colors duration-200"
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button 
+                  variant="destructive" 
+                  className="bg-red-500 hover:bg-red-600 text-white px-4"
+                  onClick={handleDeleteConfirm}
+                >
+                  Delete {itemToDelete?.type === 'card' ? 'Card' : 'Room'}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Continue learning section */}
           <div className="mt-8">
@@ -343,52 +394,6 @@ export function Dashboard() {
               }}>
                   <Copy className="w-4 h-4 text-black" />
                   <span className="text-sm font-medium text-black">Copy link</span>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Modal */}
-      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-        <DialogContent className="bg-[#1A1A1A] border border-white/10 text-white p-0 rounded-xl w-[480px]">
-          <div className="flex flex-col">
-            {/* Header */}
-            <div className="p-4 border-b border-white/10 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Trash2 className="w-5 h-5 text-red-500" />
-                <h3 className="text-lg font-medium">Delete content</h3>
-              </div>
-              <DialogClose asChild>
-                <button className="text-gray-400 hover:text-white">
-                  <X className="w-5 h-5" />
-                </button>
-              </DialogClose>
-            </div>
-
-            {/* Content */}
-            <div className="p-4">
-              <div className="mb-4">
-                <p className="text-gray-400 truncate">
-                  Are you sure you want to delete "{title}"?
-                </p>
-                <p className="text-gray-400 text-sm">
-                  This action cannot be undone.
-                </p>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <DialogClose asChild>
-                  <Button variant="ghost" className="text-white hover:bg-white/5">
-                    Cancel
-                  </Button>
-                </DialogClose>
-                <Button className="bg-red-500 text-white hover:bg-red-600" onClick={() => {
-                handleDeleteConfirm();
-                setDeleteModalOpen(false);
-              }}>
-                  Delete
                 </Button>
               </div>
             </div>

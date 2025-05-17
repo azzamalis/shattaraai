@@ -23,7 +23,7 @@ export function DashboardHeader({ onOpenDrawer }: DashboardHeaderProps) {
             variant="ghost" 
             size="icon" 
             onClick={onOpenDrawer} 
-            className="text-white hover:bg-white/10 hover:text-primary"
+            className="text-white hover:text-white hover:bg-white/10"
           >
             <Menu size={22} />
             <span className="sr-only">Toggle menu</span>
@@ -41,7 +41,7 @@ export function DashboardHeader({ onOpenDrawer }: DashboardHeaderProps) {
             <DialogTrigger asChild>
               <Button 
                 variant="outline" 
-                className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-full px-8 py-5 h-9 shadow-[0_2px_8px_rgba(var(--primary),0.25)] hover:shadow-[0_2px_12px_rgba(var(--primary),0.35)]"
+                className="bg-transparent border-2 border-[#00A3FF] text-[#00A3FF] hover:text-[#00A3FF] hover:bg-[#00A3FF]/5 transition-all rounded-full px-8 py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)]"
               >
                 Upgrade
               </Button>

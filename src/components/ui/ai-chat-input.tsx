@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -212,7 +211,12 @@ const AIChatInput = ({
               <button className="p-2 rounded-full hover:bg-white/5 transition" title="Voice input" type="button" tabIndex={-1}>
                 <Mic size={18} className="text-white/70" />
               </button>
-              <button className="flex items-center gap-1 bg-primary hover:bg-primary-light text-white p-2 rounded-full font-medium justify-center" title="Send" type="submit" tabIndex={-1}>
+              <button 
+                className="flex items-center gap-1 bg-[#00A3FF] hover:bg-[#00A3FF]/90 text-white p-2 rounded-full font-medium justify-center transition-colors" 
+                title="Send" 
+                type="submit" 
+                tabIndex={-1}
+              >
                 <Send size={16} />
               </button>
             </div>

@@ -95,9 +95,17 @@ const SignIn = () => {
           </div>
           
           {/* Google Sign-in Button */}
-          <Button variant="outline" className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 text-white" onClick={() => navigate('/onboarding')}>
+          <Button 
+            variant="outline" 
+            className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 
+              text-white hover:text-white transition-all duration-200"
+            onClick={() => navigate('/onboarding')}
+          >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
+              <path 
+                fill="currentColor" 
+                d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" 
+              />
             </svg>
             Continue with Google
           </Button>
@@ -119,7 +127,10 @@ const SignIn = () => {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label htmlFor="password" className="text-white">Password</Label>
-                <Link to="/password-reset" className="text-sm text-primary hover:underline">
+                <Link 
+                  to="/password-reset" 
+                  className="text-sm text-slate-400 hover:text-white transition-colors duration-200"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -144,9 +155,14 @@ const SignIn = () => {
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm">
+            <p className="text-slate-400 text-sm">
               Don't have an account?{' '}
-              <Link to="/signup" className="text-primary hover:underline">
+              <Link 
+                to="/signup" 
+                className="text-white font-medium relative after:absolute 
+                  after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full 
+                  after:bg-white after:transition-all after:duration-300"
+              >
                 Sign up
               </Link>
             </p>
