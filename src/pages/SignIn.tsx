@@ -27,7 +27,12 @@ export default function SignIn() {
   useEffect(() => {
     if (user) {
       console.log("User is authenticated, redirecting to:", from);
-      navigate(from, { replace: true });
+      // Add a slight delay to prevent potential race conditions
+      const redirectTimer = setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 50);
+      
+      return () => clearTimeout(redirectTimer);
     }
   }, [user, navigate, from]);
 

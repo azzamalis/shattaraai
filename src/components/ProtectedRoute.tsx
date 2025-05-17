@@ -20,8 +20,10 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!user) {
     // Redirect to signin but save the location they were trying to go to
+    console.log("No user found, redirecting to signin");
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }
 
+  // User is authenticated, render the protected content
   return <>{children}</>;
 };
