@@ -42,7 +42,7 @@ export function DashboardHeader({
           {/* Command button */}
           <Dialog open={commandOpen} onOpenChange={setCommandOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-[#1A1A1A] border-none text-gray-400 hover:text-white hover:bg-[#252525] rounded-full px-6 py-5 h-9 flex items-center justify-center gap-1.5 min-w-[120px]">
+              <Button variant="outline" className="bg-[#1A1A1A] border-none hover:bg-[#252525] rounded-full px-6 py-5 h-9 flex items-center justify-center gap-1.5 min-w-[120px] text-gray-200">
                 <Search className="h-4 w-4" />
                 <span className="text-sm font-medium mx-0.5">⌘</span>
                 <span className="text-sm font-medium">K</span>
