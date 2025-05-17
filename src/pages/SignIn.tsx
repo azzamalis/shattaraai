@@ -1,162 +1,124 @@
+
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
-import Logo from '@/components/Logo';
-import { Eye, EyeOff, LucideGithub } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-const SignIn = () => {
+import Logo from '@/components/Logo';
+
+export default function SignIn() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signIn, user } = useAuth();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
-  });
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {
-      id,
-      value
-    } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
-  };
-  const handleCheckboxChange = (checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      rememberMe: checked
-    }));
-  };
-  const handleSubmit = (e: React.FormEvent) => {
+  const location = useLocation();
+  
+  // Get the page the user was trying to visit before being redirected to sign in
+  const from = location.state?.from?.pathname || '/dashboard';
+  
+  // If already authenticated, redirect to dashboard
+  React.useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.email || !formData.password) {
-      toast.error("Missing credentials", {
-        description: "Please enter your email and password."
-      });
+    
+    if (!email || !password) {
+      toast.error('Please enter both email and password');
       return;
     }
-    setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success("Signed in successfully!", {
-        description: "Welcome back to Shattara AI!"
-      });
-
-      // Navigate to dashboard instead of home
-      navigate('/dashboard');
-    }, 1500);
+    
+    setLoading(true);
+    
+    const { error } = await signIn(email, password);
+    
+    if (error) {
+      console.error('Error signing in:', error);
+      toast.error(error.message || 'Failed to sign in');
+      setLoading(false);
+    } else {
+      toast.success('Signed in successfully');
+      // Navigate happens automatically via Auth state change
+    }
   };
-  return <div className="flex min-h-screen bg-dark">
-      {/* Left Column - Information */}
-      <div className="hidden lg:flex lg:w-1/2 bg-dark-deeper flex-col p-12">
-        <div className="mb-auto">
-          <Link to="/" className="inline-block">
-            <Logo textColor="text-white" />
-          </Link>
-        </div>
-        <div className="mb-auto">
-          <h2 className="text-4xl font-bold mb-6 text-white">Welcome back to Shattara AI</h2>
-          <p className="text-lg text-gray-400 mb-6">
-            Log in to continue your learning journey powered by our advanced AI algorithms customized for your educational needs.
-          </p>
-        </div>
-        <div className="mt-auto">
-          <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} Shattara AI. All rights reserved.
-          </p>
-        </div>
-      </div>
-      
-      {/* Right Column - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-12 bg-dark">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden mb-8">
+
+  return (
+    <div className="flex min-h-screen flex-col bg-[#111] text-white">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
+        <div className="mx-auto w-full max-w-md space-y-8">
+          <div className="text-center">
             <Link to="/" className="inline-block">
-              <Logo textColor="text-white" />
+              <Logo className="h-12 w-auto mx-auto" textColor="text-white" />
             </Link>
+            <h1 className="mt-6 text-3xl font-bold">Welcome back</h1>
+            <p className="mt-2 text-gray-400">Sign in to your account</p>
           </div>
           
-          {/* form section */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2 text-white">Sign in</h1>
-            <p className="text-gray-400">Welcome back! Please enter your details.</p>
-          </div>
-          
-          {/* Google Sign-in Button */}
-          <Button variant="outline" className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 text-white" onClick={() => navigate('/onboarding')}>
-            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
-            </svg>
-            Continue with Google
-          </Button>
-          
-          {/* Separator */}
-          <div className="relative flex items-center mb-6">
-            <div className="flex-grow border-t border-zinc-700"></div>
-            <span className="flex-shrink mx-4 text-gray-400 text-sm">or continue with email</span>
-            <div className="flex-grow border-t border-zinc-700"></div>
-          </div>
-          
-          {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">Email</Label>
-              <Input id="email" type="email" placeholder="Enter your email" className="bg-dark border-zinc-700 text-white" value={formData.email} onChange={handleChange} />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="password" className="text-white">Password</Label>
-                <Link to="/password-reset" className="text-sm text-primary hover:underline">
-                  Forgot password?
-                </Link>
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="email" className="text-white">Email</Label>
+                <Input 
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="bg-[#1A1A1A] border-white/10 text-white"
+                  required
+                />
               </div>
-              <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" className="bg-dark border-zinc-700 text-white pr-10" value={formData.password} onChange={handleChange} />
-                <button type="button" onClick={togglePasswordVisibility} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
+              
+              <div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-white">Password</Label>
+                  <Link to="/password-reset" className="text-sm text-primary hover:underline">
+                    Forgot password?
+                  </Link>
+                </div>
+                <Input 
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="bg-[#1A1A1A] border-white/10 text-white"
+                  required
+                />
               </div>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <Checkbox id="remember" className="border-zinc-700 data-[state=checked]:bg-primary" checked={formData.rememberMe} onCheckedChange={handleCheckboxChange} />
-              <label htmlFor="remember" className="text-sm text-gray-400 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Remember me
-              </label>
-            </div>
-            
-            <Button type="submit" className="w-full bg-primary hover:bg-primary-light text-white py-6" disabled={isSubmitting}>
-              {isSubmitting ? 'Signing in...' : 'Sign in'}
+            <Button 
+              type="submit" 
+              className="w-full bg-primary hover:bg-primary-light" 
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign in'
+              )}
             </Button>
-          </form>
-          
-          <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm">
+            
+            <div className="text-center text-sm text-gray-400">
               Don't have an account?{' '}
               <Link to="/signup" className="text-primary hover:underline">
                 Sign up
               </Link>
-            </p>
-          </div>
-          
-          <div className="mt-2 text-center">
-            
-          </div>
+            </div>
+          </form>
         </div>
       </div>
-    </div>;
-};
-export default SignIn;
+    </div>
+  );
+}

@@ -16,9 +16,8 @@ export const useModalAnalytics = () => {
       const userId = session?.user?.id;
       
       // Track the event in the usage_events table
-      // Use type assertion to bypass TypeScript errors until types are regenerated
-      await (supabase
-        .from('usage_events') as any)
+      await supabase
+        .from('usage_events')
         .insert({
           user_id: userId || null,
           type: eventData.event_type,
