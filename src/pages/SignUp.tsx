@@ -1,151 +1,212 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/use-auth';
-import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
+import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
-export default function SignUp() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { signUp, user } = useAuth();
+const SignUp = () => {
   const navigate = useNavigate();
-  
-  // If already authenticated, redirect to dashboard
-  React.useEffect(() => {
-    if (user) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [user, navigate]);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    acceptTerms: false
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, acceptTerms: checked }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
-      toast.error('Please fill out all required fields');
+    if (!formData.name || !formData.email || !formData.password || !formData.acceptTerms) {
+      toast.error("Please complete all fields", {
+        description: "All fields are required to create an account."
+      });
       return;
     }
     
-    if (password.length < 6) {
-      toast.error('Password should be at least 6 characters');
-      return;
-    }
+    setIsSubmitting(true);
     
-    setLoading(true);
-    
-    const { error } = await signUp(email, password, firstName, lastName);
-    
-    if (error) {
-      console.error('Error signing up:', error);
-      if (error.message.includes('email address is already registered')) {
-        toast.error('This email is already registered. Please sign in instead.');
-      } else {
-        toast.error(error.message || 'Failed to sign up');
-      }
-      setLoading(false);
-    } else {
-      toast.success('Sign up successful! Please check your email to confirm your account.');
-      navigate('/signin');
-    }
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success("Account created successfully!", {
+        description: "Welcome to Shattara AI!"
+      });
+      
+      // Navigate to onboarding page
+      navigate('/onboarding');
+    }, 1500);
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#111] text-white">
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
-        <div className="mx-auto w-full max-w-md space-y-8">
-          <div className="text-center">
+    <div className="flex min-h-screen bg-dark">
+      {/* Left Column - Information */}
+      <div className="hidden lg:flex lg:w-1/2 bg-dark-deeper flex-col p-12">
+        <div className="mb-auto">
+          <Link to="/" className="inline-block">
+            <Logo textColor="text-white" />
+          </Link>
+        </div>
+        <div className="mb-auto">
+          <h2 className="text-4xl font-bold mb-6 text-white">Revolutionize your learning experience</h2>
+          <p className="text-lg text-gray-400 mb-6">
+            Join thousands of students using Shattara AI to accelerate their learning and achieve better results through personalized AI-powered education.
+          </p>
+        </div>
+        <div className="mt-auto">
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} Shattara AI. All rights reserved.
+          </p>
+        </div>
+      </div>
+      
+      {/* Right Column - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-12 bg-dark">
+        <div className="w-full max-w-md">
+          <div className="lg:hidden mb-8">
             <Link to="/" className="inline-block">
-              <Logo className="h-12 w-auto mx-auto" textColor="text-white" />
+              <Logo textColor="text-white" />
             </Link>
-            <h1 className="mt-6 text-3xl font-bold">Create an account</h1>
-            <p className="mt-2 text-gray-400">Sign up to get started</p>
           </div>
           
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName" className="text-white">First Name</Label>
-                  <Input 
-                    id="firstName"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="John"
-                    className="bg-[#1A1A1A] border-white/10 text-white"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="lastName" className="text-white">Last Name</Label>
-                  <Input 
-                    id="lastName"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Doe"
-                    className="bg-[#1A1A1A] border-white/10 text-white"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="email" className="text-white">Email</Label>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2 text-white">Create an account</h1>
+            <p className="text-gray-400">Start your personalized learning journey today.</p>
+          </div>
+          
+          {/* Google Sign-up Button */}
+          <Button 
+            variant="outline" 
+            className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 text-white"
+            onClick={() => navigate('/onboarding')}
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
+              />
+            </svg>
+            Continue with Google
+          </Button>
+          
+          {/* Separator */}
+          <div className="relative flex items-center mb-6">
+            <div className="flex-grow border-t border-zinc-700"></div>
+            <span className="flex-shrink mx-4 text-gray-400 text-sm">or continue with email</span>
+            <div className="flex-grow border-t border-zinc-700"></div>
+          </div>
+          
+          {/* Signup Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-white">Full Name</Label>
+              <Input 
+                id="name" 
+                type="text" 
+                placeholder="Enter your name" 
+                className="bg-dark border-zinc-700 text-white"
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-white">Email</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="Enter your email" 
+                className="bg-dark border-zinc-700 text-white"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-white">Password</Label>
+              <div className="relative">
                 <Input 
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="bg-[#1A1A1A] border-white/10 text-white"
-                  required
+                  id="password" 
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Create a password" 
+                  className="bg-dark border-zinc-700 text-white pr-10"
+                  value={formData.password}
+                  onChange={handleChange}
                 />
+                <button 
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
-              
-              <div>
-                <Label htmlFor="password" className="text-white">Password</Label>
-                <Input 
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="bg-[#1A1A1A] border-white/10 text-white"
-                  required
-                />
-                <p className="mt-1 text-xs text-gray-400">Must be at least 6 characters</p>
-              </div>
+              <p className="text-xs text-gray-400">Must be at least 8 characters</p>
+            </div>
+            
+            <div className="flex items-start space-x-2">
+              <Checkbox 
+                id="terms" 
+                className="border-zinc-700 data-[state=checked]:bg-primary mt-1"
+                checked={formData.acceptTerms}
+                onCheckedChange={handleCheckboxChange}
+              />
+              <label
+                htmlFor="terms"
+                className="text-sm text-gray-400 leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                I agree to the{' '}
+                <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
+                {' '}and{' '}
+                <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+              </label>
             </div>
             
             <Button 
               type="submit" 
-              className="w-full bg-primary hover:bg-primary-light" 
-              disabled={loading}
+              className="w-full bg-primary hover:bg-primary-light text-white py-6"
+              disabled={isSubmitting}
             >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
-                </>
-              ) : (
-                'Sign up'
-              )}
+              {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </Button>
-            
-            <div className="text-center text-sm text-gray-400">
+          </form>
+          
+          <div className="mt-6 text-center">
+            <p className="text-gray-400 text-sm">
               Already have an account?{' '}
               <Link to="/signin" className="text-primary hover:underline">
                 Sign in
               </Link>
-            </div>
-          </form>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SignUp;
