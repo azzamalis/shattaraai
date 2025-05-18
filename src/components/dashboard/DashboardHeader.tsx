@@ -1,10 +1,12 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Menu } from 'lucide-react';
+import { Search, Menu, History } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { CommandModal } from './CommandModal';
 import { UpgradeModal } from './UpgradeModal';
+import { Link } from 'react-router-dom';
 
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
@@ -31,8 +33,15 @@ export function DashboardHeader({ onOpenDrawer }: DashboardHeaderProps) {
           <Logo className="h-8 w-auto" textColor="text-white" />
         </div>
         
-        {/* Center section - empty */}
-        <div></div>
+        {/* Center section - add history link */}
+        <div className="flex justify-center">
+          <Button variant="ghost" className="text-white hover:text-white hover:bg-white/10" asChild>
+            <Link to="/history" className="flex items-center gap-1.5">
+              <History size={18} />
+              <span className="hidden md:inline">History</span>
+            </Link>
+          </Button>
+        </div>
         
         {/* Right section */}
         <div className="flex justify-end items-center gap-3 pr-2">

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +18,7 @@ import PasswordReset from "./pages/PasswordReset";
 import Onboarding from "./pages/Onboarding";
 import DashboardPage from "./pages/DashboardPage";
 import RoomPage from "./pages/RoomPage";
+import HistoryPage from "./pages/HistoryPage";
 import React from "react";
 
 // Create a new QueryClient instance inside the component
@@ -45,6 +47,7 @@ const App = () => {
             {/* Dashboard routes */}
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/rooms/:id" element={<RoomPage />} />
+            <Route path="/history" element={<HistoryPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
