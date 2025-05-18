@@ -9,39 +9,40 @@ interface TrustBarProps {
 }
 
 const TrustBar: React.FC<TrustBarProps> = ({ className }) => {
-  // These logos are reliable and common Saudi universities
+  // These logos are reliable and common Saudi universities with local image paths
   const universityLogos = [
     {
       name: "King Saud University",
-      src: "https://upload.wikimedia.org/wikipedia/en/3/3d/King_Saud_University_Logo.png",
+      src: "/images/king_saud_university.png",
     },
     {
       name: "King Fahd University of Petroleum and Minerals",
-      src: "https://upload.wikimedia.org/wikipedia/en/thumb/e/ea/KFUPM_Logo.svg/1200px-KFUPM_Logo.svg.png",
+      src: "/images/KFUPM.png",
     },
     {
       name: "King Abdulaziz University",
-      src: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/King_Abdulaziz_University_Logo.svg/1200px-King_Abdulaziz_University_Logo.svg.png",
+      src: "/images/king_abdulaziz_university.png",
     },
     {
       name: "Prince Mohammad Bin Fahd University",
-      src: "https://upload.wikimedia.org/wikipedia/en/c/c8/Prince_Mohammad_bin_Fahd_University_logo.png",
+      // Using placeholder for this one as it may not be in the images folder
+      src: "/placeholder.svg",
     },
     {
       name: "King Abdullah University of Science and Technology",
-      src: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/King_Abdullah_University_of_Science_and_Technology_logo.svg/1200px-King_Abdullah_University_of_Science_and_Technology_logo.svg.png",
+      src: "/images/king_abdullah_university_of_science_and_technology.png",
     },
     {
       name: "Princess Nourah University",
-      src: "https://www.pnu.edu.sa/en/PublishingImages/logo.png",
+      src: "/images/princess_nourah_university.png",
     },
     {
       name: "Imam Abdulrahman Bin Faisal University",
-      src: "https://upload.wikimedia.org/wikipedia/commons/6/60/Imam_Abdulrahman_bin_Faisal_University_logo.svg",
+      src: "/images/Imam_Abdulrahman_Bin_Faisal_University.png",
     },
     {
       name: "Umm Al-Qura University",
-      src: "https://upload.wikimedia.org/wikipedia/en/a/a2/Umm_al-Qura_University_logo.png",
+      src: "/images/Umm_Al-Qura_University.png",
     },
   ];
 
