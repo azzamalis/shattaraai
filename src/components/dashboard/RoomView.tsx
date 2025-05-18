@@ -1,21 +1,21 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { MessageSquare, FileText, Grid, List, Plus } from 'lucide-react';
-
 interface RoomViewProps {
   title: string;
   description: string;
   isEmpty?: boolean;
   hideHeader?: boolean;
 }
-
-export function RoomView({ title, description, isEmpty = true, hideHeader = false }: RoomViewProps) {
-  return (
-    <div className="flex flex-col h-full">
-      {!hideHeader && (
-        <header className="flex flex-col border-b border-gray-300 bg-dark-deeper p-6 sticky top-0 z-10">
+export function RoomView({
+  title,
+  description,
+  isEmpty = true,
+  hideHeader = false
+}: RoomViewProps) {
+  return <div className="flex flex-col h-full">
+      {!hideHeader && <header className="flex flex-col border-b border-gray-300 bg-dark-deeper p-6 sticky top-0 z-10">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-white">{title}</h1>
@@ -46,12 +46,10 @@ export function RoomView({ title, description, isEmpty = true, hideHeader = fals
               </Button>
             </div>
           </div>
-        </header>
-      )}
+        </header>}
 
-      <main className="flex-1 overflow-auto p-6 bg-[#222222]">
-        {isEmpty ? (
-          <div className="flex flex-col items-center justify-center h-full text-center p-6">
+      <main className="flex-1 overflow-auto p-6 bg-dark-DEFAULT">
+        {isEmpty ? <div className="flex flex-col items-center justify-center h-full text-center p-6">
             <div className="bg-white p-8 rounded-full mb-4">
               <FileText className="h-12 w-12 text-primary" />
             </div>
@@ -63,9 +61,7 @@ export function RoomView({ title, description, isEmpty = true, hideHeader = fals
               <Plus className="mr-2 h-4 w-4" />
               Add Content
             </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card className="bg-white border-gray-200 p-4 hover:border-primary transition-colors">
               <div className="flex items-start gap-3">
                 <FileText className="h-8 w-8 text-primary" />
@@ -75,9 +71,7 @@ export function RoomView({ title, description, isEmpty = true, hideHeader = fals
                 </div>
               </div>
             </Card>
-          </div>
-        )}
+          </div>}
       </main>
-    </div>
-  );
-} 
+    </div>;
+}
