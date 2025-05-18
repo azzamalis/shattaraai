@@ -26,7 +26,7 @@ const TrustBar: React.FC<TrustBarProps> = ({ className }) => {
     {
       name: "Prince Mohammad Bin Fahd University",
       // Using placeholder for this one as it may not be in the images folder
-      src: "/placeholder.svg",
+      src: "public/images/prince_mohammad_bin_fahad-university.png",
     },
     {
       name: "King Abdullah University of Science and Technology",
