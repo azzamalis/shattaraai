@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -7,43 +8,46 @@ interface RoomViewProps {
   title: string;
   description: string;
   isEmpty?: boolean;
+  hideHeader?: boolean;
 }
 
-export function RoomView({ title, description, isEmpty = true }: RoomViewProps) {
+export function RoomView({ title, description, isEmpty = true, hideHeader = false }: RoomViewProps) {
   return (
     <div className="flex flex-col h-full">
-      <header className="flex flex-col border-b border-gray-300 bg-dark-deeper p-6 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-white">{title}</h1>
-            <p className="text-gray-400 mt-1">{description}</p>
+      {!hideHeader && (
+        <header className="flex flex-col border-b border-gray-300 bg-dark-deeper p-6 sticky top-0 z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white">{title}</h1>
+              <p className="text-gray-400 mt-1">{description}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" className="border-gray-300 bg-white text-gray-800 hover:bg-white hover:text-primary hover:border-primary">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Room Chat
+              </Button>
+              <Button className="bg-primary hover:bg-primary-light text-white">
+                <FileText className="mr-2 h-4 w-4" />
+                Create Exam
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" className="border-gray-300 bg-white text-gray-800 hover:bg-white hover:text-primary hover:border-primary">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Room Chat
-            </Button>
-            <Button className="bg-primary hover:bg-primary-light text-white">
-              <FileText className="mr-2 h-4 w-4" />
-              Create Exam
-            </Button>
+          
+          <div className="flex items-center justify-between mt-4">
+            <div className="text-sm text-gray-400">
+              {isEmpty ? 'No documents' : '5 documents'}
+            </div>
+            <div className="flex items-center">
+              <Button variant="ghost" size="icon" className="text-white">
+                <Grid className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="text-gray-400">
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </div>
-        
-        <div className="flex items-center justify-between mt-4">
-          <div className="text-sm text-gray-400">
-            {isEmpty ? 'No documents' : '5 documents'}
-          </div>
-          <div className="flex items-center">
-            <Button variant="ghost" size="icon" className="text-white">
-              <Grid className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="text-gray-400">
-              <List className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       <main className="flex-1 overflow-auto p-6 bg-[#222222]">
         {isEmpty ? (

@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RoomView } from '@/components/dashboard/RoomView';
+import { RoomHeroSection } from '@/components/dashboard/RoomHeroSection';
 import { useParams } from 'react-router-dom';
 
 export default function RoomPage() {
@@ -16,11 +18,15 @@ export default function RoomPage() {
 
   return (
     <DashboardLayout>
-      <RoomView 
-        title={room.title} 
-        description={room.description} 
-        isEmpty={id === "physics"} 
-      />
+      <div className="flex flex-col h-full">
+        <RoomHeroSection title={room.title} description={room.description} />
+        <RoomView 
+          title={room.title} 
+          description={room.description} 
+          isEmpty={id === "physics"} 
+          hideHeader={true} // Hide the header since we now have the hero section
+        />
+      </div>
     </DashboardLayout>
   );
 } 
