@@ -35,7 +35,7 @@ export default function RoomPage() {
                   <MessageSquare className="mr-2 h-4 w-4" />
                   Room Chat
                 </Button>
-                <Button className="bg-primary hover:bg-primary-light text-white">
+                <Button className="text-[#00a3ff] bg-primary-foreground">
                   <FileText className="mr-2 h-4 w-4" />
                   Create Exam
                 </Button>
