@@ -11,7 +11,6 @@ import { formatTime } from '@/lib/formatTime';
 import { CommandDialog, CommandInput, CommandList, CommandGroup, CommandItem } from '@/components/ui/command';
 import { Mic, FileText, Brain, BookOpen, Settings, MessageSquare } from 'lucide-react';
 import '@/styles/waveform.css';
-import { Room, RoomHandlers } from '@/lib/types';
 
 export default function RecordingRoom() {
   const [isRecording, setIsRecording] = useState(false);
@@ -75,7 +74,6 @@ export default function RecordingRoom() {
     setSelectedMicrophone("");
   };
   
-  // Create a single component that will be passed to DashboardLayout
   const RecordingContent = () => (
     <div className="flex flex-col h-full bg-black">
       <RecordingHeader 

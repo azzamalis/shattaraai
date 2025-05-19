@@ -34,7 +34,7 @@ export function LeftSidebar() {
           <div className="flex flex-col items-center justify-center h-full text-white/60">
             <ClipboardList className="h-12 w-12 mb-4 text-white/30" />
             <p className="font-medium text-white mb-1">No Chapters Yet</p>
-            <p className="text-sm">Chapters will appear here once recording starts</p>
+            <p className="text-sm">Start recording to view chapters</p>
           </div>
         </TabsContent>
         
@@ -42,7 +42,7 @@ export function LeftSidebar() {
           <div className="flex flex-col items-center justify-center h-full text-white/60">
             <FileText className="h-12 w-12 mb-4 text-white/30" />
             <p className="font-medium text-white mb-1">No Transcripts Yet</p>
-            <p className="text-sm">Transcripts will appear here once recording starts</p>
+            <p className="text-sm">Start recording to view transcripts</p>
           </div>
         </TabsContent>
       </Tabs>

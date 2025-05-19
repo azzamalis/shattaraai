@@ -35,7 +35,7 @@ export function useKeyboardShortcut(
     window.addEventListener('keydown', handleKeyDown);
     
     return () => {
-      window.addEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [key, callback, options]);
 }

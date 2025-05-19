@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { MessageSquare, FileText, BookOpen, HelpCircle, Edit } from 'lucide-react';
+import { MessageSquare, FileText, BookOpen, HelpCircle, Edit, Paperclip, Mic, Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export function RightSidebar() {
   const [activeTab, setActiveTab] = useState("chat");
@@ -78,8 +79,10 @@ export function RightSidebar() {
           <div className="flex-1 flex flex-col overflow-y-auto p-4">
             {messages.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                  <MessageSquare className="h-8 w-8 text-white/30" />
+                <div className="w-16 h-16 rounded-full bg-black/40 flex items-center justify-center mb-4">
+                  <Avatar className="h-14 w-14">
+                    <AvatarFallback className="bg-[#222] text-white font-semibold">AI</AvatarFallback>
+                  </Avatar>
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-2">Chat with the AI Tutor</h3>
                 <p className="text-white/60 text-center max-w-md">
@@ -104,7 +107,7 @@ export function RightSidebar() {
             )}
           </div>
           
-          <div className="p-4 mt-auto">
+          <div className="p-4 mt-auto border-t border-white/10">
             <div className="relative">
               <Input
                 value={inputMessage}
@@ -118,12 +121,28 @@ export function RightSidebar() {
                 placeholder="Ask anything..."
                 className="bg-black/30 border-white/10 text-white pr-20 pl-4 py-3 rounded-full"
               />
-              <Button 
-                onClick={handleSubmitChat}
-                className="absolute right-1 top-1 h-8 rounded-full bg-[#2323FF]"
-              >
-                Send
-              </Button>
+              <div className="absolute right-1 top-1 flex gap-1">
+                <Button 
+                  size="icon"
+                  variant="ghost" 
+                  className="h-8 w-8 rounded-full text-white/70 hover:text-white hover:bg-white/10"
+                >
+                  <Paperclip className="h-4 w-4" />
+                </Button>
+                <Button 
+                  size="icon"
+                  variant="ghost" 
+                  className="h-8 w-8 rounded-full text-white/70 hover:text-white hover:bg-white/10"
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
+                <Button 
+                  onClick={handleSubmitChat}
+                  className="h-8 w-8 rounded-full bg-[#2323FF]"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </TabsContent>
