@@ -11,6 +11,7 @@ import { formatTime } from '@/lib/formatTime';
 import { CommandDialog, CommandInput, CommandList, CommandGroup, CommandItem } from '@/components/ui/command';
 import { Mic, FileText, Brain, BookOpen, Settings, MessageSquare } from 'lucide-react';
 import '@/styles/waveform.css';
+import { Room, RoomHandlers } from '@/lib/types';
 
 export default function RecordingRoom() {
   const [isRecording, setIsRecording] = useState(false);
@@ -74,63 +75,61 @@ export default function RecordingRoom() {
     setSelectedMicrophone("");
   };
   
-  return (
-    <DashboardLayout>
-      {/* Wrap everything in a single div to satisfy the single child requirement */}
-      <div className="flex flex-col h-full bg-black">
-        <RecordingHeader 
-          currentTime={currentTime} 
-          isRecording={isRecording}
-          onOpenCommandMenu={() => setCommandOpen(true)}
-        />
-        
-        <div className="flex-1 overflow-hidden">
-          <ResizablePanelGroup
-            direction="horizontal"
-            className="h-full"
-          >
-            {/* Left panel - Recording area */}
-            <ResizablePanel defaultSize={50} minSize={25} maxSize={60}>
-              <div className="flex flex-col h-full">
-                <div className="p-4 border-b border-white/10">
-                  <MicrophoneSelector 
-                    selected={selectedMicrophone}
-                    onSelect={handleMicrophoneChange}
-                    onClear={clearMicrophone}
-                  />
-                </div>
-                
-                <div className="flex-1 flex flex-col items-center justify-center">
-                  <RecordingControls 
-                    isRecording={isRecording}
-                    toggleRecording={toggleRecording}
-                    recordingTime={formatTime(recordingTime)}
-                  />
-                  
-                  {!isRecording && recordingTime === 0 && (
-                    <div className="mt-8 text-white/60 text-center max-w-md px-4">
-                      <p className="mb-2 text-lg font-medium text-white">Start Recording Your Session</p>
-                      <p>Press the recording button to begin capturing audio. Chapters and transcripts will appear automatically.</p>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="border-t border-white/10">
-                  <LeftSidebar />
-                </div>
-              </div>
-            </ResizablePanel>
-            
-            <ResizableHandle withHandle className="bg-white/10" />
-            
-            {/* Right panel - AI Features */}
-            <ResizablePanel defaultSize={50} minSize={40}>
-              <RightSidebar />
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </div>
-      </div>
+  // Create a single component that will be passed to DashboardLayout
+  const RecordingContent = () => (
+    <div className="flex flex-col h-full bg-black">
+      <RecordingHeader 
+        currentTime={currentTime} 
+        isRecording={isRecording}
+        onOpenCommandMenu={() => setCommandOpen(true)}
+      />
       
+      <div className="flex-1 overflow-hidden">
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="h-full"
+        >
+          {/* Left panel - Recording area */}
+          <ResizablePanel defaultSize={50} minSize={25} maxSize={60}>
+            <div className="flex flex-col h-full">
+              <div className="p-4 border-b border-white/10">
+                <MicrophoneSelector 
+                  selected={selectedMicrophone}
+                  onSelect={handleMicrophoneChange}
+                  onClear={clearMicrophone}
+                />
+              </div>
+              
+              <div className="flex-1 flex flex-col items-center justify-center">
+                <RecordingControls 
+                  isRecording={isRecording}
+                  toggleRecording={toggleRecording}
+                  recordingTime={formatTime(recordingTime)}
+                />
+                
+                {!isRecording && recordingTime === 0 && (
+                  <div className="mt-8 text-white/60 text-center max-w-md px-4">
+                    <p className="mb-2 text-lg font-medium text-white">Start Recording Your Session</p>
+                    <p>Press the recording button to begin capturing audio. Chapters and transcripts will appear automatically.</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="border-t border-white/10">
+                <LeftSidebar />
+              </div>
+            </div>
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle className="bg-white/10" />
+          
+          {/* Right panel - AI Features */}
+          <ResizablePanel defaultSize={50} minSize={40}>
+            <RightSidebar />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+    
       {/* Command Menu Dialog */}
       <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
         <CommandInput placeholder="Type a command or search..." />
@@ -181,6 +180,12 @@ export default function RecordingRoom() {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
+    </div>
+  );
+  
+  return (
+    <DashboardLayout>
+      <RecordingContent />
     </DashboardLayout>
   );
 }
