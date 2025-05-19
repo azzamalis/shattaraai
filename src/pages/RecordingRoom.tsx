@@ -76,6 +76,7 @@ export default function RecordingRoom() {
   
   return (
     <DashboardLayout>
+      {/* Wrap everything in a single div to satisfy the single child requirement */}
       <div className="flex flex-col h-full bg-black">
         <RecordingHeader 
           currentTime={currentTime} 
