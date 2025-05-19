@@ -1,184 +1,91 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { MessageSquare, FileText, BookOpen, HelpCircle, Edit, Paperclip, Mic, Send } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { MessageCircle, FileText, BookOpen, Brain, FileStack } from "lucide-react";
+import AIChat from "./AIChat";
 
-export function RightSidebar() {
+const RightSidebar = () => {
   const [activeTab, setActiveTab] = useState("chat");
-  const [messages, setMessages] = useState<{role: 'user' | 'assistant', content: string}[]>([]);
-  const [inputMessage, setInputMessage] = useState('');
-  
-  const handleSubmitChat = () => {
-    if (!inputMessage.trim()) return;
-    
-    // Add user message
-    setMessages([...messages, { role: 'user', content: inputMessage }]);
-    setInputMessage('');
-    
-    // Simulate AI response (in a real app, this would be an API call)
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: `This is a simulated response to: "${inputMessage}"` 
-      }]);
-    }, 1000);
-  };
-  
+
   return (
-    <div className="h-full flex flex-col bg-[#111]">
-      <Tabs 
-        defaultValue="chat"
-        onValueChange={setActiveTab}
-        className="h-full flex flex-col"
-      >
-        <TabsList className="justify-between bg-transparent border-b border-white/10 p-0 h-14">
-          <TabsTrigger 
+    <div className="h-full flex flex-col bg-[#0F0F0F]">
+      <Tabs defaultValue="chat" className="flex-1 flex flex-col h-full" onValueChange={setActiveTab}>
+        <TabsList className="w-full justify-start border-b border-[#2A2A2A] rounded-none gap-1 p-1 h-12 bg-[#111111] shrink-0">
+          <TabsTrigger
             value="chat"
-            className="h-full rounded-none bg-transparent text-white/70 hover:text-white data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-[#2323FF] data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100"
           >
-            <MessageSquare className="h-5 w-5" />
-            <span className="ml-2">Chat</span>
+            <MessageCircle className="h-4 w-4" />
+            Chat
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="flashcards"
-            className="h-full rounded-none bg-transparent text-white/70 hover:text-white data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-[#2323FF] data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100"
           >
-            <FileText className="h-5 w-5" />
-            <span className="ml-2">Flashcards</span>
+            <FileStack className="h-4 w-4" />
+            Flashcards
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="quizzes"
-            className="h-full rounded-none bg-transparent text-white/70 hover:text-white data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-[#2323FF] data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100"
           >
-            <HelpCircle className="h-5 w-5" />
-            <span className="ml-2">Quizzes</span>
+            <Brain className="h-4 w-4" />
+            Quizzes
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="summary"
-            className="h-full rounded-none bg-transparent text-white/70 hover:text-white data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-[#2323FF] data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100"
           >
-            <BookOpen className="h-5 w-5" />
-            <span className="ml-2">Summary</span>
+            <BookOpen className="h-4 w-4" />
+            Summary
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="notes"
-            className="h-full rounded-none bg-transparent text-white/70 hover:text-white data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-[#2323FF] data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100"
           >
-            <Edit className="h-5 w-5" />
-            <span className="ml-2">Notes</span>
+            <FileText className="h-4 w-4" />
+            Notes
           </TabsTrigger>
         </TabsList>
-        
-        <TabsContent 
-          value="chat" 
-          className="flex-1 flex flex-col p-0 h-[calc(100%-56px)]"
-        >
-          <div className="flex-1 flex flex-col overflow-y-auto p-4">
-            {messages.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <div className="w-16 h-16 rounded-full bg-black/40 flex items-center justify-center mb-4">
-                  <Avatar className="h-14 w-14">
-                    <AvatarFallback className="bg-[#222] text-white font-semibold">AI</AvatarFallback>
-                  </Avatar>
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Chat with the AI Tutor</h3>
-                <p className="text-white/60 text-center max-w-md">
-                  Ask anything or use the suggestions below
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {messages.map((msg, index) => (
-                  <div 
-                    key={index} 
-                    className={`p-3 rounded-lg max-w-[85%] ${
-                      msg.role === 'user' 
-                        ? 'bg-[#2323FF]/20 ml-auto' 
-                        : 'bg-white/10 mr-auto'
-                    }`}
-                  >
-                    <p className="text-white">{msg.content}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          
-          <div className="p-4 mt-auto border-t border-white/10">
-            <div className="relative">
-              <Input
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmitChat();
-                  }
-                }}
-                placeholder="Ask anything..."
-                className="bg-black/30 border-white/10 text-white pr-20 pl-4 py-3 rounded-full"
-              />
-              <div className="absolute right-1 top-1 flex gap-1">
-                <Button 
-                  size="icon"
-                  variant="ghost" 
-                  className="h-8 w-8 rounded-full text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <Paperclip className="h-4 w-4" />
-                </Button>
-                <Button 
-                  size="icon"
-                  variant="ghost" 
-                  className="h-8 w-8 rounded-full text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <Mic className="h-4 w-4" />
-                </Button>
-                <Button 
-                  onClick={handleSubmitChat}
-                  className="h-8 w-8 rounded-full bg-[#2323FF]"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
+
+        <TabsContent value="chat" className="flex-1 overflow-hidden">
+          <AIChat />
+        </TabsContent>
+        <TabsContent value="flashcards" className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="flex flex-col items-center justify-center h-full min-h-[screen] text-[#555555] space-y-4 p-4">
+              <FileStack className="h-12 w-12" />
+              <p className="text-lg">Learn with the AI Tutor</p>
             </div>
-          </div>
+          </ScrollArea>
         </TabsContent>
-        
-        <TabsContent value="flashcards" className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center text-white/60 text-center">
-            <FileText className="h-12 w-12 mb-4 text-white/30" />
-            <p className="font-medium text-white mb-1">No Flashcards Yet</p>
-            <p className="text-sm">Flashcards will be generated after recording</p>
-          </div>
+        <TabsContent value="quizzes" className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-[#555555] space-y-4 p-4">
+              <Brain className="h-12 w-12" />
+              <p className="text-lg">Learn with the AI Tutor</p>
+            </div>
+          </ScrollArea>
         </TabsContent>
-        
-        <TabsContent value="quizzes" className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center text-white/60 text-center">
-            <HelpCircle className="h-12 w-12 mb-4 text-white/30" />
-            <p className="font-medium text-white mb-1">No Quizzes Yet</p>
-            <p className="text-sm">Quizzes will be generated after recording</p>
-          </div>
+        <TabsContent value="summary" className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-[#555555] space-y-4 p-4">
+              <BookOpen className="h-12 w-12" />
+              <p className="text-lg">Learn with the AI Tutor</p>
+            </div>
+          </ScrollArea>
         </TabsContent>
-        
-        <TabsContent value="summary" className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center text-white/60 text-center">
-            <BookOpen className="h-12 w-12 mb-4 text-white/30" />
-            <p className="font-medium text-white mb-1">No Summary Yet</p>
-            <p className="text-sm">Summary will be generated after recording</p>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="notes" className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center text-white/60 text-center">
-            <Edit className="h-12 w-12 mb-4 text-white/30" />
-            <p className="font-medium text-white mb-1">No Notes Yet</p>
-            <p className="text-sm">Notes will be available after recording</p>
-          </div>
+        <TabsContent value="notes" className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-[#555555] space-y-4 p-4">
+              <FileText className="h-12 w-12" />
+              <p className="text-lg">Learn with the AI Tutor</p>
+            </div>
+          </ScrollArea>
         </TabsContent>
       </Tabs>
     </div>
   );
-}
+};
+
+export default RightSidebar;

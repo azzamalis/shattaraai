@@ -1,7 +1,5 @@
-
 import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, Mic } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface MicrophoneSelectorProps {
   selected: string;
@@ -19,26 +17,22 @@ export function MicrophoneSelector({ selected, onSelect, onClear }: MicrophoneSe
   ];
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1">
-        <Select defaultValue={selected} onValueChange={onSelect}>
-          <SelectTrigger className="w-full bg-transparent border-white/20 text-white focus:ring-[#2323FF]/40">
-            <Mic className="mr-2 h-4 w-4 text-white/70" />
-            <SelectValue placeholder="Select microphone" />
-          </SelectTrigger>
-          <SelectContent className="bg-[#1A1A1A] border-white/10 text-white">
-            {microphones.map((mic) => (
-              <SelectItem key={mic} value={mic} className="hover:bg-white/10">
-                {mic}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      
+    <div className="flex items-center gap-2 w-full">
+      <select
+        value={selected}
+        onChange={e => onSelect(e.target.value)}
+        className="bg-transparent text-white text-sm px-0 py-0 focus:outline-none focus:ring-0 border-none w-auto"
+        style={{ boxShadow: 'none', appearance: 'none' }}
+      >
+        {microphones.map(mic => (
+          <option key={mic} value={mic} className="bg-black text-white">
+            {mic}
+          </option>
+        ))}
+      </select>
       {selected && onClear && (
-        <button 
-          className="text-white/70 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+        <button
+          className="text-white/70 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"
           onClick={onClear}
         >
           <X className="h-4 w-4" />

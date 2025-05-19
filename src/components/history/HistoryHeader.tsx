@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
@@ -13,7 +12,7 @@ export function HistoryHeader({ onClearHistory }: HistoryHeaderProps) {
       <h1 className="text-3xl font-bold text-white">History</h1>
       <Button 
         variant="outline" 
-        className="gap-2 border-white/20 text-white hover:bg-white/10 hover:text-white"
+        className="gap-2 border-white/20 text-black hover:bg-white/10 hover:text-white [&>svg]:text-current"
         onClick={onClearHistory}
       >
         <Trash2 size={16} />

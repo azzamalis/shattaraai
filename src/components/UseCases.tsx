@@ -45,12 +45,12 @@ const UseCases = () => {
       subtitle: 'Prepare for industry exams and advance your career'
     }, 
     {
-      image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3',
+      image: '/images/continuous_learning.png',
       title: 'Continuous Learning',
       subtitle: 'Stay sharp with lifelong educational support'
     }, 
     {
-      image: 'https://images.unsplash.com/photo-1532619675605-1ede6c2ed2b0',
+      image: '/images/research_support.png',
       title: 'Research Support',
       subtitle: 'Organize and study complex research materials'
     }

@@ -21,7 +21,7 @@ export function RoomView({
               <h1 className="text-2xl font-bold text-white">{title}</h1>
               <p className="text-gray-400 mt-1">{description}</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Button variant="outline" className="border-gray-300 bg-white text-gray-800 hover:bg-white hover:text-primary hover:border-primary">
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Room Chat

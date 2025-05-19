@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { RecordingHeader } from '@/components/recording/RecordingHeader';
 import { LeftSidebar } from '@/components/recording/LeftSidebar';
-import { RightSidebar } from '@/components/recording/RightSidebar';
+import RightSidebar from "@/components/recording/RightSidebar";
 import { formatTime } from '@/lib/formatTime';
 import { CommandDialog, CommandInput, CommandList, CommandGroup, CommandItem } from '@/components/ui/command';
 import { Mic, FileText, Brain, BookOpen, Settings, MessageSquare } from 'lucide-react';
@@ -73,20 +72,25 @@ export default function RecordingRoom() {
   };
   
   const RecordingContent = () => (
-    <div className="flex flex-col h-full bg-black">
+    <div className="flex flex-col h-full min-h-0 bg-black">
       <RecordingHeader 
         currentTime={currentTime} 
         isRecording={isRecording}
         onOpenCommandMenu={() => setCommandOpen(true)}
+        toggleRecording={toggleRecording}
+        recordingTime={formatTime(recordingTime)}
+        selectedMicrophone={selectedMicrophone}
+        onMicrophoneSelect={handleMicrophoneChange}
+        onMicrophoneClear={clearMicrophone}
       />
       
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0">
         <ResizablePanelGroup
           direction="horizontal"
           className="h-full"
         >
           {/* Left panel - Recording area */}
-          <ResizablePanel defaultSize={40} minSize={25} maxSize={60}>
+          <ResizablePanel defaultSize={40} minSize={25} maxSize={60} className="h-full">
             <LeftSidebar
               isRecording={isRecording}
               toggleRecording={toggleRecording}
@@ -100,7 +104,7 @@ export default function RecordingRoom() {
           <ResizableHandle withHandle className="bg-white/10" />
           
           {/* Right panel - AI Features */}
-          <ResizablePanel defaultSize={60} minSize={40}>
+          <ResizablePanel defaultSize={60} minSize={40} className="h-full">
             <RightSidebar />
           </ResizablePanel>
         </ResizablePanelGroup>
