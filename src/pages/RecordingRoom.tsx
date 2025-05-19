@@ -8,12 +8,33 @@ import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { LeftSidebar } from '@/components/recording/LeftSidebar';
 import { RightSidebar } from '@/components/recording/RightSidebar';
 import { formatTime } from '@/lib/formatTime';
+import { CommandDialog, CommandInput, CommandList, CommandGroup, CommandItem } from '@/components/ui/command';
+import { Mic, FileText, Brain, BookOpen, Settings, MessageSquare } from 'lucide-react';
 import '@/styles/waveform.css';
 
 export default function RecordingRoom() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedMicrophone, setSelectedMicrophone] = useState("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
+  const [commandOpen, setCommandOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString([], { 
+    hour: 'numeric', 
+    minute: '2-digit', 
+    hour12: true 
+  }));
+  
+  // Update current time every minute
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString([], { 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true 
+      }));
+    }, 60000); // Update every minute
+    
+    return () => clearInterval(intervalId);
+  }, []);
   
   // Timer effect for recording
   useEffect(() => {
@@ -49,12 +70,9 @@ export default function RecordingRoom() {
     setSelectedMicrophone(value);
   };
   
-  // Format the current time for display in the header
-  const currentTime = new Date().toLocaleTimeString([], { 
-    hour: 'numeric', 
-    minute: '2-digit', 
-    hour12: true 
-  });
+  const clearMicrophone = () => {
+    setSelectedMicrophone("");
+  };
   
   return (
     <DashboardLayout>
@@ -62,6 +80,7 @@ export default function RecordingRoom() {
         <RecordingHeader 
           currentTime={currentTime} 
           isRecording={isRecording}
+          onOpenCommandMenu={() => setCommandOpen(true)}
         />
         
         <div className="flex-1 overflow-hidden">
@@ -76,6 +95,7 @@ export default function RecordingRoom() {
                   <MicrophoneSelector 
                     selected={selectedMicrophone}
                     onSelect={handleMicrophoneChange}
+                    onClear={clearMicrophone}
                   />
                 </div>
                 
@@ -87,8 +107,9 @@ export default function RecordingRoom() {
                   />
                   
                   {!isRecording && recordingTime === 0 && (
-                    <div className="mt-8 text-white/60 text-center">
-                      <p>Start recording to view chapters</p>
+                    <div className="mt-8 text-white/60 text-center max-w-md px-4">
+                      <p className="mb-2 text-lg font-medium text-white">Start Recording Your Session</p>
+                      <p>Press the recording button to begin capturing audio. Chapters and transcripts will appear automatically.</p>
                     </div>
                   )}
                 </div>
@@ -108,6 +129,57 @@ export default function RecordingRoom() {
           </ResizablePanelGroup>
         </div>
       </div>
+      
+      {/* Command Menu Dialog */}
+      <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
+        <CommandInput placeholder="Type a command or search..." />
+        <CommandList>
+          <CommandGroup heading="Recording">
+            <CommandItem 
+              onSelect={() => {
+                toggleRecording();
+                setCommandOpen(false);
+              }}
+            >
+              <Mic className="mr-2 h-4 w-4" />
+              {isRecording ? 'Stop Recording' : 'Start Recording'}
+            </CommandItem>
+            {recordingTime > 0 && (
+              <CommandItem 
+                onSelect={() => {
+                  resetRecording();
+                  setCommandOpen(false);
+                }}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Reset Recording
+              </CommandItem>
+            )}
+          </CommandGroup>
+          
+          <CommandGroup heading="AI Tools">
+            <CommandItem onSelect={() => setCommandOpen(false)}>
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Chat with AI
+            </CommandItem>
+            <CommandItem onSelect={() => setCommandOpen(false)}>
+              <BookOpen className="mr-2 h-4 w-4" />
+              Generate Summary
+            </CommandItem>
+            <CommandItem onSelect={() => setCommandOpen(false)}>
+              <Brain className="mr-2 h-4 w-4" />
+              Create Flashcards
+            </CommandItem>
+          </CommandGroup>
+          
+          <CommandGroup heading="Settings">
+            <CommandItem onSelect={() => setCommandOpen(false)}>
+              <Settings className="mr-2 h-4 w-4" />
+              Recording Settings
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
     </DashboardLayout>
   );
 }

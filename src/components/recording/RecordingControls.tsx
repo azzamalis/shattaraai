@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic } from 'lucide-react';
+import { Mic, MicOff } from 'lucide-react';
 import { AudioWaveform } from './AudioWaveform';
 
 interface RecordingControlsProps {
@@ -16,23 +16,27 @@ export function RecordingControls({
   recordingTime 
 }: RecordingControlsProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-10">
+    <div className="flex flex-col items-center justify-center py-8">
       <Button
         onClick={toggleRecording}
-        className={`rounded-full w-14 h-14 flex items-center justify-center ${
+        className={`rounded-full w-16 h-16 flex items-center justify-center transition-all duration-300 ${
           isRecording 
-            ? 'bg-red-600 hover:bg-red-700' 
-            : 'bg-primary hover:bg-primary-light'
+            ? 'bg-red-600 hover:bg-red-700 shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
+            : 'bg-[#2323FF] hover:bg-[#2323FF]/90'
         }`}
       >
-        <Mic className={`h-6 w-6 ${isRecording ? 'animate-pulse' : ''}`} />
+        {isRecording ? (
+          <MicOff className="h-6 w-6 animate-pulse" />
+        ) : (
+          <Mic className="h-6 w-6" />
+        )}
       </Button>
       
       <div className="mt-3 text-white font-medium">
         {isRecording ? 'Stop Recording' : 'Start Recording'}
       </div>
       
-      <div className="w-full max-w-xl mt-6">
+      <div className="w-full max-w-xl mt-8">
         <AudioWaveform isActive={isRecording} />
       </div>
       
