@@ -4,12 +4,19 @@ import { Card, CardTitle, CardDescription } from '@/components/ui/card';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Upload, FileText, Mic } from 'lucide-react';
 import { FileIcon, LinkIcon, MicIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ActionCardProps {
   onPasteClick: () => void;
 }
 
 export function ActionCards({ onPasteClick }: ActionCardProps) {
+  const navigate = useNavigate();
+
+  const handleRecordClick = () => {
+    navigate('/recording');
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
       {/* Upload Document Card */}
@@ -58,7 +65,10 @@ export function ActionCards({ onPasteClick }: ActionCardProps) {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Card className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group">
+            <Card 
+              className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
+              onClick={handleRecordClick}
+            >
               <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
                 <Mic className="h-6 w-6 md:h-8 md:w-8 text-white" />
               </div>
