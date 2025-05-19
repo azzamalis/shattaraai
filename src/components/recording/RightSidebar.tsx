@@ -2,21 +2,26 @@
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { MessageSquare, FileText, BookOpen, HelpCircle, Edit } from 'lucide-react';
-import { AIChatInput } from '@/components/ui/ai-chat-input';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export function RightSidebar() {
   const [activeTab, setActiveTab] = useState("chat");
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', content: string}[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
   
-  const handleSubmitChat = (message: string) => {
+  const handleSubmitChat = () => {
+    if (!inputMessage.trim()) return;
+    
     // Add user message
-    setMessages([...messages, { role: 'user', content: message }]);
+    setMessages([...messages, { role: 'user', content: inputMessage }]);
+    setInputMessage('');
     
     // Simulate AI response (in a real app, this would be an API call)
     setTimeout(() => {
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: `This is a simulated response to: "${message}"` 
+        content: `This is a simulated response to: "${inputMessage}"` 
       }]);
     }, 1000);
   };
@@ -100,7 +105,26 @@ export function RightSidebar() {
           </div>
           
           <div className="p-4 mt-auto">
-            <AIChatInput onSubmit={handleSubmitChat} initialIsActive={true} />
+            <div className="relative">
+              <Input
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmitChat();
+                  }
+                }}
+                placeholder="Ask anything..."
+                className="bg-black/30 border-white/10 text-white pr-20 pl-4 py-3 rounded-full"
+              />
+              <Button 
+                onClick={handleSubmitChat}
+                className="absolute right-1 top-1 h-8 rounded-full bg-[#2323FF]"
+              >
+                Send
+              </Button>
+            </div>
           </div>
         </TabsContent>
         
