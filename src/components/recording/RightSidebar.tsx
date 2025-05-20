@@ -7,8 +7,8 @@ import QuizPreferences from './QuizPreferences';
 const RightSidebar = () => {
   const [activeTab, setActiveTab] = useState("chat");
   return <div className="h-full flex flex-col bg-[#0F0F0F]">
-      <Tabs defaultValue="chat" className="flex-1 flex flex-col h-full" onValueChange={setActiveTab}>
-        <TabsList className="w-full justify-start border-b border-[#2A2A2A] rounded-none gap-1 p-1 h-12 bg-[#111111] shrink-0">
+      <Tabs defaultValue="chat" onValueChange={setActiveTab} className="flex-1 flex flex-col h-full bg-black">
+        <TabsList className="w-full justify-start border-b border-[#2A2A2A] rounded-none gap-1 p-1 h-12 shrink-0 bg-black">
           <TabsTrigger value="chat" className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100">
             <MessageCircle className="h-4 w-4" />
             Chat
