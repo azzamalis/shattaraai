@@ -29,7 +29,7 @@ function StackedCircularFooter() {
           
           <div className="mb-8 flex space-x-4">
             <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-[#00A3F] hover:border-primary">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-[BLUE] hover:border-primary">
                 <Facebook className="h-4 w-4" />
                 <span className="sr-only">Facebook</span>
               </Button>
