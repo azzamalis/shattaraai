@@ -70,7 +70,7 @@ const RecordingRoom = () => {
             <LeftSidebar isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={formatTime(time)} selectedMicrophone={selectedMicrophone} onMicrophoneSelect={handleMicrophoneSelect} onMicrophoneClear={handleMicrophoneClear} />
           </ResizablePanel>
           
-          <ResizableHandle withHandle className="bg-inherit" />
+          <ResizableHandle withHandle className="bg-dark-DEFAULT" />
           
           <ResizablePanel defaultSize={50} minSize={40}>
             <RightSidebar />
