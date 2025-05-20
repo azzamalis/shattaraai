@@ -30,7 +30,7 @@ export function UpgradeModal({
         <div className="flex items-center justify-between">
           <span className="text-lg font-bold text-white">20% OFF</span>
           <div className="flex items-center">
-            <div className="bg-[#2d2d7a] text-white px-3 py-1 rounded text-sm font-mono">
+            <div className="bg-[#00A3FF] text-white px-3 py-1 rounded text-sm font-mono">
               FINALS25
             </div>
             <button onClick={copyPromoCode} className="ml-2 text-blue-400 hover:text-blue-300">
