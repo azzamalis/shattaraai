@@ -81,10 +81,10 @@ export function HistoryTable({ items, onItemClick }: HistoryTableProps) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-[#1A1A1A] border-white/20 text-white">
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/10">
-                    View Details
+                    View
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/10">
-                    Copy to Room
+                    Add
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer text-red-400 hover:bg-white/10 hover:text-red-400">
                     Delete
