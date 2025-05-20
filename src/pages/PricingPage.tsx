@@ -1,15 +1,12 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-
 const PricingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
-  return (
-    <DashboardLayout>
+  return <DashboardLayout>
       <div className="flex flex-col min-h-screen bg-black text-white">
         <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <h1 className="text-4xl sm:text-5xl font-bold text-center mb-4">Unlock smarter learning in less time.</h1>
@@ -18,14 +15,14 @@ const PricingPage: React.FC = () => {
           {/* Billing Toggle */}
           <div className="inline-flex items-center justify-center rounded-full bg-gray-800 p-1 mb-12">
             <ToggleGroup type="single" value={billingCycle} onValueChange={value => {
-              if (value) setBillingCycle(value as "monthly" | "yearly");
-            }} className="relative">
+            if (value) setBillingCycle(value as "monthly" | "yearly");
+          }} className="relative">
               <ToggleGroupItem value="monthly" className={`px-4 py-2 rounded-full text-sm transition-all ${billingCycle === "monthly" ? "bg-gray-900 text-white" : "text-gray-400"}`}>
                 Pay Monthly
               </ToggleGroupItem>
               <ToggleGroupItem value="yearly" className={`px-4 py-2 rounded-full text-sm flex items-center transition-all ${billingCycle === "yearly" ? "bg-gray-900 text-white" : "text-gray-400"}`}>
                 Pay Yearly
-                <span className="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
+                <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
                   Save 40%
                 </span>
               </ToggleGroupItem>
@@ -169,8 +166,6 @@ const PricingPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 };
-
 export default PricingPage;
