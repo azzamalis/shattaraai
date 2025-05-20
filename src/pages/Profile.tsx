@@ -2,17 +2,10 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar } from "@/components/ui/avatar";
 import { BarChart } from "@/components/ui/bar-chart";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-
 const ProfileContent = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -21,22 +14,17 @@ const ProfileContent = () => {
   // Mock data for the charts
   const performanceData = {
     labels: ["Flashcards", "Summaries", "Notes", "Exams"],
-    datasets: [
-      {
-        label: "Score",
-        data: [85, 78, 92, 88],
-        backgroundColor: "#22c55e",
-      },
-      {
-        label: "Performance",
-        data: [75, 82, 88, 85],
-        backgroundColor: "#3b82f6",
-      },
-    ],
+    datasets: [{
+      label: "Score",
+      data: [85, 78, 92, 88],
+      backgroundColor: "#22c55e"
+    }, {
+      label: "Performance",
+      data: [75, 82, 88, 85],
+      backgroundColor: "#3b82f6"
+    }]
   };
-
-  return (
-    <div className="container mx-auto p-6 space-y-6">
+  return <div className="container mx-auto p-6 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Profile Information Card */}
         <Card className="p-6 space-y-4 bg-[#222222] border-white/20">
@@ -55,27 +43,14 @@ const ProfileContent = () => {
               <label htmlFor="username" className="text-sm font-medium text-white">
                 Username
               </label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
-                className="bg-[#333333] border-white/20 text-white placeholder:text-white/50"
-              />
+              <Input id="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter your username" className="bg-[#333333] border-white/20 text-white placeholder:text-white/50" />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-white">
                 Email
               </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="bg-[#333333] border-white/20 text-white placeholder:text-white/50"
-              />
+              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter your email" className="bg-[#333333] border-white/20 text-white placeholder:text-white/50" />
             </div>
 
             <div className="space-y-2">
@@ -95,7 +70,7 @@ const ProfileContent = () => {
             </div>
 
             <div className="space-y-4 pt-4">
-              <Button className="w-full bg-primary hover:bg-primary-light text-white">
+              <Button className="w-full text-white bg-dark-deeper">
                 Invite & Earn
               </Button>
               <Button variant="destructive" className="w-full">
@@ -113,16 +88,11 @@ const ProfileContent = () => {
           </div>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 const Profile = () => {
-  return (
-    <DashboardLayout>
+  return <DashboardLayout>
       <ProfileContent />
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 };
-
-export default Profile; 
+export default Profile;
