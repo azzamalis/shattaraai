@@ -22,7 +22,7 @@ const PricingPage: React.FC = () => {
               </ToggleGroupItem>
               <ToggleGroupItem value="yearly" className={`px-4 py-2 rounded-full text-sm flex items-center transition-all ${billingCycle === "yearly" ? "bg-gray-900 text-white" : "text-gray-400"}`}>
                 Pay Yearly
-                <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
+                <span className="ml-2 text-xs bg-[#00A3FF] text-white px-2 py-0.5 rounded-full">
                   Save 40%
                 </span>
               </ToggleGroupItem>
