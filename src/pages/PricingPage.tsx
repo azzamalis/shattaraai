@@ -112,10 +112,7 @@ const PricingPage: React.FC = () => {
                     <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
                     <span>Upload files, each up to <strong>2000</strong> pages / 300 MB in size</span>
                   </li>
-                  <li className="flex items-start">
-                    <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span><strong>Priority</strong> customer support</span>
-                  </li>
+                  
                 </ul>
               </CardContent>
               <CardFooter className="px-8 pb-8 pt-0">
