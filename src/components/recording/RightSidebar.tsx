@@ -44,7 +44,7 @@ const RightSidebar = () => {
         </TabsContent>
         <TabsContent value="exams" className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
-            <div className="flex flex-col items-center justify-center h-full min-h-[400px] bg-[#121212]">
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] bg-black">
               <QuizPreferences />
             </div>
           </ScrollArea>
