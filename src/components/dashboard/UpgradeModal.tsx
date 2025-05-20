@@ -69,7 +69,7 @@ export function UpgradeModal({
               <div className="ml-3">
                 <div className="flex items-center">
                   <span className="font-medium">Annual Plan</span>
-                  <span className="ml-2 text-xs bg-primary px-2 py-0.5 rounded text-white">Save 20%</span>
+                  <span className="ml-2 text-xs bg-[#00A3FF] px-2 py-0.5 rounded text-white">Save 40%</span>
                 </div>
                 <span className="text-xs text-zinc-400">Billed annually</span>
               </div>
