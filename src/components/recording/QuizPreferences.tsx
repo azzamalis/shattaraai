@@ -8,7 +8,7 @@ const QuizPreferences = () => {
       <h2 className="text-white text-xl font-semibold">Quiz Preferences</h2>
       
       {/* Question Format Options */}
-      <div className="w-full rounded-xl p-4 space-y-3 bg-transparent border-white/10">
+      <div className="w-full rounded-xl p-4 space-y-3 bg-transparent">
         <ToggleGroup type="single" value={questionFormat} onValueChange={value => value && setQuestionFormat(value)} className="flex justify-center gap-2 w-full">
           <ToggleGroupItem value="multiple-choice" className="flex-1 bg-transparent data-[state=on]:bg-[#2A2A2A] border border-white/10 hover:bg-[#2A2A2A] text-white p-3 rounded-lg" aria-label="Multiple Choice">
             <div className="flex items-center justify-center gap-2">
