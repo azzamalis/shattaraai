@@ -39,7 +39,7 @@ const QuizPreferences = () => {
           <ToggleGroupItem value="medium" className="flex-1 bg-transparent data-[state=on]:bg-[#2A2A2A] border border-white/10 hover:bg-[#2A2A2A] text-white p-3 rounded-lg" aria-label="Medium">
             <div className="flex items-center justify-center gap-2">
               <div className="flex">
-                <Star className="h-5 w-5" />
+                <Star className="h-5 w-5 mx-[8px]" />
                 <Star className="h-5 w-5 -ml-2" />
               </div>
               <span>Medium</span>
