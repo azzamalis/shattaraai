@@ -27,11 +27,11 @@ const RightSidebar = () => {
             Flashcards
           </TabsTrigger>
           <TabsTrigger
-            value="quizzes"
+            value="exams"
             className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100"
           >
             <Brain className="h-4 w-4" />
-            Quizzes
+            Exams
           </TabsTrigger>
           <TabsTrigger
             value="summary"
