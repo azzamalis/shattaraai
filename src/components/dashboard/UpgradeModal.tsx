@@ -26,7 +26,7 @@ export function UpgradeModal({
       </button>
       
       {/* Promotional banner */}
-      <div className="p-4 w-full rounded-t-lg bg-neutral-900">
+      <div className="p-4 w-full rounded-t-lg bg-dark-DEFAULT">
         <div className="flex items-center justify-between">
           <span className="text-lg font-bold text-white">20% OFF</span>
           <div className="flex items-center">
