@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import RoomPage from "./pages/RoomPage";
 import HistoryPage from "./pages/HistoryPage";
 import RecordingRoom from "./pages/RecordingRoom";
 import PricingPage from "./pages/PricingPage";
+import Profile from "./pages/Profile";
 import React from "react";
 
 // Create a new QueryClient instance inside the component
@@ -48,6 +48,7 @@ const App = () => {
             
             {/* Dashboard routes */}
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/rooms/:id" element={<RoomPage />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/recording" element={<RecordingRoom />} />

@@ -3,7 +3,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft, Pencil, Trash2, Check, X, ChevronDown } from 'lucide-react';
+import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft, Pencil, Trash2, Check, X, ChevronDown, User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
@@ -309,7 +309,14 @@ export function DashboardDrawer({
                 </div>
                 
                 <div className="py-1">
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white"
+                    onClick={() => {
+                      navigate('/profile');
+                      onOpenChange(false);
+                    }}
+                  >
                     <Settings size={16} className="mr-3 text-gray-300" />
                     <span>Settings</span>
                   </Button>

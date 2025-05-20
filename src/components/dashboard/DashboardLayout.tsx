@@ -6,7 +6,7 @@ import { Room, RoomHandlers } from '@/lib/types';
 import { toast } from 'sonner';
 
 interface DashboardLayoutProps {
-  children: React.ReactElement<RoomHandlers & { rooms: Room[] }>;
+  children: React.ReactElement<Partial<RoomHandlers & { rooms: Room[] }>>;
   className?: string;
 }
 
@@ -76,11 +76,13 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
     };
   }, [isDrawerOpen, isMobile]);
 
-  // Clone children with room props
-  const childWithProps = React.cloneElement(children, {
-    rooms,
-    ...roomHandlers
-  });
+  // Clone children with room props only if they accept them
+  const childWithProps = React.isValidElement(children) && children.type.toString().includes('Dashboard') 
+    ? React.cloneElement(children, {
+        rooms,
+        ...roomHandlers
+      })
+    : children;
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-[#111] overflow-hidden">
