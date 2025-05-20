@@ -61,7 +61,7 @@ const RightSidebar = () => {
           <ScrollArea className="h-full">
             <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-white/60 space-y-4 p-4">
               <FileText className="h-12 w-12 mb-2" />
-              <p className="text-lg text-center max-w-md">Need a refresher on what you've covered? Your smart notes are already organized and waiting.</p>
+              <p className="text-center max-w-md text-base">Need a refresher on what you've covered? Your smart notes are already organized and waiting.</p>
             </div>
           </ScrollArea>
         </TabsContent>
