@@ -74,7 +74,7 @@ const PricingPage: React.FC = () => {
             {/* Pro Plan */}
             <Card className="bg-white text-black border-0 rounded-lg overflow-hidden relative">
               <div className="absolute -top-3 inset-x-0 flex justify-center">
-                <span className="bg-gray-900 text-white text-xs px-3 rounded-full py-[12px]">
+                <span className="bg-[#00A3FF] text-white px-3 rounded-full py-[10px] my-[5px] text-xs">
                   {billingCycle === "yearly" ? "Billed annually" : "Most popular"}
                 </span>
               </div>
