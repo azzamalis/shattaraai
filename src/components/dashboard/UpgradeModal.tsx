@@ -107,7 +107,7 @@ export function UpgradeModal({
           <div className="ml-3">
             <div className="text-sm font-medium">Join over 10K+ learners boosting their results with Shattara AI.</div>
             <div className="text-xs text-zinc-400 mt-1">
-              Need a school plan? <a href="#" className="text-[WHITE] hover:underline">Contact Us</a>
+              Looking for a plan for your school? <a href="#" className="text-[WHITE] hover:underline">Let’s talk</a>
             </div>
           </div>
         </div>
