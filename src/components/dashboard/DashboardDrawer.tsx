@@ -13,7 +13,6 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Room, RoomHandlers } from '@/lib/types';
-
 interface DashboardDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -22,7 +21,6 @@ interface DashboardDrawerProps {
   onEditRoom: (id: string, newName: string) => void;
   onDeleteRoom: (id: string) => void;
 }
-
 export function DashboardDrawer({
   open,
   onOpenChange,
@@ -39,7 +37,6 @@ export function DashboardDrawer({
   const [hasSeenTutorial, setHasSeenTutorial] = useState(() => {
     return localStorage.getItem('hasSeenTutorial') === 'true';
   });
-  
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
   const [roomToDeleteName, setRoomToDeleteName] = useState<string>("");
@@ -51,58 +48,45 @@ export function DashboardDrawer({
   const visibleRooms = rooms.slice(0, 3);
   const hiddenRooms = rooms.slice(3);
   const hasHiddenRooms = rooms.length > 3;
-
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   useEffect(() => {
     if (!tutorialModalOpen) {
       setHasSeenTutorial(localStorage.getItem('hasSeenTutorial') === 'true');
     }
   }, [tutorialModalOpen]);
-
   const handleFeedbackClick = () => {
     console.log("Feedback button clicked");
     setFeedbackModalOpen(true);
   };
-
   const handleTutorialClick = () => {
     console.log("Tutorial button clicked");
     setTutorialModalOpen(true);
-    
     setHasSeenTutorial(true);
     localStorage.setItem('hasSeenTutorial', 'true');
   };
-
   const handleLogout = () => {
     localStorage.removeItem('hasSeenTutorial');
-    
     onOpenChange(false);
-    
     toast.success("Logged out successfully", {
       description: "You have been logged out of your account."
     });
-    
     navigate('/');
   };
-
   const getDrawerWidth = () => {
     if (windowWidth < 640) return 'w-[85vw]';
     if (windowWidth < 768) return 'w-[350px]';
     return 'w-[300px]';
   };
-
   const handleRoomClick = (roomId: string) => {
     navigate(`/rooms/${roomId}`);
     onOpenChange(false);
   };
-
   const handleRenameClick = (e: React.MouseEvent, roomId: string) => {
     e.stopPropagation();
     const room = rooms.find(r => r.id === roomId);
@@ -111,7 +95,6 @@ export function DashboardDrawer({
       setEditedRoomName(room.name);
     }
   };
-
   const handleSaveRename = (e: React.MouseEvent, roomId: string) => {
     e.stopPropagation();
     if (editedRoomName.trim()) {
@@ -119,12 +102,10 @@ export function DashboardDrawer({
       setEditingRoomId(null);
     }
   };
-
   const handleCancelRename = (e: React.MouseEvent) => {
     e.stopPropagation();
     setEditingRoomId(null);
   };
-
   const handleDeleteClick = (e: React.MouseEvent, roomId: string) => {
     e.stopPropagation();
     const room = rooms.find(r => r.id === roomId);
@@ -134,7 +115,6 @@ export function DashboardDrawer({
       setDeleteModalOpen(true);
     }
   };
-
   const handleDeleteConfirm = () => {
     if (roomToDelete) {
       onDeleteRoom(roomToDelete);
@@ -142,7 +122,6 @@ export function DashboardDrawer({
       setDeleteModalOpen(false);
     }
   };
-
   return <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="left" className={`${getDrawerWidth()} bg-[#222222] border-r border-white/20 p-0`} closeButton={false}>
@@ -158,17 +137,14 @@ export function DashboardDrawer({
 
           <div className="flex flex-col h-[calc(100%-130px)] overflow-auto">
             <div className="px-4 pt-4 pb-2">
-              <Button 
-                className="w-full flex items-center justify-center gap-2 
+              <Button className="w-full flex items-center justify-center gap-2 
                   bg-transparent border border-dashed border-white/20 
-                  text-white hover:bg-white/5 transition-colors duration-200"
-                onClick={() => {
-                  navigate('/dashboard');
-                  onOpenChange(false);
-                }}
-              >
+                  text-white hover:bg-white/5 transition-colors duration-200" onClick={() => {
+              navigate('/dashboard');
+              onOpenChange(false);
+            }}>
                 <Plus size={18} />
-                <span>Add Content</span>
+                <span>New Content</span>
               </Button>
             </div>
             
@@ -197,175 +173,88 @@ export function DashboardDrawer({
               </div>
 
               <div className="space-y-1">
-                <Button 
-                  variant="ghost" 
-                  className="w-full flex items-center justify-center gap-2 
+                <Button variant="ghost" className="w-full flex items-center justify-center gap-2 
                     text-white hover:bg-white/5 
                     border border-dashed border-white/20 
                     rounded-md mb-2 transition-colors duration-200
-                    hover:text-white" 
-                  onClick={onAddRoom}
-                >
+                    hover:text-white" onClick={onAddRoom}>
                   <Plus size={18} />
                   <span>Add a Room</span>
                 </Button>
 
-                {visibleRooms.map((room) => (
-                  <Button
-                    key={room.id}
-                    variant="ghost"
-                    className="w-full flex items-center justify-between gap-2 px-2 py-1.5 
+                {visibleRooms.map(room => <Button key={room.id} variant="ghost" className="w-full flex items-center justify-between gap-2 px-2 py-1.5 
                       text-white hover:bg-white/5 transition-colors duration-200
-                      hover:text-white group"
-                    onClick={() => handleRoomClick(room.id)}
-                  >
-                    {editingRoomId === room.id ? (
-                      <div className="flex-1 flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                        <input
-                          type="text"
-                          value={editedRoomName}
-                          onChange={(e) => setEditedRoomName(e.target.value)}
-                          className="flex-1 bg-transparent border-none border-b border-white text-white outline-none focus:outline-none focus:ring-0 focus:border-none"
-                          style={{ borderBottom: '1px solid white' }}
-                          autoFocus
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') handleSaveRename(e as any, room.id);
-                            if (e.key === 'Escape') handleCancelRename(e as any);
-                          }}
-                        />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={(e) => handleSaveRename(e, room.id)}
-                        >
+                      hover:text-white group" onClick={() => handleRoomClick(room.id)}>
+                    {editingRoomId === room.id ? <div className="flex-1 flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                        <input type="text" value={editedRoomName} onChange={e => setEditedRoomName(e.target.value)} className="flex-1 bg-transparent border-none border-b border-white text-white outline-none focus:outline-none focus:ring-0 focus:border-none" style={{
+                    borderBottom: '1px solid white'
+                  }} autoFocus onKeyDown={e => {
+                    if (e.key === 'Enter') handleSaveRename(e as any, room.id);
+                    if (e.key === 'Escape') handleCancelRename(e as any);
+                  }} />
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={e => handleSaveRename(e, room.id)}>
                           <Check className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={handleCancelRename}
-                        >
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCancelRename}>
                           <X className="h-4 w-4" />
                         </Button>
-                      </div>
-                    ) : (
-                      <>
+                      </div> : <>
                         <span className="flex-1 text-left truncate">{room.name}</span>
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 hover:bg-white/10"
-                            onClick={(e) => handleRenameClick(e, room.id)}
-                          >
+                          <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={e => handleRenameClick(e, room.id)}>
                             <Pencil className="h-3 w-3" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 hover:bg-white/10"
-                            onClick={(e) => handleDeleteClick(e, room.id)}
-                          >
+                          <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={e => handleDeleteClick(e, room.id)}>
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
-                      </>
-                    )}
-                  </Button>
-                ))}
+                      </>}
+                  </Button>)}
 
-                {hasHiddenRooms && (
-                  <Popover open={showMoreRooms} onOpenChange={setShowMoreRooms}>
+                {hasHiddenRooms && <Popover open={showMoreRooms} onOpenChange={setShowMoreRooms}>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="w-full flex items-center justify-between px-2 py-1.5 
+                      <Button variant="ghost" className="w-full flex items-center justify-between px-2 py-1.5 
                           text-white/60 hover:bg-white/5 hover:text-white 
-                          transition-colors duration-200 group"
-                      >
+                          transition-colors duration-200 group">
                         <span className="flex items-center gap-2">
                           <ChevronDown className="h-4 w-4 transition-transform duration-200" />
                           <span>Show More</span>
                         </span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent 
-                      className="w-[calc(300px-2rem)] bg-[#1A1A1A] border-white/10 p-1"
-                      align="center"
-                      sideOffset={5}
-                    >
+                    <PopoverContent className="w-[calc(300px-2rem)] bg-[#1A1A1A] border-white/10 p-1" align="center" sideOffset={5}>
                       <div className="space-y-1">
-                        {hiddenRooms.map((room) => (
-                          <Button
-                            key={room.id}
-                            variant="ghost"
-                            className="w-full flex items-center justify-between gap-2 px-2 py-1.5 
+                        {hiddenRooms.map(room => <Button key={room.id} variant="ghost" className="w-full flex items-center justify-between gap-2 px-2 py-1.5 
                               text-white hover:bg-white/5 transition-colors duration-200
-                              hover:text-white group"
-                            onClick={() => handleRoomClick(room.id)}
-                          >
-                            {editingRoomId === room.id ? (
-                              <div className="flex-1 flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                                <input
-                                  type="text"
-                                  value={editedRoomName}
-                                  onChange={(e) => setEditedRoomName(e.target.value)}
-                                  className="flex-1 bg-transparent border-none border-b border-white text-white outline-none focus:outline-none focus:ring-0 focus:border-none"
-                                  style={{ borderBottom: '1px solid white' }}
-                                  autoFocus
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSaveRename(e as any, room.id);
-                                    if (e.key === 'Escape') handleCancelRename(e as any);
-                                  }}
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6"
-                                  onClick={(e) => handleSaveRename(e, room.id)}
-                                >
+                              hover:text-white group" onClick={() => handleRoomClick(room.id)}>
+                            {editingRoomId === room.id ? <div className="flex-1 flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                                <input type="text" value={editedRoomName} onChange={e => setEditedRoomName(e.target.value)} className="flex-1 bg-transparent border-none border-b border-white text-white outline-none focus:outline-none focus:ring-0 focus:border-none" style={{
+                          borderBottom: '1px solid white'
+                        }} autoFocus onKeyDown={e => {
+                          if (e.key === 'Enter') handleSaveRename(e as any, room.id);
+                          if (e.key === 'Escape') handleCancelRename(e as any);
+                        }} />
+                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={e => handleSaveRename(e, room.id)}>
                                   <Check className="h-4 w-4" />
                                 </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6"
-                                  onClick={handleCancelRename}
-                                >
+                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCancelRename}>
                                   <X className="h-4 w-4" />
                                 </Button>
-                              </div>
-                            ) : (
-                              <>
+                              </div> : <>
                                 <span className="flex-1 text-left truncate">{room.name}</span>
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 hover:bg-white/10"
-                                    onClick={(e) => handleRenameClick(e, room.id)}
-                                  >
+                                  <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={e => handleRenameClick(e, room.id)}>
                                     <Pencil className="h-3 w-3" />
                                   </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 hover:bg-white/10"
-                                    onClick={(e) => handleDeleteClick(e, room.id)}
-                                  >
+                                  <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={e => handleDeleteClick(e, room.id)}>
                                     <Trash2 className="h-3 w-3" />
                                   </Button>
                                 </div>
-                              </>
-                            )}
-                          </Button>
-                        ))}
+                              </>}
+                          </Button>)}
                       </div>
                     </PopoverContent>
-                  </Popover>
-                )}
+                  </Popover>}
               </div>
             </div>
             
@@ -379,9 +268,7 @@ export function DashboardDrawer({
                 <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white relative" onClick={handleTutorialClick}>
                   <Book size={18} className="mr-2" />
                   <span>Quick Guide</span>
-                  {!hasSeenTutorial && (
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-green-500"></span>
-                  )}
+                  {!hasSeenTutorial && <span className="absolute right-2 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-green-500"></span>}
                 </Button>
                 <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white" asChild>
                   <Link to="/extension">
@@ -443,11 +330,7 @@ export function DashboardDrawer({
                     </div>
                     <Switch checked={darkMode} onCheckedChange={setDarkMode} className="data-[state=checked]:bg-primary" />
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white"
-                    onClick={handleLogout}
-                  >
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white" onClick={handleLogout}>
                     <LogOut size={16} className="mr-3 text-gray-300" />
                     <span>Log out</span>
                   </Button>
@@ -476,17 +359,10 @@ export function DashboardDrawer({
           </p>
 
           <div className="flex justify-end gap-3">
-            <Button
-              variant="ghost"
-              className="text-white hover:bg-white/5"
-              onClick={() => setDeleteModalOpen(false)}
-            >
+            <Button variant="ghost" className="text-white hover:bg-white/5" onClick={() => setDeleteModalOpen(false)}>
               Cancel
             </Button>
-            <Button
-              className="bg-red-500 text-white hover:bg-red-600"
-              onClick={handleDeleteConfirm}
-            >
+            <Button className="bg-red-500 text-white hover:bg-red-600" onClick={handleDeleteConfirm}>
               Delete Room
             </Button>
           </div>
