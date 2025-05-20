@@ -20,6 +20,7 @@ import DashboardPage from "./pages/DashboardPage";
 import RoomPage from "./pages/RoomPage";
 import HistoryPage from "./pages/HistoryPage";
 import RecordingRoom from "./pages/RecordingRoom";
+import PricingPage from "./pages/PricingPage";
 import React from "react";
 
 // Create a new QueryClient instance inside the component
@@ -50,6 +51,7 @@ const App = () => {
             <Route path="/rooms/:id" element={<RoomPage />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/recording" element={<RecordingRoom />} />
+            <Route path="/pricing" element={<PricingPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

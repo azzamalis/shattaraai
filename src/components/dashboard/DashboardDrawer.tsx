@@ -426,9 +426,11 @@ export function DashboardDrawer({
                     <Settings size={16} className="mr-3 text-gray-300" />
                     <span>Settings</span>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white">
-                    <Tag size={16} className="mr-3 text-gray-300" />
-                    <span>Pricing</span>
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white" asChild>
+                    <Link to="/pricing">
+                      <Tag size={16} className="mr-3 text-gray-300" />
+                      <span>Pricing</span>
+                    </Link>
                   </Button>
                   <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white">
                     <History size={16} className="mr-3 text-gray-300" />
