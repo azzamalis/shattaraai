@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, FileText, BookOpen, Brain, FileStack } from "lucide-react";
+import { MessageCircle, FileText, BookOpen, Brain, FileStack, CheckSquare, FileInput, Star } from "lucide-react";
 import AIChat from "./AIChat";
+import QuizPreferences from './QuizPreferences';
 
 const RightSidebar = () => {
   const [activeTab, setActiveTab] = useState("chat");
@@ -60,11 +61,10 @@ const RightSidebar = () => {
             </div>
           </ScrollArea>
         </TabsContent>
-        <TabsContent value="quizzes" className="flex-1 overflow-hidden">
+        <TabsContent value="exams" className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
-            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-white/60 space-y-4 p-4">
-              <Brain className="h-12 w-12 mb-2" />
-              <p className="text-lg text-center max-w-md">Think you've got it down? A quick practice exam is ready to help you find out.</p>
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] bg-[#121212]">
+              <QuizPreferences />
             </div>
           </ScrollArea>
         </TabsContent>
