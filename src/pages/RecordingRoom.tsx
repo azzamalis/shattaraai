@@ -1,16 +1,32 @@
 
 import React, { useState, useEffect } from "react";
-import RecordingHeader from "@/components/RecordingHeader";
-import LeftSidebar from "@/components/LeftSidebar";
-import RightSidebar from "@/components/RightSidebar";
-import MicrophoneSelector from "@/components/MicrophoneSelector";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { RecordingHeader } from "@/components/recording/RecordingHeader";
+import { LeftSidebar } from "@/components/recording/LeftSidebar";
+import RightSidebar from "@/components/recording/RightSidebar";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import RecordingControls from "@/components/RecordingControls";
 
 const RecordingRoom = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [time, setTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState("");
+  const [selectedMicrophone, setSelectedMicrophone] = useState("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
+
+  useEffect(() => {
+    const updateCurrentTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const ampm = hours >= 12 ? "PM" : "AM";
+      const formattedHours = hours % 12 || 12;
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      setCurrentTime(`${formattedHours}:${formattedMinutes} ${ampm}`);
+    };
+
+    updateCurrentTime();
+    const interval = setInterval(updateCurrentTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -33,22 +49,49 @@ const RecordingRoom = () => {
     setIsRecording(!isRecording);
   };
 
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
+  const handleMicrophoneSelect = (value: string) => {
+    setSelectedMicrophone(value);
+  };
+
+  const handleMicrophoneClear = () => {
+    setSelectedMicrophone("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground dark">
-      <RecordingHeader />
+    <div className="flex flex-col h-screen bg-black text-white dark">
+      <DashboardHeader onOpenDrawer={() => {}} />
+      
+      <RecordingHeader 
+        currentTime={currentTime}
+        isRecording={isRecording}
+        toggleRecording={toggleRecording}
+        recordingTime={formatTime(time)}
+        selectedMicrophone={selectedMicrophone}
+        onMicrophoneSelect={handleMicrophoneSelect}
+        onMicrophoneClear={handleMicrophoneClear}
+        rooms={[
+          { id: "1", name: "Room 1", lastActive: "Just now" },
+          { id: "2", name: "Room 2", lastActive: "1 hour ago" }
+        ]}
+      />
       
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={50} minSize={25} maxSize={60}>
-            <div className="flex flex-col h-full">
-              <MicrophoneSelector />
-              <RecordingControls 
-                isRecording={isRecording} 
-                time={time} 
-                toggleRecording={toggleRecording} 
-              />
-              <LeftSidebar isRecording={isRecording} />
-            </div>
+            <LeftSidebar 
+              isRecording={isRecording}
+              toggleRecording={toggleRecording}
+              recordingTime={formatTime(time)}
+              selectedMicrophone={selectedMicrophone}
+              onMicrophoneSelect={handleMicrophoneSelect}
+              onMicrophoneClear={handleMicrophoneClear}
+            />
           </ResizablePanel>
           
           <ResizableHandle withHandle />

@@ -1,43 +1,42 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 interface AudioWaveformProps {
   isRecording: boolean;
 }
 
 const AudioWaveform = ({ isRecording }: AudioWaveformProps) => {
-  const [barHeights, setBarHeights] = useState<number[]>([]);
-  
-  // Generate initial random heights and update when active state changes
-  useEffect(() => {
-    const generateHeights = () => {
-      return Array.from({ length: 40 }, () => Math.random() * 20 + 5);
-    };
+  const [bars, setBars] = useState<number[]>([]);
 
-    setBarHeights(generateHeights());
-    
-    // When recording is active, periodically update bar heights for animation
+  useEffect(() => {
+    // Generate initial random bars
+    const initialBars = Array.from({ length: 40 }, () => Math.random() * 0.5 + 0.1);
+    setBars(initialBars);
+
+    // If recording, animate the bars
     let interval: NodeJS.Timeout;
     if (isRecording) {
       interval = setInterval(() => {
-        setBarHeights(generateHeights());
-      }, 800);
+        setBars(prev => prev.map(() => Math.random() * 0.8 + 0.2));
+      }, 100);
     }
-    
+
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [isRecording]);
-  
+
   return (
-    <div className="flex items-center justify-center h-6 gap-[2px]">
-      {barHeights.map((height, index) => (
-        <div 
+    <div className="flex items-center justify-center h-full w-full gap-0.5">
+      {bars.map((height, index) => (
+        <div
           key={index}
-          className={`waveform-bar transition-all duration-300 w-[2px] bg-muted-foreground rounded-full ${isRecording ? 'opacity-100' : 'opacity-30'}`}
+          className="waveform-bar bg-white/40 rounded-full w-[3px]"
           style={{
-            height: isRecording ? `${height}px` : '1px',
-            animationDelay: `${index * 0.05}s`
+            height: isRecording ? `${height * 100}%` : "10%",
+            transform: isRecording ? `scaleY(${height * 1.5})` : "scaleY(0.2)",
+            transition: "transform 0.1s ease-in-out",
+            opacity: isRecording ? 1 : 0.3,
           }}
         />
       ))}

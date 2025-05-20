@@ -6,11 +6,11 @@ import { Download, Share2 } from "lucide-react";
 const HeaderControls = () => {
   return (
     <div className="flex items-center space-x-2">
-      <Button variant="outline" size="sm" className="border-border">
+      <Button variant="outline" size="sm" className="border-white/20 text-white bg-transparent hover:bg-white/10">
         <Download className="h-4 w-4 mr-2" />
         Save
       </Button>
-      <Button variant="outline" size="sm" className="border-border">
+      <Button variant="outline" size="sm" className="border-white/20 text-white bg-transparent hover:bg-white/10">
         <Share2 className="h-4 w-4 mr-2" />
         Share
       </Button>

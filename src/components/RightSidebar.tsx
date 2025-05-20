@@ -9,53 +9,43 @@ const RightSidebar = () => {
   const [activeTab, setActiveTab] = useState("chat");
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-[#0F0F0F]">
       <Tabs defaultValue="chat" className="w-full h-full" onValueChange={setActiveTab}>
-        <TabsList className="w-full justify-start border-b rounded-none gap-0 p-0 h-11">
+        <TabsList className="w-full justify-start border-b border-white/10 rounded-none gap-1 p-1 h-12 bg-[#111111]">
           <TabsTrigger
             value="chat"
-            className={`data-[state=active]:bg-transparent flex-1 h-full rounded-none ${
-              activeTab === "chat" ? "active-tab" : ""
-            }`}
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors duration-100"
           >
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Chat
+            <MessageCircle className="h-4 w-4" />
+            <span>Chat</span>
           </TabsTrigger>
           <TabsTrigger
             value="flashcards"
-            className={`data-[state=active]:bg-transparent flex-1 h-full rounded-none ${
-              activeTab === "flashcards" ? "active-tab" : ""
-            }`}
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors duration-100"
           >
-            <FileStack className="h-4 w-4 mr-2" />
-            Flashcards
+            <FileStack className="h-4 w-4" />
+            <span>Flashcards</span>
           </TabsTrigger>
           <TabsTrigger
             value="quizzes"
-            className={`data-[state=active]:bg-transparent flex-1 h-full rounded-none ${
-              activeTab === "quizzes" ? "active-tab" : ""
-            }`}
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors duration-100"
           >
-            <Brain className="h-4 w-4 mr-2" />
-            Quizzes
+            <Brain className="h-4 w-4" />
+            <span>Quizzes</span>
           </TabsTrigger>
           <TabsTrigger
             value="summary"
-            className={`data-[state=active]:bg-transparent flex-1 h-full rounded-none ${
-              activeTab === "summary" ? "active-tab" : ""
-            }`}
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors duration-100"
           >
-            <BookOpen className="h-4 w-4 mr-2" />
-            Summary
+            <BookOpen className="h-4 w-4" />
+            <span>Summary</span>
           </TabsTrigger>
           <TabsTrigger
             value="notes"
-            className={`data-[state=active]:bg-transparent flex-1 h-full rounded-none ${
-              activeTab === "notes" ? "active-tab" : ""
-            }`}
+            className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors duration-100"
           >
-            <FileText className="h-4 w-4 mr-2" />
-            Notes
+            <FileText className="h-4 w-4" />
+            <span>Notes</span>
           </TabsTrigger>
         </TabsList>
 
@@ -65,32 +55,36 @@ const RightSidebar = () => {
 
         <TabsContent value="flashcards" className="p-0 m-0 h-full">
           <ScrollArea className="h-[calc(100vh-160px)]">
-            <div className="p-4 flex items-center justify-center h-full text-sm text-muted-foreground">
-              Start recording to generate flashcards
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-white/40 space-y-4 p-4">
+              <FileStack className="h-12 w-12" />
+              <p className="text-lg">Learn with the AI Tutor</p>
             </div>
           </ScrollArea>
         </TabsContent>
 
         <TabsContent value="quizzes" className="p-0 m-0 h-full">
           <ScrollArea className="h-[calc(100vh-160px)]">
-            <div className="p-4 flex items-center justify-center h-full text-sm text-muted-foreground">
-              Start recording to generate quizzes
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-white/40 space-y-4 p-4">
+              <Brain className="h-12 w-12" />
+              <p className="text-lg">Learn with the AI Tutor</p>
             </div>
           </ScrollArea>
         </TabsContent>
 
         <TabsContent value="summary" className="p-0 m-0 h-full">
           <ScrollArea className="h-[calc(100vh-160px)]">
-            <div className="p-4 flex items-center justify-center h-full text-sm text-muted-foreground">
-              Start recording to generate summary
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-white/40 space-y-4 p-4">
+              <BookOpen className="h-12 w-12" />
+              <p className="text-lg">Learn with the AI Tutor</p>
             </div>
           </ScrollArea>
         </TabsContent>
 
         <TabsContent value="notes" className="p-0 m-0 h-full">
           <ScrollArea className="h-[calc(100vh-160px)]">
-            <div className="p-4 flex items-center justify-center h-full text-sm text-muted-foreground">
-              Start recording to take notes
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-white/40 space-y-4 p-4">
+              <FileText className="h-12 w-12" />
+              <p className="text-lg">Learn with the AI Tutor</p>
             </div>
           </ScrollArea>
         </TabsContent>

@@ -1,8 +1,8 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Mic } from "lucide-react";
-import AudioWaveform from "./AudioWaveform";
+import { Mic, MicOff } from "lucide-react";
+import AudioWaveform from "@/components/AudioWaveform";
 
 interface RecordingControlsProps {
   isRecording: boolean;
@@ -18,23 +18,25 @@ const RecordingControls = ({ isRecording, time, toggleRecording }: RecordingCont
   };
 
   return (
-    <div className="w-full px-4 py-3 border-b border-border flex items-center justify-between">
-      <Button
-        onClick={toggleRecording}
-        size="sm"
-        className={`rounded-full ${
-          isRecording ? "bg-destructive hover:bg-destructive/90" : ""
-        }`}
-      >
-        <Mic className="h-4 w-4 mr-2" />
-        {isRecording ? "Stop Recording" : "Start Recording"}
-      </Button>
-      
-      <div className="flex-1 mx-4">
-        <AudioWaveform isRecording={isRecording} />
+    <div className="w-full">
+      <div className="flex items-center w-full bg-[#18181b] rounded-xl px-2 py-2">
+        <Button
+          onClick={toggleRecording}
+          className={`h-8 px-4 flex items-center justify-center gap-2 border border-white/10 bg-white text-black rounded-lg shadow-none transition-all duration-300 text-sm font-medium mr-2 ${
+            isRecording ? 'bg-red-600 text-white hover:bg-red-700' : 'hover:bg-zinc-200'
+          }`}
+          style={{ minWidth: 'auto', boxShadow: 'none' }}
+        >
+          {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          <span>{isRecording ? 'Stop' : 'Start'} Recording</span>
+        </Button>
+        <div className="flex-1 flex items-center h-8 bg-transparent">
+          <AudioWaveform isRecording={isRecording} />
+        </div>
+        <div className="text-white text-sm font-mono min-w-[40px] text-right pl-2">
+          {formatTime(time)}
+        </div>
       </div>
-      
-      <span className="font-medium text-sm">{formatTime(time)}</span>
     </div>
   );
 };

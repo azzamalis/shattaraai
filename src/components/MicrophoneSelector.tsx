@@ -1,44 +1,44 @@
 
-import React, { useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mic, X } from "lucide-react";
+import React from "react";
+import { X } from "lucide-react";
 
-interface MicrophoneOption {
-  id: string;
-  label: string;
+interface MicrophoneSelectorProps {
+  selected: string;
+  onSelect: (value: string) => void;
+  onClear?: () => void;
 }
 
-const MicrophoneSelector = () => {
-  const [microphones, setMicrophones] = useState<MicrophoneOption[]>([
-    { id: "default", label: "Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)" }
-  ]);
-  const [selectedMicrophone, setSelectedMicrophone] = useState<string>("default");
-
-  // In a real app, we would use the Media Devices API to get available microphones
-  const handleMicrophoneChange = (value: string) => {
-    setSelectedMicrophone(value);
-  };
+const MicrophoneSelector = ({ selected, onSelect, onClear }: MicrophoneSelectorProps) => {
+  // Mocked list of microphones
+  const microphones = [
+    "Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)",
+    "Headset Microphone",
+    "External USB Microphone",
+    "Bluetooth Headset"
+  ];
 
   return (
-    <div className="flex items-center justify-between px-6 py-3 border-b border-border">
-      <div className="flex items-center space-x-2 flex-grow">
-        <Mic className="h-4 w-4 text-muted-foreground" />
-        <Select value={selectedMicrophone} onValueChange={handleMicrophoneChange}>
-          <SelectTrigger className="w-full bg-transparent border-0 focus:ring-0 focus:ring-offset-0 py-0 h-auto">
-            <SelectValue placeholder="Select microphone" />
-          </SelectTrigger>
-          <SelectContent>
-            {microphones.map((mic) => (
-              <SelectItem key={mic.id} value={mic.id}>
-                {mic.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <button className="text-muted-foreground hover:text-foreground">
-        <X className="h-3.5 w-3.5" />
-      </button>
+    <div className="flex items-center gap-2 w-full">
+      <select
+        value={selected}
+        onChange={e => onSelect(e.target.value)}
+        className="bg-transparent text-white text-sm px-0 py-0 focus:outline-none focus:ring-0 border-none w-full"
+        style={{ boxShadow: 'none', appearance: 'none' }}
+      >
+        {microphones.map(mic => (
+          <option key={mic} value={mic} className="bg-black text-white">
+            {mic}
+          </option>
+        ))}
+      </select>
+      {selected && onClear && (
+        <button
+          className="text-white/70 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"
+          onClick={onClear}
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
     </div>
   );
 };

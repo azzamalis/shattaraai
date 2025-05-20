@@ -47,9 +47,49 @@
 }
 
 .active-tab {
-  @apply relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary;
+  @apply relative text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary;
 }
 
 .waveform-bar {
   transform-origin: bottom;
+}
+
+/* Improved scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Rich tab styling */
+.tab-border-indicator {
+  position: relative;
+}
+
+.tab-border-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.tab-border-indicator[data-state="active"]::after {
+  transform: scaleX(1);
 }
