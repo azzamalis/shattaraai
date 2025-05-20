@@ -6,15 +6,15 @@ import { Label } from "@/components/ui/label";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
-
 function StackedCircularFooter() {
   const currentYear = new Date().getFullYear();
-
-  return (
-    <footer className="bg-dark-deeper text-white py-12">
+  return <footer className="bg-dark-deeper text-white py-12">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center">
-          <div className="mb-8 rounded-full bg-primary/10 p-4 flex items-center justify-center" style={{ width: '120px', height: '120px' }}>
+          <div className="mb-8 rounded-full bg-primary/10 p-4 flex items-center justify-center" style={{
+          width: '120px',
+          height: '120px'
+        }}>
             <Logo textColor="text-white" className="scale-90" />
           </div>
           
@@ -29,7 +29,7 @@ function StackedCircularFooter() {
           
           <div className="mb-8 flex space-x-4">
             <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-[#00A3F] hover:border-primary">
                 <Facebook className="h-4 w-4" />
                 <span className="sr-only">Facebook</span>
               </Button>
@@ -73,8 +73,6 @@ function StackedCircularFooter() {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 }
-
 export { StackedCircularFooter };
