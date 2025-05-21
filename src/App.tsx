@@ -22,6 +22,7 @@ import HistoryPage from "./pages/HistoryPage";
 import RecordingRoom from "./pages/RecordingRoom";
 import PricingPage from "./pages/PricingPage";
 import Profile from "./pages/Profile";
+import ReportsPage from "./pages/ReportsPage";
 import React from "react";
 
 // Create a new QueryClient instance inside the component
