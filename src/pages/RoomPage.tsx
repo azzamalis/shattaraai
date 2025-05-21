@@ -23,7 +23,7 @@ export default function RoomPage() {
         <RoomHeroSection title={room.title} description={room.description} />
         
         {/* Room Title, Description and Action Buttons */}
-        <div className="bg-[#111] px-4 py-6 border-b border-white/10">
+        <div className="px-4 py-6 border-b border-white/10 bg-[#222222]">
           <div className="mx-auto max-w-6xl">
             <div className="flex items-center justify-between mb-2">
               <div>

@@ -48,7 +48,7 @@ export function RoomView({
           </div>
         </header>}
 
-      <main className="flex-1 overflow-auto p-6 bg-dark-DEFAULT">
+      <main className="flex-1 overflow-auto p-6 bg-[#222222]">
         {isEmpty ? <div className="flex flex-col items-center justify-center h-full text-center p-6">
             <div className="bg-white p-8 rounded-full mb-4">
               <FileText className="h-12 w-12 text-primary" />
