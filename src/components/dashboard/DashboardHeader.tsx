@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
@@ -7,17 +6,14 @@ import Logo from '@/components/Logo';
 import { CommandModal } from './CommandModal';
 import { UpgradeModal } from './UpgradeModal';
 import { Link } from 'react-router-dom';
-
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
 }
-
 export function DashboardHeader({
   onOpenDrawer
 }: DashboardHeaderProps) {
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  
   return <header className="flex items-center bg-[#222222] p-4 sticky top-0 z-10">
       <div className="grid grid-cols-3 w-full items-center">
         {/* Left section */}
@@ -32,16 +28,10 @@ export function DashboardHeader({
         {/* Center section - add navigation links */}
         <div className="flex justify-center space-x-2">
           <Button variant="ghost" className="text-white hover:text-white hover:bg-white/10" asChild>
-            <Link to="/history">
-              <History size={18} className="mr-2" />
-              <span className="hidden sm:inline">History</span>
-            </Link>
+            
           </Button>
           <Button variant="ghost" className="text-white hover:text-white hover:bg-white/10" asChild>
-            <Link to="/reports">
-              <BarChart size={18} className="mr-2" />
-              <span className="hidden sm:inline">Reports</span>
-            </Link>
+            
           </Button>
         </div>
         
