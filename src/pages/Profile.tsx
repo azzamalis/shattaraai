@@ -91,7 +91,7 @@ const ProfileContent: React.FC = () => {
       day: 'numeric'
     }).format(date);
   };
-  return <div className="container mx-auto p-6 space-y-6">
+  return <div className="container mx-auto p-6 space-y-6 bg-[#222222]">
       <div className="max-w-4xl mx-auto grid gap-6">
         {/* User Info Card */}
         <Card className="border-white/20 bg-[#222222] shadow-xl">
