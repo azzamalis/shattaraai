@@ -125,7 +125,7 @@ export function DashboardDrawer({
   return <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="left" className={`${getDrawerWidth()} bg-[#222222] border-r border-white/20 p-0`} closeButton={false}>
-          <div className="flex items-center justify-between p-4 border-b border-white/20">
+          <div className="flex items-center justify-between p-4 border-b border-white/5">
             <div className="flex items-center gap-2">
               <Logo className="h-8 md:h-10 w-auto" textColor="text-white" />
             </div>
