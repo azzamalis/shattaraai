@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -289,8 +288,8 @@ const ReportsPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Content Coverage */}
-        <div className="grid grid-cols-1 gap-6 mb-8">
+        {/* Content Coverage - Fixed positioning to prevent overlap */}
+        <div className="grid grid-cols-1 gap-6 mb-8 mt-8 pt-4">
           <Card className="bg-[#221F26] border-0 shadow-lg p-4 hover:shadow-[#8B5CF6]/10">
             <CardHeader>
               <CardTitle className="text-white">Content Coverage</CardTitle>
