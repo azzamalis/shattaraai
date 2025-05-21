@@ -7,7 +7,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 const PricingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   return <DashboardLayout>
-      <div className="flex flex-col min-h-screen bg-black text-white">
+      <div className="flex flex-col min-h-screen text-white bg-[#222222]">
         <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <h1 className="text-4xl sm:text-5xl font-bold text-center mb-4">Unlock smarter learning in less time.</h1>
           <p className="text-lg text-gray-400 text-center mb-12 max-w-3xl">Upload unlimited content, chat instantly, use voice mode, revisit recorded lectures, and more — all designed to boost your productivity.</p>
