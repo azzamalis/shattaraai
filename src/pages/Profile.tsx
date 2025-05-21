@@ -1,49 +1,9 @@
-
 import React, { useState } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { 
-  Dialog, 
-  DialogTrigger, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -65,9 +25,8 @@ const profileFormSchema = z.object({
   darkMode: z.boolean().default(true),
   notifyAiReplies: z.boolean().default(true),
   notifyNotesGenerated: z.boolean().default(true),
-  notifyQuizReady: z.boolean().default(true),
+  notifyQuizReady: z.boolean().default(true)
 });
-
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 // Mock user data (would be fetched from Supabase)
@@ -91,11 +50,12 @@ const mockUserData = {
 const mockLearningStats = {
   totalUploads: 24,
   totalSessions: 52,
-  totalFlashcards: 187,
+  totalFlashcards: 187
 };
-
 const ProfileContent: React.FC = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [isDarkMode, setIsDarkMode] = useState(mockUserData.darkMode);
 
   // Initialize form with default values
@@ -108,10 +68,9 @@ const ProfileContent: React.FC = () => {
       darkMode: mockUserData.darkMode,
       notifyAiReplies: mockUserData.notifyAiReplies,
       notifyNotesGenerated: mockUserData.notifyNotesGenerated,
-      notifyQuizReady: mockUserData.notifyQuizReady,
+      notifyQuizReady: mockUserData.notifyQuizReady
     }
   });
-
   const onSubmit = (data: ProfileFormValues) => {
     console.log("Form submitted with data:", data);
     // Here you would update the user's profile in Supabase
@@ -120,23 +79,19 @@ const ProfileContent: React.FC = () => {
       description: "Your profile settings have been saved."
     });
   };
-
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     form.setValue("darkMode", !isDarkMode);
   };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     }).format(date);
   };
-
-  return (
-    <div className="container mx-auto p-6 space-y-6">
+  return <div className="container mx-auto p-6 space-y-6">
       <div className="max-w-4xl mx-auto grid gap-6">
         {/* User Info Card */}
         <Card className="border-white/20 bg-[#222222] shadow-xl">
@@ -202,15 +157,15 @@ const ProfileContent: React.FC = () => {
             {/* Learning Stats */}
             <div className="mt-6 grid grid-cols-3 gap-4">
               <div className="p-3 rounded-lg bg-[#333333] text-center">
-                <div className="text-2xl font-bold text-[#2323FF]">{mockLearningStats.totalUploads}</div>
+                <div className="text-2xl font-bold text-[#FFF]">{mockLearningStats.totalUploads}</div>
                 <div className="text-sm text-white/70">Total Uploads</div>
               </div>
               <div className="p-3 rounded-lg bg-[#333333] text-center">
-                <div className="text-2xl font-bold text-[#2323FF]">{mockLearningStats.totalSessions}</div>
+                <div className="text-2xl font-bold text-[#FFF]">{mockLearningStats.totalSessions}</div>
                 <div className="text-sm text-white/70">Study Sessions</div>
               </div>
               <div className="p-3 rounded-lg bg-[#333333] text-center">
-                <div className="text-2xl font-bold text-[#2323FF]">{mockLearningStats.totalFlashcards}</div>
+                <div className="text-2xl font-bold text-[#FFF]">{mockLearningStats.totalFlashcards}</div>
                 <div className="text-sm text-white/70">Flashcards</div>
               </div>
             </div>
@@ -229,16 +184,11 @@ const ProfileContent: React.FC = () => {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="preferredLanguage"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="preferredLanguage" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel className="text-white">Preferred Language</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger className="bg-[#333333] border-white/20 text-white">
                               <SelectValue placeholder="Select a language" />
@@ -253,20 +203,13 @@ const ProfileContent: React.FC = () => {
                           </SelectContent>
                         </Select>
                         <FormMessage className="text-red-400" />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
-                  <FormField
-                    control={form.control}
-                    name="heardFrom"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="heardFrom" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel className="text-white">How Did You Hear About Us?</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger className="bg-[#333333] border-white/20 text-white">
                               <SelectValue placeholder="Select an option" />
@@ -281,31 +224,21 @@ const ProfileContent: React.FC = () => {
                           </SelectContent>
                         </Select>
                         <FormMessage className="text-red-400" />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                 </div>
                 
-                <FormField
-                  control={form.control}
-                  name="learningGoal"
-                  render={({ field }) => (
-                    <FormItem>
+                <FormField control={form.control} name="learningGoal" render={({
+                field
+              }) => <FormItem>
                       <FormLabel className="text-white">Main Learning Goal</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="What do you want to achieve with Shattara AI?"
-                          className="resize-none h-20 bg-[#333333] border-white/20 text-white placeholder:text-white/50"
-                          {...field} 
-                        />
+                        <Textarea placeholder="What do you want to achieve with Shattara AI?" className="resize-none h-20 bg-[#333333] border-white/20 text-white placeholder:text-white/50" {...field} />
                       </FormControl>
                       <FormDescription className="text-white/70">
                         This helps us tailor AI suggestions to your specific goals.
                       </FormDescription>
                       <FormMessage className="text-red-400" />
-                    </FormItem>
-                  )}
-                />
+                    </FormItem>} />
                 
                 <Separator className="bg-white/20" />
                 
@@ -317,13 +250,7 @@ const ProfileContent: React.FC = () => {
                       <FormLabel className="text-white">Theme Mode</FormLabel>
                       <FormDescription className="text-white/70">Switch between light and dark mode</FormDescription>
                     </div>
-                    <Button 
-                      type="button"
-                      variant="outline" 
-                      size="icon"
-                      onClick={toggleDarkMode}
-                      className="border-white/20 bg-[#333333] text-white hover:bg-[#444444]"
-                    >
+                    <Button type="button" variant="outline" size="icon" onClick={toggleDarkMode} className="border-white/20 bg-[#333333] text-white hover:bg-[#444444]">
                       {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                     </Button>
                   </div>
@@ -334,11 +261,9 @@ const ProfileContent: React.FC = () => {
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-white">Notification Settings</h3>
                   
-                  <FormField
-                    control={form.control}
-                    name="notifyAiReplies"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/20 bg-[#333333] p-3">
+                  <FormField control={form.control} name="notifyAiReplies" render={({
+                  field
+                }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/20 bg-[#333333] p-3">
                         <div className="space-y-0.5">
                           <FormLabel className="text-white">AI Replies</FormLabel>
                           <FormDescription className="text-white/70">
@@ -346,20 +271,13 @@ const ProfileContent: React.FC = () => {
                           </FormDescription>
                         </div>
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
-                  <FormField
-                    control={form.control}
-                    name="notifyNotesGenerated"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/20 bg-[#333333] p-3">
+                  <FormField control={form.control} name="notifyNotesGenerated" render={({
+                  field
+                }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/20 bg-[#333333] p-3">
                         <div className="space-y-0.5">
                           <FormLabel className="text-white">Notes Generated</FormLabel>
                           <FormDescription className="text-white/70">
@@ -367,20 +285,13 @@ const ProfileContent: React.FC = () => {
                           </FormDescription>
                         </div>
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
-                  <FormField
-                    control={form.control}
-                    name="notifyQuizReady"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/20 bg-[#333333] p-3">
+                  <FormField control={form.control} name="notifyQuizReady" render={({
+                  field
+                }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/20 bg-[#333333] p-3">
                         <div className="space-y-0.5">
                           <FormLabel className="text-white">Quiz Ready</FormLabel>
                           <FormDescription className="text-white/70">
@@ -388,14 +299,9 @@ const ProfileContent: React.FC = () => {
                           </FormDescription>
                         </div>
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                 </div>
                 
                 <CardFooter className="px-0 flex flex-col sm:flex-row gap-4">
@@ -430,17 +336,13 @@ const ProfileContent: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
 
 // Wrap the profile content in the dashboard layout
 const Profile = () => {
-  return (
-    <DashboardLayout>
+  return <DashboardLayout>
       <ProfileContent />
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 };
-
 export default Profile;
