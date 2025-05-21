@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import '@/styles/waveform.css';
 
 interface AudioWaveformProps {
   isActive: boolean;
