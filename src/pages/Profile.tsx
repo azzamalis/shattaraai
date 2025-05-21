@@ -106,7 +106,7 @@ const ProfileContent: React.FC = () => {
               <div className="relative">
                 <Avatar className="h-24 w-24 bg-[#333333] text-white">
                   <AvatarImage src={mockUserData.avatarUrl} />
-                  <AvatarFallback className="bg-[#2323FF]/20 text-white">
+                  <AvatarFallback className="bg-[#00A3FF]/20 text-white">
                     <User className="h-12 w-12" />
                   </AvatarFallback>
                 </Avatar>
