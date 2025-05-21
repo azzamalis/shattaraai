@@ -32,7 +32,7 @@ const PricingPage: React.FC = () => {
           {/* Pricing Cards */}
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3 w-full max-w-6xl">
             {/* Free Plan */}
-            <Card className="border-0 rounded-lg overflow-hidden bg-zinc-900">
+            <Card className="border-0 rounded-lg overflow-hidden bg-[#1a1a1a]">
               <CardContent className="p-8">
                 <h3 className="text-xl font-medium mb-2 text-white">Free</h3>
                 <div className="flex items-baseline">
@@ -123,7 +123,7 @@ const PricingPage: React.FC = () => {
             </Card>
 
             {/* Team Plan */}
-            <Card className="border-0 rounded-lg overflow-hidden bg-zinc-900">
+            <Card className="border-0 rounded-lg overflow-hidden bg-[#1a1a1a]">
               <CardContent className="p-8">
                 <h3 className="text-xl font-medium mb-2 text-white">Team</h3>
                 <div className="flex items-baseline">
