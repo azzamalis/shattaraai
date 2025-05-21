@@ -3,12 +3,13 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft, Pencil, Trash2, Check, X, ChevronDown, User, BarChart } from 'lucide-react';
+import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft, Pencil, Trash2, Check, X, ChevronDown, User, BarChart, Calculator } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
 import { FeedbackModal } from './FeedbackModal';
 import { TutorialModal } from './TutorialModal';
+import { CalculatorModal } from './modals/CalculatorModal';
 import { toast } from 'sonner';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -33,6 +34,7 @@ export function DashboardDrawer({
   const [darkMode, setDarkMode] = useState(true);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
+  const [calculatorModalOpen, setCalculatorModalOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [hasSeenTutorial, setHasSeenTutorial] = useState(() => {
     return localStorage.getItem('hasSeenTutorial') === 'true';
@@ -151,13 +153,13 @@ export function DashboardDrawer({
             <div className="px-4 py-2">
               <h3 className="text-white/70 text-xs font-medium mb-2 px-2">History</h3>
               <div className="space-y-1">
-                <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white transition-colors duration-200" asChild>
                   <Link to="/history">
                     <History size={18} className="mr-2" />
                     <span>History</span>
                   </Link>
                 </Button>
-                <Button variant="ghost" className="w-full justify-start text-white hover:bg-primary/10 hover:text-white" asChild>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white transition-colors duration-200" asChild>
                   <Link to="/recent">
                     <Clock size={18} className="mr-2" />
                     <span>Recents</span>
@@ -199,7 +201,10 @@ export function DashboardDrawer({
                           <X className="h-4 w-4" />
                         </Button>
                       </div> : <>
-                        <span className="flex-1 text-left truncate">{room.name}</span>
+                        <div className="flex items-center gap-2">
+                          <Box className="h-4 w-4 text-white/70" />
+                          <span className="flex-1 text-left truncate">{room.name}</span>
+                        </div>
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={e => handleRenameClick(e, room.id)}>
                             <Pencil className="h-3 w-3" />
@@ -241,7 +246,10 @@ export function DashboardDrawer({
                                   <X className="h-4 w-4" />
                                 </Button>
                               </div> : <>
-                                <span className="flex-1 text-left truncate">{room.name}</span>
+                                <div className="flex items-center gap-2">
+                                  <Box className="h-4 w-4 text-white/70" />
+                                  <span className="flex-1 text-left truncate">{room.name}</span>
+                                </div>
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={e => handleRenameClick(e, room.id)}>
                                     <Pencil className="h-3 w-3" />
@@ -261,23 +269,21 @@ export function DashboardDrawer({
             <div className="px-4 py-2">
               <h3 className="text-white/70 text-xs font-medium mb-2 px-2">Help & Tools</h3>
               <div className="space-y-1">
-                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white" onClick={handleFeedbackClick}>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white transition-colors duration-200" onClick={handleTutorialClick}>
+                  <Book size={18} className="mr-2" />
+                  <span>Tutorial</span>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white transition-colors duration-200" onClick={handleFeedbackClick}>
                   <MessageCircle size={18} className="mr-2" />
                   <span>Feedback</span>
                 </Button>
-                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white relative" onClick={handleTutorialClick}>
-                  <Book size={18} className="mr-2" />
-                  <span>Quick Guide</span>
-                  {!hasSeenTutorial && <span className="absolute right-2 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-green-500"></span>}
-                </Button>
-                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white" asChild>
-                  
-                </Button>
-                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white" asChild>
-                  <Link to="/reports">
-                    <BarChart size={18} className="mr-2" />
-                    <span>Reports</span>
-                  </Link>
+                <Button variant="ghost" className="w-full flex items-center justify-center gap-2 
+                    bg-transparent border border-dashed border-white/20 
+                    text-white hover:bg-white/5 hover:text-white
+                    transition-colors duration-200
+                    rounded-md mt-4 py-2" onClick={() => setCalculatorModalOpen(true)}>
+                  <Calculator size={18} />
+                  <span>Calculator</span>
                 </Button>
               </div>
             </div>
@@ -325,11 +331,6 @@ export function DashboardDrawer({
                       <span>Pricing</span>
                     </Link>
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white">
-                    <History size={16} className="mr-3 text-gray-300" />
-                    <span>History</span>
-                  </Button>
-                  
                   <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white" onClick={handleLogout}>
                     <LogOut size={16} className="mr-3 text-gray-300" />
                     <span>Log out</span>
@@ -344,6 +345,7 @@ export function DashboardDrawer({
       <FeedbackModal open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
       
       <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
+      <CalculatorModal open={calculatorModalOpen} onOpenChange={setCalculatorModalOpen} />
 
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
         <DialogContent className="bg-[#1A1A1A] text-white border-white/10 p-6 rounded-lg shadow-xl">

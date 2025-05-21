@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -13,8 +12,8 @@ interface ShareModalProps {
 export function ShareModal({ open, onOpenChange }: ShareModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 border-0">
-        <div className="bg-[#1A1A1A] rounded-xl w-full">
+      <DialogContent className="!p-0 !border-0 !shadow-none !bg-transparent">
+        <div className="bg-[#1A1A1A] rounded-xl w-full border border-white/[0.02]">
           {/* Header */}
           <div className="p-4 flex justify-between items-center">
             <div className="flex items-center gap-2">

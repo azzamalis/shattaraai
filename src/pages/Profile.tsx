@@ -91,10 +91,10 @@ const ProfileContent: React.FC = () => {
       day: 'numeric'
     }).format(date);
   };
-  return <div className="container mx-auto p-6 space-y-6 bg-[#222222]">
+  return <div className="container mx-auto p-6 space-y-6">
       <div className="max-w-4xl mx-auto grid gap-6">
         {/* User Info Card */}
-        <Card className="border-white/20 bg-[#222222] shadow-xl">
+        <Card className="border-white/10 bg-[#1A1A1A] shadow-xl">
           <CardHeader className="bg-[#1a1a1a]">
             <CardTitle className="text-white">User Information</CardTitle>
             <CardDescription className="text-white/70">
@@ -116,7 +116,7 @@ const ProfileContent: React.FC = () => {
                       Change
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-[#222222] border-white/20 text-white">
+                  <DialogContent className="bg-[#1A1A1A] border-white/10 text-white">
                     <DialogHeader>
                       <DialogTitle>Update profile picture</DialogTitle>
                       <DialogDescription className="text-white/70">
@@ -125,7 +125,7 @@ const ProfileContent: React.FC = () => {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Input id="picture" type="file" className="col-span-4 bg-[#333333] border-white/20 text-white" />
+                        <Input id="picture" type="file" className="col-span-4 bg-[#222222] border-white/10 text-white" />
                       </div>
                     </div>
                     <DialogFooter>
@@ -156,15 +156,15 @@ const ProfileContent: React.FC = () => {
             
             {/* Learning Stats */}
             <div className="mt-6 grid grid-cols-3 gap-4">
-              <div className="p-3 rounded-lg bg-[#333333] text-center">
+              <div className="p-3 rounded-lg bg-[#222222] text-center">
                 <div className="text-2xl font-bold text-[#FFF]">{mockLearningStats.totalUploads}</div>
                 <div className="text-sm text-white/70">Total Uploads</div>
               </div>
-              <div className="p-3 rounded-lg bg-[#333333] text-center">
+              <div className="p-3 rounded-lg bg-[#222222] text-center">
                 <div className="text-2xl font-bold text-[#FFF]">{mockLearningStats.totalSessions}</div>
                 <div className="text-sm text-white/70">Study Sessions</div>
               </div>
-              <div className="p-3 rounded-lg bg-[#333333] text-center">
+              <div className="p-3 rounded-lg bg-[#222222] text-center">
                 <div className="text-2xl font-bold text-[#FFF]">{mockLearningStats.totalFlashcards}</div>
                 <div className="text-sm text-white/70">Flashcards</div>
               </div>
@@ -173,7 +173,7 @@ const ProfileContent: React.FC = () => {
         </Card>
         
         {/* Preferences Form */}
-        <Card className="border-white/20 bg-[#222222] shadow-xl">
+        <Card className="border-white/10 bg-[#1A1A1A] shadow-xl">
           <CardHeader className="bg-[#1a1a1a]">
             <CardTitle className="text-white">Learning Preferences</CardTitle>
             <CardDescription className="text-white/70">
@@ -190,7 +190,7 @@ const ProfileContent: React.FC = () => {
                         <FormLabel className="text-white">Preferred Language</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-[#333333] border-white/20 text-white">
+                            <SelectTrigger className="bg-[#222222] border-white/10 text-white">
                               <SelectValue placeholder="Select a language" />
                             </SelectTrigger>
                           </FormControl>
@@ -211,7 +211,7 @@ const ProfileContent: React.FC = () => {
                         <FormLabel className="text-white">How Did You Hear About Us?</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-[#333333] border-white/20 text-white">
+                            <SelectTrigger className="bg-[#222222] border-white/10 text-white">
                               <SelectValue placeholder="Select an option" />
                             </SelectTrigger>
                           </FormControl>
@@ -232,7 +232,7 @@ const ProfileContent: React.FC = () => {
               }) => <FormItem>
                       <FormLabel className="text-white">Main Learning Goal</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="What do you want to achieve with Shattara AI?" className="resize-none h-20 bg-[#333333] border-white/20 text-white placeholder:text-white/50" {...field} />
+                        <Textarea placeholder="What do you want to achieve with Shattara AI?" className="resize-none h-20 bg-[#222222] border-white/10 text-white placeholder:text-white/50" {...field} />
                       </FormControl>
                       <FormDescription className="text-white/70">
                         This helps us tailor AI suggestions to your specific goals.
@@ -263,7 +263,7 @@ const ProfileContent: React.FC = () => {
                   
                   <FormField control={form.control} name="notifyAiReplies" render={({
                   field
-                }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/20 bg-[#333333] p-3">
+                }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/10 bg-[#222222] p-3">
                         <div className="space-y-0.5">
                           <FormLabel className="text-white">AI Replies</FormLabel>
                           <FormDescription className="text-white/70">
@@ -277,7 +277,7 @@ const ProfileContent: React.FC = () => {
                   
                   <FormField control={form.control} name="notifyNotesGenerated" render={({
                   field
-                }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/20 bg-[#333333] p-3">
+                }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/10 bg-[#222222] p-3">
                         <div className="space-y-0.5">
                           <FormLabel className="text-white">Notes Generated</FormLabel>
                           <FormDescription className="text-white/70">
@@ -291,7 +291,7 @@ const ProfileContent: React.FC = () => {
                   
                   <FormField control={form.control} name="notifyQuizReady" render={({
                   field
-                }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/20 bg-[#333333] p-3">
+                }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/10 bg-[#222222] p-3">
                         <div className="space-y-0.5">
                           <FormLabel className="text-white">Quiz Ready</FormLabel>
                           <FormDescription className="text-white/70">
@@ -316,7 +316,7 @@ const ProfileContent: React.FC = () => {
                         Delete My Account
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-[#222222] border-white/20 text-white">
+                    <AlertDialogContent className="bg-[#1A1A1A] border-white/10 text-white">
                       <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription className="text-white/70">
