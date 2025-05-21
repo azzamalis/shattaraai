@@ -155,7 +155,7 @@ const PricingPage: React.FC = () => {
                 </ul>
               </CardContent>
               <CardFooter className="px-8 pb-8 pt-0">
-                <Button className="w-full bg-transparent hover:bg-gray-800 text-white font-medium border-white" variant="outline">
+                <Button variant="outline" className="w-full bg-transparent hover:bg-#1a1a1a text-white font-medium border-white">
                   Contact Us
                 </Button>
               </CardFooter>
