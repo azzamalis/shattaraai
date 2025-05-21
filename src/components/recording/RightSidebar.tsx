@@ -4,8 +4,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, FileText, BookOpen, Brain, FileStack, CheckSquare, FileInput, Star } from "lucide-react";
 import AIChat from "./AIChat";
 import QuizPreferences from './QuizPreferences';
+import Notes from '@/components/recording/Notes';
+
 const RightSidebar = () => {
   const [activeTab, setActiveTab] = useState("chat");
+  const [isRecording, setIsRecording] = useState(false);
+
   return <div className="h-full flex flex-col bg-[#0F0F0F]">
       <Tabs defaultValue="chat" onValueChange={setActiveTab} className="flex-1 flex flex-col h-full bg-black">
         <TabsList className="w-full justify-start border-b border-[#2A2A2A] rounded-none gap-1 p-1 h-12 shrink-0 bg-black">
@@ -58,12 +62,7 @@ const RightSidebar = () => {
           </ScrollArea>
         </TabsContent>
         <TabsContent value="notes" className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-white/60 space-y-4 p-4">
-              <FileText className="h-12 w-12 mb-2" />
-              <p className="text-center max-w-md text-base">Need a refresher on what you've covered? Your smart notes are already organized and waiting.</p>
-            </div>
-          </ScrollArea>
+          <Notes isRecording={isRecording} />
         </TabsContent>
       </Tabs>
     </div>;

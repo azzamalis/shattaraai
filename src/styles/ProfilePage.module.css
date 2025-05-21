@@ -1,0 +1,23 @@
+/* Profile page specific styles */
+.profile-page-wrapper {
+  isolation: isolate; /* Creates a new stacking context */
+}
+
+.profile-page-content {
+  /* Specific to profile page scrolling behavior */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.profile-page-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.profile-page-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.profile-page-content::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+} 
