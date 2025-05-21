@@ -309,14 +309,10 @@ export function DashboardDrawer({
                 </div>
                 
                 <div className="py-1">
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white"
-                    onClick={() => {
-                      navigate('/profile');
-                      onOpenChange(false);
-                    }}
-                  >
+                  <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white" onClick={() => {
+                  navigate('/profile');
+                  onOpenChange(false);
+                }}>
                     <Settings size={16} className="mr-3 text-gray-300" />
                     <span>Settings</span>
                   </Button>
@@ -330,13 +326,7 @@ export function DashboardDrawer({
                     <History size={16} className="mr-3 text-gray-300" />
                     <span>History</span>
                   </Button>
-                  <div className="flex items-center justify-between px-3 py-2 hover:bg-white/10">
-                    <div className="flex items-center text-white">
-                      <Moon size={16} className="mr-3 text-gray-300" />
-                      <span>Dark mode</span>
-                    </div>
-                    <Switch checked={darkMode} onCheckedChange={setDarkMode} className="data-[state=checked]:bg-primary" />
-                  </div>
+                  
                   <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white" onClick={handleLogout}>
                     <LogOut size={16} className="mr-3 text-gray-300" />
                     <span>Log out</span>
