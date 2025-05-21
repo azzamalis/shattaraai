@@ -130,7 +130,7 @@ const ReportsPage: React.FC = () => {
             <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome back, Ashlynn</h1>
             <p className="text-[#8E9196]">Your progress this week is awesome. Let's keep it up!</p>
           </div>
-          <div className="flex items-center mt-4 md:mt-0 bg-[#221F26]/50 rounded-lg p-2">
+          <div className="flex items-center mt-4 md:mt-0 rounded-lg p-2 bg-[#1a1a1a]">
             <Flame className="h-6 w-6 text-orange-500 mr-2" />
             <span className="text-white font-medium">{studyStreak}-day streak</span>
           </div>
