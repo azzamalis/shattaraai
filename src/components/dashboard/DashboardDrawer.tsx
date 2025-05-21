@@ -3,7 +3,28 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, History, Clock, Box, MessageCircle, Book, Chrome, Settings, Tag, Moon, LogOut, ChevronUp, ChevronsLeft, Pencil, Trash2, Check, X, ChevronDown, User } from 'lucide-react';
+import { 
+  Plus, 
+  History, 
+  Clock, 
+  Box, 
+  MessageCircle, 
+  Book, 
+  Chrome, 
+  Settings, 
+  Tag, 
+  Moon, 
+  LogOut, 
+  ChevronUp, 
+  ChevronsLeft, 
+  Pencil, 
+  Trash2, 
+  Check, 
+  X, 
+  ChevronDown, 
+  User,
+  BarChart
+} from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
@@ -274,6 +295,12 @@ export function DashboardDrawer({
                   <Link to="/extension">
                     <Chrome size={18} className="mr-2" />
                     <span>Chrome Extension</span>
+                  </Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white" asChild>
+                  <Link to="/reports">
+                    <BarChart size={18} className="mr-2" />
+                    <span>Reports</span>
                   </Link>
                 </Button>
               </div>
