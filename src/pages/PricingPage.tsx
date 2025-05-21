@@ -13,7 +13,7 @@ const PricingPage: React.FC = () => {
           <p className="text-lg text-gray-400 text-center mb-12 max-w-3xl">Upload unlimited content, chat instantly, use voice mode, revisit recorded lectures, and more — all designed to boost your productivity.</p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center justify-center rounded-full bg-gray-800 p-1 mb-12">
+          <div className="inline-flex items-center justify-center rounded-full p-1 mb-12 bg-[#1a1a1a]">
             <ToggleGroup type="single" value={billingCycle} onValueChange={value => {
             if (value) setBillingCycle(value as "monthly" | "yearly");
           }} className="relative bg-[#1a1a1a]">
