@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +22,7 @@ import HistoryPage from "./pages/HistoryPage";
 import RecordingRoom from "./pages/RecordingRoom";
 import PricingPage from "./pages/PricingPage";
 import Profile from "./pages/Profile";
+import ReportsPage from "./pages/ReportsPage";
 import React from "react";
 
 // Create a new QueryClient instance inside the component
@@ -53,6 +55,7 @@ const App = () => {
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/recording" element={<RecordingRoom />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
