@@ -7,25 +7,60 @@ import { Clock, MessageSquare, FileUp, Activity, FileText, Layers, BookOpen, Use
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 // Mock data - in a real app, this would be fetched from an API
-const weeklyData = [
-  { name: "Mon", quizAccuracy: 65, flashcards: 24 },
-  { name: "Tue", quizAccuracy: 59, flashcards: 13 },
-  { name: "Wed", quizAccuracy: 80, flashcards: 36 },
-  { name: "Thu", quizAccuracy: 81, flashcards: 45 },
-  { name: "Fri", quizAccuracy: 76, flashcards: 27 },
-  { name: "Sat", quizAccuracy: 85, flashcards: 18 },
-  { name: "Sun", quizAccuracy: 83, flashcards: 31 }
-];
-
-const monthlyData = [
-  { name: "Jan", quizAccuracy: 65, flashcards: 120 },
-  { name: "Feb", quizAccuracy: 59, flashcards: 110 },
-  { name: "Mar", quizAccuracy: 80, flashcards: 145 },
-  { name: "Apr", quizAccuracy: 81, flashcards: 165 },
-  { name: "May", quizAccuracy: 76, flashcards: 190 },
-  { name: "Jun", quizAccuracy: 85, flashcards: 220 }
-];
-
+const weeklyData = [{
+  name: "Mon",
+  quizAccuracy: 65,
+  flashcards: 24
+}, {
+  name: "Tue",
+  quizAccuracy: 59,
+  flashcards: 13
+}, {
+  name: "Wed",
+  quizAccuracy: 80,
+  flashcards: 36
+}, {
+  name: "Thu",
+  quizAccuracy: 81,
+  flashcards: 45
+}, {
+  name: "Fri",
+  quizAccuracy: 76,
+  flashcards: 27
+}, {
+  name: "Sat",
+  quizAccuracy: 85,
+  flashcards: 18
+}, {
+  name: "Sun",
+  quizAccuracy: 83,
+  flashcards: 31
+}];
+const monthlyData = [{
+  name: "Jan",
+  quizAccuracy: 65,
+  flashcards: 120
+}, {
+  name: "Feb",
+  quizAccuracy: 59,
+  flashcards: 110
+}, {
+  name: "Mar",
+  quizAccuracy: 80,
+  flashcards: 145
+}, {
+  name: "Apr",
+  quizAccuracy: 81,
+  flashcards: 165
+}, {
+  name: "May",
+  quizAccuracy: 76,
+  flashcards: 190
+}, {
+  name: "Jun",
+  quizAccuracy: 85,
+  flashcards: 220
+}];
 const ReportsPage: React.FC = () => {
   const [timeframe, setTimeframe] = useState<"weekly" | "monthly">("weekly");
   const data = timeframe === "weekly" ? weeklyData : monthlyData;
@@ -35,14 +70,16 @@ const ReportsPage: React.FC = () => {
     quizAccuracy: {
       label: "Quiz Accuracy",
       theme: {
-        light: "#8B5CF6", // Vivid purple
+        light: "#8B5CF6",
+        // Vivid purple
         dark: "#8B5CF6"
       }
     },
     flashcards: {
       label: "Flashcards",
       theme: {
-        light: "#1EAEDB", // Bright blue
+        light: "#1EAEDB",
+        // Bright blue
         dark: "#1EAEDB"
       }
     }
@@ -72,18 +109,21 @@ const ReportsPage: React.FC = () => {
   };
 
   // AI Helpfulness Feedback (Optional enhancement)
-  const aiHelpfulnessData = [
-    { name: 'Very Helpful', value: 65 },
-    { name: 'Somewhat Helpful', value: 25 },
-    { name: 'Not Helpful', value: 10 }
-  ];
+  const aiHelpfulnessData = [{
+    name: 'Very Helpful',
+    value: 65
+  }, {
+    name: 'Somewhat Helpful',
+    value: 25
+  }, {
+    name: 'Not Helpful',
+    value: 10
+  }];
 
   // Streak data (Optional enhancement)
   const studyStreak = 4;
-  
-  return (
-    <DashboardLayout>
-      <div className="flex flex-col min-h-screen text-white p-4 md:p-6 bg-black">
+  return <DashboardLayout>
+      <div className="flex flex-col min-h-screen text-white p-4 md:p-6 bg-[#222222]">
         {/* Header with greeting and streak */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
@@ -212,24 +252,10 @@ const ReportsPage: React.FC = () => {
               <div className="flex justify-between items-center">
                 <CardTitle className="text-white">Quiz Accuracy Over Time</CardTitle>
                 <div className="flex space-x-2">
-                  <button
-                    onClick={() => setTimeframe("weekly")}
-                    className={`px-2 py-1 text-xs rounded-md ${
-                      timeframe === "weekly"
-                        ? "bg-[#8B5CF6] text-white"
-                        : "bg-[#1A1F2C] text-[#8E9196]"
-                    }`}
-                  >
+                  <button onClick={() => setTimeframe("weekly")} className={`px-2 py-1 text-xs rounded-md ${timeframe === "weekly" ? "bg-[#8B5CF6] text-white" : "bg-[#1A1F2C] text-[#8E9196]"}`}>
                     Weekly
                   </button>
-                  <button
-                    onClick={() => setTimeframe("monthly")}
-                    className={`px-2 py-1 text-xs rounded-md ${
-                      timeframe === "monthly"
-                        ? "bg-[#8B5CF6] text-white"
-                        : "bg-[#1A1F2C] text-[#8E9196]"
-                    }`}
-                  >
+                  <button onClick={() => setTimeframe("monthly")} className={`px-2 py-1 text-xs rounded-md ${timeframe === "monthly" ? "bg-[#8B5CF6] text-white" : "bg-[#1A1F2C] text-[#8E9196]"}`}>
                     Monthly
                   </button>
                 </div>
@@ -247,15 +273,14 @@ const ReportsPage: React.FC = () => {
                       <XAxis dataKey="name" stroke="#8E9196" />
                       <YAxis stroke="#8E9196" />
                       <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
-                      <Line
-                        dataKey="quizAccuracy"
-                        name="Quiz Accuracy"
-                        type="monotone"
-                        stroke="#8B5CF6"
-                        strokeWidth={2}
-                        dot={{ fill: "#8B5CF6", r: 4 }}
-                        activeDot={{ r: 6, fill: "#fff", stroke: "#8B5CF6" }}
-                      />
+                      <Line dataKey="quizAccuracy" name="Quiz Accuracy" type="monotone" stroke="#8B5CF6" strokeWidth={2} dot={{
+                      fill: "#8B5CF6",
+                      r: 4
+                    }} activeDot={{
+                      r: 6,
+                      fill: "#fff",
+                      stroke: "#8B5CF6"
+                    }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -322,28 +347,18 @@ const ReportsPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {aiHelpfulnessData.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between">
+                {aiHelpfulnessData.map(item => <div key={item.name} className="flex items-center justify-between">
                     <span className="text-sm text-stone-300">{item.name}</span>
                     <div className="flex items-center">
                       <div className="w-[150px] bg-[#1A1F2C] rounded-full h-2 mr-2">
-                        <div
-                          className="h-2 rounded-full"
-                          style={{
-                            width: `${item.value}%`,
-                            backgroundColor:
-                              item.name === 'Very Helpful'
-                                ? '#8B5CF6'
-                                : item.name === 'Somewhat Helpful'
-                                ? '#1EAEDB'
-                                : '#E11D48',
-                          }}
-                        />
+                        <div className="h-2 rounded-full" style={{
+                      width: `${item.value}%`,
+                      backgroundColor: item.name === 'Very Helpful' ? '#8B5CF6' : item.name === 'Somewhat Helpful' ? '#1EAEDB' : '#E11D48'
+                    }} />
                       </div>
                       <span className="text-xs font-medium text-stone-300">{item.value}%</span>
                     </div>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </CardContent>
           </Card>
@@ -378,8 +393,6 @@ const ReportsPage: React.FC = () => {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 };
-
 export default ReportsPage;
