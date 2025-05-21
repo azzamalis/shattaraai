@@ -95,13 +95,13 @@ const ProfileContent: React.FC = () => {
       <div className="max-w-4xl mx-auto grid gap-6">
         {/* User Info Card */}
         <Card className="border-white/20 bg-[#222222] shadow-xl">
-          <CardHeader>
+          <CardHeader className="bg-[#1a1a1a]">
             <CardTitle className="text-white">User Information</CardTitle>
             <CardDescription className="text-white/70">
               View and manage your personal information
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-[#1a1a1a]">
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
                 <Avatar className="h-24 w-24 bg-[#333333] text-white">
@@ -174,13 +174,13 @@ const ProfileContent: React.FC = () => {
         
         {/* Preferences Form */}
         <Card className="border-white/20 bg-[#222222] shadow-xl">
-          <CardHeader>
+          <CardHeader className="bg-[#1a1a1a]">
             <CardTitle className="text-white">Learning Preferences</CardTitle>
             <CardDescription className="text-white/70">
               Update your learning settings and preferences
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-[#1a1a1a]">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
