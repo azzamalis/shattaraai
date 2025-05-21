@@ -1,18 +1,17 @@
-
 import React, { useState } from 'react';
 import { ActionCards } from './ActionCards';
 import { AIChatInput } from '@/components/ui/ai-chat-input';
 import { PasteContentModal } from './PasteContentModal';
 import { toast } from 'sonner';
-
 interface RoomHeroSectionProps {
   title: string;
   description: string;
 }
-
-export function RoomHeroSection({ title, description }: RoomHeroSectionProps) {
+export function RoomHeroSection({
+  title,
+  description
+}: RoomHeroSectionProps) {
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
-  
   const handlePasteSubmit = (data: {
     url?: string;
     text?: string;
@@ -24,14 +23,11 @@ export function RoomHeroSection({ title, description }: RoomHeroSectionProps) {
     }
     setIsPasteModalOpen(false);
   };
-
   const handleAISubmit = (value: string) => {
     toast.success("Your question was submitted");
     console.log("AI query:", value);
   };
-
-  return (
-    <div className="w-full border-b border-white/10 bg-[#111] px-4 py-6 md:py-8">
+  return <div className="w-full border-b border-white/10 px-4 py-6 md:py-8 bg-[#222222]">
       <div className="mx-auto max-w-6xl">
         <div className="mb-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">
@@ -46,12 +42,7 @@ export function RoomHeroSection({ title, description }: RoomHeroSectionProps) {
         </div>
         
         {/* Modals */}
-        <PasteContentModal 
-          isOpen={isPasteModalOpen} 
-          onClose={() => setIsPasteModalOpen(false)} 
-          onSubmit={handlePasteSubmit} 
-        />
+        <PasteContentModal isOpen={isPasteModalOpen} onClose={() => setIsPasteModalOpen(false)} onSubmit={handlePasteSubmit} />
       </div>
-    </div>
-  );
+    </div>;
 }
