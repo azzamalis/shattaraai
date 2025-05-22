@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -6,14 +5,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ChevronUp, Settings, Tag, LogOut, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
 interface UserProfileProps {
   onOpenChange: (open: boolean) => void;
 }
-
-export const UserProfile: React.FC<UserProfileProps> = ({ onOpenChange }) => {
+export const UserProfile: React.FC<UserProfileProps> = ({
+  onOpenChange
+}) => {
   const navigate = useNavigate();
-
   const handleLogout = () => {
     localStorage.removeItem('hasSeenTutorial');
     onOpenChange(false);
@@ -22,9 +20,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onOpenChange }) => {
     });
     navigate('/');
   };
-
-  return (
-    <div className="absolute bottom-0 left-0 right-0 border-t border-white/20 p-4 bg-[#222222]">
+  return <div className="absolute bottom-0 left-0 right-0 border-t border-white/20 p-4 bg-black">
       <Popover>
         <PopoverTrigger asChild>
           <Button variant="ghost" className="flex items-center justify-between w-full text-white hover:bg-white/10 p-2 rounded-lg">
@@ -54,9 +50,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onOpenChange }) => {
           
           <div className="py-1">
             <Button variant="ghost" className="w-full justify-start px-3 py-2 text-white hover:bg-white/10 hover:!text-white" onClick={() => {
-              navigate('/profile');
-              onOpenChange(false);
-            }}>
+            navigate('/profile');
+            onOpenChange(false);
+          }}>
               <Settings size={16} className="mr-3 text-gray-300" />
               <span>Settings</span>
             </Button>
@@ -73,6 +69,5 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onOpenChange }) => {
           </div>
         </PopoverContent>
       </Popover>
-    </div>
-  );
+    </div>;
 };
