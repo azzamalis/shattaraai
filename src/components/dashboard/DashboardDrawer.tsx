@@ -116,6 +116,7 @@ export function DashboardDrawer({
             rooms={rooms}
             onAddRoom={onAddRoom}
             onEditRoom={onEditRoom}
+            onDeleteRoom={onDeleteRoom}
             onOpenChange={onOpenChange}
             setRoomToDelete={setRoomToDelete}
             setRoomToDeleteName={setRoomToDeleteName}
