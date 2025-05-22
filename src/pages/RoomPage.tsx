@@ -4,6 +4,7 @@ import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RoomView } from '@/components/dashboard/RoomView';
 import { RoomHeroSection } from '@/components/dashboard/RoomHeroSection';
 import { AITutorChatDrawer } from '@/components/dashboard/AITutorChatDrawer';
+import { ExamPrepModal } from '@/components/dashboard/ExamPrepModal';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, FileText, Pencil, Check, X } from 'lucide-react';
@@ -27,6 +28,9 @@ export default function RoomPage() {
 
   // State for AI Tutor Chat drawer
   const [isChatOpen, setIsChatOpen] = useState(false);
+  
+  // State for Exam Prep modal
+  const [isExamModalOpen, setIsExamModalOpen] = useState(false);
 
   // Fetch room data when component mounts
   useEffect(() => {
@@ -132,12 +136,15 @@ export default function RoomPage() {
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Room Chat
               </Button>
-              <Button className="
+              <Button 
+                className="
                   bg-[#1a1a1a] hover:bg-[#1a1a1a]
                   text-white
                   border border-transparent hover:border-white/10
                   transition-colors duration-200
-                ">
+                "
+                onClick={() => setIsExamModalOpen(true)}
+              >
                 <FileText className="mr-2 h-4 w-4" />
                 Create Exam
               </Button>
@@ -150,6 +157,9 @@ export default function RoomPage() {
         
         {/* AI Tutor Chat Drawer */}
         <AITutorChatDrawer open={isChatOpen} onOpenChange={setIsChatOpen} />
+        
+        {/* Exam Prep Modal */}
+        <ExamPrepModal isOpen={isExamModalOpen} onClose={() => setIsExamModalOpen(false)} />
       </div>
     </DashboardLayout>;
 }
