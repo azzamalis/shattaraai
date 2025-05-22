@@ -56,7 +56,7 @@ export function AITutorChatDrawer({
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
             <h3 className="text-lg font-semibold text-white">Learn with Shattara AI Tutor</h3>
             <SheetClose asChild>
-              <Button variant="ghost" size="icon" className="text-white">
+              <Button variant="ghost" size="icon" className="text-[#4b4b4b]">
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
               </Button>
