@@ -277,6 +277,12 @@ export function DashboardDrawer({
                   <MessageCircle size={18} className="mr-2" />
                   <span>Feedback</span>
                 </Button>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/5 hover:text-white transition-colors duration-200" asChild>
+                  <Link to="/reports">
+                    <BarChart size={18} className="mr-2" />
+                    <span>Reports</span>
+                  </Link>
+                </Button>
                 <Button variant="ghost" className="w-full flex items-center justify-center gap-2 
                     bg-transparent border border-dashed border-white/20 
                     text-white hover:bg-white/5 hover:text-white
