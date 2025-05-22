@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,7 +36,6 @@ const weeklyData = [{
   quizAccuracy: 83,
   flashcards: 31
 }];
-
 const monthlyData = [{
   name: "Jan",
   quizAccuracy: 65,
@@ -70,7 +68,6 @@ const getProgressColor = (value: number) => {
   if (value <= 50) return "#F6BC2F";
   return "#0E8345";
 };
-
 const ReportsPage: React.FC = () => {
   const [timeframe, setTimeframe] = useState<"weekly" | "monthly">("weekly");
   const data = timeframe === "weekly" ? weeklyData : monthlyData;
@@ -130,9 +127,7 @@ const ReportsPage: React.FC = () => {
 
   // Streak data (Optional enhancement)
   const studyStreak = 4;
-  
-  return (
-    <DashboardLayout>
+  return <DashboardLayout>
       <div className="flex flex-col min-h-screen text-white p-4 md:p-6 bg-black">
         {/* Header with greeting and streak */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -262,24 +257,10 @@ const ReportsPage: React.FC = () => {
               <div className="flex justify-between items-center">
                 <CardTitle className="text-white">Quiz Accuracy Over Time</CardTitle>
                 <div className="flex space-x-2">
-                  <button 
-                    onClick={() => setTimeframe("weekly")} 
-                    className={`px-2 py-1 text-xs rounded-md ${
-                      timeframe === "weekly" 
-                        ? "bg-[#00A3FF]/10 text-white" 
-                        : "bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#5B5B5B]"
-                    }`}
-                  >
+                  <button onClick={() => setTimeframe("weekly")} className={`px-2 py-1 text-xs rounded-md ${timeframe === "weekly" ? "bg-[#00A3FF]/10 text-white" : "bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#5B5B5B]"}`}>
                     Weekly
                   </button>
-                  <button 
-                    onClick={() => setTimeframe("monthly")} 
-                    className={`px-2 py-1 text-xs rounded-md ${
-                      timeframe === "monthly" 
-                        ? "bg-[#00A3FF]/10 text-white" 
-                        : "bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#5B5B5B]"
-                    }`}
-                  >
+                  <button onClick={() => setTimeframe("monthly")} className={`px-2 py-1 text-xs rounded-md ${timeframe === "monthly" ? "bg-[#00A3FF]/10 text-white" : "bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#5B5B5B]"}`}>
                     Monthly
                   </button>
                 </div>
@@ -296,26 +277,18 @@ const ReportsPage: React.FC = () => {
                       <CartesianGrid strokeDasharray="3 3" stroke="#555" />
                       <XAxis dataKey="name" stroke="#A6A6A6" />
                       <YAxis stroke="#A6A6A6" />
-                      <ChartTooltip 
-                        content={<ChartTooltipContent indicator="dot" />} 
-                        contentStyle={{ backgroundColor: '#DDDDDD', color: '#000' }}
-                      />
-                      <Line 
-                        dataKey="quizAccuracy" 
-                        name="Quiz Accuracy" 
-                        type="monotone" 
-                        stroke="#00A3FF" 
-                        strokeWidth={2} 
-                        dot={{
-                          fill: "#00A3FF",
-                          r: 4
-                        }} 
-                        activeDot={{
-                          r: 6,
-                          fill: "#fff",
-                          stroke: "#00A3FF"
-                        }} 
-                      />
+                      <ChartTooltip content={<ChartTooltipContent indicator="dot" />} contentStyle={{
+                      backgroundColor: '#DDDDDD',
+                      color: '#000'
+                    }} />
+                      <Line dataKey="quizAccuracy" name="Quiz Accuracy" type="monotone" stroke="#00A3FF" strokeWidth={2} dot={{
+                      fill: "#00A3FF",
+                      r: 4
+                    }} activeDot={{
+                      r: 6,
+                      fill: "#fff",
+                      stroke: "#00A3FF"
+                    }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -338,10 +311,10 @@ const ReportsPage: React.FC = () => {
                       <CartesianGrid strokeDasharray="3 3" stroke="#555" />
                       <XAxis dataKey="name" stroke="#A6A6A6" />
                       <YAxis stroke="#A6A6A6" />
-                      <ChartTooltip 
-                        content={<ChartTooltipContent />} 
-                        contentStyle={{ backgroundColor: '#DDDDDD', color: '#000' }}
-                      />
+                      <ChartTooltip content={<ChartTooltipContent />} contentStyle={{
+                      backgroundColor: '#DDDDDD',
+                      color: '#000'
+                    }} />
                       <Bar dataKey="flashcards" name="Flashcards" fill="#0E8345" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -363,11 +336,7 @@ const ReportsPage: React.FC = () => {
             <CardContent>
               <div className="flex items-center">
                 <div className="flex-1 mr-4">
-                  <Progress 
-                    value={progressMetrics.contentCoverage} 
-                    className="h-3 bg-[#333]"
-                    indicatorClassName={`bg-[${getProgressColor(progressMetrics.contentCoverage)}]`}
-                  />
+                  <Progress value={progressMetrics.contentCoverage} className="h-3 bg-[#333]" indicatorClassName={`bg-[${getProgressColor(progressMetrics.contentCoverage)}]`} />
                 </div>
                 <div className="text-xl font-semibold text-white">
                   {progressMetrics.contentCoverage}%
@@ -389,26 +358,18 @@ const ReportsPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {aiHelpfulnessData.map(item => (
-                  <div key={item.name} className="flex items-center justify-between">
+                {aiHelpfulnessData.map(item => <div key={item.name} className="flex items-center justify-between">
                     <span className="text-sm text-[#A6A6A6]">{item.name}</span>
                     <div className="flex items-center">
                       <div className="w-[150px] bg-[#333] rounded-full h-2 mr-2">
-                        <div 
-                          className="h-2 rounded-full" 
-                          style={{
-                            width: `${item.value}%`,
-                            backgroundColor: 
-                              item.name === 'Very Helpful' ? '#0E8345' : 
-                              item.name === 'Somewhat Helpful' ? '#F6BC2F' : 
-                              '#DE1135'
-                          }} 
-                        />
+                        <div className="h-2 rounded-full" style={{
+                      width: `${item.value}%`,
+                      backgroundColor: item.name === 'Very Helpful' ? '#0E8345' : item.name === 'Somewhat Helpful' ? '#F6BC2F' : '#DE1135'
+                    }} />
                       </div>
                       <span className="text-xs font-medium text-[#A6A6A6]">{item.value}%</span>
                     </div>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </CardContent>
           </Card>
@@ -434,7 +395,7 @@ const ReportsPage: React.FC = () => {
                   <p className="text-xs text-center mt-1 text-[#A6A6A6]">Created 145 cards</p>
                 </div>
                 <div className="bg-[#333] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <FileText className="h-8 w-8 text-white mb-2" />
+                  <FileText className="h-8 w-8 text-[#00A3FF] mb-2" />
                   <h3 className="font-medium text-center text-white">Summaries</h3>
                   <p className="text-xs text-center mt-1 text-[#A6A6A6]">15 documents</p>
                 </div>
@@ -443,8 +404,6 @@ const ReportsPage: React.FC = () => {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 };
-
 export default ReportsPage;
