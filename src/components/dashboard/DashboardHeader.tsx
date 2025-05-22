@@ -14,7 +14,7 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  return <header className="flex items-center bg-[#222222] p-4 sticky top-0 z-10">
+  return <header className="flex items-center p-4 sticky top-0 z-10 bg-black">
       <div className="grid grid-cols-3 w-full items-center">
         {/* Left section */}
         <div className="flex items-center gap-3">
