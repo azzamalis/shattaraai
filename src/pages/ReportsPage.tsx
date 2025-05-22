@@ -186,7 +186,7 @@ const ReportsPage: React.FC = () => {
           <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
               <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <Activity className="w-4 h-4 mr-2 text-[#0E8345]" />
+                <Activity className="w-4 h-4 mr-2 text-[#00A3FF]" />
                 Sessions This Week
               </CardTitle>
             </CardHeader>
@@ -203,7 +203,7 @@ const ReportsPage: React.FC = () => {
           <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
               <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <FileText className="w-4 h-4 mr-2 text-white" />
+                <FileText className="w-4 h-4 mr-2 text-[#00A3FF]" />
                 Summaries Created
               </CardTitle>
             </CardHeader>
@@ -239,7 +239,7 @@ const ReportsPage: React.FC = () => {
           <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
               <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <Users className="w-4 h-4 mr-2 text-[#0E8345]" />
+                <Users className="w-4 h-4 mr-2 text-[#00A3FF]" />
                 Rooms Created
               </CardTitle>
             </CardHeader>
