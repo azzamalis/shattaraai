@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +37,7 @@ const weeklyData = [{
   quizAccuracy: 83,
   flashcards: 31
 }];
+
 const monthlyData = [{
   name: "Jan",
   quizAccuracy: 65,
@@ -61,6 +63,14 @@ const monthlyData = [{
   quizAccuracy: 85,
   flashcards: 220
 }];
+
+// Helper function to get progress color based on value
+const getProgressColor = (value: number) => {
+  if (value <= 25) return "#DE1135";
+  if (value <= 50) return "#F6BC2F";
+  return "#0E8345";
+};
+
 const ReportsPage: React.FC = () => {
   const [timeframe, setTimeframe] = useState<"weekly" | "monthly">("weekly");
   const data = timeframe === "weekly" ? weeklyData : monthlyData;
@@ -70,17 +80,15 @@ const ReportsPage: React.FC = () => {
     quizAccuracy: {
       label: "Quiz Accuracy",
       theme: {
-        light: "#8B5CF6",
-        // Vivid purple
-        dark: "#8B5CF6"
+        light: "#00A3FF",
+        dark: "#00A3FF"
       }
     },
     flashcards: {
       label: "Flashcards",
       theme: {
-        light: "#1EAEDB",
-        // Bright blue
-        dark: "#1EAEDB"
+        light: "#0E8345",
+        dark: "#0E8345"
       }
     }
   };
@@ -122,15 +130,17 @@ const ReportsPage: React.FC = () => {
 
   // Streak data (Optional enhancement)
   const studyStreak = 4;
-  return <DashboardLayout>
-      <div className="flex flex-col min-h-screen text-white p-4 md:p-6 bg-[#222222]">
+  
+  return (
+    <DashboardLayout>
+      <div className="flex flex-col min-h-screen text-white p-4 md:p-6 bg-black">
         {/* Header with greeting and streak */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome back, Ashlynn</h1>
-            <p className="text-[#8E9196]">Your progress this week is awesome. Let's keep it up!</p>
+            <p className="text-[#A6A6A6]">Your progress this week is awesome. Let's keep it up!</p>
           </div>
-          <div className="flex items-center mt-4 md:mt-0 rounded-lg p-2 bg-[#1a1a1a]">
+          <div className="flex items-center mt-4 md:mt-0 rounded-lg p-2 bg-[#4B4B4B]">
             <Flame className="h-6 w-6 text-orange-500 mr-2" />
             <span className="text-white font-medium">{studyStreak}-day streak</span>
           </div>
@@ -139,55 +149,55 @@ const ReportsPage: React.FC = () => {
         {/* Engagement Metrics */}
         <h2 className="text-xl font-semibold mb-4">Engagement Metrics</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-[#221F26] border-0 shadow-lg hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#8E9196] flex items-center">
-                <Clock className="w-4 h-4 mr-2 text-[#8B5CF6]" />
+              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
+                <Clock className="w-4 h-4 mr-2 text-[#00A3FF]" />
                 Study Time This Week
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{engagementMetrics.studyTime}</p>
-              <p className="text-xs text-[#8E9196] mt-1">Hours:Minutes</p>
+              <p className="text-2xl font-bold text-white">{engagementMetrics.studyTime}</p>
+              <p className="text-xs text-[#A6A6A6] mt-1">Hours:Minutes</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#221F26] border-0 shadow-lg hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#8E9196] flex items-center">
-                <MessageSquare className="w-4 h-4 mr-2 text-[#1EAEDB]" />
+              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
+                <MessageSquare className="w-4 h-4 mr-2 text-[#00A3FF]" />
                 Total AI Chats
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{engagementMetrics.aiChats}</p>
-              <p className="text-xs text-[#8E9196] mt-1">Conversations</p>
+              <p className="text-2xl font-bold text-white">{engagementMetrics.aiChats}</p>
+              <p className="text-xs text-[#A6A6A6] mt-1">Conversations</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#221F26] border-0 shadow-lg hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#8E9196] flex items-center">
-                <FileUp className="w-4 h-4 mr-2 text-[#E5DEFF]" />
+              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
+                <FileUp className="w-4 h-4 mr-2 text-white" />
                 Files Uploaded
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{engagementMetrics.filesUploaded}</p>
-              <p className="text-xs text-[#8E9196] mt-1">Documents</p>
+              <p className="text-2xl font-bold text-white">{engagementMetrics.filesUploaded}</p>
+              <p className="text-xs text-[#A6A6A6] mt-1">Documents</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#221F26] border-0 shadow-lg hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#8E9196] flex items-center">
-                <Activity className="w-4 h-4 mr-2 text-green-500" />
+              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
+                <Activity className="w-4 h-4 mr-2 text-[#0E8345]" />
                 Sessions This Week
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{engagementMetrics.sessions}</p>
-              <p className="text-xs text-[#8E9196] mt-1">Login sessions</p>
+              <p className="text-2xl font-bold text-white">{engagementMetrics.sessions}</p>
+              <p className="text-xs text-[#A6A6A6] mt-1">Login sessions</p>
             </CardContent>
           </Card>
         </div>
@@ -195,51 +205,51 @@ const ReportsPage: React.FC = () => {
         {/* Productivity Metrics */}
         <h2 className="text-xl font-semibold mb-4">Productivity Metrics</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-[#221F26] border-0 shadow-lg hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#8E9196] flex items-center">
-                <FileText className="w-4 h-4 mr-2 text-[#E5DEFF]" />
+              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
+                <FileText className="w-4 h-4 mr-2 text-white" />
                 Summaries Created
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{productivityMetrics.summariesCreated}</p>
+              <p className="text-2xl font-bold text-white">{productivityMetrics.summariesCreated}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#221F26] border-0 shadow-lg hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#8E9196] flex items-center">
-                <Layers className="w-4 h-4 mr-2 text-[#8B5CF6]" />
+              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
+                <Layers className="w-4 h-4 mr-2 text-[#00A3FF]" />
                 Flashcards Created
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{productivityMetrics.flashcardsCreated}</p>
+              <p className="text-2xl font-bold text-white">{productivityMetrics.flashcardsCreated}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#221F26] border-0 shadow-lg hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#8E9196] flex items-center">
-                <BookOpen className="w-4 h-4 mr-2 text-[#1EAEDB]" />
+              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
+                <BookOpen className="w-4 h-4 mr-2 text-[#00A3FF]" />
                 Quizzes/Exams Taken
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{productivityMetrics.quizzesTaken}</p>
+              <p className="text-2xl font-bold text-white">{productivityMetrics.quizzesTaken}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#221F26] border-0 shadow-lg hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#8E9196] flex items-center">
-                <Users className="w-4 h-4 mr-2 text-green-500" />
+              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
+                <Users className="w-4 h-4 mr-2 text-[#0E8345]" />
                 Rooms Created
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{productivityMetrics.roomsCreated}</p>
+              <p className="text-2xl font-bold text-white">{productivityMetrics.roomsCreated}</p>
             </CardContent>
           </Card>
         </div>
@@ -247,20 +257,34 @@ const ReportsPage: React.FC = () => {
         {/* Progress Charts */}
         <h2 className="text-xl font-semibold mb-4">Progress Charts</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="bg-[#221F26] border-0 shadow-lg p-4 hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg p-4 hover:shadow-[#00A3FF]/10">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-white">Quiz Accuracy Over Time</CardTitle>
                 <div className="flex space-x-2">
-                  <button onClick={() => setTimeframe("weekly")} className={`px-2 py-1 text-xs rounded-md ${timeframe === "weekly" ? "bg-[#8B5CF6] text-white" : "bg-[#1A1F2C] text-[#8E9196]"}`}>
+                  <button 
+                    onClick={() => setTimeframe("weekly")} 
+                    className={`px-2 py-1 text-xs rounded-md ${
+                      timeframe === "weekly" 
+                        ? "bg-[#00A3FF]/10 text-white" 
+                        : "bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#5B5B5B]"
+                    }`}
+                  >
                     Weekly
                   </button>
-                  <button onClick={() => setTimeframe("monthly")} className={`px-2 py-1 text-xs rounded-md ${timeframe === "monthly" ? "bg-[#8B5CF6] text-white" : "bg-[#1A1F2C] text-[#8E9196]"}`}>
+                  <button 
+                    onClick={() => setTimeframe("monthly")} 
+                    className={`px-2 py-1 text-xs rounded-md ${
+                      timeframe === "monthly" 
+                        ? "bg-[#00A3FF]/10 text-white" 
+                        : "bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#5B5B5B]"
+                    }`}
+                  >
                     Monthly
                   </button>
                 </div>
               </div>
-              <CardDescription className="text-[#8E9196]">
+              <CardDescription className="text-[#A6A6A6]">
                 Your quiz accuracy over time
               </CardDescription>
             </CardHeader>
@@ -269,18 +293,29 @@ const ReportsPage: React.FC = () => {
                 <ChartContainer config={chartConfig}>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                      <XAxis dataKey="name" stroke="#8E9196" />
-                      <YAxis stroke="#8E9196" />
-                      <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
-                      <Line dataKey="quizAccuracy" name="Quiz Accuracy" type="monotone" stroke="#8B5CF6" strokeWidth={2} dot={{
-                      fill: "#8B5CF6",
-                      r: 4
-                    }} activeDot={{
-                      r: 6,
-                      fill: "#fff",
-                      stroke: "#8B5CF6"
-                    }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#555" />
+                      <XAxis dataKey="name" stroke="#A6A6A6" />
+                      <YAxis stroke="#A6A6A6" />
+                      <ChartTooltip 
+                        content={<ChartTooltipContent indicator="dot" />} 
+                        contentStyle={{ backgroundColor: '#DDDDDD', color: '#000' }}
+                      />
+                      <Line 
+                        dataKey="quizAccuracy" 
+                        name="Quiz Accuracy" 
+                        type="monotone" 
+                        stroke="#00A3FF" 
+                        strokeWidth={2} 
+                        dot={{
+                          fill: "#00A3FF",
+                          r: 4
+                        }} 
+                        activeDot={{
+                          r: 6,
+                          fill: "#fff",
+                          stroke: "#00A3FF"
+                        }} 
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -288,10 +323,10 @@ const ReportsPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#221F26] border-0 shadow-lg p-4 hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg p-4 hover:shadow-[#00A3FF]/10">
             <CardHeader>
               <CardTitle className="text-white">Flashcards Reviewed</CardTitle>
-              <CardDescription className="text-[#8E9196]">
+              <CardDescription className="text-[#A6A6A6]">
                 Number of flashcards reviewed per {timeframe === "weekly" ? "day" : "month"}
               </CardDescription>
             </CardHeader>
@@ -300,11 +335,14 @@ const ReportsPage: React.FC = () => {
                 <ChartContainer config={chartConfig}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                      <XAxis dataKey="name" stroke="#8E9196" />
-                      <YAxis stroke="#8E9196" />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="flashcards" name="Flashcards" fill="#1EAEDB" radius={[4, 4, 0, 0]} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#555" />
+                      <XAxis dataKey="name" stroke="#A6A6A6" />
+                      <YAxis stroke="#A6A6A6" />
+                      <ChartTooltip 
+                        content={<ChartTooltipContent />} 
+                        contentStyle={{ backgroundColor: '#DDDDDD', color: '#000' }}
+                      />
+                      <Bar dataKey="flashcards" name="Flashcards" fill="#0E8345" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -313,21 +351,25 @@ const ReportsPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Content Coverage - Fixed positioning to prevent overlap */}
+        {/* Content Coverage */}
         <div className="grid grid-cols-1 gap-6 mb-8 mt-8 pt-4">
-          <Card className="bg-[#221F26] border-0 shadow-lg p-4 hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg p-4 hover:shadow-[#00A3FF]/10">
             <CardHeader>
               <CardTitle className="text-white">Content Coverage</CardTitle>
-              <CardDescription className="text-stone-300">
+              <CardDescription className="text-[#A6A6A6]">
                 Percentage of uploads with generated notes/summaries
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
                 <div className="flex-1 mr-4">
-                  <Progress value={progressMetrics.contentCoverage} className="h-3 bg-[#1A1F2C]" />
+                  <Progress 
+                    value={progressMetrics.contentCoverage} 
+                    className="h-3 bg-[#333]"
+                    indicatorClassName={`bg-[${getProgressColor(progressMetrics.contentCoverage)}]`}
+                  />
                 </div>
-                <div className="text-xl font-semibold">
+                <div className="text-xl font-semibold text-white">
                   {progressMetrics.contentCoverage}%
                 </div>
               </div>
@@ -338,61 +380,71 @@ const ReportsPage: React.FC = () => {
         {/* AI Helpfulness Feedback (Optional Enhancement) */}
         <h2 className="text-xl font-semibold mb-4">AI Assistant Feedback</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-[#221F26] border-0 shadow-lg col-span-1 hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg col-span-1 hover:shadow-[#00A3FF]/10">
             <CardHeader>
               <CardTitle className="text-white">Rate AI Helpfulness</CardTitle>
-              <CardDescription className="text-stone-300">
+              <CardDescription className="text-[#A6A6A6]">
                 Based on your feedback
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {aiHelpfulnessData.map(item => <div key={item.name} className="flex items-center justify-between">
-                    <span className="text-sm text-stone-300">{item.name}</span>
+                {aiHelpfulnessData.map(item => (
+                  <div key={item.name} className="flex items-center justify-between">
+                    <span className="text-sm text-[#A6A6A6]">{item.name}</span>
                     <div className="flex items-center">
-                      <div className="w-[150px] bg-[#1A1F2C] rounded-full h-2 mr-2">
-                        <div className="h-2 rounded-full" style={{
-                      width: `${item.value}%`,
-                      backgroundColor: item.name === 'Very Helpful' ? '#8B5CF6' : item.name === 'Somewhat Helpful' ? '#1EAEDB' : '#E11D48'
-                    }} />
+                      <div className="w-[150px] bg-[#333] rounded-full h-2 mr-2">
+                        <div 
+                          className="h-2 rounded-full" 
+                          style={{
+                            width: `${item.value}%`,
+                            backgroundColor: 
+                              item.name === 'Very Helpful' ? '#0E8345' : 
+                              item.name === 'Somewhat Helpful' ? '#F6BC2F' : 
+                              '#DE1135'
+                          }} 
+                        />
                       </div>
-                      <span className="text-xs font-medium text-stone-300">{item.value}%</span>
+                      <span className="text-xs font-medium text-[#A6A6A6]">{item.value}%</span>
                     </div>
-                  </div>)}
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
 
           {/* Highlight top used features */}
-          <Card className="bg-[#221F26] border-0 shadow-lg col-span-1 md:col-span-2 hover:shadow-[#8B5CF6]/10">
+          <Card className="bg-[#4B4B4B] border-0 shadow-lg col-span-1 md:col-span-2 hover:shadow-[#00A3FF]/10">
             <CardHeader>
               <CardTitle className="text-white">Top Used Features</CardTitle>
-              <CardDescription className="text-stone-300">
+              <CardDescription className="text-[#A6A6A6]">
                 Features you use most often
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-[#1A1F2C] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <MessageSquare className="h-8 w-8 text-[#8B5CF6] mb-2" />
-                  <h3 className="font-medium text-center">AI Tutor</h3>
-                  <p className="text-xs text-center mt-1 text-stone-300">Used 78 times</p>
+                <div className="bg-[#333] rounded-xl p-4 flex flex-col items-center justify-center">
+                  <MessageSquare className="h-8 w-8 text-[#00A3FF] mb-2" />
+                  <h3 className="font-medium text-center text-white">AI Tutor</h3>
+                  <p className="text-xs text-center mt-1 text-[#A6A6A6]">Used 78 times</p>
                 </div>
-                <div className="bg-[#1A1F2C] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <Layers className="h-8 w-8 text-[#1EAEDB] mb-2" />
-                  <h3 className="font-medium text-center">Flashcards</h3>
-                  <p className="text-xs text-center mt-1 text-stone-300">Created 145 cards</p>
+                <div className="bg-[#333] rounded-xl p-4 flex flex-col items-center justify-center">
+                  <Layers className="h-8 w-8 text-[#00A3FF] mb-2" />
+                  <h3 className="font-medium text-center text-white">Flashcards</h3>
+                  <p className="text-xs text-center mt-1 text-[#A6A6A6]">Created 145 cards</p>
                 </div>
-                <div className="bg-[#1A1F2C] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <FileText className="h-8 w-8 text-[#E5DEFF] mb-2" />
-                  <h3 className="font-medium text-center">Summaries</h3>
-                  <p className="text-xs text-center mt-1 text-stone-300">15 documents</p>
+                <div className="bg-[#333] rounded-xl p-4 flex flex-col items-center justify-center">
+                  <FileText className="h-8 w-8 text-white mb-2" />
+                  <h3 className="font-medium text-center text-white">Summaries</h3>
+                  <p className="text-xs text-center mt-1 text-[#A6A6A6]">15 documents</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
-    </DashboardLayout>;
+    </DashboardLayout>
+  );
 };
+
 export default ReportsPage;
