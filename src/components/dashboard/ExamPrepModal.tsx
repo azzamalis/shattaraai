@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, Paste, SkipForward, ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { Upload, ClipboardPaste, SkipForward, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
 interface ExamPrepModalProps {
   isOpen: boolean;
@@ -94,7 +93,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                 </div>
                 
                 <div className="w-72 h-32 border border-white/10 rounded-lg p-4 flex flex-col items-center justify-center hover:border-white/20 transition-colors cursor-pointer">
-                  <Paste className="h-6 w-6 text-white mb-2" />
+                  <ClipboardPaste className="h-6 w-6 text-white mb-2" />
                   <span className="text-white font-medium">Paste</span>
                   <span className="text-[#A6A6A6] text-sm">YouTube, Website, Text</span>
                 </div>
