@@ -13,8 +13,16 @@ interface ActionCardProps {
 export function ActionCards({ onPasteClick }: ActionCardProps) {
   const navigate = useNavigate();
 
+  const handleUploadClick = () => {
+    navigate('/content/new?type=upload');
+  };
+
+  const handlePasteClick = () => {
+    navigate('/content/new?type=paste');
+  };
+
   const handleRecordClick = () => {
-    navigate('/recording');
+    navigate('/content/new?type=recording');
   };
 
   return (
@@ -23,7 +31,10 @@ export function ActionCards({ onPasteClick }: ActionCardProps) {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Card className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group">
+            <Card 
+              className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
+              onClick={handleUploadClick}
+            >
               <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
                 <Upload className="h-6 w-6 md:h-8 md:w-8 text-white" />
               </div>
@@ -44,7 +55,10 @@ export function ActionCards({ onPasteClick }: ActionCardProps) {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Card className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" onClick={onPasteClick}>
+            <Card 
+              className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" 
+              onClick={handlePasteClick}
+            >
               <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
                 <FileText className="h-6 w-6 md:h-8 md:w-8 text-white" />
               </div>

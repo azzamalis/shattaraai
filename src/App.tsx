@@ -20,6 +20,7 @@ import DashboardPage from "./pages/DashboardPage";
 import RoomPage from "./pages/RoomPage";
 import HistoryPage from "./pages/HistoryPage";
 import RecordingRoom from "./pages/RecordingRoom";
+import ContentPage from "./pages/ContentPage";
 import PricingPage from "./pages/PricingPage";
 import Profile from "./pages/Profile";
 import ReportsPage from "./pages/ReportsPage";
