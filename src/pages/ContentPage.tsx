@@ -7,7 +7,7 @@ import { ContentRightSidebar } from '@/components/content/ContentRightSidebar';
 import { ContentHeader } from '@/components/content/ContentHeader';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 
-export type ContentType = 'recording' | 'pdf' | 'video' | 'youtube';
+export type ContentType = 'recording' | 'pdf' | 'video' | 'youtube' | 'upload' | 'paste' | 'website';
 
 export interface ContentData {
   id: string;
@@ -15,6 +15,8 @@ export interface ContentData {
   title: string;
   url?: string;
   filePath?: string;
+  filename?: string;
+  text?: string;
   metadata?: Record<string, any>;
 }
 
@@ -22,11 +24,17 @@ export default function ContentPage() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const type = searchParams.get('type') as ContentType || 'recording';
+  const url = searchParams.get('url');
+  const filename = searchParams.get('filename');
+  const text = searchParams.get('text');
   
   const [contentData, setContentData] = useState<ContentData>({
     id: id || 'new',
     type,
-    title: getDefaultTitle(type),
+    title: getDefaultTitle(type, filename),
+    url,
+    filename,
+    text,
   });
 
   const [isRecording, setIsRecording] = useState(false);
@@ -44,6 +52,18 @@ export default function ContentPage() {
       if (interval) clearInterval(interval);
     };
   }, [isRecording]);
+
+  useEffect(() => {
+    // Update content data when URL parameters change
+    setContentData(prev => ({
+      ...prev,
+      type,
+      title: getDefaultTitle(type, filename),
+      url,
+      filename,
+      text,
+    }));
+  }, [type, url, filename, text]);
 
   const toggleRecording = () => {
     if (!isRecording) {
@@ -107,19 +127,23 @@ export default function ContentPage() {
   );
 }
 
-function getDefaultTitle(type: ContentType): string {
+function getDefaultTitle(type: ContentType, filename?: string | null): string {
   const now = new Date();
   const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   
   switch (type) {
     case 'recording':
       return `Recording at ${time}`;
+    case 'upload':
     case 'pdf':
-      return `Document at ${time}`;
+      return filename ? filename : `Document at ${time}`;
     case 'video':
-      return `Video at ${time}`;
+      return filename ? filename : `Video at ${time}`;
     case 'youtube':
       return `YouTube Video at ${time}`;
+    case 'paste':
+    case 'website':
+      return `Website Content at ${time}`;
     default:
       return `Content at ${time}`;
   }

@@ -19,7 +19,6 @@ import Onboarding from "./pages/Onboarding";
 import DashboardPage from "./pages/DashboardPage";
 import RoomPage from "./pages/RoomPage";
 import HistoryPage from "./pages/HistoryPage";
-import RecordingRoom from "./pages/RecordingRoom";
 import ContentPage from "./pages/ContentPage";
 import PricingPage from "./pages/PricingPage";
 import Profile from "./pages/Profile";
@@ -54,7 +53,7 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/rooms/:id" element={<RoomPage />} />
             <Route path="/history" element={<HistoryPage />} />
-            <Route path="/recording" element={<RecordingRoom />} />
+            <Route path="/content/:id" element={<ContentPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             

@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Card, CardTitle, CardDescription } from '@/components/ui/card';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Upload, FileText, Mic } from 'lucide-react';
 import { FileIcon, LinkIcon, MicIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface ActionCardProps {
   onPasteClick: () => void;
@@ -12,92 +13,113 @@ interface ActionCardProps {
 
 export function ActionCards({ onPasteClick }: ActionCardProps) {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
-    navigate('/content/new?type=upload');
+    fileInputRef.current?.click();
   };
 
-  const handlePasteClick = () => {
-    navigate('/content/new?type=paste');
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Generate a unique ID for the content
+      const contentId = `upload-${Date.now()}`;
+      // Navigate to content page with upload type
+      navigate(`/content/${contentId}?type=upload&filename=${encodeURIComponent(file.name)}`);
+      toast.success(`File "${file.name}" selected successfully`);
+    }
   };
 
   const handleRecordClick = () => {
-    navigate('/content/new?type=recording');
+    // Generate a unique ID for the recording
+    const contentId = `recording-${Date.now()}`;
+    navigate(`/content/${contentId}?type=recording`);
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
-      {/* Upload Document Card */}
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Card 
-              className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
-              onClick={handleUploadClick}
-            >
-              <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                <Upload className="h-6 w-6 md:h-8 md:w-8 text-white" />
-              </div>
-              <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Upload</CardTitle>
-              <CardDescription className="text-gray-400 text-xs md:text-sm">File, Audio, Video</CardDescription>
-            </Card>
-          </TooltipTrigger>
-          <TooltipContent className="bg-[#1A1A1A] border border-white/10 text-white px-3 py-2 text-sm rounded-lg shadow-xl" sideOffset={5}>
-            <p className="flex items-center gap-2">
-              <FileIcon className="h-4 w-4 text-gray-400" />
-              Supported file types: PDF, PPT, DOC, TXT, Audio, Video
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+    <>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,audio/*,video/*"
+        onChange={handleFileSelect}
+        style={{ display: 'none' }}
+      />
       
-      {/* Paste Text Card */}
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Card 
-              className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" 
-              onClick={handlePasteClick}
-            >
-              <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                <FileText className="h-6 w-6 md:h-8 md:w-8 text-white" />
-              </div>
-              <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Paste</CardTitle>
-              <CardDescription className="text-gray-400 text-xs md:text-sm">YouTube, Website, Text</CardDescription>
-            </Card>
-          </TooltipTrigger>
-          <TooltipContent className="bg-[#1A1A1A] border border-white/10 text-white px-3 py-2 text-sm rounded-lg shadow-xl" sideOffset={5}>
-            <p className="flex items-center gap-2">
-              <LinkIcon className="h-4 w-4 text-gray-400" />
-              YouTube Link, Website URL, Text content
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      
-      {/* Record Audio Card */}
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Card 
-              className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
-              onClick={handleRecordClick}
-            >
-              <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                <Mic className="h-6 w-6 md:h-8 md:w-8 text-white" />
-              </div>
-              <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Record</CardTitle>
-              <CardDescription className="text-gray-400 text-xs md:text-sm">Record Your Lecture</CardDescription>
-            </Card>
-          </TooltipTrigger>
-          <TooltipContent className="bg-[#1A1A1A] border border-white/10 text-white px-3 py-2 text-sm rounded-lg shadow-xl" sideOffset={5}>
-            <p className="flex items-center gap-2">
-              <MicIcon className="h-4 w-4 text-gray-400" />
-              Record your lectures in real-time
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
+        {/* Upload Document Card */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Card 
+                className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
+                onClick={handleUploadClick}
+              >
+                <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
+                  <Upload className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                </div>
+                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Upload</CardTitle>
+                <CardDescription className="text-gray-400 text-xs md:text-sm">File, Audio, Video</CardDescription>
+              </Card>
+            </TooltipTrigger>
+            <TooltipContent className="bg-[#1A1A1A] border border-white/10 text-white px-3 py-2 text-sm rounded-lg shadow-xl" sideOffset={5}>
+              <p className="flex items-center gap-2">
+                <FileIcon className="h-4 w-4 text-gray-400" />
+                Supported file types: PDF, PPT, DOC, TXT, Audio, Video
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        {/* Paste Text Card */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Card 
+                className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" 
+                onClick={onPasteClick}
+              >
+                <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
+                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                </div>
+                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Paste</CardTitle>
+                <CardDescription className="text-gray-400 text-xs md:text-sm">YouTube, Website, Text</CardDescription>
+              </Card>
+            </TooltipTrigger>
+            <TooltipContent className="bg-[#1A1A1A] border border-white/10 text-white px-3 py-2 text-sm rounded-lg shadow-xl" sideOffset={5}>
+              <p className="flex items-center gap-2">
+                <LinkIcon className="h-4 w-4 text-gray-400" />
+                YouTube Link, Website URL, Text content
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        {/* Record Audio Card */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Card 
+                className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
+                onClick={handleRecordClick}
+              >
+                <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
+                  <Mic className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                </div>
+                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Record</CardTitle>
+                <CardDescription className="text-gray-400 text-xs md:text-sm">Record Your Lecture</CardDescription>
+              </Card>
+            </TooltipTrigger>
+            <TooltipContent className="bg-[#1A1A1A] border border-white/10 text-white px-3 py-2 text-sm rounded-lg shadow-xl" sideOffset={5}>
+              <p className="flex items-center gap-2">
+                <MicIcon className="h-4 w-4 text-gray-400" />
+                Record your lectures in real-time
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </>
   );
 }
