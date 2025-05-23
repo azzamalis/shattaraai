@@ -1,409 +1,152 @@
-import React, { useState } from "react";
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Clock, MessageSquare, FileUp, Activity, FileText, Layers, BookOpen, Users, Flame } from "lucide-react";
+import React from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Flame, FileText, BookOpen, Bot, AlertTriangle, Smile } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { MetricCard } from "@/components/metrics/MetricCard";
 
-// Mock data - in a real app, this would be fetched from an API
-const weeklyData = [{
-  name: "Mon",
-  quizAccuracy: 65,
-  flashcards: 24
-}, {
-  name: "Tue",
-  quizAccuracy: 59,
-  flashcards: 13
-}, {
-  name: "Wed",
-  quizAccuracy: 80,
-  flashcards: 36
-}, {
-  name: "Thu",
-  quizAccuracy: 81,
-  flashcards: 45
-}, {
-  name: "Fri",
-  quizAccuracy: 76,
-  flashcards: 27
-}, {
-  name: "Sat",
-  quizAccuracy: 85,
-  flashcards: 18
-}, {
-  name: "Sun",
-  quizAccuracy: 83,
-  flashcards: 31
-}];
-const monthlyData = [{
-  name: "Jan",
-  quizAccuracy: 65,
-  flashcards: 120
-}, {
-  name: "Feb",
-  quizAccuracy: 59,
-  flashcards: 110
-}, {
-  name: "Mar",
-  quizAccuracy: 80,
-  flashcards: 145
-}, {
-  name: "Apr",
-  quizAccuracy: 81,
-  flashcards: 165
-}, {
-  name: "May",
-  quizAccuracy: 76,
-  flashcards: 190
-}, {
-  name: "Jun",
-  quizAccuracy: 85,
-  flashcards: 220
-}];
+const weeklyProgress = [
+  { name: "Sun", Accuracy: 70 },
+  { name: "Mon", Accuracy: 80 },
+  { name: "Tue", Accuracy: 60 },
+  { name: "Wed", Accuracy: 75 },
+  { name: "Thu", Accuracy: 85 },
+  { name: "Fri", Accuracy: 90 },
+  { name: "Sat", Accuracy: 88 },
+];
 
-// Helper function to get progress color based on value
-const getProgressColor = (value: number) => {
-  if (value <= 25) return "#DE1135";
-  if (value <= 50) return "#F6BC2F";
-  return "#0E8345";
-};
-const ReportsPage: React.FC = () => {
-  const [timeframe, setTimeframe] = useState<"weekly" | "monthly">("weekly");
-  const data = timeframe === "weekly" ? weeklyData : monthlyData;
+const challenges = [
+  { topic: "Physics: Kinematics", notes: "Struggled with equations" },
+  { topic: "Arabic Literature", notes: "Needs deeper comprehension" },
+  { topic: "English Essay Writing", notes: "Grammar inconsistencies" },
+];
 
-  // Fixed chart configuration - either use color OR theme, not both
-  const chartConfig = {
-    quizAccuracy: {
-      label: "Quiz Accuracy",
-      theme: {
-        light: "#00A3FF",
-        dark: "#00A3FF"
-      }
-    },
-    flashcards: {
-      label: "Flashcards",
-      theme: {
-        light: "#0E8345",
-        dark: "#0E8345"
-      }
-    }
-  };
-
-  // Calculated engagement metrics - in a real app, this would be actual user data
-  const engagementMetrics = {
-    studyTime: "32:15",
-    aiChats: 78,
-    filesUploaded: 24,
-    sessions: 18
-  };
-
-  // Calculated productivity metrics
-  const productivityMetrics = {
-    summariesCreated: 15,
-    flashcardsCreated: 145,
-    quizzesTaken: 12,
-    roomsCreated: 7
-  };
-
-  // Progress metrics
-  const progressMetrics = {
-    quizAccuracy: 78,
-    flashcardsPerWeek: 120,
-    contentCoverage: 65
-  };
-
-  // AI Helpfulness Feedback (Optional enhancement)
-  const aiHelpfulnessData = [{
-    name: 'Very Helpful',
-    value: 65
-  }, {
-    name: 'Somewhat Helpful',
-    value: 25
-  }, {
-    name: 'Not Helpful',
-    value: 10
-  }];
-
-  // Streak data (Optional enhancement)
-  const studyStreak = 4;
-  return <DashboardLayout>
+export default function ReportsPage() {
+  return (
+    <DashboardLayout>
       <div className="flex flex-col min-h-screen text-white p-4 md:p-6 bg-black">
-        {/* Header with greeting and streak */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome back, Ashlynn</h1>
-            <p className="text-[#A6A6A6]">Your progress this week is awesome. Let's keep it up!</p>
-          </div>
-          <div className="flex items-center mt-4 md:mt-0 rounded-lg p-2 bg-[#4B4B4B]">
-            <Flame className="h-6 w-6 text-orange-500 mr-2" />
-            <span className="text-white font-medium">{studyStreak}-day streak</span>
-          </div>
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Your Learning Journey</h1>
+          <p className="text-[#A6A6A6]">Track your progress and identify areas for improvement</p>
         </div>
 
-        {/* Engagement Metrics */}
-        <h2 className="text-xl font-semibold mb-4">Engagement Metrics</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <Clock className="w-4 h-4 mr-2 text-[#00A3FF]" />
-                Study Time This Week
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-white">{engagementMetrics.studyTime}</p>
-              <p className="text-xs text-[#A6A6A6] mt-1">Hours:Minutes</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <MessageSquare className="w-4 h-4 mr-2 text-[#00A3FF]" />
-                Total AI Chats
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-white">{engagementMetrics.aiChats}</p>
-              <p className="text-xs text-[#A6A6A6] mt-1">Conversations</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <FileUp className="w-4 h-4 mr-2 text-white" />
-                Files Uploaded
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-white">{engagementMetrics.filesUploaded}</p>
-              <p className="text-xs text-[#A6A6A6] mt-1">Documents</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <Activity className="w-4 h-4 mr-2 text-[#00A3FF]" />
-                Sessions This Week
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-white">{engagementMetrics.sessions}</p>
-              <p className="text-xs text-[#A6A6A6] mt-1">Login sessions</p>
-            </CardContent>
-          </Card>
+        {/* Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <MetricCard icon={<FileText />} value="42" label="Files Studied" />
+          <MetricCard icon={<BookOpen />} value="128" label="Flashcards Reviewed" />
+          <MetricCard icon={<Bot />} value="7" label="Quizzes Taken" />
+          <MetricCard icon={<Flame />} value="6 days" label="Study Streak 🔥" />
         </div>
 
-        {/* Productivity Metrics */}
-        <h2 className="text-xl font-semibold mb-4">Productivity Metrics</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Weekly Progress */}
+        <Card className="mb-6 bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
+          <CardHeader className="flex items-center justify-between pb-2">
+            <CardTitle className="text-white">📈 Learning Progress</CardTitle>
+            <span className="text-sm text-[#A6A6A6]">Accuracy This Week</span>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="h-[240px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyProgress}>
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#A6A6A6" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="#A6A6A6" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: '#333',
+                      border: '1px solid #555',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '12px'
+                    }}
+                    labelStyle={{ color: '#00A3FF' }}
+                  />
+                  <Bar 
+                    dataKey="Accuracy" 
+                    fill="#00A3FF" 
+                    radius={[6, 6, 0, 0]} 
+                    opacity={0.8}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Goals + Feedback */}
+        <div className="grid gap-4 lg:grid-cols-2 mb-6">
           <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <FileText className="w-4 h-4 mr-2 text-[#00A3FF]" />
-                Summaries Created
-              </CardTitle>
+              <CardTitle className="text-white">🎯 Weekly Goal</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-white">{productivityMetrics.summariesCreated}</p>
+            <CardContent className="p-4">
+              <p className="text-lg mb-2 text-white">You've completed 80% of your goal!</p>
+              <Progress value={80} className="h-3 bg-[#333]" />
+              <p className="text-sm text-[#A6A6A6] mt-2">
+                Just 2 more quizzes to hit your target.
+              </p>
             </CardContent>
           </Card>
 
           <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <Layers className="w-4 h-4 mr-2 text-[#00A3FF]" />
-                Flashcards Created
-              </CardTitle>
+              <CardTitle className="text-white">✨ Helpfulness Rating</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-white">{productivityMetrics.flashcardsCreated}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <BookOpen className="w-4 h-4 mr-2 text-[#00A3FF]" />
-                Quizzes/Exams Taken
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-white">{productivityMetrics.quizzesTaken}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-md font-medium text-[#A6A6A6] flex items-center">
-                <Users className="w-4 h-4 mr-2 text-[#00A3FF]" />
-                Rooms Created
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-white">{productivityMetrics.roomsCreated}</p>
+            <CardContent className="p-4">
+              <p className="text-3xl font-bold mb-2 text-white">94%</p>
+              <Progress value={94} className="h-3 bg-[#333]" />
+              <p className="text-sm text-[#A6A6A6] mt-2">
+                Based on 200 feedback entries this month.
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Progress Charts */}
-        <h2 className="text-xl font-semibold mb-4">Progress Charts</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg p-4 hover:shadow-[#00A3FF]/10">
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-white">Quiz Accuracy Over Time</CardTitle>
-                <div className="flex space-x-2">
-                  <button onClick={() => setTimeframe("weekly")} className={`px-2 py-1 text-xs rounded-md ${timeframe === "weekly" ? "bg-[#00A3FF]/10 text-white" : "bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#5B5B5B]"}`}>
-                    Weekly
-                  </button>
-                  <button onClick={() => setTimeframe("monthly")} className={`px-2 py-1 text-xs rounded-md ${timeframe === "monthly" ? "bg-[#00A3FF]/10 text-white" : "bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#5B5B5B]"}`}>
-                    Monthly
-                  </button>
-                </div>
-              </div>
-              <CardDescription className="text-[#A6A6A6]">
-                Your quiz accuracy over time
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="h-[250px]">
-                <ChartContainer config={chartConfig}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#555" />
-                      <XAxis dataKey="name" stroke="#A6A6A6" />
-                      <YAxis stroke="#A6A6A6" />
-                      <ChartTooltip content={<ChartTooltipContent indicator="dot" />} contentStyle={{
-                      backgroundColor: '#DDDDDD',
-                      color: '#000'
-                    }} />
-                      <Line dataKey="quizAccuracy" name="Quiz Accuracy" type="monotone" stroke="#00A3FF" strokeWidth={2} dot={{
-                      fill: "#00A3FF",
-                      r: 4
-                    }} activeDot={{
-                      r: 6,
-                      fill: "#fff",
-                      stroke: "#00A3FF"
-                    }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Areas of Difficulty */}
+        <Card className="mb-6 bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-white">🚧 Top Challenges</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <ul className="space-y-4">
+              {challenges.map((item, idx) => (
+                <li key={idx} className="flex items-start space-x-3">
+                  <AlertTriangle className="text-yellow-500 mt-1" size={20} />
+                  <div>
+                    <p className="font-medium text-white">{item.topic}</p>
+                    <p className="text-sm text-[#A6A6A6]">{item.notes}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
 
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg p-4 hover:shadow-[#00A3FF]/10">
-            <CardHeader>
-              <CardTitle className="text-white">Flashcards Reviewed</CardTitle>
-              <CardDescription className="text-[#A6A6A6]">
-                Number of flashcards reviewed per {timeframe === "weekly" ? "day" : "month"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="h-[250px]">
-                <ChartContainer config={chartConfig}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#555" />
-                      <XAxis dataKey="name" stroke="#A6A6A6" />
-                      <YAxis stroke="#A6A6A6" />
-                      <ChartTooltip content={<ChartTooltipContent />} contentStyle={{
-                      backgroundColor: '#DDDDDD',
-                      color: '#000'
-                    }} />
-                      <Bar dataKey="flashcards" name="Flashcards" fill="#0E8345" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Content Coverage */}
-        <div className="grid grid-cols-1 gap-6 mb-8 mt-8 pt-4">
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg p-4 hover:shadow-[#00A3FF]/10">
-            <CardHeader>
-              <CardTitle className="text-white">Content Coverage</CardTitle>
-              <CardDescription className="text-[#A6A6A6]">
-                Percentage of uploads with generated notes/summaries
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <div className="flex-1 mr-4">
-                  <Progress value={progressMetrics.contentCoverage} className="h-3 bg-[#333]" indicatorClassName={`bg-[${getProgressColor(progressMetrics.contentCoverage)}]`} />
-                </div>
-                <div className="text-xl font-semibold text-white">
-                  {progressMetrics.contentCoverage}%
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* AI Helpfulness Feedback (Optional Enhancement) */}
-        <h2 className="text-xl font-semibold mb-4">AI Assistant Feedback</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg col-span-1 hover:shadow-[#00A3FF]/10">
-            <CardHeader>
-              <CardTitle className="text-white">Rate AI Helpfulness</CardTitle>
-              <CardDescription className="text-[#A6A6A6]">
-                Based on your feedback
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {aiHelpfulnessData.map(item => <div key={item.name} className="flex items-center justify-between">
-                    <span className="text-sm text-[#A6A6A6]">{item.name}</span>
-                    <div className="flex items-center">
-                      <div className="w-[150px] bg-[#333] rounded-full h-2 mr-2">
-                        <div className="h-2 rounded-full" style={{
-                      width: `${item.value}%`,
-                      backgroundColor: item.name === 'Very Helpful' ? '#0E8345' : item.name === 'Somewhat Helpful' ? '#F6BC2F' : '#DE1135'
-                    }} />
-                      </div>
-                      <span className="text-xs font-medium text-[#A6A6A6]">{item.value}%</span>
-                    </div>
-                  </div>)}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Highlight top used features */}
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg col-span-1 md:col-span-2 hover:shadow-[#00A3FF]/10">
-            <CardHeader>
-              <CardTitle className="text-white">Top Used Features</CardTitle>
-              <CardDescription className="text-[#A6A6A6]">
-                Features you use most often
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-[#333] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <MessageSquare className="h-8 w-8 text-[#00A3FF] mb-2" />
-                  <h3 className="font-medium text-center text-white">AI Tutor</h3>
-                  <p className="text-xs text-center mt-1 text-[#A6A6A6]">Used 78 times</p>
-                </div>
-                <div className="bg-[#333] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <Layers className="h-8 w-8 text-[#00A3FF] mb-2" />
-                  <h3 className="font-medium text-center text-white">Flashcards</h3>
-                  <p className="text-xs text-center mt-1 text-[#A6A6A6]">Created 145 cards</p>
-                </div>
-                <div className="bg-[#333] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <FileText className="h-8 w-8 text-[#00A3FF] mb-2" />
-                  <h3 className="font-medium text-center text-white">Summaries</h3>
-                  <p className="text-xs text-center mt-1 text-[#A6A6A6]">15 documents</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Encouragement Message */}
+        <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
+          <CardHeader className="flex items-center space-x-3 pb-2">
+            <Smile className="text-green-500" size={24} />
+            <CardTitle className="text-white">Keep Going!</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <p className="text-[#A6A6A6] text-sm">
+              You're making steady progress. Focus on small wins daily — your future self will thank you. 🚀
+            </p>
+          </CardContent>
+        </Card>
       </div>
-    </DashboardLayout>;
-};
-export default ReportsPage;
+    </DashboardLayout>
+  );
+}
