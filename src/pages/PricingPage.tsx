@@ -4,13 +4,55 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const PricingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const [isCopied, setIsCopied] = useState(false);
+
+  const copyPromoCode = () => {
+    navigator.clipboard.writeText("SUMMER25");
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
 
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full overflow-auto bg-[#222222]">
+        {/* Promo Banner */}
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="rounded-xl bg-[#0A1A2A] border border-[#00A3FF]/30 shadow-[0_0_30px_-5px_rgba(0,163,255,0.5)] backdrop-blur-sm">
+              <div className="py-8 px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-white text-2xl">🎉</span>
+                    <span className="text-white text-2xl font-semibold">25% OFF</span>
+                  </div>
+                  
+                  <div className="text-white/90">Early Summer Sale</div>
+
+                  <div className="flex items-center space-x-2">
+                    <code className="bg-[#00A3FF]/10 px-4 py-2 rounded-md border border-[#00A3FF]/30 text-white font-mono">SUMMER25</code>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={copyPromoCode}
+                      className="h-9 px-4 bg-[#00A3FF]/10 border border-[#00A3FF]/30 text-white hover:bg-[#00A3FF]/20 hover:border-[#00A3FF]/50 transition-colors rounded-md"
+                    >
+                      {isCopied ? "Copied!" : "Copy"}
+                    </Button>
+                  </div>
+
+                  <div className="text-sm text-white/80">
+                    25% off your purchase. Use code at checkout. Offer ends May 31.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="flex-1 py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             {/* Heading Section */}
@@ -195,6 +237,68 @@ const PricingPage: React.FC = () => {
                 </CardFooter>
               </Card>
             </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="w-full bg-[#111111] py-16">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl font-medium text-white mb-3">Frequently Asked Questions</h2>
+              <p className="text-sm text-gray-400">
+                Can't find the answer here?{" "}
+                <a href="#" className="text-[#00A3FF] hover:underline">
+                  Contact us
+                </a>
+              </p>
+            </div>
+
+            <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="pro-plan" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+                  What do I get with the Pro plan?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-400 text-sm">
+                  With the Pro plan, you get unlimited uploads, AI chats, quiz generation, practice exams, and voice mode. You can upload files up to 2000 pages or 300MB in size, and access all premium features without any restrictions.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="payment-methods" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+                  What payment methods do you offer?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-400 text-sm">
+                  We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and various local payment methods. For team plans, we also offer invoice-based payments.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="cancel-plan" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+                  Can I cancel my Shattara AI plan at any time?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-400 text-sm">
+                  Yes, you can cancel your subscription at any time. If you cancel, you'll retain access to premium features until the end of your current billing period. We don't offer refunds for partial months.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="student-discount" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+                  Do you offer student discount?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-400 text-sm">
+                  Yes! We offer a 50% discount for verified students. To get the discount, please verify your student status using your academic email address or student ID through our verification partner.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="refund-policy" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
+                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+                  What is your refund policy?
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-400 text-sm">
+                  We offer a 14-day money-back guarantee for all new subscriptions. If you're not satisfied with Shattara AI within the first 14 days, contact our support team for a full refund, no questions asked.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </div>
