@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { Card, CardTitle, CardDescription } from '@/components/ui/card';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
@@ -6,27 +7,29 @@ import { FileIcon, LinkIcon, MicIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useContent } from '@/contexts/ContentContext';
+
 interface ActionCardProps {
   onPasteClick: () => void;
 }
-export function ActionCards({
-  onPasteClick
-}: ActionCardProps) {
+
+export function ActionCards({ onPasteClick }: ActionCardProps) {
   const navigate = useNavigate();
-  const {
-    onAddContent
-  } = useContent();
+  const { onAddContent } = useContent();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       // Determine content type based on file
       let contentType = 'upload';
-      if (file.type.includes('pdf')) contentType = 'pdf';else if (file.type.includes('audio')) contentType = 'audio';else if (file.type.includes('video')) contentType = 'video';
-
+      if (file.type.includes('pdf')) contentType = 'pdf';
+      else if (file.type.includes('audio')) contentType = 'audio';
+      else if (file.type.includes('video')) contentType = 'video';
+      
       // Add content to tracking system
       const contentId = onAddContent({
         title: file.name,
@@ -34,38 +37,46 @@ export function ActionCards({
         filename: file.name,
         fileSize: file.size
       });
-
+      
       // Navigate to content page
       navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}`);
       toast.success(`File "${file.name}" selected successfully`);
     }
   };
+
   const handleRecordClick = () => {
     // Add recording to tracking system
     const contentId = onAddContent({
-      title: `Recording at ${new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
-      })}`,
+      title: `Recording at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
       type: 'recording'
     });
+    
     navigate(`/content/${contentId}?type=recording`);
   };
-  return <>
-      <input ref={fileInputRef} type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,audio/*,video/*" onChange={handleFileSelect} style={{
-      display: 'none'
-    }} />
+
+  return (
+    <>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,audio/*,video/*"
+        onChange={handleFileSelect}
+        style={{ display: 'none' }}
+      />
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
         {/* Upload Document Card */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Card onClick={handleUploadClick} className="bg-[#FDFDFD] border border-[#E6E6E6] hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group">
+              <Card 
+                className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
+                onClick={handleUploadClick}
+              >
                 <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                  <Upload className="h-6 w-6 md:h-8 md:w-8 text-[#0A0A0A]" />
+                  <Upload className="h-6 w-6 md:h-8 md:w-8 text-white" />
                 </div>
-                <CardTitle className="text-[#0A0A0A] mb-1 md:mb-2 text-base md:text-xl">Upload</CardTitle>
+                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Upload</CardTitle>
                 <CardDescription className="text-gray-400 text-xs md:text-sm">File, Audio, Video</CardDescription>
               </Card>
             </TooltipTrigger>
@@ -82,11 +93,14 @@ export function ActionCards({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Card onClick={onPasteClick} className="bg-[#FDFDFD] border border-[#E6E6E6] hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group">
+              <Card 
+                className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" 
+                onClick={onPasteClick}
+              >
                 <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-[#0A0A0A]" />
+                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-white" />
                 </div>
-                <CardTitle className="text-[#0A0A0A] mb-1 md:mb-2 text-base md:text-xl">Paste</CardTitle>
+                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Paste</CardTitle>
                 <CardDescription className="text-gray-400 text-xs md:text-sm">YouTube, Website, Text</CardDescription>
               </Card>
             </TooltipTrigger>
@@ -103,11 +117,14 @@ export function ActionCards({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Card onClick={handleRecordClick} className="bg-[#FDFDFD] border border-[#E6E6E6] hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group">
+              <Card 
+                className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
+                onClick={handleRecordClick}
+              >
                 <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                  <Mic className="h-6 w-6 md:h-8 md:w-8 text-[#0A0A0A]" />
+                  <Mic className="h-6 w-6 md:h-8 md:w-8 text-white" />
                 </div>
-                <CardTitle className="text-[#0A0A0A] mb-1 md:mb-2 text-base md:text-xl">Record</CardTitle>
+                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Record</CardTitle>
                 <CardDescription className="text-gray-400 text-xs md:text-sm">Record Your Lecture</CardDescription>
               </Card>
             </TooltipTrigger>
@@ -120,5 +137,6 @@ export function ActionCards({
           </Tooltip>
         </TooltipProvider>
       </div>
-    </>;
+    </>
+  );
 }
