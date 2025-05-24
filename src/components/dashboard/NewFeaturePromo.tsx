@@ -7,7 +7,7 @@ export function NewFeaturePromo() {
   return <div className="mb-4 sm:mb-6 md:mb-8 flex justify-center">
       <Popover>
         <PopoverTrigger asChild>
-          <Button className="bg-[#00A3FF] hover:bg-[#00A3FF]/10 px-4 py-2 rounded-full flex items-center gap-2 border border-[#00A3FF] text-[#00A3FF]">
+          <Button className="bg-[#00A3FF] px-4 py-2 rounded-full flex items-center gap-2 border border-[#00A3FF] text-[#00A3FF]">
             <div className="flex items-center gap-2">
               <Badge className="bg-[#00A3FF]/20 text-[#00A3FF] font-medium text-xs px-2 py-0.5 pointer-events-none">
                 NEW
