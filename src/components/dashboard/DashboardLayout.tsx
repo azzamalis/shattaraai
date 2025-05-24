@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardDrawer } from './DashboardDrawer';
 import { Room, RoomHandlers } from '@/lib/types';
 import { toast } from 'sonner';
+import { ContentProvider } from '@/contexts/ContentContext';
 
 interface DashboardLayoutProps {
   children: React.ReactElement<Partial<RoomHandlers & { rooms: Room[] }>>;
@@ -85,23 +87,25 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
     : children;
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-[#111] overflow-hidden">
-      <DashboardHeader onOpenDrawer={() => setIsDrawerOpen(true)} />
-      <DashboardDrawer 
-        open={isDrawerOpen} 
-        onOpenChange={setIsDrawerOpen}
-        rooms={rooms}
-        {...roomHandlers}
-      />
-      <main 
-        className={cn(
-          "flex-1 transition-all duration-300 ease-in-out", 
-          isDrawerOpen ? "lg:ml-[300px]" : "ml-0",
-          className
-        )}
-      >
-        {childWithProps}
-      </main>
-    </div>
+    <ContentProvider>
+      <div className="flex min-h-screen w-full flex-col bg-[#111] overflow-hidden">
+        <DashboardHeader onOpenDrawer={() => setIsDrawerOpen(true)} />
+        <DashboardDrawer 
+          open={isDrawerOpen} 
+          onOpenChange={setIsDrawerOpen}
+          rooms={rooms}
+          {...roomHandlers}
+        />
+        <main 
+          className={cn(
+            "flex-1 transition-all duration-300 ease-in-out", 
+            isDrawerOpen ? "lg:ml-[300px]" : "ml-0",
+            className
+          )}
+        >
+          {childWithProps}
+        </main>
+      </div>
+    </ContentProvider>
   );
 }

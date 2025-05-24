@@ -6,6 +6,7 @@ import { Upload, FileText, Mic } from 'lucide-react';
 import { FileIcon, LinkIcon, MicIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useContent } from '@/contexts/ContentContext';
 
 interface ActionCardProps {
   onPasteClick: () => void;
@@ -13,6 +14,7 @@ interface ActionCardProps {
 
 export function ActionCards({ onPasteClick }: ActionCardProps) {
   const navigate = useNavigate();
+  const { onAddContent } = useContent();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
@@ -22,23 +24,38 @@ export function ActionCards({ onPasteClick }: ActionCardProps) {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Generate a unique ID for the content
-      const contentId = `upload-${Date.now()}`;
-      // Navigate to content page with upload type
-      navigate(`/content/${contentId}?type=upload&filename=${encodeURIComponent(file.name)}`);
+      // Determine content type based on file
+      let contentType = 'upload';
+      if (file.type.includes('pdf')) contentType = 'pdf';
+      else if (file.type.includes('audio')) contentType = 'audio';
+      else if (file.type.includes('video')) contentType = 'video';
+      
+      // Add content to tracking system
+      const contentId = onAddContent({
+        title: file.name,
+        type: contentType as any,
+        filename: file.name,
+        fileSize: file.size
+      });
+      
+      // Navigate to content page
+      navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}`);
       toast.success(`File "${file.name}" selected successfully`);
     }
   };
 
   const handleRecordClick = () => {
-    // Generate a unique ID for the recording
-    const contentId = `recording-${Date.now()}`;
+    // Add recording to tracking system
+    const contentId = onAddContent({
+      title: `Recording at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+      type: 'recording'
+    });
+    
     navigate(`/content/${contentId}?type=recording`);
   };
 
   return (
     <>
-      {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"

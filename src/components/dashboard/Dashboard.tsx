@@ -11,6 +11,7 @@ import { MyRoomsSection } from './MyRoomsSection';
 import { ContinueLearningSection } from './ContinueLearningSection';
 import { ShareModal } from './modals/ShareModal';
 import { DeleteConfirmModal } from './modals/DeleteConfirmModal';
+import { useContent } from '@/contexts/ContentContext';
 
 interface DashboardProps extends RoomHandlers {
   rooms: Room[];
@@ -23,6 +24,7 @@ export function Dashboard({
   onDeleteRoom
 }: DashboardProps) {
   const navigate = useNavigate();
+  const { onAddContent, onDeleteContent } = useContent();
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -32,20 +34,29 @@ export function Dashboard({
     url?: string;
     text?: string;
   }) => {
-    // Generate a unique ID for the content
-    const contentId = `paste-${Date.now()}`;
-    
     // Determine content type based on URL
-    let contentType = 'paste';
+    let contentType = 'text';
+    let title = 'Text Content';
+    
     if (data.url) {
       if (data.url.includes('youtube.com') || data.url.includes('youtu.be')) {
         contentType = 'youtube';
+        title = 'YouTube Video';
       } else {
         contentType = 'website';
+        title = 'Website Content';
       }
     }
     
-    // Navigate to content page with appropriate parameters
+    // Add content to tracking system
+    const contentId = onAddContent({
+      title,
+      type: contentType as any,
+      url: data.url,
+      text: data.text
+    });
+    
+    // Navigate to content page
     const searchParams = new URLSearchParams({
       type: contentType,
       ...(data.url && { url: data.url }),
@@ -66,7 +77,6 @@ export function Dashboard({
   const handleAISubmit = (value: string) => {
     toast.success("Your question was submitted");
     console.log("AI query:", value);
-    // Here you would typically send the query to your AI backend
   };
 
   const handleDeleteClick = (roomId: string) => {
@@ -88,20 +98,19 @@ export function Dashboard({
       onDeleteRoom(itemToDelete.id);
       toast.success(`"${itemToDelete.name}" has been deleted`);
     } else if (itemToDelete.type === 'card') {
-      // Handle card deletion here when implemented
-      toast.success(`"${itemToDelete.name}" has been deleted from ${itemToDelete.parentName}`);
+      onDeleteContent(itemToDelete.id);
+      toast.success(`"${itemToDelete.name}" has been deleted`);
     }
 
     setItemToDelete(null);
     setDeleteModalOpen(false);
   };
 
-  const handleCardDelete = () => {
+  const handleCardDelete = (contentId: string) => {
     setItemToDelete({
-      id: 'python-card',
+      id: contentId,
       type: 'card',
-      name: 'Python Language',
-      parentName: "Azzam's Space"
+      name: 'Content Item'
     });
     setDeleteModalOpen(true);
   };
@@ -110,23 +119,18 @@ export function Dashboard({
     <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-black">
         <div className="max-w-6xl mx-auto">
-          {/* Practice with exams section */}
           <NewFeaturePromo />
           
-          {/* Centered main heading with responsive font size */}
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 sm:mb-8 md:mb-12 text-center">
             What do you want to learn today?
           </h1>
           
-          {/* Action Cards */}
           <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
           
-          {/* AI Assistant Input */}
           <div className="mb-6 sm:mb-8">
             <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
           </div>
 
-          {/* My Rooms section */}
           <MyRoomsSection 
             rooms={rooms} 
             onAddRoom={onAddRoom} 
@@ -134,7 +138,6 @@ export function Dashboard({
             onDeleteRoom={handleDeleteClick} 
           />
 
-          {/* Continue learning section */}
           <ContinueLearningSection 
             onDeleteCard={handleCardDelete} 
             onShareCard={() => setShareModalOpen(true)} 
@@ -142,7 +145,6 @@ export function Dashboard({
         </div>
       </main>
 
-      {/* Modals */}
       <PasteContentModal 
         isOpen={isPasteModalOpen} 
         onClose={() => setIsPasteModalOpen(false)} 
