@@ -61,11 +61,11 @@ export function ActionCards({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Card className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" onClick={handleUploadClick}>
+              <Card onClick={handleUploadClick} className="bg-[#FDFDFD] border border-[#E6E6E6] hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group">
                 <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                  <Upload className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                  <Upload className="h-6 w-6 md:h-8 md:w-8 text-[#0A0A0A]" />
                 </div>
-                <CardTitle className="text-[#0A0A0A] mb-1 md:mb-2 text-base md:text-lg">Upload</CardTitle>
+                <CardTitle className="text-[#0A0A0A] mb-1 md:mb-2 text-base md:text-xl">Upload</CardTitle>
                 <CardDescription className="text-gray-400 text-xs md:text-sm">File, Audio, Video</CardDescription>
               </Card>
             </TooltipTrigger>
@@ -82,11 +82,11 @@ export function ActionCards({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Card className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" onClick={onPasteClick}>
+              <Card onClick={onPasteClick} className="bg-[#FDFDFD] border border-[#E6E6E6] hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group">
                 <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-[#0A0A0A]" />
                 </div>
-                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Paste</CardTitle>
+                <CardTitle className="text-[#0A0A0A] mb-1 md:mb-2 text-base md:text-xl">Paste</CardTitle>
                 <CardDescription className="text-gray-400 text-xs md:text-sm">YouTube, Website, Text</CardDescription>
               </Card>
             </TooltipTrigger>
@@ -103,11 +103,11 @@ export function ActionCards({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Card className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" onClick={handleRecordClick}>
+              <Card onClick={handleRecordClick} className="bg-[#FDFDFD] border border-[#E6E6E6] hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group">
                 <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                  <Mic className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                  <Mic className="h-6 w-6 md:h-8 md:w-8 text-[#0A0A0A]" />
                 </div>
-                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Record</CardTitle>
+                <CardTitle className="text-[#0A0A0A] mb-1 md:mb-2 text-base md:text-xl">Record</CardTitle>
                 <CardDescription className="text-gray-400 text-xs md:text-sm">Record Your Lecture</CardDescription>
               </Card>
             </TooltipTrigger>
