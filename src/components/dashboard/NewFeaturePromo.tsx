@@ -12,7 +12,7 @@ export function NewFeaturePromo() {
           <Button className="bg-transparent hover:bg-white/10 text-white px-4 py-2 rounded-full flex items-center gap-2 border border-white/20">
             <div className="flex items-center gap-2">
               <Badge className="bg-[#00A3FF]/20 text-[#00A3FF] font-medium text-xs px-2 py-0.5 pointer-events-none">
-                NEW
+                coming soon
               </Badge>
               <span>Practice with exams</span>
               <ChevronDown className="h-4 w-4" />
