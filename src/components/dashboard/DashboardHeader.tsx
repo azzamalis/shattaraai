@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
@@ -7,19 +6,15 @@ import Logo from '@/components/Logo';
 import { CommandModal } from './CommandModal';
 import { UpgradeModal } from './UpgradeModal';
 import { Link } from 'react-router-dom';
-
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
 }
-
 export function DashboardHeader({
   onOpenDrawer
 }: DashboardHeaderProps) {
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-
-  return (
-    <header className="flex items-center p-4 sticky top-0 z-50 bg-black border-b border-white/10">
+  return <header className="flex items-center p-4 sticky top-0 z-10 bg-black">
       <div className="grid grid-cols-3 w-full items-center">
         {/* Left section */}
         <div className="flex items-center gap-3">
@@ -65,6 +60,5 @@ export function DashboardHeader({
           </Dialog>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 }
