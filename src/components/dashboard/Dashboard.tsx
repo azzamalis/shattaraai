@@ -117,11 +117,11 @@ export function Dashboard({
 
   return (
     <div className="flex flex-col h-full">
-      <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-black">
+      <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-dashboard-bg transition-colors duration-300">
         <div className="max-w-6xl mx-auto">
           <NewFeaturePromo />
           
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 sm:mb-8 md:mb-12 text-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold dashboard-text mb-6 sm:mb-8 md:mb-12 text-center">
             What do you want to learn today?
           </h1>
           

@@ -30,17 +30,8 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#2323FF',
-					foreground: '#FFFFFF',
-					light: '#4949ff',
-				},
-				dark: {
-					DEFAULT: '#111111',
-					deeper: '#000000',
-				},
-				accent: {
-					DEFAULT: '#F4F6F8',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: 'hsl(var(--primary))',
+					foreground: 'hsl(var(--primary-foreground))',
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -54,13 +45,18 @@ export default {
 					DEFAULT: 'hsl(var(--muted))',
 					foreground: 'hsl(var(--muted-foreground))'
 				},
+				accent: {
+					DEFAULT: 'hsl(var(--accent))',
+					foreground: 'hsl(var(--accent-foreground))'
+				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
 					foreground: 'hsl(var(--popover-foreground))'
 				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					foreground: 'hsl(var(--card-foreground))',
+					hover: 'hsl(var(--card-hover))',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -71,7 +67,29 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Custom dashboard colors
+				dashboard: {
+					bg: 'hsl(var(--dashboard-bg))',
+					card: 'hsl(var(--dashboard-card))',
+					'card-hover': 'hsl(var(--dashboard-card-hover))',
+					'secondary-card': 'hsl(var(--dashboard-secondary-card))',
+					'secondary-card-hover': 'hsl(var(--dashboard-secondary-card-hover))',
+					text: 'hsl(var(--dashboard-text))',
+					'text-secondary': 'hsl(var(--dashboard-text-secondary))',
+					'text-placeholder': 'hsl(var(--dashboard-text-placeholder))',
+					sidebar: 'hsl(var(--dashboard-sidebar))',
+					button: 'hsl(var(--dashboard-button))',
+					'button-text': 'hsl(var(--dashboard-button-text))',
+					'button-border': 'hsl(var(--dashboard-button-border))',
+					icons: 'hsl(var(--dashboard-icons))',
+					separator: 'hsl(var(--dashboard-separator))',
+				},
+				// Legacy colors for compatibility
+				dark: {
+					DEFAULT: '#111111',
+					deeper: '#000000',
+				},
 			},
 			maxWidth: {
 				container: "1280px",
