@@ -64,7 +64,7 @@ export default function Profile() {
               <div className="flex items-start gap-4">
                 <Avatar className="h-20 w-20">
                   <AvatarImage src={userData.avatarUrl} alt={userData.name} />
-                  <AvatarFallback className="bg-dashboard-secondary-card text-dashboard-text">
+                  <AvatarFallback className="bg-dashboard-secondary-card text-dashboard-text border-0">
                     {userData.name.split(" ").map(n => n[0]).join("")}
                   </AvatarFallback>
                 </Avatar>
@@ -222,14 +222,14 @@ export default function Profile() {
         <div className="flex justify-end gap-4 mt-6">
           <Button
             variant="outline"
-            className="text-destructive hover:bg-destructive/10 hover:text-destructive border-dashboard-separator"
+            className="bg-destructive text-white hover:bg-destructive/90 hover:text-white border-destructive"
             onClick={handleDeleteAccount}
           >
             Delete My Account
           </Button>
           <Button
             onClick={handleSaveChanges}
-            className="dashboard-button border border-dashboard-button-border"
+            className="bg-dashboard-text text-dashboard-bg hover:bg-dashboard-text/90 border border-dashboard-separator"
           >
             Save Changes
           </Button>

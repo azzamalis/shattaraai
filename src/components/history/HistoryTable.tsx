@@ -34,12 +34,12 @@ interface HistoryTableProps {
 export function HistoryTable({ items, onItemClick }: HistoryTableProps) {
   return (
     <Table>
-      <TableHeader className="bg-[#222]">
-        <TableRow className="border-white/10 hover:bg-white/5">
-          <TableHead className="text-white/70">Title</TableHead>
-          <TableHead className="text-white/70">Room</TableHead>
-          <TableHead className="text-white/70">Type</TableHead>
-          <TableHead className="text-white/70">Date</TableHead>
+      <TableHeader className="bg-transparent">
+        <TableRow className="border-dashboard-separator hover:bg-dashboard-card-hover">
+          <TableHead className="dashboard-text">Title</TableHead>
+          <TableHead className="dashboard-text">Room</TableHead>
+          <TableHead className="dashboard-text">Type</TableHead>
+          <TableHead className="dashboard-text">Date</TableHead>
           <TableHead className="w-[50px]"></TableHead>
         </TableRow>
       </TableHeader>
@@ -47,7 +47,7 @@ export function HistoryTable({ items, onItemClick }: HistoryTableProps) {
         {items.map((item) => (
           <TableRow 
             key={item.id} 
-            className="border-white/10 hover:bg-white/5 cursor-pointer"
+            className="border-dashboard-separator hover:bg-dashboard-card-hover cursor-pointer"
             onClick={() => onItemClick(item.id)}
           >
             <TableCell className="font-medium">
@@ -56,10 +56,10 @@ export function HistoryTable({ items, onItemClick }: HistoryTableProps) {
                 {item.type === 'Meeting Notes' && <Clock size={16} className="text-green-400" />}
                 {item.type === 'Chat' && <Clock size={16} className="text-purple-400" />}
                 {item.type === 'Research' && <HistoryIcon size={16} className="text-amber-400" />}
-                {item.title}
+                <span className="dashboard-text">{item.title}</span>
               </div>
             </TableCell>
-            <TableCell>{item.room}</TableCell>
+            <TableCell className="dashboard-text">{item.room}</TableCell>
             <TableCell>
               <span className={`px-2 py-1 rounded-full text-xs ${
                 item.type === 'Document Analysis' ? 'bg-blue-500/20 text-blue-400' :
@@ -70,23 +70,23 @@ export function HistoryTable({ items, onItemClick }: HistoryTableProps) {
                 {item.type}
               </span>
             </TableCell>
-            <TableCell>{format(item.date, 'MMM d, yyyy • h:mm a')}</TableCell>
+            <TableCell className="dashboard-text">{format(item.date, 'MMM d, yyyy • h:mm a')}</TableCell>
             <TableCell>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 dashboard-text hover:dashboard-text hover:bg-dashboard-card-hover">
                     <MoreVertical size={16} />
                     <span className="sr-only">Open menu</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#1A1A1A] border-white/20 text-white">
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/10">
+                <DropdownMenuContent align="end" className="bg-dashboard-card border-dashboard-separator dashboard-text">
+                  <DropdownMenuItem className="cursor-pointer hover:bg-dashboard-card-hover">
                     View
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/10">
+                  <DropdownMenuItem className="cursor-pointer hover:bg-dashboard-card-hover">
                     Add
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer text-red-400 hover:bg-white/10 hover:text-red-400">
+                  <DropdownMenuItem className="cursor-pointer text-red-400 hover:bg-dashboard-card-hover hover:text-red-400">
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -97,7 +97,7 @@ export function HistoryTable({ items, onItemClick }: HistoryTableProps) {
         
         {items.length === 0 && (
           <TableRow>
-            <TableCell colSpan={5} className="h-24 text-center text-white/50">
+            <TableCell colSpan={5} className="h-24 text-center dashboard-text-placeholder">
               No history items found.
             </TableCell>
           </TableRow>

@@ -47,10 +47,10 @@ export function History() {
           />
         </div>
         
-        <Card className="bg-[#1A1A1A] border-white/20 text-white">
-          <CardHeader className="border-b border-white/10">
+        <Card className="bg-transparent border-dashboard-separator dashboard-text">
+          <CardHeader className="border-b border-dashboard-separator">
             <CardTitle className="text-xl">Recent Activity</CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="dashboard-text-secondary">
               View and manage your recent interactions
             </CardDescription>
           </CardHeader>

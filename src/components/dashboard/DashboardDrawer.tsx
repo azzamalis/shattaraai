@@ -13,6 +13,7 @@ import { HelpTools } from './drawer/HelpTools';
 import { UserProfile } from './drawer/UserProfile';
 import { DeleteRoomModal } from './drawer/DeleteRoomModal';
 import { Room } from '@/lib/types';
+
 interface DashboardDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -21,6 +22,7 @@ interface DashboardDrawerProps {
   onEditRoom: (id: string, newName: string) => void;
   onDeleteRoom: (id: string) => void;
 }
+
 export function DashboardDrawer({
   open,
   onOpenChange,
@@ -74,47 +76,49 @@ export function DashboardDrawer({
       setDeleteModalOpen(false);
     }
   };
-  return <>
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className={`${getDrawerWidth()} bg-[#222222] border-r border-white/20 p-0`} closeButton={false}>
-        <div className="flex items-center justify-between p-4 border-b border-white/5 bg-black">
-          <div className="flex items-center gap-2">
-            <Logo className="h-8 md:h-10 w-auto" textColor="text-white" />
-          </div>
-          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-white hover:text-white hover:bg-white/10">
-            <ChevronsLeft size={22} />
-            <span className="sr-only">Close sidebar</span>
-          </Button>
-        </div>
-
-        <div className="flex flex-col h-[calc(100%-130px)] overflow-auto bg-black">
-          <div className="px-4 pt-4 pb-2">
-            <Button className="w-full flex items-center justify-center gap-2 
-                bg-transparent border border-dashed border-white/20 
-                text-white hover:bg-white/5 transition-colors duration-200" onClick={() => {
-              navigate('/dashboard');
-              onOpenChange(false);
-            }}>
-              <Plus size={18} />
-              <span>New Content</span>
+  return (
+    <>
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="left" className={`${getDrawerWidth()} bg-dashboard-sidebar border-r border-dashboard-separator p-0`} closeButton={false}>
+          <div className="flex items-center justify-between p-4 border-b border-dashboard-separator bg-dashboard-sidebar">
+            <div className="flex items-center gap-2">
+              <Logo className="h-8 md:h-10 w-auto" textColor="text-dashboard-text" />
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="dashboard-text hover:dashboard-text hover:bg-dashboard-card-hover">
+              <ChevronsLeft size={22} />
+              <span className="sr-only">Close sidebar</span>
             </Button>
           </div>
-          
-          <HistorySection />
-          
-          <RoomsSection rooms={rooms} onAddRoom={onAddRoom} onEditRoom={onEditRoom} onDeleteRoom={onDeleteRoom} onOpenChange={onOpenChange} setRoomToDelete={setRoomToDelete} setRoomToDeleteName={setRoomToDeleteName} setDeleteModalOpen={setDeleteModalOpen} />
-          
-          <HelpTools onTutorialClick={handleTutorialClick} onFeedbackClick={handleFeedbackClick} onCalculatorClick={() => setCalculatorModalOpen(true)} />
-        </div>
 
-        <UserProfile onOpenChange={onOpenChange} />
-      </SheetContent>
-    </Sheet>
+          <div className="flex flex-col h-[calc(100%-130px)] overflow-auto bg-dashboard-sidebar">
+            <div className="px-4 pt-4 pb-2">
+              <Button className="w-full flex items-center justify-center gap-2 
+                  bg-transparent border border-dashed border-dashboard-separator 
+                  dashboard-text hover:bg-dashboard-card-hover transition-colors duration-200" onClick={() => {
+                navigate('/dashboard');
+                onOpenChange(false);
+              }}>
+                <Plus size={18} />
+                <span>New Content</span>
+              </Button>
+            </div>
+            
+            <HistorySection />
+            
+            <RoomsSection rooms={rooms} onAddRoom={onAddRoom} onEditRoom={onEditRoom} onDeleteRoom={onDeleteRoom} onOpenChange={onOpenChange} setRoomToDelete={setRoomToDelete} setRoomToDeleteName={setRoomToDeleteName} setDeleteModalOpen={setDeleteModalOpen} />
+            
+            <HelpTools onTutorialClick={handleTutorialClick} onFeedbackClick={handleFeedbackClick} onCalculatorClick={() => setCalculatorModalOpen(true)} />
+          </div>
 
-    <FeedbackModal open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
-    <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
-    <CalculatorModal open={calculatorModalOpen} onOpenChange={setCalculatorModalOpen} />
+          <UserProfile onOpenChange={onOpenChange} />
+        </SheetContent>
+      </Sheet>
 
-    <DeleteRoomModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} roomName={roomToDeleteName} onConfirm={handleDeleteConfirm} />
-  </>;
+      <FeedbackModal open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
+      <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
+      <CalculatorModal open={calculatorModalOpen} onOpenChange={setCalculatorModalOpen} />
+
+      <DeleteRoomModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} roomName={roomToDeleteName} onConfirm={handleDeleteConfirm} />
+    </>
+  );
 }
