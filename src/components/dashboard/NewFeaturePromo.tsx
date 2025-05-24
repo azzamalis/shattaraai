@@ -11,7 +11,7 @@ export function NewFeaturePromo() {
         <PopoverTrigger asChild>
           <Button className="bg-[#00A3FF] hover:bg-[#00A3FF] text-white px-4 py-2 rounded-full flex items-center gap-2 border border-white/20">
             <div className="flex items-center gap-2">
-              <Badge className="bg-[#00A3FF]/20 text-[#00A3FF] font-medium text-xs px-2 py-0.5 pointer-events-none">
+              <Badge className="bg-[#00A3FF]/20 text-[#FFFFFF] font-medium text-xs px-2 py-0.5 pointer-events-none">
                 coming soon
               </Badge>
               <span>Practice with exams</span>
