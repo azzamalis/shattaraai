@@ -82,7 +82,7 @@ export function ActionCards({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Card className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" onClick={onPasteClick}>
+              <Card onClick={onPasteClick} className="border border-white/20 hover:border-white/40 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group bg-[#fdfdfd]">
                 <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
                   <FileText className="h-6 w-6 md:h-8 md:w-8 text-white" />
                 </div>
@@ -103,7 +103,7 @@ export function ActionCards({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Card className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" onClick={handleRecordClick}>
+              <Card onClick={handleRecordClick} className="border border-white/20 hover:border-white/40 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group bg-[#fdfdfd]">
                 <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
                   <Mic className="h-6 w-6 md:h-8 md:w-8 text-white" />
                 </div>
