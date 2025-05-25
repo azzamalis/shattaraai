@@ -3,7 +3,7 @@ import React from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Flame, FileText, BookOpen, Bot, AlertTriangle, Smile } from "lucide-react";
+import { Flame, FileText, BookOpen, Bot, AlertTriangle, Smile, Star, TrendingUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { MetricCard } from "@/components/metrics/MetricCard";
 
@@ -42,7 +42,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Weekly Progress */}
-        <Card className="mb-6 bg-dashboard-card border-dashboard-separator shadow-lg hover:bg-dashboard-card-hover transition-colors duration-200">
+        <Card className="mb-6 bg-dashboard-card border-dashboard-separator shadow-lg transition-colors duration-200">
           <CardHeader className="flex items-center justify-between pb-2">
             <CardTitle className="text-dashboard-text">📈 Learning Progress</CardTitle>
             <span className="text-sm text-dashboard-text-secondary">Accuracy This Week</span>
@@ -79,6 +79,7 @@ export default function ReportsPage() {
                     fill="#00A3FF" 
                     radius={[6, 6, 0, 0]} 
                     opacity={0.8}
+                    className="hover:opacity-100 transition-opacity duration-200"
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -135,16 +136,33 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
 
-        {/* Encouragement Message */}
-        <Card className="bg-dashboard-card border-dashboard-separator shadow-lg hover:bg-dashboard-card-hover transition-colors duration-200">
-          <CardHeader className="flex items-center space-x-3 pb-2">
-            <Smile className="text-green-500" size={24} />
-            <CardTitle className="text-dashboard-text">Keep Going!</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <p className="text-dashboard-text-secondary text-sm">
-              You're making steady progress. Focus on small wins daily — your future self will thank you. 🚀
-            </p>
+        {/* Enhanced Motivation Card */}
+        <Card className="bg-gradient-to-br from-dashboard-card to-dashboard-card-hover border-dashboard-separator shadow-lg hover:shadow-xl transition-all duration-200">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-4">
+              <div className="p-3 rounded-full bg-green-500/10 text-green-500">
+                <Star size={24} />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-3">
+                  <h3 className="text-xl font-semibold text-dashboard-text">Keep Going!</h3>
+                  <TrendingUp className="text-green-500" size={20} />
+                </div>
+                <p className="text-dashboard-text-secondary text-base leading-relaxed mb-4">
+                  You're making steady progress. Focus on small wins daily — your future self will thank you. 🚀
+                </p>
+                <div className="flex items-center space-x-4 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-dashboard-text-secondary">On track</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-dashboard-text-secondary">Improving daily</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -1,19 +1,27 @@
-import { Card } from "@/components/ui/card";
+
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface MetricCardProps {
-  icon: JSX.Element;
+  icon: React.ReactNode;
   value: string;
   label: string;
 }
 
 export function MetricCard({ icon, value, label }: MetricCardProps) {
   return (
-    <Card className="flex items-center p-4 gap-4 hover:bg-[#3A3A3A] transition bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
-      <div className="bg-[#00A3FF]/20 p-2 rounded-md text-[#00A3FF]">{icon}</div>
-      <div>
-        <div className="text-xl font-bold text-white">{value}</div>
-        <div className="text-sm text-[#A6A6A6]">{label}</div>
-      </div>
+    <Card className="bg-dashboard-card border-dashboard-separator shadow-lg hover:bg-dashboard-card-hover transition-colors duration-200">
+      <CardContent className="p-6">
+        <div className="flex items-center space-x-4">
+          <div className="p-3 rounded-lg bg-dashboard-card-hover text-dashboard-icons">
+            {icon}
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-dashboard-text">{value}</div>
+            <div className="text-sm text-dashboard-text-secondary">{label}</div>
+          </div>
+        </div>
+      </CardContent>
     </Card>
   );
-} 
+}

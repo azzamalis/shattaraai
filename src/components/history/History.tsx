@@ -5,12 +5,16 @@ import { HistoryHeader } from './HistoryHeader';
 import { HistorySearch } from './HistorySearch';
 import { HistoryFilter } from './HistoryFilter';
 import { HistoryTable, HistoryItem } from './HistoryTable';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { historyItems } from './historyData';
 import { toast } from 'sonner';
+
+const ITEMS_PER_PAGE = 10;
 
 export function History() {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
   
   // Filter history items based on search query and type filter
   const filteredItems = historyItems.filter(item => {
@@ -22,6 +26,11 @@ export function History() {
     return matchesSearch && matchesType;
   });
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   const handleItemClick = (id: string) => {
     console.log(`Navigating to item: ${id}`);
   };
@@ -29,6 +38,13 @@ export function History() {
   const handleClearHistory = () => {
     toast.info("History cleared successfully");
   };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const isFirstPage = currentPage === 1;
+  const isLastPage = currentPage === totalPages || totalPages === 0;
 
   return (
     <div className="container mx-auto p-6">
@@ -47,20 +63,67 @@ export function History() {
           />
         </div>
         
-        <Card className="bg-transparent border-dashboard-separator dashboard-text">
+        <Card className="bg-dashboard-card border-dashboard-separator shadow-lg">
           <CardHeader className="border-b border-dashboard-separator">
-            <CardTitle className="text-xl">Recent Activity</CardTitle>
-            <CardDescription className="dashboard-text-secondary">
+            <CardTitle className="text-xl text-dashboard-text">Recent Activity</CardTitle>
+            <CardDescription className="text-dashboard-text-secondary">
               View and manage your recent interactions
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             <HistoryTable 
-              items={filteredItems} 
+              items={paginatedItems} 
               onItemClick={handleItemClick} 
             />
           </CardContent>
         </Card>
+
+        {/* Pagination */}
+        {totalPages > 0 && (
+          <div className="flex justify-center mt-6">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    href="#" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!isFirstPage) handlePageChange(currentPage - 1);
+                    }}
+                    className={`${isFirstPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-dashboard-text hover:bg-dashboard-card-hover`}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(page);
+                      }}
+                      isActive={currentPage === page}
+                      className="text-dashboard-text hover:bg-dashboard-card-hover"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    href="#" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!isLastPage) handlePageChange(currentPage + 1);
+                    }}
+                    className={`${isLastPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-dashboard-text hover:bg-dashboard-card-hover`}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   );
