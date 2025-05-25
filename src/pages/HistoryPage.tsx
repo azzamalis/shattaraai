@@ -9,7 +9,9 @@ export default function HistoryPage() {
   // but we need to ensure consistency across dashboard pages
   return (
     <DashboardLayout>
-      <History />
+      <div className="min-h-screen bg-dashboard-bg transition-colors duration-300">
+        <History />
+      </div>
     </DashboardLayout>
   );
 }

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -18,7 +19,7 @@ const PricingPage: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full overflow-auto bg-[#222222]">
+      <div className="flex flex-col h-full overflow-auto bg-dashboard-bg transition-colors duration-300">
         {/* Promo Banner */}
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
           <div className="max-w-7xl mx-auto">
@@ -57,10 +58,10 @@ const PricingPage: React.FC = () => {
           <div className="max-w-7xl mx-auto">
             {/* Heading Section */}
             <div className="text-center mb-12">
-              <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+              <h1 className="text-4xl sm:text-5xl font-bold text-dashboard-text mb-4">
                 Unlock smarter learning in less time.
               </h1>
-              <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+              <p className="text-lg text-dashboard-text-secondary max-w-3xl mx-auto">
                 Upload unlimited content, chat instantly, use voice mode, revisit recorded lectures, and more — all designed to boost your productivity.
               </p>
             </div>
@@ -73,20 +74,20 @@ const PricingPage: React.FC = () => {
                 onValueChange={value => {
                   if (value) setBillingCycle(value as "monthly" | "yearly");
                 }} 
-                className="relative bg-[#000a00]/0"
+                className="relative bg-dashboard-card rounded-lg p-1"
               >
                 <ToggleGroupItem 
                   value="monthly" 
-                  className={`px-4 py-2 rounded-full text-sm transition-all ${
-                    billingCycle === "monthly" ? "bg-gray-900 text-white" : "text-gray-400"
+                  className={`px-4 py-2 rounded-md text-sm transition-all ${
+                    billingCycle === "monthly" ? "bg-dashboard-card-hover text-dashboard-text" : "text-dashboard-text-secondary"
                   }`}
                 >
                   Pay Monthly
                 </ToggleGroupItem>
                 <ToggleGroupItem 
                   value="yearly" 
-                  className={`px-4 py-2 rounded-full text-sm flex items-center transition-all ${
-                    billingCycle === "yearly" ? "bg-gray-900 text-white" : "text-gray-400"
+                  className={`px-4 py-2 rounded-md text-sm flex items-center transition-all ${
+                    billingCycle === "yearly" ? "bg-dashboard-card-hover text-dashboard-text" : "text-dashboard-text-secondary"
                   }`}
                 >
                   Pay Yearly
@@ -100,40 +101,40 @@ const PricingPage: React.FC = () => {
             {/* Pricing Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Free Plan */}
-              <Card className="border-0 rounded-lg overflow-hidden bg-[#1a1a1a]">
+              <Card className="border-dashboard-separator rounded-lg overflow-hidden bg-dashboard-card">
                 <CardContent className="p-8">
-                  <h3 className="text-xl font-medium mb-2 text-white">Free</h3>
+                  <h3 className="text-xl font-medium mb-2 text-dashboard-text">Free</h3>
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-white">$0</span>
-                    <span className="ml-1 text-white">/ month</span>
+                    <span className="text-5xl font-bold text-dashboard-text">$0</span>
+                    <span className="ml-1 text-dashboard-text">/ month</span>
                   </div>
-                  <p className="text-sm mt-4 mb-6 pb-4 border-b border-gray-800 text-white">Kickstart your learning journey today.
+                  <p className="text-sm mt-4 mb-6 pb-4 border-b border-dashboard-separator text-dashboard-text">Kickstart your learning journey today.
                   </p>
                   <ul className="space-y-4 mt-6">
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white">3 uploads, pastes, and records / day</span>
+                      <span className="text-dashboard-text">3 uploads, pastes, and records / day</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white">5 AI chats / day (10 / month with Learn+ mode)</span>
+                      <span className="text-dashboard-text">5 AI chats / day (10 / month with Learn+ mode)</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white">10 quiz answers / day</span>
+                      <span className="text-dashboard-text">10 quiz answers / day</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white">2 practice exams / month</span>
+                      <span className="text-dashboard-text">2 practice exams / month</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white">Upload files, each up to 100 pages / 10 MB in size</span>
+                      <span className="text-dashboard-text">Upload files, each up to 100 pages / 10 MB in size</span>
                     </li>
                   </ul>
                 </CardContent>
                 <CardFooter className="px-8 pb-8 pt-0">
-                  <Button className="w-full bg-white hover:bg-gray-200 text-black font-medium" variant="outline">
+                  <Button className="w-full bg-dashboard-button text-dashboard-button-text hover:bg-dashboard-card-hover font-medium" variant="outline">
                     Get Started
                   </Button>
                 </CardFooter>
@@ -180,7 +181,6 @@ const PricingPage: React.FC = () => {
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
                       <span>Upload files, each up to <strong>2000</strong> pages / 300 MB in size</span>
                     </li>
-                    
                   </ul>
                 </CardContent>
                 <CardFooter className="px-8 pb-8 pt-0">
@@ -191,34 +191,34 @@ const PricingPage: React.FC = () => {
               </Card>
 
               {/* Team Plan */}
-              <Card className="border-0 rounded-lg overflow-hidden bg-[#1a1a1a]">
+              <Card className="border-dashboard-separator rounded-lg overflow-hidden bg-dashboard-card">
                 <CardContent className="p-8">
-                  <h3 className="text-xl font-medium mb-2 text-white">Team</h3>
+                  <h3 className="text-xl font-medium mb-2 text-dashboard-text">Team</h3>
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-white">Custom</span>
+                    <span className="text-5xl font-bold text-dashboard-text">Custom</span>
                   </div>
-                  <p className="text-sm mt-4 mb-6 pb-4 border-b border-gray-800 text-white">For teams to learn, grow, and share knowledge.</p>
-                  <div className="text-sm mb-4 mt-6 bg-transparent text-white">Everything in Pro +</div>
+                  <p className="text-sm mt-4 mb-6 pb-4 border-b border-dashboard-separator text-dashboard-text">For teams to learn, grow, and share knowledge.</p>
+                  <div className="text-sm mb-4 mt-6 bg-transparent text-dashboard-text">Everything in Pro +</div>
                   <ul className="space-y-4">
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white">Centralized team billing</span>
+                      <span className="text-dashboard-text">Centralized team billing</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white">Add team members</span>
+                      <span className="text-dashboard-text">Add team members</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white">Custom options available in select cases</span>
+                      <span className="text-dashboard-text">Custom options available in select cases</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white">Collaborative spaces and features</span>
+                      <span className="text-dashboard-text">Collaborative spaces and features</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-white"><strong>Priority</strong> customer support</span>
+                      <span className="text-dashboard-text"><strong>Priority</strong> customer support</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -226,9 +226,9 @@ const PricingPage: React.FC = () => {
                   <Button 
                     className="
                       w-full 
-                      bg-transparent hover:bg-white/5
-                      text-white hover:text-white
-                      border border-white/10 hover:border-white/20
+                      bg-transparent hover:bg-dashboard-card-hover
+                      text-dashboard-text hover:text-dashboard-text
+                      border border-dashboard-separator hover:border-dashboard-separator
                       transition-all duration-200
                     "
                   >
@@ -241,11 +241,11 @@ const PricingPage: React.FC = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="w-full bg-[#111111] py-16">
+        <div className="w-full bg-dashboard-card py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-2xl font-medium text-white mb-3">Frequently Asked Questions</h2>
-              <p className="text-sm text-gray-400">
+              <h2 className="text-2xl font-medium text-dashboard-text mb-3">Frequently Asked Questions</h2>
+              <p className="text-sm text-dashboard-text-secondary">
                 Can't find the answer here?{" "}
                 <a href="#" className="text-[#00A3FF] hover:underline">
                   Contact us
@@ -254,47 +254,47 @@ const PricingPage: React.FC = () => {
             </div>
 
             <Accordion type="single" collapsible className="space-y-4">
-              <AccordionItem value="pro-plan" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
-                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+              <AccordionItem value="pro-plan" className="border-dashboard-separator bg-dashboard-card rounded-lg px-6">
+                <AccordionTrigger className="text-dashboard-text hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
                   What do I get with the Pro plan?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-400 text-sm">
+                <AccordionContent className="text-dashboard-text-secondary text-sm">
                   With the Pro plan, you get unlimited uploads, AI chats, quiz generation, practice exams, and voice mode. You can upload files up to 2000 pages or 300MB in size, and access all premium features without any restrictions.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="payment-methods" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
-                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+              <AccordionItem value="payment-methods" className="border-dashboard-separator bg-dashboard-card rounded-lg px-6">
+                <AccordionTrigger className="text-dashboard-text hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
                   What payment methods do you offer?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-400 text-sm">
+                <AccordionContent className="text-dashboard-text-secondary text-sm">
                   We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and various local payment methods. For team plans, we also offer invoice-based payments.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="cancel-plan" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
-                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+              <AccordionItem value="cancel-plan" className="border-dashboard-separator bg-dashboard-card rounded-lg px-6">
+                <AccordionTrigger className="text-dashboard-text hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
                   Can I cancel my Shattara AI plan at any time?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-400 text-sm">
+                <AccordionContent className="text-dashboard-text-secondary text-sm">
                   Yes, you can cancel your subscription at any time. If you cancel, you'll retain access to premium features until the end of your current billing period. We don't offer refunds for partial months.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="student-discount" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
-                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+              <AccordionItem value="student-discount" className="border-dashboard-separator bg-dashboard-card rounded-lg px-6">
+                <AccordionTrigger className="text-dashboard-text hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
                   Do you offer student discount?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-400 text-sm">
+                <AccordionContent className="text-dashboard-text-secondary text-sm">
                   Yes! We offer a 50% discount for verified students. To get the discount, please verify your student status using your academic email address or student ID through our verification partner.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="refund-policy" className="border-[#333333] bg-[#1A1A1A] rounded-lg px-6">
-                <AccordionTrigger className="text-white hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
+              <AccordionItem value="refund-policy" className="border-dashboard-separator bg-dashboard-card rounded-lg px-6">
+                <AccordionTrigger className="text-dashboard-text hover:no-underline text-sm font-medium [&[data-state=open]>svg]:rotate-180">
                   What is your refund policy?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-400 text-sm">
+                <AccordionContent className="text-dashboard-text-secondary text-sm">
                   We offer a 14-day money-back guarantee for all new subscriptions. If you're not satisfied with Shattara AI within the first 14 days, contact our support team for a full refund, no questions asked.
                 </AccordionContent>
               </AccordionItem>

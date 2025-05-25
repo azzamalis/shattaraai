@@ -1,3 +1,4 @@
+
 import React from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -25,11 +26,11 @@ const challenges = [
 export default function ReportsPage() {
   return (
     <DashboardLayout>
-      <div className="flex flex-col min-h-screen text-white p-4 md:p-6 bg-black">
+      <div className="flex flex-col min-h-screen bg-dashboard-bg transition-colors duration-300 text-dashboard-text p-4 md:p-6">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Your Learning Journey</h1>
-          <p className="text-[#A6A6A6]">Track your progress and identify areas for improvement</p>
+          <p className="text-dashboard-text-secondary">Track your progress and identify areas for improvement</p>
         </div>
 
         {/* Metrics */}
@@ -41,10 +42,10 @@ export default function ReportsPage() {
         </div>
 
         {/* Weekly Progress */}
-        <Card className="mb-6 bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
+        <Card className="mb-6 bg-dashboard-card border-dashboard-separator shadow-lg hover:bg-dashboard-card-hover transition-colors duration-200">
           <CardHeader className="flex items-center justify-between pb-2">
-            <CardTitle className="text-white">📈 Learning Progress</CardTitle>
-            <span className="text-sm text-[#A6A6A6]">Accuracy This Week</span>
+            <CardTitle className="text-dashboard-text">📈 Learning Progress</CardTitle>
+            <span className="text-sm text-dashboard-text-secondary">Accuracy This Week</span>
           </CardHeader>
           <CardContent className="p-4">
             <div className="h-[240px] w-full">
@@ -52,23 +53,23 @@ export default function ReportsPage() {
                 <BarChart data={weeklyProgress}>
                   <XAxis 
                     dataKey="name" 
-                    stroke="#A6A6A6" 
+                    stroke="hsl(var(--dashboard-text-secondary))" 
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                   />
                   <YAxis 
-                    stroke="#A6A6A6" 
+                    stroke="hsl(var(--dashboard-text-secondary))" 
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                   />
                   <Tooltip 
                     contentStyle={{
-                      backgroundColor: '#333',
-                      border: '1px solid #555',
+                      backgroundColor: 'hsl(var(--dashboard-card))',
+                      border: '1px solid hsl(var(--dashboard-separator))',
                       borderRadius: '8px',
-                      color: '#fff',
+                      color: 'hsl(var(--dashboard-text))',
                       fontSize: '12px'
                     }}
                     labelStyle={{ color: '#00A3FF' }}
@@ -87,27 +88,27 @@ export default function ReportsPage() {
 
         {/* Goals + Feedback */}
         <div className="grid gap-4 lg:grid-cols-2 mb-6">
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
+          <Card className="bg-dashboard-card border-dashboard-separator shadow-lg hover:bg-dashboard-card-hover transition-colors duration-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-white">🎯 Weekly Goal</CardTitle>
+              <CardTitle className="text-dashboard-text">🎯 Weekly Goal</CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-              <p className="text-lg mb-2 text-white">You've completed 80% of your goal!</p>
-              <Progress value={80} className="h-3 bg-[#333]" />
-              <p className="text-sm text-[#A6A6A6] mt-2">
+              <p className="text-lg mb-2 text-dashboard-text">You've completed 80% of your goal!</p>
+              <Progress value={80} className="h-3 bg-dashboard-separator" />
+              <p className="text-sm text-dashboard-text-secondary mt-2">
                 Just 2 more quizzes to hit your target.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
+          <Card className="bg-dashboard-card border-dashboard-separator shadow-lg hover:bg-dashboard-card-hover transition-colors duration-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-white">✨ Helpfulness Rating</CardTitle>
+              <CardTitle className="text-dashboard-text">✨ Helpfulness Rating</CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-              <p className="text-3xl font-bold mb-2 text-white">94%</p>
-              <Progress value={94} className="h-3 bg-[#333]" />
-              <p className="text-sm text-[#A6A6A6] mt-2">
+              <p className="text-3xl font-bold mb-2 text-dashboard-text">94%</p>
+              <Progress value={94} className="h-3 bg-dashboard-separator" />
+              <p className="text-sm text-dashboard-text-secondary mt-2">
                 Based on 200 feedback entries this month.
               </p>
             </CardContent>
@@ -115,9 +116,9 @@ export default function ReportsPage() {
         </div>
 
         {/* Areas of Difficulty */}
-        <Card className="mb-6 bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
+        <Card className="mb-6 bg-dashboard-card border-dashboard-separator shadow-lg hover:bg-dashboard-card-hover transition-colors duration-200">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white">🚧 Top Challenges</CardTitle>
+            <CardTitle className="text-dashboard-text">🚧 Top Challenges</CardTitle>
           </CardHeader>
           <CardContent className="p-4">
             <ul className="space-y-4">
@@ -125,8 +126,8 @@ export default function ReportsPage() {
                 <li key={idx} className="flex items-start space-x-3">
                   <AlertTriangle className="text-yellow-500 mt-1" size={20} />
                   <div>
-                    <p className="font-medium text-white">{item.topic}</p>
-                    <p className="text-sm text-[#A6A6A6]">{item.notes}</p>
+                    <p className="font-medium text-dashboard-text">{item.topic}</p>
+                    <p className="text-sm text-dashboard-text-secondary">{item.notes}</p>
                   </div>
                 </li>
               ))}
@@ -135,13 +136,13 @@ export default function ReportsPage() {
         </Card>
 
         {/* Encouragement Message */}
-        <Card className="bg-[#4B4B4B] border-0 shadow-lg hover:shadow-[#00A3FF]/10">
+        <Card className="bg-dashboard-card border-dashboard-separator shadow-lg hover:bg-dashboard-card-hover transition-colors duration-200">
           <CardHeader className="flex items-center space-x-3 pb-2">
             <Smile className="text-green-500" size={24} />
-            <CardTitle className="text-white">Keep Going!</CardTitle>
+            <CardTitle className="text-dashboard-text">Keep Going!</CardTitle>
           </CardHeader>
           <CardContent className="p-4">
-            <p className="text-[#A6A6A6] text-sm">
+            <p className="text-dashboard-text-secondary text-sm">
               You're making steady progress. Focus on small wins daily — your future self will thank you. 🚀
             </p>
           </CardContent>
