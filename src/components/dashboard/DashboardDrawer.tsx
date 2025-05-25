@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import Logo from '@/components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, ChevronsLeft } from 'lucide-react';
@@ -87,37 +88,64 @@ export function DashboardDrawer({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className={`${getDrawerWidth()} bg-dashboard-sidebar p-0`} closeButton={false}>
-          <div className="flex items-center justify-between p-4 bg-dashboard-sidebar">
+        <SheetContent side="left" className={`${getDrawerWidth()} bg-dashboard-bg dark:bg-dashboard-bg p-0 flex flex-col`} closeButton={false}>
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 bg-dashboard-bg dark:bg-dashboard-bg shrink-0">
             <div className="flex items-center gap-2">
-              <Logo className="h-8 md:h-10 w-auto" textColor="text-dashboard-text" />
+              <Logo className="h-8 md:h-10 w-auto" textColor="text-dashboard-text dark:text-dashboard-text" />
             </div>
-            <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-dashboard-text hover:text-dashboard-text hover:bg-dashboard-card-hover">
+            <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-dashboard-text dark:text-dashboard-text hover:text-dashboard-text dark:hover:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover">
               <ChevronsLeft size={22} />
               <span className="sr-only">Close sidebar</span>
             </Button>
           </div>
 
-          <div className="flex flex-col h-[calc(100%-130px)] overflow-auto bg-dashboard-sidebar">
-            <div className="px-4 pt-4 pb-6">
-              <Button className="w-full flex items-center justify-center gap-2 
-                  bg-primary text-white hover:bg-primary/90 
-                  transition-colors duration-200" onClick={() => {
-                navigate('/dashboard');
-                onOpenChange(false);
-              }}>
-                <Plus size={18} />
-                <span>New Content</span>
-              </Button>
+          {/* Scrollable Content */}
+          <ScrollArea className="flex-1 px-4">
+            <div className="space-y-8 pb-6">
+              {/* New Content Button */}
+              <div className="px-2">
+                <Button 
+                  variant="ghost" 
+                  className="w-full flex items-center justify-center gap-2 
+                    bg-transparent border border-dashed border-dashboard-separator dark:border-dashboard-separator 
+                    text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text
+                    transition-colors duration-200 rounded-md py-2" 
+                  onClick={() => {
+                    navigate('/dashboard');
+                    onOpenChange(false);
+                  }}
+                >
+                  <Plus size={18} />
+                  <span>Add content</span>
+                </Button>
+              </div>
+              
+              {/* History Section */}
+              <HistorySection />
+              
+              {/* Rooms Section */}
+              <RoomsSection 
+                rooms={rooms} 
+                onAddRoom={onAddRoom} 
+                onEditRoom={onEditRoom} 
+                onDeleteRoom={onDeleteRoom} 
+                onOpenChange={onOpenChange} 
+                setRoomToDelete={setRoomToDelete} 
+                setRoomToDeleteName={setRoomToDeleteName} 
+                setDeleteModalOpen={setDeleteModalOpen} 
+              />
+              
+              {/* Help Tools Section */}
+              <HelpTools 
+                onTutorialClick={handleTutorialClick} 
+                onFeedbackClick={handleFeedbackClick} 
+                onCalculatorClick={() => setCalculatorModalOpen(true)} 
+              />
             </div>
-            
-            <HistorySection />
-            
-            <RoomsSection rooms={rooms} onAddRoom={onAddRoom} onEditRoom={onEditRoom} onDeleteRoom={onDeleteRoom} onOpenChange={onOpenChange} setRoomToDelete={setRoomToDelete} setRoomToDeleteName={setRoomToDeleteName} setDeleteModalOpen={setDeleteModalOpen} />
-            
-            <HelpTools onTutorialClick={handleTutorialClick} onFeedbackClick={handleFeedbackClick} onCalculatorClick={() => setCalculatorModalOpen(true)} />
-          </div>
+          </ScrollArea>
 
+          {/* User Profile */}
           <UserProfile onOpenChange={onOpenChange} />
         </SheetContent>
       </Sheet>
