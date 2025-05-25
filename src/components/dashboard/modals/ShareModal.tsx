@@ -13,7 +13,7 @@ export function ShareModal({ open, onOpenChange }: ShareModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="!p-0 !border-0 !shadow-none !bg-transparent">
-        <div className="bg-[#1A1A1A] rounded-xl w-full border border-white/[0.02]">
+        <div className="bg-white rounded-xl w-full border border-[#E5E7EB]">
           {/* Header */}
           <div className="p-4 flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -30,7 +30,7 @@ export function ShareModal({ open, onOpenChange }: ShareModalProps) {
           {/* Content */}
           <div className="px-4 pb-4">
             <div className="flex items-center gap-2 w-full">
-              <div className="flex-1 min-w-0 bg-black/50 rounded-lg px-3 py-2 text-gray-400 text-sm">
+              <div className="flex-1 min-w-0 bg-[#F3F4F6] rounded-lg px-3 py-2 text-[#111827] text-sm">
                 <span className="truncate block">https://shattara.ai/dashboard/room/1588830905134054</span>
               </div>
               <Button 
