@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -6,19 +5,15 @@ import { Check } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-
 const PricingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const [isCopied, setIsCopied] = useState(false);
-
   const copyPromoCode = () => {
     navigator.clipboard.writeText("SUMMER25");
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
   };
-
-  return (
-    <DashboardLayout>
+  return <DashboardLayout>
       <div className="flex flex-col h-full overflow-auto bg-dashboard-bg transition-colors duration-300">
         {/* Promo Banner */}
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
@@ -35,12 +30,7 @@ const PricingPage: React.FC = () => {
 
                   <div className="flex items-center space-x-2">
                     <code className="bg-[#00A3FF]/10 px-4 py-2 rounded-md border border-[#00A3FF]/30 text-white font-mono">SUMMER25</code>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={copyPromoCode}
-                      className="h-9 px-4 bg-[#00A3FF]/10 border border-[#00A3FF]/30 text-white hover:bg-[#00A3FF]/20 hover:border-[#00A3FF]/50 transition-colors rounded-md"
-                    >
+                    <Button variant="outline" size="sm" onClick={copyPromoCode} className="h-9 px-4 bg-[#00A3FF]/10 border border-[#00A3FF]/30 text-white hover:bg-[#00A3FF]/20 hover:border-[#00A3FF]/50 transition-colors rounded-md">
                       {isCopied ? "Copied!" : "Copy"}
                     </Button>
                   </div>
@@ -68,28 +58,13 @@ const PricingPage: React.FC = () => {
 
             {/* Billing Toggle */}
             <div className="flex justify-center mb-12">
-              <ToggleGroup 
-                type="single" 
-                value={billingCycle} 
-                onValueChange={value => {
-                  if (value) setBillingCycle(value as "monthly" | "yearly");
-                }} 
-                className="relative bg-dashboard-card rounded-lg p-1"
-              >
-                <ToggleGroupItem 
-                  value="monthly" 
-                  className={`px-4 py-2 rounded-md text-sm transition-all ${
-                    billingCycle === "monthly" ? "bg-dashboard-card-hover text-dashboard-text" : "text-dashboard-text-secondary"
-                  }`}
-                >
+              <ToggleGroup type="single" value={billingCycle} onValueChange={value => {
+              if (value) setBillingCycle(value as "monthly" | "yearly");
+            }} className="relative bg-dashboard-card rounded-lg p-1">
+                <ToggleGroupItem value="monthly" className={`px-4 py-2 rounded-md text-sm transition-all ${billingCycle === "monthly" ? "bg-dashboard-card-hover text-dashboard-text" : "text-dashboard-text-secondary"}`}>
                   Pay Monthly
                 </ToggleGroupItem>
-                <ToggleGroupItem 
-                  value="yearly" 
-                  className={`px-4 py-2 rounded-md text-sm flex items-center transition-all ${
-                    billingCycle === "yearly" ? "bg-dashboard-card-hover text-dashboard-text" : "text-dashboard-text-secondary"
-                  }`}
-                >
+                <ToggleGroupItem value="yearly" className={`px-4 py-2 rounded-md text-sm flex items-center transition-all ${billingCycle === "yearly" ? "bg-dashboard-card-hover text-dashboard-text" : "text-dashboard-text-secondary"}`}>
                   Pay Yearly
                   <span className="ml-2 text-xs bg-[#00A3FF] text-white px-2 py-0.5 rounded-full">
                     Save 40%
@@ -223,15 +198,13 @@ const PricingPage: React.FC = () => {
                   </ul>
                 </CardContent>
                 <CardFooter className="px-8 pb-8 pt-0">
-                  <Button 
-                    className="
+                  <Button className="
                       w-full 
                       bg-transparent hover:bg-dashboard-card-hover
                       text-dashboard-text hover:text-dashboard-text
                       border border-dashboard-separator hover:border-dashboard-separator
                       transition-all duration-200
-                    "
-                  >
+                    ">
                     Contact Us
                   </Button>
                 </CardFooter>
@@ -241,7 +214,7 @@ const PricingPage: React.FC = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="w-full bg-dashboard-card py-16">
+        <div className="w-full py-16 bg-[#121212]">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-2xl font-medium text-dashboard-text mb-3">Frequently Asked Questions</h2>
@@ -302,8 +275,6 @@ const PricingPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 };
-
 export default PricingPage;
