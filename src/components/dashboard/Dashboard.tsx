@@ -112,7 +112,7 @@ export function Dashboard({
         <div className="max-w-6xl mx-auto">
           <NewFeaturePromo />
           
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold dashboard-text mb-6 sm:mb-8 md:mb-12 text-center">Start smarter — what’s your topic?</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold dashboard-text mb-6 sm:mb-8 md:mb-12 text-center">What do you need help understanding today?</h1>
           
           <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
           
