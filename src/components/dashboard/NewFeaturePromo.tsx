@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, Box } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 export function NewFeaturePromo() {
-  return <div className="mb-4 sm:mb-6 md:mb-8 flex justify-center">
+  return (
+    <div className="mb-4 sm:mb-6 md:mb-8 flex justify-center">
       <Popover>
         <PopoverTrigger asChild>
-          <Button className="hover:bg-[300A3FF]/15 text-[#00A3FF] px-4 py-2 rounded-full flex items-center gap-2 border border-white/20 bg-[#00a3ff]/25">
+          <Button className="bg-transparent hover:bg-[300A3FF]/15 text-[#00A3FF] px-4 py-2 rounded-full flex items-center gap-2 border border-white/20">
             <div className="flex items-center gap-2">
               <Badge className="bg-[#00A3FF]/20 text-[#00A3FF] font-medium text-xs px-2 py-0.5 pointer-events-none">
                 coming soon
@@ -35,5 +37,6 @@ export function NewFeaturePromo() {
           </div>
         </PopoverContent>
       </Popover>
-    </div>;
+    </div>
+  );
 }
