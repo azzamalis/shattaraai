@@ -16,7 +16,7 @@ export function ContinueLearningSection({ onDeleteCard, onShareCard }: ContinueL
     return (
       <div className="mt-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium text-white">Continue learning</h2>
+          <h2 className="text-lg font-medium text-[#232323] dark:text-white transition-colors duration-200">Continue learning</h2>
         </div>
         <div className="text-gray-400 text-center py-8">
           No content yet. Upload, paste, or record something to get started!
@@ -28,7 +28,7 @@ export function ContinueLearningSection({ onDeleteCard, onShareCard }: ContinueL
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium text-white">Continue learning</h2>
+        <h2 className="text-lg font-medium text-[#232323] dark:text-white transition-colors duration-200">Continue learning</h2>
         <button className="text-sm text-gray-400 hover:text-white transition-colors">View all</button>
       </div>
       

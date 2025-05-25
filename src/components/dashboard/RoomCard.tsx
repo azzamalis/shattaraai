@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Pencil, Trash, Plus, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -65,14 +66,18 @@ export const RoomCard: React.FC<RoomCardProps> = ({
           "p-4",
           "rounded-lg border border-dashed border-zinc-700",
           "hover:border-zinc-600 hover:bg-zinc-900",
+          "dark:border-zinc-700 dark:hover:border-zinc-600 dark:hover:bg-zinc-900",
+          "border-dashboard-separator hover:border-dashboard-separator hover:bg-dashboard-card-hover",
           "group transition-all duration-300"
         )}
       >
         <Plus 
-          className="w-5 h-5 text-zinc-400 group-hover:text-zinc-300 group-hover:rotate-90 transition-all duration-300" 
+          className="w-5 h-5 text-zinc-400 group-hover:text-zinc-300 group-hover:rotate-90 transition-all duration-300
+            text-[#232323] dark:text-zinc-400 dark:group-hover:text-zinc-300" 
         />
         <span 
-          className="text-zinc-400 group-hover:text-zinc-300 text-base transition-colors duration-300"
+          className="text-zinc-400 group-hover:text-zinc-300 text-base transition-colors duration-300
+            text-[#232323] dark:text-zinc-400 dark:group-hover:text-zinc-300"
         >
           Add room
         </span>
@@ -84,10 +89,11 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     <div 
       className={cn(
         "relative flex items-center justify-between",
-        "p-4 bg-zinc-900",
-        "rounded-lg border border-zinc-800",
-        "hover:bg-zinc-800 hover:border-zinc-700",
-        "group transition-all duration-300"
+        "p-4",
+        "rounded-lg border",
+        "group transition-all duration-300",
+        "bg-dashboard-card border-dashboard-separator hover:bg-[#F3F3F3]",
+        "dark:bg-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-800 dark:hover:border-zinc-700"
       )}
     >
       <div className="flex flex-col gap-1.5 flex-1 min-w-0">
@@ -98,7 +104,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent text-zinc-100 text-base font-medium 
+              className="flex-1 bg-transparent text-[#232323] dark:text-zinc-100 text-base font-medium 
                 border-b border-zinc-700 focus:border-zinc-500
                 px-0 py-0.5
                 focus:outline-none focus:ring-0
@@ -108,20 +114,20 @@ export const RoomCard: React.FC<RoomCardProps> = ({
             <div className="flex items-center gap-1">
               <button
                 onClick={handleSave}
-                className="p-1 rounded-full hover:bg-white/10 text-white/60 hover:text-white/90 transition-colors"
+                className="p-1 rounded-full hover:bg-white/10 text-[#232323] dark:text-white/60 hover:text-[#232323] dark:hover:text-white/90 transition-colors"
               >
                 <Check className="w-4 h-4" />
               </button>
               <button
                 onClick={handleCancel}
-                className="p-1 rounded-full hover:bg-white/10 text-white/60 hover:text-white/90 transition-colors"
+                className="p-1 rounded-full hover:bg-white/10 text-[#232323] dark:text-white/60 hover:text-[#232323] dark:hover:text-white/90 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
         ) : (
-          <h3 className="text-zinc-100 text-base font-medium truncate">{name}</h3>
+          <h3 className="text-[#232323] dark:text-zinc-100 text-base font-medium truncate transition-colors duration-200">{name}</h3>
         )}
         {formattedDate && (
           <p className="text-zinc-400 text-sm">{formattedDate}</p>
@@ -132,13 +138,13 @@ export const RoomCard: React.FC<RoomCardProps> = ({
         <div className="flex gap-2 ml-4">
           <button 
             onClick={handleEditClick}
-            className="p-1 rounded-full hover:bg-white/10 text-white/60 hover:text-white/90 transition-colors"
+            className="p-1 rounded-full hover:bg-white/10 text-[#232323] dark:text-white/60 hover:text-[#232323] dark:hover:text-white/90 transition-colors"
           >
             <Pencil className="w-4 h-4" />
           </button>
           <button 
             onClick={handleDeleteClick}
-            className="p-1 rounded-full hover:bg-white/10 text-white/60 hover:text-white/90 transition-colors"
+            className="p-1 rounded-full hover:bg-white/10 text-[#232323] dark:text-white/60 hover:text-[#232323] dark:hover:text-white/90 transition-colors"
           >
             <Trash className="w-4 h-4" />
           </button>

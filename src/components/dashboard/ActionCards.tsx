@@ -70,13 +70,17 @@ export function ActionCards({ onPasteClick }: ActionCardProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Card 
-                className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
+                className="
+                  bg-dashboard-card hover:bg-dashboard-card-hover 
+                  border border-dashboard-separator hover:border-dashboard-separator 
+                  transition-all duration-200 flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group
+                "
                 onClick={handleUploadClick}
               >
-                <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                  <Upload className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                <div className="mb-3 md:mb-4 bg-transparent border border-dashboard-separator p-2 md:p-3 rounded-full group-hover:border-dashboard-separator">
+                  <Upload className="h-6 w-6 md:h-8 md:w-8 text-[#232323] dark:text-white transition-colors duration-200" />
                 </div>
-                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Upload</CardTitle>
+                <CardTitle className="text-[#232323] dark:text-white mb-1 md:mb-2 text-base md:text-lg transition-colors duration-200">Upload</CardTitle>
                 <CardDescription className="text-gray-400 text-xs md:text-sm">File, Audio, Video</CardDescription>
               </Card>
             </TooltipTrigger>
@@ -94,13 +98,17 @@ export function ActionCards({ onPasteClick }: ActionCardProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Card 
-                className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group" 
+                className="
+                  bg-dashboard-card hover:bg-dashboard-card-hover 
+                  border border-dashboard-separator hover:border-dashboard-separator 
+                  transition-all duration-200 flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group
+                " 
                 onClick={onPasteClick}
               >
-                <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                <div className="mb-3 md:mb-4 bg-transparent border border-dashboard-separator p-2 md:p-3 rounded-full group-hover:border-dashboard-separator">
+                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-[#232323] dark:text-white transition-colors duration-200" />
                 </div>
-                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Paste</CardTitle>
+                <CardTitle className="text-[#232323] dark:text-white mb-1 md:mb-2 text-base md:text-lg transition-colors duration-200">Paste</CardTitle>
                 <CardDescription className="text-gray-400 text-xs md:text-sm">YouTube, Website, Text</CardDescription>
               </Card>
             </TooltipTrigger>
@@ -118,13 +126,17 @@ export function ActionCards({ onPasteClick }: ActionCardProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Card 
-                className="bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group"
+                className="
+                  bg-dashboard-card hover:bg-dashboard-card-hover 
+                  border border-dashboard-separator hover:border-dashboard-separator 
+                  transition-all duration-200 flex flex-col items-center p-4 md:p-6 text-center cursor-pointer group
+                "
                 onClick={handleRecordClick}
               >
-                <div className="mb-3 md:mb-4 bg-transparent border border-white/10 p-2 md:p-3 rounded-full group-hover:border-white/20">
-                  <Mic className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                <div className="mb-3 md:mb-4 bg-transparent border border-dashboard-separator p-2 md:p-3 rounded-full group-hover:border-dashboard-separator">
+                  <Mic className="h-6 w-6 md:h-8 md:w-8 text-[#232323] dark:text-white transition-colors duration-200" />
                 </div>
-                <CardTitle className="text-white mb-1 md:mb-2 text-base md:text-lg">Record</CardTitle>
+                <CardTitle className="text-[#232323] dark:text-white mb-1 md:mb-2 text-base md:text-lg transition-colors duration-200">Record</CardTitle>
                 <CardDescription className="text-gray-400 text-xs md:text-sm">Record Your Lecture</CardDescription>
               </Card>
             </TooltipTrigger>

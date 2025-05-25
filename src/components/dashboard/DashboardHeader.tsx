@@ -52,10 +52,17 @@ export function DashboardHeader({
             <UpgradeModal onClose={() => setUpgradeOpen(false)} />
           </Dialog>
 
-          {/* Command button */}
+          {/* Command button - Updated for light mode */}
           <Dialog open={commandOpen} onOpenChange={setCommandOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-dashboard-card border-none dashboard-text-secondary hover:dashboard-text hover:bg-dashboard-card-hover rounded-full px-6 py-5 h-9 flex items-center justify-center gap-1.5 min-w-[120px]">
+              <Button variant="outline" className="
+                bg-dashboard-card border-none 
+                text-[#8D8D8D] 
+                hover:bg-dashboard-card-hover hover:text-[#8D8D8D]
+                dark:bg-dashboard-card dark:text-dashboard-text-secondary 
+                dark:hover:bg-dashboard-card-hover dark:hover:text-dashboard-text
+                rounded-full px-6 py-5 h-9 flex items-center justify-center gap-1.5 min-w-[120px] transition-all duration-200
+              ">
                 <Search className="h-4 w-4" />
                 <span className="text-sm font-medium mx-0.5">⌘</span>
                 <span className="text-sm font-medium">K</span>
