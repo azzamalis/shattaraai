@@ -66,16 +66,16 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
   return (
     <div className="px-4 py-2">
       <div className="flex items-center justify-between mb-2 px-2">
-        <h3 className="text-white/70 text-xs font-medium">Rooms</h3>
-        <span className="text-white/40 text-xs">{rooms.length} rooms</span>
+        <h3 className="text-dashboard-text text-base font-medium">Rooms</h3>
+        <span className="text-dashboard-text-secondary text-xs">{rooms.length} rooms</span>
       </div>
 
       <div className="space-y-1">
         <Button variant="ghost" className="w-full flex items-center justify-center gap-2 
-            text-white hover:bg-white/5 
-            border border-dashed border-white/20 
+            text-dashboard-text hover:bg-dashboard-card-hover 
+            border border-dashed border-dashboard-separator 
             rounded-md mb-2 transition-colors duration-200
-            hover:text-white" onClick={onAddRoom}>
+            hover:text-dashboard-text" onClick={onAddRoom}>
           <Plus size={18} />
           <span>Add a Room</span>
         </Button>
@@ -99,7 +99,7 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
           <Popover open={showMoreRooms} onOpenChange={setShowMoreRooms}>
             <PopoverTrigger asChild>
               <Button variant="ghost" className="w-full flex items-center justify-between px-2 py-1.5 
-                  text-white/60 hover:bg-white/5 hover:text-white 
+                  text-dashboard-text-secondary hover:bg-dashboard-card-hover hover:text-dashboard-text 
                   transition-colors duration-200 group">
                 <span className="flex items-center gap-2">
                   <ChevronDown className="h-4 w-4 transition-transform duration-200" />
@@ -107,7 +107,7 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
                 </span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[calc(300px-2rem)] bg-[#1A1A1A] border-white/10 p-1" align="center" sideOffset={5}>
+            <PopoverContent className="w-[calc(300px-2rem)] bg-dashboard-card border-dashboard-separator p-1" align="center" sideOffset={5}>
               <div className="space-y-1">
                 {hiddenRooms.map(room => (
                   <RoomItem
