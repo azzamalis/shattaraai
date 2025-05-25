@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -88,73 +87,95 @@ export function DashboardDrawer({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className={`${getDrawerWidth()} bg-dashboard-bg dark:bg-dashboard-bg p-0 flex flex-col`} closeButton={false}>
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 bg-dashboard-bg dark:bg-dashboard-bg shrink-0">
-            <div className="flex items-center gap-2">
+        <SheetContent 
+          side="left" 
+          className={`${getDrawerWidth()} bg-dashboard-bg dark:bg-dashboard-bg p-0 flex flex-col border-r border-dashboard-separator dark:border-dashboard-separator`} 
+          closeButton={false}
+        >
+          {/* Enhanced Header */}
+          <div className="flex items-center justify-between px-8 py-6 bg-dashboard-bg dark:bg-dashboard-bg shrink-0">
+            <div className="flex items-center gap-3">
               <Logo className="h-8 md:h-10 w-auto" textColor="text-dashboard-text dark:text-dashboard-text" />
             </div>
-            <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-dashboard-text dark:text-dashboard-text hover:text-dashboard-text dark:hover:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => onOpenChange(false)} 
+              className="text-dashboard-text dark:text-dashboard-text hover:text-dashboard-text dark:hover:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover rounded-full"
+            >
               <ChevronsLeft size={22} />
               <span className="sr-only">Close sidebar</span>
             </Button>
           </div>
 
-          {/* Scrollable Content */}
-          <ScrollArea className="flex-1 px-4">
-            <div className="space-y-8 pb-6">
-              {/* New Content Button */}
-              <div className="px-2">
+          <ScrollArea className="flex-1 overflow-y-auto">
+            <div className="space-y-12 pt-2">
+              {/* Add Content Button */}
+              <div className="px-6">
                 <Button 
                   variant="ghost" 
-                  className="w-full flex items-center justify-center gap-2 
+                  className="w-full flex items-center justify-center gap-3 
                     bg-transparent border border-dashed border-dashboard-separator dark:border-dashboard-separator 
                     text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text
-                    transition-colors duration-200 rounded-md py-2" 
+                    transition-colors duration-200 rounded-md py-3" 
                   onClick={() => {
                     navigate('/dashboard');
                     onOpenChange(false);
                   }}
                 >
-                  <Plus size={18} />
-                  <span>Add content</span>
+                  <Plus size={20} />
+                  <span className="font-medium">Add content</span>
                 </Button>
               </div>
               
               {/* History Section */}
-              <HistorySection />
+              <div className="px-6">
+                <HistorySection />
+              </div>
               
               {/* Rooms Section */}
-              <RoomsSection 
-                rooms={rooms} 
-                onAddRoom={onAddRoom} 
-                onEditRoom={onEditRoom} 
-                onDeleteRoom={onDeleteRoom} 
-                onOpenChange={onOpenChange} 
-                setRoomToDelete={setRoomToDelete} 
-                setRoomToDeleteName={setRoomToDeleteName} 
-                setDeleteModalOpen={setDeleteModalOpen} 
-              />
+              <div className="px-6">
+                <RoomsSection 
+                  rooms={rooms} 
+                  onAddRoom={onAddRoom} 
+                  onEditRoom={onEditRoom} 
+                  onDeleteRoom={onDeleteRoom} 
+                  onOpenChange={onOpenChange} 
+                  setRoomToDelete={setRoomToDelete} 
+                  setRoomToDeleteName={setRoomToDeleteName} 
+                  setDeleteModalOpen={setDeleteModalOpen} 
+                />
+              </div>
               
               {/* Help Tools Section */}
-              <HelpTools 
-                onTutorialClick={handleTutorialClick} 
-                onFeedbackClick={handleFeedbackClick} 
-                onCalculatorClick={() => setCalculatorModalOpen(true)} 
-              />
+              <div className="px-6">
+                <HelpTools 
+                  onTutorialClick={handleTutorialClick} 
+                  onFeedbackClick={handleFeedbackClick} 
+                  onCalculatorClick={() => setCalculatorModalOpen(true)} 
+                />
+              </div>
             </div>
           </ScrollArea>
 
-          {/* User Profile */}
-          <UserProfile onOpenChange={onOpenChange} />
+          {/* Enhanced User Profile */}
+          <div className="mt-auto">
+            <div className="px-6 py-4">
+              <UserProfile onOpenChange={onOpenChange} />
+            </div>
+          </div>
         </SheetContent>
       </Sheet>
 
       <FeedbackModal open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
       <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
       <CalculatorModal open={calculatorModalOpen} onOpenChange={setCalculatorModalOpen} />
-
-      <DeleteRoomModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} roomName={roomToDeleteName} onConfirm={handleDeleteConfirm} />
+      <DeleteRoomModal 
+        open={deleteModalOpen} 
+        onOpenChange={setDeleteModalOpen} 
+        roomName={roomToDeleteName} 
+        onConfirm={handleDeleteConfirm} 
+      />
     </>
   );
 }

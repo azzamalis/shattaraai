@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -64,20 +63,20 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
   };
 
   return (
-    <div className="px-4 py-2">
-      <div className="flex items-center justify-between mb-2 px-2">
-        <h3 className="text-dashboard-text text-base font-medium">Rooms</h3>
-        <span className="text-dashboard-text-secondary text-xs">{rooms.length} rooms</span>
-      </div>
-
-      <div className="space-y-1">
-        <Button variant="ghost" className="w-full flex items-center justify-center gap-2 
-            text-dashboard-text hover:bg-dashboard-card-hover 
-            border border-dashed border-dashboard-separator 
-            rounded-md mb-2 transition-colors duration-200
-            hover:text-dashboard-text" onClick={onAddRoom}>
-          <Plus size={18} />
-          <span>Add a Room</span>
+    <div>
+      <h2 className="text-base font-semibold mb-4 text-dashboard-text dark:text-dashboard-text">Rooms</h2>
+      
+      <div className="space-y-2">
+        <Button 
+          variant="ghost" 
+          className="w-full flex items-center justify-center gap-3 
+            bg-transparent border border-dashed border-dashboard-separator dark:border-dashboard-separator 
+            text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text
+            transition-colors duration-200 rounded-md py-3 mb-4" 
+          onClick={onAddRoom}
+        >
+          <Plus size={20} />
+          <span className="font-medium">Add a Room</span>
         </Button>
 
         {visibleRooms.map(room => (
@@ -98,9 +97,12 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
         {hasHiddenRooms && (
           <Popover open={showMoreRooms} onOpenChange={setShowMoreRooms}>
             <PopoverTrigger asChild>
-              <Button variant="ghost" className="w-full flex items-center justify-between px-2 py-1.5 
+              <Button 
+                variant="ghost" 
+                className="w-full flex items-center justify-between px-2 py-1.5 
                   text-dashboard-text-secondary hover:bg-dashboard-card-hover hover:text-dashboard-text 
-                  transition-colors duration-200 group">
+                  transition-colors duration-200 group"
+              >
                 <span className="flex items-center gap-2">
                   <ChevronDown className="h-4 w-4 transition-transform duration-200" />
                   <span>Show More</span>

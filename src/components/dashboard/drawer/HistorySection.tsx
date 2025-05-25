@@ -3,17 +3,22 @@ import { Button } from '@/components/ui/button';
 import { History } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RecentSection } from './RecentSection';
+
 export const HistorySection: React.FC = () => {
-  return <div className="space-y-6">
-      <div className="px-2">
-        <Button variant="ghost" className="w-full justify-start text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text transition-colors duration-200" asChild>
-          <Link to="/history">
-            <History size={18} className="mr-3" />
-            <span className="text-base">History</span>
-          </Link>
-        </Button>
+  return (
+    <div className="space-y-8">
+      <div>
+        <Link 
+          to="/history" 
+          className="block"
+        >
+          <h2 className="text-base font-semibold mb-4 text-dashboard-text dark:text-dashboard-text hover:text-dashboard-text/80 dark:hover:text-dashboard-text/80 transition-colors duration-200">
+            History
+          </h2>
+        </Link>
       </div>
       
       <RecentSection />
-    </div>;
+    </div>
+  );
 };
