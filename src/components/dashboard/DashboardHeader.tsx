@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
@@ -6,15 +7,19 @@ import Logo from '@/components/Logo';
 import { CommandModal } from './CommandModal';
 import { UpgradeModal } from './UpgradeModal';
 import { Link } from 'react-router-dom';
+
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
 }
+
 export function DashboardHeader({
   onOpenDrawer
 }: DashboardHeaderProps) {
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  return <header className="flex items-center p-4 sticky top-0 z-50 bg-dashboard-bg border-b border-dashboard-separator transition-colors duration-300">
+
+  return (
+    <header className="flex items-center p-4 sticky top-0 z-50 bg-dashboard-bg border-b border-dashboard-separator transition-colors duration-300">
       <div className="grid grid-cols-3 w-full items-center">
         {/* Left section */}
         <div className="flex items-center gap-3">
@@ -50,7 +55,7 @@ export function DashboardHeader({
           {/* Command button */}
           <Dialog open={commandOpen} onOpenChange={setCommandOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-dashboard-card border-none dashboard-text-secondary hover:dashboard-text hover:bg-dashboard-card-hover rounded-full px-6 py-5 h-9 flex items-center justify-center gap-1.5 min-w-[120px] text-[#f3f3f3]">
+              <Button variant="outline" className="bg-dashboard-card border-none dashboard-text-secondary hover:dashboard-text hover:bg-dashboard-card-hover rounded-full px-6 py-5 h-9 flex items-center justify-center gap-1.5 min-w-[120px]">
                 <Search className="h-4 w-4" />
                 <span className="text-sm font-medium mx-0.5">⌘</span>
                 <span className="text-sm font-medium">K</span>
@@ -60,5 +65,6 @@ export function DashboardHeader({
           </Dialog>
         </div>
       </div>
-    </header>;
+    </header>
+  );
 }
