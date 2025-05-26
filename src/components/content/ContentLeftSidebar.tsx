@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Upload, Youtube, Link, AudioLines } from "lucide-react";
-import { ContentViewer } from './ContentViewer';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ListTodo, AlignLeft } from 'lucide-react';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
+import { ContentViewer } from '@/components/content/ContentViewer';
 import { ContentData } from '@/pages/ContentPage';
 
 interface ContentLeftSidebarProps {
@@ -19,42 +19,6 @@ interface ContentLeftSidebarProps {
   onMicrophoneClear?: () => void;
 }
 
-const getTabIcon = (type: string) => {
-  switch (type) {
-    case 'recording':
-      return AudioLines;
-    case 'pdf':
-    case 'upload':
-      return Upload;
-    case 'youtube':
-      return Youtube;
-    case 'website':
-    case 'paste':
-      return Link;
-    default:
-      return FileText;
-  }
-};
-
-const getTabLabel = (type: string) => {
-  switch (type) {
-    case 'recording':
-      return 'Recording';
-    case 'pdf':
-      return 'PDF';
-    case 'upload':
-      return 'Upload';
-    case 'youtube':
-      return 'YouTube';
-    case 'website':
-      return 'Website';
-    case 'paste':
-      return 'Paste';
-    default:
-      return 'Content';
-  }
-};
-
 export function ContentLeftSidebar({
   contentData,
   onUpdateContent,
@@ -65,86 +29,109 @@ export function ContentLeftSidebar({
   onMicrophoneSelect,
   onMicrophoneClear
 }: ContentLeftSidebarProps) {
-  const [activeTab, setActiveTab] = useState("content");
-  const TabIcon = getTabIcon(contentData.type);
+  const [activeTab, setActiveTab] = useState("chapters");
+
+  const renderControls = () => {
+    if (contentData.type === 'recording') {
+      return (
+        <>
+          <div className="p-4 pb-3 shrink-0 bg-dashboard-bg">
+            <MicrophoneSelector 
+              selected={selectedMicrophone} 
+              onSelect={onMicrophoneSelect} 
+              onClear={onMicrophoneClear} 
+            />
+          </div>
+          <div className="px-4 pb-4 shrink-0 bg-dashboard-bg">
+            <RecordingControls 
+              isRecording={isRecording} 
+              toggleRecording={toggleRecording} 
+              recordingTime={recordingTime} 
+            />
+          </div>
+        </>
+      );
+    }
+    return (
+      <div className="p-4 shrink-0 bg-dashboard-bg">
+        <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
+      </div>
+    );
+  };
+
+  const renderTabContent = () => {
+    const hasContent = contentData.type === 'recording' ? isRecording : !!contentData.url || !!contentData.filePath;
+    
+    return (
+      <>
+        <TabsContent value="chapters" className="absolute inset-0">
+          <ScrollArea className="h-full">
+            {hasContent ? (
+              <div className="p-4 space-y-4">
+                <div className="text-dashboard-text-secondary">
+                  {contentData.type === 'recording' && isRecording && "Recording in progress..."}
+                  {contentData.type !== 'recording' && "Processing content..."}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+                <p className="text-dashboard-text-secondary text-center text-base">
+                  {contentData.type === 'recording' ? 'Start recording to view chapters' : 'Add content to view chapters'}
+                </p>
+              </div>
+            )}
+          </ScrollArea>
+        </TabsContent>
+        
+        <TabsContent value="transcripts" className="absolute inset-0">
+          <ScrollArea className="h-full">
+            {hasContent ? (
+              <div className="p-4 space-y-4">
+                <div className="text-dashboard-text-secondary">
+                  {contentData.type === 'recording' && isRecording && "Transcribing in progress..."}
+                  {contentData.type !== 'recording' && "Extracting text..."}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+                <p className="text-dashboard-text-secondary text-center text-base">
+                  {contentData.type === 'recording' ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
+                </p>
+              </div>
+            )}
+          </ScrollArea>
+        </TabsContent>
+      </>
+    );
+  };
 
   return (
-    <div className="h-full flex flex-col bg-dashboard-bg">
-      <Tabs 
-        defaultValue="content" 
-        onValueChange={setActiveTab} 
-        className="flex-1 flex flex-col h-full"
-      >
-        <div className="p-4 border-b border-dashboard-separator bg-dashboard-bg">
-          <TabsList className="w-fit bg-dashboard-card border border-dashboard-separator rounded-lg p-1 h-auto">
+    <div className="h-full flex flex-col min-h-0 bg-dashboard-bg border-r border-dashboard-separator">
+      {renderControls()}
+      
+      <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-dashboard-bg">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <TabsList className="w-fit bg-dashboard-card border border-dashboard-separator rounded-lg p-1 h-10 flex gap-1">
             <TabsTrigger 
-              value="content" 
-              className="flex items-center gap-2 px-4 py-2 rounded-md data-[state=active]:bg-dashboard-bg data-[state=active]:text-dashboard-text data-[state=active]:shadow-sm text-dashboard-text-secondary hover:text-dashboard-text transition-all duration-200"
+              value="chapters" 
+              className="h-8 px-4 rounded-md bg-transparent text-dashboard-text-secondary hover:text-dashboard-text data-[state=active]:bg-dashboard-bg data-[state=active]:text-dashboard-text data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
             >
-              <TabIcon className="h-4 w-4" />
-              {getTabLabel(contentData.type)}
+              <ListTodo className="h-4 w-4" />
+              <span className="text-sm font-medium">Chapters</span>
             </TabsTrigger>
-            {contentData.type === 'recording' && (
-              <TabsTrigger 
-                value="settings" 
-                className="flex items-center gap-2 px-4 py-2 rounded-md data-[state=active]:bg-dashboard-bg data-[state=active]:text-dashboard-text data-[state=active]:shadow-sm text-dashboard-text-secondary hover:text-dashboard-text transition-all duration-200"
-              >
-                Settings
-              </TabsTrigger>
-            )}
+            <TabsTrigger 
+              value="transcripts" 
+              className="h-8 px-4 rounded-md bg-transparent text-dashboard-text-secondary hover:text-dashboard-text data-[state=active]:bg-dashboard-bg data-[state=active]:text-dashboard-text data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
+            >
+              <AlignLeft className="h-4 w-4" />
+              <span className="text-sm font-medium">Transcripts</span>
+            </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="content" className="flex-1 overflow-hidden m-0">
-          <div className="h-full flex flex-col">
-            {contentData.type === 'recording' && (
-              <div className="p-4 border-b border-dashboard-separator bg-dashboard-bg">
-                <div className="space-y-3">
-                  <div className="text-sm text-dashboard-text-secondary">
-                    Recording with:
-                  </div>
-                  <MicrophoneSelector
-                    selected={selectedMicrophone}
-                    onSelect={onMicrophoneSelect}
-                    onClear={onMicrophoneClear}
-                  />
-                  <RecordingControls
-                    isRecording={isRecording}
-                    toggleRecording={toggleRecording}
-                    recordingTime={recordingTime}
-                  />
-                </div>
-              </div>
-            )}
-            
-            <div className="flex-1 overflow-hidden">
-              <ContentViewer contentData={contentData} />
-            </div>
-          </div>
-        </TabsContent>
-
-        {contentData.type === 'recording' && (
-          <TabsContent value="settings" className="flex-1 overflow-hidden m-0">
-            <ScrollArea className="h-full">
-              <div className="p-4 space-y-4">
-                <div className="text-dashboard-text font-medium">Recording Settings</div>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm text-dashboard-text-secondary block mb-2">
-                      Microphone
-                    </label>
-                    <MicrophoneSelector
-                      selected={selectedMicrophone}
-                      onSelect={onMicrophoneSelect}
-                      onClear={onMicrophoneClear}
-                    />
-                  </div>
-                  {/* Add more recording settings here as needed */}
-                </div>
-              </div>
-            </ScrollArea>
-          </TabsContent>
-        )}
+        <div className="flex-1 relative overflow-hidden">
+          {renderTabContent()}
+        </div>
       </Tabs>
     </div>
   );
