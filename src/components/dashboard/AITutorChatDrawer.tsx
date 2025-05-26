@@ -1,17 +1,21 @@
+
 import React, { useState } from 'react';
 import { X, Send } from 'lucide-react';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
 }
+
 interface AITutorChatDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
 export function AITutorChatDrawer({
   open,
   onOpenChange
@@ -22,6 +26,7 @@ export function AITutorChatDrawer({
     role: 'assistant',
     content: 'Hello! I\'m Shattara AI Tutor. How can I help you learn today?'
   }]);
+
   const handleSendMessage = () => {
     if (!input.trim()) return;
 
@@ -44,19 +49,30 @@ export function AITutorChatDrawer({
       setMessages(prev => [...prev, aiMessage]);
     }, 1000);
   };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSendMessage();
     }
   };
-  return <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:w-[400px] p-0 border-l border-white/10 bg-black" closeButton={false}>
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent 
+        side="right" 
+        className="w-full sm:w-[400px] p-0 border-l border-dashboard-separator bg-dashboard-bg"
+        closeButton={false}
+      >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-            <h3 className="text-lg font-semibold text-white">Learn with Shattara AI Tutor</h3>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-dashboard-separator bg-dashboard-bg">
+            <h3 className="text-lg font-semibold text-dashboard-text">Learn with Shattara AI Tutor</h3>
             <SheetClose asChild>
-              <Button variant="ghost" size="icon" className="text-[#4b4b4b]">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-dashboard-text-secondary hover:text-dashboard-text hover:bg-dashboard-card-hover transition-colors duration-200"
+              >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
               </Button>
@@ -64,19 +80,50 @@ export function AITutorChatDrawer({
           </div>
           
           {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map(message => <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === 'user' ? 'bg-[#00A3FF] text-white' : 'bg-[#4B4B4B] text-white'}`}>
-                  {message.content}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-dashboard-bg">
+            {messages.map(message => (
+              <div 
+                key={message.id} 
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div 
+                  className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                    message.role === 'user' 
+                      ? 'bg-[#00A3FF] text-white' 
+                      : 'bg-dashboard-card text-dashboard-text border border-dashboard-separator'
+                  }`}
+                >
+                  <p className="text-sm leading-relaxed">{message.content}</p>
                 </div>
-              </div>)}
+              </div>
+            ))}
           </div>
           
           {/* Input Area */}
-          <div className="p-4 border-t border-white/10">
-            <div className="flex gap-2">
-              <Input value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="Ask anything..." className="border-white/10 text-white placeholder:text-white/50 bg-transparent" />
-              <Button onClick={handleSendMessage} disabled={!input.trim()} className="bg-[#00A3FF] text-white hover:bg-[#00A3FF]/80">
+          <div className="p-6 border-t border-dashboard-separator bg-dashboard-bg">
+            <div className="flex gap-3">
+              <Input 
+                value={input} 
+                onChange={e => setInput(e.target.value)} 
+                onKeyDown={handleKeyDown} 
+                placeholder="Ask anything..." 
+                className="
+                  flex-1 border-dashboard-separator text-dashboard-text 
+                  placeholder:text-dashboard-text-secondary 
+                  bg-dashboard-card hover:bg-dashboard-card-hover
+                  focus:border-[#00A3FF] focus:ring-1 focus:ring-[#00A3FF] 
+                  transition-all duration-200
+                " 
+              />
+              <Button 
+                onClick={handleSendMessage} 
+                disabled={!input.trim()} 
+                className="
+                  bg-[#00A3FF] text-white hover:bg-[#00A3FF]/90 
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  transition-all duration-200 hover:shadow-sm
+                "
+              >
                 <Send className="h-4 w-4" />
                 <span className="sr-only">Send message</span>
               </Button>
@@ -84,5 +131,6 @@ export function AITutorChatDrawer({
           </div>
         </div>
       </SheetContent>
-    </Sheet>;
+    </Sheet>
+  );
 }
