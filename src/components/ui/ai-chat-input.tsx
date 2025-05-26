@@ -161,6 +161,7 @@ const AIChatInput = ({
           overflow: "hidden",
           borderRadius: 16,
           background: "transparent",
+          // Custom border styling to ensure visibility in unfocused state
           borderStyle: "solid",
           borderWidth: "1px",
           borderColor: isActive || inputValue ? "rgba(35, 35, 255, 0.4)" : "rgba(255, 255, 255, 0.1)"
@@ -173,7 +174,7 @@ const AIChatInput = ({
             {/* Input Row */}
             <div className="flex items-center gap-2 p-3 rounded-full max-w-full w-full my-1">
               <button className="p-2 rounded-full hover:bg-white/5 transition" title="Attach file" type="button" tabIndex={-1}>
-                <Paperclip size={18} className="text-dashboard-text-secondary" />
+                <Paperclip size={18} className="text-white/70" />
               </button>
   
               {/* Text Input & Placeholder */}
@@ -183,7 +184,7 @@ const AIChatInput = ({
                   type="text" 
                   value={inputValue} 
                   onChange={e => setInputValue(e.target.value)} 
-                  className="flex-1 border-0 outline-none rounded-md py-2 text-base bg-transparent w-full font-normal text-dashboard-text focus:outline-none focus:ring-0 focus:border-0"
+                  className="flex-1 border-0 outline-none rounded-md py-2 text-base bg-transparent w-full font-normal text-white focus:outline-none focus:ring-0 focus:border-0"
                   style={{
                     position: "relative",
                     zIndex: 1
@@ -191,34 +192,24 @@ const AIChatInput = ({
                 />
                 <div className="absolute left-0 top-0 w-full h-full pointer-events-none flex items-center px-3 py-2">
                   <AnimatePresence mode="wait">
-                    {showPlaceholder && !isActive && !inputValue && (
-                      <motion.span 
-                        key={placeholderIndex} 
-                        className="absolute left-0 top-1/2 -translate-y-1/2 text-dashboard-text-secondary select-none pointer-events-none" 
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          zIndex: 0
-                        }}
-                        variants={placeholderContainerVariants} 
-                        initial="initial" 
-                        animate="animate" 
-                        exit="exit"
-                      >
-                        {PLACEHOLDERS[placeholderIndex].split("").map((char, i) => (
-                          <motion.span key={i} style={{ display: "inline-block" }}>
-                            {char === " " ? "\u00A0" : char}
-                          </motion.span>
-                        ))}
-                      </motion.span>
-                    )}
+                    {showPlaceholder && !isActive && !inputValue && <motion.span key={placeholderIndex} className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 select-none pointer-events-none" style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    zIndex: 0
+                  }} variants={placeholderContainerVariants} initial="initial" animate="animate" exit="exit">
+                        {PLACEHOLDERS[placeholderIndex].split("").map((char, i) => <motion.span key={i} variants={letterVariants} style={{
+                      display: "inline-block"
+                    }}>
+                              {char === " " ? "\u00A0" : char}
+                            </motion.span>)}
+                      </motion.span>}
                   </AnimatePresence>
                 </div>
               </div>
   
               <button className="p-2 rounded-full hover:bg-white/5 transition" title="Voice input" type="button" tabIndex={-1}>
-                <Mic size={18} className="text-dashboard-text-secondary" />
+                <Mic size={18} className="text-white/70" />
               </button>
               <button 
                 className="flex items-center gap-1 bg-[#00A3FF] hover:bg-[#00A3FF]/90 text-white p-2 rounded-full font-medium justify-center transition-colors" 
@@ -232,62 +223,54 @@ const AIChatInput = ({
           </form>
   
           {/* Expanded Controls */}
-          <motion.div 
-            className="w-full flex justify-start px-4 items-center text-sm" 
-            variants={{
-              hidden: {
-                opacity: 0,
-                y: 20,
-                pointerEvents: "none" as const,
-                transition: { duration: 0.25 }
-              },
-              visible: {
-                opacity: 1,
-                y: 0,
-                pointerEvents: "auto" as const,
-                transition: { duration: 0.35, delay: 0.08 }
-              }
-            }} 
-            initial="hidden" 
-            animate={isActive || inputValue ? "visible" : "hidden"} 
-            style={{ marginTop: 8 }}
-          >
+          <motion.div className="w-full flex justify-start px-4 items-center text-sm" variants={{
+          hidden: {
+            opacity: 0,
+            y: 20,
+            pointerEvents: "none" as const,
+            transition: {
+              duration: 0.25
+            }
+          },
+          visible: {
+            opacity: 1,
+            y: 0,
+            pointerEvents: "auto" as const,
+            transition: {
+              duration: 0.35,
+              delay: 0.08
+            }
+          }
+        }} initial="hidden" animate={isActive || inputValue ? "visible" : "hidden"} style={{
+          marginTop: 8
+        }}>
             <div className="flex gap-3 items-center py-[4px]">
-              {/* AI Thinking Toggle - Pill Style */}
-              <button 
-                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all font-medium text-sm border ${
-                  aiThinkingActive 
-                    ? "bg-[#00A3FF]/20 border-[#00A3FF]/60 text-dashboard-text shadow-sm" 
-                    : "bg-dashboard-card hover:bg-dashboard-card-hover border-dashboard-separator text-dashboard-text-secondary hover:text-dashboard-text"
-                }`} 
-                title="AI Thinking" 
-                type="button" 
-                onClick={e => {
-                  e.stopPropagation();
-                  setAiThinkingActive(a => !a);
-                }}
-              >
-                <Atom className={`transition-all ${aiThinkingActive ? "text-[#00A3FF]" : ""}`} size={16} />
-                <span>Learn+</span>
+              {/* Think Toggle */}
+              <button className={`flex items-center gap-1 px-4 py-1.5 rounded-full transition-all font-medium group ${aiThinkingActive ? "bg-primary/10 outline outline-primary/60 text-white" : "bg-white/5 text-white/70 hover:bg-white/10"}`} title="AI Thinking" type="button" onClick={e => {
+              e.stopPropagation();
+              setAiThinkingActive(a => !a);
+            }}>
+                <Atom className={`transition-all ${aiThinkingActive ? "text-primary" : ""}`} size={16} />
+                <span className="text-xs">AI Thinking</span>
               </button>
   
-              {/* Deep Search Toggle - Pill Style */}
-              <button 
-                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all font-medium text-sm border ${
-                  deepSearchActive 
-                    ? "bg-[#00A3FF]/20 border-[#00A3FF]/60 text-dashboard-text shadow-sm" 
-                    : "bg-dashboard-card hover:bg-dashboard-card-hover border-dashboard-separator text-dashboard-text-secondary hover:text-dashboard-text"
-                }`} 
-                title="Deep Search" 
-                type="button" 
-                onClick={e => {
-                  e.stopPropagation();
-                  setDeepSearchActive(a => !a);
-                }}
-              >
-                <Globe className={`transition-all ${deepSearchActive ? "text-[#00A3FF]" : ""}`} size={16} />
-                <span>Search</span>
-              </button>
+              {/* Deep Search Toggle */}
+              <motion.button className={`flex items-center px-4 gap-1 py-1.5 rounded-full transition font-medium whitespace-nowrap overflow-hidden justify-start ${deepSearchActive ? "bg-primary/10 outline outline-primary/60 text-white" : "bg-white/5 text-white/70 hover:bg-white/10"}`} title="Deep Search" type="button" onClick={e => {
+              e.stopPropagation();
+              setDeepSearchActive(a => !a);
+            }} initial={false} animate={{
+              width: deepSearchActive ? 125 : 36,
+              paddingLeft: deepSearchActive ? 8 : 9
+            }}>
+                <div className="flex-1">
+                  <Globe size={16} className={deepSearchActive ? "text-primary" : ""} />
+                </div>
+                <motion.span className="pb-[2px] text-xs" initial={false} animate={{
+                opacity: deepSearchActive ? 1 : 0
+              }}>
+                  Deep Search
+                </motion.span>
+              </motion.button>
             </div>
           </motion.div>
         </div>
