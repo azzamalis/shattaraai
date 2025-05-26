@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,7 +6,6 @@ import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
 import { ContentData } from '@/pages/ContentPage';
-
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -18,7 +16,6 @@ interface ContentLeftSidebarProps {
   onMicrophoneSelect: (value: string) => void;
   onMicrophoneClear?: () => void;
 }
-
 export function ContentLeftSidebar({
   contentData,
   onUpdateContent,
@@ -30,91 +27,60 @@ export function ContentLeftSidebar({
   onMicrophoneClear
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
-
   const renderControls = () => {
     if (contentData.type === 'recording') {
-      return (
-        <>
+      return <>
           <div className="p-4 pb-2 shrink-0 bg-[#222222]">
-            <MicrophoneSelector 
-              selected={selectedMicrophone} 
-              onSelect={onMicrophoneSelect} 
-              onClear={onMicrophoneClear} 
-            />
+            <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
           </div>
           <div className="px-4 pb-4 shrink-0 bg-[#222222]">
-            <RecordingControls 
-              isRecording={isRecording} 
-              toggleRecording={toggleRecording} 
-              recordingTime={recordingTime} 
-            />
+            <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
           </div>
-        </>
-      );
+        </>;
     }
-    
-    return (
-      <div className="p-4 shrink-0 bg-[#222222]">
-        <ContentViewer 
-          contentData={contentData}
-          onUpdateContent={onUpdateContent}
-        />
-      </div>
-    );
+    return <div className="p-4 shrink-0 bg-[#222222]">
+        <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
+      </div>;
   };
-
   const renderTabContent = () => {
     const hasContent = contentData.type === 'recording' ? isRecording : !!contentData.url || !!contentData.filePath;
-    
-    return (
-      <>
+    return <>
         <TabsContent value="chapters" className="absolute inset-0">
           <ScrollArea className="h-full">
-            {hasContent ? (
-              <div className="p-4 space-y-4">
+            {hasContent ? <div className="p-4 space-y-4">
                 <div className="text-white/60">
                   {contentData.type === 'recording' && isRecording && "Recording in progress..."}
                   {contentData.type !== 'recording' && "Processing content..."}
                 </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                <ClipboardList className="h-12 w-12 mb-4 text-white/30" />
-                <p className="text-[14px] font-medium text-white mb-1.5 text-center">No Chapters Yet</p>
-                <p className="text-[13px] text-white/60 text-center">
+              </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+                
+                
+                <p className="text-white/60 text-center text-lg">
                   {contentData.type === 'recording' ? 'Start recording to view chapters' : 'Add content to view chapters'}
                 </p>
-              </div>
-            )}
+              </div>}
           </ScrollArea>
         </TabsContent>
         
         <TabsContent value="transcripts" className="absolute inset-0">
           <ScrollArea className="h-full">
-            {hasContent ? (
-              <div className="p-4 space-y-4">
+            {hasContent ? <div className="p-4 space-y-4">
                 <div className="text-white/60">
                   {contentData.type === 'recording' && isRecording && "Transcribing in progress..."}
                   {contentData.type !== 'recording' && "Extracting text..."}
                 </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                <FileText className="h-12 w-12 mb-4 text-white/30" />
-                <p className="text-[14px] font-medium text-white mb-1.5 text-center">No Transcripts Yet</p>
-                <p className="text-[13px] text-white/60 text-center">
+              </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+                
+                
+                <p className="text-white/60 text-center text-lg">
                   {contentData.type === 'recording' ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
                 </p>
-              </div>
-            )}
+              </div>}
           </ScrollArea>
         </TabsContent>
-      </>
-    );
+      </>;
   };
-
-  return (
-    <div className="h-full flex flex-col min-h-0 bg-black">
+  return <div className="h-full flex flex-col min-h-0 bg-black">
       {renderControls()}
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-[#222222]">
@@ -133,6 +99,5 @@ export function ContentLeftSidebar({
           {renderTabContent()}
         </div>
       </Tabs>
-    </div>
-  );
+    </div>;
 }
