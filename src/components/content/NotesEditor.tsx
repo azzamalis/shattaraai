@@ -72,13 +72,12 @@ export function NotesEditor({ isRecording }: NotesEditorProps) {
       const textarea = textareaRef.current;
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
-      const beforeSlash = content.substring(0, start - 1); // Remove the '/' character
+      const beforeSlash = content.substring(0, start - 1);
       const afterCursor = content.substring(end);
       
       const newContent = beforeSlash + text + afterCursor;
       setContent(newContent);
       
-      // Set cursor position after inserted text
       setTimeout(() => {
         if (textareaRef.current) {
           const newPosition = start - 1 + text.length;
@@ -104,7 +103,6 @@ export function NotesEditor({ isRecording }: NotesEditorProps) {
     setContent(newContent);
     setCursorPosition(cursorPos);
     
-    // Check if user typed '/' at the beginning of a line or after whitespace
     const beforeCursor = newContent.substring(0, cursorPos);
     const lastChar = beforeCursor[beforeCursor.length - 1];
     const prevChar = beforeCursor[beforeCursor.length - 2];
@@ -120,7 +118,7 @@ export function NotesEditor({ isRecording }: NotesEditorProps) {
     <div className="h-full flex flex-col bg-dashboard-bg">
       <div className="flex-1 relative">
         <ScrollArea className="h-full">
-          <div className="p-4">
+          <div className="p-6">
             <textarea
               ref={textareaRef}
               value={content}
@@ -134,13 +132,13 @@ export function NotesEditor({ isRecording }: NotesEditorProps) {
         </ScrollArea>
         
         {showCommands && (
-          <div className="absolute left-4 bg-dashboard-card border border-dashboard-separator rounded-lg shadow-lg p-2 z-50 min-w-[240px]">
+          <div className="absolute left-6 bg-dashboard-card border border-dashboard-separator rounded-lg shadow-lg p-2 z-50 min-w-[240px]">
             <div className="space-y-1">
               {slashCommands.map((command) => (
                 <Button
                   key={command.id}
                   variant="ghost"
-                  className="w-full justify-start h-auto p-2 hover:bg-dashboard-card-hover"
+                  className="w-full justify-start h-auto p-3 hover:bg-dashboard-card-hover text-left"
                   onClick={command.action}
                 >
                   <div className="flex items-center gap-3">

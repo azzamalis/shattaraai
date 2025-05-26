@@ -92,7 +92,7 @@ export default function ContentPage() {
 
   return (
     <DashboardLayout className="p-0">
-      <div className="flex flex-col h-screen bg-black text-white dark">
+      <div className="flex flex-col h-screen bg-dashboard-bg text-dashboard-text">
         <ContentHeader 
           contentData={contentData}
           onUpdateContent={updateContentData}
@@ -115,7 +115,7 @@ export default function ContentPage() {
               />
             </ResizablePanel>
             
-            <ResizableHandle withHandle className="bg-zinc-700" />
+            <ResizableHandle withHandle className="bg-dashboard-separator" />
             
             <ResizablePanel defaultSize={50} minSize={40}>
               <ContentRightSidebar contentData={contentData} />

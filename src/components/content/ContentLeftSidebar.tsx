@@ -106,22 +106,22 @@ export function ContentLeftSidebar({
   };
 
   return (
-    <div className="h-full flex flex-col min-h-0 bg-dashboard-bg">
+    <div className="h-full flex flex-col min-h-0 bg-dashboard-bg border-r border-dashboard-separator">
       {renderControls()}
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-dashboard-bg">
-        <div className="px-4 pt-2 pb-3 shrink-0">
-          <TabsList className="w-fit bg-dashboard-card border border-dashboard-separator shadow-sm rounded-lg p-1 h-9 flex gap-1">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <TabsList className="w-fit bg-dashboard-card border border-dashboard-separator rounded-lg p-1 h-10 flex gap-1">
             <TabsTrigger 
               value="chapters" 
-              className="h-7 px-3 rounded-md bg-transparent text-dashboard-text-secondary hover:text-dashboard-text data-[state=active]:bg-dashboard-bg data-[state=active]:text-dashboard-text data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
+              className="h-8 px-4 rounded-md bg-transparent text-dashboard-text-secondary hover:text-dashboard-text data-[state=active]:bg-dashboard-bg data-[state=active]:text-dashboard-text data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
             >
               <ListTodo className="h-4 w-4" />
               <span className="text-sm font-medium">Chapters</span>
             </TabsTrigger>
             <TabsTrigger 
               value="transcripts" 
-              className="h-7 px-3 rounded-md bg-transparent text-dashboard-text-secondary hover:text-dashboard-text data-[state=active]:bg-dashboard-bg data-[state=active]:text-dashboard-text data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
+              className="h-8 px-4 rounded-md bg-transparent text-dashboard-text-secondary hover:text-dashboard-text data-[state=active]:bg-dashboard-bg data-[state=active]:text-dashboard-text data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
             >
               <AlignLeft className="h-4 w-4" />
               <span className="text-sm font-medium">Transcripts</span>
