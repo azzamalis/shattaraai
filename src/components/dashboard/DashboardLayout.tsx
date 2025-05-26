@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { DashboardHeader } from './DashboardHeader';
@@ -6,13 +5,22 @@ import { DashboardDrawer } from './DashboardDrawer';
 import { Room, RoomHandlers } from '@/lib/types';
 import { toast } from 'sonner';
 import { ContentProvider } from '@/contexts/ContentContext';
+import { useLocation } from 'react-router-dom';
+import { ContentData } from '@/pages/ContentPage';
 
 interface DashboardLayoutProps {
-  children: React.ReactElement<Partial<RoomHandlers & { rooms: Room[] }>>;
+  children: React.ReactNode;
   className?: string;
+  contentData?: ContentData;
+  onUpdateContent?: (updates: Partial<ContentData>) => void;
 }
 
-export function DashboardLayout({ children, className }: DashboardLayoutProps) {
+export function DashboardLayout({ 
+  children, 
+  className,
+  contentData,
+  onUpdateContent 
+}: DashboardLayoutProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
@@ -80,7 +88,7 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
 
   // Clone children with room props only if they accept them
   const childWithProps = React.isValidElement(children) && children.type.toString().includes('Dashboard') 
-    ? React.cloneElement(children, {
+    ? React.cloneElement(children as React.ReactElement, {
         rooms,
         ...roomHandlers
       })
@@ -89,7 +97,11 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
   return (
     <ContentProvider>
       <div className="flex min-h-screen w-full flex-col bg-dashboard-bg overflow-hidden transition-colors duration-300">
-        <DashboardHeader onOpenDrawer={() => setIsDrawerOpen(true)} />
+        <DashboardHeader 
+          onOpenDrawer={() => setIsDrawerOpen(true)} 
+          contentData={contentData}
+          onUpdateContent={onUpdateContent}
+        />
         <DashboardDrawer 
           open={isDrawerOpen} 
           onOpenChange={setIsDrawerOpen}

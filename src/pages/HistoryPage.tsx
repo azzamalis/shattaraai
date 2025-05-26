@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { History } from '@/components/history/History';

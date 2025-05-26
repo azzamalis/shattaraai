@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ContentLeftSidebar } from '@/components/content/ContentLeftSidebar';
 import { ContentRightSidebar } from '@/components/content/ContentRightSidebar';
-import { ContentHeader } from '@/components/content/ContentHeader';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 
 export type ContentType = 'recording' | 'pdf' | 'video' | 'youtube' | 'upload' | 'paste' | 'website';
@@ -91,18 +89,23 @@ export default function ContentPage() {
   };
 
   return (
-    <DashboardLayout className="p-0">
-      <div className="flex flex-col h-screen bg-black text-white dark">
-        <ContentHeader 
-          contentData={contentData}
-          onUpdateContent={updateContentData}
-          isRecording={isRecording}
-          recordingTime={formatTime(recordingTime)}
-        />
-        
-        <div className="flex-1 overflow-hidden">
-          <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel defaultSize={50} minSize={25} maxSize={60}>
+    <DashboardLayout 
+      className="p-0" 
+      contentData={contentData}
+      onUpdateContent={updateContentData}
+    >
+      <div className="flex flex-col h-screen bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-300">
+        <div className="flex-1 overflow-hidden pt-0 px-4 md:px-6">
+          <ResizablePanelGroup 
+            direction="horizontal"
+            className="h-full"
+          >
+            <ResizablePanel 
+              defaultSize={50} 
+              minSize={25} 
+              maxSize={60}
+              className="bg-dashboard-card dark:bg-dashboard-card rounded-lg border border-dashboard-separator dark:border-dashboard-separator"
+            >
               <ContentLeftSidebar 
                 contentData={contentData}
                 onUpdateContent={updateContentData}
@@ -115,9 +118,18 @@ export default function ContentPage() {
               />
             </ResizablePanel>
             
-            <ResizableHandle withHandle className="bg-zinc-700" />
+            <ResizableHandle 
+              withHandle 
+              className="mx-2"
+            >
+              <div className="w-1 h-10 bg-dashboard-separator dark:bg-dashboard-separator rounded-full transition-colors duration-200" />
+            </ResizableHandle>
             
-            <ResizablePanel defaultSize={50} minSize={40}>
+            <ResizablePanel 
+              defaultSize={50} 
+              minSize={40}
+              className="bg-dashboard-card dark:bg-dashboard-card rounded-lg"
+            >
               <ContentRightSidebar contentData={contentData} />
             </ResizablePanel>
           </ResizablePanelGroup>

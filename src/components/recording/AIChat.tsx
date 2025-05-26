@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Send, Paperclip, AudioWaveform, GraduationCap, Search, MessageSquare } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+
 interface Message {
   id: number;
   content: string;
   sender: "user" | "ai";
 }
+
 const AIChat = () => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([{
@@ -63,6 +65,7 @@ const AIChat = () => {
   }]);
   const [isRecording, setIsRecording] = useState(false);
   const [activeMode, setActiveMode] = useState<"learn" | "search" | null>(null);
+
   const handleSendMessage = () => {
     if (inputValue.trim() === "") return;
     const newMessage: Message = {
@@ -83,66 +86,136 @@ const AIChat = () => {
     }, 1000);
     setInputValue("");
   };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
+
   const toggleRecording = () => {
     setIsRecording(!isRecording);
   };
-  return <div className="flex flex-col h-full">
+
+  return (
+    <div className="flex flex-col h-full">
       <div className="flex-1 min-h-0">
         <ScrollArea className="h-full">
-          <div className="p-4 h-full bg-black">
-            {messages.length === 0 ? <div className="h-full flex flex-col items-center justify-center min-h-[400px] text-center">
-                <div className="h-16 w-16 mb-4 flex items-center justify-center text-gray-400">
+          <div className="p-4 h-full bg-dashboard-bg dark:bg-dashboard-bg">
+            {messages.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center min-h-[400px] text-center">
+                <div className="h-16 w-16 mb-4 flex items-center justify-center text-dashboard-text-secondary">
                   <MessageSquare className="h-10 w-10" />
                 </div>
-                <h3 className="font-medium text-lg text-white">Chat with Shattara AI</h3>
-                <p className="text-sm text-gray-400 mt-2">
+                <h3 className="font-medium text-lg text-dashboard-text">
+                  Chat with Shattara AI
+                </h3>
+                <p className="text-sm text-dashboard-text-secondary mt-2">
                   Ask Shattara AI to generate flashcards, notes, summaries and quizzes
                 </p>
-              </div> : <div className="space-y-4">
-                {messages.map(msg => <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-                    {msg.sender === "ai" && <Avatar className="h-8 w-8 mr-2 mt-1">
-                        <AvatarFallback className="bg-gray-800 text-gray-400">AI</AvatarFallback>
-                      </Avatar>}
-                    <div className={`max-w-[80%] rounded-lg p-3 ${msg.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-200"}`}>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map(msg => (
+                  <div 
+                    key={msg.id} 
+                    className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div 
+                      className={cn(
+                        "max-w-[80%] rounded-lg p-3 text-[#FAFAFA]",
+                        msg.sender === "user" 
+                          ? "bg-[#1D1D1D]"
+                          : "bg-transparent"
+                      )}
+                    >
                       {msg.content}
                     </div>
-                  </div>)}
-              </div>}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </ScrollArea>
       </div>
 
-      <div className="flex flex-col gap-2 p-4 border-t border-white/10 shrink-0 bg-black">
+      <div className="flex flex-col gap-2 p-4 border-t border-dashboard-separator shrink-0 bg-dashboard-bg dark:bg-dashboard-bg">
         <div className="flex items-center gap-2">
-          <Input value={inputValue} onChange={e => setInputValue(e.target.value)} onKeyDown={handleKeyPress} placeholder="Ask anything..." className="flex-1 bg-transparent text-gray-200 border border-white/10 rounded-lg focus:border-white/20 focus:ring-0 focus:outline-none placeholder:text-gray-500 h-10" />
-          <Button variant="ghost" size="icon" className="h-10 w-10 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">
+          <Input 
+            value={inputValue} 
+            onChange={e => setInputValue(e.target.value)} 
+            onKeyDown={handleKeyPress} 
+            placeholder="Ask anything..." 
+            className={cn(
+              "flex-1 bg-dashboard-card dark:bg-dashboard-card",
+              "text-dashboard-text border-dashboard-separator",
+              "rounded-lg focus:border-dashboard-text/20",
+              "focus:ring-0 focus:outline-none",
+              "placeholder:text-dashboard-text-secondary h-10"
+            )}
+          />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-10 w-10 text-dashboard-text-secondary hover:text-dashboard-text hover:bg-dashboard-card-hover rounded-lg"
+          >
             <Paperclip className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className={cn("h-10 w-10 hover:bg-white/5 rounded-lg", isRecording ? "text-red-500" : "text-gray-400 hover:text-white")} onClick={toggleRecording}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={cn(
+              "h-10 w-10 hover:bg-dashboard-card-hover rounded-lg",
+              isRecording ? "text-red-500" : "text-dashboard-text-secondary hover:text-dashboard-text"
+            )}
+            onClick={toggleRecording}
+          >
             <AudioWaveform className="h-5 w-5" />
           </Button>
-          <Button onClick={handleSendMessage} size="icon" disabled={!inputValue.trim()} className="h-10 w-10 text-white hover:bg-white/5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+          <Button 
+            onClick={handleSendMessage} 
+            size="icon" 
+            disabled={!inputValue.trim()} 
+            className="h-10 w-10 text-dashboard-text hover:bg-dashboard-card-hover rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Send className="h-5 w-5" />
           </Button>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setActiveMode(activeMode === "learn" ? null : "learn")} className={cn("h-8 px-3 rounded-full flex items-center gap-1 font-normal transition-colors duration-200", activeMode === "learn" ? "bg-white text-black hover:bg-white/90" : "text-gray-400 hover:text-white hover:bg-white/5")}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setActiveMode(activeMode === "learn" ? null : "learn")} 
+            className={cn(
+              "h-8 px-3 rounded-full flex items-center gap-1 font-normal transition-colors duration-200",
+              activeMode === "learn" 
+                ? "bg-dashboard-text text-dashboard-bg hover:bg-dashboard-text/90" 
+                : "text-dashboard-text-secondary hover:text-dashboard-text hover:bg-dashboard-card-hover"
+            )}
+          >
             <GraduationCap className="h-4 w-4" />
             Learn+
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => setActiveMode(activeMode === "search" ? null : "search")} className={cn("h-8 px-3 rounded-full flex items-center gap-1 font-normal transition-colors duration-200", activeMode === "search" ? "bg-white text-black hover:bg-white/90" : "text-gray-400 hover:text-white hover:bg-white/5")}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setActiveMode(activeMode === "search" ? null : "search")} 
+            className={cn(
+              "h-8 px-3 rounded-full flex items-center gap-1 font-normal transition-colors duration-200",
+              activeMode === "search" 
+                ? "bg-dashboard-text text-dashboard-bg hover:bg-dashboard-text/90" 
+                : "text-dashboard-text-secondary hover:text-dashboard-text hover:bg-dashboard-card-hover"
+            )}
+          >
             <Search className="h-4 w-4" />
             Search
           </Button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default AIChat;
