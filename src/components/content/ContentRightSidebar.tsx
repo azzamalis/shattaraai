@@ -180,7 +180,7 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
         
         <TabsContent value="exams" className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
-            <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
+            <div className="flex flex-col items-center justify-start pt-8 h-full min-h-[400px]">
               <QuizPreferences />
             </div>
           </ScrollArea>
