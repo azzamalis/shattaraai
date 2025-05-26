@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RoomView } from '@/components/dashboard/RoomView';
@@ -121,10 +120,10 @@ export default function RoomPage() {
         <RoomHeroSection title={room.title} description={room.description} />
         
         {/* Room Title, Description and Action Buttons */}
-        <div className="px-6 py-8 bg-dashboard-bg">
+        <div className="px-4 py-8 bg-dashboard-bg">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between">
-              <div className="flex items-start gap-2 flex-1 min-w-0" style={{ marginLeft: '52px' }}>
+              <div className="flex items-start gap-2 flex-1 min-w-0">
                 <div className="flex-1 min-w-0">
                   <div className="group">
                     <div className="flex items-center gap-3 mb-2">
