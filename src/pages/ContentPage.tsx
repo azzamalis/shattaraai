@@ -4,7 +4,6 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ContentLeftSidebar } from '@/components/content/ContentLeftSidebar';
 import { ContentRightSidebar } from '@/components/content/ContentRightSidebar';
-import { ContentHeader } from '@/components/content/ContentHeader';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 
 export type ContentType = 'recording' | 'pdf' | 'video' | 'youtube' | 'upload' | 'paste' | 'website';
@@ -91,15 +90,8 @@ export default function ContentPage() {
   };
 
   return (
-    <DashboardLayout className="p-0">
-      <div className="flex flex-col h-screen bg-black text-white dark">
-        <ContentHeader 
-          contentData={contentData}
-          onUpdateContent={updateContentData}
-          isRecording={isRecording}
-          recordingTime={formatTime(recordingTime)}
-        />
-        
+    <DashboardLayout className="p-0" contentData={contentData} onUpdateContent={updateContentData}>
+      <div className="flex flex-col h-screen bg-dashboard-bg text-dashboard-text">
         <div className="flex-1 overflow-hidden">
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel defaultSize={50} minSize={25} maxSize={60}>
@@ -115,7 +107,7 @@ export default function ContentPage() {
               />
             </ResizablePanel>
             
-            <ResizableHandle withHandle className="bg-zinc-700" />
+            <ResizableHandle withHandle className="bg-dashboard-separator" />
             
             <ResizablePanel defaultSize={50} minSize={40}>
               <ContentRightSidebar contentData={contentData} />
