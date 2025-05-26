@@ -90,12 +90,12 @@ export default function ContentPage() {
 
   return (
     <DashboardLayout 
-      className="p-0" 
+      className="content-page-layout p-0"
       contentData={contentData}
       onUpdateContent={updateContentData}
     >
-      <div className="flex flex-col h-screen bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-300">
-        <div className="flex-1 overflow-hidden pt-0 px-4 md:px-6">
+      <div className="flex flex-col h-[calc(100vh-64px)] bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-300">
+        <div className="h-full px-4 md:px-6">
           <ResizablePanelGroup 
             direction="horizontal"
             className="h-full"

@@ -6,6 +6,8 @@ import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
 import { ContentData } from '@/pages/ContentPage';
+import { cn } from '@/lib/utils';
+
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -16,6 +18,7 @@ interface ContentLeftSidebarProps {
   onMicrophoneSelect: (value: string) => void;
   onMicrophoneClear?: () => void;
 }
+
 export function ContentLeftSidebar({
   contentData,
   onUpdateContent,
@@ -27,6 +30,7 @@ export function ContentLeftSidebar({
   onMicrophoneClear
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
+
   const renderControls = () => {
     if (contentData.type === 'recording') {
       return <>
@@ -42,6 +46,7 @@ export function ContentLeftSidebar({
         <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
       </div>;
   };
+
   const renderTabContent = () => {
     const hasContent = contentData.type === 'recording' ? isRecording : !!contentData.url || !!contentData.filePath;
     return <>
@@ -80,18 +85,65 @@ export function ContentLeftSidebar({
         </TabsContent>
       </>;
   };
+
   return <div className="h-full flex flex-col min-h-0 bg-black">
       {renderControls()}
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-[#222222]">
-        <TabsList className="w-full border-b border-white/10 p-0 h-12 px-4 gap-6 mb-2 shrink-0 bg-[#222222]">
-          <TabsTrigger value="chapters" className="flex-1 h-full rounded-none bg-transparent text-white/70 hover:text-white data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-white/70 data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-2 flex items-center justify-center">
-            <ListTodo className="h-[18px] w-[18px] mr-2.5 flex-shrink-0" />
-            <span className="text-[14px] font-medium tracking-[-0.1px]">Chapters</span>
+        <TabsList className={cn(
+          "w-fit justify-start gap-1 p-1 h-12 shrink-0 ml-4",
+          "bg-[#1D1D1D] transition-colors duration-200",
+          "rounded-xl flex"
+        )}>
+          <TabsTrigger 
+            value="chapters"
+            className={cn(
+              "h-full rounded-md flex items-center gap-2",
+              "px-6",
+              "text-sm font-medium",
+              "text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary",
+              "data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-[#121212]",
+              "data-[state=active]:shadow-none",
+              "transition-colors duration-200",
+              "focus-visible:ring-0 focus-visible:ring-offset-0",
+              "focus:ring-0 focus:ring-offset-0",
+              "ring-0 ring-offset-0",
+              "border-0 outline-none",
+              "data-[state=active]:ring-0",
+              "data-[state=active]:ring-offset-0",
+              "data-[state=active]:border-0",
+              "data-[state=active]:outline-none"
+            )}
+          >
+            <ListTodo className="h-[14px] w-[14px]" />
+            <span>Chapters</span>
           </TabsTrigger>
-          <TabsTrigger value="transcripts" className="flex-1 h-full rounded-none bg-transparent text-white/70 hover:text-white data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-white/70 data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-2 flex items-center justify-center">
-            <AlignLeft className="h-[18px] w-[18px] mr-2.5 flex-shrink-0" />
-            <span className="text-[14px] font-medium tracking-[-0.1px]">Transcripts</span>
+          <TabsTrigger 
+            value="transcripts"
+            className={cn(
+              "h-full rounded-md flex items-center gap-2",
+              "px-6",
+              "text-sm font-medium",
+              "text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary",
+              "data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-[#121212]",
+              "data-[state=active]:shadow-none",
+              "transition-colors duration-200",
+              "focus-visible:ring-0 focus-visible:ring-offset-0",
+              "focus:ring-0 focus:ring-offset-0",
+              "ring-0 ring-offset-0",
+              "border-0 outline-none",
+              "data-[state=active]:ring-0",
+              "data-[state=active]:ring-offset-0",
+              "data-[state=active]:border-0",
+              "data-[state=active]:outline-none"
+            )}
+          >
+            <AlignLeft className="h-[14px] w-[14px]" />
+            <span>Transcripts</span>
           </TabsTrigger>
         </TabsList>
 

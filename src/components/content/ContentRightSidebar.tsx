@@ -17,15 +17,15 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
   const [isRecording, setIsRecording] = useState(false);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col content-right-sidebar">
       <Tabs 
         defaultValue="chat" 
         onValueChange={setActiveTab} 
-        className="flex-1 flex flex-col h-full"
+        className="h-full flex flex-col"
       >
         <TabsList className={cn(
           "w-full justify-start gap-1 p-1 h-12 shrink-0",
-          "bg-[#1D1D1D] hover:bg-[#1D1D1D]/90 transition-colors duration-200",
+          "bg-[#1D1D1D] transition-colors duration-200",
           "rounded-xl"
         )}>
           <TabsTrigger 
@@ -33,10 +33,12 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary hover:text-dashboard-text transition-colors",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary",
               "data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-[#121212]",
               "data-[state=active]:shadow-none",
+              "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
               "focus:ring-0 focus:ring-offset-0",
               "ring-0 ring-offset-0",
@@ -47,8 +49,8 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
               "data-[state=active]:outline-none"
             )}
           >
-            <MessageCircle className="h-4 w-4" />
-            Chat
+            <MessageCircle className="h-[14px] w-[14px]" />
+            <span>Chat</span>
           </TabsTrigger>
           
           <TabsTrigger 
@@ -56,10 +58,12 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary hover:text-dashboard-text transition-colors",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary",
               "data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-[#121212]",
               "data-[state=active]:shadow-none",
+              "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
               "focus:ring-0 focus:ring-offset-0",
               "ring-0 ring-offset-0",
@@ -70,8 +74,8 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
               "data-[state=active]:outline-none"
             )}
           >
-            <FileStack className="h-4 w-4" />
-            Flashcards
+            <FileStack className="h-[14px] w-[14px]" />
+            <span>Flashcards</span>
           </TabsTrigger>
           
           <TabsTrigger 
@@ -79,10 +83,12 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary hover:text-dashboard-text transition-colors",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary",
               "data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-[#121212]",
               "data-[state=active]:shadow-none",
+              "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
               "focus:ring-0 focus:ring-offset-0",
               "ring-0 ring-offset-0",
@@ -93,8 +99,8 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
               "data-[state=active]:outline-none"
             )}
           >
-            <Brain className="h-4 w-4" />
-            Exams
+            <Brain className="h-[14px] w-[14px]" />
+            <span>Exams</span>
           </TabsTrigger>
           
           <TabsTrigger 
@@ -102,10 +108,12 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary hover:text-dashboard-text transition-colors",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary",
               "data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-[#121212]",
               "data-[state=active]:shadow-none",
+              "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
               "focus:ring-0 focus:ring-offset-0",
               "ring-0 ring-offset-0",
@@ -116,8 +124,8 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
               "data-[state=active]:outline-none"
             )}
           >
-            <BookOpen className="h-4 w-4" />
-            Summary
+            <BookOpen className="h-[14px] w-[14px]" />
+            <span>Summary</span>
           </TabsTrigger>
           
           <TabsTrigger 
@@ -125,10 +133,12 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary hover:text-dashboard-text transition-colors",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary",
               "data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-[#121212]",
               "data-[state=active]:shadow-none",
+              "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
               "focus:ring-0 focus:ring-offset-0",
               "ring-0 ring-offset-0",
@@ -139,12 +149,18 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
               "data-[state=active]:outline-none"
             )}
           >
-            <FileText className="h-4 w-4" />
-            Notes
+            <FileText className="h-[14px] w-[14px]" />
+            <span>Notes</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="chat" className="flex-1 overflow-hidden">
+        <TabsContent 
+          value="chat" 
+          className={cn(
+            "flex-1 overflow-hidden mt-0",
+            "content-page-tab-content"
+          )}
+        >
           <AIChat />
         </TabsContent>
         

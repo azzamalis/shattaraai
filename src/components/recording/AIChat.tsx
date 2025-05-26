@@ -99,10 +99,10 @@ const AIChat = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 min-h-0">
+    <div className="flex flex-col h-full relative">
+      <div className="absolute inset-0 bottom-[140px] overflow-hidden">
         <ScrollArea className="h-full">
-          <div className="p-4 h-full bg-dashboard-bg dark:bg-dashboard-bg">
+          <div className="p-4 bg-transparent">
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center min-h-[400px] text-center">
                 <div className="h-16 w-16 mb-4 flex items-center justify-center text-dashboard-text-secondary">
@@ -140,78 +140,120 @@ const AIChat = () => {
         </ScrollArea>
       </div>
 
-      <div className="flex flex-col gap-2 p-4 border-t border-dashboard-separator shrink-0 bg-dashboard-bg dark:bg-dashboard-bg">
-        <div className="flex items-center gap-2">
-          <Input 
-            value={inputValue} 
-            onChange={e => setInputValue(e.target.value)} 
-            onKeyDown={handleKeyPress} 
-            placeholder="Ask anything..." 
-            className={cn(
-              "flex-1 bg-dashboard-card dark:bg-dashboard-card",
-              "text-dashboard-text border-dashboard-separator",
-              "rounded-lg focus:border-dashboard-text/20",
-              "focus:ring-0 focus:outline-none",
-              "placeholder:text-dashboard-text-secondary h-10"
-            )}
-          />
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-10 w-10 text-dashboard-text-secondary hover:text-dashboard-text hover:bg-dashboard-card-hover rounded-lg"
-          >
-            <Paperclip className="h-5 w-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className={cn(
-              "h-10 w-10 hover:bg-dashboard-card-hover rounded-lg",
-              isRecording ? "text-red-500" : "text-dashboard-text-secondary hover:text-dashboard-text"
-            )}
-            onClick={toggleRecording}
-          >
-            <AudioWaveform className="h-5 w-5" />
-          </Button>
-          <Button 
-            onClick={handleSendMessage} 
-            size="icon" 
-            disabled={!inputValue.trim()} 
-            className="h-10 w-10 text-dashboard-text hover:bg-dashboard-card-hover rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Send className="h-5 w-5" />
-          </Button>
-        </div>
+      <div className="absolute bottom-0 left-0 right-0">
+        <div className="flex flex-col px-6 py-4">
+          {/* Message Input Row */}
+          <div className="flex items-center gap-3 mb-2">
+            <Input 
+              value={inputValue} 
+              onChange={e => setInputValue(e.target.value)} 
+              onKeyDown={handleKeyPress} 
+              placeholder="Ask anything..." 
+              className={cn(
+                "flex-1",
+                "h-12",
+                "px-4 py-2",
+                "text-[#FAFAFA]",
+                "bg-transparent",
+                "border border-[#333333]",
+                "rounded-lg",
+                "transition-all duration-200",
+                "focus:border-[#404040]",
+                "focus:ring-0 focus:outline-none",
+                "hover:border-[#404040]",
+                "placeholder:text-[#666666]"
+              )}
+            />
+            
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={cn(
+                  "h-12 w-12",
+                  "text-[#666666]",
+                  "hover:text-[#FAFAFA]",
+                  "hover:bg-[#1A1A1A]",
+                  "rounded-lg",
+                  "transition-colors duration-200"
+                )}
+              >
+                <Paperclip className="h-5 w-5" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={cn(
+                  "h-12 w-12",
+                  "text-[#666666]",
+                  "hover:text-[#FAFAFA]",
+                  "hover:bg-[#1A1A1A]",
+                  "rounded-lg",
+                  "transition-colors duration-200",
+                  isRecording && "text-red-500"
+                )}
+                onClick={toggleRecording}
+              >
+                <AudioWaveform className="h-5 w-5" />
+              </Button>
+              <Button 
+                onClick={handleSendMessage} 
+                size="icon" 
+                disabled={!inputValue.trim()} 
+                className={cn(
+                  "h-12 w-12",
+                  "text-[#FAFAFA]",
+                  "bg-[#1A1A1A]",
+                  "hover:bg-[#242424]",
+                  "rounded-lg",
+                  "transition-colors duration-200",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setActiveMode(activeMode === "learn" ? null : "learn")} 
-            className={cn(
-              "h-8 px-3 rounded-full flex items-center gap-1 font-normal transition-colors duration-200",
-              activeMode === "learn" 
-                ? "bg-dashboard-text text-dashboard-bg hover:bg-dashboard-text/90" 
-                : "text-dashboard-text-secondary hover:text-dashboard-text hover:bg-dashboard-card-hover"
-            )}
-          >
-            <GraduationCap className="h-4 w-4" />
-            Learn+
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setActiveMode(activeMode === "search" ? null : "search")} 
-            className={cn(
-              "h-8 px-3 rounded-full flex items-center gap-1 font-normal transition-colors duration-200",
-              activeMode === "search" 
-                ? "bg-dashboard-text text-dashboard-bg hover:bg-dashboard-text/90" 
-                : "text-dashboard-text-secondary hover:text-dashboard-text hover:bg-dashboard-card-hover"
-            )}
-          >
-            <Search className="h-4 w-4" />
-            Search
-          </Button>
+          {/* Toggle Buttons Row */}
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setActiveMode(activeMode === "learn" ? null : "learn")} 
+              className={cn(
+                "h-8 px-3 rounded-full",
+                "flex items-center gap-1.5",
+                "text-sm font-normal",
+                "transition-colors duration-200",
+                activeMode === "learn" 
+                  ? "bg-[#FAFAFA] text-[#121212]" 
+                  : "text-[#666666] hover:text-[#FAFAFA] hover:bg-[#1A1A1A]"
+              )}
+            >
+              <GraduationCap className="h-4 w-4" />
+              Learn+
+            </Button>
+
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setActiveMode(activeMode === "search" ? null : "search")} 
+              className={cn(
+                "h-8 px-3 rounded-full",
+                "flex items-center gap-1.5",
+                "text-sm font-normal",
+                "transition-colors duration-200",
+                activeMode === "search" 
+                  ? "bg-[#FAFAFA] text-[#121212]" 
+                  : "text-[#666666] hover:text-[#FAFAFA] hover:bg-[#1A1A1A]"
+              )}
+            >
+              <Search className="h-4 w-4" />
+              Search
+            </Button>
+          </div>
         </div>
       </div>
     </div>
