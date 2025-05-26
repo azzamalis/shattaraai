@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RoomView } from '@/components/dashboard/RoomView';
@@ -8,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, FileText, Pencil, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
+
 export default function RoomPage() {
   const {
     id
@@ -26,7 +28,7 @@ export default function RoomPage() {
 
   // State for AI Tutor Chat drawer
   const [isChatOpen, setIsChatOpen] = useState(false);
-
+  
   // State for Exam Prep modal
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
 
@@ -47,6 +49,7 @@ export default function RoomPage() {
     setEditedDescription(room.description);
     setIsEditing(true);
   };
+  
   const handleSave = () => {
     if (editedTitle.trim()) {
       // Update the room state
@@ -65,9 +68,11 @@ export default function RoomPage() {
       setIsEditing(false);
     }
   };
+  
   const handleCancel = () => {
     setIsEditing(false);
   };
+  
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSave();
@@ -75,13 +80,14 @@ export default function RoomPage() {
       handleCancel();
     }
   };
+
   return <DashboardLayout>
       <div className="flex flex-col h-screen overflow-hidden">
         {/* Hero Section at the top */}
         <RoomHeroSection title={room.title} description={room.description} />
         
         {/* Room Title, Description and Action Buttons */}
-        <div className="px-6 py-6 border-b border-white/10 bg-white">
+        <div className="px-6 py-6 border-b border-white/10 bg-black">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-start gap-2 flex-1">
               <div className="flex-1 min-w-0">
@@ -116,22 +122,29 @@ export default function RoomPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 ml-4">
-              <Button variant="outline" className="
+              <Button 
+                variant="outline" 
+                className="
                   border-white/10 hover:border-white/20
                   bg-transparent hover:bg-transparent
                   text-white hover:text-white
                   transition-colors duration-200
                   [&:hover>svg]:text-white [&>svg]:text-white
-                " onClick={() => setIsChatOpen(true)}>
+                "
+                onClick={() => setIsChatOpen(true)}
+              >
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Room Chat
               </Button>
-              <Button className="
+              <Button 
+                className="
                   bg-[#1a1a1a] hover:bg-[#1a1a1a]
                   text-white
                   border border-transparent hover:border-white/10
                   transition-colors duration-200
-                " onClick={() => setIsExamModalOpen(true)}>
+                "
+                onClick={() => setIsExamModalOpen(true)}
+              >
                 <FileText className="mr-2 h-4 w-4" />
                 Create Exam
               </Button>

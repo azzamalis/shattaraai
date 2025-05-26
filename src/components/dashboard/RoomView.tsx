@@ -49,7 +49,7 @@ export function RoomView({
         </header>}
 
       <main className="flex-1 overflow-auto">
-        <div className="flex flex-col items-center justify-center h-full text-center bg-white">
+        <div className="flex flex-col items-center justify-center h-full text-center bg-black">
           <FileText className="h-12 w-12 text-white/40 mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">No documents yet</h2>
           <p className="text-gray-400 max-w-md">

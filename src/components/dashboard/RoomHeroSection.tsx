@@ -27,7 +27,7 @@ export function RoomHeroSection({
     toast.success("Your question was submitted");
     console.log("AI query:", value);
   };
-  return <div className="w-full border-b border-white/10 px-4 py-6 md:py-8 bg-white">
+  return <div className="w-full border-b border-white/10 px-4 py-6 md:py-8 bg-black">
       <div className="mx-auto max-w-6xl">
         <div className="mb-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">
