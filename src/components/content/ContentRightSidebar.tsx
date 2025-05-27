@@ -172,7 +172,7 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             <ScrollArea className="h-full">
               <div className={cn(
                 "flex flex-col items-center justify-center h-full min-h-[400px]",
-                "text-dashboard-text-secondary dark:text-dashboard-text-secondary space-y-4 p-8"
+                "text-dashboard-text/60 dark:text-dashboard-text-secondary space-y-4 p-8"
               )}>
                 <FileStack className="h-12 w-12 mb-2" />
                 <p className="text-center max-w-md text-base">
@@ -198,7 +198,7 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             <ScrollArea className="h-full">
               <div className={cn(
                 "flex flex-col items-center justify-center h-full min-h-[400px]",
-                "text-dashboard-text-secondary dark:text-dashboard-text-secondary space-y-4 p-8"
+                "text-dashboard-text/60 dark:text-dashboard-text-secondary space-y-4 p-8"
               )}>
                 <BookOpen className="h-12 w-12 mb-2" />
                 <p className="text-center max-w-md text-base">

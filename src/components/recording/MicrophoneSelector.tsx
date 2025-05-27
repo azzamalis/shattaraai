@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { X } from 'lucide-react';
 
@@ -21,18 +22,18 @@ export function MicrophoneSelector({ selected, onSelect, onClear }: MicrophoneSe
       <select
         value={selected}
         onChange={e => onSelect(e.target.value)}
-        className="bg-transparent text-white text-sm px-0 py-0 focus:outline-none focus:ring-0 border-none w-auto"
+        className="bg-transparent text-dashboard-text/70 dark:text-white text-sm px-0 py-0 focus:outline-none focus:ring-0 border-none w-auto"
         style={{ boxShadow: 'none', appearance: 'none' }}
       >
         {microphones.map(mic => (
-          <option key={mic} value={mic} className="bg-black text-white">
+          <option key={mic} value={mic} className="bg-dashboard-card dark:bg-black text-dashboard-text dark:text-white">
             {mic}
           </option>
         ))}
       </select>
       {selected && onClear && (
         <button
-          className="text-white/70 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"
+          className="text-dashboard-text-secondary/70 dark:text-white/70 hover:text-dashboard-text dark:hover:text-white p-1 rounded-full hover:bg-dashboard-card-hover/50 dark:hover:bg-white/10 transition-colors"
           onClick={onClear}
         >
           <X className="h-4 w-4" />
