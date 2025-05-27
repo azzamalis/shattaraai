@@ -41,7 +41,7 @@ const Pricing = () => {
       ],
     },
     {
-      name: "Premium",
+      name: "Pro",
       price: {
         monthly: 20,
         yearly: 144, // $12/month when paid yearly
