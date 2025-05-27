@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -16,6 +17,9 @@ export interface ContentData {
   filename?: string;
   text?: string;
   metadata?: Record<string, any>;
+  isProcessing?: boolean;
+  hasError?: boolean;
+  errorMessage?: string;
 }
 
 export default function ContentPage() {
@@ -33,6 +37,8 @@ export default function ContentPage() {
     url,
     filename,
     text,
+    isProcessing: false,
+    hasError: false,
   });
 
   const [isRecording, setIsRecording] = useState(false);
@@ -62,6 +68,20 @@ export default function ContentPage() {
       text,
     }));
   }, [type, url, filename, text]);
+
+  // Simulate content processing for non-recording types
+  useEffect(() => {
+    if (contentData.type !== 'recording' && (contentData.url || contentData.filePath || contentData.text)) {
+      setContentData(prev => ({ ...prev, isProcessing: true }));
+      
+      // Simulate processing delay
+      const timer = setTimeout(() => {
+        setContentData(prev => ({ ...prev, isProcessing: false }));
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [contentData.type, contentData.url, contentData.filePath, contentData.text]);
 
   const toggleRecording = () => {
     if (!isRecording) {
@@ -95,10 +115,10 @@ export default function ContentPage() {
       onUpdateContent={updateContentData}
     >
       <div className="flex flex-col h-[calc(100vh-64px)] bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-300">
-        <div className="h-full px-4 md:px-6">
+        <div className="h-full px-4 md:px-6 py-4">
           <ResizablePanelGroup 
             direction="horizontal"
-            className="h-full"
+            className="h-full gap-4"
           >
             <ResizablePanel 
               defaultSize={50} 
@@ -120,7 +140,7 @@ export default function ContentPage() {
             
             <ResizableHandle 
               withHandle 
-              className="mx-2"
+              className="w-1"
             >
               <div className="w-1 h-10 bg-dashboard-separator dark:bg-dashboard-separator rounded-full transition-colors duration-200" />
             </ResizableHandle>
@@ -128,7 +148,7 @@ export default function ContentPage() {
             <ResizablePanel 
               defaultSize={50} 
               minSize={40}
-              className="bg-dashboard-card dark:bg-dashboard-card rounded-lg"
+              className="bg-dashboard-card dark:bg-dashboard-card rounded-lg border border-dashboard-separator dark:border-dashboard-separator"
             >
               <ContentRightSidebar contentData={contentData} />
             </ResizablePanel>

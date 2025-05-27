@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,15 +18,15 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
   const [isRecording, setIsRecording] = useState(false);
 
   return (
-    <div className="h-full flex flex-col content-right-sidebar">
+    <div className="h-full flex flex-col content-right-sidebar bg-dashboard-card dark:bg-dashboard-card">
       <Tabs 
         defaultValue="chat" 
         onValueChange={setActiveTab} 
         className="h-full flex flex-col"
       >
         <TabsList className={cn(
-          "w-full justify-start gap-1 p-1 h-12 shrink-0",
-          "bg-[#1D1D1D] transition-colors duration-200",
+          "w-full justify-start gap-1 p-1 h-12 shrink-0 m-4 mb-0",
+          "bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-200",
           "rounded-xl"
         )}>
           <TabsTrigger 
@@ -33,10 +34,10 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
+              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
               "data-[state=active]:shadow-none",
               "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
@@ -58,10 +59,10 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
+              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
               "data-[state=active]:shadow-none",
               "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
@@ -83,10 +84,10 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
+              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
               "data-[state=active]:shadow-none",
               "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
@@ -108,10 +109,10 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
+              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
               "data-[state=active]:shadow-none",
               "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
@@ -133,10 +134,10 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
             className={cn(
               "flex-1 h-full rounded-md flex items-center justify-center gap-2",
               "text-sm font-medium",
-              "text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-[#121212]",
+              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
+              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
+              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
+              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
               "data-[state=active]:shadow-none",
               "transition-colors duration-200",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
@@ -157,51 +158,61 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
         <TabsContent 
           value="chat" 
           className={cn(
-            "flex-1 overflow-hidden mt-0",
+            "flex-1 overflow-hidden mt-0 mx-4 mb-4",
             "content-page-tab-content"
           )}
         >
-          <AIChat />
+          <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+            <AIChat />
+          </div>
         </TabsContent>
         
-        <TabsContent value="flashcards" className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className={cn(
-              "flex flex-col items-center justify-center h-full min-h-[screen]",
-              "text-dashboard-text-secondary space-y-4 p-4"
-            )}>
-              <FileStack className="h-12 w-12 mb-2" />
-              <p className="text-center max-w-md text-base">
-                Ready to review the key concepts? I've got flashcards lined up to make memorization quick and easy.
-              </p>
-            </div>
-          </ScrollArea>
+        <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
+          <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+            <ScrollArea className="h-full">
+              <div className={cn(
+                "flex flex-col items-center justify-center h-full min-h-[400px]",
+                "text-dashboard-text-secondary dark:text-dashboard-text-secondary space-y-4 p-8"
+              )}>
+                <FileStack className="h-12 w-12 mb-2" />
+                <p className="text-center max-w-md text-base">
+                  Ready to review the key concepts? I've got flashcards lined up to make memorization quick and easy.
+                </p>
+              </div>
+            </ScrollArea>
+          </div>
         </TabsContent>
         
-        <TabsContent value="exams" className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="flex flex-col items-center justify-start pt-8 h-full min-h-[400px]">
-              <QuizPreferences />
-            </div>
-          </ScrollArea>
+        <TabsContent value="exams" className="flex-1 overflow-hidden mx-4 mb-4">
+          <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+            <ScrollArea className="h-full">
+              <div className="flex flex-col items-center justify-start pt-8 h-full min-h-[400px]">
+                <QuizPreferences />
+              </div>
+            </ScrollArea>
+          </div>
         </TabsContent>
         
-        <TabsContent value="summary" className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className={cn(
-              "flex flex-col items-center justify-center h-full min-h-[400px]",
-              "text-dashboard-text-secondary space-y-4 p-4"
-            )}>
-              <BookOpen className="h-12 w-12 mb-2" />
-              <p className="text-center max-w-md text-base">
-                Want the short version before diving deep? I've prepped a crisp summary to save you time and focus your attention.
-              </p>
-            </div>
-          </ScrollArea>
+        <TabsContent value="summary" className="flex-1 overflow-hidden mx-4 mb-4">
+          <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+            <ScrollArea className="h-full">
+              <div className={cn(
+                "flex flex-col items-center justify-center h-full min-h-[400px]",
+                "text-dashboard-text-secondary dark:text-dashboard-text-secondary space-y-4 p-8"
+              )}>
+                <BookOpen className="h-12 w-12 mb-2" />
+                <p className="text-center max-w-md text-base">
+                  Want the short version before diving deep? I've prepped a crisp summary to save you time and focus your attention.
+                </p>
+              </div>
+            </ScrollArea>
+          </div>
         </TabsContent>
         
-        <TabsContent value="notes" className="flex-1 overflow-hidden">
-          <Notes isRecording={isRecording} />
+        <TabsContent value="notes" className="flex-1 overflow-hidden mx-4 mb-4">
+          <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+            <Notes isRecording={isRecording} />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
