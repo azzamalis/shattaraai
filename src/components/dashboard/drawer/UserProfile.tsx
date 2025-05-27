@@ -71,7 +71,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           >
             <Link to="/pricing">
               <Tag size={16} className="mr-3 text-dashboard-text-secondary dark:text-dashboard-text-secondary" />
-              <span>Upgrade Plan</span>
+              <span>Pricing</span>
             </Link>
           </Button>
           
