@@ -32,6 +32,9 @@ export function ContentLeftSidebar({
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
 
+  // Check if we should hide tabs (for PDF content)
+  const shouldHideTabs = contentData.type === 'pdf';
+
   const renderControls = () => {
     if (contentData.type === 'recording') {
       return <>
@@ -43,7 +46,10 @@ export function ContentLeftSidebar({
           </div>
         </>;
     }
-    return <div className="p-4 shrink-0 bg-dashboard-card dark:bg-dashboard-card">
+    return <div className={cn(
+        "p-4 shrink-0 bg-dashboard-card dark:bg-dashboard-card",
+        shouldHideTabs && "flex-1" // Make content viewer take full height for PDF
+      )}>
         <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
       </div>;
   };
@@ -85,6 +91,14 @@ export function ContentLeftSidebar({
       </>;
   };
 
+  // If it's PDF content, render without tabs
+  if (shouldHideTabs) {
+    return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
+        {renderControls()}
+      </div>;
+  }
+
+  // Default layout with tabs for other content types
   return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
       {renderControls()}
       

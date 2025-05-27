@@ -13,7 +13,7 @@ export function ContentViewer({ contentData, onUpdateContent }: ContentViewerPro
     switch (contentData.type) {
       case 'pdf':
         return (
-          <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
+          <div className="w-full h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
             {contentData.url || contentData.filePath ? (
               <iframe
                 src={contentData.url || contentData.filePath}
@@ -34,7 +34,7 @@ export function ContentViewer({ contentData, onUpdateContent }: ContentViewerPro
       
       case 'video':
         return (
-          <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+          <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
             {contentData.url || contentData.filePath ? (
               <video
                 src={contentData.url || contentData.filePath}
@@ -55,7 +55,7 @@ export function ContentViewer({ contentData, onUpdateContent }: ContentViewerPro
       
       case 'youtube':
         return (
-          <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+          <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
             {contentData.url ? (
               <iframe
                 src={`https://www.youtube.com/embed/${extractYouTubeId(contentData.url)}`}
