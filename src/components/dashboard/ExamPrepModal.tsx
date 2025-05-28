@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, ClipboardPaste, ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { Upload, ClipboardPaste, ArrowLeft, ArrowRight, Check, FileText, Video, Headphones } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ExamPrepModalProps {
@@ -16,7 +16,6 @@ interface ContentItem {
   id: string;
   title: string;
   type: 'video' | 'document' | 'audio' | 'text';
-  thumbnail: string;
   isSelected: boolean;
 }
 
@@ -30,28 +29,24 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
       id: '1',
       title: 'The British Empire',
       type: 'video',
-      thumbnail: '/thumbnails/british-empire.jpg',
       isSelected: false
     },
     {
       id: '2',
       title: 'Think Fast, Talk Smart',
       type: 'video',
-      thumbnail: '/thumbnails/think-fast.jpg',
       isSelected: false
     },
     {
       id: '3',
       title: 'Understanding Applied Psychology',
       type: 'document',
-      thumbnail: '/thumbnails/psychology.jpg',
       isSelected: false
     },
     {
       id: '4',
       title: 'Social Class',
       type: 'text',
-      thumbnail: '/thumbnails/social-class.jpg',
       isSelected: false
     }
   ]);
@@ -94,6 +89,19 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
     ));
   };
 
+  const getContentIcon = (type: string) => {
+    switch (type) {
+      case 'video':
+        return <Video className="h-4 w-4 text-[#A6A6A6]" />;
+      case 'document':
+        return <FileText className="h-4 w-4 text-[#A6A6A6]" />;
+      case 'audio':
+        return <Headphones className="h-4 w-4 text-[#A6A6A6]" />;
+      default:
+        return <FileText className="h-4 w-4 text-[#A6A6A6]" />;
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl bg-black border border-white/10 p-0 rounded-lg">
@@ -119,32 +127,32 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
               <h2 className="text-2xl font-bold text-white mb-2">Choose contents to have for your exam below</h2>
               <p className="text-[#A6A6A6] mb-8">An exam will be generated based on these contents</p>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                {contentItems.map(item => (
-                  <div 
-                    key={item.id}
-                    className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group"
-                    onClick={() => toggleItemSelection(item.id)}
-                  >
-                    <img 
-                      src={item.thumbnail} 
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/50 transition-opacity duration-200 group-hover:opacity-70" />
-                    <div className="absolute top-2 right-2">
+              <div className="max-w-2xl mx-auto mb-8">
+                <div className="space-y-3">
+                  {contentItems.map(item => (
+                    <div 
+                      key={item.id}
+                      className="flex items-center gap-4 p-4 rounded-lg border border-white/10 hover:border-white/20 transition-colors cursor-pointer"
+                      onClick={() => toggleItemSelection(item.id)}
+                    >
                       <div className={cn(
-                        "w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors duration-200",
-                        item.isSelected ? "bg-[#00a3ff] border-[#00a3ff]" : "border-white/50 bg-black/50"
+                        "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors duration-200",
+                        item.isSelected ? "bg-[#00a3ff] border-[#00a3ff]" : "border-white/50"
                       )}>
-                        {item.isSelected && <Check className="h-4 w-4 text-white" />}
+                        {item.isSelected && <Check className="h-3 w-3 text-white" />}
+                      </div>
+                      
+                      <div className="flex items-center gap-3 flex-1 text-left">
+                        {getContentIcon(item.type)}
+                        <span className="text-white font-medium">{item.title}</span>
+                      </div>
+                      
+                      <div className="text-xs text-[#A6A6A6] capitalize">
+                        {item.type}
                       </div>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-3">
-                      <h3 className="text-white text-sm font-medium truncate">{item.title}</h3>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
               
               <div className="flex justify-between items-center">
