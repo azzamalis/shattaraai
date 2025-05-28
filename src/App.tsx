@@ -23,6 +23,7 @@ import ContentPage from "./pages/ContentPage";
 import PricingPage from "./pages/PricingPage";
 import Profile from "./pages/Profile";
 import ReportsPage from "./pages/ReportsPage";
+import ExamLoadingPage from "./pages/ExamLoadingPage";
 import { ContentProvider } from "./contexts/ContentContext";
 import React from "react";
 
@@ -65,6 +66,7 @@ const App = () => {
               <Route path="/content/:id" element={<ContentPage />} />
               <Route path="/pricing" element={<PricingPage />} />
               <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/exam-loading" element={<ExamLoadingPage />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

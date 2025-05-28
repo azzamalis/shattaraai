@@ -3,6 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Loader2, Check } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 
+interface ExamLoadingScreenProps {
+  onComplete?: () => void;
+}
+
 const loadingSteps = [
   "Preparing your exam materials",
   "Analyzing existing contents", 
@@ -11,7 +15,7 @@ const loadingSteps = [
   "Reviewing final criteria"
 ];
 
-export function ExamLoadingScreen() {
+export function ExamLoadingScreen({ onComplete }: ExamLoadingScreenProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const { isDark } = useTheme();
@@ -43,6 +47,16 @@ export function ExamLoadingScreen() {
     };
   }, []);
 
+  // Handle completion when all steps are done
+  useEffect(() => {
+    if (completedSteps.length === loadingSteps.length && onComplete) {
+      const timer = setTimeout(() => {
+        onComplete();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [completedSteps.length, onComplete]);
+
   const getStepState = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
       return 'completed';
@@ -72,9 +86,9 @@ export function ExamLoadingScreen() {
     switch (state) {
       case 'loading':
       case 'completed':
-        return isDark ? 'text-white' : 'text-[#FAFAFA]';
+        return isDark ? 'text-white' : 'text-[#171717]';
       default:
-        return isDark ? 'text-[#171717]' : 'text-[#FDFDFD]';
+        return isDark ? 'text-[#A6A6A6]' : 'text-[#A6A6A6]';
     }
   };
 
