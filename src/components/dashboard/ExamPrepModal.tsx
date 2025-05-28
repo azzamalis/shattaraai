@@ -60,6 +60,15 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
+      // Save exam configuration to localStorage
+      const examConfig = {
+        selectedTopics: contentItems.filter(item => item.isSelected).map(item => item.title),
+        numQuestions,
+        questionType,
+        examLength
+      };
+      localStorage.setItem('examConfig', JSON.stringify(examConfig));
+      
       // Close modal and navigate to loading page
       onClose();
       navigate('/exam-loading');
@@ -261,7 +270,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                     <SelectContent className="bg-[#1A1A1A] border-white/10">
                       <SelectItem value="Both" className="text-white hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white">Both</SelectItem>
                       <SelectItem value="Multiple Choice" className="text-white hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white">Multiple Choice</SelectItem>
-                      <SelectItem value="Written" className="text-white hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white">Written</SelectItem>
+                      <SelectItem value="Free Writing" className="text-white hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white">Free Writing</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

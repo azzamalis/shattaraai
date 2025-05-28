@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Share2, SkipForward, Undo2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -40,7 +39,7 @@ interface ExamInterfaceProps {
 const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam }) => {
   const [answers, setAnswers] = useState<{[key: number]: any}>({});
   const [skippedQuestions, setSkippedQuestions] = useState(new Set<number>());
-  const [timeRemaining, setTimeRemaining] = useState(examConfig.duration * 60); // Convert minutes to seconds
+  const [timeRemaining, setTimeRemaining] = useState(examConfig.duration * 60);
   const [isSaving, setIsSaving] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<number | null>(null);
 
@@ -128,27 +127,40 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
         }
       ];
 
-      let questionPool: any[] = [];
+      let finalQuestions: any[] = [];
       
+      // Fixed logic to properly handle exam types
       if (config.examType === 'Multiple Choice') {
-        questionPool = [...multipleChoiceQuestions];
-        while (questionPool.length < config.numQuestions) {
-          questionPool = [...questionPool, ...multipleChoiceQuestions];
+        // Only multiple choice questions
+        const shuffled = [...multipleChoiceQuestions].sort(() => Math.random() - 0.5);
+        finalQuestions = shuffled.slice(0, Math.min(config.numQuestions, shuffled.length));
+        
+        // If we need more questions than available, repeat them
+        while (finalQuestions.length < config.numQuestions) {
+          const remaining = config.numQuestions - finalQuestions.length;
+          const additionalQuestions = shuffled.slice(0, remaining);
+          finalQuestions = [...finalQuestions, ...additionalQuestions];
         }
       } else if (config.examType === 'Free Writing') {
-        questionPool = [...freeTextQuestions];
-        while (questionPool.length < config.numQuestions) {
-          questionPool = [...questionPool, ...freeTextQuestions];
+        // Only free text questions
+        const shuffled = [...freeTextQuestions].sort(() => Math.random() - 0.5);
+        finalQuestions = shuffled.slice(0, Math.min(config.numQuestions, shuffled.length));
+        
+        // If we need more questions than available, repeat them
+        while (finalQuestions.length < config.numQuestions) {
+          const remaining = config.numQuestions - finalQuestions.length;
+          const additionalQuestions = shuffled.slice(0, remaining);
+          finalQuestions = [...finalQuestions, ...additionalQuestions];
         }
       } else {
-        const halfQuestions = Math.floor(config.numQuestions / 2);
-        const mcQuestions = multipleChoiceQuestions.slice(0, halfQuestions);
-        const ftQuestions = freeTextQuestions.slice(0, config.numQuestions - halfQuestions);
-        questionPool = [...mcQuestions, ...ftQuestions];
-        questionPool = questionPool.sort(() => Math.random() - 0.5);
+        // Mixed mode: Both types
+        const halfQuestions = Math.ceil(config.numQuestions / 2);
+        const mcQuestions = [...multipleChoiceQuestions].sort(() => Math.random() - 0.5).slice(0, halfQuestions);
+        const ftQuestions = [...freeTextQuestions].sort(() => Math.random() - 0.5).slice(0, config.numQuestions - halfQuestions);
+        finalQuestions = [...mcQuestions, ...ftQuestions].sort(() => Math.random() - 0.5);
       }
 
-      return questionPool.slice(0, config.numQuestions).map((q, index) => ({
+      return finalQuestions.slice(0, config.numQuestions).map((q, index) => ({
         ...q,
         id: index + 1,
         type: q.type as 'multiple-choice' | 'free-text'
@@ -165,9 +177,9 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Progress calculation - count both answered and skipped questions
+  // Fixed progress calculation
   const totalCompletedQuestions = Object.keys(answers).length + skippedQuestions.size;
-  const progressPercentage = (totalCompletedQuestions / questions.length) * 100;
+  const progressPercentage = Math.min((totalCompletedQuestions / questions.length) * 100, 100);
 
   // Auto-save function with debounce (separate from state update)
   const debouncedAutoSave = useCallback(
@@ -209,12 +221,21 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
 
   // Timer logic
   useEffect(() => {
+    if (timeRemaining <= 0) return;
+    
     const timer = setInterval(() => {
-      setTimeRemaining(prev => prev > 0 ? prev - 1 : 0);
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          // Auto-submit when time runs out
+          handleSubmitExam();
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
     
     return () => clearInterval(timer);
-  }, []);
+  }, [timeRemaining]);
 
   const handleSubmitExam = () => {
     onSubmitExam(questions, answers, skippedQuestions);
@@ -310,9 +331,9 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
             Share exam
           </button>
           
-          {/* Center: Progress Bar */}
+          {/* Center: Fixed Progress Bar */}
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">0</span>
+            <span className="text-sm text-gray-400">{totalCompletedQuestions}</span>
             <div className="h-2 w-96 rounded-full bg-gray-700">
               <div 
                 className="h-full rounded-full bg-blue-500 transition-all duration-300" 
@@ -322,8 +343,10 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
             <span className="text-sm text-gray-400">{questions.length}</span>
           </div>
           
-          {/* Right: Timer */}
-          <div className="font-mono text-lg">{formatTime(timeRemaining)}</div>
+          {/* Right: Timer with warning color when low */}
+          <div className={`font-mono text-lg ${timeRemaining < 300 ? 'text-red-400' : 'text-white'}`}>
+            {formatTime(timeRemaining)}
+          </div>
         </div>
       </header>
 
