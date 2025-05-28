@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, ClipboardPaste, ArrowLeft, ArrowRight, Check, FileText, Video, Headphones } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ExamLoadingScreen } from './ExamLoadingScreen';
 
 interface ExamPrepModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ interface ContentItem {
 
 export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
   const [step, setStep] = useState(1);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [numQuestions, setNumQuestions] = useState('25');
   const [examLength, setExamLength] = useState('60');
   const [questionType, setQuestionType] = useState('Both');
@@ -58,8 +60,8 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      // Handle exam creation here
-      onClose();
+      // Show loading screen instead of closing modal
+      setShowLoadingScreen(true);
     }
   };
   
@@ -101,6 +103,11 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
         return <FileText className="h-4 w-4 text-[#A6A6A6]" />;
     }
   };
+
+  // Show loading screen if triggered
+  if (showLoadingScreen) {
+    return <ExamLoadingScreen />;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
