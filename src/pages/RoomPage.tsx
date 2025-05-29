@@ -138,9 +138,10 @@ export default function RoomPage() {
         {/* Room Title, Description and Action Buttons */}
         <div className="px-4 py-8 bg-dashboard-bg">
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-start gap-2 flex-1 min-w-0">
-                <div className="flex-1 min-w-0">
+            <div className="flex flex-col gap-6">
+              {/* Title, Description and Buttons Section */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-start gap-2 flex-1 min-w-0">
                   <div className="group">
                     <div className="flex items-center gap-3 mb-2">
                       {isEditingTitle ? (
@@ -169,76 +170,80 @@ export default function RoomPage() {
                         </>
                       )}
                     </div>
-                    <div className="flex items-center gap-3">
-                      {isEditingDescription ? (
-                        <input 
-                          type="text" 
-                          value={editedDescription} 
-                          onChange={e => setEditedDescription(e.target.value)} 
-                          onKeyDown={handleDescriptionKeyDown}
-                          onClick={e => e.stopPropagation()}
-                          className="text-dashboard-text-secondary bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
-                          placeholder="Add a description" 
-                          autoFocus 
-                        />
-                      ) : (
-                        <>
-                          <p className="text-dashboard-text-secondary">
-                            {room.description || "No description"}
-                          </p>
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDescriptionEdit();
-                            }}
-                            className="p-1.5 text-dashboard-text/30 opacity-0 group-hover:opacity-100 hover:text-dashboard-text/70 transition-all duration-200"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    
+                    {isEditingDescription ? (
+                      <input 
+                        type="text" 
+                        value={editedDescription} 
+                        onChange={e => setEditedDescription(e.target.value)} 
+                        onKeyDown={handleDescriptionKeyDown}
+                        onClick={e => e.stopPropagation()}
+                        className="text-dashboard-text-secondary bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
+                        placeholder="Add a description" 
+                        autoFocus 
+                      />
+                    ) : (
+                      <>
+                        <p className="text-dashboard-text-secondary">
+                          {room.description || "No description"}
+                        </p>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDescriptionEdit();
+                          }}
+                          className="p-1.5 text-dashboard-text/30 opacity-0 group-hover:opacity-100 hover:text-dashboard-text/70 transition-all duration-200"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-4">
+                  <Button 
+                    variant="outline" 
+                    className="
+                      bg-transparent hover:bg-transparent
+                      text-[#121212] hover:text-[#121212]
+                      border-[#0A0A0A] hover:border-[#0A0A0A]
+                      dark:text-[#FAFAFA] dark:hover:text-[#FAFAFA]
+                      dark:border-[#232323] dark:hover:border-[#232323]
+                      transition-all duration-200
+                      hover:shadow-sm
+                    "
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsChatOpen(true);
+                    }}
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Room Chat
+                  </Button>
+                  <Button 
+                    className="
+                      bg-[#0A0A0A] hover:bg-[#0A0A0A]/90
+                      text-[#FAFAFA] hover:text-[#FAFAFA]
+                      dark:bg-[#FAFAFA] dark:hover:bg-[#FAFAFA]/90
+                      dark:text-[#171717] dark:hover:text-[#171717]
+                      transition-all duration-200
+                      hover:shadow-sm
+                    "
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsExamModalOpen(true);
+                    }}
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Create Exam
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-3 ml-4">
-                <Button 
-                  variant="outline" 
-                  className="
-                    bg-transparent hover:bg-transparent
-                    text-[#121212] hover:text-[#121212]
-                    border-[#0A0A0A] hover:border-[#0A0A0A]
-                    dark:text-[#FAFAFA] dark:hover:text-[#FAFAFA]
-                    dark:border-[#232323] dark:hover:border-[#232323]
-                    transition-all duration-200
-                    hover:shadow-sm
-                  "
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsChatOpen(true);
-                  }}
-                >
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Room Chat
-                </Button>
-                <Button 
-                  className="
-                    bg-[#0A0A0A] hover:bg-[#0A0A0A]/90
-                    text-[#FAFAFA] hover:text-[#FAFAFA]
-                    dark:bg-[#FAFAFA] dark:hover:bg-[#FAFAFA]/90
-                    dark:text-[#171717] dark:hover:text-[#171717]
-                    transition-all duration-200
-                    hover:shadow-sm
-                  "
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsExamModalOpen(true);
-                  }}
-                >
-                  <FileText className="mr-2 h-4 w-4" />
-                  Create Exam
-                </Button>
-              </div>
+
+              {/* Separator line after title, description, and buttons */}
+              <div className="w-full h-px bg-[#E5E5E5] dark:bg-[#262626]" />
             </div>
           </div>
         </div>
