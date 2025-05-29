@@ -151,7 +151,7 @@ export function RoomHeader({ room, onRoomUpdate, onChatClick, onExamClick }: Roo
         <div className="flex items-center gap-3">
           <Button 
             variant="outline" 
-            className="border-dashboard-separator bg-dashboard-card text-dashboard-text hover:bg-dashboard-card-hover"
+            className="bg-white dark:bg-[#FDFDFD] text-[#171717] border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-100"
             onClick={(e) => {
               e.stopPropagation();
               onChatClick();
@@ -162,13 +162,13 @@ export function RoomHeader({ room, onRoomUpdate, onChatClick, onExamClick }: Roo
           </Button>
           <Button 
             variant="outline" 
-            className="border-dashboard-separator bg-dashboard-card text-dashboard-text hover:bg-dashboard-card-hover"
+            className="bg-white dark:bg-[#FDFDFD] text-[#171717] border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-100"
           >
             <BarChart3 className="mr-2 h-4 w-4" />
             View Results
           </Button>
           <Button 
-            className="bg-primary hover:bg-primary/90 text-white"
+            className="bg-[#171717] dark:bg-[#171717] hover:bg-[#2a2a2a] dark:hover:bg-[#2a2a2a] text-white"
             onClick={(e) => {
               e.stopPropagation();
               onExamClick();
