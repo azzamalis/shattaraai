@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Share2, SkipForward, Undo2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 // Debounce utility function for auto-save only
 function debounce(func: (...args: any[]) => void, wait: number) {
@@ -42,6 +44,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
   const [timeRemaining, setTimeRemaining] = useState(examConfig.duration * 60);
   const [isSaving, setIsSaving] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   // Memoize the question generation to prevent re-rendering
   const questions = useMemo(() => {
@@ -238,7 +241,27 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
   }, [timeRemaining]);
 
   const handleSubmitExam = () => {
-    onSubmitExam(questions, answers, skippedQuestions);
+    // Save exam results to localStorage
+    const examResults = {
+      questions,
+      answers,
+      skippedQuestions: Array.from(skippedQuestions),
+      score: {
+        correct: questions.filter((q, index) => 
+          answers[index] === q.correctAnswer
+        ).length,
+        incorrect: questions.filter((q, index) => 
+          answers[index] !== undefined && answers[index] !== q.correctAnswer
+        ).length,
+        skipped: skippedQuestions.size,
+        total: questions.length
+      }
+    };
+    
+    localStorage.setItem('examResults', JSON.stringify(examResults));
+    
+    // Navigate to ExamResultsInterface first
+    navigate('/exam-results');
   };
 
   // Render individual question
@@ -247,7 +270,11 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
     const isAnswered = answers.hasOwnProperty(question.id);
 
     return (
-      <div key={question.id} className="mb-8 rounded-lg bg-gray-800 p-6">
+      <div key={question.id} className={cn(
+        "mb-8 rounded-lg p-6",
+        "bg-gray-50 dark:bg-gray-800",
+        "border border-gray-200 dark:border-gray-700"
+      )}>
         {!isSkipped ? (
           <>
             <div className="mb-8 flex items-start justify-between">
@@ -257,7 +284,11 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
               </div>
               <button 
                 onClick={() => handleSkip(question.id)}
-                className="flex items-center gap-1 text-sm text-gray-400 hover:text-white"
+                className={cn(
+                  "flex items-center gap-1 text-sm",
+                  "text-gray-500 dark:text-gray-400",
+                  "hover:text-gray-900 dark:hover:text-white"
+                )}
               >
                 <SkipForward className="h-4 w-4" />
                 Skip
@@ -271,11 +302,12 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
                   <button
                     key={index}
                     onClick={() => handleMultipleChoiceAnswer(question.id, index)}
-                    className={`w-full rounded-lg border p-4 text-left transition-colors ${
+                    className={cn(
+                      "w-full rounded-lg border p-4 text-left transition-colors",
                       answers[question.id] === index
-                        ? 'border-blue-500 bg-blue-900/10'
-                        : 'border-gray-600 bg-gray-700 hover:border-gray-500'
-                    }`}
+                        ? "border-primary bg-primary/10"
+                        : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500"
+                    )}
                   >
                     <span className="mr-3 font-medium">{String.fromCharCode(65 + index)}.</span>
                     {option}
@@ -290,7 +322,14 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
                   value={answers[question.id] || ''}
                   onChange={(e) => handleFreeTextChange(question.id, e.target.value)}
                   placeholder="Type your answer here..."
-                  className="min-h-32 w-full resize-none rounded-lg border border-gray-600 bg-gray-700 p-4 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className={cn(
+                    "min-h-32 w-full resize-none rounded-lg p-4",
+                    "border border-gray-200 dark:border-gray-600",
+                    "bg-white dark:bg-gray-700",
+                    "text-gray-900 dark:text-white",
+                    "placeholder-gray-400 dark:placeholder-gray-500",
+                    "focus:border-primary focus:ring-1 focus:ring-primary"
+                  )}
                 />
                 {isSaving && savingQuestionId === question.id && (
                   <div className="absolute bottom-2 right-2 text-xs text-gray-400">
@@ -321,57 +360,80 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className={cn(
+      "min-h-screen",
+      "bg-white dark:bg-gray-900",
+      "text-gray-900 dark:text-white"
+    )}>
       {/* Header - Sticky */}
-      <header className="sticky top-0 z-10 border-b border-gray-700 bg-gray-800">
+      <header className={cn(
+        "sticky top-0 z-10",
+        "border-b border-gray-200 dark:border-gray-700",
+        "bg-gray-50 dark:bg-gray-800"
+      )}>
         <div className="flex items-center justify-between px-6 py-3">
           {/* Left: Share Button */}
-          <button className="flex items-center gap-2 rounded-md bg-gray-700 px-3 py-2 text-sm hover:bg-gray-600">
+          <button className={cn(
+            "flex items-center gap-2 rounded-md",
+            "bg-gray-100 dark:bg-gray-700",
+            "hover:bg-gray-200 dark:hover:bg-gray-600",
+            "text-sm px-3 py-2"
+          )}>
             <Share2 className="h-4 w-4" />
             Share exam
           </button>
           
           {/* Center: Fixed Progress Bar */}
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">{totalCompletedQuestions}</span>
-            <div className="h-2 w-96 rounded-full bg-gray-700">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {totalCompletedQuestions}
+            </span>
+            <div className="h-2 w-96 rounded-full bg-gray-200 dark:bg-gray-700">
               <div 
-                className="h-full rounded-full bg-blue-500 transition-all duration-300" 
+                className="h-full rounded-full bg-primary transition-all duration-300" 
                 style={{width: `${progressPercentage}%`}}
               ></div>
             </div>
-            <span className="text-sm text-gray-400">{questions.length}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {questions.length}
+            </span>
           </div>
           
-          {/* Right: Timer with warning color when low */}
-          <div className={`font-mono text-lg ${timeRemaining < 300 ? 'text-red-400' : 'text-white'}`}>
+          {/* Right: Timer with warning color */}
+          <div className={cn(
+            "font-mono text-lg",
+            timeRemaining < 300 ? "text-red-500 dark:text-red-400" : "text-gray-900 dark:text-white"
+          )}>
             {formatTime(timeRemaining)}
           </div>
         </div>
       </header>
 
-      {/* Main Content - Scrollable */}
-      <main className="pb-24">
+      {/* Main Content */}
+      <main className="pb-12">
         <ScrollArea className="h-[calc(100vh-140px)]">
           <div className="px-6 py-8">
             <div className="mx-auto max-w-4xl">
               {questions.map(renderQuestion)}
+              
+              {/* Submit Button moved inside main content */}
+              <div className="mt-12">
+                <button 
+                  onClick={handleSubmitExam}
+                  className={cn(
+                    "w-full rounded-lg py-4 px-8 text-lg font-medium",
+                    "bg-primary text-white",
+                    "hover:bg-primary/90 transition-colors",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
+                >
+                  Submit Exam
+                </button>
+              </div>
             </div>
           </div>
         </ScrollArea>
       </main>
-
-      {/* Submit Button - Sticky Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 border-t border-gray-700 bg-gray-800 px-6 py-4">
-        <div className="mx-auto flex max-w-4xl justify-center">
-          <button 
-            onClick={handleSubmitExam}
-            className="rounded-lg bg-white py-4 px-8 text-lg font-medium text-black transition-colors hover:bg-gray-100"
-          >
-            Submit Exam
-          </button>
-        </div>
-      </footer>
     </div>
   );
 };

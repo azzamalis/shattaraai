@@ -1,6 +1,7 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Share2, MessageCircle, ChevronRight, RotateCcw, BarChart3, X, Send } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 interface Question {
   id: number;
@@ -16,14 +17,9 @@ interface Question {
   isSkipped?: boolean;
 }
 
-interface ChatMessage {
-  isUser: boolean;
-  content: string;
-}
-
 interface ExamResults {
   questions: Question[];
-  answers: { [key: number]: any };
+  answers: {[key: number]: any};
   skippedQuestions: Set<number>;
   score: {
     correct: number;
@@ -33,111 +29,137 @@ interface ExamResults {
   };
 }
 
+interface ChatMessage {
+  isUser: boolean;
+  content: string;
+}
+
+const DUMMY_EXAM_DATA = {
+  questions: [
+    {
+      id: 1,
+      type: 'multiple-choice',
+      question: 'What is the primary force responsible for the formation of stars?',
+      options: [
+        'Electromagnetic force',
+        'Gravitational force',
+        'Nuclear force',
+        'Centrifugal force'
+      ],
+      correctAnswer: 1,
+      userAnswer: 0,
+      explanation: 'Gravitational force is the primary force responsible for star formation. It causes clouds of gas and dust in space to collapse, leading to the formation of protostars and eventually stars. The intense pressure and temperature at the core, also a result of gravitational compression, enables nuclear fusion to begin.',
+      referenceTime: '2:15',
+      referenceSource: 'Stellar Formation Basics'
+    },
+    {
+      id: 2,
+      type: 'free-text',
+      question: 'Explain how scientists can detect and study black holes despite them not emitting light.',
+      userAnswer: 'asdfasasdf',
+      feedback: 'While your answer needs more detail, here\'s a comprehensive explanation: Scientists detect black holes through indirect methods such as: 1) Observing the gravitational effects on nearby stars and gas, 2) Detecting X-ray emissions from heated material falling into the black hole, 3) Gravitational lensing effects, and 4) Recently, through gravitational wave detection when black holes merge.',
+      referenceTime: '5:30',
+      referenceSource: 'Black Hole Detection Methods'
+    },
+    {
+      id: 3,
+      type: 'multiple-choice',
+      question: 'How does the size of a black hole affect the experience of traveling inside it?',
+      options: [
+        'Supermassive black holes kill instantly upon crossing the event horizon.',
+        'Larger black holes have stronger tidal forces that cause immediate death.',
+        'Smaller black holes kill before the event horizon; supermassive ones allow longer survival.',
+        'Smaller black holes allow for longer survival due to weaker gravity effects.'
+      ],
+      correctAnswer: 2,
+      userAnswer: 2,
+      explanation: 'Correct! In smaller black holes, tidal forces are much stronger near the event horizon, leading to "spaghettification" before reaching it. In supermassive black holes, these forces are relatively weaker at the event horizon, theoretically allowing for longer survival past this point, though eventual destruction is still certain.',
+      referenceTime: '8:45',
+      referenceSource: 'Black Hole Physics'
+    },
+    {
+      id: 4,
+      type: 'free-text',
+      question: 'Describe the process of nuclear fusion in stars and its role in stellar evolution.',
+      isSkipped: true,
+      feedback: 'Nuclear fusion in stars primarily involves the fusion of hydrogen nuclei into helium through the proton-proton chain reaction or CNO cycle. This process releases enormous energy, providing the outward pressure that balances the star\'s gravitational collapse. As stars age, they can fuse heavier elements, leading to different evolutionary stages. The type of fusion occurring in a star\'s core determines its position on the main sequence and its eventual fate.',
+      referenceTime: '12:20',
+      referenceSource: 'Stellar Evolution'
+    },
+    {
+      id: 5,
+      type: 'multiple-choice',
+      question: 'Which of the following best describes the relationship between a star\'s mass and its lifespan?',
+      options: [
+        'More massive stars live longer than less massive stars',
+        'A star\'s mass has no effect on its lifespan',
+        'Less massive stars live longer than more massive stars',
+        'All stars have approximately the same lifespan'
+      ],
+      correctAnswer: 2,
+      userAnswer: 1,
+      explanation: 'Incorrect. Less massive stars actually live longer than more massive stars. This is because massive stars burn through their nuclear fuel much more quickly due to the intense gravitational pressure and higher core temperatures. A low-mass red dwarf might live for trillions of years, while a very massive star might only live for a few million years.',
+      referenceTime: '15:10',
+      referenceSource: 'Stellar Lifespans'
+    }
+  ],
+  answers: {
+    1: 0,
+    2: 'asdfasasdf',
+    3: 2,
+    5: 1
+  },
+  skippedQuestions: [4],
+  score: {
+    correct: 1,
+    incorrect: 2,
+    skipped: 1,
+    total: 5
+  }
+};
+
 const ExamResultsInterface: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [currentChatQuestion, setCurrentChatQuestion] = useState<number | null>(null);
-  const chatMessagesRef = useRef<HTMLDivElement>(null);
+  const chatMessagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  // Sample data structure for testing
-  const examResults: ExamResults = {
-    questions: [
-      {
-        id: 1,
-        type: 'multiple-choice',
-        question: 'How does the size of a black hole affect the experience of traveling inside it?',
-        options: [
-          'Supermassive black holes kill instantly upon crossing the event horizon.',
-          'Larger black holes have stronger tidal forces that cause immediate death.',
-          'Smaller black holes kill before the event horizon; supermassive ones allow longer survival.',
-          'Smaller black holes allow for longer survival due to weaker gravity effects.'
-        ],
-        correctAnswer: 2,
-        userAnswer: 0,
-        explanation: 'This is correct because smaller black holes have stronger tidal forces near the event horizon that would be fatal quickly. In contrast, supermassive black holes have a less steep gravitational gradient, allowing longer survival inside before reaching the singularity.',
-        referenceTime: '03:38:',
-        referenceSource: 'Types and Sizes of Black H...'
-      },
-      {
-        id: 2,
-        type: 'multiple-choice',
-        question: 'What defines the event horizon of a black hole?',
-        options: [
-          'The region where gravitational pull is weakest and light can escape',
-          'The point at which the gravitational force is equal to the escape velocity of objects',
-          'The boundary beyond which nothing can escape, not even light',
-          'The area surrounding a black hole where matter is drawn in but not trapped'
-        ],
-        correctAnswer: 2,
-        userAnswer: 2,
-        explanation: 'Correct! The event horizon is the boundary around a black hole beyond which nothing, not even light, can escape due to the extreme gravitational pull.',
-        referenceTime: '01:15:',
-        referenceSource: 'Event Horizon Definition...'
-      },
-      {
-        id: 3,
-        type: 'multiple-choice',
-        question: 'What is the primary force responsible for the formation of stars?',
-        options: [
-          'Electromagnetic force',
-          'Gravitational force',
-          'Nuclear force',
-          'Centrifugal force'
-        ],
-        correctAnswer: 1,
-        userAnswer: 0,
-        explanation: 'Gravitational force is the primary force that causes gas and dust to collapse and form stars. While electromagnetic forces play a role, gravity is the dominant force in stellar formation.',
-        referenceTime: '02:22:',
-        referenceSource: 'Star Formation Process...'
-      },
-      {
-        id: 4,
-        type: 'free-text',
-        question: 'Explain the difference between the event horizon and the singularity in a black hole.',
-        userAnswer: 'The event horizon is the boundary around a black hole where nothing can escape, while the singularity is the center point where all matter is compressed.',
-        feedback: 'Good explanation! You correctly identified that the event horizon is the boundary beyond which escape is impossible, and the singularity is the theoretical point of infinite density at the center. You could expand on how the event horizon is observable while the singularity remains hidden.',
-        referenceTime: '01:45:',
-        referenceSource: 'Black Hole Structure...'
-      },
-      {
-        id: 5,
-        type: 'free-text',
-        question: 'Explain the two possible outcomes for a person after crossing the Event Horizon of a black hole.',
-        userAnswer: '',
-        feedback: 'After crossing the Event Horizon, one outcome is dying from tidal forces that stretch and destroy the body (spaghettification). The other hypothesized outcome is encountering a firewall, a theoretical boundary that would instantly destroy anything crossing it.',
-        referenceTime: '02:40:',
-        referenceSource: 'Effects of Falling into a Bla...',
-        isSkipped: true
-      },
-      {
-        id: 6,
-        type: 'multiple-choice',
-        question: 'Why is the singularity inside a black hole considered a theoretical challenge?',
-        options: [
-          'Because it is believed to be a portal to another universe or dimension',
-          'Because it may be infinitely dense and its nature is unknown',
-          'Because it is theorized to emit radiation that can be detected',
-          'Because it is surrounded by an event horizon that prevents observation'
-        ],
-        correctAnswer: 1,
-        userAnswer: 1,
-        explanation: 'The singularity is thought to concentrate all the black hole\'s mass into a single point with no volume or surface, leading to infinite density.',
-        referenceTime: '01:38:',
-        referenceSource: 'Event Horizon and Singular..'
-      }
-    ],
-    answers: { 1: 0, 2: 2, 3: 0, 4: 'The event horizon is the boundary around a black hole where nothing can escape, while the singularity is the center point where all matter is compressed.', 5: '', 6: 1 },
-    skippedQuestions: new Set([5]),
-    score: { correct: 3, incorrect: 2, skipped: 1, total: 6 }
-  };
-
-  // Auto-scroll chat to bottom
+  // Add dummy data when component mounts
   useEffect(() => {
-    if (chatMessagesRef.current) {
-      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+    if (!localStorage.getItem('examResults')) {
+      localStorage.setItem('examResults', JSON.stringify(DUMMY_EXAM_DATA));
     }
-  }, [chatMessages]);
+  }, []);
+
+  // Get exam results from localStorage
+  const examResults = (() => {
+    const savedResults = localStorage.getItem('examResults');
+    if (savedResults) {
+      const parsed = JSON.parse(savedResults);
+      return {
+        ...parsed,
+        skippedQuestions: new Set(parsed.skippedQuestions), // Convert array back to Set
+        score: {
+          ...parsed.score,
+          correct: Object.entries(parsed.answers).filter(([id, answer]) => {
+            const question = parsed.questions.find(q => q.id === parseInt(id));
+            return question?.type === 'multiple-choice' && answer === question.correctAnswer;
+          }).length,
+          incorrect: Object.entries(parsed.answers).filter(([id, answer]) => {
+            const question = parsed.questions.find(q => q.id === parseInt(id));
+            return question?.type === 'multiple-choice' && answer !== question.correctAnswer;
+          }).length,
+          skipped: parsed.skippedQuestions.length,
+          total: parsed.questions.length
+        }
+      };
+    }
+    // If no results found, redirect to exam page
+    navigate('/exam');
+    return null;
+  })();
 
   const openChatForQuestion = (questionId: number) => {
     setCurrentChatQuestion(questionId);
@@ -165,8 +187,9 @@ const ExamResultsInterface: React.FC = () => {
     setChatInput('');
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       sendMessage();
     }
   };
@@ -185,11 +208,11 @@ const ExamResultsInterface: React.FC = () => {
             borderColor = 'border-red-500';
             bgColor = 'bg-red-900/10';
           }
-          
+
           return (
             <div
               key={index}
-              className={`rounded-lg border p-4 ${borderColor} ${bgColor}`}
+              className={`w-full rounded-lg border p-4 ${borderColor} ${bgColor}`}
             >
               <span className="mr-3 font-medium">{String.fromCharCode(65 + index)}.</span>
               {option}
@@ -197,20 +220,23 @@ const ExamResultsInterface: React.FC = () => {
           );
         })}
         
-        <div className={`mt-4 rounded-lg p-4 ${
+        <div className={`mt-4 rounded-lg border p-4 ${
           question.userAnswer === question.correctAnswer 
-            ? 'bg-green-900/10 border border-green-500' 
-            : 'bg-red-900/10 border border-red-500'
+            ? 'border-green-500 bg-green-900/10' 
+            : 'border-red-500 bg-red-900/10'
         }`}>
-          <p className={`text-sm leading-relaxed ${
+          <div className={`mb-2 font-medium ${
             question.userAnswer === question.correctAnswer ? 'text-green-400' : 'text-red-400'
           }`}>
-            {question.explanation}
+            {question.userAnswer === question.correctAnswer ? 'Correct' : 'Incorrect'}
+          </div>
+          <p className="text-sm text-gray-300 leading-relaxed">
+            {question.explanation || 'Explanation not available for this question.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <p className="mt-2 text-xs text-gray-400">
+            <div className="mt-2 text-xs text-gray-400">
               Reference: {question.referenceTime} {question.referenceSource}
-            </p>
+            </div>
           )}
         </div>
       </div>
@@ -220,19 +246,19 @@ const ExamResultsInterface: React.FC = () => {
   const renderFreeTextAnswer = (question: Question) => {
     if (question.isSkipped) {
       return (
-        <div className="space-y-4">
-          <div className="rounded-lg border border-gray-600 bg-gray-800 p-4">
-            <p className="text-gray-400 italic">Question was skipped</p>
+        <div>
+          <div className="mb-4 rounded-lg border border-gray-600 bg-gray-800 p-4">
+            <div className="text-gray-500 italic">Question was skipped</div>
           </div>
-          
           <div className="rounded-lg border border-gray-600 bg-gray-800 p-4">
+            <div className="mb-2 font-medium text-gray-400">Suggested Answer</div>
             <p className="text-sm text-gray-300 leading-relaxed">
-              {question.feedback}
+              {question.feedback || 'Sample answer not available for this question.'}
             </p>
             {question.referenceTime && question.referenceSource && (
-              <p className="mt-2 text-xs text-gray-400">
+              <div className="mt-2 text-xs text-gray-400">
                 Reference: {question.referenceTime} {question.referenceSource}
-              </p>
+              </div>
             )}
           </div>
         </div>
@@ -240,19 +266,20 @@ const ExamResultsInterface: React.FC = () => {
     }
 
     return (
-      <div className="space-y-4">
-        <div className="rounded-lg border border-gray-600 bg-gray-700 p-4">
-          <p className="text-white leading-relaxed">{question.userAnswer}</p>
+      <div>
+        <div className="mb-4 rounded-lg border border-gray-600 bg-gray-800 p-4">
+          <div className="mb-2 text-sm text-gray-400">Your Answer:</div>
+          <div className="text-white">{question.userAnswer || 'No answer provided'}</div>
         </div>
-        
         <div className="rounded-lg border border-green-500 bg-green-900/10 p-4">
-          <p className="text-sm text-green-400 leading-relaxed">
-            {question.feedback}
+          <div className="mb-2 font-medium text-green-400">AI Feedback</div>
+          <p className="text-sm text-gray-300 leading-relaxed">
+            {question.feedback || 'Good effort! This type of question requires detailed explanation of the concepts involved.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <p className="mt-2 text-xs text-gray-400">
+            <div className="mt-2 text-xs text-gray-400">
               Reference: {question.referenceTime} {question.referenceSource}
-            </p>
+            </div>
           )}
         </div>
       </div>
@@ -266,6 +293,15 @@ const ExamResultsInterface: React.FC = () => {
       return renderFreeTextAnswer(question);
     }
   };
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+
+  if (!examResults) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -331,7 +367,10 @@ const ExamResultsInterface: React.FC = () => {
             <RotateCcw className="h-5 w-5" />
             Try Again
           </button>
-          <button className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white py-3 font-medium text-black hover:bg-gray-100">
+          <button 
+            onClick={() => navigate('/exam/results')}
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white py-3 font-medium text-black hover:bg-gray-100"
+          >
             <BarChart3 className="h-5 w-5" />
             View Results
           </button>
@@ -347,55 +386,48 @@ const ExamResultsInterface: React.FC = () => {
           />
           <div className="w-96 bg-gray-800 shadow-xl flex flex-col">
             {/* Header with close button */}
-            <div className="flex items-center justify-between border-b border-gray-700 px-6 py-4">
-              <h3 className="text-lg font-semibold">Space Chat</h3>
+            <div className="flex items-center justify-between border-b border-gray-700 p-4">
+              <h2 className="text-lg font-semibold">Space Chat</h2>
               <button 
                 onClick={() => setIsChatOpen(false)}
-                className="text-gray-400 hover:text-white"
+                className="rounded-md p-1 hover:bg-gray-700"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
             
             {/* Scrollable messages area */}
-            <div 
-              ref={chatMessagesRef}
-              className="flex-1 overflow-y-auto p-6 space-y-4"
-            >
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {chatMessages.map((message, index) => (
-                <div 
-                  key={index} 
-                  className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div 
-                    className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                      message.isUser 
-                        ? 'bg-white text-black' 
-                        : 'bg-transparent border border-gray-600 text-white'
-                    }`}
-                  >
-                    <p className="text-sm leading-relaxed">{message.content}</p>
+                <div key={index} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[80%] rounded-lg p-3 ${
+                    message.isUser 
+                      ? 'bg-white text-black' 
+                      : 'bg-transparent border border-gray-600 text-white'
+                  }`}>
+                    {message.content}
                   </div>
                 </div>
               ))}
+              <div ref={chatMessagesEndRef} />
             </div>
             
             {/* Input area at bottom */}
-            <div className="border-t border-gray-700 p-6">
-              <div className="flex gap-3">
-                <input 
-                  value={chatInput} 
-                  onChange={(e) => setChatInput(e.target.value)} 
-                  onKeyDown={handleKeyDown} 
-                  placeholder="Ask anything..." 
-                  className="flex-1 rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+            <div className="border-t border-gray-700 p-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask a question..."
+                  className="flex-1 rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                 />
                 <button 
-                  onClick={sendMessage} 
-                  disabled={!chatInput.trim()} 
-                  className="rounded-lg bg-blue-500 p-2 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={sendMessage}
+                  className="rounded-lg bg-blue-600 px-3 py-2 hover:bg-blue-700"
                 >
-                  <Send className="h-5 w-5" />
+                  <Send className="h-4 w-4" />
                 </button>
               </div>
             </div>

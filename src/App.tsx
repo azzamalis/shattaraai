@@ -24,6 +24,9 @@ import Profile from "./pages/Profile";
 import ReportsPage from "./pages/ReportsPage";
 import ExamLoadingPage from "./pages/ExamLoadingPage";
 import ExamPage from "./pages/ExamPage";
+import ExamResultsPage from "./pages/ExamResultsPage";
+import ExamResultsInterface from '@/components/dashboard/ExamResultsInterface';
+import { ExamResultsSummary } from '@/components/dashboard/ExamResultsSummary';
 import { ContentProvider } from "./contexts/ContentContext";
 import React from "react";
 
@@ -68,6 +71,8 @@ const App = () => {
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/exam-loading" element={<ExamLoadingPage />} />
               <Route path="/exam" element={<ExamPage />} />
+              <Route path="/exam-results" element={<ExamResultsInterface />} />
+              <Route path="/exam/results" element={<ExamResultsSummary />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

@@ -4,7 +4,7 @@ import { RoomView } from '@/components/dashboard/RoomView';
 import { RoomHeroSection } from '@/components/dashboard/RoomHeroSection';
 import { AITutorChatDrawer } from '@/components/dashboard/AITutorChatDrawer';
 import { ExamPrepModal } from '@/components/dashboard/ExamPrepModal';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, FileText, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
@@ -15,6 +15,8 @@ export default function RoomPage() {
   } = useParams<{
     id: string;
   }>();
+
+  const location = useLocation();
 
   // State for editing
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -41,6 +43,20 @@ export default function RoomPage() {
       description: id === "1" ? "Personal learning space" : id === "2" ? "" : id === "3" ? "Research and development" : ""
     };
     setRoom(fetchedRoom);
+  }, [id]);
+
+  // Handle exam modal trigger from exam summary
+  useEffect(() => {
+    if (location.state?.openExamModal) {
+      setIsExamModalOpen(true);
+      // Clear the state to prevent modal from reopening on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+
+  // Store room ID when entering the room
+  useEffect(() => {
+    localStorage.setItem('currentRoomId', id);
   }, [id]);
 
   // Initialize edited values when entering edit mode

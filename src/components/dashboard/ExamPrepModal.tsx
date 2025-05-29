@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Upload, ClipboardPaste, ArrowLeft, ArrowRight, Check, FileText, Video, Headphones } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@/hooks/useTheme';
 
 interface ExamPrepModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
   const [examLength, setExamLength] = useState('60');
   const [questionType, setQuestionType] = useState('Both');
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [contentItems, setContentItems] = useState<ContentItem[]>([
     {
       id: '1',
@@ -114,9 +116,30 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
     }
   };
 
+  const handleStartExam = () => {
+    // Save exam configuration to localStorage
+    const examConfig = {
+      selectedTopics: contentItems.filter(item => item.isSelected).map(item => item.title),
+      numQuestions,
+      questionType,
+      examLength
+    };
+    localStorage.setItem('examConfig', JSON.stringify(examConfig));
+    
+    // Close the modal
+    onClose();
+    
+    // Navigate to loading screen
+    navigate('/exam-loading');
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl bg-black border border-white/10 p-0 rounded-lg">
+      <DialogContent className={cn(
+        "max-w-4xl p-0 rounded-lg",
+        "bg-[#121212]",
+        "border border-white/10"
+      )}>
         <div className="p-6">
           {/* Progress bar */}
           <div className="flex justify-center mb-8">
@@ -126,7 +149,9 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                   key={index}
                   className={cn(
                     "h-1 flex-1 rounded-full transition-all duration-300",
-                    index + 1 <= step ? "bg-[#00a3ff]" : "bg-white/10"
+                    index + 1 <= step 
+                      ? "bg-primary"
+                      : "bg-white/10"
                   )}
                 />
               ))}
@@ -144,19 +169,26 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                   {contentItems.map(item => (
                     <div 
                       key={item.id}
-                      className="flex items-center gap-4 p-4 rounded-lg border border-white/10 hover:border-white/20 transition-colors cursor-pointer"
+                      className={cn(
+                        "flex items-center gap-4 p-4 rounded-lg",
+                        "border border-white/10",
+                        "hover:border-white/20",
+                        "transition-colors cursor-pointer"
+                      )}
                       onClick={() => toggleItemSelection(item.id)}
                     >
                       <div className={cn(
                         "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors duration-200",
-                        item.isSelected ? "bg-[#00a3ff] border-[#00a3ff]" : "border-white/50"
+                        item.isSelected 
+                          ? "bg-primary border-primary" 
+                          : "border-white/50"
                       )}>
                         {item.isSelected && <Check className="h-3 w-3 text-white" />}
                       </div>
                       
                       <div className="flex items-center gap-3 flex-1 text-left">
                         {getContentIcon(item.type)}
-                        <span className="text-white font-medium">{item.title}</span>
+                        <span className="font-medium text-white">{item.title}</span>
                       </div>
                       
                       <div className="text-xs text-[#A6A6A6] capitalize">
@@ -175,7 +207,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                   >
                     <div className={cn(
                       "w-5 h-5 rounded border flex items-center justify-center transition-colors duration-200",
-                      selectedCount === contentItems.length ? "bg-[#00a3ff] border-[#00a3ff]" : "border-white/50"
+                      selectedCount === contentItems.length ? "bg-primary border-primary" : "border-white/50"
                     )}>
                       {selectedCount === contentItems.length && <Check className="h-3 w-3 text-white" />}
                     </div>
@@ -185,7 +217,11 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                 <Button 
                   onClick={handleNext}
                   disabled={selectedCount === 0}
-                  className="bg-white text-black hover:bg-white/90 transition-colors px-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={cn(
+                    "bg-primary text-white",
+                    "hover:bg-primary/90 transition-colors px-4",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
                 >
                   Continue <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -196,20 +232,20 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
           {/* Step 2: Have a practice exam */}
           {step === 2 && (
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">Have a practice exam or cheatsheet for reference?</h2>
-              <p className="text-[#A6A6A6] mb-8">We will use this to make the exam as accurate as possible</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Have a practice exam or cheatsheet for reference?</h2>
+              <p className="text-gray-500 dark:text-[#A6A6A6] mb-8">We will use this to make the exam as accurate as possible</p>
               
               <div className="flex justify-center gap-6 mt-10 mb-20">
-                <div className="w-80 h-36 border border-white/10 rounded-lg p-4 flex flex-col items-center justify-center hover:border-white/20 transition-colors cursor-pointer">
-                  <Upload className="h-6 w-6 text-white mb-2" />
-                  <span className="text-white font-medium">Upload</span>
-                  <span className="text-[#A6A6A6] text-sm">File, Audio, Video</span>
+                <div className="w-80 h-36 border border-gray-200 dark:border-white/10 rounded-lg p-4 flex flex-col items-center justify-center hover:border-gray-300 dark:hover:border-white/20 transition-colors cursor-pointer">
+                  <Upload className="h-6 w-6 text-gray-900 dark:text-white mb-2" />
+                  <span className="font-medium text-gray-900 dark:text-white">Upload</span>
+                  <span className="text-gray-500 dark:text-[#A6A6A6] text-sm">File, Audio, Video</span>
                 </div>
                 
-                <div className="w-80 h-36 border border-white/10 rounded-lg p-4 flex flex-col items-center justify-center hover:border-white/20 transition-colors cursor-pointer">
-                  <ClipboardPaste className="h-6 w-6 text-white mb-2" />
-                  <span className="text-white font-medium">Paste</span>
-                  <span className="text-[#A6A6A6] text-sm">YouTube, Website, Text</span>
+                <div className="w-80 h-36 border border-gray-200 dark:border-white/10 rounded-lg p-4 flex flex-col items-center justify-center hover:border-gray-300 dark:hover:border-white/20 transition-colors cursor-pointer">
+                  <ClipboardPaste className="h-6 w-6 text-gray-900 dark:text-white mb-2" />
+                  <span className="font-medium text-gray-900 dark:text-white">Paste</span>
+                  <span className="text-gray-500 dark:text-[#A6A6A6] text-sm">YouTube, Website, Text</span>
                 </div>
               </div>
               
@@ -217,7 +253,10 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                 <Button 
                   onClick={handleBack}
                   variant="ghost" 
-                  className="text-white hover:bg-white/10 hover:text-white"
+                  className={cn(
+                    "text-gray-900 dark:text-white",
+                    "hover:bg-gray-100 dark:hover:bg-white/10"
+                  )}
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
@@ -226,13 +265,20 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                   <Button 
                     onClick={handleSkip}
                     variant="ghost" 
-                    className="text-white hover:bg-white/10 hover:text-white"
+                    className={cn(
+                      "text-gray-900 dark:text-white",
+                      "hover:bg-gray-100 dark:hover:bg-white/10"
+                    )}
                   >
                     Skip
                   </Button>
                   <Button 
                     onClick={handleNext}
-                    className="bg-white text-black hover:bg-white/90 transition-colors px-4"
+                    className={cn(
+                      "bg-primary text-white",
+                      "hover:bg-primary/90 transition-colors px-4",
+                      "disabled:opacity-50 disabled:cursor-not-allowed"
+                    )}
                   >
                     Continue <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -244,39 +290,39 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
           {/* Step 3: Choose your preference */}
           {step === 3 && (
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">Choose your preference</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Choose your preference</h2>
               
               <div className="grid grid-cols-2 gap-8 mt-8 mb-8 max-w-2xl mx-auto">
                 <div>
-                  <Label htmlFor="numQuestions" className="text-white flex items-center">
+                  <Label htmlFor="numQuestions" className="text-gray-900 dark:text-white flex items-center">
                     Number of Questions <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input 
                     id="numQuestions" 
                     value={numQuestions} 
                     onChange={(e) => setNumQuestions(e.target.value)} 
-                    className="bg-transparent border-white/10 text-white mt-2 h-12"
+                    className="bg-transparent border-gray-200 dark:border-white/10 text-gray-900 dark:text-white mt-2 h-12"
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="questionType" className="text-white flex items-center">
+                  <Label htmlFor="questionType" className="text-gray-900 dark:text-white flex items-center">
                     Question Type <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Select value={questionType} onValueChange={setQuestionType}>
-                    <SelectTrigger className="bg-transparent border-white/10 text-white mt-2 h-12">
+                    <SelectTrigger className="bg-transparent border-gray-200 dark:border-white/10 text-gray-900 dark:text-white mt-2 h-12">
                       <SelectValue placeholder="Select question type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1A1A1A] border-white/10">
-                      <SelectItem value="Both" className="text-white hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white">Both</SelectItem>
-                      <SelectItem value="Multiple Choice" className="text-white hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white">Multiple Choice</SelectItem>
-                      <SelectItem value="Free Writing" className="text-white hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white">Free Writing</SelectItem>
+                    <SelectContent className="bg-[#1A1A1A] border-gray-200 dark:border-white/10">
+                      <SelectItem value="Both" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 focus:bg-gray-100 dark:focus:bg-white/10 focus:text-gray-900">Both</SelectItem>
+                      <SelectItem value="Multiple Choice" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 focus:bg-gray-100 dark:focus:bg-white/10 focus:text-gray-900">Multiple Choice</SelectItem>
+                      <SelectItem value="Free Writing" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 focus:bg-gray-100 dark:focus:bg-white/10 focus:text-gray-900">Free Writing</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 <div className="col-span-2">
-                  <Label htmlFor="examLength" className="text-white">
+                  <Label htmlFor="examLength" className="text-gray-900 dark:text-white">
                     Exam Length (Minutes)
                   </Label>
                   <Input 
@@ -284,7 +330,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                     value={examLength} 
                     onChange={(e) => setExamLength(e.target.value)} 
                     placeholder="e.g. 60" 
-                    className="bg-transparent border-white/10 text-white mt-2 h-12"
+                    className="bg-transparent border-gray-200 dark:border-white/10 text-gray-900 dark:text-white mt-2 h-12"
                   />
                 </div>
               </div>
@@ -293,7 +339,10 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                 <Button 
                   onClick={handleBack}
                   variant="ghost" 
-                  className="text-white hover:bg-white/10 hover:text-white"
+                  className={cn(
+                    "text-gray-900 dark:text-white",
+                    "hover:bg-gray-100 dark:hover:bg-white/10"
+                  )}
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
@@ -302,15 +351,22 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                   <Button 
                     onClick={handleSkip}
                     variant="ghost" 
-                    className="text-white hover:bg-white/10 hover:text-white"
+                    className={cn(
+                      "text-gray-900 dark:text-white",
+                      "hover:bg-gray-100 dark:hover:bg-white/10"
+                    )}
                   >
                     Skip
                   </Button>
                   <Button 
-                    onClick={handleNext}
-                    className="bg-white text-black hover:bg-white/90 transition-colors px-4"
+                    onClick={handleStartExam}
+                    className={cn(
+                      "bg-primary text-white",
+                      "hover:bg-primary/90 transition-colors px-4",
+                      "disabled:opacity-50 disabled:cursor-not-allowed"
+                    )}
                   >
-                    Start <ArrowRight className="ml-2 h-4 w-4" />
+                    Start Exam
                   </Button>
                 </div>
               </div>

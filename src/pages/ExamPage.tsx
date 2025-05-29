@@ -1,8 +1,10 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ExamInterface from '@/components/dashboard/ExamInterface';
 
 export default function ExamPage() {
+  const navigate = useNavigate();
+
   // Get exam config from localStorage or navigation state
   const getExamConfig = () => {
     const savedConfig = localStorage.getItem('examConfig');
@@ -30,10 +32,23 @@ export default function ExamPage() {
   const examConfig = getExamConfig();
 
   const handleSubmitExam = (questions: any[], answers: {[key: number]: any}, skippedQuestions: Set<number>) => {
-    console.log('Exam submitted:', { questions, answers, skippedQuestions });
+    // Save exam results to localStorage for the results page
+    const examResults = {
+      questions,
+      answers,
+      skippedQuestions: Array.from(skippedQuestions),
+      score: {
+        total: questions.length,
+        // Add more score calculations here
+      }
+    };
+    localStorage.setItem('examResults', JSON.stringify(examResults));
+    
     // Clear exam config after submission
     localStorage.removeItem('examConfig');
-    // Handle exam submission logic here
+    
+    // Navigate to results page
+    navigate('/exam-results');
   };
 
   return (
