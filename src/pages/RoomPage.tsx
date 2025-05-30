@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RoomView } from '@/components/dashboard/RoomView';
@@ -10,15 +11,9 @@ import { MessageSquare, FileText, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function RoomPage() {
-  const {
-    id
-  } = useParams<{
-    id: string;
-  }>();
-
+  const { id } = useParams<{ id: string; }>();
   const location = useLocation();
 
-  // State for editing
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
@@ -28,16 +23,11 @@ export default function RoomPage() {
     description: ''
   });
 
-  // State for AI Tutor Chat drawer
   const [isChatOpen, setIsChatOpen] = useState(false);
-  
-  // State for Exam Prep modal
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
 
   // Fetch room data when component mounts
   useEffect(() => {
-    // In a real app, this would be an API call
-    // For now, we'll simulate some room data
     const fetchedRoom = {
       title: id === "1" ? "Azzam's Room" : id === "2" ? "Untitled Room" : id === "3" ? "Project 'Neom'" : "Untitled Room",
       description: id === "1" ? "Personal learning space" : id === "2" ? "" : id === "3" ? "Research and development" : ""
@@ -49,7 +39,6 @@ export default function RoomPage() {
   useEffect(() => {
     if (location.state?.openExamModal) {
       setIsExamModalOpen(true);
-      // Clear the state to prevent modal from reopening on refresh
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -59,7 +48,6 @@ export default function RoomPage() {
     localStorage.setItem('currentRoomId', id);
   }, [id]);
 
-  // Initialize edited values when entering edit mode
   const handleTitleEdit = () => {
     setEditedTitle(room.title);
     setIsEditingTitle(true);
@@ -72,25 +60,16 @@ export default function RoomPage() {
   
   const handleTitleSave = () => {
     if (editedTitle.trim()) {
-      setRoom(prev => ({
-        ...prev,
-        title: editedTitle.trim()
-      }));
+      setRoom(prev => ({ ...prev, title: editedTitle.trim() }));
       toast.success("Room title updated successfully");
     } else {
-      setRoom(prev => ({
-        ...prev,
-        title: "Untitled Room"
-      }));
+      setRoom(prev => ({ ...prev, title: "Untitled Room" }));
     }
     setIsEditingTitle(false);
   };
 
   const handleDescriptionSave = () => {
-    setRoom(prev => ({
-      ...prev,
-      description: editedDescription.trim()
-    }));
+    setRoom(prev => ({ ...prev, description: editedDescription.trim() }));
     toast.success("Room description updated successfully");
     setIsEditingDescription(false);
   };
@@ -119,7 +98,6 @@ export default function RoomPage() {
     }
   };
 
-  // Handle click outside to cancel editing
   const handleClickOutside = () => {
     if (isEditingTitle) {
       handleTitleCancel();
@@ -131,15 +109,12 @@ export default function RoomPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-screen overflow-hidden bg-dashboard-bg" onClick={handleClickOutside}>
-        {/* Hero Section at the top */}
+      <div className="flex flex-col h-screen overflow-hidden bg-background" onClick={handleClickOutside}>
         <RoomHeroSection title={room.title} description={room.description} />
         
-        {/* Room Title, Description and Action Buttons */}
-        <div className="px-4 py-8 bg-dashboard-bg">
+        <div className="px-4 py-8 bg-background">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col gap-6">
-              {/* Title, Description and Buttons Section */}
               <div className="flex items-center justify-between">
                 <div className="flex items-start gap-2 flex-1 min-w-0">
                   <div className="group">
@@ -151,19 +126,19 @@ export default function RoomPage() {
                           onChange={e => setEditedTitle(e.target.value)} 
                           onKeyDown={handleTitleKeyDown}
                           onClick={e => e.stopPropagation()}
-                          className="text-2xl font-bold text-dashboard-text bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
+                          className="text-2xl font-bold text-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
                           placeholder="Untitled Room" 
                           autoFocus 
                         />
                       ) : (
                         <>
-                          <h1 className="text-2xl font-bold text-dashboard-text">{room.title}</h1>
+                          <h1 className="text-2xl font-bold text-foreground">{room.title}</h1>
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
                               handleTitleEdit();
                             }}
-                            className="p-1.5 text-dashboard-text/30 opacity-0 group-hover:opacity-100 hover:text-dashboard-text/70 transition-all duration-200"
+                            className="p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground transition-all duration-200"
                           >
                             <Pencil className="h-4 w-4" />
                           </button>
@@ -178,13 +153,13 @@ export default function RoomPage() {
                         onChange={e => setEditedDescription(e.target.value)} 
                         onKeyDown={handleDescriptionKeyDown}
                         onClick={e => e.stopPropagation()}
-                        className="text-dashboard-text-secondary bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
+                        className="text-muted-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
                         placeholder="Add a description" 
                         autoFocus 
                       />
                     ) : (
                       <>
-                        <p className="text-dashboard-text-secondary">
+                        <p className="text-muted-foreground">
                           {room.description || "No description"}
                         </p>
                         <button 
@@ -192,7 +167,7 @@ export default function RoomPage() {
                             e.stopPropagation();
                             handleDescriptionEdit();
                           }}
-                          className="p-1.5 text-dashboard-text/30 opacity-0 group-hover:opacity-100 hover:text-dashboard-text/70 transition-all duration-200"
+                          className="p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground transition-all duration-200"
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
@@ -201,19 +176,10 @@ export default function RoomPage() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex items-center gap-4">
                   <Button 
                     variant="outline" 
-                    className="
-                      bg-transparent hover:bg-transparent
-                      text-[#121212] hover:text-[#121212]
-                      border-[#0A0A0A] hover:border-[#0A0A0A]
-                      dark:text-[#FAFAFA] dark:hover:text-[#FAFAFA]
-                      dark:border-[#232323] dark:hover:border-[#232323]
-                      transition-all duration-200
-                      hover:shadow-sm
-                    "
+                    className="component-base hover:bg-accent transition-all duration-200 hover:shadow-sm"
                     onClick={(e) => {
                       e.stopPropagation();
                       setIsChatOpen(true);
@@ -223,14 +189,7 @@ export default function RoomPage() {
                     Room Chat
                   </Button>
                   <Button 
-                    className="
-                      bg-[#0A0A0A] hover:bg-[#0A0A0A]/90
-                      text-[#FAFAFA] hover:text-[#FAFAFA]
-                      dark:bg-[#FAFAFA] dark:hover:bg-[#FAFAFA]/90
-                      dark:text-[#171717] dark:hover:text-[#171717]
-                      transition-all duration-200
-                      hover:shadow-sm
-                    "
+                    className="bg-foreground hover:bg-foreground/90 text-background hover:text-background transition-all duration-200 hover:shadow-sm"
                     onClick={(e) => {
                       e.stopPropagation();
                       setIsExamModalOpen(true);
@@ -242,19 +201,15 @@ export default function RoomPage() {
                 </div>
               </div>
 
-              {/* Separator line after title, description, and buttons */}
-              <div className="w-full h-px bg-[#E5E5E5] dark:bg-[#262626]" />
+              <div className="w-full h-px bg-border" />
             </div>
           </div>
         </div>
         
-        {/* Room Content */}
         <RoomView title={room.title} description={room.description} isEmpty={id === "physics"} hideHeader={true} />
         
-        {/* AI Tutor Chat Drawer */}
         <AITutorChatDrawer open={isChatOpen} onOpenChange={setIsChatOpen} />
         
-        {/* Exam Prep Modal */}
         <ExamPrepModal isOpen={isExamModalOpen} onClose={() => setIsExamModalOpen(false)} />
       </div>
     </DashboardLayout>

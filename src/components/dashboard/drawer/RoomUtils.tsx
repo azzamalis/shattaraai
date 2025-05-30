@@ -31,8 +31,8 @@ export const RoomItem: React.FC<RoomItemProps> = ({
       key={room.id} 
       variant="ghost" 
       className="w-full flex items-center justify-between gap-2 px-2 py-1.5 
-        text-dashboard-text hover:bg-dashboard-card-hover transition-colors duration-200
-        hover:text-dashboard-text group" 
+        text-foreground hover:bg-accent transition-colors duration-200
+        hover:text-foreground group" 
       onClick={() => onRoomClick(room.id)}
     >
       {editingRoomId === room.id ? (
@@ -41,32 +41,32 @@ export const RoomItem: React.FC<RoomItemProps> = ({
             type="text" 
             value={editedRoomName} 
             onChange={e => setEditedRoomName(e.target.value)} 
-            className="flex-1 bg-transparent border-none border-b border-dashboard-text text-dashboard-text outline-none focus:outline-none focus:ring-0 focus:border-none" 
-            style={{ borderBottom: '1px solid hsl(var(--dashboard-text))' }} 
+            className="flex-1 bg-transparent border-none border-b border-foreground text-foreground outline-none focus:outline-none focus:ring-0 focus:border-none" 
+            style={{ borderBottom: '1px solid hsl(var(--foreground))' }} 
             autoFocus 
             onKeyDown={e => {
               if (e.key === 'Enter') onSaveRename(e as any, room.id);
               if (e.key === 'Escape') onCancelRename(e as any);
             }} 
           />
-          <Button variant="ghost" size="icon" className="h-6 w-6 text-dashboard-text hover:bg-dashboard-card-hover" onClick={e => onSaveRename(e, room.id)}>
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-foreground hover:bg-accent" onClick={e => onSaveRename(e, room.id)}>
             <Check className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6 text-dashboard-text hover:bg-dashboard-card-hover" onClick={onCancelRename}>
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-foreground hover:bg-accent" onClick={onCancelRename}>
             <X className="h-4 w-4" />
           </Button>
         </div>
       ) : (
         <>
           <div className="flex items-center gap-2">
-            <Box className="h-4 w-4 text-dashboard-text-secondary" />
+            <Box className="h-4 w-4 text-muted-foreground" />
             <span className="flex-1 text-left truncate">{room.name}</span>
           </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-dashboard-text hover:bg-dashboard-card-hover" onClick={e => onRenameClick(e, room.id)}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-foreground hover:bg-accent" onClick={e => onRenameClick(e, room.id)}>
               <Pencil className="h-3 w-3" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-dashboard-text hover:bg-dashboard-card-hover" onClick={e => onDeleteClick(e, room.id)}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-foreground hover:bg-accent" onClick={e => onDeleteClick(e, room.id)}>
               <Trash2 className="h-3 w-3" />
             </Button>
           </div>

@@ -30,7 +30,6 @@ export function AITutorChatDrawer({
   const handleSendMessage = () => {
     if (!input.trim()) return;
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -39,7 +38,6 @@ export function AITutorChatDrawer({
     setMessages(prev => [...prev, userMessage]);
     setInput('');
 
-    // Simulate AI response
     setTimeout(() => {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -60,18 +58,17 @@ export function AITutorChatDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="right" 
-        className="w-full sm:w-[400px] p-0 border-l border-dashboard-separator bg-dashboard-bg"
+        className="w-full sm:w-[400px] p-0 border-l border-border bg-background"
         closeButton={false}
       >
         <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-dashboard-separator bg-dashboard-bg">
-            <h3 className="text-lg font-semibold text-dashboard-text">Learn with Shattara AI Tutor</h3>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background">
+            <h3 className="text-lg font-semibold text-foreground">Learn with Shattara AI Tutor</h3>
             <SheetClose asChild>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="text-dashboard-text-secondary hover:text-dashboard-text hover:bg-dashboard-card-hover transition-colors duration-200"
+                className="text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200"
               >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
@@ -79,8 +76,7 @@ export function AITutorChatDrawer({
             </SheetClose>
           </div>
           
-          {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-dashboard-bg">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-background">
             {messages.map(message => (
               <div 
                 key={message.id} 
@@ -89,8 +85,8 @@ export function AITutorChatDrawer({
                 <div 
                   className={`max-w-[80%] rounded-lg px-4 py-3 ${
                     message.role === 'user' 
-                      ? 'bg-[#00A3FF] text-white' 
-                      : 'bg-dashboard-card text-dashboard-text border border-dashboard-separator'
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'component-base'
                   }`}
                 >
                   <p className="text-sm leading-relaxed">{message.content}</p>
@@ -99,8 +95,7 @@ export function AITutorChatDrawer({
             ))}
           </div>
           
-          {/* Input Area */}
-          <div className="p-6 border-t border-dashboard-separator bg-dashboard-bg">
+          <div className="p-6 border-t border-border bg-background">
             <div className="flex gap-3">
               <Input 
                 value={input} 
@@ -108,10 +103,10 @@ export function AITutorChatDrawer({
                 onKeyDown={handleKeyDown} 
                 placeholder="Ask anything..." 
                 className="
-                  flex-1 border-dashboard-separator text-dashboard-text 
-                  placeholder:text-dashboard-text-secondary 
-                  bg-dashboard-card hover:bg-dashboard-card-hover
-                  focus:border-[#00A3FF] focus:ring-1 focus:ring-[#00A3FF] 
+                  flex-1 border-border text-foreground 
+                  placeholder:text-muted-foreground 
+                  bg-card hover:bg-accent
+                  focus:border-primary focus:ring-1 focus:ring-primary 
                   transition-all duration-200
                 " 
               />
@@ -119,7 +114,7 @@ export function AITutorChatDrawer({
                 onClick={handleSendMessage} 
                 disabled={!input.trim()} 
                 className="
-                  bg-[#00A3FF] text-white hover:bg-[#00A3FF]/90 
+                  bg-primary text-primary-foreground hover:bg-primary/90 
                   disabled:opacity-50 disabled:cursor-not-allowed
                   transition-all duration-200 hover:shadow-sm
                 "

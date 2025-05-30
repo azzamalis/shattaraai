@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -31,7 +32,6 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
   const [editedRoomName, setEditedRoomName] = useState("");
   const [showMoreRooms, setShowMoreRooms] = useState(false);
 
-  // Split rooms into visible and hidden
   const visibleRooms = rooms.slice(0, 3);
   const hiddenRooms = rooms.slice(3);
   const hasHiddenRooms = rooms.length > 3;
@@ -53,7 +53,6 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
     setDeleteModalOpen
   );
 
-  // Override handleSaveRename to include the onEditRoom callback
   const handleSaveRename = (e: React.MouseEvent, roomId: string) => {
     e.stopPropagation();
     if (editedRoomName.trim()) {
@@ -64,14 +63,14 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
 
   return (
     <div>
-      <h2 className="text-base font-semibold mb-4 text-dashboard-text dark:text-dashboard-text">Rooms</h2>
+      <h2 className="text-base font-semibold mb-4 text-foreground">Rooms</h2>
       
       <div className="space-y-2">
         <Button 
           variant="ghost" 
           className="w-full flex items-center justify-center gap-3 
-            bg-transparent border border-dashed border-dashboard-separator dark:border-dashboard-separator 
-            text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text
+            bg-transparent border border-dashed border-border 
+            text-foreground hover:bg-accent hover:text-foreground
             transition-colors duration-200 rounded-md py-3 mb-4" 
           onClick={onAddRoom}
         >
@@ -100,7 +99,7 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
               <Button 
                 variant="ghost" 
                 className="w-full flex items-center justify-between px-2 py-1.5 
-                  text-dashboard-text-secondary hover:bg-dashboard-card-hover hover:text-dashboard-text 
+                  text-muted-foreground hover:bg-accent hover:text-foreground 
                   transition-colors duration-200 group"
               >
                 <span className="flex items-center gap-2">
@@ -109,7 +108,7 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
                 </span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[calc(300px-2rem)] bg-dashboard-card border-dashboard-separator p-1" align="center" sideOffset={5}>
+            <PopoverContent className="w-[calc(300px-2rem)] bg-card border-border p-1" align="center" sideOffset={5}>
               <div className="space-y-1">
                 {hiddenRooms.map(room => (
                   <RoomItem
