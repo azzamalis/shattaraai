@@ -336,11 +336,16 @@
 @layer components {
   /* Dashboard-scoped component styling */
   .dashboard-layout .component-base {
-    @apply bg-card text-card-foreground border-border;
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid hsl(var(--border));
   }
   
   .dashboard-layout .card-enhanced {
-    @apply component-base hover:shadow-[var(--shadow-hover)] transition-all duration-200;
+    @apply hover:shadow-[var(--shadow-hover)] transition-all duration-200;
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid hsl(var(--border));
   }
   
   .dashboard-layout .hover-shadow {
