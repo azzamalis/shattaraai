@@ -1,3 +1,4 @@
+
 import React from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -78,6 +79,7 @@ export default function ReportsPage() {
                     fill="#00A3FF" 
                     radius={[6, 6, 0, 0]} 
                     opacity={0.8}
+                    className="hover:opacity-100 transition-opacity duration-200"
                   />
                 </BarChart>
               </ResponsiveContainer>
