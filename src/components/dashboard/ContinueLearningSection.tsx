@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { LearningCard } from './LearningCard';
 import { useContent } from '@/contexts/ContentContext';
@@ -15,9 +16,9 @@ export function ContinueLearningSection({ onDeleteCard, onShareCard }: ContinueL
     return (
       <div className="w-full mt-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium text-[#232323] dark:text-white transition-colors duration-200">Continue learning</h2>
+          <h2 className="text-lg font-medium text-foreground transition-colors duration-200">Continue learning</h2>
         </div>
-        <div className="text-gray-400 text-center py-8">
+        <div className="text-muted-foreground text-center py-8">
           No content yet. Upload, paste, or record something to get started!
         </div>
       </div>
@@ -27,8 +28,8 @@ export function ContinueLearningSection({ onDeleteCard, onShareCard }: ContinueL
   return (
     <div className="w-full mt-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium text-[#232323] dark:text-white transition-colors duration-200">Continue learning</h2>
-        <button className="text-sm text-gray-400 hover:text-white transition-colors">View all</button>
+        <h2 className="text-lg font-medium text-foreground transition-colors duration-200">Continue learning</h2>
+        <button className="text-sm text-muted-foreground hover:text-foreground transition-colors">View all</button>
       </div>
       
       <div className="relative">
@@ -46,8 +47,8 @@ export function ContinueLearningSection({ onDeleteCard, onShareCard }: ContinueL
           </CarouselContent>
           {content.length > 1 && (
             <>
-              <CarouselPrevious className="hidden md:flex -left-12 bg-[#1A1A1A] border-white/20 text-white hover:bg-[#2A2A2A]" />
-              <CarouselNext className="hidden md:flex -right-12 bg-[#1A1A1A] border-white/20 text-white hover:bg-[#2A2A2A]" />
+              <CarouselPrevious className="hidden md:flex -left-12 bg-card border-border text-foreground hover:bg-accent" />
+              <CarouselNext className="hidden md:flex -right-12 bg-card border-border text-foreground hover:bg-accent" />
             </>
           )}
         </Carousel>

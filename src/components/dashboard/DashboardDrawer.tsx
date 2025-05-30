@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -89,19 +90,19 @@ export function DashboardDrawer({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent 
           side="left" 
-          className={`${getDrawerWidth()} bg-dashboard-bg dark:bg-dashboard-bg p-0 flex flex-col border-r border-dashboard-separator dark:border-dashboard-separator`} 
+          className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r border-border`} 
           closeButton={false}
         >
           {/* Enhanced Header */}
-          <div className="flex items-center justify-between px-8 py-6 bg-dashboard-bg dark:bg-dashboard-bg shrink-0">
+          <div className="flex items-center justify-between px-8 py-6 bg-background shrink-0">
             <div className="flex items-center gap-3">
-              <Logo className="h-8 md:h-10 w-auto" textColor="text-dashboard-text dark:text-dashboard-text" />
+              <Logo className="h-8 md:h-10 w-auto" textColor="text-foreground" />
             </div>
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => onOpenChange(false)} 
-              className="text-dashboard-text dark:text-dashboard-text hover:text-dashboard-text dark:hover:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover rounded-full"
+              className="text-foreground hover:text-foreground hover:bg-accent rounded-full"
             >
               <ChevronsLeft size={22} />
               <span className="sr-only">Close sidebar</span>
@@ -115,8 +116,8 @@ export function DashboardDrawer({
                 <Button 
                   variant="ghost" 
                   className="w-full flex items-center justify-center gap-3 
-                    bg-transparent border border-dashed border-dashboard-separator dark:border-dashboard-separator 
-                    text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text
+                    bg-transparent border border-dashed border-border 
+                    text-foreground hover:bg-accent hover:text-foreground
                     transition-colors duration-200 rounded-md py-3" 
                   onClick={() => {
                     navigate('/dashboard');
