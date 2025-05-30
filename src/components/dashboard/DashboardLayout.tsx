@@ -25,7 +25,6 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const { isDark } = useTheme();
   
   // Room state management
   const [rooms, setRooms] = useState<Room[]>([
@@ -100,8 +99,7 @@ export function DashboardLayout({
   return (
     <ContentProvider>
       <div className={cn(
-        "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300",
-        isDark && "dark"
+        "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300"
       )}>
         <DashboardHeader 
           onOpenDrawer={() => setIsDrawerOpen(true)} 
