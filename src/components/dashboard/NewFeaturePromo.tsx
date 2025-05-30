@@ -25,19 +25,19 @@ export function NewFeaturePromo() {
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] bg-[#1A1A1A] border border-white/10 text-white p-0" align="center" sideOffset={5}>
+        <PopoverContent className="w-[200px] bg-card border-border text-foreground p-0" align="center" sideOffset={5}>
           <div className="py-2 px-1">
-            <div className="px-2 py-1.5 text-sm font-medium text-gray-400">Choose a Room</div>
-            <Button variant="ghost" className="w-full justify-start px-2 py-1.5 text-sm text-white hover:bg-white/10 hover:!text-white group">
-              <Box size={16} className="mr-2 text-gray-300 group-hover:text-white" />
+            <div className="px-2 py-1.5 text-sm font-medium text-muted-foreground">Choose a Room</div>
+            <Button variant="ghost" className="w-full justify-start px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-foreground group">
+              <Box size={16} className="mr-2 text-muted-foreground group-hover:text-foreground" />
               <span>Azzam's Room</span>
             </Button>
-            <Button variant="ghost" className="w-full justify-start px-2 py-1.5 text-sm text-white hover:bg-white/10 hover:!text-white group">
-              <Box size={16} className="mr-2 text-gray-300 group-hover:text-white" />
+            <Button variant="ghost" className="w-full justify-start px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-foreground group">
+              <Box size={16} className="mr-2 text-muted-foreground group-hover:text-foreground" />
               <span>Project 'Neom'</span>
             </Button>
-            <Button variant="ghost" className="w-full justify-start px-2 py-1.5 text-sm text-white hover:bg-white/10 hover:!text-white group">
-              <Box size={16} className="mr-2 text-gray-300 group-hover:text-white" />
+            <Button variant="ghost" className="w-full justify-start px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-foreground group">
+              <Box size={16} className="mr-2 text-muted-foreground group-hover:text-foreground" />
               <span>Untitled Room</span>
             </Button>
           </div>
