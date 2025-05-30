@@ -96,7 +96,7 @@ export function DashboardLayout({
 
   return (
     <ContentProvider>
-      <div className="flex min-h-screen w-full flex-col bg-dashboard-bg overflow-hidden transition-colors duration-300">
+      <div className="dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300">
         <DashboardHeader 
           onOpenDrawer={() => setIsDrawerOpen(true)} 
           contentData={contentData}
