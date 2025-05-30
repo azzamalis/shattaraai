@@ -1,22 +1,55 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
     
-    --card: 0 0% 29%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 99%;
+    --card-foreground: 0 0% 0%;
     
-    --popover: 0 0% 29%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 99%;
+    --popover-foreground: 0 0% 0%;
     
     --primary: 210 100% 50%;
     --primary-foreground: 0 0% 98%;
     
-    --secondary: 0 0% 20%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 0%;
+    
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 0%;
+    
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 221 14% 89%;
+    --input: 221 14% 89%;
+    --ring: 210 100% 50%;
+    
+    --radius: 0.5rem;
+  }
+
+  .dashboard-layout.dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 98%;
+    
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 0 0% 89%;
+    --primary-foreground: 0 0% 7%;
+    
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 98%;
     
     --muted: 0 0% 15%;
@@ -28,11 +61,9 @@
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 210 100% 50%;
-    
-    --radius: 0.5rem;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 89%;
   }
 }
 

@@ -63,10 +63,10 @@ export function History() {
           />
         </div>
         
-        <Card className="bg-dashboard-card border-dashboard-separator shadow-lg">
-          <CardHeader className="border-b border-dashboard-separator">
-            <CardTitle className="text-xl text-dashboard-text">Recent Activity</CardTitle>
-            <CardDescription className="text-dashboard-text-secondary">
+        <Card className="bg-card border-border shadow-lg">
+          <CardHeader className="border-b border-border">
+            <CardTitle className="text-xl text-foreground">Recent Activity</CardTitle>
+            <CardDescription className="text-muted-foreground">
               View and manage your recent interactions
             </CardDescription>
           </CardHeader>
@@ -90,7 +90,7 @@ export function History() {
                       e.preventDefault();
                       if (!isFirstPage) handlePageChange(currentPage - 1);
                     }}
-                    className={`${isFirstPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-dashboard-text hover:bg-dashboard-card-hover`}
+                    className={`${isFirstPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-foreground hover:bg-accent`}
                   />
                 </PaginationItem>
                 
@@ -103,7 +103,7 @@ export function History() {
                         handlePageChange(page);
                       }}
                       isActive={currentPage === page}
-                      className="text-dashboard-text hover:bg-dashboard-card-hover"
+                      className="text-foreground hover:bg-accent"
                     >
                       {page}
                     </PaginationLink>
@@ -117,7 +117,7 @@ export function History() {
                       e.preventDefault();
                       if (!isLastPage) handlePageChange(currentPage + 1);
                     }}
-                    className={`${isLastPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-dashboard-text hover:bg-dashboard-card-hover`}
+                    className={`${isLastPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-foreground hover:bg-accent`}
                   />
                 </PaginationItem>
               </PaginationContent>
