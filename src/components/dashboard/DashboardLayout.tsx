@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { DashboardHeader } from './DashboardHeader';
@@ -100,8 +99,7 @@ export function DashboardLayout({
   return (
     <ContentProvider>
       <div className={cn(
-        "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300",
-        isDark && "dark"
+        "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300"
       )}>
         <DashboardHeader 
           onOpenDrawer={() => setIsDrawerOpen(true)} 
