@@ -1,10 +1,11 @@
-
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Share2, X, RotateCcw, RefreshCw, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ChevronRight, Share2, X } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { useNavigate } from 'react-router-dom';
 import { ShareExamModal } from './ShareExamModal';
+import { CircularProgress } from './exam-results/CircularProgress';
+import { ChapterBreakdown } from './exam-results/ChapterBreakdown';
+import { ExamActionButtons } from './exam-results/ExamActionButtons';
 
 interface ChapterData {
   title: string;
@@ -38,45 +39,7 @@ const chapters: ChapterData[] = [
   { title: "Hawking Radiation and Black Hole Evaporation", timeRange: "04:04 - 05:31", correct: 0, total: 2 }
 ];
 
-const CircularProgress: React.FC<{ percentage: number }> = ({ percentage }) => {
-  const radius = 50;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-  return (
-    <div className="relative inline-flex items-center justify-center">
-      <svg className="transform -rotate-90" width="150" height="150">
-        <circle
-          className="stroke-border"
-          strokeWidth="8"
-          fill="transparent"
-          r={radius}
-          cx="75"
-          cy="75"
-        />
-        <circle
-          className="stroke-orange-500 transition-all duration-700 ease-in-out"
-          strokeWidth="8"
-          fill="transparent"
-          r={radius}
-          cx="75"
-          cy="75"
-          style={{
-            strokeDasharray: circumference,
-            strokeDashoffset: strokeDashoffset,
-          }}
-        />
-      </svg>
-      <div className="absolute flex flex-col items-center justify-center">
-        <span className="text-2xl font-bold text-foreground">{percentage.toFixed(1)}%</span>
-        <span className="text-sm text-muted-foreground">Score</span>
-      </div>
-    </div>
-  );
-};
-
 export function ExamResultsSummary() {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -177,76 +140,14 @@ export function ExamResultsSummary() {
         </div>
 
         {/* Content Breakdown */}
-        <div className="rounded-lg border border-border bg-card">
-          {/* Header */}
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex w-full items-center justify-between p-4 hover:bg-accent"
-          >
-            <div className="flex items-center gap-2 text-foreground">
-              <ChevronDown className={cn("h-5 w-5 transition-transform", !isExpanded && "-rotate-90")} />
-              <span>Black Holes Explained – From Birth to Death</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="h-2 w-24 overflow-hidden rounded-full bg-border">
-                <div 
-                  className="h-full bg-orange-500" 
-                  style={{ width: `${(examData.correctAnswers / examData.totalQuestions) * 100}%` }}
-                />
-              </div>
-              <span className="text-sm text-foreground">{examData.correctAnswers}/{examData.totalQuestions}</span>
-            </div>
-          </button>
-
-          {/* Expanded Content */}
-          {isExpanded && (
-            <div className="border-t border-border p-4">
-              <div className="space-y-4">
-                {chapters.map((chapter, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div>
-                      <div className="text-foreground">{chapter.title}</div>
-                      <div className="text-sm text-muted-foreground">{chapter.timeRange}</div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button className="rounded-md bg-yellow-400/10 px-3 py-1 text-sm text-yellow-400 hover:bg-yellow-400/20">
-                        Review ↗
-                      </button>
-                      <span className="text-sm text-muted-foreground">
-                        {chapter.correct}/{chapter.total}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        <ChapterBreakdown chapters={chapters} examData={examData} />
 
         {/* Action Buttons */}
-        <div className="mt-8 flex justify-center gap-4 pb-8">
-          <button 
-            onClick={handleTryAgain}
-            className="flex h-10 w-40 items-center justify-center gap-2 rounded-lg border border-border text-foreground hover:bg-accent"
-          >
-            <RefreshCw className="h-5 w-5" />
-            Try Again
-          </button>
-          <button 
-            onClick={handleRetake}
-            className="flex h-10 w-40 items-center justify-center gap-2 rounded-lg border border-border text-foreground hover:bg-accent"
-          >
-            <RotateCcw className="h-5 w-5" />
-            Retake Exam
-          </button>
-          <button 
-            onClick={handleCreateNew}
-            className="flex h-10 w-48 items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <Plus className="h-5 w-5" />
-            Create New Exam
-          </button>
-        </div>
+        <ExamActionButtons
+          onTryAgain={handleTryAgain}
+          onRetake={handleRetake}
+          onCreateNew={handleCreateNew}
+        />
       </main>
 
       {/* Share Modal */}

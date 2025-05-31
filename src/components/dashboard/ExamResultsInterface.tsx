@@ -1,8 +1,10 @@
-
-import React, { useState, useEffect, useRef } from 'react';
-import { Share2, MessageCircle, ChevronRight, RotateCcw, BarChart3, X, Send } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { ExamResultsHeader } from './exam-results-interface/ExamResultsHeader';
+import { ExamResultsFooter } from './exam-results-interface/ExamResultsFooter';
+import { ChatDrawer } from './exam-results-interface/ChatDrawer';
+import { AnswerBreakdown } from './exam-results-interface/AnswerBreakdown';
 
 interface Question {
   id: number;
@@ -28,11 +30,6 @@ interface ExamResults {
     skipped: number;
     total: number;
   };
-}
-
-interface ChatMessage {
-  isUser: boolean;
-  content: string;
 }
 
 const DUMMY_EXAM_DATA = {
@@ -121,10 +118,7 @@ const DUMMY_EXAM_DATA = {
 
 const ExamResultsInterface: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState('');
   const [currentChatQuestion, setCurrentChatQuestion] = useState<number | null>(null);
-  const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   // Add dummy data when component mounts
@@ -141,7 +135,7 @@ const ExamResultsInterface: React.FC = () => {
       const parsed = JSON.parse(savedResults);
       return {
         ...parsed,
-        skippedQuestions: new Set(parsed.skippedQuestions), // Convert array back to Set
+        skippedQuestions: new Set(parsed.skippedQuestions),
         score: {
           ...parsed.score,
           correct: Object.entries(parsed.answers).filter(([id, answer]) => {
@@ -157,7 +151,6 @@ const ExamResultsInterface: React.FC = () => {
         }
       };
     }
-    // If no results found, redirect to exam page
     navigate('/exam');
     return null;
   })();
@@ -165,140 +158,7 @@ const ExamResultsInterface: React.FC = () => {
   const openChatForQuestion = (questionId: number) => {
     setCurrentChatQuestion(questionId);
     setIsChatOpen(true);
-    setChatMessages([
-      {
-        isUser: false,
-        content: `I'm here to help you understand question ${questionId}. What would you like to know?`
-      }
-    ]);
   };
-
-  const sendMessage = () => {
-    if (!chatInput.trim()) return;
-    
-    setChatMessages(prev => [...prev, { isUser: true, content: chatInput }]);
-    
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { 
-        isUser: false, 
-        content: 'This is a simulated AI tutor response. In a real implementation, this would connect to your AI service.' 
-      }]);
-    }, 1000);
-    
-    setChatInput('');
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
-  const renderMultipleChoiceAnswer = (question: Question) => {
-    return (
-      <div className="space-y-3">
-        {question.options?.map((option, index) => {
-          let borderColor = 'border-border';
-          let bgColor = 'bg-card';
-          
-          if (index === question.correctAnswer) {
-            borderColor = 'border-green-500';
-            bgColor = 'bg-green-500/10';
-          } else if (index === question.userAnswer && index !== question.correctAnswer) {
-            borderColor = 'border-red-500';
-            bgColor = 'bg-red-500/10';
-          }
-
-          return (
-            <div
-              key={index}
-              className={`w-full rounded-lg border p-4 ${borderColor} ${bgColor}`}
-            >
-              <span className="mr-3 font-medium">{String.fromCharCode(65 + index)}.</span>
-              {option}
-            </div>
-          );
-        })}
-        
-        <div className={`mt-4 rounded-lg border p-4 ${
-          question.userAnswer === question.correctAnswer 
-            ? 'border-green-500 bg-green-500/10' 
-            : 'border-red-500 bg-red-500/10'
-        }`}>
-          <div className={`mb-2 font-medium ${
-            question.userAnswer === question.correctAnswer ? 'text-green-400' : 'text-red-400'
-          }`}>
-            {question.userAnswer === question.correctAnswer ? 'Correct' : 'Incorrect'}
-          </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {question.explanation || 'Explanation not available for this question.'}
-          </p>
-          {question.referenceTime && question.referenceSource && (
-            <div className="mt-2 text-xs text-muted-foreground">
-              Reference: {question.referenceTime} {question.referenceSource}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const renderFreeTextAnswer = (question: Question) => {
-    if (question.isSkipped) {
-      return (
-        <div>
-          <div className="mb-4 rounded-lg border border-border bg-card p-4">
-            <div className="text-muted-foreground italic">Question was skipped</div>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-4">
-            <div className="mb-2 font-medium text-muted-foreground">Suggested Answer</div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {question.feedback || 'Sample answer not available for this question.'}
-            </p>
-            {question.referenceTime && question.referenceSource && (
-              <div className="mt-2 text-xs text-muted-foreground">
-                Reference: {question.referenceTime} {question.referenceSource}
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div>
-        <div className="mb-4 rounded-lg border border-border bg-card p-4">
-          <div className="mb-2 text-sm text-muted-foreground">Your Answer:</div>
-          <div className="text-foreground">{question.userAnswer || 'No answer provided'}</div>
-        </div>
-        <div className="rounded-lg border border-green-500 bg-green-500/10 p-4">
-          <div className="mb-2 font-medium text-green-400">AI Feedback</div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {question.feedback || 'Good effort! This type of question requires detailed explanation of the concepts involved.'}
-          </p>
-          {question.referenceTime && question.referenceSource && (
-            <div className="mt-2 text-xs text-muted-foreground">
-              Reference: {question.referenceTime} {question.referenceSource}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const renderAnswerBreakdown = (question: Question) => {
-    if (question.type === 'multiple-choice') {
-      return renderMultipleChoiceAnswer(question);
-    } else {
-      return renderFreeTextAnswer(question);
-    }
-  };
-
-  // Auto-scroll chat to bottom
-  useEffect(() => {
-    chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
 
   if (!examResults) {
     return null;
@@ -306,34 +166,10 @@ const ExamResultsInterface: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-card">
-        <div className="flex items-center justify-between px-6 py-3">
-          {/* Left: Share Button */}
-          <button className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm hover:bg-accent/80">
-            <Share2 className="h-4 w-4" />
-            Share exam
-          </button>
-          
-          {/* Center: Progress Bar (completed) */}
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{examResults.score.total}</span>
-            <div className="h-2 w-96 rounded-full bg-border">
-              <div className="h-full w-full rounded-full bg-primary"></div>
-            </div>
-            <span className="text-sm text-muted-foreground">{examResults.score.total}</span>
-          </div>
-          
-          {/* Right: Space Chat Button */}
-          <button 
-            onClick={() => setIsChatOpen(true)}
-            className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm hover:bg-accent/80"
-          >
-            <MessageCircle className="h-4 w-4" />
-            Space Chat
-          </button>
-        </div>
-      </header>
+      <ExamResultsHeader
+        totalQuestions={examResults.score.total}
+        onOpenChat={() => setIsChatOpen(true)}
+      />
 
       {/* Main Content Area */}
       <main className="pb-24 pt-8">
@@ -355,86 +191,22 @@ const ExamResultsInterface: React.FC = () => {
                 </button>
               </div>
               
-              {renderAnswerBreakdown(question)}
+              <AnswerBreakdown question={question} />
             </div>
           ))}
         </div>
       </main>
 
-      {/* Sticky Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 border-t border-border bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-4xl gap-4">
-          <button className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent py-3 font-medium hover:bg-accent/80">
-            <RotateCcw className="h-5 w-5" />
-            Try Again
-          </button>
-          <button 
-            onClick={() => navigate('/exam/results')}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-3 font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            <BarChart3 className="h-5 w-5" />
-            View Results
-          </button>
-        </div>
-      </footer>
+      <ExamResultsFooter
+        onTryAgain={() => {}}
+        onViewResults={() => navigate('/exam/results')}
+      />
 
-      {/* Sliding Chat Drawer */}
-      {isChatOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          <div 
-            className="flex-1 bg-black/50" 
-            onClick={() => setIsChatOpen(false)}
-          />
-          <div className="w-96 bg-card shadow-xl flex flex-col">
-            {/* Header with close button */}
-            <div className="flex items-center justify-between border-b border-border p-4">
-              <h2 className="text-lg font-semibold">Space Chat</h2>
-              <button 
-                onClick={() => setIsChatOpen(false)}
-                className="rounded-md p-1 hover:bg-accent"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            
-            {/* Scrollable messages area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {chatMessages.map((message, index) => (
-                <div key={index} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] rounded-lg p-3 ${
-                    message.isUser 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-accent text-foreground'
-                  }`}>
-                    {message.content}
-                  </div>
-                </div>
-              ))}
-              <div ref={chatMessagesEndRef} />
-            </div>
-            
-            {/* Input area at bottom */}
-            <div className="border-t border-border p-4">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask a question..."
-                  className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none"
-                />
-                <button 
-                  onClick={sendMessage}
-                  className="rounded-lg bg-primary px-3 py-2 hover:bg-primary/90"
-                >
-                  <Send className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ChatDrawer
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        currentQuestionId={currentChatQuestion}
+      />
     </div>
   );
 };
