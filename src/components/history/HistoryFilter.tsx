@@ -18,13 +18,13 @@ export function HistoryFilter({ typeFilter, onFilterChange }: HistoryFilterProps
   return (
     <div className="flex items-center gap-2">
       <Select value={typeFilter} onValueChange={onFilterChange}>
-        <SelectTrigger className="w-[180px] bg-dashboard-card border-dashboard-separator text-dashboard-text">
+        <SelectTrigger className="w-[180px] bg-card border-border text-foreground">
           <div className="flex items-center gap-2">
-            <Filter size={16} className="text-dashboard-text-secondary" />
+            <Filter size={16} className="text-muted-foreground" />
             <SelectValue placeholder="Filter by type" />
           </div>
         </SelectTrigger>
-        <SelectContent className="bg-dashboard-card border-dashboard-separator text-dashboard-text">
+        <SelectContent className="bg-card border-border text-foreground">
           <SelectItem value="all">All Types</SelectItem>
           <SelectItem value="Document Analysis">Document Analysis</SelectItem>
           <SelectItem value="Meeting Notes">Meeting Notes</SelectItem>
