@@ -85,7 +85,7 @@ export function ExamResultsSummary() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-full bg-background">
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-border bg-background px-6 py-4">
         <div className="flex items-center gap-2">
@@ -112,15 +112,15 @@ export function ExamResultsSummary() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="mx-auto max-w-4xl px-6 pt-24">
-        {/* Title */}
-        <h1 className="mb-12 text-center text-3xl font-bold text-foreground">
+      {/* Main Content - Reduce top padding */}
+      <main className="container mx-auto max-w-4xl px-6 pt-16">
+        {/* Title - Reduce margin */}
+        <h1 className="mb-4 text-center text-3xl font-bold text-foreground">
           Keep up the momentum!
         </h1>
 
-        {/* Stats Row */}
-        <div className="mb-8 flex items-center justify-center gap-16">
+        {/* Stats Row - Reduce margin */}
+        <div className="mb-4 flex items-center justify-center gap-16">
           <div className="text-center">
             <div className="text-3xl font-bold text-foreground">{examData.skipped}</div>
             <div className="text-sm text-muted-foreground">Skipped</div>
@@ -132,22 +132,26 @@ export function ExamResultsSummary() {
           </div>
         </div>
 
-        {/* Preview Link */}
-        <div className="mb-8 text-center">
+        {/* Preview Link - Reduce margin */}
+        <div className="mb-4 text-center">
           <button className="text-sm text-muted-foreground underline hover:text-foreground">
             Preview Exam 1
           </button>
         </div>
 
-        {/* Content Breakdown */}
-        <ChapterBreakdown chapters={chapters} examData={examData} />
+        {/* Content Breakdown - Add padding adjustment */}
+        <div className="pb-4">
+          <ChapterBreakdown chapters={chapters} examData={examData} />
+        </div>
 
-        {/* Action Buttons */}
-        <ExamActionButtons
-          onTryAgain={handleTryAgain}
-          onRetake={handleRetake}
-          onCreateNew={handleCreateNew}
-        />
+        {/* Action Buttons - Ensure proper spacing */}
+        <div className="mt-4">
+          <ExamActionButtons
+            onTryAgain={handleTryAgain}
+            onRetake={handleRetake}
+            onCreateNew={handleCreateNew}
+          />
+        </div>
       </main>
 
       {/* Share Modal */}

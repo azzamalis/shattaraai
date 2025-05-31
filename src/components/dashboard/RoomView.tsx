@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -51,10 +50,10 @@ export function RoomView({
   ];
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden bg-background">
+    <div className="flex flex-col bg-background">
       {!hideHeader && (
         <header className="flex flex-col border-b border-border bg-background px-4 py-6 sticky top-0 z-10">
-          <div className="mx-auto max-w-6xl w-full">
+          <div className="mx-auto max-w-7xl w-full">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-foreground">{title}</h1>
@@ -89,8 +88,8 @@ export function RoomView({
         </header>
       )}
 
-      <main className="flex-1 overflow-auto px-4">
-        <div className="max-w-6xl mx-auto w-full py-6">
+      <main>
+        <div className="max-w-7xl mx-auto w-full py-6 pb-8">
           {isEmpty ? (
             <div className="flex flex-col items-center justify-center text-center">
               <h2 className="text-xl font-bold text-foreground mb-1">No documents yet</h2>

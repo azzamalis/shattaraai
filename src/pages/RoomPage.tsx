@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RoomView } from '@/components/dashboard/RoomView';
@@ -109,34 +108,66 @@ export default function RoomPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-screen overflow-hidden bg-background" onClick={handleClickOutside}>
-        <RoomHeroSection title={room.title} description={room.description} />
+      <div className="flex flex-col h-full bg-background" onClick={handleClickOutside}>
+        <div className="pb-4">
+          <RoomHeroSection title={room.title} description={room.description} />
+        </div>
         
-        <div className="px-4 py-8 bg-background">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-start gap-2 flex-1 min-w-0">
-                  <div className="group">
-                    <div className="flex items-center gap-3 mb-2">
-                      {isEditingTitle ? (
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="px-4 bg-background">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-start gap-2 flex-1 min-w-0">
+                    <div className="group">
+                      <div className="flex items-center gap-3 mb-2">
+                        {isEditingTitle ? (
+                          <input 
+                            type="text" 
+                            value={editedTitle} 
+                            onChange={e => setEditedTitle(e.target.value)} 
+                            onKeyDown={handleTitleKeyDown}
+                            onClick={e => e.stopPropagation()}
+                            className="text-2xl font-bold text-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
+                            placeholder="Untitled Room" 
+                            autoFocus 
+                          />
+                        ) : (
+                          <>
+                            <h1 className="text-2xl font-bold text-foreground">{room.title}</h1>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleTitleEdit();
+                              }}
+                              className="p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground transition-all duration-200"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                      
+                      {isEditingDescription ? (
                         <input 
                           type="text" 
-                          value={editedTitle} 
-                          onChange={e => setEditedTitle(e.target.value)} 
-                          onKeyDown={handleTitleKeyDown}
+                          value={editedDescription} 
+                          onChange={e => setEditedDescription(e.target.value)} 
+                          onKeyDown={handleDescriptionKeyDown}
                           onClick={e => e.stopPropagation()}
-                          className="text-2xl font-bold text-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
-                          placeholder="Untitled Room" 
+                          className="text-muted-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
+                          placeholder="Add a description" 
                           autoFocus 
                         />
                       ) : (
                         <>
-                          <h1 className="text-2xl font-bold text-foreground">{room.title}</h1>
+                          <p className="text-muted-foreground">
+                            {room.description || "No description"}
+                          </p>
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleTitleEdit();
+                              handleDescriptionEdit();
                             }}
                             className="p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground transition-all duration-200"
                           >
@@ -145,71 +176,49 @@ export default function RoomPage() {
                         </>
                       )}
                     </div>
-                    
-                    {isEditingDescription ? (
-                      <input 
-                        type="text" 
-                        value={editedDescription} 
-                        onChange={e => setEditedDescription(e.target.value)} 
-                        onKeyDown={handleDescriptionKeyDown}
-                        onClick={e => e.stopPropagation()}
-                        className="text-muted-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
-                        placeholder="Add a description" 
-                        autoFocus 
-                      />
-                    ) : (
-                      <>
-                        <p className="text-muted-foreground">
-                          {room.description || "No description"}
-                        </p>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDescriptionEdit();
-                          }}
-                          className="p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground transition-all duration-200"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                      </>
-                    )}
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <Button 
+                      variant="outline" 
+                      className="component-base hover:bg-accent transition-all duration-200 hover:shadow-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsChatOpen(true);
+                      }}
+                    >
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Room Chat
+                    </Button>
+                    <Button 
+                      className="bg-foreground hover:bg-foreground/90 text-background hover:text-background transition-all duration-200 hover:shadow-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsExamModalOpen(true);
+                      }}
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      Create Exam
+                    </Button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <Button 
-                    variant="outline" 
-                    className="component-base hover:bg-accent transition-all duration-200 hover:shadow-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsChatOpen(true);
-                    }}
-                  >
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Room Chat
-                  </Button>
-                  <Button 
-                    className="bg-foreground hover:bg-foreground/90 text-background hover:text-background transition-all duration-200 hover:shadow-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsExamModalOpen(true);
-                    }}
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    Create Exam
-                  </Button>
-                </div>
+                <div className="w-full h-px bg-border" />
               </div>
-
-              <div className="w-full h-px bg-border" />
             </div>
+          </div>
+          
+          <div className="flex-1 overflow-auto">
+            <RoomView 
+              title={room.title} 
+              description={room.description} 
+              isEmpty={id === "physics"} 
+              hideHeader={true} 
+            />
           </div>
         </div>
         
-        <RoomView title={room.title} description={room.description} isEmpty={id === "physics"} hideHeader={true} />
-        
         <AITutorChatDrawer open={isChatOpen} onOpenChange={setIsChatOpen} />
-        
         <ExamPrepModal isOpen={isExamModalOpen} onClose={() => setIsExamModalOpen(false)} />
       </div>
     </DashboardLayout>

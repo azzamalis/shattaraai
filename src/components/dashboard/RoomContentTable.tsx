@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, FileText, Video, Youtube, Mic } from 'lucide-react';
+import { MoreVertical, FileText, Video, Youtube, Mic, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,8 +58,16 @@ const getTagColor = (tag: ContentTag) => {
 };
 
 export function RoomContentTable({ items, onEdit, onDelete, onShare }: RoomContentTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+  
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = items.slice(startIndex, endIndex);
+
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col">
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b border-dashboard-separator">
@@ -71,7 +79,7 @@ export function RoomContentTable({ items, onEdit, onDelete, onShare }: RoomConte
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
+          {currentItems.map((item) => (
             <tr 
               key={item.id} 
               className="border-b border-dashboard-separator hover:bg-dashboard-card-hover transition-colors duration-200"
@@ -123,6 +131,48 @@ export function RoomContentTable({ items, onEdit, onDelete, onShare }: RoomConte
           ))}
         </tbody>
       </table>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between mt-4 mb-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {startIndex + 1} to {Math.min(endIndex, items.length)} of {items.length} items
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="h-8 w-8 p-0 hover:bg-accent hover:text-primary"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <Button
+              key={page}
+              variant={currentPage === page ? "default" : "outline"}
+              size="sm"
+              onClick={() => setCurrentPage(page)}
+              className={`h-8 w-8 p-0 ${
+                currentPage === page 
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "hover:bg-accent hover:text-primary"
+              }`}
+            >
+              {page}
+            </Button>
+          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className="h-8 w-8 p-0 hover:bg-accent hover:text-primary"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 } 

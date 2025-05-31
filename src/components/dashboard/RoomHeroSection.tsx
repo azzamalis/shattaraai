@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ActionCards } from './ActionCards';
 import { AIChatInput } from '@/components/ui/ai-chat-input';
@@ -34,19 +33,27 @@ export function RoomHeroSection({
   };
 
   return (
-    <div className="w-full px-4 py-6 md:py-8 bg-background">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 text-center">What do you need help understanding today?</h2>
+    <div className="w-full bg-background">
+      <div className="max-w-[800px] mx-auto px-4 sm:px-6">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 text-center">
+            What do you need help understanding today?
+          </h2>
           
-          <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
+          <div className="py-4">
+            <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
+          </div>
         </div>
         
-        <div className="mb-6">
+        <div>
           <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
         </div>
         
-        <PasteContentModal isOpen={isPasteModalOpen} onClose={() => setIsPasteModalOpen(false)} onSubmit={handlePasteSubmit} />
+        <PasteContentModal 
+          isOpen={isPasteModalOpen} 
+          onClose={() => setIsPasteModalOpen(false)} 
+          onSubmit={handlePasteSubmit} 
+        />
       </div>
     </div>
   );

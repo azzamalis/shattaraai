@@ -165,7 +165,7 @@ const ExamResultsInterface: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="h-full bg-background text-foreground">
       <ExamResultsHeader
         totalQuestions={examResults.score.total}
         onOpenChat={() => setIsChatOpen(true)}

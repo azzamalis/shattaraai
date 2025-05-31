@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Room, RoomHandlers, DeleteItem } from '@/lib/types';
@@ -109,17 +108,21 @@ export function Dashboard({
   return (
     <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-background transition-colors duration-300">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-[800px] mx-auto mb-12">
           <NewFeaturePromo />
           
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 sm:mb-8 md:mb-12 text-center">What do you need help understanding today?</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 sm:mb-8 md:mb-12 text-center">
+            What do you need help understanding today?
+          </h1>
           
           <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
           
-          <div className="mb-6 sm:mb-8">
+          <div className="my-6 sm:my-8">
             <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
           </div>
+        </div>
 
+        <div className="max-w-6xl mx-auto">
           <MyRoomsSection rooms={rooms} onAddRoom={onAddRoom} onEditRoom={onEditRoom} onDeleteRoom={handleDeleteClick} />
 
           <ContinueLearningSection onDeleteCard={handleCardDelete} onShareCard={() => setShareModalOpen(true)} />

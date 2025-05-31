@@ -1,4 +1,3 @@
-
 import React from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -26,7 +25,7 @@ const challenges = [
 export default function ReportsPage() {
   return (
     <DashboardLayout>
-      <div className="flex flex-col min-h-screen bg-background transition-colors duration-300 text-foreground p-4 md:p-6">
+      <div className="flex flex-col h-full bg-background transition-colors duration-300 text-foreground p-4 md:p-6">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Your Learning Journey</h1>
