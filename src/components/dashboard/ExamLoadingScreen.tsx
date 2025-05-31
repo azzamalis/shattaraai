@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Loader2, Check } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
 
 interface ExamLoadingScreenProps {
   onComplete?: () => void;
@@ -18,7 +17,6 @@ const loadingSteps = [
 export function ExamLoadingScreen({ onComplete }: ExamLoadingScreenProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const { isDark } = useTheme();
 
   useEffect(() => {
     let timeouts: NodeJS.Timeout[] = [];
@@ -74,7 +72,7 @@ export function ExamLoadingScreen({ onComplete }: ExamLoadingScreenProps) {
       case 'loading':
         return <Loader2 className="w-5 h-5 mr-3 animate-spin" />;
       case 'completed':
-        return <Check className="w-5 h-5 mr-3 text-[#00a3ff]" />;
+        return <Check className="w-5 h-5 mr-3 text-primary" />;
       default:
         return <div className="w-5 h-5 mr-3" />;
     }
@@ -86,18 +84,14 @@ export function ExamLoadingScreen({ onComplete }: ExamLoadingScreenProps) {
     switch (state) {
       case 'loading':
       case 'completed':
-        return isDark ? 'text-white' : 'text-[#171717]';
+        return 'text-foreground';
       default:
-        return isDark ? 'text-[#A6A6A6]' : 'text-[#A6A6A6]';
+        return 'text-muted-foreground';
     }
   };
 
   return (
-    <div 
-      className={`h-screen flex items-center justify-center ${
-        isDark ? 'bg-[#121212]' : 'bg-[#FAFAFA]'
-      }`}
-    >
+    <div className="h-screen flex items-center justify-center bg-background">
       <div className="max-w-md mx-auto">
         <div className="space-y-4">
           {loadingSteps.map((step, index) => (

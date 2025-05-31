@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { ContentProvider } from '@/contexts/ContentContext';
 import { useLocation } from 'react-router-dom';
 import { ContentData } from '@/pages/ContentPage';
-import { useTheme } from '@/hooks/useTheme';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -24,7 +23,6 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const { isDark } = useTheme();
   
   // Room state management
   const [rooms, setRooms] = useState<Room[]>([
@@ -88,6 +86,14 @@ export function DashboardLayout({
     };
   }, [isDrawerOpen, isMobile]);
 
+  // Force dark mode for dashboard
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    return () => {
+      // Keep dark mode when component unmounts to maintain consistency
+    };
+  }, []);
+
   // Clone children with room props only if they accept them
   const childWithProps = React.isValidElement(children) && children.type.toString().includes('Dashboard') 
     ? React.cloneElement(children as React.ReactElement, {
@@ -99,8 +105,7 @@ export function DashboardLayout({
   return (
     <ContentProvider>
       <div className={cn(
-        "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300",
-        isDark && "dark"
+        "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300 dark"
       )}>
         <DashboardHeader 
           onOpenDrawer={() => setIsDrawerOpen(true)} 

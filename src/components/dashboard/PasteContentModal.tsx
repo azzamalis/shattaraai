@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -41,20 +42,20 @@ export function PasteContentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="bg-[#111] border-white/10 text-white max-w-md w-full p-0 overflow-hidden">
+      <DialogContent className="bg-card border-border text-foreground max-w-md w-full p-0 overflow-hidden">
         <div className="p-6">
           <DialogHeader className="mb-4">
             <div className="flex items-center gap-2">
-              <Link className="text-white/70 h-5 w-5" />
+              <Link className="text-muted-foreground h-5 w-5" />
               <DialogTitle className="text-xl font-bold">YouTube, Website, Etc</DialogTitle>
             </div>
-            <p className="text-gray-400 text-sm mt-1">Enter a YouTube Link, Website URL, Doc, Etc</p>
+            <p className="text-muted-foreground text-sm mt-1">Enter a YouTube Link, Website URL, Doc, Etc</p>
           </DialogHeader>
 
           {/* URL Input Section */}
           <div className="mb-6">
             <Input 
-              className="bg-[#222222] border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 px-4 py-3 text-white placeholder:text-gray-500 transition-colors duration-200" 
+              className="bg-muted border-border focus:border-ring focus:ring-1 focus:ring-ring px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors duration-200" 
               placeholder="https://youtube.com/dQw4w9WgXcQ" 
               value={url} 
               onChange={e => setUrl(e.target.value)} 
@@ -64,22 +65,22 @@ export function PasteContentModal({
           {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-[#111] px-3 text-sm text-gray-400">or</span>
+              <span className="bg-card px-3 text-sm text-muted-foreground">or</span>
             </div>
           </div>
 
           {/* Text Input Section */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <FileText className="text-white/70 h-5 w-5" />
+              <FileText className="text-muted-foreground h-5 w-5" />
               <h3 className="text-base font-medium">Paste Text</h3>
             </div>
-            <p className="text-gray-400 text-sm mb-2">Copy and paste text to add as content</p>
+            <p className="text-muted-foreground text-sm mb-2">Copy and paste text to add as content</p>
             <Textarea 
-              className="bg-[#222222] border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 px-4 py-3 min-h-[100px] text-white placeholder:text-gray-500 transition-colors duration-200" 
+              className="bg-muted border-border focus:border-ring focus:ring-1 focus:ring-ring px-4 py-3 min-h-[100px] text-foreground placeholder:text-muted-foreground transition-colors duration-200" 
               placeholder="Paste your notes here" 
               value={text} 
               onChange={e => setText(e.target.value)} 
@@ -90,7 +91,7 @@ export function PasteContentModal({
           <div className="flex justify-end gap-3">
             <Button 
               variant="outline" 
-              className="bg-transparent border-white/10 text-white/70 hover:bg-white/5 hover:text-white" 
+              className="bg-transparent border-border text-muted-foreground hover:bg-accent hover:text-foreground" 
               onClick={onClose}
             >
               Cancel
@@ -98,7 +99,7 @@ export function PasteContentModal({
             <Button 
               onClick={handleSubmit} 
               disabled={isSubmitting || !url && !text} 
-              className="bg-white/10 hover:bg-white/15 text-white font-medium transition-colors duration-200"
+              className="bg-accent hover:bg-accent/80 text-foreground font-medium transition-colors duration-200"
             >
               {isSubmitting ? 'Adding...' : 'Add'}
             </Button>

@@ -50,7 +50,7 @@ const RecordingHeader = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full p-4 border-b border-white/10 bg-black">
+    <div className="flex flex-col gap-2 w-full p-4 border-b border-border bg-background">
       <div className="flex items-center justify-between w-full mb-1">
         <div className="flex items-center min-w-0">
           {isEditing ? (
@@ -60,19 +60,19 @@ const RecordingHeader = ({
               onChange={(e) => setRecordingTitle(e.target.value)}
               onKeyDown={handleTitleKeyDown}
               onBlur={handleTitleSave}
-              className="text-white text-sm font-medium bg-transparent border-none border-b border-white/20 focus:border-white/40 outline-none focus:outline-none focus:ring-0 min-w-0"
+              className="text-foreground text-sm font-medium bg-transparent border-none border-b border-border focus:border-ring outline-none focus:outline-none focus:ring-0 min-w-0"
               autoFocus
             />
           ) : (
-            <h1 className="text-white text-sm font-medium truncate">
+            <h1 className="text-foreground text-sm font-medium truncate">
               {recordingTitle}
-              {isRecording && <span className="ml-2 inline-flex h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>}
+              {isRecording && <span className="ml-2 inline-flex h-2 w-2 rounded-full bg-destructive animate-pulse"></span>}
             </h1>
           )}
           <Button 
             variant="ghost" 
             size="icon" 
-            className="ml-2 text-white/70 hover:text-white hover:bg-white/10"
+            className="ml-2 text-muted-foreground hover:text-foreground hover:bg-accent"
             onClick={handleTitleEdit}
           >
             <Pencil className="h-4 w-4" />
@@ -81,13 +81,13 @@ const RecordingHeader = ({
         <div className="flex items-center gap-2 ml-4">
           <Popover open={saveDropdownOpen} onOpenChange={setSaveDropdownOpen}>
             <PopoverTrigger asChild>
-              <Button className="bg-transparent hover:bg-white/10 border border-white/20 text-white" size="sm">
+              <Button className="bg-transparent hover:bg-accent border border-border text-foreground" size="sm">
                 <Download className="h-4 w-4 mr-2" />
                 Save
               </Button>
             </PopoverTrigger>
             <PopoverContent 
-              className="w-[200px] bg-[#1A1A1A] border-white/10 p-1 z-50"
+              className="w-[200px] bg-card border-border p-1 z-50"
               side="bottom"
               align="end"
               sideOffset={5}
@@ -99,14 +99,14 @@ const RecordingHeader = ({
                       key={room.id}
                       variant="ghost"
                       className="w-full flex items-center justify-between px-2 py-1.5 
-                        text-white hover:bg-white/5 transition-colors duration-200"
+                        text-foreground hover:bg-accent transition-colors duration-200"
                       onClick={() => handleSaveToRoom(room.id)}
                     >
                       <span className="flex-1 text-left truncate">{room.name}</span>
                     </Button>
                   ))
                 ) : (
-                  <div className="px-2 py-1.5 text-white/60 text-sm">
+                  <div className="px-2 py-1.5 text-muted-foreground text-sm">
                     No rooms available
                   </div>
                 )}
@@ -114,7 +114,7 @@ const RecordingHeader = ({
             </PopoverContent>
           </Popover>
           <Button 
-            className="bg-transparent hover:bg-white/10 border border-white/20 text-white" 
+            className="bg-transparent hover:bg-accent border border-border text-foreground" 
             size="sm"
             onClick={() => setShareModalOpen(true)}
           >
@@ -126,10 +126,10 @@ const RecordingHeader = ({
       
       {/* Share Modal */}
       <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
-        <DialogContent className="bg-[#1A1A1A] text-white border-white/10">
+        <DialogContent className="bg-card text-foreground border-border">
           <DialogHeader>
             <DialogTitle>Share Recording</DialogTitle>
-            <DialogDescription className="text-white/70">
+            <DialogDescription className="text-muted-foreground">
               Share this recording with your team or friends.
             </DialogDescription>
           </DialogHeader>
@@ -138,10 +138,10 @@ const RecordingHeader = ({
               type="text" 
               value="https://your-app.com/shared/recording-123" 
               readOnly
-              className="w-full bg-[#111] border border-white/10 rounded p-2 text-white"
+              className="w-full bg-muted border border-border rounded p-2 text-foreground"
             />
             <div className="flex justify-end mt-4">
-              <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 Copy Link
               </Button>
             </div>

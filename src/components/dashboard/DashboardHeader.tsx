@@ -2,13 +2,12 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Menu, History, BarChart, Pencil, Sun, Moon } from 'lucide-react';
+import { Search, Menu, Pencil } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { CommandModal } from './CommandModal';
 import { Link, useLocation } from 'react-router-dom';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/hooks/useTheme';
 
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
@@ -25,7 +24,6 @@ export function DashboardHeader({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(contentData?.title || '');
   const location = useLocation();
-  const { theme, toggleTheme, isDark } = useTheme();
   
   const isContentPage = location.pathname.startsWith('/content/');
 
@@ -132,17 +130,6 @@ export function DashboardHeader({
         
         {/* Right section */}
         <div className="flex items-center justify-end gap-4">
-          {/* Theme toggle button */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={toggleTheme}
-            className="text-foreground hover:text-foreground hover:bg-accent"
-          >
-            {isDark ? <Sun size={20} /> : <Moon size={20} />}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-
           {/* Upgrade button */}
           <Link to="/pricing">
             <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-full px-8 py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)]">

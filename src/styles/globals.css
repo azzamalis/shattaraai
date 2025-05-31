@@ -40,22 +40,22 @@
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
     
-    --card: 0 0% 29%;
+    --card: 0 0% 7%;
     --card-foreground: 0 0% 100%;
     
-    --popover: 0 0% 29%;
+    --popover: 0 0% 7%;
     --popover-foreground: 0 0% 100%;
     
     --primary: 210 100% 50%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 0 0% 65%;
+    --secondary: 0 0% 16%;
     --secondary-foreground: 0 0% 100%;
     
-    --muted: 0 0% 65%;
+    --muted: 0 0% 16%;
     --muted-foreground: 0 0% 65%;
     
-    --accent: 0 0% 87%;
+    --accent: 0 0% 13%;
     --accent-foreground: 0 0% 100%;
     
     --destructive: 0 62.8% 30.6%;
@@ -142,6 +142,17 @@
 
 .dashboard-layout:not(.content-page-layout) main {
   min-height: calc(100vh - 64px);
+}
+
+/* Dashboard specific dark mode styles */
+.dashboard-layout.dark {
+  --dashboard-bg: 0 0% 0%;
+  --dashboard-card: 0 0% 7%;
+  --dashboard-text: 0 0% 100%;
+  --dashboard-text-secondary: 0 0% 65%;
+  --dashboard-border: 0 0% 18%;
+  --dashboard-card-hover: 0 0% 13%;
+  --dashboard-separator: 0 0% 18%;
 }
 
 /* Content Page Tab Styles */
