@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/use-toast";
+import { useTheme } from "@/hooks/useTheme";
 import { format } from "date-fns";
 
 const initialUserData = {
@@ -34,6 +35,7 @@ const initialUserData = {
 export default function Profile() {
   const [userData, setUserData] = useState(initialUserData);
   const { toast } = useToast();
+  const { theme, toggleTheme, isDark } = useTheme();
 
   const handleSaveChanges = () => {
     toast({
@@ -134,6 +136,25 @@ export default function Profile() {
                   }
                   className="min-h-[100px] component-base placeholder:text-muted-foreground"
                   placeholder="What do you want to achieve?"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card-enhanced">
+            <CardHeader>
+              <CardTitle className="text-foreground">Display Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm text-foreground">Dark Mode</label>
+                  <p className="text-xs text-muted-foreground mt-1">Switch between light and dark themes</p>
+                </div>
+                <Switch
+                  checked={isDark}
+                  onCheckedChange={toggleTheme}
+                  className="data-[state=checked]:bg-primary"
                 />
               </div>
             </CardContent>

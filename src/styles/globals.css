@@ -1,69 +1,38 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
     
-    --card: 0 0% 99%;
-    --card-foreground: 0 0% 0%;
+    --card: 0 0% 29%;
+    --card-foreground: 0 0% 98%;
     
-    --popover: 0 0% 99%;
-    --popover-foreground: 0 0% 0%;
+    --popover: 0 0% 29%;
+    --popover-foreground: 0 0% 98%;
     
     --primary: 210 100% 50%;
     --primary-foreground: 0 0% 98%;
     
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 98%;
     
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
     
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 98%;
     
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 221 14% 89%;
-    --input: 221 14% 89%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
     --ring: 210 100% 50%;
     
     --radius: 0.5rem;
-  }
-
-  html.dark {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    
-    --card: 0 0% 29%;
-    --card-foreground: 0 0% 100%;
-    
-    --popover: 0 0% 29%;
-    --popover-foreground: 0 0% 100%;
-    
-    --primary: 210 100% 50%;
-    --primary-foreground: 0 0% 100%;
-    
-    --secondary: 0 0% 65%;
-    --secondary-foreground: 0 0% 100%;
-    
-    --muted: 0 0% 65%;
-    --muted-foreground: 0 0% 65%;
-    
-    --accent: 0 0% 87%;
-    --accent-foreground: 0 0% 100%;
-    
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 0 0% 89%;
   }
 }
 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Sidebar, 
@@ -38,19 +37,19 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   return (
-    <Sidebar variant="sidebar" collapsible="icon" className="bg-card border-r border-border">
-      <SidebarHeader className="flex items-center justify-between p-4 border-b border-border">
+    <Sidebar variant="sidebar" collapsible="icon" className="bg-[#222222] border-r border-white/20">
+      <SidebarHeader className="flex items-center justify-between p-4 border-b border-white/20">
         <div className="flex items-center gap-2">
-          {isExpanded && <Logo className="h-10 w-auto" textColor="text-foreground" />}
+          {isExpanded && <Logo className="h-10 w-auto" textColor="text-white" />}
         </div>
         {!isMobile && <SidebarTrigger />}
       </SidebarHeader>
 
-      <SidebarContent className="bg-card">
+      <SidebarContent className="bg-[#222222]">
         <SidebarGroup>
           <div className="px-2">
             <Button 
-              className="w-full justify-start gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="w-full justify-start gap-2 bg-primary hover:bg-primary-light text-white"
               onClick={() => navigate('/dashboard')}
             >
               <Plus size={18} />
@@ -60,11 +59,11 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-muted-foreground">History</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white/70">History</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="History" className="text-foreground hover:bg-accent hover:text-accent-foreground">
+                <SidebarMenuButton asChild tooltip="History" className="text-white hover:bg-primary/10 hover:text-white">
                   <Link to="/history">
                     <History size={18} />
                     <span>My History</span>
@@ -72,7 +71,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Recent Documents" className="text-foreground hover:bg-accent hover:text-accent-foreground">
+                <SidebarMenuButton asChild tooltip="Recent Documents" className="text-white hover:bg-primary/10 hover:text-white">
                   <Link to="/recent">
                     <Clock size={18} />
                     <span>Recent Documents</span>
@@ -84,11 +83,11 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-muted-foreground">Rooms</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white/70">Rooms</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Azzam's Room" className="text-foreground hover:bg-accent hover:text-accent-foreground">
+                <SidebarMenuButton asChild tooltip="Azzam's Room" className="text-white hover:bg-primary/10 hover:text-white">
                   <Link to="/rooms/1">
                     <Box size={18} />
                     <span>Azzam's Room</span>
@@ -96,7 +95,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Untitled Room" className="text-foreground hover:bg-accent hover:text-accent-foreground">
+                <SidebarMenuButton asChild tooltip="Untitled Room" className="text-white hover:bg-primary/10 hover:text-white">
                   <Link to="/rooms/2">
                     <Box size={18} />
                     <span>Untitled Room</span>
@@ -104,7 +103,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Add Room" className="text-foreground hover:bg-accent hover:text-accent-foreground border border-dashed border-border rounded-md mt-2">
+                <SidebarMenuButton asChild tooltip="Add Room" className="text-white hover:bg-primary/10 hover:text-white border border-dashed border-white/20 rounded-md mt-2">
                   <Link to="/rooms/new">
                     <Plus size={18} />
                     <span>Add Room</span>
@@ -116,11 +115,11 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-muted-foreground">Help & Tools</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white/70">Help & Tools</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Feedback" className="text-foreground hover:bg-accent hover:text-accent-foreground">
+                <SidebarMenuButton asChild tooltip="Feedback" className="text-white hover:bg-primary/10 hover:text-white">
                   <Link to="/feedback">
                     <MessageCircle size={18} />
                     <span>Feedback</span>
@@ -128,7 +127,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Quick Guide" className="text-foreground hover:bg-accent hover:text-accent-foreground">
+                <SidebarMenuButton asChild tooltip="Quick Guide" className="text-white hover:bg-primary/10 hover:text-white">
                   <Link to="/help">
                     <Book size={18} />
                     <span>Quick Guide</span>
@@ -136,7 +135,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Chrome Extension" className="text-foreground hover:bg-accent hover:text-accent-foreground">
+                <SidebarMenuButton asChild tooltip="Chrome Extension" className="text-white hover:bg-primary/10 hover:text-white">
                   <Link to="/extension">
                     <Chrome size={18} />
                     <span>Chrome Extension</span>
@@ -148,15 +147,15 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border p-4 bg-card">
-        <div className="flex items-center gap-3 text-foreground">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+      <SidebarFooter className="border-t border-white/20 p-4 bg-[#222222]">
+        <div className="flex items-center gap-3 text-white">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">
             <User size={16} />
           </div>
           {isExpanded && (
             <div className="overflow-hidden">
-              <p className="truncate text-sm font-medium text-foreground">Free Plan</p>
-              <p className="truncate text-xs text-muted-foreground">user@shattara.ai</p>
+              <p className="truncate text-sm font-medium text-white">Free Plan</p>
+              <p className="truncate text-xs text-gray-400">user@shattara.ai</p>
             </div>
           )}
         </div>
