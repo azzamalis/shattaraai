@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -90,52 +89,52 @@ export function DashboardDrawer({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent 
           side="left" 
-          className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r border-border`} 
+          className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r border-border`}
           closeButton={false}
         >
-          {/* Enhanced Header */}
-          <div className="flex items-center justify-between px-8 py-6 bg-background shrink-0">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-4 mb-2">
             <div className="flex items-center gap-3">
-              <Logo className="h-8 md:h-10 w-auto" textColor="text-foreground" />
+              <Logo className="h-8 w-auto" textColor="text-foreground" />
             </div>
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => onOpenChange(false)} 
-              className="text-foreground hover:text-foreground hover:bg-accent rounded-full"
+              className="text-foreground hover:text-foreground hover:bg-accent rounded-lg h-8 w-8"
             >
-              <ChevronsLeft size={22} />
+              <ChevronsLeft className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
             </Button>
           </div>
 
           <ScrollArea className="flex-1 overflow-y-auto">
-            <div className="space-y-12 pt-2">
+            <div className="flex flex-col space-y-6 px-3 pt-2">
               {/* Add Content Button */}
-              <div className="px-6">
+              <div className="w-full">
                 <Button 
                   variant="ghost" 
-                  className="w-full flex items-center justify-center gap-3 
-                    bg-transparent border border-dashed border-border 
-                    text-foreground hover:bg-accent hover:text-foreground
-                    transition-colors duration-200 rounded-md py-3" 
+                  className="w-full flex items-center justify-start gap-2 
+                    bg-transparent border-2 border-dashed border-primary/10 
+                    text-primary hover:bg-primary/5 hover:text-primary hover:border-primary/10
+                    transition-colors duration-200 rounded-lg py-2 px-2" 
                   onClick={() => {
                     navigate('/dashboard');
                     onOpenChange(false);
                   }}
                 >
-                  <Plus size={20} />
-                  <span className="font-medium">Add content</span>
+                  <Plus className="h-4 w-4" />
+                  <span className="text-sm font-medium">Add content</span>
                 </Button>
               </div>
               
               {/* History Section */}
-              <div className="px-6">
+              <div className="w-full">
                 <HistorySection />
               </div>
               
               {/* Rooms Section */}
-              <div className="px-6">
+              <div className="w-full">
                 <RoomsSection 
                   rooms={rooms} 
                   onAddRoom={onAddRoom} 
@@ -149,7 +148,7 @@ export function DashboardDrawer({
               </div>
               
               {/* Help Tools Section */}
-              <div className="px-6">
+              <div className="w-full">
                 <HelpTools 
                   onTutorialClick={handleTutorialClick} 
                   onFeedbackClick={handleFeedbackClick} 
@@ -159,9 +158,9 @@ export function DashboardDrawer({
             </div>
           </ScrollArea>
 
-          {/* Enhanced User Profile */}
+          {/* User Profile */}
           <div className="mt-auto">
-            <div className="px-6 py-4">
+            <div className="px-4 py-4">
               <UserProfile onOpenChange={onOpenChange} />
             </div>
           </div>

@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { Search, Menu, Pencil } from 'lucide-react';
@@ -26,6 +25,18 @@ export function DashboardHeader({
   const location = useLocation();
   
   const isContentPage = location.pathname.startsWith('/content/');
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setCommandOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   const handleTitleEdit = () => {
     setEditedTitle(contentData?.title || '');
@@ -140,15 +151,20 @@ export function DashboardHeader({
           {/* Command button */}
           <Dialog open={commandOpen} onOpenChange={setCommandOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="
-                bg-secondary border-none 
-                text-muted-foreground 
-                hover:bg-accent hover:text-muted-foreground
-                rounded-full px-6 py-5 h-9 flex items-center justify-center gap-1.5 min-w-[120px] transition-all duration-200
-              ">
-                <Search className="h-4 w-4" />
-                <span className="text-sm font-medium mx-0.5">⌘</span>
-                <span className="text-sm font-medium">K</span>
+              <Button
+                variant="outline"
+                className="inline-flex h-9 w-fit rounded-lg border border-input bg-background/50 px-3 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <span className="flex grow items-center">
+                  <Search
+                    className="-ms-1 me-3 h-4 w-4"
+                    aria-hidden="true"
+                  />
+                  <span className="font-normal">Search</span>
+                </span>
+                <kbd className="-me-1 ms-12 inline-flex h-5 max-h-full items-center rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                  ⌘K
+                </kbd>
               </Button>
             </DialogTrigger>
             <CommandModal open={commandOpen} onOpenChange={setCommandOpen} />

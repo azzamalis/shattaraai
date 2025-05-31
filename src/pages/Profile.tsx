@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,17 +6,22 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
+import { languages } from "@/components/onboarding/data/languages";
+import { getGoalOptions } from "@/components/onboarding/data/goals";
+import { sourceOptions } from "@/components/onboarding/data/sources";
 
 const initialUserData = {
   name: "Alex Johnson",
   role: "Student",
   createdAt: "2023-09-15T12:00:00Z",
-  avatarUrl: "",
-  preferredLanguage: "English",
-  learningGoal: "Master advanced algorithms",
+  preferences: {
+    language: "en",
+    purpose: "student",
+    goal: "exam-prep",
+    source: "search"
+  },
   notifications: {
     aiReplies: true,
     notesGenerated: true,
@@ -52,17 +56,11 @@ export default function Profile() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-background p-6 text-foreground transition-colors duration-300">
-        <Card className="card-enhanced w-full mb-6">
-          <CardContent className="p-6">
-            <div className="flex flex-wrap justify-between items-start gap-6">
-              <div className="flex items-start gap-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={userData.avatarUrl} alt={userData.name} />
-                  <AvatarFallback className="bg-muted text-foreground border-0">
-                    {userData.name.split(" ").map(n => n[0]).join("")}
-                  </AvatarFallback>
-                </Avatar>
+      <div className="h-full bg-background text-foreground">
+        <div className="max-w-7xl mx-auto p-6 space-y-6">
+          <Card className="card-enhanced w-full mb-6">
+            <CardContent className="p-6">
+              <div className="flex flex-wrap justify-between items-start gap-6">
                 <div>
                   <h1 className="text-2xl font-bold text-foreground">{userData.name}</h1>
                   <p className="text-muted-foreground mb-2">{userData.role}</p>
@@ -70,71 +68,151 @@ export default function Profile() {
                     Member since {format(new Date(userData.createdAt), "MMMM yyyy")}
                   </p>
                 </div>
-              </div>
 
-              <div className="flex flex-wrap gap-8">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-foreground">{userData.stats.uploads}</p>
-                  <p className="text-sm text-muted-foreground">Uploads</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-foreground">{userData.stats.sessions}</p>
-                  <p className="text-sm text-muted-foreground">Sessions</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-foreground">{userData.stats.flashcards}</p>
-                  <p className="text-sm text-muted-foreground">Flashcards</p>
-                </div>
-                <div className="min-w-[200px]">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm text-muted-foreground">Goal Progress</span>
-                    <span className="text-sm font-bold text-foreground">{userData.stats.progressPercent}%</span>
+                <div className="flex flex-wrap gap-8">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-foreground">{userData.stats.uploads}</p>
+                    <p className="text-sm text-muted-foreground">Uploads</p>
                   </div>
-                  <Progress value={userData.stats.progressPercent} className="h-2" />
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-foreground">{userData.stats.sessions}</p>
+                    <p className="text-sm text-muted-foreground">Sessions</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-foreground">{userData.stats.flashcards}</p>
+                    <p className="text-sm text-muted-foreground">Flashcards</p>
+                  </div>
+                  <div className="min-w-[200px]">
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm text-muted-foreground">Goal Progress</span>
+                      <span className="text-sm font-bold text-foreground">{userData.stats.progressPercent}%</span>
+                    </div>
+                    <Progress value={userData.stats.progressPercent} className="h-2" />
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <div className="space-y-4">
           <Card className="card-enhanced">
             <CardHeader>
               <CardTitle className="text-foreground">Preferences</CardTitle>
             </CardHeader>
-            <CardContent className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-muted-foreground mb-2">
-                  Preferred Language
-                </label>
-                <Select
-                  value={userData.preferredLanguage}
-                  onValueChange={(value) => 
-                    setUserData(prev => ({ ...prev, preferredLanguage: value }))
-                  }
-                >
-                  <SelectTrigger className="w-full component-base">
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    <SelectItem value="English" className="text-foreground hover:bg-accent">English</SelectItem>
-                    <SelectItem value="Spanish" className="text-foreground hover:bg-accent">Spanish</SelectItem>
-                    <SelectItem value="French" className="text-foreground hover:bg-accent">French</SelectItem>
-                  </SelectContent>
-                </Select>
+            <CardContent className="grid gap-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-2">
+                    Language
+                  </label>
+                  <Select
+                    value={userData.preferences.language}
+                    onValueChange={(value) => 
+                      setUserData(prev => ({ 
+                        ...prev, 
+                        preferences: { ...prev.preferences, language: value }
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="w-full component-base">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border">
+                      {languages.map((lang) => (
+                        <SelectItem 
+                          key={lang.value} 
+                          value={lang.value}
+                          className="text-foreground hover:bg-accent"
+                        >
+                          {lang.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-2">
+                    How do you want to use Shattara?
+                  </label>
+                  <Select
+                    value={userData.preferences.purpose}
+                    onValueChange={(value) => 
+                      setUserData(prev => ({ 
+                        ...prev, 
+                        preferences: { ...prev.preferences, purpose: value, goal: '' }
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="w-full component-base">
+                      <SelectValue placeholder="I'm here for" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border">
+                      <SelectItem value="student" className="text-foreground hover:bg-accent">Student</SelectItem>
+                      <SelectItem value="teacher" className="text-foreground hover:bg-accent">Teacher</SelectItem>
+                      <SelectItem value="work" className="text-foreground hover:bg-accent">Work</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm text-muted-foreground mb-2">
-                  Learning Goal
-                </label>
-                <Textarea
-                  value={userData.learningGoal}
-                  onChange={(e) => 
-                    setUserData(prev => ({ ...prev, learningGoal: e.target.value }))
-                  }
-                  className="min-h-[100px] component-base placeholder:text-muted-foreground"
-                  placeholder="What do you want to achieve?"
-                />
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-2">
+                    What's your main personal goal with Shattara?
+                  </label>
+                  <Select
+                    value={userData.preferences.goal}
+                    onValueChange={(value) => 
+                      setUserData(prev => ({ 
+                        ...prev, 
+                        preferences: { ...prev.preferences, goal: value }
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="w-full component-base">
+                      <SelectValue placeholder="Select your goals" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border">
+                      {getGoalOptions(userData.preferences.purpose).map((option) => (
+                        <SelectItem 
+                          key={option.value} 
+                          value={option.value}
+                          className="text-foreground hover:bg-accent"
+                        >
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-2">
+                    How did you hear about us?
+                  </label>
+                  <Select
+                    value={userData.preferences.source}
+                    onValueChange={(value) => 
+                      setUserData(prev => ({ 
+                        ...prev, 
+                        preferences: { ...prev.preferences, source: value }
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="w-full component-base">
+                      <SelectValue placeholder="I found Shattara from" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border">
+                      {sourceOptions.map((option) => (
+                        <SelectItem 
+                          key={option.value} 
+                          value={option.value}
+                          className="text-foreground hover:bg-accent"
+                        >
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -187,22 +265,22 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
-        </div>
 
-        <div className="flex justify-end gap-4 mt-6">
-          <Button
-            variant="outline"
-            className="bg-destructive text-white hover:bg-destructive/90 hover:text-white border-destructive"
-            onClick={handleDeleteAccount}
-          >
-            Delete My Account
-          </Button>
-          <Button
-            onClick={handleSaveChanges}
-            className="bg-foreground text-background hover:bg-foreground/90"
-          >
-            Save Changes
-          </Button>
+          <div className="flex justify-end gap-4 pt-2">
+            <Button
+              variant="outline"
+              className="bg-destructive text-white hover:bg-destructive/90 hover:text-white border-destructive"
+              onClick={handleDeleteAccount}
+            >
+              Delete My Account
+            </Button>
+            <Button
+              onClick={handleSaveChanges}
+              className="bg-foreground text-background hover:bg-foreground/90"
+            >
+              Save Changes
+            </Button>
+          </div>
         </div>
       </div>
     </DashboardLayout>

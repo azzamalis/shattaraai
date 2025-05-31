@@ -1,8 +1,6 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Box, ChevronDown, Plus } from 'lucide-react';
+import { Plus, ChevronDown } from 'lucide-react';
 import { Room } from '@/lib/types';
 import { RoomItem, createRoomHandlers } from './RoomUtils';
 import { useNavigate } from 'react-router-dom';
@@ -28,18 +26,17 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
   setDeleteModalOpen
 }) => {
   const navigate = useNavigate();
+  const [showMoreRooms, setShowMoreRooms] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
   const [editedRoomName, setEditedRoomName] = useState("");
-  const [showMoreRooms, setShowMoreRooms] = useState(false);
 
-  const visibleRooms = rooms.slice(0, 3);
-  const hiddenRooms = rooms.slice(3);
+  const visibleRooms = showMoreRooms ? rooms : rooms.slice(0, 3);
   const hasHiddenRooms = rooms.length > 3;
 
   const {
     handleRoomClick,
     handleRenameClick,
-    handleSaveRename: baseHandleSaveRename,
+    handleSaveRename,
     handleCancelRename,
     handleDeleteClick
   } = createRoomHandlers(
@@ -53,32 +50,23 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
     setDeleteModalOpen
   );
 
-  const handleSaveRename = (e: React.MouseEvent, roomId: string) => {
-    e.stopPropagation();
-    if (editedRoomName.trim()) {
-      onEditRoom(roomId, editedRoomName.trim());
-      setEditingRoomId(null);
-    }
-  };
-
   return (
     <div>
-      <h2 className="text-base font-semibold mb-4 text-foreground">Rooms</h2>
-      
-      <div className="space-y-2">
+      <h2 className="ml-2 text-sm mb-2 font-semibold text-foreground">Rooms</h2>
+      <div className="flex w-full flex-col space-y-1">
         <Button 
           variant="ghost" 
-          className="w-full flex items-center justify-center gap-3 
-            bg-transparent border border-dashed border-border 
-            text-foreground hover:bg-accent hover:text-foreground
-            transition-colors duration-200 rounded-md py-3 mb-4" 
+          className="w-full flex items-center justify-start gap-2 
+            bg-transparent border-2 border-dashed border-primary/10 
+            text-primary/80 hover:bg-primary/5 hover:text-primary hover:border-primary/10
+            transition-colors duration-200 rounded-lg py-2 px-2 mb-1" 
           onClick={onAddRoom}
         >
-          <Plus size={20} />
-          <span className="font-medium">Add a Room</span>
+          <Plus className="h-4 w-4" />
+          <span className="text-sm font-normal">Add room</span>
         </Button>
 
-        {visibleRooms.map(room => (
+        {visibleRooms.map((room) => (
           <RoomItem
             key={room.id}
             room={room}
@@ -87,46 +75,28 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
             setEditedRoomName={setEditedRoomName}
             onRoomClick={handleRoomClick}
             onRenameClick={handleRenameClick}
-            onSaveRename={handleSaveRename}
+            onSaveRename={(e, id) => {
+              handleSaveRename(e, id);
+              onEditRoom(id, editedRoomName);
+            }}
             onCancelRename={handleCancelRename}
             onDeleteClick={handleDeleteClick}
           />
         ))}
 
         {hasHiddenRooms && (
-          <Popover open={showMoreRooms} onOpenChange={setShowMoreRooms}>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="w-full flex items-center justify-between px-2 py-1.5 
-                  text-muted-foreground hover:bg-accent hover:text-foreground 
-                  transition-colors duration-200 group"
-              >
-                <span className="flex items-center gap-2">
-                  <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-                  <span>Show More</span>
-                </span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[calc(300px-2rem)] bg-card border-border p-1" align="center" sideOffset={5}>
-              <div className="space-y-1">
-                {hiddenRooms.map(room => (
-                  <RoomItem
-                    key={room.id}
-                    room={room}
-                    editingRoomId={editingRoomId}
-                    editedRoomName={editedRoomName}
-                    setEditedRoomName={setEditedRoomName}
-                    onRoomClick={handleRoomClick}
-                    onRenameClick={handleRenameClick}
-                    onSaveRename={handleSaveRename}
-                    onCancelRename={handleCancelRename}
-                    onDeleteClick={handleDeleteClick}
-                  />
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+          <Button
+            variant="ghost"
+            className="w-full flex items-center justify-start gap-2 
+              bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
+              transition-colors duration-200 rounded-lg py-2 px-2"
+            onClick={() => setShowMoreRooms(!showMoreRooms)}
+          >
+            <ChevronDown className="h-4 w-4" />
+            <span className="text-sm font-normal">
+              {showMoreRooms ? 'Show less' : `Show ${rooms.length - 3} more`}
+            </span>
+          </Button>
         )}
       </div>
     </div>

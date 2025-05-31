@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -204,16 +204,16 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[450px] bg-[#1A1A1A] border border-white/10 p-5 rounded-xl shadow-lg">
+      <DialogContent className="w-[450px] bg-card border-border p-5 rounded-xl shadow-lg">
         <div className="flex flex-col space-y-4">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-medium text-white">Calculator</h2>
+            <h2 className="text-xl font-medium text-foreground">Calculator</h2>
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => onOpenChange(false)} 
-              className="text-gray-400 hover:text-white hover:bg-white/10"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               <X size={18} />
               <span className="sr-only">Close</span>
@@ -221,47 +221,47 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
           </div>
 
           <Tabs defaultValue="standard" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3 bg-[#222222] rounded-lg overflow-hidden">
+            <TabsList className="grid w-full grid-cols-3 bg-muted rounded-lg overflow-hidden p-1">
               <TabsTrigger 
                 value="standard" 
-                className="data-[state=active]:bg-[#2323FF] data-[state=active]:text-white text-gray-400 hover:text-white hover:bg-white/5"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0"
               >
                 Standard
               </TabsTrigger>
               <TabsTrigger 
                 value="scientific" 
-                className="data-[state=active]:bg-[#2323FF] data-[state=active]:text-white text-gray-400 hover:text-white hover:bg-white/5"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0"
               >
                 Scientific
               </TabsTrigger>
               <TabsTrigger 
                 value="converter" 
-                className="data-[state=active]:bg-[#2323FF] data-[state=active]:text-white text-gray-400 hover:text-white hover:bg-white/5"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0"
               >
                 Converter
               </TabsTrigger>
             </TabsList>
 
             {/* Standard Calculator */}
-            <TabsContent value="standard" className="space-y-4 mt-4">
+            <TabsContent value="standard">
               <div className="space-y-2">
                 <Input
                   type="text"
                   value={standardInput}
                   onChange={(e) => setStandardInput(e.target.value)}
                   placeholder="Enter expression..."
-                  className="text-right text-lg bg-[#222222] border-none focus-visible:ring-1 focus-visible:ring-white/20 text-white placeholder:text-gray-500 rounded-lg"
+                  className="text-right text-lg bg-muted border-none focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground rounded-lg"
                 />
-                <div className="text-right text-2xl font-semibold min-h-[2rem] text-white">
+                <div className="text-right text-2xl font-semibold min-h-[2rem] text-foreground">
                   {standardResult}
                 </div>
                 <div className="grid grid-cols-4 gap-2">
                   {['7', '8', '9', '/'].map((key) => (
                     <Button
                       key={key}
-                      variant="ghost"
+                      variant="secondary"
                       onClick={() => setStandardInput(standardInput + key)}
-                      className="bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -269,9 +269,9 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                   {['4', '5', '6', '*'].map((key) => (
                     <Button
                       key={key}
-                      variant="ghost"
+                      variant="secondary"
                       onClick={() => setStandardInput(standardInput + key)}
-                      className="bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -279,9 +279,9 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                   {['1', '2', '3', '-'].map((key) => (
                     <Button
                       key={key}
-                      variant="ghost"
+                      variant="secondary"
                       onClick={() => setStandardInput(standardInput + key)}
-                      className="bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -289,26 +289,26 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                   {['0', '.', '=', '+'].map((key) => (
                     <Button
                       key={key}
-                      variant={key === '=' ? 'default' : 'ghost'}
+                      variant={key === '=' ? 'default' : 'secondary'}
                       onClick={() => key === '=' ? calculateStandard() : setStandardInput(standardInput + key)}
                       className={key === '=' ? 
-                        "bg-[#2323FF] hover:bg-[#2323FF]/90 text-white" : 
-                        "bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                        "bg-primary hover:bg-primary/90 text-primary-foreground" : 
+                        "bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                       }
                     >
                       {key}
                     </Button>
                   ))}
                   <Button
-                    className="col-span-2 bg-[#222222] text-white hover:bg-white/10 hover:text-white"
-                    variant="ghost"
+                    className="col-span-2 bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                    variant="secondary"
                     onClick={() => setStandardInput('')}
                   >
                     Clear
                   </Button>
                   <Button
-                    className="col-span-2 bg-[#222222] text-white hover:bg-white/10 hover:text-white"
-                    variant="ghost"
+                    className="col-span-2 bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                    variant="secondary"
                     onClick={() => setStandardInput(standardInput.slice(0, -1))}
                   >
                     ←
@@ -318,15 +318,15 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
             </TabsContent>
 
             {/* Scientific Calculator */}
-            <TabsContent value="scientific" className="space-y-4 mt-4">
+            <TabsContent value="scientific">
               <div className="space-y-2">
                 <div className="flex justify-end items-center gap-2 mb-2">
-                  <span className="text-sm text-gray-400">Mode:</span>
+                  <span className="text-sm text-muted-foreground">Mode:</span>
                   <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
                     onClick={() => setIsRadianMode(!isRadianMode)}
-                    className="bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                    className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                   >
                     {isRadianMode ? 'RAD' : 'DEG'}
                   </Button>
@@ -336,18 +336,18 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                   value={scientificInput}
                   onChange={(e) => setScientificInput(e.target.value)}
                   placeholder="Enter expression..."
-                  className="text-right text-lg bg-[#222222] border-none focus-visible:ring-1 focus-visible:ring-white/20 text-white placeholder:text-gray-500 rounded-lg"
+                  className="text-right text-lg bg-muted border-none focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground rounded-lg"
                 />
-                <div className="text-right text-2xl font-semibold min-h-[2rem] text-white">
+                <div className="text-right text-2xl font-semibold min-h-[2rem] text-foreground">
                   {scientificResult}
                 </div>
                 <div className="grid grid-cols-5 gap-2">
                   {['sin', 'cos', 'tan', 'π', '^'].map((key) => (
                     <Button
                       key={key}
-                      variant="ghost"
+                      variant="secondary"
                       onClick={() => setScientificInput(scientificInput + key + (key === 'π' ? '' : '('))}
-                      className="bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -355,9 +355,9 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                   {['√', 'log', 'ln', '(', ')'].map((key) => (
                     <Button
                       key={key}
-                      variant="ghost"
+                      variant="secondary"
                       onClick={() => setScientificInput(scientificInput + key + (key === '√' ? '(' : ''))}
-                      className="bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -365,9 +365,9 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                   {['7', '8', '9', '/', '%'].map((key) => (
                     <Button
                       key={key}
-                      variant="ghost"
+                      variant="secondary"
                       onClick={() => setScientificInput(scientificInput + key)}
-                      className="bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -375,9 +375,9 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                   {['4', '5', '6', '*', 'e'].map((key) => (
                     <Button
                       key={key}
-                      variant="ghost"
+                      variant="secondary"
                       onClick={() => setScientificInput(scientificInput + key)}
-                      className="bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -385,11 +385,11 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                   {['1', '2', '3', '-', '='].map((key) => (
                     <Button
                       key={key}
-                      variant={key === '=' ? 'default' : 'ghost'}
+                      variant={key === '=' ? 'default' : 'secondary'}
                       onClick={() => key === '=' ? calculateScientific() : setScientificInput(scientificInput + key)}
                       className={key === '=' ? 
-                        "bg-[#2323FF] hover:bg-[#2323FF]/90 text-white" : 
-                        "bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                        "bg-primary hover:bg-primary/90 text-primary-foreground" : 
+                        "bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                       }
                     >
                       {key}
@@ -398,7 +398,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                   {['0', '.', 'Clear', '+', '←'].map((key) => (
                     <Button
                       key={key}
-                      variant="ghost"
+                      variant="secondary"
                       onClick={() => {
                         switch (key) {
                           case 'Clear':
@@ -411,7 +411,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                             setScientificInput(scientificInput + key);
                         }
                       }}
-                      className="bg-[#222222] text-white hover:bg-white/10 hover:text-white"
+                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -421,7 +421,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
             </TabsContent>
 
             {/* Unit Converter */}
-            <TabsContent value="converter" className="space-y-4 mt-4">
+            <TabsContent value="converter">
               <div className="space-y-4">
                 <Select
                   value={unitCategory}
@@ -431,15 +431,15 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                     setToUnit(unitCategories[value][1]);
                   }}
                 >
-                  <SelectTrigger className="bg-[#222222] border-none focus:ring-1 focus:ring-white/20 text-white">
+                  <SelectTrigger className="bg-muted border-none focus:ring-1 focus:ring-primary text-foreground">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1A1A1A] border-white/10">
+                  <SelectContent className="bg-card border-border">
                     {Object.keys(unitCategories).map((category) => (
                       <SelectItem 
                         key={category} 
                         value={category}
-                        className="text-white hover:bg-white/10"
+                        className="text-foreground hover:bg-accent"
                       >
                         {category.charAt(0).toUpperCase() + category.slice(1)}
                       </SelectItem>
@@ -450,15 +450,15 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Select value={fromUnit} onValueChange={setFromUnit}>
-                      <SelectTrigger className="bg-[#222222] border-none focus:ring-1 focus:ring-white/20 text-white">
+                      <SelectTrigger className="bg-muted border-none focus:ring-1 focus:ring-primary text-foreground">
                         <SelectValue placeholder="From" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1A1A1A] border-white/10">
+                      <SelectContent className="bg-card border-border">
                         {unitCategories[unitCategory].map((unit) => (
                           <SelectItem 
                             key={unit} 
                             value={unit}
-                            className="text-white hover:bg-white/10"
+                            className="text-foreground hover:bg-accent"
                           >
                             {unit}
                           </SelectItem>
@@ -470,35 +470,35 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                       value={unitValue}
                       onChange={(e) => setUnitValue(e.target.value)}
                       placeholder="Enter value..."
-                      className="bg-[#222222] border-none focus-visible:ring-1 focus-visible:ring-white/20 text-white placeholder:text-gray-500 rounded-lg"
+                      className="bg-muted border-none focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground rounded-lg"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Select value={toUnit} onValueChange={setToUnit}>
-                      <SelectTrigger className="bg-[#222222] border-none focus:ring-1 focus:ring-white/20 text-white">
+                      <SelectTrigger className="bg-muted border-none focus:ring-1 focus:ring-primary text-foreground">
                         <SelectValue placeholder="To" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1A1A1A] border-white/10">
+                      <SelectContent className="bg-card border-border">
                         {unitCategories[unitCategory].map((unit) => (
                           <SelectItem 
                             key={unit} 
                             value={unit}
-                            className="text-white hover:bg-white/10"
+                            className="text-foreground hover:bg-accent"
                           >
                             {unit}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <div className="h-10 px-3 py-2 rounded-lg bg-[#222222] text-white flex items-center">
+                    <div className="h-10 px-3 py-2 rounded-lg bg-muted text-foreground flex items-center">
                       {convertedValue || '---'}
                     </div>
                   </div>
                 </div>
 
                 <Button
-                  className="w-full bg-[#2323FF] hover:bg-[#2323FF]/90 text-white"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   onClick={convertUnit}
                 >
                   Convert

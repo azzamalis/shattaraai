@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Book, MessageCircle, BarChart, Calculator } from 'lucide-react';
+import { Book, MessageCircle, Calculator, BarChart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface HelpToolsProps {
@@ -16,50 +16,58 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
 }) => {
   return (
     <div>
-      <h2 className="text-base font-semibold mb-4 text-dashboard-text dark:text-dashboard-text">Help & Tools</h2>
-      <div className="space-y-2">
+      <h2 className="ml-2 text-sm mb-2 font-semibold text-foreground">Help & Tools</h2>
+      <div className="flex flex-col space-y-1">
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-2 py-1.5 text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text transition-colors duration-200" 
+          className="w-full flex items-center justify-start gap-2 
+            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
+            transition-colors duration-200 rounded-lg py-2 px-2" 
           onClick={onFeedbackClick}
         >
-          <div className="flex items-center gap-2">
-            <MessageCircle size={16} className="text-dashboard-text-secondary" />
-            <span>Feedback</span>
-          </div>
+          <MessageCircle className="h-4 w-4 text-primary/60" />
+          <span className="text-sm font-normal">Feedback</span>
         </Button>
         
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-2 py-1.5 text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text transition-colors duration-200" 
+          className="w-full flex items-center justify-start gap-2 
+            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
+            transition-colors duration-200 rounded-lg py-2 px-2" 
           onClick={onTutorialClick}
         >
-          <div className="flex items-center gap-2">
-            <Book size={16} className="text-dashboard-text-secondary" />
-            <span>Quick Guide</span>
-          </div>
+          <Book className="h-4 w-4 text-primary/60" />
+          <span className="text-sm font-normal relative">
+            Tutorial
+            <span className="absolute -top-1.5 right-[-6px] flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-1.5 w-1.5 rounded-full bg-green-500/60 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+            </span>
+          </span>
         </Button>
-        
+
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-2 py-1.5 text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text transition-colors duration-200" 
+          className="w-full flex items-center justify-start gap-2 
+            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
+            transition-colors duration-200 rounded-lg py-2 px-2" 
           asChild
         >
           <Link to="/reports" className="flex items-center gap-2">
-            <BarChart size={16} className="text-dashboard-text-secondary" />
-            <span>Reports</span>
+            <BarChart className="h-4 w-4 text-primary/60" />
+            <span className="text-sm font-normal">Reports</span>
           </Link>
         </Button>
         
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-2 py-1.5 text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text transition-colors duration-200" 
+          className="w-full flex items-center justify-start gap-2 
+            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
+            transition-colors duration-200 rounded-lg py-2 px-2" 
           onClick={onCalculatorClick}
         >
-          <div className="flex items-center gap-2">
-            <Calculator size={16} className="text-dashboard-text-secondary" />
-            <span>Calculator</span>
-          </div>
+          <Calculator className="h-4 w-4 text-primary/60" />
+          <span className="text-sm font-normal">Calculator</span>
         </Button>
       </div>
     </div>

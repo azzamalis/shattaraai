@@ -1,17 +1,30 @@
-
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
+import { ArrowRight } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TutorialModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+type ContentType = {
+  type: 'image' | 'video';
+  src: string;
+  alt?: string;
+};
+
 export function TutorialModal({ open, onOpenChange }: TutorialModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const totalSteps = 5;
+  const [activeTab, setActiveTab] = useState('upload');
+  const totalSteps = 9;
 
   // Mark tutorial as seen when it's opened
   useEffect(() => {
@@ -22,91 +35,85 @@ export function TutorialModal({ open, onOpenChange }: TutorialModalProps) {
 
   const tutorialSteps = [
     {
-      title: "Welcome to Shattara",
-      subtitle: "Let's get you started with a quick tour",
-      content: (
-        <div className="flex flex-col items-center text-center p-6">
-          <img src="/placeholder.svg" alt="Welcome" className="w-64 h-64 mb-4" />
-          <p className="text-lg mb-4 text-foreground">
-            Shattara is your all-in-one AI-powered study platform designed to help you learn more efficiently.
-          </p>
-          <p className="text-md text-muted-foreground">
-            This quick guide will walk you through the main features to help you get started right away.
-          </p>
-        </div>
-      )
+      title: "Upload, paste, or record",
+      subtitle: "Upload, paste, or record content to start learning. Just add content in one quick click!",
+      content: {
+        type: 'video',
+        src: '/videos/upload-demo.mp4',
+        alt: 'Content Upload Demo'
+      } as ContentType
     },
     {
-      title: "Create Your Study Rooms",
-      subtitle: "Organize your materials in one place",
-      content: (
-        <div className="flex flex-col md:flex-row items-center p-6 gap-8">
-          <img src="/placeholder.svg" alt="Study Rooms" className="w-48 h-48" />
-          <div>
-            <ul className="list-disc pl-5 space-y-2 text-foreground">
-              <li>Create dedicated rooms for different subjects or courses</li>
-              <li>Each room organizes all your notes and materials in one place</li>
-              <li>Invite collaborators to share and work together</li>
-              <li>Access your content from any device, anywhere</li>
-            </ul>
-          </div>
-        </div>
-      )
+      title: "Website links",
+      subtitle: "You can now paste website URLs to quickly understand the content.",
+      content: {
+        type: 'video',
+        src: '/videos/website-links-demo.mp4',
+        alt: 'Website Links Demo'
+      } as ContentType
     },
     {
-      title: "Add Your Content",
-      subtitle: "Upload notes, paste text, or record voice",
-      content: (
-        <div className="flex flex-col md:flex-row items-center p-6 gap-8">
-          <div>
-            <ul className="list-disc pl-5 space-y-2 text-foreground">
-              <li>Upload PDFs, images, and documents with one click</li>
-              <li>Paste text directly from websites or other sources</li>
-              <li>Record your voice for audio notes</li>
-              <li>Our AI automatically organizes and indexes everything</li>
-            </ul>
-          </div>
-          <img src="/placeholder.svg" alt="Content Upload" className="w-48 h-48" />
-        </div>
-      )
+      title: "Chat with AI",
+      subtitle: "Ask questions and get personalized insights about your content. P.S. Use 'Think Mode' in the AI Chat.",
+      content: {
+        type: 'video',
+        src: '/videos/ai-chat-demo.mp4',
+        alt: 'AI Chat Demo'
+      } as ContentType
     },
     {
-      title: "Learn with AI",
-      subtitle: "Ask questions and get instant answers",
-      content: (
-        <div className="flex flex-col md:flex-row items-center p-6 gap-8">
-          <img src="/placeholder.svg" alt="AI Learn" className="w-48 h-48" />
-          <div>
-            <ul className="list-disc pl-5 space-y-2 text-foreground">
-              <li>Ask any question about your content</li>
-              <li>Generate practice quizzes to test your knowledge</li>
-              <li>Create flashcards with a single click</li>
-              <li>Get explanations tailored to your learning style</li>
-            </ul>
-          </div>
-        </div>
-      )
+      title: "Practice flashcards",
+      subtitle: "Learn with an AI tutor that simplifies ideas and guides you to the right sources. P.S. Say 'Teach Me' for the AI.",
+      content: {
+        type: 'video',
+        src: '/videos/flashcards-demo.mp4',
+        alt: 'Flashcards Demo'
+      } as ContentType
     },
     {
-      title: "You're All Set!",
-      subtitle: "Start learning smarter today",
-      content: (
-        <div className="flex flex-col items-center text-center p-6">
-          <img src="/placeholder.svg" alt="Getting Started" className="w-64 h-64 mb-4" />
-          <p className="text-lg mb-4 text-foreground">
-            You're now ready to use Shattara to revolutionize your learning experience.
-          </p>
-          <p className="text-md mb-6 text-muted-foreground">
-            Start by creating your first room and adding some content.
-          </p>
-          <Button 
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            onClick={() => onOpenChange(false)}
-          >
-            Get Started
-          </Button>
-        </div>
-      )
+      title: "Generate summaries, chapters, and transcripts",
+      subtitle: "Get brief summaries, chapter breakdowns, and transcripts of your content.",
+      content: {
+        type: 'video',
+        src: '/videos/summaries-demo.mp4',
+        alt: 'Summaries Demo'
+      } as ContentType
+    },
+    {
+      title: "Summary prompts",
+      subtitle: "Get the exact information you need by creating custom prompts for your summaries.",
+      content: {
+        type: 'video',
+        src: '/videos/prompts-demo.mp4',
+        alt: 'Summary Prompts Demo'
+      } as ContentType
+    },
+    {
+      title: "Study with quizzes",
+      subtitle: "Study your topic with quizzes that break down into concepts, a chat to ask questions, feedback, and sources.",
+      content: {
+        type: 'video',
+        src: '/videos/quizzes-demo.mp4',
+        alt: 'Quizzes Demo'
+      } as ContentType
+    },
+    {
+      title: "Spaces & space chat",
+      subtitle: "Add contents to your spaces, chat with all your contents, and more!",
+      content: {
+        type: 'video',
+        src: '/videos/spaces-demo.mp4',
+        alt: 'Spaces Demo'
+      } as ContentType
+    },
+    {
+      title: "Languages, AI Models, & More",
+      subtitle: "Choose from 20+ languages and 4+ AI models in account settings.",
+      content: {
+        type: 'video',
+        src: '/videos/settings-demo.mp4',
+        alt: 'Settings Demo'
+      } as ContentType
     }
   ];
 
@@ -124,70 +131,139 @@ export function TutorialModal({ open, onOpenChange }: TutorialModalProps) {
     }
   };
 
-  const handleClose = () => {
-    setCurrentStep(0);
-    onOpenChange(false);
+  const renderContent = (content: ContentType) => {
+    if (content.type === 'video') {
+      return (
+        <video 
+          className="w-full h-full object-cover"
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+        >
+          <source src={content.src} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      );
+    }
+    return (
+      <img 
+        src={content.src} 
+        alt={content.alt || ''} 
+        className="w-full h-full object-cover" 
+      />
+    );
   };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       if (!isOpen) {
         setCurrentStep(0);
+        setActiveTab('upload');
       }
       onOpenChange(isOpen);
     }}>
-      <DialogOverlay className="bg-black/70 backdrop-blur-sm" />
-      <DialogContent className="max-w-3xl w-[95vw] h-[90vh] md:h-auto p-0 bg-card rounded-xl border-border shadow-2xl overflow-hidden">
-        {/* Close button */}
+      <DialogContent className="max-w-4xl w-[95vw] gap-0 p-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border border-border/50">
+        {/* Close button - X in the top right */}
         <button 
-          onClick={handleClose}
-          className="absolute top-4 right-4 z-50 p-2 rounded-full bg-accent hover:bg-accent/80 transition-colors"
-          aria-label="Close tutorial"
+          onClick={() => onOpenChange(false)}
+          className="absolute right-4 top-4 z-50 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
         >
-          <X className="h-4 w-4 text-foreground" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+          <span className="sr-only">Close</span>
         </button>
 
         {/* Header */}
-        <div className="bg-card p-6 border-b border-border">
-          <h2 className="text-2xl font-bold text-foreground">{tutorialSteps[currentStep].title}</h2>
-          <p className="text-sm text-muted-foreground mt-1">{tutorialSteps[currentStep].subtitle}</p>
-        </div>
+        <DialogHeader className="p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+          <DialogTitle className="text-2xl font-semibold tracking-tight text-foreground">
+            {tutorialSteps[currentStep].title}
+          </DialogTitle>
+          <p className="text-base text-muted-foreground/80 mt-1.5">
+            {tutorialSteps[currentStep].subtitle}
+          </p>
+        </DialogHeader>
 
         {/* Main content area */}
-        <div className="flex-1 overflow-auto bg-muted min-h-[300px] max-h-[60vh]">
-          {tutorialSteps[currentStep].content}
+        <div className="px-6">
+          {currentStep === 0 ? (
+            <div className="space-y-6 py-4">
+              <Tabs defaultValue="upload" value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="w-full grid grid-cols-3 gap-2 p-1 h-14 bg-background">
+                  <TabsTrigger 
+                    value="upload"
+                    className="h-full rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+                  >
+                    Upload
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="paste"
+                    className="h-full rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+                  >
+                    Paste
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="record"
+                    className="h-full rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+                  >
+                    Record
+                  </TabsTrigger>
+                </TabsList>
+                <div className="relative w-full aspect-video bg-card rounded-lg overflow-hidden border border-border/50 mt-6">
+                  {renderContent(tutorialSteps[currentStep].content)}
+                </div>
+              </Tabs>
+            </div>
+          ) : (
+            <div className="pt-4 pb-6">
+              <div className="relative w-full aspect-video bg-card rounded-lg overflow-hidden border border-border/50">
+                {renderContent(tutorialSteps[currentStep].content)}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer with navigation controls */}
-        <div className="p-4 border-t border-border bg-card flex flex-col sm:flex-row items-center justify-between">
+        <div className="flex items-center justify-between px-6 py-4 bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/30">
           {/* Step dots */}
-          <div className="flex space-x-2 justify-center mb-4 sm:mb-0">
+          <div className="flex gap-1">
             {Array.from({ length: totalSteps }).map((_, index) => (
               <div
                 key={index}
-                className={`h-2 w-2 rounded-full transition-colors ${
-                  index === currentStep ? 'bg-primary' : 'bg-muted-foreground'
-                }`}
+                className={cn(
+                  "h-2 w-2 rounded-full transition-colors",
+                  index === currentStep 
+                    ? "bg-primary shadow-sm shadow-primary/50" 
+                    : "bg-primary/20 hover:bg-primary/30 transition-colors"
+                )}
               />
             ))}
           </div>
 
           {/* Navigation buttons */}
-          <div className="flex space-x-3">
+          <div className="flex gap-3">
             {currentStep > 0 && (
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={handleBack}
-                className="px-4 py-2"
+                className="hover:bg-accent"
               >
                 Back
               </Button>
             )}
             <Button
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2"
-              onClick={handleNext}
+              onClick={currentStep === totalSteps - 1 ? () => onOpenChange(false) : handleNext}
+              className="bg-primary hover:bg-primary/90"
             >
-              {currentStep === totalSteps - 1 ? 'Finish' : 'Next'}
+              {currentStep === totalSteps - 1 ? 'Close' : 'Next'}
+              {currentStep !== totalSteps - 1 && (
+                <ArrowRight
+                  className="ml-2 h-4 w-4 opacity-70"
+                  aria-hidden="true"
+                />
+              )}
             </Button>
           </div>
         </div>

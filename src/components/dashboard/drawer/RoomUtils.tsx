@@ -31,8 +31,8 @@ export const RoomItem: React.FC<RoomItemProps> = ({
       key={room.id} 
       variant="ghost" 
       className="w-full flex items-center justify-between gap-2 px-2 py-1.5 
-        text-foreground hover:bg-accent transition-colors duration-200
-        hover:text-foreground group" 
+        text-primary/80 hover:bg-primary/5 hover:text-primary transition-colors duration-200
+        group" 
       onClick={() => onRoomClick(room.id)}
     >
       {editingRoomId === room.id ? (
@@ -41,33 +41,33 @@ export const RoomItem: React.FC<RoomItemProps> = ({
             type="text" 
             value={editedRoomName} 
             onChange={e => setEditedRoomName(e.target.value)} 
-            className="flex-1 bg-transparent border-none border-b border-foreground text-foreground outline-none focus:outline-none focus:ring-0 focus:border-none" 
-            style={{ borderBottom: '1px solid hsl(var(--foreground))' }} 
+            className="flex-1 bg-transparent border-none border-b border-primary text-primary outline-none focus:outline-none focus:ring-0 focus:border-none" 
+            style={{ borderBottom: '1px solid hsl(var(--primary))' }} 
             autoFocus 
             onKeyDown={e => {
               if (e.key === 'Enter') onSaveRename(e as any, room.id);
               if (e.key === 'Escape') onCancelRename(e as any);
             }} 
           />
-          <Button variant="ghost" size="icon" className="h-6 w-6 text-foreground hover:bg-accent" onClick={e => onSaveRename(e, room.id)}>
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-primary/80 hover:bg-primary/5 hover:text-primary" onClick={e => onSaveRename(e, room.id)}>
             <Check className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6 text-foreground hover:bg-accent" onClick={onCancelRename}>
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-primary/80 hover:bg-primary/5 hover:text-primary" onClick={onCancelRename}>
             <X className="h-4 w-4" />
           </Button>
         </div>
       ) : (
         <>
           <div className="flex items-center gap-2">
-            <Box className="h-4 w-4 text-muted-foreground" />
+            <Box className="h-4 w-4 text-primary/60" />
             <span className="flex-1 text-left truncate">{room.name}</span>
           </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-foreground hover:bg-accent" onClick={e => onRenameClick(e, room.id)}>
-              <Pencil className="h-3 w-3" />
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-primary/80 hover:bg-primary/5 hover:text-primary" onClick={e => onRenameClick(e, room.id)}>
+              <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-foreground hover:bg-accent" onClick={e => onDeleteClick(e, room.id)}>
-              <Trash2 className="h-3 w-3" />
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-primary/80 hover:bg-primary/5 hover:text-primary" onClick={e => onDeleteClick(e, room.id)}>
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         </>

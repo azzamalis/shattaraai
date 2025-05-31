@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ContentItem, ContentHandlers } from '@/lib/types';
 
@@ -9,8 +8,72 @@ interface ContentContextType extends ContentHandlers {
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
+// Dummy data for testing
+const dummyContent: ContentItem[] = [
+  {
+    id: 'content-1',
+    title: 'Introduction to Quantum Physics',
+    type: 'pdf',
+    createdAt: new Date().toISOString(),
+    filename: 'quantum-physics.pdf',
+    thumbnail: '/placeholder.svg',
+    metadata: {
+      pages: 25,
+      progress: 0.4
+    }
+  },
+  {
+    id: 'content-2',
+    title: 'Machine Learning Fundamentals',
+    type: 'video',
+    createdAt: new Date().toISOString(),
+    duration: 3600,
+    thumbnail: '/placeholder.svg',
+    metadata: {
+      duration: '1 hour',
+      progress: 0.6
+    }
+  },
+  {
+    id: 'content-3',
+    title: 'Web Development Best Practices',
+    type: 'website',
+    createdAt: new Date().toISOString(),
+    url: 'https://example.com/web-dev',
+    text: 'Learn about modern web development practices...',
+    metadata: {
+      readTime: '15 mins',
+      progress: 0.2
+    }
+  },
+  {
+    id: 'content-4',
+    title: 'Data Structures & Algorithms',
+    type: 'recording',
+    createdAt: new Date().toISOString(),
+    duration: 1800,
+    metadata: {
+      duration: '30 mins',
+      progress: 0.8
+    }
+  },
+  {
+    id: 'content-5',
+    title: 'Advanced JavaScript Concepts',
+    type: 'youtube',
+    createdAt: new Date().toISOString(),
+    url: 'https://youtube.com/watch?v=example',
+    duration: 2700,
+    thumbnail: '/placeholder.svg',
+    metadata: {
+      duration: '45 mins',
+      progress: 0.3
+    }
+  }
+];
+
 export function ContentProvider({ children }: { children: React.ReactNode }) {
-  const [content, setContent] = useState<ContentItem[]>([]);
+  const [content, setContent] = useState<ContentItem[]>(dummyContent);
 
   // Load content from localStorage on mount
   useEffect(() => {
