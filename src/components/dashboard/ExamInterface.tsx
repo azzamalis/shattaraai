@@ -272,8 +272,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
     return (
       <div key={question.id} className={cn(
         "mb-8 rounded-lg p-6",
-        "bg-gray-50 dark:bg-gray-800",
-        "border border-gray-200 dark:border-gray-700"
+        "bg-card border-border"
       )}>
         {!isSkipped ? (
           <>
@@ -286,8 +285,8 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
                 onClick={() => handleSkip(question.id)}
                 className={cn(
                   "flex items-center gap-1 text-sm",
-                  "text-gray-500 dark:text-gray-400",
-                  "hover:text-gray-900 dark:hover:text-white"
+                  "text-muted-foreground",
+                  "hover:text-foreground"
                 )}
               >
                 <SkipForward className="h-4 w-4" />
@@ -306,7 +305,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
                       "w-full rounded-lg border p-4 text-left transition-colors",
                       answers[question.id] === index
                         ? "border-primary bg-primary/10"
-                        : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500"
+                        : "border-border bg-card hover:border-muted-foreground/50"
                     )}
                   >
                     <span className="mr-3 font-medium">{String.fromCharCode(65 + index)}.</span>
@@ -324,15 +323,15 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
                   placeholder="Type your answer here..."
                   className={cn(
                     "min-h-32 w-full resize-none rounded-lg p-4",
-                    "border border-gray-200 dark:border-gray-600",
-                    "bg-white dark:bg-gray-700",
-                    "text-gray-900 dark:text-white",
-                    "placeholder-gray-400 dark:placeholder-gray-500",
+                    "border border-border",
+                    "bg-background",
+                    "text-foreground",
+                    "placeholder-muted-foreground",
                     "focus:border-primary focus:ring-1 focus:ring-primary"
                   )}
                 />
                 {isSaving && savingQuestionId === question.id && (
-                  <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+                  <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
                     <span className="animate-pulse">Saving...</span>
                   </div>
                 )}
@@ -343,11 +342,11 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
           // Skipped State
           <>
             <div className="mb-2 text-lg font-medium">{question.id}.</div>
-            <h2 className="mb-8 text-xl leading-relaxed text-gray-500">{question.question}</h2>
+            <h2 className="mb-8 text-xl leading-relaxed text-muted-foreground">{question.question}</h2>
             <div className="flex justify-center">
               <button 
                 onClick={() => handleUndoSkip(question.id)}
-                className="flex items-center gap-2 rounded-md bg-gray-700 px-4 py-2 hover:bg-gray-600"
+                className="flex items-center gap-2 rounded-md bg-accent px-4 py-2 hover:bg-accent/80"
               >
                 <Undo2 className="h-4 w-4" />
                 Undo Skip
@@ -360,41 +359,28 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
   };
 
   return (
-    <div className={cn(
-      "min-h-screen",
-      "bg-white dark:bg-gray-900",
-      "text-gray-900 dark:text-white"
-    )}>
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header - Sticky */}
-      <header className={cn(
-        "sticky top-0 z-10",
-        "border-b border-gray-200 dark:border-gray-700",
-        "bg-gray-50 dark:bg-gray-800"
-      )}>
+      <header className="sticky top-0 z-10 border-b border-border bg-card">
         <div className="flex items-center justify-between px-6 py-3">
           {/* Left: Share Button */}
-          <button className={cn(
-            "flex items-center gap-2 rounded-md",
-            "bg-gray-100 dark:bg-gray-700",
-            "hover:bg-gray-200 dark:hover:bg-gray-600",
-            "text-sm px-3 py-2"
-          )}>
+          <button className="flex items-center gap-2 rounded-md bg-accent hover:bg-accent/80 text-sm px-3 py-2">
             <Share2 className="h-4 w-4" />
             Share exam
           </button>
           
           {/* Center: Fixed Progress Bar */}
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-muted-foreground">
               {totalCompletedQuestions}
             </span>
-            <div className="h-2 w-96 rounded-full bg-gray-200 dark:bg-gray-700">
+            <div className="h-2 w-96 rounded-full bg-border">
               <div 
                 className="h-full rounded-full bg-primary transition-all duration-300" 
                 style={{width: `${progressPercentage}%`}}
               ></div>
             </div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-muted-foreground">
               {questions.length}
             </span>
           </div>
@@ -402,7 +388,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
           {/* Right: Timer with warning color */}
           <div className={cn(
             "font-mono text-lg",
-            timeRemaining < 300 ? "text-red-500 dark:text-red-400" : "text-gray-900 dark:text-white"
+            timeRemaining < 300 ? "text-red-500" : "text-foreground"
           )}>
             {formatTime(timeRemaining)}
           </div>
@@ -422,7 +408,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
                   onClick={handleSubmitExam}
                   className={cn(
                     "w-full rounded-lg py-4 px-8 text-lg font-medium",
-                    "bg-primary text-white",
+                    "bg-primary text-primary-foreground",
                     "hover:bg-primary/90 transition-colors",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}

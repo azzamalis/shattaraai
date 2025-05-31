@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, Share2, X, RotateCcw, RefreshCw, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -46,7 +47,7 @@ const CircularProgress: React.FC<{ percentage: number }> = ({ percentage }) => {
     <div className="relative inline-flex items-center justify-center">
       <svg className="transform -rotate-90" width="150" height="150">
         <circle
-          className="stroke-[#1F1F1F]"
+          className="stroke-border"
           strokeWidth="8"
           fill="transparent"
           r={radius}
@@ -54,7 +55,7 @@ const CircularProgress: React.FC<{ percentage: number }> = ({ percentage }) => {
           cy="75"
         />
         <circle
-          className="stroke-[#F97316] transition-all duration-700 ease-in-out"
+          className="stroke-orange-500 transition-all duration-700 ease-in-out"
           strokeWidth="8"
           fill="transparent"
           r={radius}
@@ -67,8 +68,8 @@ const CircularProgress: React.FC<{ percentage: number }> = ({ percentage }) => {
         />
       </svg>
       <div className="absolute flex flex-col items-center justify-center">
-        <span className="text-2xl font-bold text-white">{percentage.toFixed(1)}%</span>
-        <span className="text-sm text-gray-400">Score</span>
+        <span className="text-2xl font-bold text-foreground">{percentage.toFixed(1)}%</span>
+        <span className="text-sm text-muted-foreground">Score</span>
       </div>
     </div>
   );
@@ -121,27 +122,27 @@ export function ExamResultsSummary() {
   };
 
   return (
-    <div className="min-h-screen bg-[#121212]">
+    <div className="min-h-screen bg-background">
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-white/10 bg-[#121212] px-6 py-4">
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-border bg-background px-6 py-4">
         <div className="flex items-center gap-2">
-          <Logo className="h-8 w-auto" textColor="text-white" />
+          <Logo className="h-8 w-auto" textColor="text-foreground" />
         </div>
-        <div className="flex items-center gap-2 text-white">
+        <div className="flex items-center gap-2 text-foreground">
           <span>Exam 1</span>
           <ChevronRight className="h-4 w-4" />
         </div>
         <div className="flex items-center gap-4">
           <button 
             onClick={handleShare}
-            className="flex items-center gap-2 rounded-md bg-white/5 px-3 py-2 text-sm text-white hover:bg-white/10"
+            className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm text-foreground hover:bg-accent/80"
           >
             <Share2 className="h-4 w-4" />
             Share exam
           </button>
           <button 
             onClick={handleClose}
-            className="text-white/60 hover:text-white"
+            className="text-muted-foreground hover:text-foreground"
           >
             <X className="h-5 w-5" />
           </button>
@@ -151,67 +152,67 @@ export function ExamResultsSummary() {
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-6 pt-24">
         {/* Title */}
-        <h1 className="mb-12 text-center text-3xl font-bold text-white">
+        <h1 className="mb-12 text-center text-3xl font-bold text-foreground">
           Keep up the momentum!
         </h1>
 
         {/* Stats Row */}
         <div className="mb-8 flex items-center justify-center gap-16">
           <div className="text-center">
-            <div className="text-3xl font-bold text-white">{examData.skipped}</div>
-            <div className="text-sm text-gray-400">Skipped</div>
+            <div className="text-3xl font-bold text-foreground">{examData.skipped}</div>
+            <div className="text-sm text-muted-foreground">Skipped</div>
           </div>
           <CircularProgress percentage={examData.score} />
           <div className="text-center">
-            <div className="text-3xl font-bold text-white">{examData.timeTaken}</div>
-            <div className="text-sm text-gray-400">Time Taken</div>
+            <div className="text-3xl font-bold text-foreground">{examData.timeTaken}</div>
+            <div className="text-sm text-muted-foreground">Time Taken</div>
           </div>
         </div>
 
         {/* Preview Link */}
         <div className="mb-8 text-center">
-          <button className="text-sm text-gray-400 underline hover:text-gray-300">
+          <button className="text-sm text-muted-foreground underline hover:text-foreground">
             Preview Exam 1
           </button>
         </div>
 
         {/* Content Breakdown */}
-        <div className="rounded-lg border border-white/10 bg-[#171717]/50">
+        <div className="rounded-lg border border-border bg-card">
           {/* Header */}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex w-full items-center justify-between p-4 hover:bg-white/5"
+            className="flex w-full items-center justify-between p-4 hover:bg-accent"
           >
-            <div className="flex items-center gap-2 text-white">
+            <div className="flex items-center gap-2 text-foreground">
               <ChevronDown className={cn("h-5 w-5 transition-transform", !isExpanded && "-rotate-90")} />
               <span>Black Holes Explained – From Birth to Death</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="h-2 w-24 overflow-hidden rounded-full bg-[#171717]">
+              <div className="h-2 w-24 overflow-hidden rounded-full bg-border">
                 <div 
-                  className="h-full bg-[#F97316]" 
+                  className="h-full bg-orange-500" 
                   style={{ width: `${(examData.correctAnswers / examData.totalQuestions) * 100}%` }}
                 />
               </div>
-              <span className="text-sm text-white">{examData.correctAnswers}/{examData.totalQuestions}</span>
+              <span className="text-sm text-foreground">{examData.correctAnswers}/{examData.totalQuestions}</span>
             </div>
           </button>
 
           {/* Expanded Content */}
           {isExpanded && (
-            <div className="border-t border-white/10 p-4">
+            <div className="border-t border-border p-4">
               <div className="space-y-4">
                 {chapters.map((chapter, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <div>
-                      <div className="text-white">{chapter.title}</div>
-                      <div className="text-sm text-gray-400">{chapter.timeRange}</div>
+                      <div className="text-foreground">{chapter.title}</div>
+                      <div className="text-sm text-muted-foreground">{chapter.timeRange}</div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <button className="rounded-md bg-[#FDE047]/10 px-3 py-1 text-sm text-[#FDE047] hover:bg-[#FDE047]/20">
+                      <button className="rounded-md bg-yellow-400/10 px-3 py-1 text-sm text-yellow-400 hover:bg-yellow-400/20">
                         Review ↗
                       </button>
-                      <span className="text-sm text-gray-400">
+                      <span className="text-sm text-muted-foreground">
                         {chapter.correct}/{chapter.total}
                       </span>
                     </div>
@@ -226,21 +227,21 @@ export function ExamResultsSummary() {
         <div className="mt-8 flex justify-center gap-4 pb-8">
           <button 
             onClick={handleTryAgain}
-            className="flex h-10 w-40 items-center justify-center gap-2 rounded-lg border border-white/10 text-white hover:bg-white/5"
+            className="flex h-10 w-40 items-center justify-center gap-2 rounded-lg border border-border text-foreground hover:bg-accent"
           >
             <RefreshCw className="h-5 w-5" />
             Try Again
           </button>
           <button 
             onClick={handleRetake}
-            className="flex h-10 w-40 items-center justify-center gap-2 rounded-lg border border-white/10 text-white hover:bg-white/5"
+            className="flex h-10 w-40 items-center justify-center gap-2 rounded-lg border border-border text-foreground hover:bg-accent"
           >
             <RotateCcw className="h-5 w-5" />
             Retake Exam
           </button>
           <button 
             onClick={handleCreateNew}
-            className="flex h-10 w-48 items-center justify-center gap-2 rounded-lg bg-[#FDFDFD] text-[#121212] hover:bg-[#FDFDFD]/90"
+            className="flex h-10 w-48 items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="h-5 w-5" />
             Create New Exam
@@ -255,4 +256,4 @@ export function ExamResultsSummary() {
       />
     </div>
   );
-} 
+}

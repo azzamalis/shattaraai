@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Share2, MessageCircle, ChevronRight, RotateCcw, BarChart3, X, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -198,15 +199,15 @@ const ExamResultsInterface: React.FC = () => {
     return (
       <div className="space-y-3">
         {question.options?.map((option, index) => {
-          let borderColor = 'border-gray-600';
-          let bgColor = 'bg-gray-800';
+          let borderColor = 'border-border';
+          let bgColor = 'bg-card';
           
           if (index === question.correctAnswer) {
             borderColor = 'border-green-500';
-            bgColor = 'bg-green-900/10';
+            bgColor = 'bg-green-500/10';
           } else if (index === question.userAnswer && index !== question.correctAnswer) {
             borderColor = 'border-red-500';
-            bgColor = 'bg-red-900/10';
+            bgColor = 'bg-red-500/10';
           }
 
           return (
@@ -222,19 +223,19 @@ const ExamResultsInterface: React.FC = () => {
         
         <div className={`mt-4 rounded-lg border p-4 ${
           question.userAnswer === question.correctAnswer 
-            ? 'border-green-500 bg-green-900/10' 
-            : 'border-red-500 bg-red-900/10'
+            ? 'border-green-500 bg-green-500/10' 
+            : 'border-red-500 bg-red-500/10'
         }`}>
           <div className={`mb-2 font-medium ${
             question.userAnswer === question.correctAnswer ? 'text-green-400' : 'text-red-400'
           }`}>
             {question.userAnswer === question.correctAnswer ? 'Correct' : 'Incorrect'}
           </div>
-          <p className="text-sm text-gray-300 leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             {question.explanation || 'Explanation not available for this question.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <div className="mt-2 text-xs text-gray-400">
+            <div className="mt-2 text-xs text-muted-foreground">
               Reference: {question.referenceTime} {question.referenceSource}
             </div>
           )}
@@ -247,16 +248,16 @@ const ExamResultsInterface: React.FC = () => {
     if (question.isSkipped) {
       return (
         <div>
-          <div className="mb-4 rounded-lg border border-gray-600 bg-gray-800 p-4">
-            <div className="text-gray-500 italic">Question was skipped</div>
+          <div className="mb-4 rounded-lg border border-border bg-card p-4">
+            <div className="text-muted-foreground italic">Question was skipped</div>
           </div>
-          <div className="rounded-lg border border-gray-600 bg-gray-800 p-4">
-            <div className="mb-2 font-medium text-gray-400">Suggested Answer</div>
-            <p className="text-sm text-gray-300 leading-relaxed">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <div className="mb-2 font-medium text-muted-foreground">Suggested Answer</div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {question.feedback || 'Sample answer not available for this question.'}
             </p>
             {question.referenceTime && question.referenceSource && (
-              <div className="mt-2 text-xs text-gray-400">
+              <div className="mt-2 text-xs text-muted-foreground">
                 Reference: {question.referenceTime} {question.referenceSource}
               </div>
             )}
@@ -267,17 +268,17 @@ const ExamResultsInterface: React.FC = () => {
 
     return (
       <div>
-        <div className="mb-4 rounded-lg border border-gray-600 bg-gray-800 p-4">
-          <div className="mb-2 text-sm text-gray-400">Your Answer:</div>
-          <div className="text-white">{question.userAnswer || 'No answer provided'}</div>
+        <div className="mb-4 rounded-lg border border-border bg-card p-4">
+          <div className="mb-2 text-sm text-muted-foreground">Your Answer:</div>
+          <div className="text-foreground">{question.userAnswer || 'No answer provided'}</div>
         </div>
-        <div className="rounded-lg border border-green-500 bg-green-900/10 p-4">
+        <div className="rounded-lg border border-green-500 bg-green-500/10 p-4">
           <div className="mb-2 font-medium text-green-400">AI Feedback</div>
-          <p className="text-sm text-gray-300 leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             {question.feedback || 'Good effort! This type of question requires detailed explanation of the concepts involved.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <div className="mt-2 text-xs text-gray-400">
+            <div className="mt-2 text-xs text-muted-foreground">
               Reference: {question.referenceTime} {question.referenceSource}
             </div>
           )}
@@ -304,29 +305,29 @@ const ExamResultsInterface: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-40 border-b border-gray-700 bg-gray-800">
+      <header className="sticky top-0 z-40 border-b border-border bg-card">
         <div className="flex items-center justify-between px-6 py-3">
           {/* Left: Share Button */}
-          <button className="flex items-center gap-2 rounded-md bg-gray-700 px-3 py-2 text-sm hover:bg-gray-600">
+          <button className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm hover:bg-accent/80">
             <Share2 className="h-4 w-4" />
             Share exam
           </button>
           
           {/* Center: Progress Bar (completed) */}
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">{examResults.score.total}</span>
-            <div className="h-2 w-96 rounded-full bg-gray-700">
-              <div className="h-full w-full rounded-full bg-blue-500"></div>
+            <span className="text-sm text-muted-foreground">{examResults.score.total}</span>
+            <div className="h-2 w-96 rounded-full bg-border">
+              <div className="h-full w-full rounded-full bg-primary"></div>
             </div>
-            <span className="text-sm text-gray-400">{examResults.score.total}</span>
+            <span className="text-sm text-muted-foreground">{examResults.score.total}</span>
           </div>
           
           {/* Right: Space Chat Button */}
           <button 
             onClick={() => setIsChatOpen(true)}
-            className="flex items-center gap-2 rounded-md bg-gray-700 px-3 py-2 text-sm hover:bg-gray-600"
+            className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm hover:bg-accent/80"
           >
             <MessageCircle className="h-4 w-4" />
             Space Chat
@@ -340,7 +341,7 @@ const ExamResultsInterface: React.FC = () => {
           <h1 className="mb-8 text-center text-2xl font-semibold">Answer Breakdown</h1>
           
           {examResults.questions.map((question) => (
-            <div key={question.id} className="mb-8 rounded-lg bg-gray-800 p-6">
+            <div key={question.id} className="mb-8 rounded-lg bg-card p-6">
               <div className="mb-4 flex items-start justify-between">
                 <div>
                   <div className="mb-2 text-lg font-medium">{question.id}.</div>
@@ -348,7 +349,7 @@ const ExamResultsInterface: React.FC = () => {
                 </div>
                 <button 
                   onClick={() => openChatForQuestion(question.id)}
-                  className="flex items-center gap-1 text-sm text-gray-400 hover:text-white"
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
                 >
                   Ask chat <ChevronRight className="h-4 w-4" />
                 </button>
@@ -361,15 +362,15 @@ const ExamResultsInterface: React.FC = () => {
       </main>
 
       {/* Sticky Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 border-t border-gray-700 bg-gray-800 px-6 py-4">
+      <footer className="fixed bottom-0 left-0 right-0 border-t border-border bg-card px-6 py-4">
         <div className="mx-auto flex max-w-4xl gap-4">
-          <button className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gray-700 py-3 font-medium hover:bg-gray-600">
+          <button className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent py-3 font-medium hover:bg-accent/80">
             <RotateCcw className="h-5 w-5" />
             Try Again
           </button>
           <button 
             onClick={() => navigate('/exam/results')}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white py-3 font-medium text-black hover:bg-gray-100"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-3 font-medium text-primary-foreground hover:bg-primary/90"
           >
             <BarChart3 className="h-5 w-5" />
             View Results
@@ -384,13 +385,13 @@ const ExamResultsInterface: React.FC = () => {
             className="flex-1 bg-black/50" 
             onClick={() => setIsChatOpen(false)}
           />
-          <div className="w-96 bg-gray-800 shadow-xl flex flex-col">
+          <div className="w-96 bg-card shadow-xl flex flex-col">
             {/* Header with close button */}
-            <div className="flex items-center justify-between border-b border-gray-700 p-4">
+            <div className="flex items-center justify-between border-b border-border p-4">
               <h2 className="text-lg font-semibold">Space Chat</h2>
               <button 
                 onClick={() => setIsChatOpen(false)}
-                className="rounded-md p-1 hover:bg-gray-700"
+                className="rounded-md p-1 hover:bg-accent"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -402,8 +403,8 @@ const ExamResultsInterface: React.FC = () => {
                 <div key={index} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] rounded-lg p-3 ${
                     message.isUser 
-                      ? 'bg-white text-black' 
-                      : 'bg-transparent border border-gray-600 text-white'
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-accent text-foreground'
                   }`}>
                     {message.content}
                   </div>
@@ -413,7 +414,7 @@ const ExamResultsInterface: React.FC = () => {
             </div>
             
             {/* Input area at bottom */}
-            <div className="border-t border-gray-700 p-4">
+            <div className="border-t border-border p-4">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -421,11 +422,11 @@ const ExamResultsInterface: React.FC = () => {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask a question..."
-                  className="flex-1 rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                  className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none"
                 />
                 <button 
                   onClick={sendMessage}
-                  className="rounded-lg bg-blue-600 px-3 py-2 hover:bg-blue-700"
+                  className="rounded-lg bg-primary px-3 py-2 hover:bg-primary/90"
                 >
                   <Send className="h-4 w-4" />
                 </button>

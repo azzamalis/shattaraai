@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -106,13 +107,13 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
   const getContentIcon = (type: string) => {
     switch (type) {
       case 'video':
-        return <Video className="h-4 w-4 text-[#A6A6A6]" />;
+        return <Video className="h-4 w-4 text-muted-foreground" />;
       case 'document':
-        return <FileText className="h-4 w-4 text-[#A6A6A6]" />;
+        return <FileText className="h-4 w-4 text-muted-foreground" />;
       case 'audio':
-        return <Headphones className="h-4 w-4 text-[#A6A6A6]" />;
+        return <Headphones className="h-4 w-4 text-muted-foreground" />;
       default:
-        return <FileText className="h-4 w-4 text-[#A6A6A6]" />;
+        return <FileText className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -137,8 +138,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={cn(
         "max-w-4xl p-0 rounded-lg",
-        "bg-[#121212]",
-        "border border-white/10"
+        "bg-card border-border"
       )}>
         <div className="p-6">
           {/* Progress bar */}
@@ -151,7 +151,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                     "h-1 flex-1 rounded-full transition-all duration-300",
                     index + 1 <= step 
                       ? "bg-primary"
-                      : "bg-white/10"
+                      : "bg-border"
                   )}
                 />
               ))}
@@ -161,8 +161,8 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
           {/* Step 1: Choose contents */}
           {step === 1 && (
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">Choose contents to have for your exam below</h2>
-              <p className="text-[#A6A6A6] mb-8">An exam will be generated based on these contents</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Choose contents to have for your exam below</h2>
+              <p className="text-muted-foreground mb-8">An exam will be generated based on these contents</p>
               
               <div className="max-w-2xl mx-auto mb-8">
                 <div className="space-y-3">
@@ -171,8 +171,8 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                       key={item.id}
                       className={cn(
                         "flex items-center gap-4 p-4 rounded-lg",
-                        "border border-white/10",
-                        "hover:border-white/20",
+                        "border border-border",
+                        "hover:border-muted-foreground/50",
                         "transition-colors cursor-pointer"
                       )}
                       onClick={() => toggleItemSelection(item.id)}
@@ -181,17 +181,17 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                         "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors duration-200",
                         item.isSelected 
                           ? "bg-primary border-primary" 
-                          : "border-white/50"
+                          : "border-muted-foreground"
                       )}>
-                        {item.isSelected && <Check className="h-3 w-3 text-white" />}
+                        {item.isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
                       </div>
                       
                       <div className="flex items-center gap-3 flex-1 text-left">
                         {getContentIcon(item.type)}
-                        <span className="font-medium text-white">{item.title}</span>
+                        <span className="font-medium text-foreground">{item.title}</span>
                       </div>
                       
-                      <div className="text-xs text-[#A6A6A6] capitalize">
+                      <div className="text-xs text-muted-foreground capitalize">
                         {item.type}
                       </div>
                     </div>
@@ -203,13 +203,13 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={toggleSelectAll}
-                    className="flex items-center gap-2 text-white hover:text-white/90 transition-colors"
+                    className="flex items-center gap-2 text-foreground hover:text-muted-foreground transition-colors"
                   >
                     <div className={cn(
                       "w-5 h-5 rounded border flex items-center justify-center transition-colors duration-200",
-                      selectedCount === contentItems.length ? "bg-primary border-primary" : "border-white/50"
+                      selectedCount === contentItems.length ? "bg-primary border-primary" : "border-muted-foreground"
                     )}>
-                      {selectedCount === contentItems.length && <Check className="h-3 w-3 text-white" />}
+                      {selectedCount === contentItems.length && <Check className="h-3 w-3 text-primary-foreground" />}
                     </div>
                     <span>Select All ({selectedCount}/{contentItems.length})</span>
                   </button>
@@ -218,7 +218,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                   onClick={handleNext}
                   disabled={selectedCount === 0}
                   className={cn(
-                    "bg-primary text-white",
+                    "bg-primary text-primary-foreground",
                     "hover:bg-primary/90 transition-colors px-4",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
@@ -232,20 +232,20 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
           {/* Step 2: Have a practice exam */}
           {step === 2 && (
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Have a practice exam or cheatsheet for reference?</h2>
-              <p className="text-gray-500 dark:text-[#A6A6A6] mb-8">We will use this to make the exam as accurate as possible</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Have a practice exam or cheatsheet for reference?</h2>
+              <p className="text-muted-foreground mb-8">We will use this to make the exam as accurate as possible</p>
               
               <div className="flex justify-center gap-6 mt-10 mb-20">
-                <div className="w-80 h-36 border border-gray-200 dark:border-white/10 rounded-lg p-4 flex flex-col items-center justify-center hover:border-gray-300 dark:hover:border-white/20 transition-colors cursor-pointer">
-                  <Upload className="h-6 w-6 text-gray-900 dark:text-white mb-2" />
-                  <span className="font-medium text-gray-900 dark:text-white">Upload</span>
-                  <span className="text-gray-500 dark:text-[#A6A6A6] text-sm">File, Audio, Video</span>
+                <div className="w-80 h-36 border border-border rounded-lg p-4 flex flex-col items-center justify-center hover:border-muted-foreground/50 transition-colors cursor-pointer">
+                  <Upload className="h-6 w-6 text-foreground mb-2" />
+                  <span className="font-medium text-foreground">Upload</span>
+                  <span className="text-muted-foreground text-sm">File, Audio, Video</span>
                 </div>
                 
-                <div className="w-80 h-36 border border-gray-200 dark:border-white/10 rounded-lg p-4 flex flex-col items-center justify-center hover:border-gray-300 dark:hover:border-white/20 transition-colors cursor-pointer">
-                  <ClipboardPaste className="h-6 w-6 text-gray-900 dark:text-white mb-2" />
-                  <span className="font-medium text-gray-900 dark:text-white">Paste</span>
-                  <span className="text-gray-500 dark:text-[#A6A6A6] text-sm">YouTube, Website, Text</span>
+                <div className="w-80 h-36 border border-border rounded-lg p-4 flex flex-col items-center justify-center hover:border-muted-foreground/50 transition-colors cursor-pointer">
+                  <ClipboardPaste className="h-6 w-6 text-foreground mb-2" />
+                  <span className="font-medium text-foreground">Paste</span>
+                  <span className="text-muted-foreground text-sm">YouTube, Website, Text</span>
                 </div>
               </div>
               
@@ -253,10 +253,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                 <Button 
                   onClick={handleBack}
                   variant="ghost" 
-                  className={cn(
-                    "text-gray-900 dark:text-white",
-                    "hover:bg-gray-100 dark:hover:bg-white/10"
-                  )}
+                  className="text-foreground hover:bg-accent"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
@@ -265,20 +262,13 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                   <Button 
                     onClick={handleSkip}
                     variant="ghost" 
-                    className={cn(
-                      "text-gray-900 dark:text-white",
-                      "hover:bg-gray-100 dark:hover:bg-white/10"
-                    )}
+                    className="text-foreground hover:bg-accent"
                   >
                     Skip
                   </Button>
                   <Button 
                     onClick={handleNext}
-                    className={cn(
-                      "bg-primary text-white",
-                      "hover:bg-primary/90 transition-colors px-4",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
-                    )}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-4"
                   >
                     Continue <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -290,39 +280,39 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
           {/* Step 3: Choose your preference */}
           {step === 3 && (
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Choose your preference</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Choose your preference</h2>
               
               <div className="grid grid-cols-2 gap-8 mt-8 mb-8 max-w-2xl mx-auto">
                 <div>
-                  <Label htmlFor="numQuestions" className="text-gray-900 dark:text-white flex items-center">
+                  <Label htmlFor="numQuestions" className="text-foreground flex items-center">
                     Number of Questions <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input 
                     id="numQuestions" 
                     value={numQuestions} 
                     onChange={(e) => setNumQuestions(e.target.value)} 
-                    className="bg-transparent border-gray-200 dark:border-white/10 text-gray-900 dark:text-white mt-2 h-12"
+                    className="bg-background border-border text-foreground mt-2 h-12"
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="questionType" className="text-gray-900 dark:text-white flex items-center">
+                  <Label htmlFor="questionType" className="text-foreground flex items-center">
                     Question Type <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Select value={questionType} onValueChange={setQuestionType}>
-                    <SelectTrigger className="bg-transparent border-gray-200 dark:border-white/10 text-gray-900 dark:text-white mt-2 h-12">
+                    <SelectTrigger className="bg-background border-border text-foreground mt-2 h-12">
                       <SelectValue placeholder="Select question type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1A1A1A] border-gray-200 dark:border-white/10">
-                      <SelectItem value="Both" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 focus:bg-gray-100 dark:focus:bg-white/10 focus:text-gray-900">Both</SelectItem>
-                      <SelectItem value="Multiple Choice" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 focus:bg-gray-100 dark:focus:bg-white/10 focus:text-gray-900">Multiple Choice</SelectItem>
-                      <SelectItem value="Free Writing" className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 focus:bg-gray-100 dark:focus:bg-white/10 focus:text-gray-900">Free Writing</SelectItem>
+                    <SelectContent className="bg-card border-border">
+                      <SelectItem value="Both" className="text-foreground hover:bg-accent focus:bg-accent">Both</SelectItem>
+                      <SelectItem value="Multiple Choice" className="text-foreground hover:bg-accent focus:bg-accent">Multiple Choice</SelectItem>
+                      <SelectItem value="Free Writing" className="text-foreground hover:bg-accent focus:bg-accent">Free Writing</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 <div className="col-span-2">
-                  <Label htmlFor="examLength" className="text-gray-900 dark:text-white">
+                  <Label htmlFor="examLength" className="text-foreground">
                     Exam Length (Minutes)
                   </Label>
                   <Input 
@@ -330,7 +320,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                     value={examLength} 
                     onChange={(e) => setExamLength(e.target.value)} 
                     placeholder="e.g. 60" 
-                    className="bg-transparent border-gray-200 dark:border-white/10 text-gray-900 dark:text-white mt-2 h-12"
+                    className="bg-background border-border text-foreground mt-2 h-12"
                   />
                 </div>
               </div>
@@ -339,10 +329,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                 <Button 
                   onClick={handleBack}
                   variant="ghost" 
-                  className={cn(
-                    "text-gray-900 dark:text-white",
-                    "hover:bg-gray-100 dark:hover:bg-white/10"
-                  )}
+                  className="text-foreground hover:bg-accent"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
@@ -351,20 +338,13 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
                   <Button 
                     onClick={handleSkip}
                     variant="ghost" 
-                    className={cn(
-                      "text-gray-900 dark:text-white",
-                      "hover:bg-gray-100 dark:hover:bg-white/10"
-                    )}
+                    className="text-foreground hover:bg-accent"
                   >
                     Skip
                   </Button>
                   <Button 
                     onClick={handleStartExam}
-                    className={cn(
-                      "bg-primary text-white",
-                      "hover:bg-primary/90 transition-colors px-4",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
-                    )}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-4"
                   >
                     Start Exam
                   </Button>
