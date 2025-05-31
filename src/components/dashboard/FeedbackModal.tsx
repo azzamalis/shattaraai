@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -37,7 +38,7 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="w-[450px] bg-white border border-[#E5E7EB] p-5 rounded-xl shadow-lg"
+        className="w-[450px] bg-card border-border p-5 rounded-xl shadow-lg"
       >
         <DialogTitle className="sr-only">Send Feedback</DialogTitle>
         <DialogDescription className="sr-only">
@@ -46,12 +47,12 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
         
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-medium text-[#111827]">Send Feedback</h2>
+            <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => onOpenChange(false)} 
-              className="text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6]"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               <X size={18} />
               <span className="sr-only">Close</span>
@@ -60,7 +61,7 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
           
           <Textarea
             placeholder="Share your thoughts..."
-            className="min-h-[120px] bg-[#F9FAFB] border-none focus-visible:ring-1 focus-visible:ring-[#2323FF] text-[#111827] placeholder:text-[#6B7280] rounded-lg"
+            className="min-h-[120px] bg-muted border-none focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground rounded-lg"
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
           />
@@ -68,7 +69,7 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
           <div className="flex items-center justify-between pt-2">
             <Button 
               variant="ghost" 
-              className="text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6]"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
               onClick={() => onOpenChange(false)}
             >
               Cancel
@@ -78,20 +79,20 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6]"
+                className="text-muted-foreground hover:text-foreground hover:bg-accent"
               >
                 <Image size={18} />
                 <span className="sr-only">Attach image</span>
               </Button>
               
               <Button 
-                className="bg-[#2323FF] hover:bg-[#2323FF]/90 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 onClick={handleSubmit}
                 disabled={!feedback.trim() || isSubmitting}
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
                     <span>Sending...</span>
                   </div>
                 ) : (

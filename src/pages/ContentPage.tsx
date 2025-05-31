@@ -114,7 +114,7 @@ export default function ContentPage() {
       contentData={contentData}
       onUpdateContent={updateContentData}
     >
-      <div className="flex flex-col h-[calc(100vh-64px)] bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-300">
+      <div className="flex flex-col h-[calc(100vh-64px)] bg-background transition-colors duration-300">
         <div className="h-full px-4 md:px-6 py-4">
           <ResizablePanelGroup 
             direction="horizontal"
@@ -124,7 +124,7 @@ export default function ContentPage() {
               defaultSize={50} 
               minSize={25} 
               maxSize={60}
-              className="bg-dashboard-card dark:bg-dashboard-card rounded-lg border border-dashboard-separator dark:border-dashboard-separator"
+              className="bg-card rounded-lg border border-border"
             >
               <ContentLeftSidebar 
                 contentData={contentData}
@@ -142,13 +142,13 @@ export default function ContentPage() {
               withHandle 
               className="w-1"
             >
-              <div className="w-1 h-10 bg-dashboard-separator dark:bg-dashboard-separator rounded-full transition-colors duration-200" />
+              <div className="w-1 h-10 bg-border rounded-full transition-colors duration-200" />
             </ResizableHandle>
             
             <ResizablePanel 
               defaultSize={50} 
               minSize={40}
-              className="bg-dashboard-card dark:bg-dashboard-card rounded-lg border border-dashboard-separator dark:border-dashboard-separator"
+              className="bg-card rounded-lg border border-border"
             >
               <ContentRightSidebar contentData={contentData} />
             </ResizablePanel>

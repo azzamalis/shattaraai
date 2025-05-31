@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -70,7 +71,7 @@ const AIChatInput = ({
     collapsed: {
       height: 68,
       boxShadow: "0 2px 8px 0 rgba(0,0,0,0.08)",
-      border: "1px solid rgba(255, 255, 255, 0.1)",
+      border: "1px solid hsl(var(--border))",
       transition: {
         type: "spring",
         stiffness: 120,
@@ -80,7 +81,7 @@ const AIChatInput = ({
     expanded: {
       height: 128,
       boxShadow: "0 8px 32px 0 rgba(0,0,0,0.16)",
-      border: "1px solid rgba(255, 255, 255, 0.2)",
+      border: "1px solid hsl(var(--border))",
       transition: {
         type: "spring",
         stiffness: 120,
@@ -159,31 +160,25 @@ const AIChatInput = ({
         style={{
           overflow: "hidden",
           borderRadius: 16,
-          background: "transparent",
-          // Custom border styling to ensure visibility in unfocused state
-          borderStyle: "solid",
-          borderWidth: "1px",
-          borderColor: isActive || inputValue ? "rgba(255, 255, 255, 0.2)" : "rgba(255, 255, 255, 0.1)"
+          backgroundColor: "hsl(var(--card))",
+          borderColor: isActive || inputValue ? "hsl(var(--border))" : "hsl(var(--border))"
         }} 
         onClick={handleActivate}
       >
         <div className="flex flex-col items-stretch w-full h-full">
-          {/* Input Form */}
           <form onSubmit={handleSubmit} className="flex items-center h-full">
-            {/* Input Row */}
             <div className="flex items-center gap-2 p-3 rounded-full max-w-full w-full my-1">
-              <button className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition" title="Attach file" type="button" tabIndex={-1}>
-                <Paperclip size={18} className="text-[#6B6B6B] dark:text-white/70" />
+              <button className="p-2 rounded-full hover:bg-accent transition text-muted-foreground" title="Attach file" type="button" tabIndex={-1}>
+                <Paperclip size={18} />
               </button>
   
-              {/* Text Input & Placeholder */}
               <div className="relative flex-1">
                 <input 
                   ref={inputRef} 
                   type="text" 
                   value={inputValue} 
                   onChange={e => setInputValue(e.target.value)} 
-                  className="flex-1 border-0 outline-none rounded-md py-2 text-base bg-transparent w-full font-normal text-black dark:text-white focus:outline-none focus:ring-0 focus:border-0"
+                  className="flex-1 border-0 outline-none rounded-md py-2 text-base bg-transparent w-full font-normal text-foreground focus:outline-none focus:ring-0 focus:border-0"
                   style={{
                     position: "relative",
                     zIndex: 1
@@ -191,7 +186,7 @@ const AIChatInput = ({
                 />
                 <div className="absolute left-0 top-0 w-full h-full pointer-events-none flex items-center px-3 py-2">
                   <AnimatePresence mode="wait">
-                    {showPlaceholder && !isActive && !inputValue && <motion.span key={placeholderIndex} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#6B6B6B] dark:text-gray-400 select-none pointer-events-none" style={{
+                    {showPlaceholder && !isActive && !inputValue && <motion.span key={placeholderIndex} className="absolute left-0 top-1/2 -translate-y-1/2 text-muted-foreground select-none pointer-events-none" style={{
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -208,7 +203,7 @@ const AIChatInput = ({
               </div>
   
               <button 
-                className="flex items-center gap-1 dark:bg-[#878787] dark:hover:bg-[#878787]/90 dark:text-[#1A1A1A] bg-[#8A8A8A] hover:bg-[#8A8A8A]/90 text-[#FBFBFB] p-2 rounded-full font-medium justify-center transition-colors" 
+                className="flex items-center gap-1 bg-muted hover:bg-accent text-foreground p-2 rounded-full font-medium justify-center transition-colors" 
                 title="Send" 
                 type="submit" 
                 tabIndex={-1}
@@ -218,7 +213,6 @@ const AIChatInput = ({
             </div>
           </form>
   
-          {/* Expanded Controls */}
           <motion.div className="w-full flex justify-start px-4 items-center text-sm" variants={{
           hidden: {
             opacity: 0,
@@ -241,11 +235,10 @@ const AIChatInput = ({
           marginTop: 8
         }}>
             <div className="flex gap-3 items-center py-[4px]">
-              {/* Deep Search Toggle */}
               <motion.button className={`flex items-center px-4 gap-1 py-1.5 rounded-full transition font-medium whitespace-nowrap overflow-hidden justify-start ${
                 deepSearchActive 
-                  ? "bg-[#00A3FF]/5 dark:bg-[#00A3FF]/10 outline outline-1 outline-[#00A3FF]/40 dark:outline-[#00A3FF]/60 text-[#00A3FF]" 
-                  : "bg-black/5 dark:bg-white/5 text-[#6B6B6B] dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/10"
+                  ? "bg-[#00A3FF]/10 outline outline-1 outline-[#00A3FF]/40 text-[#00A3FF]" 
+                  : "bg-accent text-muted-foreground hover:bg-accent"
               }`} title="Search" type="button" onClick={e => {
               e.stopPropagation();
               setDeepSearchActive(a => !a);
@@ -254,7 +247,7 @@ const AIChatInput = ({
               paddingLeft: deepSearchActive ? 8 : 9
             }}>
                 <div className="flex-1">
-                  <Globe size={16} className={deepSearchActive ? "text-[#00A3FF]" : "text-[#6B6B6B] dark:text-white/70"} />
+                  <Globe size={16} className={deepSearchActive ? "text-[#00A3FF]" : "text-muted-foreground"} />
                 </div>
                 <motion.span className="pb-[2px] text-xs" initial={false} animate={{
                 opacity: deepSearchActive ? 1 : 0
