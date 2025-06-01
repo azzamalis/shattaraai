@@ -5,8 +5,7 @@ import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ContentLeftSidebar } from '@/components/content/ContentLeftSidebar';
 import { ContentRightSidebar } from '@/components/content/ContentRightSidebar';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-
-export type ContentType = 'recording' | 'pdf' | 'video' | 'youtube' | 'upload' | 'paste' | 'website';
+import { ContentType } from '@/lib/types';
 
 export interface ContentData {
   id: string;
@@ -173,9 +172,10 @@ function getDefaultTitle(type: ContentType, filename?: string | null): string {
       return filename ? filename : `Video at ${time}`;
     case 'youtube':
       return `YouTube Video at ${time}`;
-    case 'paste':
     case 'website':
       return `Website Content at ${time}`;
+    case 'text':
+      return `Text Content at ${time}`;
     default:
       return `Content at ${time}`;
   }
