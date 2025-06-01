@@ -1,7 +1,7 @@
-
 import React, { useRef, useEffect } from 'react';
 import { NotesBlock } from '@/lib/types';
 import { Type, Hash, List, CheckSquare, Code, Quote, Table, Minus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface SlashCommandMenuProps {
   position: { x: number; y: number };
@@ -50,11 +50,15 @@ export function SlashCommandMenu({ position, onSelect, onClose }: SlashCommandMe
   return (
     <div
       ref={menuRef}
-      className="fixed bg-popover border border-border rounded-lg shadow-lg z-50 w-72 max-h-60 overflow-y-auto"
+      className={cn(
+        "fixed bg-dashboard-card dark:bg-dashboard-card",
+        "border border-dashboard-separator dark:border-dashboard-separator",
+        "rounded-lg shadow-lg z-50 w-72 max-h-60 overflow-y-auto"
+      )}
       style={{ left: position.x, top: position.y }}
     >
       <div className="p-2">
-        <div className="text-xs font-medium text-muted-foreground px-2 py-1 mb-1">
+        <div className="text-xs font-medium text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 px-2 py-1 mb-1">
           Basic Blocks
         </div>
         {slashCommands.map((command) => {
@@ -63,14 +67,20 @@ export function SlashCommandMenu({ position, onSelect, onClose }: SlashCommandMe
             <button
               key={command.type}
               onClick={() => onSelect(command.type)}
-              className="w-full flex items-center gap-3 px-2 py-2 text-left hover:bg-accent rounded-md transition-colors"
+              className={cn(
+                "w-full flex items-center gap-3 px-2 py-2 text-left",
+                "hover:bg-dashboard-bg dark:hover:bg-dashboard-bg",
+                "rounded-md transition-colors"
+              )}
             >
-              <Icon className="h-4 w-4 text-muted-foreground" />
+              <Icon className="h-[14px] w-[14px] text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70" />
               <div className="flex-1">
-                <div className="text-sm font-medium">{command.label}</div>
+                <div className="text-sm font-medium text-dashboard-text dark:text-dashboard-text">
+                  {command.label}
+                </div>
               </div>
               {command.shortcut && (
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
                   {command.shortcut}
                 </div>
               )}

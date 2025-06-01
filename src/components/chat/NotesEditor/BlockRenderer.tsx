@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { NotesBlock } from '@/lib/types';
 import { BlockControls } from './BlockControls';
+import { cn } from '@/lib/utils';
 
 interface BlockRendererProps {
   block: NotesBlock;
@@ -49,19 +49,30 @@ export function BlockRenderer({
   };
 
   const getClassName = () => {
-    const baseClasses = 'w-full bg-transparent border-0 outline-none focus:outline-none resize-none min-h-[1.5rem] text-[#FFF] placeholder:text-[#A6A6A6] leading-relaxed';
+    const baseClasses = cn(
+      "w-full bg-transparent border-0 outline-none resize-none min-h-[1.5rem]",
+      "text-dashboard-text dark:text-dashboard-text",
+      "placeholder:text-dashboard-text-secondary/70 dark:placeholder:text-dashboard-text-secondary/70",
+      "leading-relaxed",
+      "focus:outline-none focus:ring-0 focus:border-0",
+      "focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0",
+      "focus-within:outline-none focus-within:ring-0 focus-within:border-0",
+      "appearance-none",
+      "[&:focus]:outline-none [&:focus]:ring-0 [&:focus]:border-0",
+      "[&:focus-visible]:outline-none [&:focus-visible]:ring-0 [&:focus-visible]:border-0"
+    );
     
     switch (block.type) {
       case 'h1':
-        return `${baseClasses} text-3xl font-bold`;
+        return cn(baseClasses, "text-2xl font-bold");
       case 'h2':
-        return `${baseClasses} text-2xl font-semibold`;
+        return cn(baseClasses, "text-xl font-semibold");
       case 'h3':
-        return `${baseClasses} text-xl font-medium`;
+        return cn(baseClasses, "text-lg font-medium");
       case 'code':
-        return `${baseClasses} font-mono bg-[#4B4B4B] p-3 rounded text-sm`;
+        return cn(baseClasses, "font-mono bg-dashboard-card dark:bg-dashboard-card p-3 rounded text-sm");
       case 'quote':
-        return `${baseClasses} border-l-4 border-[#00A3FF] pl-4 italic`;
+        return cn(baseClasses, "border-l-4 border-primary pl-4 italic");
       default:
         return baseClasses;
     }
@@ -70,12 +81,12 @@ export function BlockRenderer({
   const renderBlock = () => {
     switch (block.type) {
       case 'divider':
-        return <hr className="border-[#4B4B4B] my-4" />;
+        return <hr className="border-dashboard-separator dark:border-dashboard-separator my-4" />;
       
       case 'ul':
         return (
           <div className="flex items-start gap-2">
-            <span className="text-[#A6A6A6] mt-1">•</span>
+            <span className="text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 mt-1">•</span>
             <textarea
               data-block-id={block.id}
               value={block.content}
@@ -91,7 +102,7 @@ export function BlockRenderer({
       case 'ol':
         return (
           <div className="flex items-start gap-2">
-            <span className="text-[#A6A6A6] mt-1">1.</span>
+            <span className="text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 mt-1">1.</span>
             <textarea
               data-block-id={block.id}
               value={block.content}
@@ -107,7 +118,10 @@ export function BlockRenderer({
       case 'todo':
         return (
           <div className="flex items-start gap-2">
-            <input type="checkbox" className="mt-1" />
+            <input 
+              type="checkbox" 
+              className="mt-1 border-dashboard-separator dark:border-dashboard-separator" 
+            />
             <textarea
               data-block-id={block.id}
               value={block.content}

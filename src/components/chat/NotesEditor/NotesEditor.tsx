@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { NotesBlock } from '@/lib/types';
 import { BlockRenderer } from './BlockRenderer';
@@ -132,7 +131,7 @@ export function NotesEditor() {
   };
 
   return (
-    <div ref={editorRef} className="h-full overflow-y-auto bg-[#000]">
+    <div ref={editorRef} className="h-full overflow-y-auto bg-dashboard-bg dark:bg-dashboard-bg">
       <div className="max-w-4xl mx-auto p-6">
         <div className="space-y-1">
           {blocks.map((block) => (

@@ -1,8 +1,8 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { CommandOption } from '@/lib/types';
 import { Mic, MicOff, Send, Search, AtSign, Globe } from 'lucide-react';
 import { CommandDropdown } from './CommandDropdown';
+import { cn } from '@/lib/utils';
 
 interface ChatInputProps {
   value: string;
@@ -80,10 +80,13 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
       return (
         <button
           onClick={handleVoiceToggle}
-          className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+          className={cn(
+            "p-2 rounded-full transition-colors",
+            "bg-red-500 text-white hover:bg-red-600"
+          )}
           title="Stop recording"
         >
-          <MicOff className="h-4 w-4" />
+          <MicOff className="h-[14px] w-[14px]" />
         </button>
       );
     }
@@ -92,10 +95,13 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
       return (
         <button
           onClick={handleSend}
-          className="p-2 rounded-full bg-[#00A3FF] text-white hover:bg-[#00A3FF]/90 transition-colors"
+          className={cn(
+            "p-2 rounded-full transition-colors",
+            "bg-[#00A3FF] text-white hover:bg-[#00A3FF]/90"
+          )}
           title="Send message"
         >
-          <Send className="h-4 w-4" />
+          <Send className="h-[14px] w-[14px]" />
         </button>
       );
     }
@@ -103,10 +109,16 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
     return (
       <button
         onClick={handleVoiceToggle}
-        className="p-2 rounded-full bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#DDDDDD]/10 transition-colors"
+        className={cn(
+          "p-2 rounded-full transition-colors",
+          "bg-dashboard-bg dark:bg-dashboard-bg",
+          "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
+          "hover:bg-dashboard-card dark:hover:bg-dashboard-card",
+          "hover:text-dashboard-text dark:hover:text-dashboard-text"
+        )}
         title="Start recording"
       >
-        <Mic className="h-4 w-4" />
+        <Mic className="h-[14px] w-[14px]" />
       </button>
     );
   };
@@ -121,7 +133,11 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
         />
       )}
       
-      <div className="bg-[#4B4B4B] rounded-lg border border-[#4B4B4B] p-1">
+      <div className={cn(
+        "rounded-lg border p-1",
+        "bg-dashboard-bg dark:bg-dashboard-bg",
+        "border-dashboard-separator dark:border-dashboard-separator"
+      )}>
         {/* Main input area */}
         <div className="flex items-center gap-3 p-3">
           <input
@@ -131,33 +147,42 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask anything"
-            className="flex-1 bg-transparent border-0 outline-none focus:outline-none focus:ring-0 text-sm placeholder:text-[#A6A6A6] text-[#FFF]"
+            className={cn(
+              "flex-1 bg-transparent border-0 outline-none",
+              "text-sm text-dashboard-text dark:text-dashboard-text",
+              "placeholder:text-dashboard-text-secondary/70 dark:placeholder:text-dashboard-text-secondary/70",
+              "focus:outline-none focus:ring-0 focus:border-0",
+              "focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0"
+            )}
           />
           
           {getVoiceButton()}
         </div>
         
         {/* Command and search options */}
-        <div className="flex items-center justify-between px-3 pb-2">
-          <div className="flex items-center gap-2">
-            <button 
-              className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-[#00A3FF]/10 text-[#00A3FF] hover:bg-[#00A3FF]/20 transition-colors"
-              onClick={() => onChange(value + '@')}
-            >
-              <AtSign className="h-3 w-3" />
-              Commands
-            </button>
-          </div>
-          
+        <div className="flex items-center gap-3 px-3 pb-2">
+          <button 
+            className={cn(
+              "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs transition-colors",
+              "bg-[#00A3FF]/10 text-[#00A3FF]",
+              "hover:bg-[#00A3FF]/20"
+            )}
+            onClick={() => onChange(value + '@')}
+          >
+            <AtSign className="h-[14px] w-[14px]" />
+            Commands
+          </button>
+
           <button
             onClick={() => setSearchActive(!searchActive)}
-            className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+            className={cn(
+              "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs transition-colors",
               searchActive 
-                ? 'bg-[#00A3FF]/10 text-[#00A3FF]' 
-                : 'bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#DDDDDD]/10'
-            }`}
+                ? "bg-[#00A3FF]/10 text-[#00A3FF] hover:bg-[#00A3FF]/20"
+                : "bg-dashboard-bg dark:bg-dashboard-bg text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 hover:bg-dashboard-card dark:hover:bg-dashboard-card hover:text-dashboard-text dark:hover:text-dashboard-text"
+            )}
           >
-            <Globe className="h-3 w-3" />
+            <Globe className="h-[14px] w-[14px]" />
             Search
           </button>
         </div>

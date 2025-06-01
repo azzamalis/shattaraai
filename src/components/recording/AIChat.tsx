@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
@@ -92,7 +91,7 @@ const AIChat = () => {
   };
   const getButtonStyles = (option: QuickSelectionOption) => {
     const baseStyles = "flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm transition-all duration-200";
-    const defaultStyles = "bg-transparent border border-dashboard-text-secondary/20 dark:border-[#F5F5E8]/20 text-dashboard-text-secondary dark:text-[#F5F5E8]";
+    const defaultStyles = "bg-transparent border border-dashboard-text-secondary/20 dark:border-dashboard-separator text-dashboard-text dark:text-dashboard-text";
     const activeStyles = {
       search: "bg-[#00A3FF]/5 border-2 border-[#00A3FF]/50 text-[#00A3FF]",
       exams: "bg-[#FF8A00]/10 border-2 border-[#FF8A00] text-[#FF8A00]",
@@ -163,7 +162,7 @@ const AIChat = () => {
                 </div>
               </div> : <div className="space-y-4">
                 {messages.map(msg => <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={cn("max-w-[80%] rounded-lg p-3", msg.sender === "user" ? "bg-dashboard-card dark:bg-[#1D1D1D] text-dashboard-text dark:text-[#FAFAFA]" : "bg-transparent text-dashboard-text dark:text-[#FAFAFA]")}>
+                    <div className={cn("max-w-[80%] rounded-lg p-3", msg.sender === "user" ? "bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text" : "bg-transparent text-dashboard-text dark:text-dashboard-text")}>
                       {msg.content}
                     </div>
                   </div>)}
@@ -172,19 +171,19 @@ const AIChat = () => {
         </ScrollArea>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 bg-dashboard-card/80 dark:bg-[#121212] border-t border-dashboard-separator dark:border-[#1D1D1D]">
+      <div className="absolute bottom-0 left-0 right-0 bg-dashboard-card/80 dark:bg-dashboard-card border-t border-dashboard-separator dark:border-dashboard-separator">
         <div className="flex flex-col px-6 py-4">
           {/* Message Input Row */}
           <div className="flex items-center gap-3 mb-2">
-            <input type="text" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress} placeholder="Ask anything..." className="flex-1 h-12 px-4 py-2 text-dashboard-text dark:text-[#FAFAFA] bg-transparent border border-dashboard-separator/60 dark:border-[#333333] rounded-lg focus:border-dashboard-separator dark:focus:border-[#404040] focus:ring-0 focus:outline-none hover:border-dashboard-separator dark:hover:border-[#404040] placeholder:text-dashboard-text-secondary/60 dark:placeholder:text-[#666666]" />
+            <input type="text" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress} placeholder="Ask anything..." className="flex-1 h-12 px-4 py-2 text-dashboard-text dark:text-dashboard-text bg-transparent border border-dashboard-separator/60 dark:border-dashboard-separator focus:border-dashboard-separator dark:focus:border-dashboard-separator focus:ring-0 focus:outline-none hover:border-dashboard-separator dark:hover:border-dashboard-separator placeholder:text-dashboard-text-secondary/60 dark:placeholder:text-dashboard-text-secondary" />
             
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className={cn("h-12 w-12", "text-dashboard-text-secondary dark:text-[#666666]", "hover:text-dashboard-text dark:hover:text-[#FAFAFA]", "hover:bg-dashboard-card dark:hover:bg-[#1A1A1A]", "rounded-lg", "transition-colors duration-200")}>
+              <Button variant="ghost" size="icon" className={cn("h-12 w-12", "text-dashboard-text-secondary dark:text-dashboard-text-secondary", "hover:text-dashboard-text dark:hover:text-dashboard-text", "hover:bg-dashboard-card dark:hover:bg-dashboard-card", "rounded-lg", "transition-colors duration-200")}>
                 <Paperclip className="h-5 w-5" />
               </Button>
               
-              <Button onClick={handleSendMessage} size="icon" disabled={!inputValue.trim()} className={cn("h-12 w-12", "text-dashboard-text dark:text-[#FAFAFA]", "bg-dashboard-card dark:bg-[#1A1A1A]", "hover:bg-dashboard-card-hover dark:hover:bg-[#242424]", "rounded-lg", "transition-colors duration-200", "disabled:opacity-50 disabled:cursor-not-allowed")}>
+              <Button onClick={handleSendMessage} size="icon" disabled={!inputValue.trim()} className={cn("h-12 w-12", "text-dashboard-text dark:text-dashboard-text", "bg-dashboard-card dark:bg-dashboard-card", "hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover", "rounded-lg", "transition-colors duration-200", "disabled:opacity-50 disabled:cursor-not-allowed")}>
                 <Send className="h-5 w-5" />
               </Button>
             </div>
@@ -192,12 +191,12 @@ const AIChat = () => {
 
           {/* Toggle Buttons Row */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={handleLearnToggle} className={cn("h-8 px-3 rounded-full", "flex items-center gap-1.5", "text-sm font-normal", "transition-all duration-200", isLearnActive ? "bg-[#00FF85]/5 border-2 border-[#00FF85]/50 text-[#00FF85]" : "text-dashboard-text-secondary/80 dark:text-[#666666] hover:text-dashboard-text dark:hover:text-[#FAFAFA] hover:bg-dashboard-card dark:hover:bg-[#1A1A1A] border border-dashboard-text-secondary/20 dark:border-[#F5F5E8]/20")}>
+            <Button variant="ghost" size="sm" onClick={handleLearnToggle} className={cn("h-8 px-3 rounded-full", "flex items-center gap-1.5", "text-sm font-normal", "transition-all duration-200", isLearnActive ? "bg-[#00FF85]/5 border-2 border-[#00FF85]/50 text-[#00FF85]" : "text-dashboard-text-secondary dark:text-dashboard-text-secondary hover:text-dashboard-text dark:hover:text-dashboard-text hover:bg-dashboard-card dark:hover:bg-dashboard-card border border-dashboard-text-secondary/20 dark:border-dashboard-text-secondary/20")}>
               <GraduationCap className="h-4 w-4" />
               Learn+
             </Button>
 
-            <Button variant="ghost" size="sm" onClick={handleSearchToggle} className={cn("h-8 px-3 rounded-full", "flex items-center gap-1.5", "text-sm font-normal", "transition-all duration-200", isSearchActive ? "bg-[#00A3FF]/5 border-2 border-[#00A3FF]/50 text-[#00A3FF]" : "text-dashboard-text-secondary/80 dark:text-[#666666] hover:text-dashboard-text dark:hover:text-[#FAFAFA] hover:bg-dashboard-card dark:hover:bg-[#1A1A1A] border border-dashboard-text-secondary/20 dark:border-[#F5F5E8]/20")}>
+            <Button variant="ghost" size="sm" onClick={handleSearchToggle} className={cn("h-8 px-3 rounded-full", "flex items-center gap-1.5", "text-sm font-normal", "transition-all duration-200", isSearchActive ? "bg-[#00A3FF]/5 border-2 border-[#00A3FF]/50 text-[#00A3FF]" : "text-dashboard-text-secondary dark:text-dashboard-text-secondary hover:text-dashboard-text dark:hover:text-dashboard-text hover:bg-dashboard-card dark:hover:bg-dashboard-card border border-dashboard-text-secondary/20 dark:border-dashboard-text-secondary/20")}>
               <Search className="h-4 w-4" />
               Search
             </Button>

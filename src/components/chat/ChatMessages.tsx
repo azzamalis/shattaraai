@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Message } from '@/lib/types';
 import { Copy, Check, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -26,13 +26,13 @@ export function ChatMessages({ messages }: ChatMessagesProps) {
     // Show empty state for initial AI greeting
     return (
       <div className="flex flex-col items-center justify-center h-full p-8">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-          <MessageCircle className="h-8 w-8 text-primary" />
+        <div className="w-16 h-16 rounded-full bg-[#00A3FF]/10 flex items-center justify-center mb-4">
+          <MessageCircle className="h-8 w-8 text-[#00A3FF]" />
         </div>
-        <h3 className="text-xl font-semibold text-foreground mb-2">
+        <h3 className="text-xl font-semibold text-dashboard-text dark:text-dashboard-text mb-2">
           Learn with the Shattara AI Tutor
         </h3>
-        <p className="text-muted-foreground text-center max-w-md">
+        <p className="text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 text-center max-w-md">
           Start a conversation to get help with any topic, generate quizzes, create flashcards, and more.
         </p>
       </div>
@@ -47,31 +47,33 @@ export function ChatMessages({ messages }: ChatMessagesProps) {
           className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
         >
           <div
-            className={`
-              group relative max-w-[80%] rounded-lg px-4 py-3
-              ${message.sender === 'user' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-transparent border border-border'
-              }
-            `}
+            className={cn(
+              "group relative max-w-[80%] rounded-lg px-4 py-3",
+              message.sender === 'user' 
+                ? "bg-[#00A3FF] text-white" 
+                : "bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text"
+            )}
           >
             <p className="text-sm">{message.content}</p>
             
             {message.copyable && (
               <button
                 onClick={() => copyToClipboard(message.content, message.id)}
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-accent"
+                className={cn(
+                  "absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded",
+                  "hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover"
+                )}
                 title="Copy message"
               >
                 {copiedId === message.id ? (
-                  <Check className="h-3 w-3 text-green-500" />
+                  <Check className="h-3 w-3 text-[#00A3FF]" />
                 ) : (
-                  <Copy className="h-3 w-3" />
+                  <Copy className="h-3 w-3 text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70" />
                 )}
               </button>
             )}
             
-            <div className="text-xs opacity-60 mt-1">
+            <div className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60 mt-1">
               {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </div>
           </div>

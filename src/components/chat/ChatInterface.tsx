@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { ChatTabType, Message } from '@/lib/types';
 import { ChatTabNavigation } from './ChatTabNavigation';
@@ -70,36 +69,50 @@ export function ChatInterface({ activeTab, onTabChange, initialQuery }: ChatInte
     switch (activeTab) {
       case 'chat':
         return (
-          <div className="flex flex-col h-full">
-            <div className="flex-1 overflow-y-auto">
-              <ChatMessages messages={messages} />
-              <div ref={messagesEndRef} />
-            </div>
-            <div className="border-t border-border p-4">
-              <ChatInput 
-                value={inputValue}
-                onChange={setInputValue}
-                onSend={handleSendMessage}
-              />
+          <div className="flex-1 overflow-hidden mx-4 mb-4">
+            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+              <div className="flex flex-col h-full">
+                <div className="flex-1 overflow-y-auto">
+                  <ChatMessages messages={messages} />
+                  <div ref={messagesEndRef} />
+                </div>
+                <div className="border-t border-border p-4">
+                  <ChatInput 
+                    value={inputValue}
+                    onChange={setInputValue}
+                    onSend={handleSendMessage}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         );
       case 'notes':
-        return <NotesEditor />;
+        return (
+          <div className="flex-1 overflow-hidden mx-4 mb-4">
+            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+              <NotesEditor />
+            </div>
+          </div>
+        );
       case 'flashcards':
       case 'quizzes':
-        return <EmptyStates type={activeTab} />;
+        return (
+          <div className="flex-1 overflow-hidden mx-4 mb-4">
+            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+              <EmptyStates type={activeTab} />
+            </div>
+          </div>
+        );
       default:
         return null;
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-dashboard-card dark:bg-dashboard-card">
       <ChatTabNavigation activeTab={activeTab} onTabChange={onTabChange} />
-      <div className="flex-1 overflow-hidden">
-        {renderTabContent()}
-      </div>
+      {renderTabContent()}
     </div>
   );
 }
