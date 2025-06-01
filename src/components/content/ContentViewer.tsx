@@ -92,7 +92,7 @@ export function ContentViewer({ contentData, onUpdateContent }: ContentViewerPro
           </div>
         );
 
-      case 'paste':
+      case 'text':
       case 'website':
         return (
           <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator p-4 overflow-auto">
