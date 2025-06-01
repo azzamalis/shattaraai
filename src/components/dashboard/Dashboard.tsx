@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Room, RoomHandlers, DeleteItem } from '@/lib/types';
@@ -67,8 +68,19 @@ export function Dashboard({
   };
 
   const handleAISubmit = (value: string) => {
-    toast.success("Your question was submitted");
-    console.log("AI query:", value);
+    // Create new chat content
+    const contentId = onAddContent({
+      title: 'Chat with Shattara AI',
+      type: 'chat',
+      text: value
+    });
+
+    // Navigate to chat page with the query
+    const searchParams = new URLSearchParams({
+      query: value
+    });
+    navigate(`/chat/${contentId}?${searchParams.toString()}`);
+    toast.success("Starting conversation with Shattara AI");
   };
 
   const handleDeleteClick = (roomId: string) => {
