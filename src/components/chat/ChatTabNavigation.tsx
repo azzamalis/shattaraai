@@ -17,8 +17,8 @@ const tabs = [
 
 export function ChatTabNavigation({ activeTab, onTabChange }: ChatTabNavigationProps) {
   return (
-    <div className="border-b border-border bg-card">
-      <div className="flex">
+    <div className="border-b border-[#4B4B4B] bg-[#000]">
+      <div className="flex w-full">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -28,10 +28,10 @@ export function ChatTabNavigation({ activeTab, onTabChange }: ChatTabNavigationP
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`
-                flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors
+                flex-1 flex items-center justify-center gap-2 px-6 py-4 text-sm font-medium transition-colors
                 ${isActive 
-                  ? 'text-foreground border-b-2 border-primary bg-primary/5' 
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  ? 'text-[#FFF] bg-[#00A3FF]/10 border-b-2 border-[#00A3FF]' 
+                  : 'text-[#A6A6A6] hover:text-[#FFF] hover:bg-[#DDDDDD]/10'
                 }
               `}
             >

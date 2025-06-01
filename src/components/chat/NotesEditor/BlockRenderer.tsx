@@ -1,14 +1,27 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { NotesBlock } from '@/lib/types';
+import { BlockControls } from './BlockControls';
 
 interface BlockRendererProps {
   block: NotesBlock;
   onUpdate: (updates: Partial<NotesBlock>) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
+  onAddBlock: () => void;
+  onDeleteBlock: () => void;
+  onShowTypeMenu: () => void;
 }
 
-export function BlockRenderer({ block, onUpdate, onKeyDown }: BlockRendererProps) {
+export function BlockRenderer({ 
+  block, 
+  onUpdate, 
+  onKeyDown, 
+  onAddBlock, 
+  onDeleteBlock,
+  onShowTypeMenu 
+}: BlockRendererProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
   const handleContentChange = (content: string) => {
     onUpdate({ content });
   };
@@ -31,12 +44,12 @@ export function BlockRenderer({ block, onUpdate, onKeyDown }: BlockRendererProps
       case 'quote':
         return 'Quote';
       default:
-        return 'Type / for commands';
+        return 'Type / for commands or @ for AI features';
     }
   };
 
   const getClassName = () => {
-    const baseClasses = 'w-full bg-transparent border-0 outline-none resize-none min-h-[1.5rem] text-foreground placeholder:text-muted-foreground leading-relaxed';
+    const baseClasses = 'w-full bg-transparent border-0 outline-none focus:outline-none resize-none min-h-[1.5rem] text-[#FFF] placeholder:text-[#A6A6A6] leading-relaxed';
     
     switch (block.type) {
       case 'h1':
@@ -46,9 +59,9 @@ export function BlockRenderer({ block, onUpdate, onKeyDown }: BlockRendererProps
       case 'h3':
         return `${baseClasses} text-xl font-medium`;
       case 'code':
-        return `${baseClasses} font-mono bg-muted p-3 rounded text-sm`;
+        return `${baseClasses} font-mono bg-[#4B4B4B] p-3 rounded text-sm`;
       case 'quote':
-        return `${baseClasses} border-l-4 border-primary pl-4 italic`;
+        return `${baseClasses} border-l-4 border-[#00A3FF] pl-4 italic`;
       default:
         return baseClasses;
     }
@@ -57,12 +70,12 @@ export function BlockRenderer({ block, onUpdate, onKeyDown }: BlockRendererProps
   const renderBlock = () => {
     switch (block.type) {
       case 'divider':
-        return <hr className="border-border my-4" />;
+        return <hr className="border-[#4B4B4B] my-4" />;
       
       case 'ul':
         return (
           <div className="flex items-start gap-2">
-            <span className="text-muted-foreground mt-1">•</span>
+            <span className="text-[#A6A6A6] mt-1">•</span>
             <textarea
               data-block-id={block.id}
               value={block.content}
@@ -78,7 +91,7 @@ export function BlockRenderer({ block, onUpdate, onKeyDown }: BlockRendererProps
       case 'ol':
         return (
           <div className="flex items-start gap-2">
-            <span className="text-muted-foreground mt-1">1.</span>
+            <span className="text-[#A6A6A6] mt-1">1.</span>
             <textarea
               data-block-id={block.id}
               value={block.content}
@@ -123,7 +136,18 @@ export function BlockRenderer({ block, onUpdate, onKeyDown }: BlockRendererProps
   };
 
   return (
-    <div className="py-1">
+    <div 
+      className="py-1 relative group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <BlockControls
+        block={block}
+        onAddBlock={onAddBlock}
+        onDeleteBlock={onDeleteBlock}
+        onShowTypeMenu={onShowTypeMenu}
+        isVisible={isHovered}
+      />
       {renderBlock()}
     </div>
   );

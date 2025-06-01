@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { CommandOption } from '@/lib/types';
-import { Mic, MicOff, Send, Search } from 'lucide-react';
+import { Mic, MicOff, Send, Search, AtSign, Globe } from 'lucide-react';
 import { CommandDropdown } from './CommandDropdown';
 
 interface ChatInputProps {
@@ -31,7 +31,7 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
   const [showCommandMenu, setShowCommandMenu] = useState(false);
   const [commandSearch, setCommandSearch] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState(0);
+  const [searchActive, setSearchActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -73,7 +73,6 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
 
   const handleVoiceToggle = () => {
     setIsRecording(!isRecording);
-    // Voice recording logic would go here
   };
 
   const getVoiceButton = () => {
@@ -93,7 +92,7 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
       return (
         <button
           onClick={handleSend}
-          className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="p-2 rounded-full bg-[#00A3FF] text-white hover:bg-[#00A3FF]/90 transition-colors"
           title="Send message"
         >
           <Send className="h-4 w-4" />
@@ -104,7 +103,7 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
     return (
       <button
         onClick={handleVoiceToggle}
-        className="p-2 rounded-full bg-muted text-muted-foreground hover:bg-accent transition-colors"
+        className="p-2 rounded-full bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#DDDDDD]/10 transition-colors"
         title="Start recording"
       >
         <Mic className="h-4 w-4" />
@@ -122,22 +121,46 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
         />
       )}
       
-      <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card">
-        <button className="p-2 rounded-full hover:bg-accent transition-colors">
-          <Search className="h-4 w-4 text-muted-foreground" />
-        </button>
+      <div className="bg-[#4B4B4B] rounded-lg border border-[#4B4B4B] p-1">
+        {/* Main input area */}
+        <div className="flex items-center gap-3 p-3">
+          <input
+            ref={inputRef}
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask anything"
+            className="flex-1 bg-transparent border-0 outline-none focus:outline-none focus:ring-0 text-sm placeholder:text-[#A6A6A6] text-[#FFF]"
+          />
+          
+          {getVoiceButton()}
+        </div>
         
-        <input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask anything"
-          className="flex-1 bg-transparent border-0 outline-none text-sm placeholder:text-muted-foreground"
-        />
-        
-        {getVoiceButton()}
+        {/* Command and search options */}
+        <div className="flex items-center justify-between px-3 pb-2">
+          <div className="flex items-center gap-2">
+            <button 
+              className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-[#00A3FF]/10 text-[#00A3FF] hover:bg-[#00A3FF]/20 transition-colors"
+              onClick={() => onChange(value + '@')}
+            >
+              <AtSign className="h-3 w-3" />
+              Commands
+            </button>
+          </div>
+          
+          <button
+            onClick={() => setSearchActive(!searchActive)}
+            className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+              searchActive 
+                ? 'bg-[#00A3FF]/10 text-[#00A3FF]' 
+                : 'bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#DDDDDD]/10'
+            }`}
+          >
+            <Globe className="h-3 w-3" />
+            Search
+          </button>
+        </div>
       </div>
     </div>
   );

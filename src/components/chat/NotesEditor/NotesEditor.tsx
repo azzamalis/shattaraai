@@ -132,7 +132,7 @@ export function NotesEditor() {
   };
 
   return (
-    <div ref={editorRef} className="h-full overflow-y-auto">
+    <div ref={editorRef} className="h-full overflow-y-auto bg-[#000]">
       <div className="max-w-4xl mx-auto p-6">
         <div className="space-y-1">
           {blocks.map((block) => (
@@ -141,6 +141,13 @@ export function NotesEditor() {
               block={block}
               onUpdate={(updates) => updateBlock(block.id, updates)}
               onKeyDown={(e) => handleKeyDown(e, block.id)}
+              onAddBlock={() => addBlock(block.id)}
+              onDeleteBlock={() => deleteBlock(block.id)}
+              onShowTypeMenu={() => {
+                setCurrentBlockId(block.id);
+                setShowSlashMenu(true);
+                setSlashMenuPosition({ x: 200, y: 200 });
+              }}
             />
           ))}
         </div>
