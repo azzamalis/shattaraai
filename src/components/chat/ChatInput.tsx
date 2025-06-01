@@ -65,7 +65,7 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
 
   const handleCommandSelect = (command: CommandOption) => {
     const atIndex = value.lastIndexOf('@');
-    const newValue = value.slice(0, atIndex) + command.label + ' ';
+    const newValue = value.slice(0, atIndex) + 'Create @' + command.label + ' on ';
     onChange(newValue);
     setShowCommandMenu(false);
     inputRef.current?.focus();
@@ -152,7 +152,8 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
               "text-sm text-dashboard-text dark:text-dashboard-text",
               "placeholder:text-dashboard-text-secondary/70 dark:placeholder:text-dashboard-text-secondary/70",
               "focus:outline-none focus:ring-0 focus:border-0",
-              "focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0"
+              "focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0",
+              "[&_@]:text-[#00A3FF]"
             )}
           />
           

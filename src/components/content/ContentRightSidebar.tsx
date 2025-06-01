@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -158,12 +157,16 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
         <TabsContent 
           value="chat" 
           className={cn(
-            "flex-1 overflow-hidden mt-0 mx-4 mb-4",
+            "flex-1 overflow-hidden mx-4 mb-4",
             "content-page-tab-content"
           )}
         >
           <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-            <AIChat />
+            <ScrollArea className="h-full">
+              <div className="h-full min-h-[400px] pt-12">
+                <AIChat />
+              </div>
+            </ScrollArea>
           </div>
         </TabsContent>
         
