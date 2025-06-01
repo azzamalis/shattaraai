@@ -44,7 +44,7 @@ export function BlockRenderer({
       case 'quote':
         return 'Quote';
       default:
-        return 'Type / for commands or @ for AI features';
+        return 'Type / for commands';
     }
   };
 
