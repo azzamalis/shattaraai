@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -104,7 +103,7 @@ export function ContentLeftSidebar({
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-dashboard-card dark:bg-dashboard-card">
         <TabsList className={cn(
-          "w-fit justify-start gap-1 p-1 h-12 shrink-0 ml-4",
+          "w-fit justify-start gap-4 p-4 h-12 shrink-0 mx-4 my-2",
           "bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-200",
           "rounded-xl flex"
         )}>

@@ -9,7 +9,7 @@ interface BlockRendererProps {
   onKeyDown: (e: React.KeyboardEvent) => void;
   onAddBlock: () => void;
   onDeleteBlock: () => void;
-  onShowTypeMenu: () => void;
+  onShowTypeMenu: (e: React.MouseEvent) => void;
 }
 
 export function BlockRenderer({ 

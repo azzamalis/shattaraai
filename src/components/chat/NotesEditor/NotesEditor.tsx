@@ -3,7 +3,7 @@ import { NotesBlock } from '@/lib/types';
 import { BlockRenderer } from './BlockRenderer';
 import { SlashCommandMenu } from './SlashCommandMenu';
 
-export function NotesEditor() {
+export function NotesEditor({ useDynamicMenuPosition = false }) {
   const [blocks, setBlocks] = useState<NotesBlock[]>([
     { id: '1', type: 'paragraph', content: '' }
   ]);
@@ -130,9 +130,20 @@ export function NotesEditor() {
     }
   };
 
+  const handleShowTypeMenu = (event, blockId) => {
+    if (useDynamicMenuPosition && event && event.currentTarget) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setSlashMenuPosition({ x: rect.left, y: rect.bottom });
+    } else {
+      setSlashMenuPosition({ x: 200, y: 200 });
+    }
+    setCurrentBlockId(blockId);
+    setShowSlashMenu(true);
+  };
+
   return (
     <div ref={editorRef} className="h-full overflow-y-auto bg-dashboard-bg dark:bg-dashboard-bg">
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-4xl mx-auto p-6 pl-16">
         <div className="space-y-1">
           {blocks.map((block) => (
             <BlockRenderer
@@ -142,11 +153,7 @@ export function NotesEditor() {
               onKeyDown={(e) => handleKeyDown(e, block.id)}
               onAddBlock={() => addBlock(block.id)}
               onDeleteBlock={() => deleteBlock(block.id)}
-              onShowTypeMenu={() => {
-                setCurrentBlockId(block.id);
-                setShowSlashMenu(true);
-                setSlashMenuPosition({ x: 200, y: 200 });
-              }}
+              onShowTypeMenu={(event) => handleShowTypeMenu(event, block.id)}
             />
           ))}
         </div>

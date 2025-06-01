@@ -7,7 +7,7 @@ interface BlockControlsProps {
   block: NotesBlock;
   onAddBlock: () => void;
   onDeleteBlock: () => void;
-  onShowTypeMenu: () => void;
+  onShowTypeMenu: (event: React.MouseEvent, blockId: string) => void;
   isVisible: boolean;
 }
 
@@ -39,7 +39,7 @@ export function BlockControls({
       
       <div className="relative">
         <button
-          onClick={() => setShowActions(!showActions)}
+          onClick={(e) => onShowTypeMenu(e, block.id)}
           className={cn(
             "p-1 rounded transition-colors opacity-0 group-hover:opacity-100",
             "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
@@ -60,7 +60,7 @@ export function BlockControls({
           )}>
             <button
               onClick={() => {
-                onShowTypeMenu();
+                onShowTypeMenu(null, block.id);
                 setShowActions(false);
               }}
               className={cn(
