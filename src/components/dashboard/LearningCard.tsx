@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { toast } from 'sonner';
 import { ContentItem } from '@/lib/types';
 import { ContentPreview } from '@/components/content/ContentPreview';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 interface LearningCardProps {
@@ -18,8 +18,10 @@ export function LearningCard({ content, onDelete, onShare }: LearningCardProps) 
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(content.title);
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSaveTitle = () => {
+  const handleSaveTitle = (e: React.MouseEvent) => {
+    e.stopPropagation();
     toast.success("Title updated successfully");
     setIsEditing(false);
   };
@@ -29,14 +31,18 @@ export function LearningCard({ content, onDelete, onShare }: LearningCardProps) 
     setMenuOpen(true);
   };
 
+  const handleCardClick = () => {
+    navigate(`/content/${content.id}?type=${content.type}`);
+  };
+
   // Calculate progress percentage
   const progress = content.metadata?.progress || 0;
   const progressPercent = Math.round(progress * 100);
 
   return (
-    <Link 
-      to={`/content/${content.id}?type=${content.type}`} 
-      className="block w-full"
+    <div 
+      onClick={handleCardClick}
+      className="block w-full cursor-pointer"
     >
       <div className={cn(
         // Card container
@@ -132,7 +138,7 @@ export function LearningCard({ content, onDelete, onShare }: LearningCardProps) 
           {/* Title */}
           <div className="relative group/title">
             {isEditing ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                 <input 
                   type="text" 
                   value={title} 
@@ -148,7 +154,7 @@ export function LearningCard({ content, onDelete, onShare }: LearningCardProps) 
                   spellCheck="false" 
                 />
                 <button 
-                  onClick={handleSaveTitle} 
+                  onClick={handleSaveTitle}
                   className="absolute right-0 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Check className="w-4 h-4" />
@@ -161,7 +167,7 @@ export function LearningCard({ content, onDelete, onShare }: LearningCardProps) 
                 </h3>
                 <button 
                   onClick={(e) => {
-                    e.preventDefault();
+                    e.stopPropagation();
                     setIsEditing(true);
                   }} 
                   className="absolute right-0 opacity-0 group-hover/title:opacity-100 transition-opacity"
@@ -182,6 +188,6 @@ export function LearningCard({ content, onDelete, onShare }: LearningCardProps) 
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

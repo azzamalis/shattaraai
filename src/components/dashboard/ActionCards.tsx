@@ -67,7 +67,7 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div 
-                  className="border-border text-card-foreground shadow-sm rounded-2xl group hover:shadow-[var(--shadow-hover)] bg-card cursor-pointer transition-all duration-200 relative"
+                  className="border-border text-card-foreground shadow-sm rounded-2xl group bg-card cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]"
                   onClick={handleUploadClick}
                 >
                   <div className="p-4 sm:h-[120px] flex flex-col sm:flex-col items-start justify-center gap-y-1">
@@ -99,7 +99,7 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div 
-                  className="border-border text-card-foreground shadow-sm rounded-2xl group hover:shadow-[var(--shadow-hover)] bg-card cursor-pointer transition-all duration-200 relative"
+                  className="border-border text-card-foreground shadow-sm rounded-2xl group bg-card cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]"
                   onClick={onPasteClick}
                 >
                   <div className="p-4 sm:h-[120px] flex flex-col sm:flex-col items-start justify-center gap-y-1">
@@ -131,7 +131,7 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div 
-                  className="border-border text-card-foreground shadow-sm rounded-2xl group hover:shadow-[var(--shadow-hover)] bg-card cursor-pointer transition-all duration-200 relative"
+                  className="border-border text-card-foreground shadow-sm rounded-2xl group bg-card cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]"
                   onClick={handleRecordClick}
                 >
                   <div className="p-4 sm:h-[120px] flex flex-col sm:flex-col items-start justify-center gap-y-1">

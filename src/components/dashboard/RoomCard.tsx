@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Pencil, Trash, Plus, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -49,7 +48,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({
         "p-4",
         "rounded-lg border border-border",
         "group transition-all duration-300",
-        "bg-card hover:bg-accent"
+        "bg-card hover:bg-accent",
+        "hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]"
       )}
     >
       <div className="flex flex-col gap-1.5 flex-1 min-w-0">
