@@ -35,7 +35,7 @@ const HeroContent = () => {
   };
 
   return (
-    <section>
+    <section className="relative min-h-screen">
       <div className="relative pt-24 md:pt-36">
         <AnimatedGroup
           variants={{
@@ -66,8 +66,8 @@ const HeroContent = () => {
           <div className="absolute inset-x-0 top-56 -z-20 hidden lg:top-32 dark:block bg-dark-deeper h-full"></div>
         </AnimatedGroup>
         
-        {/* EducationAnimation as background */}
-        <div className="absolute inset-0 -z-10 w-full h-full">
+        {/* EducationAnimation as background - positioned to be visible */}
+        <div className="absolute inset-0 -z-10 w-full h-full opacity-30">
           <EducationAnimation className="w-full h-full" />
         </div>
         
