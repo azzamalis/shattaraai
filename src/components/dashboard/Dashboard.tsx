@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Room, RoomHandlers, DeleteItem } from '@/lib/types';
+import { Room, RoomHandlers, DeleteItem, ContentItem } from '@/lib/types';
 import { toast } from "sonner";
 import { AIChatInput } from '@/components/ui/ai-chat-input';
 import { PasteContentModal } from '@/components/dashboard/PasteContentModal';
@@ -9,8 +8,8 @@ import { NewFeaturePromo } from './NewFeaturePromo';
 import { ActionCards } from './ActionCards';
 import { MyRoomsSection } from './MyRoomsSection';
 import { ContinueLearningSection } from './ContinueLearningSection';
-import { ShareModal } from './modals/ShareModal';
-import { DeleteConfirmModal } from './modals/DeleteConfirmModal';
+import { ShareModal } from '@/components/dashboard/modals/share-modal';
+import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { useContent } from '@/contexts/ContentContext';
 
 interface DashboardProps extends RoomHandlers {
@@ -29,6 +28,7 @@ export function Dashboard({
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<DeleteItem | null>(null);
+  const [itemToShare, setItemToShare] = useState<ContentItem | null>(null);
 
   const handlePasteSubmit = (data: { url?: string; text?: string; }) => {
     // Determine content type based on URL
@@ -108,13 +108,18 @@ export function Dashboard({
     setDeleteModalOpen(false);
   };
 
-  const handleCardDelete = (contentId: string) => {
+  const handleCardDelete = (item: ContentItem) => {
     setItemToDelete({
-      id: contentId,
+      id: item.id,
       type: 'card',
-      name: 'Content Item'
+      name: item.title
     });
     setDeleteModalOpen(true);
+  };
+
+  const handleCardShare = (item: ContentItem) => {
+    setItemToShare(item);
+    setShareModalOpen(true);
   };
 
   return (
@@ -137,15 +142,34 @@ export function Dashboard({
         <div className="max-w-6xl mx-auto">
           <MyRoomsSection rooms={rooms} onAddRoom={onAddRoom} onEditRoom={onEditRoom} onDeleteRoom={handleDeleteClick} />
 
-          <ContinueLearningSection onDeleteCard={handleCardDelete} onShareCard={() => setShareModalOpen(true)} />
+          <ContinueLearningSection onDeleteCard={handleCardDelete} onShareCard={handleCardShare} />
         </div>
       </main>
 
       <PasteContentModal isOpen={isPasteModalOpen} onClose={() => setIsPasteModalOpen(false)} onSubmit={handlePasteSubmit} />
       
-      <ShareModal open={shareModalOpen} onOpenChange={setShareModalOpen} />
+      <ShareModal 
+        open={shareModalOpen} 
+        onOpenChange={setShareModalOpen}
+        type="content"
+        itemToShare={{
+          id: itemToShare?.id || '',
+          title: itemToShare?.title || '',
+          url: itemToShare?.url,
+        }}
+      />
       
-      <DeleteConfirmModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} itemToDelete={itemToDelete} onConfirm={handleDeleteConfirm} />
+      <DeleteModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        type={itemToDelete?.type === 'card' ? 'content' : itemToDelete?.type || 'content'}
+        itemToDelete={{
+          id: itemToDelete?.id || '',
+          title: itemToDelete?.name || '',
+          parentName: itemToDelete?.parentName
+        }}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pencil, Share2, Download } from 'lucide-react';
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut';
-import { ShareModal } from '@/components/dashboard/modals/ShareModal';
+import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Room } from '@/lib/types';
 interface RecordingHeaderProps {
@@ -100,6 +100,14 @@ export function RecordingHeader({
         </div>
       </div>
       {/* Share Modal */}
-      <ShareModal open={shareModalOpen} onOpenChange={setShareModalOpen} />
+      <ShareModal 
+        open={shareModalOpen} 
+        onOpenChange={setShareModalOpen}
+        type="content"
+        itemToShare={{
+          id: "recording-id", // Replace with actual ID
+          title: "Recording", // Replace with actual title
+        }}
+      />
     </div>;
 }

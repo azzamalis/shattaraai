@@ -12,7 +12,7 @@ import { RoomsSection } from './drawer/RoomsSection';
 import { HistorySection } from './drawer/HistorySection';
 import { HelpTools } from './drawer/HelpTools';
 import { UserProfile } from './drawer/UserProfile';
-import { DeleteRoomModal } from './drawer/DeleteRoomModal';
+import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { Room } from '@/lib/types';
 
 interface DashboardDrawerProps {
@@ -170,11 +170,15 @@ export function DashboardDrawer({
       <FeedbackModal open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
       <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
       <CalculatorModal open={calculatorModalOpen} onOpenChange={setCalculatorModalOpen} />
-      <DeleteRoomModal 
-        open={deleteModalOpen} 
-        onOpenChange={setDeleteModalOpen} 
-        roomName={roomToDeleteName} 
-        onConfirm={handleDeleteConfirm} 
+      <DeleteModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        type="room"
+        itemToDelete={{
+          id: roomToDelete,
+          title: roomToDeleteName,
+        }}
+        onConfirm={handleDeleteConfirm}
       />
     </>
   );

@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pencil, Share2, Download } from 'lucide-react';
-import { ShareModal } from '@/components/dashboard/modals/ShareModal';
+import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ContentData } from '@/pages/ContentPage';
 
@@ -116,7 +115,15 @@ export function ContentHeader({
         </div>
       </div>
       
-      <ShareModal open={shareModalOpen} onOpenChange={setShareModalOpen} />
+      <ShareModal 
+        open={shareModalOpen} 
+        onOpenChange={setShareModalOpen}
+        type="content"
+        itemToShare={{
+          id: contentData.id,
+          title: contentData.title,
+        }}
+      />
     </div>
   );
 }

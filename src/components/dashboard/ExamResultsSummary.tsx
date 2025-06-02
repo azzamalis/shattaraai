@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChevronRight, Share2, X } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { useNavigate } from 'react-router-dom';
-import { ShareExamModal } from './ShareExamModal';
+import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { CircularProgress } from './exam-results/CircularProgress';
 import { ChapterBreakdown } from './exam-results/ChapterBreakdown';
 import { ExamActionButtons } from './exam-results/ExamActionButtons';
@@ -155,9 +155,14 @@ export function ExamResultsSummary() {
       </main>
 
       {/* Share Modal */}
-      <ShareExamModal 
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
+      <ShareModal
+        open={isShareModalOpen}
+        onOpenChange={setIsShareModalOpen}
+        type="exam"
+        itemToShare={{
+          id: roomId,
+          title: "Exam 1",
+        }}
       />
     </div>
   );

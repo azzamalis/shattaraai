@@ -3,10 +3,11 @@ import { LearningCard } from './LearningCard';
 import { useContent } from '@/contexts/ContentContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
+import { ContentItem } from '@/lib/types';
 
 interface ContinueLearningProps {
-  onDeleteCard: (id: string) => void;
-  onShareCard: () => void;
+  onDeleteCard: (item: ContentItem) => void;
+  onShareCard: (item: ContentItem) => void;
 }
 
 export function ContinueLearningSection({ onDeleteCard, onShareCard }: ContinueLearningProps) {
@@ -63,8 +64,8 @@ export function ContinueLearningSection({ onDeleteCard, onShareCard }: ContinueL
               >
                 <LearningCard 
                   content={item}
-                  onDelete={() => onDeleteCard(item.id)}
-                  onShare={onShareCard}
+                  onDelete={() => onDeleteCard(item)}
+                  onShare={() => onShareCard(item)}
                 />
               </CarouselItem>
             ))}
