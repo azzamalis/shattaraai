@@ -70,20 +70,6 @@ export function RoomView({
                 </Button>
               </div>
             </div>
-            
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-muted-foreground">
-                {isEmpty ? 'No documents' : `${exampleItems.length} documents`}
-              </div>
-              <div className="flex items-center">
-                <Button variant="ghost" size="icon" className="text-foreground">
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="text-muted-foreground">
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
           </div>
         </header>
       )}

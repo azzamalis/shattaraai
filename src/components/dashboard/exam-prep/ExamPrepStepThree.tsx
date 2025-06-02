@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -54,10 +53,10 @@ export function ExamPrepStepThree({
             <SelectTrigger className="bg-background border-border text-foreground mt-2 h-12">
               <SelectValue placeholder="Select question type" />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border">
-              <SelectItem value="Both" className="text-foreground hover:bg-accent focus:bg-accent">Both</SelectItem>
-              <SelectItem value="Multiple Choice" className="text-foreground hover:bg-accent focus:bg-accent">Multiple Choice</SelectItem>
-              <SelectItem value="Free Writing" className="text-foreground hover:bg-accent focus:bg-accent">Free Writing</SelectItem>
+            <SelectContent className="bg-popover border-border z-[200]">
+              <SelectItem value="Both" className="text-foreground hover:bg-accent/50">Both</SelectItem>
+              <SelectItem value="Multiple Choice" className="text-foreground hover:bg-accent/50">Multiple Choice</SelectItem>
+              <SelectItem value="Free Writing" className="text-foreground hover:bg-accent/50">Free Writing</SelectItem>
             </SelectContent>
           </Select>
         </div>

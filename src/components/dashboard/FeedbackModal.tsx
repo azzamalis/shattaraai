@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -61,7 +60,7 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
           
           <Textarea
             placeholder="Share your thoughts..."
-            className="min-h-[120px] bg-muted border-none focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground rounded-lg"
+            className="min-h-[120px] bg-muted border-none text-foreground placeholder:text-muted-foreground rounded-lg"
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
           />

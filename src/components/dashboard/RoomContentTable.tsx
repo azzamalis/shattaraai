@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, FileText, Video, Youtube, Mic, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MoreVertical, FileText, Video, Youtube, Mic, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from '@/lib/utils';
 
 // Define the content tag types
 export type ContentTag = 'Summary' | 'Notes' | 'Exams' | 'Flashcards';
@@ -27,6 +28,9 @@ interface RoomContentTableProps {
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
   onShare?: (id: string) => void;
+  showSelectionColumn?: boolean;
+  onSelect?: (id: string) => void;
+  selectedItems?: string[];
 }
 
 // Helper function to get the icon for each content type
@@ -57,7 +61,15 @@ const getTagColor = (tag: ContentTag) => {
   }
 };
 
-export function RoomContentTable({ items, onEdit, onDelete, onShare }: RoomContentTableProps) {
+export function RoomContentTable({ 
+  items, 
+  onEdit, 
+  onDelete, 
+  onShare,
+  showSelectionColumn,
+  onSelect,
+  selectedItems = []
+}: RoomContentTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(items.length / itemsPerPage);
@@ -67,10 +79,15 @@ export function RoomContentTable({ items, onEdit, onDelete, onShare }: RoomConte
   const currentItems = items.slice(startIndex, endIndex);
 
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full flex flex-col pt-8">
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b border-dashboard-separator">
+            {showSelectionColumn && (
+              <th className="text-left py-4 px-4 font-medium text-dashboard-text text-base w-10">
+                Select
+              </th>
+            )}
             <th className="text-left py-4 px-4 font-medium text-dashboard-text text-base">Title Name</th>
             <th className="text-center py-4 px-4 font-medium text-dashboard-text text-base">Uploaded Date</th>
             <th className="text-center py-4 px-4 font-medium text-dashboard-text text-base">AI Content Tags</th>
@@ -84,6 +101,23 @@ export function RoomContentTable({ items, onEdit, onDelete, onShare }: RoomConte
               key={item.id} 
               className="border-b border-dashboard-separator hover:bg-dashboard-card-hover transition-colors duration-200"
             >
+              {showSelectionColumn && (
+                <td className="py-6 px-4">
+                  <div
+                    onClick={() => onSelect?.(item.id)}
+                    className={cn(
+                      "w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors duration-200",
+                      selectedItems.includes(item.id)
+                        ? "bg-primary border-primary"
+                        : "border-muted-foreground"
+                    )}
+                  >
+                    {selectedItems.includes(item.id) && (
+                      <Check className="h-3 w-3 text-primary-foreground" />
+                    )}
+                  </div>
+                </td>
+              )}
               <td className="py-6 px-4 text-dashboard-text font-semibold">{item.title}</td>
               <td className="py-6 px-4 text-dashboard-text text-center">{item.uploadedDate}</td>
               <td className="py-6 px-4">

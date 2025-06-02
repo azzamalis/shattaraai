@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -55,7 +54,7 @@ export function PasteContentModal({
           {/* URL Input Section */}
           <div className="mb-6">
             <Input 
-              className="bg-muted border-border focus:border-ring focus:ring-1 focus:ring-ring px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors duration-200" 
+              className="bg-muted border-border px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors duration-200" 
               placeholder="https://youtube.com/dQw4w9WgXcQ" 
               value={url} 
               onChange={e => setUrl(e.target.value)} 
@@ -80,7 +79,7 @@ export function PasteContentModal({
             </div>
             <p className="text-muted-foreground text-sm mb-2">Copy and paste text to add as content</p>
             <Textarea 
-              className="bg-muted border-border focus:border-ring focus:ring-1 focus:ring-ring px-4 py-3 min-h-[100px] text-foreground placeholder:text-muted-foreground transition-colors duration-200" 
+              className="bg-muted border-border px-4 py-3 min-h-[100px] text-foreground placeholder:text-muted-foreground transition-colors duration-200" 
               placeholder="Paste your notes here" 
               value={text} 
               onChange={e => setText(e.target.value)} 

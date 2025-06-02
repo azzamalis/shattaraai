@@ -163,7 +163,7 @@ export function TutorialModal({ open, onOpenChange }: TutorialModalProps) {
       }
       onOpenChange(isOpen);
     }}>
-      <DialogContent className="max-w-4xl w-[95vw] gap-0 p-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border border-border/50">
+      <DialogContent className="!max-w-5xl w-[95vw] gap-0 p-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border border-border/50">
         {/* Close button - X in the top right */}
         <button 
           onClick={() => onOpenChange(false)}

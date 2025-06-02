@@ -109,7 +109,7 @@ export default function RoomPage() {
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full bg-background" onClick={handleClickOutside}>
-        <div className="pb-4">
+        <div className="py-12">
           <RoomHeroSection title={room.title} description={room.description} />
         </div>
         
@@ -160,7 +160,7 @@ export default function RoomPage() {
                           autoFocus 
                         />
                       ) : (
-                        <>
+                        <div className="flex items-center gap-2">
                           <p className="text-muted-foreground">
                             {room.description || "No description"}
                           </p>
@@ -173,7 +173,7 @@ export default function RoomPage() {
                           >
                             <Pencil className="h-4 w-4" />
                           </button>
-                        </>
+                        </div>
                       )}
                     </div>
                   </div>

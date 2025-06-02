@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, Send } from 'lucide-react';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
@@ -102,13 +101,7 @@ export function AITutorChatDrawer({
                 onChange={e => setInput(e.target.value)} 
                 onKeyDown={handleKeyDown} 
                 placeholder="Ask anything..." 
-                className="
-                  flex-1 border-border text-foreground 
-                  placeholder:text-muted-foreground 
-                  bg-card hover:bg-accent
-                  focus:border-primary focus:ring-1 focus:ring-primary 
-                  transition-all duration-200
-                " 
+                className="bg-muted border-border text-foreground placeholder:text-muted-foreground" 
               />
               <Button 
                 onClick={handleSendMessage} 

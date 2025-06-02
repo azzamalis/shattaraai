@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -24,25 +23,29 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
     {
       id: '1',
       title: 'The British Empire',
-      type: 'video',
+      uploadedDate: '30/05/2025',
+      type: 'Video',
       isSelected: false
     },
     {
       id: '2',
       title: 'Think Fast, Talk Smart',
-      type: 'video',
+      uploadedDate: '30/05/2025',
+      type: 'Video',
       isSelected: false
     },
     {
       id: '3',
       title: 'Understanding Applied Psychology',
-      type: 'document',
+      uploadedDate: '30/05/2025',
+      type: 'PDF Files',
       isSelected: false
     },
     {
       id: '4',
       title: 'Social Class',
-      type: 'text',
+      uploadedDate: '30/05/2025',
+      type: 'Recording',
       isSelected: false
     }
   ]);
@@ -103,7 +106,7 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={cn(
-        "max-w-4xl p-0 rounded-lg",
+        "max-w-3xl p-0 rounded-lg sm:max-w-3xl",
         "bg-card border-border"
       )}>
         <div className="p-6">
