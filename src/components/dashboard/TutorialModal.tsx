@@ -5,6 +5,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -156,78 +158,20 @@ export function TutorialModal({ open, onOpenChange }: TutorialModalProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen) {
-        setCurrentStep(0);
-        setActiveTab('upload');
-      }
-      onOpenChange(isOpen);
-    }}>
-      <DialogContent className="max-w-4xl w-[95vw] gap-0 p-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border border-border/50">
-        {/* Close button - X in the top right */}
-        <button 
-          onClick={() => onOpenChange(false)}
-          className="absolute right-4 top-4 z-50 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-            <path d="M18 6 6 18"></path>
-            <path d="m6 6 12 12"></path>
-          </svg>
-          <span className="sr-only">Close</span>
-        </button>
-
-        {/* Header */}
-        <DialogHeader className="p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-          <DialogTitle className="text-2xl font-semibold tracking-tight text-foreground">
-            {tutorialSteps[currentStep].title}
-          </DialogTitle>
-          <p className="text-base text-muted-foreground/80 mt-1.5">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl w-[90vw] sm:w-[80vw] md:w-[70vw]">
+        <DialogHeader>
+          <DialogTitle>{tutorialSteps[currentStep].title}</DialogTitle>
+          <DialogDescription>
             {tutorialSteps[currentStep].subtitle}
-          </p>
+          </DialogDescription>
         </DialogHeader>
-
-        {/* Main content area */}
-        <div className="px-6">
-          {currentStep === 0 ? (
-            <div className="space-y-6 py-4">
-              <Tabs defaultValue="upload" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full grid grid-cols-3 gap-2 p-1 h-14 bg-background">
-                  <TabsTrigger 
-                    value="upload"
-                    className="h-full rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-                  >
-                    Upload
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="paste"
-                    className="h-full rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-                  >
-                    Paste
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="record"
-                    className="h-full rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-                  >
-                    Record
-                  </TabsTrigger>
-                </TabsList>
-                <div className="relative w-full aspect-video bg-card rounded-lg overflow-hidden border border-border/50 mt-6">
-                  {renderContent(tutorialSteps[currentStep].content)}
-                </div>
-              </Tabs>
-            </div>
-          ) : (
-            <div className="pt-4 pb-6">
-              <div className="relative w-full aspect-video bg-card rounded-lg overflow-hidden border border-border/50">
-                {renderContent(tutorialSteps[currentStep].content)}
-              </div>
-            </div>
-          )}
+        
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+          {renderContent(tutorialSteps[currentStep].content)}
         </div>
-
-        {/* Footer with navigation controls */}
-        <div className="flex items-center justify-between px-6 py-4 bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/30">
-          {/* Step dots */}
+        
+        <DialogFooter className="flex items-center justify-between">
           <div className="flex gap-1">
             {Array.from({ length: totalSteps }).map((_, index) => (
               <div
@@ -235,38 +179,24 @@ export function TutorialModal({ open, onOpenChange }: TutorialModalProps) {
                 className={cn(
                   "h-2 w-2 rounded-full transition-colors",
                   index === currentStep 
-                    ? "bg-primary shadow-sm shadow-primary/50" 
-                    : "bg-primary/20 hover:bg-primary/30 transition-colors"
+                    ? "bg-primary" 
+                    : "bg-primary/20"
                 )}
               />
             ))}
           </div>
-
-          {/* Navigation buttons */}
-          <div className="flex gap-3">
+          
+          <div className="flex gap-2">
             {currentStep > 0 && (
-              <Button
-                variant="ghost"
-                onClick={handleBack}
-                className="hover:bg-accent"
-              >
+              <Button variant="ghost" onClick={handleBack}>
                 Back
               </Button>
             )}
-            <Button
-              onClick={currentStep === totalSteps - 1 ? () => onOpenChange(false) : handleNext}
-              className="bg-primary hover:bg-primary/90"
-            >
+            <Button onClick={handleNext}>
               {currentStep === totalSteps - 1 ? 'Close' : 'Next'}
-              {currentStep !== totalSteps - 1 && (
-                <ArrowRight
-                  className="ml-2 h-4 w-4 opacity-70"
-                  aria-hidden="true"
-                />
-              )}
             </Button>
           </div>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
