@@ -35,12 +35,12 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       </PopoverTrigger>
       
       <PopoverContent 
-        className="w-[250px] bg-dashboard-card dark:bg-dashboard-card border border-dashboard-separator dark:border-dashboard-separator text-dashboard-text dark:text-dashboard-text p-0 mb-1" 
+        className="w-[250px] bg-dashboard-card dark:bg-dashboard-card border border-dashboard-separator dark:border-dashboard-separator text-dashboard-text dark:text-dashboard-text p-0 mb-1 shadow-lg z-[100] pointer-events-auto" 
         align="end" 
         side="top" 
         sideOffset={5}
       >
-        <div className="p-4 border-b border-dashboard-separator dark:border-dashboard-separator">
+        <div className="p-4 border-b border-dashboard-separator dark:border-dashboard-separator pointer-events-auto">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-primary">
               <AvatarFallback className="bg-primary text-primary-foreground">
@@ -51,7 +51,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           </div>
         </div>
         
-        <div className="py-2">
+        <div className="py-2 pointer-events-auto">
           <Button 
             variant="ghost" 
             className="w-full justify-start px-4 py-2.5 text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text" 

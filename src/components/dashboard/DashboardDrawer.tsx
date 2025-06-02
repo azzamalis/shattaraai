@@ -130,7 +130,7 @@ export function DashboardDrawer({
               
               {/* History Section */}
               <div className="w-full">
-                <HistorySection />
+                <HistorySection rooms={rooms} />
               </div>
               
               {/* Rooms Section */}
