@@ -3,6 +3,7 @@ import { CommandOption } from '@/lib/types';
 import { Mic, MicOff, Send, Search, AtSign, Globe } from 'lucide-react';
 import { CommandDropdown } from './CommandDropdown';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ChatInputProps {
   value: string;
@@ -78,48 +79,72 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
   const getVoiceButton = () => {
     if (isRecording) {
       return (
-        <button
-          onClick={handleVoiceToggle}
-          className={cn(
-            "p-2 rounded-full transition-colors",
-            "bg-red-500 text-white hover:bg-red-600"
-          )}
-          title="Stop recording"
-        >
-          <MicOff className="h-[14px] w-[14px]" />
-        </button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleVoiceToggle}
+                className={cn(
+                  "p-2 rounded-full transition-colors",
+                  "bg-red-500 text-white hover:bg-red-600"
+                )}
+              >
+                <MicOff className="h-[14px] w-[14px]" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Stop recording</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       );
     }
     
     if (value.trim()) {
       return (
-        <button
-          onClick={handleSend}
-          className={cn(
-            "p-2 rounded-full transition-colors",
-            "bg-[#00A3FF] text-white hover:bg-[#00A3FF]/90"
-          )}
-          title="Send message"
-        >
-          <Send className="h-[14px] w-[14px]" />
-        </button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleSend}
+                className={cn(
+                  "p-2 rounded-full transition-colors",
+                  "bg-[#00A3FF] text-white hover:bg-[#00A3FF]/90"
+                )}
+              >
+                <Send className="h-[14px] w-[14px]" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Send message</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       );
     }
     
     return (
-      <button
-        onClick={handleVoiceToggle}
-        className={cn(
-          "p-2 rounded-full transition-colors",
-          "bg-dashboard-bg dark:bg-dashboard-bg",
-          "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
-          "hover:bg-dashboard-card dark:hover:bg-dashboard-card",
-          "hover:text-dashboard-text dark:hover:text-dashboard-text"
-        )}
-        title="Start recording"
-      >
-        <Mic className="h-[14px] w-[14px]" />
-      </button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={handleVoiceToggle}
+              className={cn(
+                "p-2 rounded-full transition-colors",
+                "bg-dashboard-bg dark:bg-dashboard-bg",
+                "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
+                "hover:bg-dashboard-card dark:hover:bg-dashboard-card",
+                "hover:text-dashboard-text dark:hover:text-dashboard-text"
+              )}
+            >
+              <Mic className="h-[14px] w-[14px]" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Talk to Shattara AI</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   };
 
@@ -162,30 +187,48 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
         
         {/* Command and search options */}
         <div className="flex items-center gap-3 px-3 pb-2">
-          <button 
-            className={cn(
-              "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs transition-colors",
-              "bg-[#00A3FF]/10 text-[#00A3FF]",
-              "hover:bg-[#00A3FF]/20"
-            )}
-            onClick={() => onChange(value + '@')}
-          >
-            <AtSign className="h-[14px] w-[14px]" />
-            Commands
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs transition-colors",
+                    "bg-[#00A3FF]/10 text-[#00A3FF]",
+                    "hover:bg-[#00A3FF]/20"
+                  )}
+                  onClick={() => onChange(value + '@')}
+                >
+                  <AtSign className="h-[14px] w-[14px]" />
+                  Commands
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Type '@' for commands</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-          <button
-            onClick={() => setSearchActive(!searchActive)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs transition-colors",
-              searchActive 
-                ? "bg-[#00A3FF]/10 text-[#00A3FF] hover:bg-[#00A3FF]/20"
-                : "bg-dashboard-bg dark:bg-dashboard-bg text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 hover:bg-dashboard-card dark:hover:bg-dashboard-card hover:text-dashboard-text dark:hover:text-dashboard-text"
-            )}
-          >
-            <Globe className="h-[14px] w-[14px]" />
-            Search
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setSearchActive(!searchActive)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs transition-colors",
+                    searchActive 
+                      ? "bg-[#00A3FF]/10 text-[#00A3FF] hover:bg-[#00A3FF]/20"
+                      : "bg-dashboard-bg dark:bg-dashboard-bg text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 hover:bg-dashboard-card dark:hover:bg-dashboard-card hover:text-dashboard-text dark:hover:text-dashboard-text"
+                  )}
+                >
+                  <Globe className="h-[14px] w-[14px]" />
+                  Search
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Search the web</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </div>
