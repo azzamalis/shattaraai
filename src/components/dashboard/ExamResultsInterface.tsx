@@ -185,9 +185,10 @@ const ExamResultsInterface: React.FC = () => {
                 </div>
                 <button 
                   onClick={() => openChatForQuestion(question.id)}
-                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+                  className="flex items-center whitespace-nowrap gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
                 >
-                  Ask chat <ChevronRight className="h-4 w-4" />
+                  <span>Ask chat</span>
+                  <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
               

@@ -104,7 +104,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
         progressPercentage={progressPercentage}
       />
 
-      <main className="pb-12">
+      <main className="pb-0">
         <ScrollArea className="h-[calc(100vh-140px)]">
           <div className="px-6 py-8">
             <div className="mx-auto max-w-4xl">
@@ -124,10 +124,12 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
                 />
               ))}
               
-              <div className="mt-12">
+              <div className="mt-12 relative">
+                <div className="absolute inset-0 -bottom-8 bg-background" />
                 <button 
                   onClick={handleSubmitExam}
                   className={cn(
+                    "relative z-10",
                     "w-full rounded-lg py-4 px-8 text-lg font-medium",
                     "bg-primary text-primary-foreground",
                     "hover:bg-primary/90 transition-colors",

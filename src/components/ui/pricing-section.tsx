@@ -37,7 +37,7 @@ function PricingSection({
     highlight: cn("h-12 bg-primary", "hover:bg-primary-light", "text-white", "shadow-[0_1px_15px_rgba(35,35,255,0.3)]", "hover:shadow-[0_1px_20px_rgba(35,35,255,0.4)]", "font-semibold text-base")
   };
   const badgeStyles = cn("px-4 py-1.5 text-sm font-medium", "bg-primary", "text-white", "border-none shadow-lg");
-  return <section className={cn("relative bg-dark text-white", "py-20 px-4 md:py-28", "overflow-hidden", className)}>
+  return <section className={cn("relative bg-dark-deeper text-white", "py-20 px-4 md:py-28", "overflow-hidden", className)}>
       <div className="w-full max-w-5xl mx-auto">
         <div className="flex flex-col items-center gap-4 mb-12">
           <h2 className="text-3xl font-bold">

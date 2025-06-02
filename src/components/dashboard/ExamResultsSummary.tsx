@@ -114,8 +114,8 @@ export function ExamResultsSummary() {
 
       {/* Main Content - Reduce top padding */}
       <main className="container mx-auto max-w-4xl px-6 pt-16">
-        {/* Title - Reduce margin */}
-        <h1 className="mb-4 text-center text-3xl font-bold text-foreground">
+        {/* Title - Add 1rem top padding */}
+        <h1 className="mb-4 pt-4 text-center text-3xl font-bold text-foreground">
           Keep up the momentum!
         </h1>
 
