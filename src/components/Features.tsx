@@ -1,11 +1,12 @@
-
 import React from 'react';
 import { FeaturesSectionWithHoverEffects } from '@/components/ui/feature-section-with-hover-effects';
+import GradientBackground from '@/components/ui/gradient-background';
 
 const Features = () => {
   return (
-    <section id="features" className="py-24 bg-dark-deeper">
-      <div className="container mx-auto px-4 md:px-6">
+    <section id="features" className="py-24 bg-dark-deeper relative">
+      <GradientBackground />
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold mb-4 text-white">
             AI-generated notes, flashcards, and exam simulators—all in one place.

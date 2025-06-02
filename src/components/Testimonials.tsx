@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { TestimonialsSection } from '@/components/ui/testimonials-with-marquee';
+import GradientBackground from '@/components/ui/gradient-background';
 
 const Testimonials = () => {
   const testimonials = [
@@ -52,11 +52,16 @@ const Testimonials = () => {
   ];
 
   return (
-    <TestimonialsSection
-      title="Trusted by students and educators"
-      description="Join thousands of students and teachers who are already transforming education with Shattara AI"
-      testimonials={testimonials}
-    />
+    <section className="py-24 bg-dark-deeper relative">
+      <GradientBackground />
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <TestimonialsSection
+          title="Trusted by students and educators"
+          description="Join thousands of students and teachers who are already transforming education with Shattara AI"
+          testimonials={testimonials}
+        />
+      </div>
+    </section>
   );
 };
 

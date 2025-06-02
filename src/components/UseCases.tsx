@@ -1,6 +1,7 @@
 // Test commit - UseCases component for educational platform
 import React, { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import GradientBackground from '@/components/ui/gradient-background';
 
 const UseCases = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -57,8 +58,9 @@ const UseCases = () => {
   ];
   
   return (
-    <section id="use-cases" className="py-24 bg-dark-deeper">
-      <div className="container mx-auto px-4 md:px-6">
+    <section className="py-24 bg-dark-deeper relative">
+      <GradientBackground />
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold mb-4 text-white">
             Designed for every learning journey
