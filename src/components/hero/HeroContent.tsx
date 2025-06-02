@@ -36,42 +36,15 @@ const HeroContent = () => {
 
   return (
     <section className="relative min-h-screen">
-      <div className="relative pt-24 md:pt-36">
-        <AnimatedGroup
-          variants={{
-            container: {
-              visible: {
-                transition: {
-                  delayChildren: 1,
-                },
-              },
-            },
-            item: {
-              hidden: {
-                opacity: 0,
-                y: 20,
-              },
-              visible: {
-                opacity: 1,
-                y: 0,
-                transition: {
-                  type: "spring",
-                  bounce: 0.3,
-                  duration: 2,
-                },
-              },
-            },
-          }}
-          className="absolute inset-0 -z-20">
-          <div className="absolute inset-x-0 top-56 -z-20 hidden lg:top-32 dark:block bg-dark-deeper h-full"></div>
-        </AnimatedGroup>
+      {/* EducationAnimation as the main background - highest priority */}
+      <div className="absolute inset-0 z-0 w-full h-full">
+        <EducationAnimation className="w-full h-full" />
+      </div>
+
+      <div className="relative pt-24 md:pt-36 z-10">
+        {/* Remove the overlapping background div that was covering the animation */}
         
-        {/* EducationAnimation as background - positioned to be visible */}
-        <div className="absolute inset-0 -z-10 w-full h-full opacity-30">
-          <EducationAnimation className="w-full h-full" />
-        </div>
-        
-        <div className="mx-auto max-w-7xl px-6 relative z-10">
+        <div className="mx-auto max-w-7xl px-6 relative">
           <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
             <AnimatedGroup variants={transitionVariants}>
               <HeroActionLink to="/signup" text="AI-Powered Learning Platform" />
@@ -141,7 +114,7 @@ const HeroContent = () => {
               aria-hidden
               className="bg-gradient-to-b to-dark-deeper absolute inset-0 z-10 from-transparent from-35%"
             />
-            <div className="bg-dark/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/10 p-4 shadow-lg shadow-black/15">
+            <div className="bg-dark/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/10 p-4 shadow-lg shadow-black/15 z-20">
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
               
               <img
