@@ -1,7 +1,7 @@
 import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Trash2, AlertTriangle } from 'lucide-react';
 
 interface DeleteModalProps {
   open: boolean;
@@ -30,33 +30,47 @@ export function DeleteModal({
       className="sm:max-w-md"
     >
       <div className="space-y-6 py-4">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-full bg-red-500/10">
-            <Trash2 className="h-5 w-5 text-red-500" />
+        {/* Header with Icon */}
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-full bg-red-500/10 ring-1 ring-red-500/20">
+            <Trash2 className="h-6 w-6 text-red-500" />
           </div>
           <div>
-            <p className="text-foreground">
-              Are you sure you want to delete "<span className="font-medium">{itemToDelete.title}</span>"?
+            <h3 className="text-lg font-semibold text-foreground">
+              Delete Confirmation
+            </h3>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              This action cannot be undone
             </p>
-            {itemToDelete.parentName && (
-              <p className="text-sm text-muted-foreground mt-1">
-                This will be removed from {itemToDelete.parentName}
-              </p>
-            )}
           </div>
         </div>
 
-        {/* Warning */}
-        <p className="text-sm text-muted-foreground">
-          This action cannot be undone.
-        </p>
+        {/* Warning Message */}
+        <div className="rounded-lg bg-red-50 dark:bg-red-950/50 p-4 border border-red-200 dark:border-red-800">
+          <div className="flex gap-3">
+            <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-red-700 dark:text-red-300">
+                You are about to delete:
+              </p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                "<span className="font-semibold">{itemToDelete.title}</span>"
+              </p>
+              {itemToDelete.parentName && (
+                <p className="text-sm text-red-600/80 dark:text-red-400/80 mt-1">
+                  This will be removed from {itemToDelete.parentName}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 pt-2">
           <Button
             variant="ghost"
             onClick={() => onOpenChange(false)}
+            className="hover:bg-muted/50"
           >
             Cancel
           </Button>
@@ -66,6 +80,7 @@ export function DeleteModal({
               onConfirm();
               onOpenChange(false);
             }}
+            className="bg-red-500 hover:bg-red-600 focus:ring-2 focus:ring-red-500/20"
           >
             Delete
           </Button>
