@@ -66,14 +66,9 @@ const HeroContent = () => {
           <div className="absolute inset-x-0 top-56 -z-20 hidden lg:top-32 dark:block bg-dark-deeper h-full"></div>
         </AnimatedGroup>
         
-        {/* Futuristic gradient background */}
-        <div aria-hidden className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_10%,#000 30%,#2323FF_100%)]" />
-        
-        {/* Animated floating elements */}
-        <div className="absolute inset-0 -z-5 overflow-hidden">
-          <div className="absolute top-1/3 -left-10 w-40 h-40 rounded-full bg-primary/10 blur-3xl opacity-20 animate-pulse"></div>
-          <div className="absolute top-2/3 right-20 w-32 h-32 rounded-full bg-primary/20 blur-3xl opacity-15 animate-[pulse_4s_infinite]"></div>
-          <div className="absolute bottom-1/4 left-1/4 w-28 h-28 rounded-full bg-primary/30 blur-3xl opacity-10 animate-[pulse_5s_infinite]"></div>
+        {/* EducationAnimation as background */}
+        <div className="absolute inset-0 -z-10 w-full h-full">
+          <EducationAnimation className="w-full h-full" />
         </div>
         
         <div className="mx-auto max-w-7xl px-6 relative z-10">
@@ -149,9 +144,10 @@ const HeroContent = () => {
             <div className="bg-dark/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/10 p-4 shadow-lg shadow-black/15">
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
               
-              {/* Replace static image with the p5.js animation */}
-              <EducationAnimation 
-                className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px]" 
+              <img
+                src="/placeholder.svg"
+                alt="AI Learning Platform Interface"
+                className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover"
               />
             </div>
           </div>
