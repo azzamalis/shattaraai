@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, Image, X } from 'lucide-react';
@@ -36,34 +37,74 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px]">
-        <DialogHeader>
-          <DialogTitle>Send Feedback</DialogTitle>
-          <DialogDescription>
-            Use this form to share your thoughts and feedback with us
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent 
+        className="w-[450px] bg-card border-border p-5 rounded-xl shadow-lg"
+      >
+        <DialogTitle className="sr-only">Send Feedback</DialogTitle>
+        <DialogDescription className="sr-only">
+          Use this form to share your thoughts and feedback with us
+        </DialogDescription>
         
-        <div className="py-4">
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => onOpenChange(false)} 
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
+            >
+              <X size={18} />
+              <span className="sr-only">Close</span>
+            </Button>
+          </div>
+          
           <Textarea
             placeholder="Share your thoughts..."
-            className="min-h-[120px]"
+            className="min-h-[120px] bg-muted border-none focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground rounded-lg"
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
           />
+          
+          <div className="flex items-center justify-between pt-2">
+            <Button 
+              variant="ghost" 
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-muted-foreground hover:text-foreground hover:bg-accent"
+              >
+                <Image size={18} />
+                <span className="sr-only">Attach image</span>
+              </Button>
+              
+              <Button 
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={handleSubmit}
+                disabled={!feedback.trim() || isSubmitting}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
+                    <span>Sending...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Send size={16} />
+                    <span>Send feedback</span>
+                  </div>
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
-        
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSubmit}
-            disabled={!feedback.trim() || isSubmitting}
-          >
-            {isSubmitting ? "Sending..." : "Send feedback"}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

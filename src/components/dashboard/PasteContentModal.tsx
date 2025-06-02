@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Link, FileText } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface PasteContentModalProps {
   isOpen: boolean;
@@ -40,71 +40,71 @@ export function PasteContentModal({
     }, 800);
   };
 
-  const isValidUrl = (url: string) => {
-    try {
-      new URL(url);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[450px]">
-        <DialogHeader>
-          <DialogTitle>Add Content</DialogTitle>
-          <DialogDescription>
-            Enter a YouTube Link, Website URL, or paste text content
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+      <DialogContent className="bg-card border-border text-foreground max-w-md w-full p-0 overflow-hidden">
+        <div className="p-6">
+          <DialogHeader className="mb-4">
+            <div className="flex items-center gap-2">
+              <Link className="text-muted-foreground h-5 w-5" />
+              <DialogTitle className="text-xl font-bold">YouTube, Website, Etc</DialogTitle>
+            </div>
+            <p className="text-muted-foreground text-sm mt-1">Enter a YouTube Link, Website URL, Doc, Etc</p>
+          </DialogHeader>
+
+          {/* URL Input Section */}
+          <div className="mb-6">
             <Input 
-              placeholder="https://youtube.com/..."
-              value={url}
-              onChange={e => setUrl(e.target.value)}
-              className={cn(
-                "w-full",
-                url && !isValidUrl(url) && "border-red-500"
-              )}
+              className="bg-muted border-border focus:border-ring focus:ring-1 focus:ring-ring px-4 py-3 text-foreground placeholder:text-muted-foreground transition-colors duration-200" 
+              placeholder="https://youtube.com/dQw4w9WgXcQ" 
+              value={url} 
+              onChange={e => setUrl(e.target.value)} 
             />
-            {url && !isValidUrl(url) && (
-              <p className="text-sm text-red-500">Please enter a valid URL</p>
-            )}
           </div>
-          
-          <div className="relative">
+
+          {/* Divider */}
+          <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <div className="w-full border-t border-border"></div>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or
-              </span>
+            <div className="relative flex justify-center">
+              <span className="bg-card px-3 text-sm text-muted-foreground">or</span>
             </div>
           </div>
-          
-          <Textarea
-            placeholder="Paste your text content here..."
-            value={text}
-            onChange={e => setText(e.target.value)}
-            className="min-h-[120px]"
-          />
+
+          {/* Text Input Section */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-2">
+              <FileText className="text-muted-foreground h-5 w-5" />
+              <h3 className="text-base font-medium">Paste Text</h3>
+            </div>
+            <p className="text-muted-foreground text-sm mb-2">Copy and paste text to add as content</p>
+            <Textarea 
+              className="bg-muted border-border focus:border-ring focus:ring-1 focus:ring-ring px-4 py-3 min-h-[100px] text-foreground placeholder:text-muted-foreground transition-colors duration-200" 
+              placeholder="Paste your notes here" 
+              value={text} 
+              onChange={e => setText(e.target.value)} 
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3">
+            <Button 
+              variant="outline" 
+              className="bg-transparent border-border text-muted-foreground hover:bg-accent hover:text-foreground" 
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmit} 
+              disabled={isSubmitting || !url && !text} 
+              className="bg-accent hover:bg-accent/80 text-foreground font-medium transition-colors duration-200"
+            >
+              {isSubmitting ? 'Adding...' : 'Add'}
+            </Button>
+          </div>
         </div>
-        
-        <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSubmit}
-            disabled={(!url && !text) || (url && !isValidUrl(url))}
-          >
-            Add Content
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
