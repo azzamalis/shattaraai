@@ -20,6 +20,37 @@ export interface RoomHandlers {
 
 export type ContentType = 'recording' | 'pdf' | 'video' | 'audio' | 'youtube' | 'website' | 'text' | 'upload' | 'chat';
 
+export type RecordingState = 'new' | 'recording' | 'paused' | 'completed' | 'existing';
+
+export interface RecordingMetadata {
+  duration?: number;
+  fileSize?: number;
+  format?: string;
+  sampleRate?: number;
+  createdAt?: string;
+  lastModified?: string;
+  audioUrl?: string;
+  transcriptUrl?: string;
+  chaptersData?: ChapterData[];
+}
+
+export interface ChapterData {
+  id: string;
+  title: string;
+  startTime: number;
+  endTime: number;
+  summary?: string;
+}
+
+export interface RecordingStateInfo {
+  state: RecordingState;
+  isNewRecording: boolean;
+  isExistingRecording: boolean;
+  hasAudioFile: boolean;
+  hasTranscript: boolean;
+  hasChapters: boolean;
+}
+
 export interface ContentItem {
   id: string;
   title: string;
@@ -32,6 +63,7 @@ export interface ContentItem {
   duration?: number;
   thumbnail?: string;
   metadata?: Record<string, any>;
+  recordingMetadata?: RecordingMetadata;
 }
 
 export interface ContentHandlers {

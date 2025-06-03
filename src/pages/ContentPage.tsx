@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -6,6 +5,7 @@ import { ContentLeftSidebar } from '@/components/content/ContentLeftSidebar';
 import { ContentRightSidebar } from '@/components/content/ContentRightSidebar';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { ContentType } from '@/lib/types';
+import { useRecordingState } from '@/hooks/useRecordingState';
 
 export interface ContentData {
   id: string;
@@ -29,10 +29,20 @@ export default function ContentPage() {
   const filename = searchParams.get('filename');
   const text = searchParams.get('text');
   
+  // Use recording state detection hook
+  const { 
+    recordingStateInfo, 
+    recordingMetadata, 
+    isLoading: isRecordingLoading 
+  } = useRecordingState({
+    contentId: id || 'new',
+    contentType: type
+  });
+
   const [contentData, setContentData] = useState<ContentData>({
     id: id || 'new',
     type,
-    title: getDefaultTitle(type, filename),
+    title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
     url,
     filename,
     text,
@@ -57,30 +67,32 @@ export default function ContentPage() {
   }, [isRecording]);
 
   useEffect(() => {
-    // Update content data when URL parameters change
+    // Update content data when URL parameters change or recording state is detected
     setContentData(prev => ({
       ...prev,
       type,
-      title: getDefaultTitle(type, filename),
+      title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
       url,
       filename,
       text,
     }));
-  }, [type, url, filename, text]);
+  }, [type, url, filename, text, recordingStateInfo?.isExistingRecording]);
 
-  // Simulate content processing for non-recording types
+  // Simulate content processing for non-recording types or modify for existing recordings
   useEffect(() => {
-    if (contentData.type !== 'recording' && (contentData.url || contentData.filePath || contentData.text)) {
+    if (recordingStateInfo?.isExistingRecording && !isRecordingLoading) {
+      // For existing recordings, set processing to false immediately
+      setContentData(prev => ({ ...prev, isProcessing: false }));
+    } else if (contentData.type !== 'recording' && (contentData.url || contentData.filePath || contentData.text)) {
       setContentData(prev => ({ ...prev, isProcessing: true }));
       
-      // Simulate processing delay
       const timer = setTimeout(() => {
         setContentData(prev => ({ ...prev, isProcessing: false }));
       }, 2000);
 
       return () => clearTimeout(timer);
     }
-  }, [contentData.type, contentData.url, contentData.filePath, contentData.text]);
+  }, [contentData.type, contentData.url, contentData.filePath, contentData.text, recordingStateInfo?.isExistingRecording, isRecordingLoading]);
 
   const toggleRecording = () => {
     if (!isRecording) {
@@ -134,6 +146,9 @@ export default function ContentPage() {
                 selectedMicrophone={selectedMicrophone}
                 onMicrophoneSelect={handleMicrophoneSelect}
                 onMicrophoneClear={handleMicrophoneClear}
+                recordingStateInfo={recordingStateInfo}
+                recordingMetadata={recordingMetadata}
+                isRecordingLoading={isRecordingLoading}
               />
             </ResizablePanel>
             
@@ -158,12 +173,15 @@ export default function ContentPage() {
   );
 }
 
-function getDefaultTitle(type: ContentType, filename?: string | null): string {
+function getDefaultTitle(type: ContentType, filename?: string | null, isExistingRecording?: boolean): string {
   const now = new Date();
   const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   
   switch (type) {
     case 'recording':
+      if (isExistingRecording) {
+        return filename ? filename : 'Existing Recording';
+      }
       return `Recording at ${time}`;
     case 'upload':
     case 'pdf':
