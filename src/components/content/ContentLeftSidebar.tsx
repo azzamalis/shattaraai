@@ -22,6 +22,7 @@ interface ContentLeftSidebarProps {
   recordingStateInfo?: RecordingStateInfo;
   recordingMetadata?: RecordingMetadata | null;
   isRecordingLoading?: boolean;
+  onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
 }
 
 export function ContentLeftSidebar({
@@ -35,7 +36,8 @@ export function ContentLeftSidebar({
   onMicrophoneClear,
   recordingStateInfo,
   recordingMetadata,
-  isRecordingLoading
+  isRecordingLoading,
+  onTextAction
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
 
@@ -92,13 +94,17 @@ export function ContentLeftSidebar({
       );
     }
 
-    // Default content viewer for other types
+    // Default content viewer for other types (including PDF)
     return (
       <div className={cn(
         "p-4 shrink-0 bg-dashboard-card dark:bg-dashboard-card",
         shouldHideTabs && "flex-1"
       )}>
-        <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
+        <ContentViewer 
+          contentData={contentData} 
+          onUpdateContent={onUpdateContent}
+          onTextAction={onTextAction}
+        />
       </div>
     );
   };
