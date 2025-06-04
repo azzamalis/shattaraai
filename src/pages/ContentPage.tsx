@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -120,12 +119,6 @@ export default function ContentPage() {
     setContentData(prev => ({ ...prev, ...updates }));
   };
 
-  // Handle text actions from PDF viewer and other content
-  const handleTextAction = (action: 'explain' | 'search' | 'summarize', text: string) => {
-    console.log(`Text action: ${action} for text: ${text}`);
-    // This will be handled by the ContentRightSidebar's handleTextAction
-  };
-
   return (
     <DashboardLayout 
       className="content-page-layout p-0"
@@ -156,7 +149,6 @@ export default function ContentPage() {
                 recordingStateInfo={recordingStateInfo}
                 recordingMetadata={recordingMetadata}
                 isRecordingLoading={isRecordingLoading}
-                onTextAction={handleTextAction}
               />
             </ResizablePanel>
             
