@@ -119,6 +119,14 @@ export default function ContentPage() {
     setContentData(prev => ({ ...prev, ...updates }));
   };
 
+  // New function to handle text actions from PDF viewer
+  const handleTextAction = (action: 'explain' | 'search' | 'summarize', text: string) => {
+    // This would typically trigger a chat message in the ContentRightSidebar
+    console.log(`PDF Text Action: ${action} for text: "${text}"`);
+    // You could emit an event, use a context, or pass this to the chat component
+    // For now, we'll just log it - integration with chat would be the next step
+  };
+
   return (
     <DashboardLayout 
       className="content-page-layout p-0"
@@ -149,6 +157,7 @@ export default function ContentPage() {
                 recordingStateInfo={recordingStateInfo}
                 recordingMetadata={recordingMetadata}
                 isRecordingLoading={isRecordingLoading}
+                onTextAction={handleTextAction}
               />
             </ResizablePanel>
             

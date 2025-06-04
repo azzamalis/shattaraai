@@ -1,35 +1,24 @@
-
 import React from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
+import { PDFViewer } from './PDFViewer';
 
 interface ContentViewerProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
+  onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
 }
 
-export function ContentViewer({ contentData, onUpdateContent }: ContentViewerProps) {
+export function ContentViewer({ contentData, onUpdateContent, onTextAction }: ContentViewerProps) {
   const renderViewer = () => {
     switch (contentData.type) {
       case 'pdf':
         return (
-          <div className="w-full h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
-            {contentData.url || contentData.filePath ? (
-              <iframe
-                src={contentData.url || contentData.filePath}
-                className="w-full h-full rounded-xl"
-                title="PDF Viewer"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                  <FileText className="h-8 w-8 mb-2" />
-                  <span className="text-sm">PDF Viewer</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No PDF loaded</span>
-                </div>
-              </div>
-            )}
-          </div>
+          <PDFViewer
+            url={contentData.url}
+            filePath={contentData.filePath}
+            onTextAction={onTextAction}
+          />
         );
       
       case 'video':
