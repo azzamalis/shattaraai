@@ -11,6 +11,7 @@ import { ContinueLearningSection } from './ContinueLearningSection';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { useContent } from '@/contexts/ContentContext';
+import { motion } from 'framer-motion';
 
 interface DashboardProps extends RoomHandlers {
   rooms: Room[];
@@ -128,25 +129,78 @@ export function Dashboard({
         <div className="max-w-[800px] mx-auto mb-12">
           <NewFeaturePromo />
           
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 sm:mb-8 md:mb-12 text-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 sm:mb-8 md:mb-12 text-center"
+          >
             What do you need help understanding today?
-          </h1>
+          </motion.h1>
           
-          <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
+          </motion.div>
           
-          <div className="my-6 sm:my-8">
-            <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="relative my-6 sm:my-8"
+          >
+            {/* Updated gradient background with more subtle blur effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-2xl blur-md" />
+            <div className="relative">
+              <AIChatInput 
+                onSubmit={handleAISubmit} 
+                initialIsActive={false}
+                className="backdrop-blur-[2px]" 
+              />
+            </div>
+          </motion.div>
+
+          {/* Quick Tips Section with matching subtle styling */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="text-center"
+          >
+            <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="h-1 w-1 rounded-full bg-primary/30" />
+              <span>Try asking about specific topics</span>
+              <span className="h-1 w-1 rounded-full bg-primary/30" />
+              <span>Paste content for analysis</span>
+              <span className="h-1 w-1 rounded-full bg-primary/30" />
+              <span>Get detailed explanations</span>
+            </div>
+          </motion.div>
         </div>
 
         <div className="max-w-6xl mx-auto">
-          <MyRoomsSection rooms={rooms} onAddRoom={onAddRoom} onEditRoom={onEditRoom} onDeleteRoom={handleDeleteClick} />
+          <MyRoomsSection 
+            rooms={rooms} 
+            onAddRoom={onAddRoom} 
+            onEditRoom={onEditRoom} 
+            onDeleteRoom={handleDeleteClick} 
+          />
 
-          <ContinueLearningSection onDeleteCard={handleCardDelete} onShareCard={handleCardShare} />
+          <ContinueLearningSection 
+            onDeleteCard={handleCardDelete} 
+            onShareCard={handleCardShare} 
+          />
         </div>
       </main>
 
-      <PasteContentModal isOpen={isPasteModalOpen} onClose={() => setIsPasteModalOpen(false)} onSubmit={handlePasteSubmit} />
+      <PasteContentModal 
+        isOpen={isPasteModalOpen} 
+        onClose={() => setIsPasteModalOpen(false)} 
+        onSubmit={handlePasteSubmit} 
+      />
       
       <ShareModal 
         open={shareModalOpen} 

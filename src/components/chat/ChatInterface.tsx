@@ -5,6 +5,7 @@ import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { NotesEditor } from './NotesEditor/NotesEditor';
 import { EmptyStates } from './EmptyStates';
+import { toast } from 'sonner';
 
 interface ChatInterfaceProps {
   activeTab: ChatTabType;
@@ -36,7 +37,7 @@ export function ChatInterface({ activeTab, onTabChange, initialQuery }: ChatInte
 
   useEffect(() => {
     if (initialQuery && activeTab === 'chat') {
-      setInputValue(initialQuery);
+      handleSendMessage(initialQuery);
     }
   }, [initialQuery, activeTab]);
 

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Send } from 'lucide-react';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { chatMessageStyles } from '@/lib/chatStyles';
 
 interface Message {
   id: string;
@@ -25,6 +26,14 @@ export function AITutorChatDrawer({
     role: 'assistant',
     content: 'Hello! I\'m Shattara AI Tutor. How can I help you learn today?'
   }]);
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (!input.trim()) return;
@@ -79,19 +88,20 @@ export function AITutorChatDrawer({
             {messages.map(message => (
               <div 
                 key={message.id} 
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={chatMessageStyles.wrapper(message.role === 'user')}
               >
-                <div 
-                  className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                    message.role === 'user' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'component-base'
-                  }`}
-                >
-                  <p className="text-sm leading-relaxed">{message.content}</p>
+                <div className={chatMessageStyles.bubble(message.role === 'user')}>
+                  <p className={chatMessageStyles.content}>{message.content}</p>
+                  <div className={chatMessageStyles.timestamp}>
+                    {new Date().toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </div>
                 </div>
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
           
           <div className="p-6 border-t border-border bg-background">
