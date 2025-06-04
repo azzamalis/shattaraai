@@ -15,6 +15,26 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <!-- Add this script to force dark mode for dashboard and exam pages -->
+    <script>
+      // Check if we're on a dashboard or exam-related page
+      const path = window.location.pathname;
+      const dashboardPaths = [
+        '/dashboard',
+        '/profile',
+        '/rooms',
+        '/history',
+        '/content',
+        '/chat',
+        '/reports',
+        '/exam'
+      ];
+      
+      if (dashboardPaths.some(p => path.startsWith(p))) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
   </head>
 
   <body>
