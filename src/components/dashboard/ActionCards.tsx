@@ -21,23 +21,32 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Determine content type based on file
-      let contentType = 'upload';
-      if (file.type.includes('pdf')) contentType = 'pdf';
-      else if (file.type.includes('audio')) contentType = 'audio';
-      else if (file.type.includes('video')) contentType = 'video';
+      try {
+        // Create a temporary URL for the file
+        const fileUrl = URL.createObjectURL(file);
+        
+        // Determine content type based on file
+        let contentType = 'upload';
+        if (file.type.includes('pdf')) contentType = 'pdf';
+        else if (file.type.includes('audio')) contentType = 'audio';
+        else if (file.type.includes('video')) contentType = 'video';
 
-      // Add content to tracking system
-      const contentId = onAddContent({
-        title: file.name,
-        type: contentType as any,
-        filename: file.name,
-        fileSize: file.size
-      });
+        // Add content to tracking system with the file URL
+        const contentId = onAddContent({
+          title: file.name,
+          type: contentType as any,
+          filename: file.name,
+          fileSize: file.size,
+          url: fileUrl  // Add the file URL to the content data
+        });
 
-      // Navigate to content page
-      navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}`);
-      toast.success(`File "${file.name}" selected successfully`);
+        // Navigate to content page with the file URL
+        navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}&url=${encodeURIComponent(fileUrl)}`);
+        toast.success(`File "${file.name}" selected successfully`);
+      } catch (error) {
+        console.error('Error handling file upload:', error);
+        toast.error('Failed to process the file. Please try again.');
+      }
     }
   };
 
