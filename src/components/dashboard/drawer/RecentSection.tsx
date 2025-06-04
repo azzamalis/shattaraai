@@ -115,7 +115,7 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
                         <Share className="mr-2 h-4 w-4" />
                         <span>Share</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm text-destructive focus:text-destructive">
+                      <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors rounded-sm text-destructive focus:text-destructive">
                         <Trash className="mr-2 h-4 w-4" />
                         <span>Delete</span>
                       </DropdownMenuItem>

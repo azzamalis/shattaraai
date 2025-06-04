@@ -94,14 +94,6 @@ export function DashboardLayout({
     };
   }, []);
 
-  // Clone children with room props only if they accept them
-  const childWithProps = React.isValidElement(children) && children.type.toString().includes('Dashboard') 
-    ? React.cloneElement(children as React.ReactElement, {
-        rooms,
-        ...roomHandlers
-      })
-    : children;
-
   return (
     <ContentProvider>
       <div className={cn(
@@ -125,7 +117,10 @@ export function DashboardLayout({
             className
           )}
         >
-          {childWithProps}
+          {/* Directly pass rooms and roomHandlers to children */}
+          {React.isValidElement(children) 
+            ? React.cloneElement(children as React.ReactElement, { rooms, ...roomHandlers }) 
+            : children}
         </main>
       </div>
     </ContentProvider>

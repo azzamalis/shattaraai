@@ -7,6 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ShareModal } from '@/components/dashboard/modals/share-modal';
+import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { cn } from '@/lib/utils';
 
 // Define the content tag types
@@ -21,6 +23,7 @@ interface ContentItem {
   uploadedDate: string;
   contentTags: ContentTag[];
   type: ContentType;
+  url?: string;
 }
 
 interface RoomContentTableProps {
@@ -71,12 +74,34 @@ export function RoomContentTable({
   selectedItems = []
 }: RoomContentTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
+  
   const itemsPerPage = 5;
   const totalPages = Math.ceil(items.length / itemsPerPage);
   
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = items.slice(startIndex, endIndex);
+
+  const handleShareClick = (item: ContentItem) => {
+    setSelectedItem(item);
+    setShareModalOpen(true);
+  };
+
+  const handleDeleteClick = (item: ContentItem) => {
+    setSelectedItem(item);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedItem && onDelete) {
+      onDelete(selectedItem.id);
+      setSelectedItem(null);
+      setDeleteModalOpen(false);
+    }
+  };
 
   return (
     <div className="w-full flex flex-col pt-8">
@@ -149,11 +174,11 @@ export function RoomContentTable({
                     <DropdownMenuItem onClick={() => onEdit?.(item.id)}>
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onShare?.(item.id)}>
+                    <DropdownMenuItem onClick={() => handleShareClick(item)}>
                       Share
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => onDelete?.(item.id)}
+                      onClick={() => handleDeleteClick(item)}
                       className="text-red-600 focus:text-red-600"
                     >
                       Delete
@@ -207,6 +232,30 @@ export function RoomContentTable({
           </Button>
         </div>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal 
+        open={shareModalOpen} 
+        onOpenChange={setShareModalOpen}
+        type="content"
+        itemToShare={{
+          id: selectedItem?.id || '',
+          title: selectedItem?.title || '',
+          url: selectedItem?.url
+        }}
+      />
+
+      {/* Delete Modal */}
+      <DeleteModal 
+        open={deleteModalOpen} 
+        onOpenChange={setDeleteModalOpen}
+        type="content"
+        itemToDelete={{
+          id: selectedItem?.id || '',
+          title: selectedItem?.title || ''
+        }}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 } 

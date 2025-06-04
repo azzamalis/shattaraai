@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HistoryHeader } from './HistoryHeader';
@@ -8,10 +7,16 @@ import { HistoryTable, HistoryItem } from './HistoryTable';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { historyItems } from './historyData';
 import { toast } from 'sonner';
+import { Room, RoomHandlers } from '@/lib/types';
 
 const ITEMS_PER_PAGE = 10;
 
-export function History() {
+interface HistoryProps {
+  rooms: Room[];
+  roomHandlers: RoomHandlers;
+}
+
+export function History({ rooms, roomHandlers }: HistoryProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,6 +51,16 @@ export function History() {
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages || totalPages === 0;
 
+  const handleAddToRoom = (contentId: string, roomId: string) => {
+    // Implement add to room logic
+    console.log(`Adding content ${contentId} to room ${roomId}`);
+  };
+
+  const handleDelete = (id: string) => {
+    // Implement delete logic
+    console.log(`Deleting item ${id}`);
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="flex flex-col space-y-6">
@@ -73,7 +88,10 @@ export function History() {
           <CardContent className="p-0">
             <HistoryTable 
               items={paginatedItems} 
-              onItemClick={handleItemClick} 
+              onItemClick={handleItemClick}
+              rooms={rooms} // Add your rooms data here
+              onAddToRoom={handleAddToRoom}
+              onDelete={handleDelete}
             />
           </CardContent>
         </Card>
