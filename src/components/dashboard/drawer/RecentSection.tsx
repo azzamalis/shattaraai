@@ -5,14 +5,16 @@ import { MoreHorizontal, Plus, Share, Trash } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useContent } from '@/contexts/ContentContext';
 import { ContentPreview } from '@/components/content/ContentPreview';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { Room } from '@/lib/types';
 import { toast } from 'sonner';
+
 interface RecentSectionProps {
   rooms: Room[];
 }
+
 export const RecentSection: React.FC<RecentSectionProps> = ({
   rooms
 }) => {
@@ -24,12 +26,14 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
   const [shareModalOpen, setShareModalOpen] = React.useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedContent, setSelectedContent] = React.useState<any>(null);
+  const [openAddMenus, setOpenAddMenus] = React.useState<Set<string>>(new Set());
 
   // Sort content by date and take the first 5, with null check
   const sortedRecentContent = React.useMemo(() => {
     if (!recentContent || !Array.isArray(recentContent)) return [];
     return [...recentContent].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
   }, [recentContent]);
+
   const handleAddToRoom = React.useCallback((contentId: string, roomId: string) => {
     try {
       // Find the room and content
@@ -57,15 +61,21 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
       console.error('Error in handleAddToRoom:', error);
       toast.error('Something went wrong');
     }
+
+    // Close the add menu after selection
+    setOpenAddMenus(new Set());
   }, [rooms, recentContent, navigate]);
+
   const handleShareClick = (content: any) => {
     setSelectedContent(content);
     setShareModalOpen(true);
   };
+
   const handleDeleteClick = (content: any) => {
     setSelectedContent(content);
     setDeleteModalOpen(true);
   };
+
   const handleDeleteConfirm = () => {
     if (selectedContent) {
       onDeleteContent(selectedContent.id);
@@ -74,6 +84,19 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
       setDeleteModalOpen(false);
     }
   };
+
+  const toggleAddMenu = (contentId: string) => {
+    const newOpenMenus = new Set(openAddMenus);
+    if (newOpenMenus.has(contentId)) {
+      newOpenMenus.delete(contentId);
+    } else {
+      // Close all other menus and open this one
+      newOpenMenus.clear();
+      newOpenMenus.add(contentId);
+    }
+    setOpenAddMenus(newOpenMenus);
+  };
+
   return <>
       <div>
         <p className="ml-2 text-sm mb-2 font-semibold text-foreground">Recents</p>
@@ -99,19 +122,37 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="right" align="start" alignOffset={-5} className="w-[160px] bg-popover border-border z-[100]">
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger className="flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm">
-                          <Plus className="mr-2 h-4 w-4" />
-                          <span>Add</span>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent className="w-[160px] bg-popover border-border z-[110]" alignOffset={10} sideOffset={5}>
-                          {rooms && rooms.length > 0 ? rooms.map(room => <DropdownMenuItem key={room.id} onClick={() => handleAddToRoom(item.id, room.id)} className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm px-2 py-1.5 text-sm">
+                      <div className="relative">
+                        <DropdownMenuItem 
+                          onClick={() => toggleAddMenu(item.id)}
+                          className="flex items-center justify-between px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm"
+                        >
+                          <div className="flex items-center">
+                            <Plus className="mr-2 h-4 w-4" />
+                            <span>Add</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">▶</span>
+                        </DropdownMenuItem>
+                        
+                        {openAddMenus.has(item.id) && (
+                          <div className="absolute left-full top-0 ml-1 w-[160px] bg-popover border border-border rounded-md shadow-lg z-[110] py-1">
+                            {rooms && rooms.length > 0 ? rooms.map(room => (
+                              <button
+                                key={room.id}
+                                onClick={() => handleAddToRoom(item.id, room.id)}
+                                className="w-full text-left px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm"
+                              >
                                 {room.name}
-                              </DropdownMenuItem>) : <DropdownMenuItem disabled className="px-2 py-1.5 text-sm text-muted-foreground">
-                              No rooms available
-                            </DropdownMenuItem>}
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
+                              </button>
+                            )) : (
+                              <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                                No rooms available
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      
                       <DropdownMenuItem onClick={() => handleShareClick(item)} className="flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm">
                         <Share className="mr-2 h-4 w-4" />
                         <span>Share</span>
