@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from 'date-fns';
 import { 
@@ -50,14 +51,17 @@ export function HistoryTable({
   const [shareModalOpen, setShareModalOpen] = React.useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<HistoryItem | null>(null);
+  const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
 
   const handleShareClick = (item: HistoryItem) => {
     setSelectedItem(item);
+    setOpenDropdown(null); // Close dropdown
     setShareModalOpen(true);
   };
 
   const handleDeleteClick = (item: HistoryItem) => {
     setSelectedItem(item);
+    setOpenDropdown(null); // Close dropdown
     setDeleteModalOpen(true);
   };
 
@@ -66,6 +70,20 @@ export function HistoryTable({
       onDelete(selectedItem.id);
       setSelectedItem(null);
       setDeleteModalOpen(false);
+    }
+  };
+
+  const handleShareModalClose = (open: boolean) => {
+    setShareModalOpen(open);
+    if (!open) {
+      setSelectedItem(null);
+    }
+  };
+
+  const handleDeleteModalClose = (open: boolean) => {
+    setDeleteModalOpen(open);
+    if (!open) {
+      setSelectedItem(null);
     }
   };
 
@@ -110,7 +128,10 @@ export function HistoryTable({
               </TableCell>
               <TableCell className="text-foreground">{format(item.date, 'MMM d, yyyy • h:mm a')}</TableCell>
               <TableCell>
-                <DropdownMenu>
+                <DropdownMenu 
+                  open={openDropdown === item.id} 
+                  onOpenChange={(open) => setOpenDropdown(open ? item.id : null)}
+                >
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="ghost" 
@@ -134,6 +155,7 @@ export function HistoryTable({
                             onClick={(e) => {
                               e.stopPropagation();
                               onAddToRoom?.(item.id, room.id);
+                              setOpenDropdown(null);
                             }} 
                             className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm px-2 py-1.5 text-sm"
                           >
@@ -185,7 +207,7 @@ export function HistoryTable({
       {/* Share Modal */}
       <ShareModal 
         open={shareModalOpen} 
-        onOpenChange={setShareModalOpen} 
+        onOpenChange={handleShareModalClose} 
         type="content" 
         itemToShare={{
           id: selectedItem?.id || '',
@@ -197,7 +219,7 @@ export function HistoryTable({
       {/* Delete Modal */}
       <DeleteModal 
         open={deleteModalOpen} 
-        onOpenChange={setDeleteModalOpen} 
+        onOpenChange={handleDeleteModalClose} 
         type="content" 
         itemToDelete={{
           id: selectedItem?.id || '',
