@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HistoryHeader } from './HistoryHeader';
@@ -12,11 +13,13 @@ import { Room, RoomHandlers } from '@/lib/types';
 const ITEMS_PER_PAGE = 10;
 
 interface HistoryProps {
-  rooms: Room[];
-  roomHandlers: RoomHandlers;
+  rooms?: Room[];
+  onAddRoom?: () => void;
+  onEditRoom?: (id: string, newName: string) => void;
+  onDeleteRoom?: (id: string) => void;
 }
 
-export function History({ rooms, roomHandlers }: HistoryProps) {
+export function History({ rooms = [], onAddRoom, onEditRoom, onDeleteRoom }: HistoryProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,7 +92,7 @@ export function History({ rooms, roomHandlers }: HistoryProps) {
             <HistoryTable 
               items={paginatedItems} 
               onItemClick={handleItemClick}
-              rooms={rooms} // Add your rooms data here
+              rooms={rooms}
               onAddToRoom={handleAddToRoom}
               onDelete={handleDelete}
             />
