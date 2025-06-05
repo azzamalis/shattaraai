@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Plus, Share, Trash } from 'lucide-react';
@@ -97,13 +98,13 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
                         <span className="sr-only">Open menu</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent side="right" align="start" alignOffset={-5} className="w-[160px] bg-popover border-border z-50">
+                    <DropdownMenuContent side="right" align="start" alignOffset={-5} className="w-[160px] bg-popover border-border z-[100]">
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger className="flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm">
                           <Plus className="mr-2 h-4 w-4" />
                           <span>Add</span>
                         </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent className="w-[160px] bg-popover border-border z-[60]" alignOffset={-5} sideOffset={8}>
+                        <DropdownMenuSubContent className="w-[160px] bg-popover border-border z-[110]" alignOffset={10} sideOffset={5}>
                           {rooms && rooms.length > 0 ? rooms.map(room => <DropdownMenuItem key={room.id} onClick={() => handleAddToRoom(item.id, room.id)} className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm px-2 py-1.5 text-sm">
                                 {room.name}
                               </DropdownMenuItem>) : <DropdownMenuItem disabled className="px-2 py-1.5 text-sm text-muted-foreground">
