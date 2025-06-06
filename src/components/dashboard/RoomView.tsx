@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { MessageSquare, FileText, Grid, List } from 'lucide-react';
 import { RoomContentTable } from './RoomContentTable';
+import { ContentItem } from '@/lib/types';
 import type { ContentTag, ContentType } from './RoomContentTable';
 
 interface RoomViewProps {
@@ -18,34 +20,42 @@ export function RoomView({
   isEmpty = true,
   hideHeader = false
 }: RoomViewProps) {
-  const exampleItems = [
+  const exampleItems: ContentItem[] = [
     {
       id: '1',
       title: 'File Name Example',
-      uploadedDate: '30/05/2025',
-      contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'] as ContentTag[],
-      type: 'Video' as ContentType
+      type: 'video',
+      createdAt: '2025-05-30T00:00:00.000Z',
+      metadata: {
+        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards']
+      }
     },
     {
       id: '2',
       title: 'File Name Example',
-      uploadedDate: '30/05/2025',
-      contentTags: ['Summary', 'Flashcards', 'Exams'] as ContentTag[],
-      type: 'PDF Files' as ContentType
+      type: 'pdf',
+      createdAt: '2025-05-30T00:00:00.000Z',
+      metadata: {
+        contentTags: ['Summary', 'Flashcards', 'Exams']
+      }
     },
     {
       id: '3',
       title: 'File Name Example',
-      uploadedDate: '30/05/2025',
-      contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'] as ContentTag[],
-      type: 'Recording' as ContentType
+      type: 'recording',
+      createdAt: '2025-05-30T00:00:00.000Z',
+      metadata: {
+        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards']
+      }
     },
     {
       id: '4',
       title: 'File Name Example',
-      uploadedDate: '30/05/2025',
-      contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'] as ContentTag[],
-      type: 'Youtube URL' as ContentType
+      type: 'youtube',
+      createdAt: '2025-05-30T00:00:00.000Z',
+      metadata: {
+        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards']
+      }
     }
   ];
 
