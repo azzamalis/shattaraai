@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { MoreVertical, FileText, Video, Youtube, Mic, ChevronLeft, ChevronRight, Check } from 'lucide-react';
@@ -11,21 +12,13 @@ import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { EditContentModal } from '@/components/dashboard/modals/edit-content-modal';
 import { cn } from '@/lib/utils';
+import { ContentItem } from '@/lib/types';
 
 // Define the content tag types
 export type ContentTag = 'Summary' | 'Notes' | 'Exams' | 'Flashcards';
 
-// Define the content type
+// Define the content type for display
 export type ContentType = 'Video' | 'PDF Files' | 'Recording' | 'Youtube URL';
-
-interface ContentItem {
-  id: string;
-  title: string;
-  uploadedDate: string;
-  contentTags: ContentTag[];
-  type: ContentType;
-  url?: string;
-}
 
 interface RoomContentTableProps {
   items: ContentItem[];
@@ -62,6 +55,22 @@ const getTagColor = (tag: ContentTag) => {
       return 'bg-orange-500 text-white';
     case 'Flashcards':
       return 'bg-green-500 text-white';
+  }
+};
+
+// Helper function to map ContentItem type to display type
+const getDisplayType = (type: string): ContentType => {
+  switch (type) {
+    case 'video':
+      return 'Video';
+    case 'pdf':
+      return 'PDF Files';
+    case 'recording':
+      return 'Recording';
+    case 'youtube':
+      return 'Youtube URL';
+    default:
+      return 'PDF Files';
   }
 };
 
@@ -136,73 +145,79 @@ export function RoomContentTable({
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((item) => (
-            <tr 
-              key={item.id} 
-              className="border-b border-dashboard-separator hover:bg-dashboard-card-hover transition-colors duration-200"
-            >
-              {showSelectionColumn && (
+          {currentItems.map((item) => {
+            const displayType = getDisplayType(item.type);
+            const contentTags = item.metadata?.contentTags || [];
+            const uploadDate = new Date(item.createdAt).toLocaleDateString();
+            
+            return (
+              <tr 
+                key={item.id} 
+                className="border-b border-dashboard-separator hover:bg-dashboard-card-hover transition-colors duration-200"
+              >
+                {showSelectionColumn && (
+                  <td className="py-6 px-4">
+                    <div
+                      onClick={() => onSelect?.(item.id)}
+                      className={cn(
+                        "w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors duration-200",
+                        selectedItems.includes(item.id)
+                          ? "bg-primary border-primary"
+                          : "border-muted-foreground"
+                      )}
+                    >
+                      {selectedItems.includes(item.id) && (
+                        <Check className="h-3 w-3 text-primary-foreground" />
+                      )}
+                    </div>
+                  </td>
+                )}
+                <td className="py-6 px-4 text-dashboard-text font-semibold">{item.title}</td>
+                <td className="py-6 px-4 text-dashboard-text text-center">{uploadDate}</td>
                 <td className="py-6 px-4">
-                  <div
-                    onClick={() => onSelect?.(item.id)}
-                    className={cn(
-                      "w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors duration-200",
-                      selectedItems.includes(item.id)
-                        ? "bg-primary border-primary"
-                        : "border-muted-foreground"
-                    )}
-                  >
-                    {selectedItems.includes(item.id) && (
-                      <Check className="h-3 w-3 text-primary-foreground" />
-                    )}
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {contentTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getTagColor(tag as ContentTag)}`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </td>
-              )}
-              <td className="py-6 px-4 text-dashboard-text font-semibold">{item.title}</td>
-              <td className="py-6 px-4 text-dashboard-text text-center">{item.uploadedDate}</td>
-              <td className="py-6 px-4">
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {item.contentTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${getTagColor(tag)}`}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </td>
-              <td className="py-6 px-4">
-                <div className="flex items-center gap-2 text-dashboard-text justify-center">
-                  {getContentTypeIcon(item.type)}
-                  <span>{item.type}</span>
-                </div>
-              </td>
-              <td className="py-6 px-4 text-center">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleEditClick(item)}>
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleShareClick(item)}>
-                      Share
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleDeleteClick(item)}
-                      className="text-red-600 focus:text-red-600"
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </td>
-            </tr>
-          ))}
+                <td className="py-6 px-4">
+                  <div className="flex items-center gap-2 text-dashboard-text justify-center">
+                    {getContentTypeIcon(displayType)}
+                    <span>{displayType}</span>
+                  </div>
+                </td>
+                <td className="py-6 px-4 text-center">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEditClick(item)}>
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleShareClick(item)}>
+                        Share
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleDeleteClick(item)}
+                        className="text-red-600 focus:text-red-600"
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
