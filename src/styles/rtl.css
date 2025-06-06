@@ -1,0 +1,40 @@
+
+/* RTL-specific styles */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+/* RTL Select component adjustments */
+[dir="rtl"] .select-trigger {
+  text-align: right;
+}
+
+[dir="rtl"] .select-content {
+  text-align: right;
+}
+
+/* RTL form spacing */
+[dir="rtl"] .space-y-6 > * + * {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* RTL button adjustments */
+[dir="rtl"] .flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+/* Ensure proper flag and text alignment */
+[dir="rtl"] .flex.items-center.gap-2 {
+  justify-content: flex-end;
+}

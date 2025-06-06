@@ -7,6 +7,7 @@ import PurposeSelector from './selectors/PurposeSelector';
 import GoalSelector from './selectors/GoalSelector';
 import SourceSelector from './selectors/SourceSelector';
 import { useOnboardingForm } from '@/hooks/useOnboardingForm';
+import { useLanguage, type LanguageCode } from '@/contexts/LanguageContext';
 
 const OnboardingForm = () => {
   const { 
@@ -15,13 +16,20 @@ const OnboardingForm = () => {
     setField, 
     handleSubmit 
   } = useOnboardingForm();
+  
+  const { t, isRTL, setLanguage } = useLanguage();
+
+  const handleLanguageChange = (value: string) => {
+    setField('language', value);
+    setLanguage(value as LanguageCode);
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className={`space-y-6 ${isRTL ? 'rtl' : 'ltr'}`}>
       {/* Language Selection */}
       <LanguageSelector 
         value={formData.language} 
-        onChange={(value) => setField('language', value)} 
+        onChange={handleLanguageChange}
       />
       
       {/* Purpose Selection */}
@@ -48,11 +56,11 @@ const OnboardingForm = () => {
       {/* Continue Button */}
       <Button 
         type="submit" 
-        className="w-full bg-primary hover:bg-primary-light text-white py-6 mt-8"
+        className={`w-full bg-primary hover:bg-primary-light text-white py-6 mt-8 ${isRTL ? 'flex-row-reverse' : ''}`}
         disabled={!isFormValid}
       >
-        Continue
-        <ArrowRight className="ml-2 h-5 w-5" />
+        {t('onboarding.continue')}
+        <ArrowRight className={`${isRTL ? 'mr-2 rotate-180' : 'ml-2'} h-5 w-5`} />
       </Button>
     </form>
   );
