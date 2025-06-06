@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, FileText, Video, Youtube, Mic, RotateCcw } from 'lucide-react';
-import { ContentItem, ContentTag, ContentType } from '../RoomContentTable';
+import { ContentTag, ContentType } from '../RoomContentTable';
+import { ContentItem } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 interface EditContentModalProps {
@@ -85,30 +86,54 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
   };
 
   const addTag = (tag: ContentTag) => {
-    if (editedItem && !editedItem.contentTags.includes(tag)) {
+    if (editedItem && editedItem.metadata?.contentTags && !editedItem.metadata.contentTags.includes(tag)) {
       setEditedItem({
         ...editedItem,
-        contentTags: [...editedItem.contentTags, tag]
+        metadata: {
+          ...editedItem.metadata,
+          contentTags: [...editedItem.metadata.contentTags, tag]
+        }
       });
     }
     setNewTagInput('');
   };
 
   const removeTag = (tagToRemove: ContentTag) => {
-    if (editedItem) {
+    if (editedItem && editedItem.metadata?.contentTags) {
       setEditedItem({
         ...editedItem,
-        contentTags: editedItem.contentTags.filter(tag => tag !== tagToRemove)
+        metadata: {
+          ...editedItem.metadata,
+          contentTags: editedItem.metadata.contentTags.filter(tag => tag !== tagToRemove)
+        }
       });
     }
   };
 
   const filteredSuggestions = availableTags.filter(tag => 
     tag.toLowerCase().includes(newTagInput.toLowerCase()) &&
-    !(editedItem?.contentTags.includes(tag))
+    !(editedItem?.metadata?.contentTags?.includes(tag))
   );
 
   if (!editedItem) return null;
+
+  // Map ContentItem type to display type
+  const getDisplayType = (type: string): ContentType => {
+    switch (type) {
+      case 'video':
+        return 'Video';
+      case 'pdf':
+        return 'PDF Files';
+      case 'recording':
+        return 'Recording';
+      case 'youtube':
+        return 'Youtube URL';
+      default:
+        return 'PDF Files';
+    }
+  };
+
+  const displayType = getDisplayType(editedItem.type);
 
   return (
     <BaseModal
@@ -124,8 +149,8 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
           <div className="p-4 bg-muted/50 rounded-lg border border-border min-h-[300px]">
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                {getContentTypeIcon(editedItem.type)}
-                <span className="text-sm text-muted-foreground">{editedItem.type}</span>
+                {getContentTypeIcon(displayType)}
+                <span className="text-sm text-muted-foreground">{displayType}</span>
               </div>
               
               <h4 className="text-xl font-semibold text-foreground">
@@ -133,14 +158,14 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
               </h4>
               
               <p className="text-sm text-muted-foreground">
-                Uploaded: {editedItem.uploadedDate}
+                Uploaded: {new Date(editedItem.createdAt).toLocaleDateString()}
               </p>
               
               <div className="flex flex-wrap gap-2">
-                {editedItem.contentTags.map((tag) => (
+                {editedItem.metadata?.contentTags?.map((tag) => (
                   <Badge
                     key={tag}
-                    className={`${getTagColor(tag)} text-xs`}
+                    className={`${getTagColor(tag as ContentTag)} text-xs`}
                   >
                     {tag}
                   </Badge>
@@ -182,8 +207,8 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Content Type</label>
             <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-md">
-              {getContentTypeIcon(editedItem.type)}
-              <span className="text-sm text-muted-foreground">{editedItem.type}</span>
+              {getContentTypeIcon(displayType)}
+              <span className="text-sm text-muted-foreground">{displayType}</span>
             </div>
           </div>
 
@@ -191,7 +216,7 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Upload Date</label>
             <div className="p-3 bg-muted/30 rounded-md">
-              <span className="text-sm text-muted-foreground">{editedItem.uploadedDate}</span>
+              <span className="text-sm text-muted-foreground">{new Date(editedItem.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
 
@@ -201,14 +226,14 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
             
             {/* Current Tags */}
             <div className="flex flex-wrap gap-2">
-              {editedItem.contentTags.map((tag) => (
+              {editedItem.metadata?.contentTags?.map((tag) => (
                 <Badge
                   key={tag}
-                  className={`${getTagColor(tag)} text-xs flex items-center gap-1 pr-1`}
+                  className={`${getTagColor(tag as ContentTag)} text-xs flex items-center gap-1 pr-1`}
                 >
                   {tag}
                   <button
-                    onClick={() => removeTag(tag)}
+                    onClick={() => removeTag(tag as ContentTag)}
                     className="ml-1 hover:bg-white/20 rounded-full p-0.5"
                   >
                     <X className="h-3 w-3" />
@@ -231,7 +256,7 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
               {/* Quick Add Suggestions */}
               <div className="flex flex-wrap gap-2">
                 {availableTags
-                  .filter(tag => !editedItem.contentTags.includes(tag))
+                  .filter(tag => !editedItem.metadata?.contentTags?.includes(tag))
                   .map((tag) => (
                     <Button
                       key={tag}
