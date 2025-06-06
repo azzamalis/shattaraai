@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
+import { EditContentModal } from '@/components/dashboard/modals/edit-content-modal';
 import { cn } from '@/lib/utils';
 
 // Define the content tag types
@@ -76,6 +77,7 @@ export function RoomContentTable({
   const [currentPage, setCurrentPage] = useState(1);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
   
   const itemsPerPage = 5;
@@ -100,6 +102,19 @@ export function RoomContentTable({
       onDelete(selectedItem.id);
       setSelectedItem(null);
       setDeleteModalOpen(false);
+    }
+  };
+
+  const handleEditClick = (item: ContentItem) => {
+    setSelectedItem(item);
+    setEditModalOpen(true);
+  };
+
+  const handleEditSave = (updatedItem: ContentItem) => {
+    // Update the item in the items array (in a real app, this would be an API call)
+    console.log('Saving updated item:', updatedItem);
+    if (onEdit) {
+      onEdit(updatedItem.id);
     }
   };
 
@@ -171,7 +186,7 @@ export function RoomContentTable({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onEdit?.(item.id)}>
+                    <DropdownMenuItem onClick={() => handleEditClick(item)}>
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleShareClick(item)}>
@@ -233,6 +248,14 @@ export function RoomContentTable({
         </div>
       </div>
 
+      {/* Edit Modal */}
+      <EditContentModal 
+        open={editModalOpen} 
+        onOpenChange={setEditModalOpen}
+        contentItem={selectedItem}
+        onSave={handleEditSave}
+      />
+
       {/* Share Modal */}
       <ShareModal 
         open={shareModalOpen} 
@@ -258,4 +281,4 @@ export function RoomContentTable({
       />
     </div>
   );
-} 
+}

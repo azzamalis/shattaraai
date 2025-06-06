@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { languages } from "@/components/onboarding/data/languages";
 import { getGoalOptions } from "@/components/onboarding/data/goals";
 import { sourceOptions } from "@/components/onboarding/data/sources";
+import { SubscriptionPlanCard } from "@/components/dashboard/SubscriptionPlanCard";
 
 const initialUserData = {
   name: "Alex Johnson",
@@ -265,6 +266,8 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
+
+          <SubscriptionPlanCard />
 
           <div className="flex justify-end gap-4 pt-2">
             <Button
