@@ -8,6 +8,7 @@ import { NewFeaturePromo } from './NewFeaturePromo';
 import { ActionCards } from './ActionCards';
 import { MyRoomsSection } from './MyRoomsSection';
 import { ContinueLearningSection } from './ContinueLearningSection';
+import { ExploreContentSection } from './ExploreContentSection';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { useContent } from '@/contexts/ContentContext';
@@ -123,6 +124,16 @@ export function Dashboard({
     setShareModalOpen(true);
   };
 
+  const handleExploreCardDelete = (item: ContentItem) => {
+    // For explore content, we just show a toast since these are not user content
+    toast.success(`"${item.title}" removed from explore content`);
+  };
+
+  const handleExploreCardShare = (item: ContentItem) => {
+    setItemToShare(item);
+    setShareModalOpen(true);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-background transition-colors duration-300">
@@ -192,6 +203,11 @@ export function Dashboard({
           <ContinueLearningSection 
             onDeleteCard={handleCardDelete} 
             onShareCard={handleCardShare} 
+          />
+
+          <ExploreContentSection 
+            onDeleteCard={handleExploreCardDelete} 
+            onShareCard={handleExploreCardShare} 
           />
         </div>
       </main>
