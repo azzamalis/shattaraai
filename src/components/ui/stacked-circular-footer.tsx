@@ -27,28 +27,28 @@ function StackedCircularFooter() {
             <Link to="/contact" className="text-gray-400 hover:text-primary transition-colors">Contact Us</Link>
           </nav>
           
-          <div className="mb-8 flex space-x-4">
-            <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
-                <Facebook className="h-4 w-4" />
+          <div className="flex gap-4 mb-8">
+            <a href="https://facebook.com/shattaraai" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary group">
+                <Facebook className="h-4 w-4 text-white group-hover:text-white" />
                 <span className="sr-only">Facebook</span>
               </Button>
             </a>
-            <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
-                <Twitter className="h-4 w-4" />
+            <a href="https://twitter.com/shattaraai" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary group">
+                <Twitter className="h-4 w-4 text-white group-hover:text-white" />
                 <span className="sr-only">Twitter</span>
               </Button>
             </a>
-            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
-                <Instagram className="h-4 w-4" />
+            <a href="https://instagram.com/shattaraai" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary group">
+                <Instagram className="h-4 w-4 text-white group-hover:text-white" />
                 <span className="sr-only">Instagram</span>
               </Button>
             </a>
-            <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary">
-                <Linkedin className="h-4 w-4" />
+            <a href="https://linkedin.com/company/shattaraai" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-700 bg-transparent hover:bg-primary hover:border-primary group">
+                <Linkedin className="h-4 w-4 text-white group-hover:text-white" />
                 <span className="sr-only">LinkedIn</span>
               </Button>
             </a>

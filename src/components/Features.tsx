@@ -4,10 +4,13 @@ import GradientBackground from '@/components/ui/gradient-background';
 
 const Features = () => {
   return (
-    <section id="features" className="py-24 bg-dark-deeper relative">
+    <section 
+      id="features" 
+      className="pt-20 md:pt-24 lg:pt-32 pb-12 md:pb-16 lg:pb-20 bg-dark-deeper relative"
+    >
       <GradientBackground />
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h2 className="text-3xl font-bold mb-4 text-white">
             AI-generated notes, flashcards, and exam simulators—all in one place.
           </h2>
@@ -15,7 +18,6 @@ const Features = () => {
             Our integrated platform helps you study smarter, not harder, with tools designed to accelerate your learning.
           </p>
         </div>
-
         <FeaturesSectionWithHoverEffects />
       </div>
     </section>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PricingSection } from '@/components/ui/pricing-section';
 import { Zap, ArrowDownToDot } from 'lucide-react';
