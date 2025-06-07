@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select';
 import { sourceOptions } from '../data/sources';
 import { selectItemClasses } from '../common/SelectStyles';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SourceSelectorProps {
   value: string;
@@ -16,21 +17,23 @@ interface SourceSelectorProps {
 }
 
 const SourceSelector = ({ value, onChange }: SourceSelectorProps) => {
+  const { t, isRTL } = useLanguage();
+
   return (
-    <div className="space-y-2">
+    <div className={`space-y-2 ${isRTL ? 'text-right' : 'text-left'}`}>
       <label className="block text-sm font-medium text-white">
-        How did you hear about us?
+        {t('onboarding.source')}
       </label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-full bg-dark border-zinc-700 text-white">
-          <SelectValue placeholder="I found Shattara from" />
+        <SelectTrigger className={`w-full bg-dark border-zinc-700 text-white ${isRTL ? 'text-right' : 'text-left'}`}>
+          <SelectValue placeholder={t('onboarding.sourcePlaceholder')} />
         </SelectTrigger>
         <SelectContent className="bg-dark-deeper border-zinc-700 text-white">
           {sourceOptions.map((option) => (
             <SelectItem 
               key={option.value} 
               value={option.value}
-              className={selectItemClasses}
+              className={`${selectItemClasses} ${isRTL ? 'text-right' : 'text-left'}`}
             >
               {option.label}
             </SelectItem>

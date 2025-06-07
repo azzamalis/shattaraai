@@ -17,10 +17,21 @@
 /* RTL Select component adjustments */
 [dir="rtl"] .select-trigger {
   text-align: right;
+  direction: rtl;
 }
 
 [dir="rtl"] .select-content {
   text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] [data-radix-select-content] {
+  direction: rtl;
+}
+
+[dir="rtl"] [data-radix-select-item] {
+  text-align: right;
+  direction: rtl;
 }
 
 /* RTL form spacing */
@@ -37,4 +48,25 @@
 /* Ensure proper flag and text alignment */
 [dir="rtl"] .flex.items-center.gap-2 {
   justify-content: flex-end;
+}
+
+/* RTL Button content alignment */
+[dir="rtl"] button .flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+/* RTL Arrow icon positioning */
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+/* RTL Dropdown chevron positioning */
+[dir="rtl"] [data-radix-select-trigger] svg {
+  transform: scaleX(-1);
 }

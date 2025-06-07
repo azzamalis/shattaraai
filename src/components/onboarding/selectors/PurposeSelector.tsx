@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { selectItemClasses } from '../common/SelectStyles';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PurposeSelectorProps {
   value: string;
@@ -15,19 +16,27 @@ interface PurposeSelectorProps {
 }
 
 const PurposeSelector = ({ value, onChange }: PurposeSelectorProps) => {
+  const { t, isRTL } = useLanguage();
+
   return (
-    <div className="space-y-2">
+    <div className={`space-y-2 ${isRTL ? 'text-right' : 'text-left'}`}>
       <label className="block text-sm font-medium text-white">
-        How do you want to use Shattara?
+        {t('onboarding.purpose')}
       </label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-full bg-dark border-zinc-700 text-white">
-          <SelectValue placeholder="I'm here for" />
+        <SelectTrigger className={`w-full bg-dark border-zinc-700 text-white ${isRTL ? 'text-right' : 'text-left'}`}>
+          <SelectValue placeholder={t('onboarding.purposePlaceholder')} />
         </SelectTrigger>
         <SelectContent className="bg-dark-deeper border-zinc-700 text-white">
-          <SelectItem value="student" className={selectItemClasses}>Student</SelectItem>
-          <SelectItem value="teacher" className={selectItemClasses}>Teacher</SelectItem>
-          <SelectItem value="work" className={selectItemClasses}>Work</SelectItem>
+          <SelectItem value="student" className={`${selectItemClasses} ${isRTL ? 'text-right' : 'text-left'}`}>
+            {t('onboarding.purpose.student')}
+          </SelectItem>
+          <SelectItem value="teacher" className={`${selectItemClasses} ${isRTL ? 'text-right' : 'text-left'}`}>
+            {t('onboarding.purpose.teacher')}
+          </SelectItem>
+          <SelectItem value="work" className={`${selectItemClasses} ${isRTL ? 'text-right' : 'text-left'}`}>
+            {t('onboarding.purpose.work')}
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>
