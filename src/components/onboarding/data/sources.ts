@@ -1,11 +1,11 @@
 
-// Source options
+// Source options - now using translation keys
 export const sourceOptions = [
-  { value: 'search', label: 'Search' },
-  { value: 'instagram', label: 'Instagram' },
-  { value: 'tiktok', label: 'TikTok' },
-  { value: 'twitter', label: 'Twitter/X' },
-  { value: 'youtube', label: 'Youtube' },
-  { value: 'online-ad', label: 'Online Ad/Blog' },
-  { value: 'friends-family', label: 'Friends & Family' }
+  { value: 'search', labelKey: 'onboarding.sources.search' },
+  { value: 'instagram', labelKey: 'onboarding.sources.instagram' },
+  { value: 'tiktok', labelKey: 'onboarding.sources.tiktok' },
+  { value: 'twitter', labelKey: 'onboarding.sources.twitter' },
+  { value: 'youtube', labelKey: 'onboarding.sources.youtube' },
+  { value: 'online-ad', labelKey: 'onboarding.sources.onlineAd' },
+  { value: 'friends-family', labelKey: 'onboarding.sources.friendsFamily' }
 ];

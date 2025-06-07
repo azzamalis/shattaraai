@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type LanguageCode = 'en' | 'ar' | 'zh' | 'es' | 'fr' | 'ur' | 'hi';
@@ -30,7 +29,25 @@ const translations = {
     'onboarding.sourcePlaceholder': 'I found Shattara from',
     'onboarding.continue': 'Continue',
     'onboarding.alreadySetup': 'Already set up?',
-    'onboarding.signIn': 'Sign in'
+    'onboarding.signIn': 'Sign in',
+    // Goal options
+    'onboarding.goals.examPrep': 'Prep for exam',
+    'onboarding.goals.research': 'Conduct Research',
+    'onboarding.goals.coursework': 'Get coursework assist',
+    'onboarding.goals.lessonPlanning': 'Create lesson plans',
+    'onboarding.goals.grading': 'Automate grading',
+    'onboarding.goals.personalization': 'Personalize teaching',
+    'onboarding.goals.productivity': 'Boost productivity',
+    'onboarding.goals.learning': 'Learn new skills',
+    'onboarding.goals.innovation': 'Drive innovation',
+    // Source options
+    'onboarding.sources.search': 'Search',
+    'onboarding.sources.instagram': 'Instagram',
+    'onboarding.sources.tiktok': 'TikTok',
+    'onboarding.sources.twitter': 'Twitter/X',
+    'onboarding.sources.youtube': 'YouTube',
+    'onboarding.sources.onlineAd': 'Online Ad/Blog',
+    'onboarding.sources.friendsFamily': 'Friends & Family'
   },
   ar: {
     'onboarding.welcome': 'أهلاً بك في شطارة AI',
@@ -48,7 +65,25 @@ const translations = {
     'onboarding.sourcePlaceholder': 'لقيت شطارة من',
     'onboarding.continue': 'يلا نكمل',
     'onboarding.alreadySetup': 'مسجل من قبل؟',
-    'onboarding.signIn': 'ادخل'
+    'onboarding.signIn': 'ادخل',
+    // Goal options
+    'onboarding.goals.examPrep': 'تحضير للامتحان',
+    'onboarding.goals.research': 'عمل بحث',
+    'onboarding.goals.coursework': 'مساعدة بالواجبات',
+    'onboarding.goals.lessonPlanning': 'تحضير دروس',
+    'onboarding.goals.grading': 'تصحيح أوتوماتيكي',
+    'onboarding.goals.personalization': 'تعليم شخصي',
+    'onboarding.goals.productivity': 'زيادة الإنتاجية',
+    'onboarding.goals.learning': 'تعلم مهارات جديدة',
+    'onboarding.goals.innovation': 'دفع الابتكار',
+    // Source options
+    'onboarding.sources.search': 'بحث',
+    'onboarding.sources.instagram': 'انستغرام',
+    'onboarding.sources.tiktok': 'تيك توك',
+    'onboarding.sources.twitter': 'تويتر/إكس',
+    'onboarding.sources.youtube': 'يوتيوب',
+    'onboarding.sources.onlineAd': 'إعلان أونلاين/مدونة',
+    'onboarding.sources.friendsFamily': 'أصدقاء وعائلة'
   },
   zh: {
     'onboarding.welcome': '欢迎来到 Shattara AI',
@@ -66,7 +101,25 @@ const translations = {
     'onboarding.sourcePlaceholder': '我从这里发现 Shattara',
     'onboarding.continue': '继续',
     'onboarding.alreadySetup': '已经设置过了？',
-    'onboarding.signIn': '登录'
+    'onboarding.signIn': '登录',
+    // Goal options
+    'onboarding.goals.examPrep': '备考',
+    'onboarding.goals.research': '进行研究',
+    'onboarding.goals.coursework': '课业辅助',
+    'onboarding.goals.lessonPlanning': '制定课程计划',
+    'onboarding.goals.grading': '自动评分',
+    'onboarding.goals.personalization': '个性化教学',
+    'onboarding.goals.productivity': '提高生产力',
+    'onboarding.goals.learning': '学习新技能',
+    'onboarding.goals.innovation': '推动创新',
+    // Source options
+    'onboarding.sources.search': '搜索',
+    'onboarding.sources.instagram': 'Instagram',
+    'onboarding.sources.tiktok': 'TikTok',
+    'onboarding.sources.twitter': 'Twitter/X',
+    'onboarding.sources.youtube': 'YouTube',
+    'onboarding.sources.onlineAd': '在线广告/博客',
+    'onboarding.sources.friendsFamily': '朋友和家人'
   },
   es: {
     'onboarding.welcome': 'Bienvenido a Shattara AI',
@@ -84,7 +137,25 @@ const translations = {
     'onboarding.sourcePlaceholder': 'Encontré Shattara desde',
     'onboarding.continue': 'Continuar',
     'onboarding.alreadySetup': '¿Ya configurado?',
-    'onboarding.signIn': 'Iniciar sesión'
+    'onboarding.signIn': 'Iniciar sesión',
+    // Goal options
+    'onboarding.goals.examPrep': 'Preparar para examen',
+    'onboarding.goals.research': 'Realizar investigación',
+    'onboarding.goals.coursework': 'Asistencia con tareas',
+    'onboarding.goals.lessonPlanning': 'Crear planes de lección',
+    'onboarding.goals.grading': 'Calificación automática',
+    'onboarding.goals.personalization': 'Personalizar enseñanza',
+    'onboarding.goals.productivity': 'Aumentar productividad',
+    'onboarding.goals.learning': 'Aprender nuevas habilidades',
+    'onboarding.goals.innovation': 'Impulsar innovación',
+    // Source options
+    'onboarding.sources.search': 'Búsqueda',
+    'onboarding.sources.instagram': 'Instagram',
+    'onboarding.sources.tiktok': 'TikTok',
+    'onboarding.sources.twitter': 'Twitter/X',
+    'onboarding.sources.youtube': 'YouTube',
+    'onboarding.sources.onlineAd': 'Anuncio en línea/Blog',
+    'onboarding.sources.friendsFamily': 'Amigos y familia'
   },
   fr: {
     'onboarding.welcome': 'Bienvenue sur Shattara AI',
@@ -102,7 +173,25 @@ const translations = {
     'onboarding.sourcePlaceholder': "J'ai trouvé Shattara depuis",
     'onboarding.continue': 'Continuer',
     'onboarding.alreadySetup': 'Déjà configuré ?',
-    'onboarding.signIn': 'Se connecter'
+    'onboarding.signIn': 'Se connecter',
+    // Goal options
+    'onboarding.goals.examPrep': 'Préparer un examen',
+    'onboarding.goals.research': 'Mener des recherches',
+    'onboarding.goals.coursework': 'Aide aux devoirs',
+    'onboarding.goals.lessonPlanning': 'Créer des plans de cours',
+    'onboarding.goals.grading': 'Notation automatique',
+    'onboarding.goals.personalization': 'Personnaliser l\'enseignement',
+    'onboarding.goals.productivity': 'Augmenter la productivité',
+    'onboarding.goals.learning': 'Apprendre de nouvelles compétences',
+    'onboarding.goals.innovation': 'Stimuler l\'innovation',
+    // Source options
+    'onboarding.sources.search': 'Recherche',
+    'onboarding.sources.instagram': 'Instagram',
+    'onboarding.sources.tiktok': 'TikTok',
+    'onboarding.sources.twitter': 'Twitter/X',
+    'onboarding.sources.youtube': 'YouTube',
+    'onboarding.sources.onlineAd': 'Publicité en ligne/Blog',
+    'onboarding.sources.friendsFamily': 'Amis et famille'
   },
   ur: {
     'onboarding.welcome': 'شطارہ AI میں خوش آمدید',
@@ -120,7 +209,25 @@ const translations = {
     'onboarding.sourcePlaceholder': 'میں نے شطارہ یہاں سے پایا',
     'onboarding.continue': 'آگے بڑھیں',
     'onboarding.alreadySetup': 'پہلے سے سیٹ اپ ہے؟',
-    'onboarding.signIn': 'سائن ان'
+    'onboarding.signIn': 'سائن ان',
+    // Goal options
+    'onboarding.goals.examPrep': 'امتحان کی تیاری',
+    'onboarding.goals.research': 'تحقیق کریں',
+    'onboarding.goals.coursework': 'کورس ورک میں مدد',
+    'onboarding.goals.lessonPlanning': 'سبق کی منصوبہ بندی',
+    'onboarding.goals.grading': 'خودکار گریڈنگ',
+    'onboarding.goals.personalization': 'ذاتی تعلیم',
+    'onboarding.goals.productivity': 'پیداواری صلاحیت بڑھائیں',
+    'onboarding.goals.learning': 'نئے ہنر سیکھیں',
+    'onboarding.goals.innovation': 'جدت طرازی',
+    // Source options
+    'onboarding.sources.search': 'تلاش',
+    'onboarding.sources.instagram': 'انسٹاگرام',
+    'onboarding.sources.tiktok': 'ٹک ٹاک',
+    'onboarding.sources.twitter': 'ٹویٹر/ایکس',
+    'onboarding.sources.youtube': 'یوٹیوب',
+    'onboarding.sources.onlineAd': 'آن لائن اشتہار/بلاگ',
+    'onboarding.sources.friendsFamily': 'دوست اور خاندان'
   },
   hi: {
     'onboarding.welcome': 'Shattara AI में आपका स्वागत है',
@@ -138,7 +245,25 @@ const translations = {
     'onboarding.sourcePlaceholder': 'मैंने Shattara यहाँ से पाया',
     'onboarding.continue': 'जारी रखें',
     'onboarding.alreadySetup': 'पहले से सेट अप है?',
-    'onboarding.signIn': 'साइन इन करें'
+    'onboarding.signIn': 'साइन इन करें',
+    // Goal options
+    'onboarding.goals.examPrep': 'परीक्षा की तैयारी',
+    'onboarding.goals.research': 'अनुसंधान करें',
+    'onboarding.goals.coursework': 'कोर्सवर्क सहायता',
+    'onboarding.goals.lessonPlanning': 'पाठ योजना बनाएं',
+    'onboarding.goals.grading': 'स्वचालित ग्रेडिंग',
+    'onboarding.goals.personalization': 'व्यक्तिगत शिक्षा',
+    'onboarding.goals.productivity': 'उत्पादकता बढ़ाएं',
+    'onboarding.goals.learning': 'नए कौशल सीखें',
+    'onboarding.goals.innovation': 'नवाचार को बढ़ावा दें',
+    // Source options
+    'onboarding.sources.search': 'खोज',
+    'onboarding.sources.instagram': 'इंस्टाग्राम',
+    'onboarding.sources.tiktok': 'टिकटॉक',
+    'onboarding.sources.twitter': 'ट्विटर/एक्स',
+    'onboarding.sources.youtube': 'यूट्यूब',
+    'onboarding.sources.onlineAd': 'ऑनलाइन विज्ञापन/ब्लॉग',
+    'onboarding.sources.friendsFamily': 'मित्र और परिवार'
   }
 };
 

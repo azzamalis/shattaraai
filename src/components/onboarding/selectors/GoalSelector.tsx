@@ -37,7 +37,7 @@ const GoalSelector = ({ value, onChange, purpose }: GoalSelectorProps) => {
               value={option.value}
               className={`${selectItemClasses} ${isRTL ? 'text-right' : 'text-left'}`}
             >
-              {option.label}
+              {t(option.labelKey)}
             </SelectItem>
           ))}
         </SelectContent>

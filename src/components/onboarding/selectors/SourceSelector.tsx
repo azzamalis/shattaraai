@@ -35,7 +35,7 @@ const SourceSelector = ({ value, onChange }: SourceSelectorProps) => {
               value={option.value}
               className={`${selectItemClasses} ${isRTL ? 'text-right' : 'text-left'}`}
             >
-              {option.label}
+              {t(option.labelKey)}
             </SelectItem>
           ))}
         </SelectContent>
