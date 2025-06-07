@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Logo from '@/components/Logo';
@@ -12,7 +11,7 @@ const OnboardingContent = () => {
     <div className={`min-h-screen flex flex-col items-center justify-center bg-dark px-4 py-12 ${isRTL ? 'rtl' : 'ltr'}`}>
       <div className="mb-8">
         <Link to="/" className="inline-block">
-          <Logo textColor="text-white" />
+          <Logo textColor="text-white" className="scale-125" />
         </Link>
       </div>
       
