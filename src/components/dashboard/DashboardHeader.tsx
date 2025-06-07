@@ -7,17 +7,20 @@ import { CommandModal } from './CommandModal';
 import { Link, useLocation } from 'react-router-dom';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
+import { Room } from '@/lib/types';
 
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
   contentData?: ContentData;
   onUpdateContent?: (updates: Partial<ContentData>) => void;
+  rooms: Room[];
 }
 
 export function DashboardHeader({
   onOpenDrawer,
   contentData,
-  onUpdateContent
+  onUpdateContent,
+  rooms
 }: DashboardHeaderProps) {
   const [commandOpen, setCommandOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -167,7 +170,11 @@ export function DashboardHeader({
                 </kbd>
               </Button>
             </DialogTrigger>
-            <CommandModal open={commandOpen} onOpenChange={setCommandOpen} />
+            <CommandModal 
+              open={commandOpen} 
+              onOpenChange={setCommandOpen} 
+              rooms={rooms}
+            />
           </Dialog>
         </div>
       </div>

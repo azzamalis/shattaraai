@@ -17,13 +17,30 @@ import {
   Globe,
   Youtube
 } from 'lucide-react';
+import { useContent } from '@/contexts/ContentContext';
+import { Room } from '@/lib/types';
+import { useNavigate } from 'react-router-dom';
 
 interface CommandModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  rooms: Room[];
 }
 
-export function CommandModal({ open, onOpenChange }: CommandModalProps) {
+export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
+  const navigate = useNavigate();
+  const { recentContent } = useContent();
+
+  const handleRoomClick = (roomId: string) => {
+    navigate(`/rooms/${roomId}`);
+    onOpenChange(false);
+  };
+
+  const handleContentClick = (contentId: string, type: string) => {
+    navigate(`/content/${contentId}?type=${type}`);
+    onOpenChange(false);
+  };
+
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput placeholder="Type a command or search..." />
@@ -45,31 +62,49 @@ export function CommandModal({ open, onOpenChange }: CommandModalProps) {
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Recent">
-          <CommandItem>
-            <FileText size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
-            <span>Introduction to Quantum Physics</span>
-            <div className="ms-auto flex items-center gap-2">
-              <div className="flex items-center gap-1 rounded-md border border-border bg-muted px-1.5 py-0.5">
-                <Box size={12} className="opacity-50" />
-                <span className="text-xs text-muted-foreground">Physics Room</span>
-              </div>
+          {recentContent && recentContent.length > 0 ? (
+            recentContent.slice(0, 5).map((content) => (
+              <CommandItem 
+                key={content.id}
+                onSelect={() => handleContentClick(content.id, content.type)}
+              >
+                <FileText size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
+                <span>{content.title}</span>
+                {content.roomId && (
+                  <div className="ms-auto flex items-center gap-2">
+                    <div className="flex items-center gap-1 rounded-md border border-border bg-muted px-1.5 py-0.5">
+                      <Box size={12} className="opacity-50" />
+                      <span className="text-xs text-muted-foreground">
+                        {rooms.find(r => r.id === content.roomId)?.name || 'Unknown Room'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </CommandItem>
+            ))
+          ) : (
+            <div className="px-3 py-2 text-sm text-muted-foreground">
+              No recent content
             </div>
-          </CommandItem>
+          )}
         </CommandGroup>
         <CommandSeparator />
-        <CommandGroup heading="Navigation">
-          <CommandItem>
-            <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
-            <span>Go to Azzam's Room</span>
-          </CommandItem>
-          <CommandItem>
-            <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
-            <span>Go to Project 'Neom'</span>
-          </CommandItem>
-          <CommandItem>
-            <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
-            <span>Go to Untitled Room</span>
-          </CommandItem>
+        <CommandGroup heading="Rooms">
+          {rooms && rooms.length > 0 ? (
+            rooms.map((room) => (
+              <CommandItem 
+                key={room.id}
+                onSelect={() => handleRoomClick(room.id)}
+              >
+                <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
+                <span>Go to {room.name}</span>
+              </CommandItem>
+            ))
+          ) : (
+            <div className="px-3 py-2 text-sm text-muted-foreground">
+              No rooms available
+            </div>
+          )}
         </CommandGroup>
       </CommandList>
     </CommandDialog>

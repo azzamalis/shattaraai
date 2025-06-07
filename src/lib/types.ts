@@ -64,6 +64,7 @@ export interface ContentItem {
   thumbnail?: string;
   metadata?: Record<string, any>;
   recordingMetadata?: RecordingMetadata;
+  roomId?: string;
 }
 
 export interface ContentHandlers {
