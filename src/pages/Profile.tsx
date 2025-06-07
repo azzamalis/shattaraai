@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { languages } from "@/components/onboarding/data/languages";
 import { getGoalOptions } from "@/components/onboarding/data/goals";
 import { sourceOptions } from "@/components/onboarding/data/sources";
 import { SubscriptionPlanCard } from "@/components/dashboard/SubscriptionPlanCard";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const initialUserData = {
   name: "Alex Johnson",
@@ -39,6 +41,7 @@ const initialUserData = {
 export default function Profile() {
   const [userData, setUserData] = useState(initialUserData);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSaveChanges = () => {
     toast({
@@ -179,7 +182,7 @@ export default function Profile() {
                           value={option.value}
                           className="text-foreground hover:bg-accent"
                         >
-                          {option.label}
+                          {t(option.labelKey)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -208,7 +211,7 @@ export default function Profile() {
                           value={option.value}
                           className="text-foreground hover:bg-accent"
                         >
-                          {option.label}
+                          {t(option.labelKey)}
                         </SelectItem>
                       ))}
                     </SelectContent>

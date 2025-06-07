@@ -103,6 +103,7 @@ export function DashboardLayout({
           onOpenDrawer={() => setIsDrawerOpen(true)} 
           contentData={contentData}
           onUpdateContent={onUpdateContent}
+          rooms={rooms}
         />
         <DashboardDrawer 
           open={isDrawerOpen} 
