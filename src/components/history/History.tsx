@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HistoryHeader } from './HistoryHeader';
@@ -9,28 +8,27 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { historyItems } from './historyData';
 import { toast } from 'sonner';
 import { Room, RoomHandlers } from '@/lib/types';
-
 const ITEMS_PER_PAGE = 10;
-
 interface HistoryProps {
   rooms?: Room[];
   onAddRoom?: () => void;
   onEditRoom?: (id: string, newName: string) => void;
   onDeleteRoom?: (id: string) => void;
 }
-
-export function History({ rooms = [], onAddRoom, onEditRoom, onDeleteRoom }: HistoryProps) {
+export function History({
+  rooms = [],
+  onAddRoom,
+  onEditRoom,
+  onDeleteRoom
+}: HistoryProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   // Filter history items based on search query and type filter
   const filteredItems = historyItems.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          item.room.toLowerCase().includes(searchQuery.toLowerCase());
-    
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.room.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = typeFilter === 'all' || item.type === typeFilter;
-    
     return matchesSearch && matchesType;
   });
 
@@ -38,114 +36,78 @@ export function History({ rooms = [], onAddRoom, onEditRoom, onDeleteRoom }: His
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
   const handleItemClick = (id: string) => {
     console.log(`Navigating to item: ${id}`);
   };
-
   const handleClearHistory = () => {
     toast.info("History cleared successfully");
   };
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages || totalPages === 0;
-
   const handleAddToRoom = (contentId: string, roomId: string) => {
     // Implement add to room logic
     console.log(`Adding content ${contentId} to room ${roomId}`);
   };
-
   const handleDelete = (id: string) => {
     // Implement delete logic
     console.log(`Deleting item ${id}`);
   };
-
-  return (
-    <div className="container mx-auto p-6">
+  return <div className="container mx-auto p-6">
       <div className="flex flex-col space-y-6">
         <HistoryHeader onClearHistory={handleClearHistory} />
         
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <HistorySearch 
-            searchQuery={searchQuery} 
-            onSearchChange={setSearchQuery} 
-          />
+          <HistorySearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
           
-          <HistoryFilter 
-            typeFilter={typeFilter} 
-            onFilterChange={setTypeFilter} 
-          />
+          <HistoryFilter typeFilter={typeFilter} onFilterChange={setTypeFilter} />
         </div>
         
         <Card className="bg-card border-border shadow-lg">
           <CardHeader className="border-b border-border">
-            <CardTitle className="text-xl text-foreground">Recent Activity</CardTitle>
+            <CardTitle className="text-foreground text-lg">Recent Activity</CardTitle>
             <CardDescription className="text-muted-foreground">
               View and manage your recent interactions
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <HistoryTable 
-              items={paginatedItems} 
-              onItemClick={handleItemClick}
-              rooms={rooms}
-              onAddToRoom={handleAddToRoom}
-              onDelete={handleDelete}
-            />
+            <HistoryTable items={paginatedItems} onItemClick={handleItemClick} rooms={rooms} onAddToRoom={handleAddToRoom} onDelete={handleDelete} />
           </CardContent>
         </Card>
 
         {/* Pagination */}
-        {totalPages > 0 && (
-          <div className="flex justify-center mt-6">
+        {totalPages > 0 && <div className="flex justify-center mt-6">
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (!isFirstPage) handlePageChange(currentPage - 1);
-                    }}
-                    className={`${isFirstPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-foreground hover:bg-accent`}
-                  />
+                  <PaginationPrevious href="#" onClick={e => {
+                e.preventDefault();
+                if (!isFirstPage) handlePageChange(currentPage - 1);
+              }} className={`${isFirstPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-foreground hover:bg-accent`} />
                 </PaginationItem>
                 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handlePageChange(page);
-                      }}
-                      isActive={currentPage === page}
-                      className="text-foreground hover:bg-accent"
-                    >
+                {Array.from({
+              length: totalPages
+            }, (_, i) => i + 1).map(page => <PaginationItem key={page}>
+                    <PaginationLink href="#" onClick={e => {
+                e.preventDefault();
+                handlePageChange(page);
+              }} isActive={currentPage === page} className="text-foreground hover:bg-accent">
                       {page}
                     </PaginationLink>
-                  </PaginationItem>
-                ))}
+                  </PaginationItem>)}
                 
                 <PaginationItem>
-                  <PaginationNext 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (!isLastPage) handlePageChange(currentPage + 1);
-                    }}
-                    className={`${isLastPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-foreground hover:bg-accent`}
-                  />
+                  <PaginationNext href="#" onClick={e => {
+                e.preventDefault();
+                if (!isLastPage) handlePageChange(currentPage + 1);
+              }} className={`${isLastPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-foreground hover:bg-accent`} />
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
-          </div>
-        )}
+          </div>}
       </div>
-    </div>
-  );
+    </div>;
 }
