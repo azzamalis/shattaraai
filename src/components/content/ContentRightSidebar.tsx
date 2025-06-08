@@ -5,7 +5,6 @@ import { MessageCircle, FileText, BookOpen, Brain, FileStack } from "lucide-reac
 import AIChat from "@/components/recording/AIChat";
 import QuizPreferences from '@/components/recording/QuizPreferences';
 import Notes from '@/components/recording/Notes';
-import { FlashcardInterface } from '@/components/flashcards/FlashcardInterface';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
 
@@ -173,7 +172,17 @@ export function ContentRightSidebar({ contentData }: ContentRightSidebarProps) {
         
         <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
           <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-            <FlashcardInterface />
+            <ScrollArea className="h-full">
+              <div className={cn(
+                "flex flex-col items-center justify-center h-full min-h-[400px]",
+                "text-dashboard-text/60 dark:text-dashboard-text-secondary space-y-4 p-8"
+              )}>
+                <FileStack className="h-12 w-12 mb-2" />
+                <p className="text-center max-w-md text-base">
+                  Ready to review the key concepts? I've got flashcards lined up to make memorization quick and easy.
+                </p>
+              </div>
+            </ScrollArea>
           </div>
         </TabsContent>
         
