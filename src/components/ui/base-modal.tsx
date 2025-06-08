@@ -1,3 +1,4 @@
+
 // src/components/ui/base-modal.tsx
 import React from 'react';
 import {
@@ -19,6 +20,7 @@ interface BaseModalProps {
   children: React.ReactNode;
   className?: string;
   showCloseButton?: boolean;
+  contentClassName?: string;
 }
 
 export function BaseModal({
@@ -29,12 +31,14 @@ export function BaseModal({
   children,
   className,
   showCloseButton = true,
+  contentClassName,
 }: BaseModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
         className={cn(
           "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border border-border/50",
+          contentClassName,
           className
         )}
       >

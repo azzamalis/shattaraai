@@ -155,7 +155,7 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
       open={open}
       onOpenChange={onOpenChange}
       title="Edit Content Details"
-      className="w-[95vw] max-w-[1200px] max-h-[95vh] overflow-hidden"
+      contentClassName="w-[98vw] max-w-[1400px] max-h-[95vh] overflow-hidden !max-w-none sm:!max-w-[1400px]"
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
         {/* Left Panel - Preview */}
