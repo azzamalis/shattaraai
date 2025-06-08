@@ -27,6 +27,14 @@ export function DashboardSections({
   onExploreCardDelete,
   onExploreCardShare
 }: DashboardSectionsProps) {
+  const handleAddToRoom = (item: ContentItem, roomId: string) => {
+    const room = rooms.find(r => r.id === roomId);
+    if (room) {
+      // In a real app, this would add the content to the room
+      toast.success(`"${item.title}" added to "${room.name}"`);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <MyRoomsSection 
@@ -38,7 +46,8 @@ export function DashboardSections({
 
       <ContinueLearningSection 
         onDeleteCard={onCardDelete} 
-        onShareCard={onCardShare} 
+        onShareCard={onCardShare}
+        onAddToRoom={handleAddToRoom}
       />
 
       <ExploreContentSection 

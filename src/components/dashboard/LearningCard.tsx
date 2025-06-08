@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Globe, MoreVertical, Pencil, Check, Share, Trash2 } from 'lucide-react';
+import { Globe, MoreVertical, Pencil, Check, Share, Trash2, Plus } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { ContentItem } from '@/lib/types';
@@ -12,12 +13,22 @@ interface LearningCardProps {
   content: ContentItem;
   onDelete: () => void;
   onShare: () => void;
+  onAddToRoom?: (roomId: string) => void;
 }
 
-export function LearningCard({ content, onDelete, onShare }: LearningCardProps) {
+// Mock rooms data - in a real app, this would come from context or props
+const availableRooms = [
+  { id: '1', name: "Azzam's Room" },
+  { id: '2', name: 'Project Neom' },
+  { id: '3', name: 'Physics Lab' },
+  { id: '4', name: 'Math Studies' }
+];
+
+export function LearningCard({ content, onDelete, onShare, onAddToRoom }: LearningCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(content.title);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [addToRoomOpen, setAddToRoomOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSaveTitle = (e: React.MouseEvent) => {
@@ -33,6 +44,15 @@ export function LearningCard({ content, onDelete, onShare }: LearningCardProps) 
 
   const handleCardClick = () => {
     navigate(`/content/${content.id}?type=${content.type}`);
+  };
+
+  const handleAddToRoom = (roomId: string, roomName: string) => {
+    if (onAddToRoom) {
+      onAddToRoom(roomId);
+    }
+    toast.success(`Added to "${roomName}"`);
+    setAddToRoomOpen(false);
+    setMenuOpen(false);
   };
 
   // Calculate progress percentage
@@ -82,6 +102,44 @@ export function LearningCard({ content, onDelete, onShare }: LearningCardProps) 
               sideOffset={5}
             >
               <div className="flex flex-col">
+                <Popover open={addToRoomOpen} onOpenChange={setAddToRoomOpen}>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAddToRoomOpen(true);
+                      }}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add to Room
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent 
+                    className="w-[160px] bg-popover rounded-lg border-border p-1" 
+                    side="left" 
+                    align="start"
+                    sideOffset={8}
+                  >
+                    <div className="flex flex-col">
+                      {availableRooms.map((room) => (
+                        <Button
+                          key={room.id}
+                          variant="ghost"
+                          className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToRoom(room.id, room.name);
+                          }}
+                        >
+                          {room.name}
+                        </Button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                
                 <Button 
                   variant="ghost" 
                   className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" 

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { LearningCard } from './LearningCard';
 import { useContent } from '@/contexts/ContentContext';
@@ -8,10 +9,17 @@ import { ContentItem } from '@/lib/types';
 interface ContinueLearningProps {
   onDeleteCard: (item: ContentItem) => void;
   onShareCard: (item: ContentItem) => void;
+  onAddToRoom?: (item: ContentItem, roomId: string) => void;
 }
 
-export function ContinueLearningSection({ onDeleteCard, onShareCard }: ContinueLearningProps) {
+export function ContinueLearningSection({ onDeleteCard, onShareCard, onAddToRoom }: ContinueLearningProps) {
   const { content } = useContent();
+
+  const handleAddToRoom = (roomId: string, item: ContentItem) => {
+    if (onAddToRoom) {
+      onAddToRoom(item, roomId);
+    }
+  };
 
   if (content.length === 0) {
     return (
@@ -66,6 +74,7 @@ export function ContinueLearningSection({ onDeleteCard, onShareCard }: ContinueL
                   content={item}
                   onDelete={() => onDeleteCard(item)}
                   onShare={() => onShareCard(item)}
+                  onAddToRoom={(roomId) => handleAddToRoom(roomId, item)}
                 />
               </CarouselItem>
             ))}

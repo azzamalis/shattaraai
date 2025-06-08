@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, FileText, Video, Youtube, Mic, RotateCcw } from 'lucide-react';
 import { ContentTag, ContentType } from '../RoomContentTable';
@@ -44,6 +44,12 @@ const getTagColor = (tag: ContentTag) => {
 };
 
 const availableTags: ContentTag[] = ['Summary', 'Notes', 'Exams', 'Flashcards'];
+const availableContentTypes: { value: string; label: ContentType }[] = [
+  { value: 'video', label: 'Video' },
+  { value: 'pdf', label: 'PDF Files' },
+  { value: 'recording', label: 'Recording' },
+  { value: 'youtube', label: 'Youtube URL' }
+];
 
 export function EditContentModal({ open, onOpenChange, contentItem, onSave }: EditContentModalProps) {
   const [editedItem, setEditedItem] = useState<ContentItem | null>(null);
@@ -110,6 +116,15 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
     }
   };
 
+  const handleContentTypeChange = (value: string) => {
+    if (editedItem) {
+      setEditedItem({
+        ...editedItem,
+        type: value as ContentItem['type']
+      });
+    }
+  };
+
   const filteredSuggestions = availableTags.filter(tag => 
     tag.toLowerCase().includes(newTagInput.toLowerCase()) &&
     !(editedItem?.metadata?.contentTags?.includes(tag))
@@ -140,14 +155,15 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
       open={open}
       onOpenChange={onOpenChange}
       title="Edit Content Details"
-      className="max-w-6xl max-h-[90vh] overflow-hidden"
+      className="max-w-7xl w-[95vw] max-h-[95vh] overflow-hidden"
+      style={{ width: 'min(95vw, 1200px)' }}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
         {/* Left Panel - Preview */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-foreground mb-4">Live Preview</h3>
-          <div className="p-4 bg-muted/50 rounded-lg border border-border min-h-[300px]">
-            <div className="space-y-4">
+          <div className="p-6 bg-muted/50 rounded-lg border border-border min-h-[350px]">
+            <div className="space-y-6">
               <div className="flex items-center gap-2">
                 {getContentTypeIcon(displayType)}
                 <span className="text-sm text-muted-foreground">{displayType}</span>
@@ -176,7 +192,7 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
         </div>
 
         {/* Right Panel - Edit Form */}
-        <div className="space-y-6 overflow-y-auto max-h-[60vh]">
+        <div className="space-y-6 overflow-y-auto max-h-[70vh] pr-2">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-foreground">Edit Details</h3>
             {hasChanges && (
@@ -203,13 +219,27 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
             />
           </div>
 
-          {/* Content Type (Read-only) */}
+          {/* Content Type Dropdown */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Content Type</label>
-            <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-md">
-              {getContentTypeIcon(displayType)}
-              <span className="text-sm text-muted-foreground">{displayType}</span>
-            </div>
+            <Select value={editedItem.type} onValueChange={handleContentTypeChange}>
+              <SelectTrigger className="component-base">
+                <div className="flex items-center gap-2">
+                  {getContentTypeIcon(displayType)}
+                  <SelectValue />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                {availableContentTypes.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    <div className="flex items-center gap-2">
+                      {getContentTypeIcon(type.label)}
+                      <span>{type.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Upload Date (Read-only) */}
@@ -291,7 +321,7 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-6 border-t border-border">
+      <div className="flex items-center justify-between pt-6 border-t border-border mt-6">
         <div className="text-sm text-muted-foreground">
           {hasChanges ? "You have unsaved changes" : "No changes made"}
         </div>

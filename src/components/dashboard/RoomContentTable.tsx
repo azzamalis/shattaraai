@@ -127,6 +127,27 @@ export function RoomContentTable({
     }
   };
 
+  const handleShareModalClose = (open: boolean) => {
+    setShareModalOpen(open);
+    if (!open) {
+      setSelectedItem(null);
+    }
+  };
+
+  const handleDeleteModalClose = (open: boolean) => {
+    setDeleteModalOpen(open);
+    if (!open) {
+      setSelectedItem(null);
+    }
+  };
+
+  const handleEditModalClose = (open: boolean) => {
+    setEditModalOpen(open);
+    if (!open) {
+      setSelectedItem(null);
+    }
+  };
+
   return (
     <div className="w-full flex flex-col pt-8">
       <table className="w-full border-collapse">
@@ -266,7 +287,7 @@ export function RoomContentTable({
       {/* Edit Modal */}
       <EditContentModal 
         open={editModalOpen} 
-        onOpenChange={setEditModalOpen}
+        onOpenChange={handleEditModalClose}
         contentItem={selectedItem}
         onSave={handleEditSave}
       />
@@ -274,7 +295,7 @@ export function RoomContentTable({
       {/* Share Modal */}
       <ShareModal 
         open={shareModalOpen} 
-        onOpenChange={setShareModalOpen}
+        onOpenChange={handleShareModalClose}
         type="content"
         itemToShare={{
           id: selectedItem?.id || '',
@@ -286,7 +307,7 @@ export function RoomContentTable({
       {/* Delete Modal */}
       <DeleteModal 
         open={deleteModalOpen} 
-        onOpenChange={setDeleteModalOpen}
+        onOpenChange={handleDeleteModalClose}
         type="content"
         itemToDelete={{
           id: selectedItem?.id || '',
