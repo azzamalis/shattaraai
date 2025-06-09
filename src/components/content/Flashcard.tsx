@@ -172,13 +172,13 @@ export function Flashcard({
                     return newSet;
                   });
                 }}>
-                    <Star className={cn("w-5 h-5", starredCards.has(currentCardData.id) ? "fill-primary text-primary" : "text-muted-foreground")} />
+                    <Star className={cn("w-4 h-4", starredCards.has(currentCardData.id) ? "fill-primary text-primary" : "text-muted-foreground")} />
                   </button>
                   <button className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors" onClick={e => {
                   e.stopPropagation();
                   onEdit?.(currentCard, currentCardData);
                 }}>
-                    <Pencil className="w-5 h-5 text-muted-foreground" />
+                    <Pencil className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </div>
               </div>
