@@ -111,7 +111,7 @@ export function Flashcard({
                 e.stopPropagation();
                 setShowHint(prev => !prev);
               }}>
-                  <Lightbulb className={cn("w-5 h-5", showHint ? "text-primary" : "text-muted-foreground dark:text-muted-foreground")} />
+                  <Lightbulb className={cn("w-4 h-4", showHint ? "text-primary" : "text-muted-foreground dark:text-muted-foreground")} />
                 </button>
                 <div className="flex gap-2">
                   <button className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors" onClick={e => {
@@ -127,13 +127,13 @@ export function Flashcard({
                     return newSet;
                   });
                 }}>
-                    <Star className={cn("w-5 h-5", starredCards.has(currentCardData.id) ? "fill-primary text-primary" : "text-muted-foreground")} />
+                    <Star className={cn("w-4 h-4", starredCards.has(currentCardData.id) ? "fill-primary text-primary" : "text-muted-foreground")} />
                   </button>
                   <button className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors" onClick={e => {
                   e.stopPropagation();
                   onEdit?.(currentCard, currentCardData);
                 }}>
-                    <Pencil className="w-5 h-5 text-muted-foreground" />
+                    <Pencil className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </div>
               </div>
