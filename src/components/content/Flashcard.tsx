@@ -192,7 +192,7 @@ export function Flashcard({
               }}>
                     {showExplanation ? 'Hide Explanation' : 'Show Explanation'}
                   </button>}
-                {showExplanation && currentCardData.explanation && <div className="mt-2 p-3 bg-muted rounded-lg max-w-md">
+                {showExplanation && currentCardData.explanation && <div className="mt-2 p-3 bg-[#00A3FF]/10 rounded-lg max-w-md">
                     <p className="text-sm text-muted-foreground text-center">
                       {currentCardData.explanation}
                     </p>
