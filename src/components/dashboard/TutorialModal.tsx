@@ -76,16 +76,16 @@ export function TutorialModal({
       alt: 'Summary Prompts Demo'
     } as ContentType
   }, {
-    title: "Study with quizzes",
-    subtitle: "Study your topic with quizzes that break down into concepts, a chat to ask questions, feedback, and sources.",
+    title: "Study with exams",
+    subtitle: "Study your topic with exams that break down into concepts, a chat to ask questions, feedback, and sources.",
     content: {
       type: 'video',
       src: '/videos/quizzes-demo.mp4',
       alt: 'Quizzes Demo'
     } as ContentType
   }, {
-    title: "Spaces & space chat",
-    subtitle: "Add contents to your spaces, chat with all your contents, and more!",
+    title: "Rooms & room chat",
+    subtitle: "Add contents to your rooms, chat with all your contents, and more!",
     content: {
       type: 'video',
       src: '/videos/spaces-demo.mp4',
@@ -93,7 +93,7 @@ export function TutorialModal({
     } as ContentType
   }, {
     title: "Languages, AI Models, & More",
-    subtitle: "Choose from 20+ languages and 4+ AI models in account settings.",
+    subtitle: "Choose from 10+ languages and 3+ AI models in account settings.",
     content: {
       type: 'video',
       src: '/videos/settings-demo.mp4',

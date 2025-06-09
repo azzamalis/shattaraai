@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Pencil, Trash, Plus, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface RoomCardProps {
   id?: string;
@@ -17,6 +18,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({
   isAddButton,
   onAdd,
 }) => {
+  const navigate = useNavigate();
+
   if (isAddButton) {
     return (
       <button
@@ -41,15 +44,37 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     );
   }
 
+  const handleCardClick = () => {
+    if (id) {
+      navigate(`/rooms/${id}`);
+    }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete && id) {
+      onDelete(id);
+    }
+  };
+
   return (
     <div 
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          handleCardClick();
+        }
+      }}
       className={cn(
         "relative flex items-center justify-between",
         "p-4",
         "rounded-lg border border-border",
         "group transition-all duration-300",
         "bg-card hover:bg-accent",
-        "hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]"
+        "hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]",
+        "cursor-pointer"
       )}
     >
       <div className="flex flex-col gap-1.5 flex-1 min-w-0">
@@ -58,13 +83,9 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
       <div className="flex gap-2 ml-4">
         <button 
-          onClick={(e) => {
-            e.preventDefault();
-            if (onDelete && id) {
-              onDelete(id);
-            }
-          }}
+          onClick={handleDeleteClick}
           className="p-1 rounded-full text-muted-foreground hover:text-red-500 transition-colors"
+          aria-label={`Delete room ${name}`}
         >
           <Trash className="w-5 h-5" />
         </button>

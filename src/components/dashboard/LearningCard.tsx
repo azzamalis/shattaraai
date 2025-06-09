@@ -85,7 +85,7 @@ export function LearningCard({
                     setAddToRoomOpen(true);
                   }}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Add to Room
+                      Add
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[160px] bg-popover rounded-lg border-border p-1" side="left" align="start" sideOffset={8}>
