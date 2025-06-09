@@ -1,11 +1,8 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { MessageSquare, FileText, Grid, List } from 'lucide-react';
-import { RoomContentTable } from './RoomContentTable';
+import { MessageSquare, FileText } from 'lucide-react';
+import { RoomContentView } from './RoomContentView';
 import { ContentItem } from '@/lib/types';
-import type { ContentTag, ContentType } from './RoomContentTable';
 
 interface RoomViewProps {
   title: string;
@@ -23,38 +20,46 @@ export function RoomView({
   const exampleItems: ContentItem[] = [
     {
       id: '1',
-      title: 'File Name Example',
+      title: 'Introduction to React Hooks',
       type: 'video',
       createdAt: '2025-05-30T00:00:00.000Z',
+      filename: 'react-hooks-intro.mp4',
       metadata: {
-        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards']
+        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'],
+        progress: 0.75
       }
     },
     {
       id: '2',
-      title: 'File Name Example',
+      title: 'Advanced TypeScript Patterns',
       type: 'pdf',
-      createdAt: '2025-05-30T00:00:00.000Z',
+      createdAt: '2025-05-29T00:00:00.000Z',
+      filename: 'typescript-patterns.pdf',
       metadata: {
-        contentTags: ['Summary', 'Flashcards', 'Exams']
+        contentTags: ['Summary', 'Flashcards', 'Exams'],
+        progress: 0.5
       }
     },
     {
       id: '3',
-      title: 'File Name Example',
+      title: 'System Design Interview Prep',
       type: 'recording',
-      createdAt: '2025-05-30T00:00:00.000Z',
+      createdAt: '2025-05-28T00:00:00.000Z',
+      filename: 'system-design.mp3',
       metadata: {
-        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards']
+        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'],
+        progress: 0.25
       }
     },
     {
       id: '4',
-      title: 'File Name Example',
+      title: 'Building Modern UIs with TailwindCSS',
       type: 'youtube',
-      createdAt: '2025-05-30T00:00:00.000Z',
+      createdAt: '2025-05-27T00:00:00.000Z',
+      filename: 'tailwind-ui-tutorial',
       metadata: {
-        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards']
+        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'],
+        progress: 0.9
       }
     }
   ];
@@ -70,11 +75,11 @@ export function RoomView({
                 <p className="text-muted-foreground mt-1">{description}</p>
               </div>
               <div className="flex items-center gap-4">
-                <Button variant="outline" className="component-base hover:bg-accent hover:text-primary hover:border-primary">
+                <Button variant="outline" className="component-base hover:bg-accent hover:text-primary hover:border-primary w-[140px] h-10">
                   <MessageSquare className="mr-2 h-4 w-4" />
                   Room Chat
                 </Button>
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-[140px] h-10">
                   <FileText className="mr-2 h-4 w-4" />
                   Create Exam
                 </Button>
@@ -94,7 +99,7 @@ export function RoomView({
               </p>
             </div>
           ) : (
-            <RoomContentTable 
+            <RoomContentView 
               items={exampleItems} 
               onEdit={(id) => console.log('Edit', id)}
               onDelete={(id) => console.log('Delete', id)}

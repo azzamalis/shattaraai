@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 interface ExamPrepStepThreeProps {
   numQuestions: string;
@@ -13,7 +14,6 @@ interface ExamPrepStepThreeProps {
   examLength: string;
   setExamLength: (value: string) => void;
   onBack: () => void;
-  onSkip: () => void;
   onStartExam: () => void;
 }
 
@@ -25,9 +25,22 @@ export function ExamPrepStepThree({
   examLength,
   setExamLength,
   onBack,
-  onSkip,
   onStartExam
 }: ExamPrepStepThreeProps) {
+  // Validation function to check if all required fields are valid
+  const isFormValid = () => {
+    // Check if number of questions is a valid positive number
+    const numQuestionsValid = /^\d+$/.test(numQuestions) && parseInt(numQuestions) > 0;
+    
+    // Check if question type is selected
+    const questionTypeValid = questionType !== '';
+    
+    // Check if exam length is a valid positive number
+    const examLengthValid = /^\d+$/.test(examLength) && parseInt(examLength) > 0;
+    
+    return numQuestionsValid && questionTypeValid && examLengthValid;
+  };
+
   return (
     <div className="text-center">
       <h2 className="text-2xl font-bold text-foreground mb-2">Choose your preference</h2>
@@ -42,6 +55,7 @@ export function ExamPrepStepThree({
             value={numQuestions} 
             onChange={(e) => setNumQuestions(e.target.value)} 
             className="bg-background border-border text-foreground mt-2 h-12"
+            placeholder="Enter number of questions"
           />
         </div>
         
@@ -61,15 +75,15 @@ export function ExamPrepStepThree({
           </Select>
         </div>
         
-        <div className="col-span-2">
-          <Label htmlFor="examLength" className="text-foreground">
-            Exam Length (Minutes)
+        <div>
+          <Label htmlFor="examLength" className="text-foreground flex items-center">
+            Exam Length (Minutes) <span className="text-red-500 ml-1">*</span>
           </Label>
           <Input 
             id="examLength" 
             value={examLength} 
             onChange={(e) => setExamLength(e.target.value)} 
-            placeholder="e.g. 60" 
+            placeholder="Enter exam length in minutes" 
             className="bg-background border-border text-foreground mt-2 h-12"
           />
         </div>
@@ -84,21 +98,16 @@ export function ExamPrepStepThree({
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        <div className="flex gap-2">
-          <Button 
-            onClick={onSkip}
-            variant="ghost" 
-            className="text-foreground hover:bg-accent"
-          >
-            Skip
-          </Button>
-          <Button 
-            onClick={onStartExam}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-4"
-          >
-            Start Exam
-          </Button>
-        </div>
+        <Button 
+          onClick={onStartExam}
+          disabled={!isFormValid()}
+          className={cn(
+            "bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-4",
+            "disabled:opacity-50 disabled:cursor-not-allowed"
+          )}
+        >
+          Start Exam
+        </Button>
       </div>
     </div>
   );

@@ -4,8 +4,8 @@ import { ChatTabNavigation } from './ChatTabNavigation';
 import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { NotesEditor } from './NotesEditor/NotesEditor';
-import { EmptyStates } from './EmptyStates';
 import { toast } from 'sonner';
+import { Brain } from 'lucide-react';
 
 interface ChatInterfaceProps {
   activeTab: ChatTabType;
@@ -26,6 +26,7 @@ export function ChatInterface({ activeTab, onTabChange, initialQuery }: ChatInte
 
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hasSentInitialQuery = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -36,10 +37,11 @@ export function ChatInterface({ activeTab, onTabChange, initialQuery }: ChatInte
   }, [messages]);
 
   useEffect(() => {
-    if (initialQuery && activeTab === 'chat') {
+    if (initialQuery && !hasSentInitialQuery.current) {
       handleSendMessage(initialQuery);
+      hasSentInitialQuery.current = true;
     }
-  }, [initialQuery, activeTab]);
+  }, [initialQuery]);
 
   const handleSendMessage = (content: string) => {
     const userMessage: Message = {
@@ -117,3 +119,35 @@ export function ChatInterface({ activeTab, onTabChange, initialQuery }: ChatInte
     </div>
   );
 }
+interface EmptyStatesProps {
+  type: ChatTabType;
+}
+
+export function EmptyStates({ type }: EmptyStatesProps) {
+  const getContent = () => {
+    switch (type) {
+      case 'flashcards':
+        return {
+          description: 'Learn with the Shattara AI Tutor using interactive flashcards.'
+        };
+      case 'quizzes':
+        return {
+          description: 'Learn with the Shattara AI Tutor through adaptive quizzes.'
+        };
+      default:
+        return null;
+    }
+  };
+
+  const content = getContent();
+  if (!content) return null;
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-8">
+      <p className="text-muted-foreground text-center max-w-md">
+        {content.description}
+      </p>
+    </div>
+  );
+}
+

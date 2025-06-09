@@ -24,7 +24,7 @@ export function ChatTabNavigation({ activeTab, onTabChange }: ChatTabNavigationP
       className="w-full"
     >
       <TabsList className={cn(
-        "w-full justify-start gap-1 p-1 h-12 shrink-0 m-4 mb-0",
+        "w-[calc(100%-2rem)] justify-start gap-1 p-1 h-12 shrink-0 mx-4 mt-2 mb-4",
         "bg-dashboard-bg dark:bg-dashboard-bg",
         "transition-colors duration-200",
         "rounded-xl"

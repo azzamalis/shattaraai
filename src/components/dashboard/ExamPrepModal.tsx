@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,66 @@ interface ExamPrepModalProps {
   onClose: () => void;
 }
 
+// Initial content items for a fresh start
+const initialContentItems: ContentItem[] = [
+  {
+    id: '1',
+    title: 'The British Empire',
+    uploadedDate: '30/05/2025',
+    type: 'Video',
+    isSelected: false
+  },
+  {
+    id: '2',
+    title: 'Think Fast, Talk Smart',
+    uploadedDate: '30/05/2025',
+    type: 'Video',
+    isSelected: false
+  },
+  {
+    id: '3',
+    title: 'Understanding Applied Psychology',
+    uploadedDate: '30/05/2025',
+    type: 'PDF Files',
+    isSelected: false
+  },
+  {
+    id: '4',
+    title: 'Social Class',
+    uploadedDate: '30/05/2025',
+    type: 'Recording',
+    isSelected: false
+  },
+  {
+    id: '5',
+    title: 'Introduction to Quantum Physics',
+    uploadedDate: '31/05/2025',
+    type: 'Video',
+    isSelected: false
+  },
+  {
+    id: '6',
+    title: 'Advanced Calculus Notes',
+    uploadedDate: '31/05/2025',
+    type: 'PDF Files',
+    isSelected: false
+  },
+  {
+    id: '7',
+    title: 'Machine Learning Lecture',
+    uploadedDate: '31/05/2025',
+    type: 'Youtube URL',
+    isSelected: false
+  },
+  {
+    id: '8',
+    title: 'Chemistry Lab Session',
+    uploadedDate: '31/05/2025',
+    type: 'Recording',
+    isSelected: false
+  }
+];
+
 export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
   const [step, setStep] = useState(1);
   const [numQuestions, setNumQuestions] = useState('25');
@@ -19,38 +79,20 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
   const [questionType, setQuestionType] = useState('Both');
   const navigate = useNavigate();
   
-  const [contentItems, setContentItems] = useState<ContentItem[]>([
-    {
-      id: '1',
-      title: 'The British Empire',
-      uploadedDate: '30/05/2025',
-      type: 'Video',
-      isSelected: false
-    },
-    {
-      id: '2',
-      title: 'Think Fast, Talk Smart',
-      uploadedDate: '30/05/2025',
-      type: 'Video',
-      isSelected: false
-    },
-    {
-      id: '3',
-      title: 'Understanding Applied Psychology',
-      uploadedDate: '30/05/2025',
-      type: 'PDF Files',
-      isSelected: false
-    },
-    {
-      id: '4',
-      title: 'Social Class',
-      uploadedDate: '30/05/2025',
-      type: 'Recording',
-      isSelected: false
-    }
-  ]);
+  const [contentItems, setContentItems] = useState<ContentItem[]>(initialContentItems);
   
   const totalSteps = 3;
+
+  // Effect to reset state when the modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setStep(1); // Reset to Step 1
+      setNumQuestions('25'); // Reset number of questions
+      setExamLength('60'); // Reset exam length
+      setQuestionType('Both'); // Reset question type
+      setContentItems(initialContentItems); // Reset content selections
+    }
+  }, [isOpen]); // Only re-run when isOpen changes
   
   const handleNext = () => {
     if (step < totalSteps) {
@@ -153,7 +195,6 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
               examLength={examLength}
               setExamLength={setExamLength}
               onBack={handleBack}
-              onSkip={handleSkip}
               onStartExam={handleStartExam}
             />
           )}
