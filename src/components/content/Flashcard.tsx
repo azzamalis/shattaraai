@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Lightbulb,
@@ -12,12 +13,19 @@ import {
   Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FilterModal } from './FilterModal';
 
 export interface FlashcardData {
   id: string;
   question: string;
   answer: string;
+  hint?: string;
   explanation?: string;
+  source?: string;
+  page?: number;
+  concept?: string;
+  timeSpent?: number;
+  correct?: boolean;
   isStarred?: boolean;
 }
 
@@ -26,8 +34,13 @@ interface FlashcardProps {
   onStar?: (index: number) => void;
   onEdit?: (index: number, updatedCard: FlashcardData) => void;
   onManage?: () => void;
-  onFilter?: () => void;
+  onFilter?: (filters: FilterOptions) => void;
   onShuffle?: () => void;
+}
+
+export interface FilterOptions {
+  starredOnly: boolean;
+  concepts: string[];
 }
 
 export function Flashcard({
@@ -43,6 +56,8 @@ export function Flashcard({
   const [showExplanation, setShowExplanation] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [starredCards, setStarredCards] = useState<Set<string>>(new Set());
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [showFilterModal, setShowFilterModal] = useState(false);
 
   React.useEffect(() => {
     const initialStarred = new Set<string>();
@@ -82,13 +97,34 @@ export function Flashcard({
     }
   };
 
+  const handleShuffle = () => {
+    setIsShuffled(prev => !prev);
+    onShuffle?.();
+  };
+
+  const handleFilter = (filters: FilterOptions) => {
+    onFilter?.(filters);
+    setShowFilterModal(false);
+  };
+
+  const availableConcepts = Array.from(new Set(cards.map(card => card.concept).filter(Boolean)));
+  const hasStarredCards = cards.some(card => card.isStarred);
+
   const currentCardData = cards[currentCard];
+
+  if (!currentCardData) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full px-4 py-6 space-y-6">
+        <p className="text-muted-foreground">No flashcards available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-4 py-6 space-y-6">
       {/* Flashcard */}
       <div
-        className="w-full max-w-2xl aspect-[4/3] cursor-pointer"
+        className="w-full max-w-2xl aspect-[4/3] cursor-pointer relative"
         onClick={handleFlip}
         style={{ perspective: '1000px' }}
       >
@@ -160,10 +196,13 @@ export function Flashcard({
                 <p className="text-[22px] text-center text-card-foreground dark:text-card-foreground">
                   {currentCardData.question}
                 </p>
-                {currentCardData.explanation && showHint && (
-                  <p className="text-base text-muted-foreground text-center mt-2">
-                    <span className="font-semibold">Hint: </span>{currentCardData.explanation}
-                  </p>
+                {currentCardData.hint && showHint && (
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground text-center">
+                      <span className="font-semibold text-primary">Hint: </span>
+                      {currentCardData.hint}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
@@ -223,7 +262,7 @@ export function Flashcard({
                 </p>
                 {currentCardData.explanation && (
                   <button
-                    className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm hover:bg-secondary-hover transition-colors"
+                    className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm hover:bg-secondary/80 transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowExplanation(prev => !prev);
@@ -233,14 +272,23 @@ export function Flashcard({
                   </button>
                 )}
                 {showExplanation && currentCardData.explanation && (
-                  <p className="text-base text-muted-foreground text-center mt-2">
-                    {currentCardData.explanation}
-                  </p>
+                  <div className="mt-2 p-3 bg-muted rounded-lg max-w-md">
+                    <p className="text-sm text-muted-foreground text-center">
+                      {currentCardData.explanation}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Shuffle On Badge */}
+        {isShuffled && (
+          <div className="absolute bottom-4 right-4 px-2 py-1 bg-[#00A3FF]/10 border border-[#00A3FF]/20 rounded-md">
+            <span className="text-xs font-medium text-[#00A3FF]">Shuffle On</span>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
@@ -290,20 +338,32 @@ export function Flashcard({
         <div className="w-px h-4 bg-border" />
         <button
           className="flex items-center gap-2 hover:text-card-foreground transition-colors"
-          onClick={onFilter}
+          onClick={() => setShowFilterModal(true)}
         >
           <SlidersHorizontal className="w-4 h-4" />
           <span>Filter Options</span>
         </button>
         <div className="w-px h-4 bg-border" />
         <button
-          className="flex items-center gap-2 hover:text-card-foreground transition-colors"
-          onClick={onShuffle}
+          className={cn(
+            "flex items-center gap-2 transition-colors",
+            isShuffled ? "text-primary" : "hover:text-card-foreground"
+          )}
+          onClick={handleShuffle}
         >
           <Shuffle className="w-4 h-4" />
           <span>Shuffle</span>
         </button>
       </div>
+
+      {/* Filter Modal */}
+      <FilterModal
+        open={showFilterModal}
+        onOpenChange={setShowFilterModal}
+        onFilter={handleFilter}
+        hasStarredCards={hasStarredCards}
+        availableConcepts={availableConcepts}
+      />
     </div>
   );
 }
