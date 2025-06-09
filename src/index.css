@@ -1,3 +1,5 @@
+@import './styles/flashcard.css';
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -251,6 +253,24 @@
   .glow-effect:hover::after {
     @apply opacity-20;
   }
+
+  /* Dashboard-scoped component styling */
+  .dashboard-layout .component-base {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid hsl(var(--border));
+  }
+  
+  .dashboard-layout .card-enhanced {
+    @apply hover:shadow-[var(--shadow-hover)] transition-all duration-200;
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid hsl(var(--border));
+  }
+  
+  .dashboard-layout .hover-shadow {
+    @apply transition-all duration-200 hover:shadow-[var(--shadow-hover)];
+  }
 }
 
 @layer utilities {
@@ -331,24 +351,4 @@
   
   /* Dark hover shadow */
   --shadow-hover: 0 2px 8px rgba(255, 255, 255, 0.1);
-}
-
-@layer components {
-  /* Dashboard-scoped component styling */
-  .dashboard-layout .component-base {
-    background-color: hsl(var(--card));
-    color: hsl(var(--card-foreground));
-    border: 1px solid hsl(var(--border));
-  }
-  
-  .dashboard-layout .card-enhanced {
-    @apply hover:shadow-[var(--shadow-hover)] transition-all duration-200;
-    background-color: hsl(var(--card));
-    color: hsl(var(--card-foreground));
-    border: 1px solid hsl(var(--border));
-  }
-  
-  .dashboard-layout .hover-shadow {
-    @apply transition-all duration-200 hover:shadow-[var(--shadow-hover)];
-  }
 }
