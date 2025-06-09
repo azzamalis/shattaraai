@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { SlidersHorizontal, Shuffle } from 'lucide-react';
+import { SlidersHorizontal, Shuffle, FileStack } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FlashcardActionBarProps {
   onFilter: () => void;
   onShuffle: () => void;
+  onManageCards: () => void;
   isShuffled?: boolean;
   hasFiltersApplied?: boolean;
 }
@@ -13,11 +14,22 @@ interface FlashcardActionBarProps {
 export function FlashcardActionBar({
   onFilter,
   onShuffle,
+  onManageCards,
   isShuffled = false,
   hasFiltersApplied = false
 }: FlashcardActionBarProps) {
   return (
     <div className="flex items-center justify-center gap-6 text-sm text-dashboard-text-secondary">
+      <button
+        className="flex items-center gap-2 hover:text-dashboard-text transition-colors"
+        onClick={onManageCards}
+      >
+        <FileStack className="w-4 h-4" />
+        <span>Manage cards</span>
+      </button>
+      
+      <div className="w-px h-4 bg-border" />
+      
       <button
         className={cn(
           "flex items-center gap-2 hover:text-dashboard-text transition-colors",

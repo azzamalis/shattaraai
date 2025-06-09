@@ -66,9 +66,6 @@ export function useFlashcards() {
   const [starredCards, setStarredCards] = useState<Set<string>>(new Set());
   const [isShuffled, setIsShuffled] = useState(false);
   const [originalOrder, setOriginalOrder] = useState<FlashcardData[]>([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editQuestion, setEditQuestion] = useState('');
-  const [editAnswer, setEditAnswer] = useState('');
   
   // Modal states
   const [showManageModal, setShowManageModal] = useState(false);
@@ -157,7 +154,6 @@ export function useFlashcards() {
     setIsFlipped(false);
     setShowHint(false);
     setShowExplanation(false);
-    setIsEditing(false);
   };
 
   const recordTimeSpent = useCallback(() => {
@@ -210,33 +206,6 @@ export function useFlashcards() {
     ));
   }, [filteredCards, currentCardIndex]);
 
-  const startEdit = () => {
-    const currentCard = filteredCards[currentCardIndex];
-    if (currentCard) {
-      setEditQuestion(currentCard.question);
-      setEditAnswer(currentCard.answer);
-      setIsEditing(true);
-    }
-  };
-
-  const saveEdit = () => {
-    const currentCard = filteredCards[currentCardIndex];
-    if (currentCard && editQuestion.trim() && editAnswer.trim()) {
-      setCards(prev => prev.map(card => 
-        card.id === currentCard.id 
-          ? { ...card, question: editQuestion.trim(), answer: editAnswer.trim() }
-          : card
-      ));
-      setIsEditing(false);
-    }
-  };
-
-  const cancelEdit = () => {
-    setIsEditing(false);
-    setEditQuestion('');
-    setEditAnswer('');
-  };
-
   const shuffleCards = () => {
     if (isShuffled) {
       // Restore original order
@@ -268,7 +237,7 @@ export function useFlashcards() {
   // Keyboard navigation
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (showManageModal || showFilterModal || isEditing) return;
+      if (showManageModal || showFilterModal) return;
       
       switch (event.key) {
         case 'ArrowLeft':
@@ -290,7 +259,7 @@ export function useFlashcards() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [goToNext, goToPrevious, showManageModal, showFilterModal, isEditing]);
+  }, [goToNext, goToPrevious, showManageModal, showFilterModal]);
 
   const currentCard = filteredCards[currentCardIndex];
 
@@ -307,9 +276,6 @@ export function useFlashcards() {
     showExplanation,
     starredCards,
     isShuffled,
-    isEditing,
-    editQuestion,
-    editAnswer,
     
     // Modal states
     showManageModal,
@@ -333,19 +299,12 @@ export function useFlashcards() {
     toggleHint,
     toggleExplanation,
     toggleStar,
-    startEdit,
-    saveEdit,
-    cancelEdit,
     shuffleCards,
     applyFilters,
     
     // Modal actions
     setShowManageModal,
     setShowFilterModal,
-    
-    // Edit actions
-    setEditQuestion,
-    setEditAnswer,
     
     // Utility
     recordTimeSpent

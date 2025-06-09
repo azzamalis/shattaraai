@@ -2,6 +2,7 @@
 import React from 'react';
 import { FlashcardCard } from './FlashcardCard';
 import { FlashcardActionBar } from './FlashcardActionBar';
+import { FlashcardNavigation } from './FlashcardNavigation';
 import { ManageCardsModal } from './ManageCardsModal';
 import { FilterModal } from './FilterModal';
 import { useFlashcards } from './hooks/useFlashcards';
@@ -20,9 +21,6 @@ export function FlashcardInterface() {
     showExplanation,
     starredCards,
     isShuffled,
-    isEditing,
-    editQuestion,
-    editAnswer,
     
     // Modal states
     showManageModal,
@@ -40,19 +38,12 @@ export function FlashcardInterface() {
     toggleHint,
     toggleExplanation,
     toggleStar,
-    startEdit,
-    saveEdit,
-    cancelEdit,
     shuffleCards,
     applyFilters,
     
     // Modal actions
     setShowManageModal,
-    setShowFilterModal,
-    
-    // Edit actions
-    setEditQuestion,
-    setEditAnswer
+    setShowFilterModal
   } = useFlashcards();
 
   if (!currentCard) {
@@ -68,38 +59,37 @@ export function FlashcardInterface() {
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-4 py-6 space-y-6">
-      {/* Main Card with Navigation */}
-      <FlashcardCard
-        card={currentCard}
+      {/* Main Card */}
+      <div className="w-full max-w-2xl">
+        <FlashcardCard
+          card={currentCard}
+          isFlipped={isFlipped}
+          showHint={showHint}
+          showExplanation={showExplanation}
+          isShuffled={isShuffled}
+          isStarred={starredCards.has(currentCard.id)}
+          onFlip={toggleFlip}
+          onToggleHint={toggleHint}
+          onToggleExplanation={toggleExplanation}
+          onToggleStar={() => toggleStar()}
+        />
+      </div>
+
+      {/* Navigation */}
+      <FlashcardNavigation
         currentIndex={currentCardIndex}
         totalCards={filteredCards.length}
-        isFlipped={isFlipped}
-        showHint={showHint}
-        showExplanation={showExplanation}
-        isEditing={isEditing}
-        editQuestion={editQuestion}
-        editAnswer={editAnswer}
-        isShuffled={isShuffled}
-        isStarred={starredCards.has(currentCard.id)}
-        canGoPrevious={currentCardIndex > 0}
-        canGoNext={currentCardIndex < filteredCards.length - 1}
-        onFlip={toggleFlip}
-        onToggleHint={toggleHint}
-        onToggleExplanation={toggleExplanation}
-        onToggleStar={() => toggleStar()}
-        onEdit={startEdit}
         onPrevious={goToPrevious}
         onNext={goToNext}
-        onEditQuestion={setEditQuestion}
-        onEditAnswer={setEditAnswer}
-        onSaveEdit={saveEdit}
-        onCancelEdit={cancelEdit}
+        canGoPrevious={currentCardIndex > 0}
+        canGoNext={currentCardIndex < filteredCards.length - 1}
       />
 
       {/* Action Bar */}
       <FlashcardActionBar
         onFilter={() => setShowFilterModal(true)}
         onShuffle={shuffleCards}
+        onManageCards={() => setShowManageModal(true)}
         isShuffled={isShuffled}
         hasFiltersApplied={
           filters.starredOnly || 
