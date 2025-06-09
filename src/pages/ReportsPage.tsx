@@ -2,9 +2,22 @@ import React from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Flame, FileText, BookOpen, Bot, AlertTriangle, Smile, Star, TrendingUp } from "lucide-react";
+import { Flame, FileText, BookOpen, Bot, AlertTriangle, Smile, Star, TrendingUp, Target, ArrowRight } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { MetricCard } from "@/components/metrics/MetricCard";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+
+interface Challenge {
+  topic: string;
+  notes: string;
+  progress: number;
+  lastAttempt: string;
+  difficulty: "High" | "Medium" | "Low";
+  category: string;
+  icon: string;
+}
 
 const weeklyProgress = [
   { name: "Sun", Accuracy: 70 },
@@ -16,10 +29,34 @@ const weeklyProgress = [
   { name: "Sat", Accuracy: 88 },
 ];
 
-const challenges = [
-  { topic: "Physics: Kinematics", notes: "Struggled with equations" },
-  { topic: "Arabic Literature", notes: "Needs deeper comprehension" },
-  { topic: "English Essay Writing", notes: "Grammar inconsistencies" },
+const challenges: Challenge[] = [
+  { 
+    topic: "Physics: Kinematics", 
+    notes: "Struggled with equations",
+    progress: 65,
+    lastAttempt: "2 days ago",
+    difficulty: "High",
+    category: "Science",
+    icon: "⚡" // You can replace with actual icons if preferred
+  },
+  { 
+    topic: "Arabic Literature", 
+    notes: "Needs deeper comprehension",
+    progress: 45,
+    lastAttempt: "1 day ago",
+    difficulty: "Medium",
+    category: "Languages",
+    icon: "📚"
+  },
+  { 
+    topic: "English Essay Writing", 
+    notes: "Grammar inconsistencies",
+    progress: 75,
+    lastAttempt: "3 days ago",
+    difficulty: "Medium",
+    category: "Writing",
+    icon: "✍️"
+  },
 ];
 
 export default function ReportsPage() {
@@ -41,101 +78,164 @@ export default function ReportsPage() {
         </div>
 
         {/* Weekly Progress */}
-        <Card className="mb-6 bg-card border-border shadow-lg transition-colors duration-200">
-          <CardHeader className="flex items-center justify-between pb-2">
-            <CardTitle className="text-foreground">📈 Learning Progress</CardTitle>
-            <span className="text-sm text-muted-foreground">Accuracy This Week</span>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="h-[240px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyProgress}>
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                      color: 'hsl(var(--foreground))',
-                      fontSize: '12px'
-                    }}
-                    labelStyle={{ color: '#00A3FF' }}
-                  />
-                  <Bar 
-                    dataKey="Accuracy" 
-                    fill="#00A3FF" 
-                    radius={[6, 6, 0, 0]} 
-                    opacity={0.8}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+        <Card className="mb-6 bg-gradient-to-br from-card to-accent/5 border-border/50 shadow-lg hover:shadow-xl transition-all duration-200">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-4">
+              <div className="p-3 rounded-full bg-blue-500/10 text-blue-500">
+                <BarChart />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground">Learning Progress</h3>
+                    <p className="text-sm text-muted-foreground">Accuracy This Week</p>
+                  </div>
+                </div>
+                <div className="h-[240px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={weeklyProgress}>
+                      <XAxis 
+                        dataKey="name" 
+                        stroke="hsl(var(--muted-foreground))" 
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--muted-foreground))" 
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          color: 'hsl(var(--foreground))',
+                          fontSize: '12px'
+                        }}
+                        labelStyle={{ color: '#00A3FF' }}
+                      />
+                      <Bar 
+                        dataKey="Accuracy" 
+                        fill="#00A3FF" 
+                        radius={[6, 6, 0, 0]} 
+                        opacity={0.8}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Goals + Feedback */}
         <div className="grid gap-4 lg:grid-cols-2 mb-6">
-          <Card className="bg-card border-border shadow-lg hover:bg-accent transition-colors duration-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-foreground">🎯 Weekly Goal</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <p className="text-lg mb-2 text-foreground">You've completed 80% of your goal!</p>
-              <Progress value={80} className="h-3 bg-muted" />
-              <p className="text-sm text-muted-foreground mt-2">
-                Just 2 more quizzes to hit your target.
-              </p>
+          <Card className="bg-gradient-to-br from-card to-accent/5 border-border/50 shadow-lg hover:shadow-xl transition-all duration-200">
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-4">
+                <div className="p-3 rounded-full bg-purple-500/10 text-purple-500">
+                  <Target size={24} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground">Weekly Goal</h3>
+                      <p className="text-sm text-muted-foreground">You're almost there!</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold text-foreground">80%</p>
+                    <Progress value={80} className="h-2 bg-muted" />
+                    <p className="text-sm text-muted-foreground">
+                      Just 2 more quizzes to hit your target
+                    </p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border shadow-lg hover:bg-accent transition-colors duration-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-foreground">✨ Helpfulness Rating</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <p className="text-3xl font-bold mb-2 text-foreground">94%</p>
-              <Progress value={94} className="h-3 bg-muted" />
-              <p className="text-sm text-muted-foreground mt-2">
-                Based on 200 feedback entries this month.
-              </p>
+          <Card className="bg-gradient-to-br from-card to-accent/5 border-border/50 shadow-lg hover:shadow-xl transition-all duration-200">
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-4">
+                <div className="p-3 rounded-full bg-green-500/10 text-green-500">
+                  <Smile size={24} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground">Helpfulness Rating</h3>
+                      <p className="text-sm text-muted-foreground">Based on 200 feedback entries</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold text-foreground">94%</p>
+                    <Progress value={94} className="h-2 bg-muted" />
+                    <p className="text-sm text-muted-foreground">
+                      Excellent feedback this month
+                    </p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Areas of Difficulty */}
-        <Card className="mb-6 bg-card border-border shadow-lg hover:bg-accent transition-colors duration-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-foreground">🚧 Top Challenges</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <ul className="space-y-4">
-              {challenges.map((item, idx) => (
-                <li key={idx} className="flex items-start space-x-3">
-                  <AlertTriangle className="text-yellow-500 mt-1" size={20} />
+        {/* Top Challenges */}
+        <Card className="mb-6 bg-gradient-to-br from-card to-accent/5 border-border/50 shadow-lg hover:shadow-xl transition-all duration-200">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-4">
+              <div className="p-3 rounded-full bg-yellow-500/10 text-yellow-500">
+                <AlertTriangle size={24} />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="font-medium text-foreground">{item.topic}</p>
-                    <p className="text-sm text-muted-foreground">{item.notes}</p>
+                    <h3 className="text-xl font-semibold text-foreground">Top Challenges</h3>
+                    <p className="text-sm text-muted-foreground">Areas that need attention</p>
                   </div>
-                </li>
-              ))}
-            </ul>
+                </div>
+                <div className="space-y-4">
+                  {challenges.map((item, idx) => (
+                    <div 
+                      key={idx} 
+                      className="group flex items-center justify-between p-3 rounded-lg bg-background/50 hover:bg-accent/5 transition-colors duration-200"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 rounded-full bg-primary/5 text-primary">
+                          {item.icon}
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">{item.topic}</p>
+                          <p className="text-sm text-muted-foreground">{item.notes}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Badge 
+                          variant="secondary" 
+                          className={cn(
+                            "text-xs font-normal",
+                            item.difficulty === "High" && "bg-red-500/10 text-red-500",
+                            item.difficulty === "Medium" && "bg-yellow-500/10 text-yellow-500",
+                            item.difficulty === "Low" && "bg-green-500/10 text-green-500"
+                          )}
+                        >
+                          {item.difficulty}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         {/* Enhanced Motivation Card */}
-        <Card className="bg-gradient-to-br from-card to-accent border-border shadow-lg hover:shadow-xl transition-all duration-200">
+        <Card className="bg-gradient-to-br from-card to-accent/5 border-border/50 shadow-lg hover:shadow-xl transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start space-x-4">
               <div className="p-3 rounded-full bg-green-500/10 text-green-500">
