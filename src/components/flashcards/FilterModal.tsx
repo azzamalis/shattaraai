@@ -32,9 +32,7 @@ export function FilterModal({
   const handleClear = () => {
     const clearedFilters: FlashcardFilter = {
       starredOnly: false,
-      selectedConcepts: [],
-      showStudiedOnly: false,
-      difficulty: null
+      selectedConcepts: []
     };
     setLocalFilters(clearedFilters);
   };
@@ -82,22 +80,6 @@ export function FilterModal({
               />
               <Star className="w-4 h-4 text-yellow-500" />
               <span className="text-sm text-dashboard-text">Starred only</span>
-            </label>
-          </div>
-
-          {/* Studied Only Toggle */}
-          <div>
-            <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-border/80 cursor-pointer transition-colors bg-dashboard-bg">
-              <input
-                type="checkbox"
-                checked={localFilters.showStudiedOnly || false}
-                onChange={(e) => setLocalFilters(prev => ({
-                  ...prev,
-                  showStudiedOnly: e.target.checked
-                }))}
-                className="w-4 h-4 rounded border-border focus:ring-primary"
-              />
-              <span className="text-sm text-dashboard-text">Studied cards only</span>
             </label>
           </div>
 
@@ -150,30 +132,6 @@ export function FilterModal({
               </div>
             </div>
           )}
-
-          {/* Difficulty Filter */}
-          <div>
-            <h3 className="text-sm font-medium text-dashboard-text mb-3">Filter by difficulty</h3>
-            <div className="flex gap-2">
-              {(['easy', 'medium', 'hard'] as const).map((difficulty) => (
-                <button
-                  key={difficulty}
-                  onClick={() => setLocalFilters(prev => ({
-                    ...prev,
-                    difficulty: prev.difficulty === difficulty ? null : difficulty
-                  }))}
-                  className={cn(
-                    "px-3 py-2 text-xs rounded-lg border transition-colors capitalize",
-                    localFilters.difficulty === difficulty
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-dashboard-bg text-dashboard-text border-border hover:border-border/80"
-                  )}
-                >
-                  {difficulty}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Footer */}

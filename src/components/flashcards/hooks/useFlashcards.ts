@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { FlashcardData, FlashcardFilter, FlashcardSession } from '@/lib/flashcardTypes';
 
@@ -121,10 +120,6 @@ export function useFlashcards() {
       filtered = filtered.filter(card => starredCards.has(card.id));
     }
     
-    if (newFilters.showStudiedOnly) {
-      filtered = filtered.filter(card => card.studied);
-    }
-    
     if (newFilters.selectedConcepts.length > 0) {
       filtered = filtered.filter(card => 
         newFilters.selectedConcepts.some(concept => 
@@ -134,10 +129,6 @@ export function useFlashcards() {
           card.answer.toLowerCase().includes(concept.toLowerCase())
         )
       );
-    }
-    
-    if (newFilters.difficulty) {
-      filtered = filtered.filter(card => card.difficulty === newFilters.difficulty);
     }
     
     setFilteredCards(filtered);
@@ -324,8 +315,11 @@ export function useFlashcards() {
     showManageModal,
     showFilterModal,
     
-    // Filter data
-    filters,
+    // Filter data (simplified)
+    filters: {
+      starredOnly: filters.starredOnly,
+      selectedConcepts: filters.selectedConcepts
+    },
     availableConcepts,
     
     // Session data
