@@ -5,7 +5,7 @@ import { MessageCircle, FileText, BookOpen, Brain, FileStack } from "lucide-reac
 import AIChat from "@/components/recording/AIChat";
 import QuizPreferences from '@/components/recording/QuizPreferences';
 import Notes from '@/components/recording/Notes';
-import { FlashcardInterface } from './FlashcardInterface';
+import { Flashcard, FlashcardData } from './Flashcard';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
 
@@ -92,6 +92,51 @@ export function ContentRightSidebar({
 }: ContentRightSidebarProps) {
   const [activeTab, setActiveTab] = useState("chat");
   const [isRecording, setIsRecording] = useState(false);
+  const [cards, setCards] = useState<FlashcardData[]>(sampleFlashcards);
+  const [isShuffled, setIsShuffled] = useState(false);
+
+  const handleStarCard = (index: number) => {
+    // Implement star functionality
+    console.log('Star card:', index);
+  };
+
+  const handleEditCard = (index: number, updatedCard: any) => {
+    // Implement edit functionality
+    console.log('Edit card:', index, updatedCard);
+    // In a real application, you would update your state or call an API here
+  };
+
+  const handleManageCards = () => {
+    // Implement manage cards functionality
+    console.log('Manage cards');
+  };
+
+  const handleFilterCards = () => {
+    // Implement filter functionality
+    console.log('Filter cards');
+  };
+
+  const handleShuffleCards = () => {
+    // Implement shuffle functionality
+    console.log('Shuffle cards');
+  };
+
+  const handleShuffle = () => {
+    if (isShuffled) {
+      // Restore original order
+      setCards(sampleFlashcards);
+      setIsShuffled(false);
+    } else {
+      // Shuffle cards using Fisher-Yates algorithm
+      const shuffled = [...sampleFlashcards];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      setCards(shuffled);
+      setIsShuffled(true);
+    }
+  };
 
   return <div className="h-full flex flex-col content-right-sidebar bg-dashboard-card dark:bg-dashboard-card">
       <Tabs defaultValue="chat" onValueChange={setActiveTab} className="h-full flex flex-col">
@@ -134,7 +179,16 @@ export function ContentRightSidebar({
         
         <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
           <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-            <FlashcardInterface />
+            <ScrollArea className="h-full">
+              <Flashcard
+                cards={cards}
+                onStar={handleStarCard}
+                onEdit={handleEditCard}
+                onManage={handleManageCards}
+                onFilter={handleFilterCards}
+                onShuffle={handleShuffle}
+              />
+            </ScrollArea>
           </div>
         </TabsContent>
         
