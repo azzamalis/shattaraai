@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Filter } from 'lucide-react';
 import { 
@@ -26,10 +25,11 @@ export function HistoryFilter({ typeFilter, onFilterChange }: HistoryFilterProps
         </SelectTrigger>
         <SelectContent className="bg-card border-border text-foreground">
           <SelectItem value="all">All Types</SelectItem>
-          <SelectItem value="Document Analysis">Document Analysis</SelectItem>
-          <SelectItem value="Meeting Notes">Meeting Notes</SelectItem>
-          <SelectItem value="Chat">Chat</SelectItem>
-          <SelectItem value="Research">Research</SelectItem>
+          <SelectItem value="file">File</SelectItem>
+          <SelectItem value="video">Video</SelectItem>
+          <SelectItem value="website">Website</SelectItem>
+          <SelectItem value="youtube">YouTube</SelectItem>
+          <SelectItem value="recording">Recording</SelectItem>
         </SelectContent>
       </Select>
     </div>

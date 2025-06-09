@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { 
@@ -19,7 +18,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger
 } from '@/components/ui/dropdown-menu';
-import { Clock, History as HistoryIcon, MoreHorizontal, Plus, Share, Trash } from 'lucide-react';
+import { FileText, Video, Youtube, Mic, Globe, MessageSquare, MoreHorizontal } from 'lucide-react';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { Room } from '@/lib/types';
@@ -40,6 +39,46 @@ interface HistoryTableProps {
   onAddToRoom?: (contentId: string, roomId: string) => void;
   onDelete?: (id: string) => void;
 }
+
+// Helper function to get content type icon
+const getContentTypeIcon = (type: string) => {
+  switch (type) {
+    case 'video':
+      return <Video className="h-4 w-4 text-primary" />;
+    case 'pdf':
+      return <FileText className="h-4 w-4 text-primary" />;
+    case 'recording':
+      return <Mic className="h-4 w-4 text-primary" />;
+    case 'youtube':
+      return <Youtube className="h-4 w-4 text-primary" />;
+    case 'website':
+      return <Globe className="h-4 w-4 text-primary" />;
+    case 'text':
+      return <MessageSquare className="h-4 w-4 text-primary" />;
+    default:
+      return <FileText className="h-4 w-4 text-primary" />;
+  }
+};
+
+// Helper function to format content type for display
+const formatContentType = (type: string): string => {
+  switch (type) {
+    case 'video':
+      return 'Video';
+    case 'pdf':
+      return 'PDF';
+    case 'recording':
+      return 'Recording';
+    case 'youtube':
+      return 'YouTube';
+    case 'website':
+      return 'Website';
+    case 'text':
+      return 'Text';
+    default:
+      return 'File';
+  }
+};
 
 export function HistoryTable({ 
   items, 
@@ -107,86 +146,68 @@ export function HistoryTable({
               onClick={() => onItemClick(item.id)}
             >
               <TableCell className="font-medium">
+                <span className="text-foreground">{item.title}</span>
+              </TableCell>
+              <TableCell className="text-muted-foreground">
+                {item.room || '-'}
+              </TableCell>
+              <TableCell>
                 <div className="flex items-center gap-2">
-                  {item.type === 'Document Analysis' && <HistoryIcon size={16} className="text-blue-400" />}
-                  {item.type === 'Meeting Notes' && <Clock size={16} className="text-green-400" />}
-                  {item.type === 'Chat' && <Clock size={16} className="text-purple-400" />}
-                  {item.type === 'Research' && <HistoryIcon size={16} className="text-amber-400" />}
-                  <span className="text-foreground">{item.title}</span>
+                  {getContentTypeIcon(item.type)}
+                  <span className="text-muted-foreground">{formatContentType(item.type)}</span>
                 </div>
               </TableCell>
-              <TableCell className="text-foreground">{item.room}</TableCell>
-              <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  item.type === 'Document Analysis' ? 'bg-blue-500/20 text-blue-400' :
-                  item.type === 'Meeting Notes' ? 'bg-green-500/20 text-green-400' :
-                  item.type === 'Chat' ? 'bg-purple-500/20 text-purple-400' :
-                  'bg-amber-500/20 text-amber-400'
-                }`}>
-                  {item.type}
-                </span>
+              <TableCell className="text-muted-foreground">
+                {format(item.date, 'dd/MM/yyyy')}
               </TableCell>
-              <TableCell className="text-foreground">{format(item.date, 'MMM d, yyyy • h:mm a')}</TableCell>
               <TableCell>
-                <DropdownMenu 
-                  open={openDropdown === item.id} 
-                  onOpenChange={(open) => setOpenDropdown(open ? item.id : null)}
-                >
+                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="ghost" 
-                      className="h-7 w-7 p-0 shrink-0 hover:bg-primary/10 transition-all duration-200"
+                      className="h-8 w-8 p-0"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <MoreHorizontal className="h-4 w-4" />
                       <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-[160px] bg-popover border-border z-50">
+                  <DropdownMenuContent align="end">
                     <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm">
-                        <Plus className="mr-2 h-4 w-4" />
-                        <span>Add</span>
+                      <DropdownMenuSubTrigger>
+                        Add to Room
                       </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent className="w-[160px] bg-popover border-border z-[60]" alignOffset={-5} sideOffset={8}>
-                        {rooms && rooms.length > 0 ? rooms.map(room => (
-                          <DropdownMenuItem 
-                            key={room.id} 
+                      <DropdownMenuSubContent>
+                        {rooms.map((room) => (
+                          <DropdownMenuItem
+                            key={room.id}
                             onClick={(e) => {
                               e.stopPropagation();
                               onAddToRoom?.(item.id, room.id);
-                              setOpenDropdown(null);
-                            }} 
-                            className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm px-2 py-1.5 text-sm"
+                            }}
                           >
                             {room.name}
                           </DropdownMenuItem>
-                        )) : (
-                          <DropdownMenuItem disabled className="px-2 py-1.5 text-sm text-muted-foreground">
-                            No rooms available
-                          </DropdownMenuItem>
-                        )}
+                        ))}
                       </DropdownMenuSubContent>
                     </DropdownMenuSub>
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleShareClick(item);
-                      }} 
-                      className="flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors focus:bg-accent focus:text-accent-foreground rounded-sm"
+                        setShareModalOpen(true);
+                        setSelectedItem(item);
+                      }}
                     >
-                      <Share className="mr-2 h-4 w-4" />
-                      <span>Share</span>
+                      Share
                     </DropdownMenuItem>
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteClick(item);
-                      }} 
-                      className="flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors rounded-sm text-destructive focus:text-destructive"
+                        setDeleteModalOpen(true);
+                        setSelectedItem(item);
+                      }}
                     >
-                      <Trash className="mr-2 h-4 w-4" />
-                      <span>Delete</span>
+                      Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -196,8 +217,11 @@ export function HistoryTable({
           
           {items.length === 0 && (
             <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                No history items found.
+              <TableCell colSpan={5} className="h-24 text-center">
+                <div className="flex flex-col items-center justify-center text-muted-foreground">
+                  <FileText className="h-8 w-8 mb-2" />
+                  <p>No history items found</p>
+                </div>
               </TableCell>
             </TableRow>
           )}
