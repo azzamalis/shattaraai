@@ -60,6 +60,10 @@ export function FilterModal({
     });
   };
 
+  const handleStarredChange = (checked: boolean | "indeterminate") => {
+    setStarredOnly(checked === true);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-card border-border">
@@ -77,7 +81,7 @@ export function FilterModal({
               <Checkbox
                 id="starred-only"
                 checked={starredOnly}
-                onCheckedChange={setStarredOnly}
+                onCheckedChange={handleStarredChange}
                 disabled={!hasStarredCards}
                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
