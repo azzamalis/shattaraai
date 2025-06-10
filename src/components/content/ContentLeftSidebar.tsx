@@ -109,8 +109,8 @@ export function ContentLeftSidebar({
                     Processing content...
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                <ClipboardList className="h-12 w-12 mb-4 text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40" />
-                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-lg">
+                <ClipboardList className="h-8 w-8 mb-4 text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40" />
+                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-base">
                   {contentData.type === 'recording' ? 'Start recording to view chapters' : 'Add content to view chapters'}
                 </p>
               </div>}
