@@ -135,8 +135,8 @@ export function ContentLeftSidebar({
                     Extracting text...
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                <FileText className="h-12 w-12 mb-4 text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40" />
-                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-lg">
+                <FileText className="h-8 w-8 mb-4 text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40" />
+                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-base">
                   {contentData.type === 'recording' ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
                 </p>
               </div>}
