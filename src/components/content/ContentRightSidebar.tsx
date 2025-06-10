@@ -144,6 +144,7 @@ export function ContentRightSidebar({
   const [filteredCards, setFilteredCards] = useState<FlashcardData[]>(sampleFlashcards);
   const [isShuffled, setIsShuffled] = useState(false);
   const [originalOrder, setOriginalOrder] = useState<FlashcardData[]>(sampleFlashcards);
+
   const handleStarCard = (index: number) => {
     const actualIndex = cards.findIndex(card => card.id === filteredCards[index]?.id);
     if (actualIndex !== -1) {
@@ -163,14 +164,23 @@ export function ContentRightSidebar({
       setFilteredCards(updatedFilteredCards);
     }
   };
+
   const handleEditCard = (index: number, updatedCard: FlashcardData) => {
     console.log('Edit card:', index, updatedCard);
     // In a real application, you would update your state or call an API here
   };
+
   const handleManageCards = () => {
     console.log('Manage cards');
     // In a real application, this would open a card management interface
   };
+
+  const handleUpdateCards = (updatedCards: FlashcardData[]) => {
+    setCards(updatedCards);
+    setFilteredCards(updatedCards);
+    setOriginalOrder(updatedCards);
+  };
+
   const handleFilter = (filters: FilterOptions) => {
     let filtered = [...cards];
     if (filters.starredOnly) {
@@ -181,6 +191,7 @@ export function ContentRightSidebar({
     }
     setFilteredCards(filtered);
   };
+
   const handleShuffle = () => {
     if (isShuffled) {
       // Restore original order
@@ -200,9 +211,15 @@ export function ContentRightSidebar({
       setIsShuffled(true);
     }
   };
-  return <div className="h-full flex flex-col content-right-sidebar bg-dashboard-card dark:bg-dashboard-card">
+
+  return (
+    <div className="h-full flex flex-col content-right-sidebar bg-dashboard-card dark:bg-dashboard-card">
       <Tabs defaultValue="chat" onValueChange={setActiveTab} className="h-full flex flex-col">
-        <TabsList className={cn("w-full justify-start gap-1 p-1 h-12 shrink-0 m-4 mb-0", "bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-200", "rounded-xl")}>
+        <TabsList className={cn(
+          "w-full justify-start gap-1 p-1 h-12 shrink-0 m-4 mb-0",
+          "bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-200",
+          "rounded-xl"
+        )}>
           <TabsTrigger value="chat" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70", "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary", "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text", "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card", "data-[state=active]:shadow-none", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
             <MessageCircle className="h-[14px] w-[14px]" />
             <span className="text-sm">Chat</span>
@@ -229,7 +246,10 @@ export function ContentRightSidebar({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="chat" className={cn("flex-1 overflow-hidden mx-4 mb-4", "content-page-tab-content")}>
+        <TabsContent value="chat" className={cn(
+          "flex-1 overflow-hidden mx-4 mb-4",
+          "content-page-tab-content"
+        )}>
           <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
             <ScrollArea className="h-full">
               <div className="h-full min-h-[400px] pt-12">
@@ -242,7 +262,15 @@ export function ContentRightSidebar({
         <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
           <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
             <ScrollArea className="h-full">
-              <Flashcard cards={filteredCards} onStar={handleStarCard} onEdit={handleEditCard} onManage={handleManageCards} onFilter={handleFilter} onShuffle={handleShuffle} />
+              <Flashcard 
+                cards={filteredCards} 
+                onStar={handleStarCard} 
+                onEdit={handleEditCard} 
+                onManage={handleManageCards} 
+                onFilter={handleFilter} 
+                onShuffle={handleShuffle}
+                onUpdateCards={handleUpdateCards}
+              />
             </ScrollArea>
           </div>
         </TabsContent>
@@ -271,5 +299,6 @@ export function ContentRightSidebar({
           </div>
         </TabsContent>
       </Tabs>
-    </div>;
+    </div>
+  );
 }
