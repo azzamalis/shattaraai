@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { X, Star, SlidersHorizontal } from 'lucide-react';
 import { FilterOptions } from './Flashcard';
 
@@ -76,30 +77,18 @@ export function FilterModal({
         <div className="px-6 pb-6 space-y-6">
           {/* Starred Only Filter */}
           <div className="space-y-3">
-            <label className="flex items-center justify-between p-4 rounded-xl border border-dashboard-separator/20 hover:border-dashboard-separator/40 cursor-pointer transition-all hover:bg-dashboard-bg/50">
+            <div className="flex items-center justify-between p-4 rounded-xl border border-dashboard-separator/20 hover:border-dashboard-separator/40 transition-all hover:bg-dashboard-bg/50">
               <div className="flex items-center gap-3">
                 <Star className="w-4 h-4 text-yellow-500" />
                 <span className="text-sm font-medium text-dashboard-text">Starred only</span>
               </div>
-              <div className="relative">
-                <input 
-                  type="checkbox" 
-                  checked={tempFilters.starredOnly}
-                  disabled={!hasStarredCards}
-                  onChange={(e) => handleStarredToggle(e.target.checked)}
-                  className="sr-only"
-                />
-                <div className={`w-11 h-6 rounded-full transition-colors ${
-                  hasStarredCards 
-                    ? (tempFilters.starredOnly ? 'bg-[#00A3FF]' : 'bg-dashboard-separator/30') 
-                    : 'bg-dashboard-separator/20 opacity-50'
-                }`}>
-                  <div className={`w-5 h-5 bg-white rounded-full shadow-lg transform transition-transform ${
-                    tempFilters.starredOnly ? 'translate-x-5' : 'translate-x-0.5'
-                  } mt-0.5`}></div>
-                </div>
-              </div>
-            </label>
+              <Switch
+                checked={tempFilters.starredOnly}
+                onCheckedChange={handleStarredToggle}
+                disabled={!hasStarredCards}
+                className="data-[state=checked]:bg-[#00A3FF] data-[state=unchecked]:bg-dashboard-separator/30"
+              />
+            </div>
             {!hasStarredCards && (
               <p className="text-xs text-dashboard-text-secondary ml-4">
                 No starred cards available
@@ -122,7 +111,7 @@ export function FilterModal({
                 {tempFilters.concepts.map((concept) => (
                   <div 
                     key={concept}
-                    className="inline-flex items-center gap-2 bg-dashboard-bg border border-dashboard-separator/20 rounded-full px-3 py-2 text-sm"
+                    className="inline-flex items-center gap-2 bg-dashboard-bg border border-dashboard-separator/20 rounded-full px-3 py-2 text-sm w-fit"
                   >
                     <span className="text-dashboard-text whitespace-nowrap">{concept}</span>
                     <button 
