@@ -6,6 +6,7 @@ import AIChat from "@/components/recording/AIChat";
 import QuizPreferences from '@/components/recording/QuizPreferences';
 import Notes from '@/components/recording/Notes';
 import { Flashcard, FlashcardData, FilterOptions } from './Flashcard';
+import { SummaryDisplay } from './SummaryDisplay';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
 
@@ -259,12 +260,7 @@ export function ContentRightSidebar({
         <TabsContent value="summary" className="flex-1 overflow-hidden mx-4 mb-4">
           <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
             <ScrollArea className="h-full">
-              <div className={cn("flex flex-col items-center justify-center h-full min-h-[400px]", "text-dashboard-text/60 dark:text-dashboard-text-secondary space-y-4 p-8")}>
-                <BookOpen className="h-8 w-8 mb-2" />
-                <p className="text-center max-w-md text-base">
-                  Want the short version before diving deep? I've prepped a crisp summary to save you time and focus your attention.
-                </p>
-              </div>
+              <SummaryDisplay contentData={contentData} />
             </ScrollArea>
           </div>
         </TabsContent>
