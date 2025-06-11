@@ -161,7 +161,10 @@ export function HistoryTable({
                 {format(item.date, 'dd/MM/yyyy')}
               </TableCell>
               <TableCell>
-                <DropdownMenu>
+                <DropdownMenu
+                  open={openDropdown === item.id}
+                  onOpenChange={(open) => setOpenDropdown(open ? item.id : null)}
+                >
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="ghost" 
@@ -184,6 +187,7 @@ export function HistoryTable({
                             onClick={(e) => {
                               e.stopPropagation();
                               onAddToRoom?.(item.id, room.id);
+                              setOpenDropdown(null); // Close dropdown
                             }}
                           >
                             {room.name}
@@ -194,8 +198,7 @@ export function HistoryTable({
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        setShareModalOpen(true);
-                        setSelectedItem(item);
+                        handleShareClick(item);
                       }}
                     >
                       Share
@@ -203,8 +206,7 @@ export function HistoryTable({
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        setDeleteModalOpen(true);
-                        setSelectedItem(item);
+                        handleDeleteClick(item);
                       }}
                     >
                       Delete
