@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Lightbulb, Star, Pencil, ChevronLeft, ChevronRight, WalletCards, SlidersHorizontal, Shuffle, X, Trash2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { FlashcardDisplay } from './FlashcardDisplay';
+import { FlashcardNavigation } from './FlashcardNavigation';
+import { FlashcardControls } from './FlashcardControls';
 import { FilterModal } from './FilterModal';
-import { FlashcardManagement } from './FlashcardManagement';
 
 export interface FlashcardData {
   id: string;
@@ -50,7 +50,6 @@ export function Flashcard({
   const [starredCards, setStarredCards] = useState<Set<string>>(new Set());
   const [isShuffled, setIsShuffled] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
-  const [showManagement, setShowManagement] = useState(false);
 
   React.useEffect(() => {
     const initialStarred = new Set<string>();
@@ -100,37 +99,23 @@ export function Flashcard({
     setShowFilterModal(false);
   };
 
-  const handleManageCards = () => {
-    setShowManagement(true);
-  };
-
-  const handleEditCard = () => {
-    setShowManagement(true);
-  };
-
-  const handleBackFromManagement = () => {
-    setShowManagement(false);
-  };
-
-  const handleSaveCards = (updatedCards: FlashcardData[]) => {
-    onUpdateCards?.(updatedCards);
+  const handleToggleStar = () => {
+    const currentCardData = cards[currentCard];
+    setStarredCards(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(currentCardData.id)) {
+        newSet.delete(currentCardData.id);
+      } else {
+        newSet.add(currentCardData.id);
+      }
+      onStar?.(currentCard);
+      return newSet;
+    });
   };
 
   const availableConcepts = Array.from(new Set(cards.map(card => card.concept).filter(Boolean)));
   const hasStarredCards = cards.some(card => card.isStarred);
   const currentCardData = cards[currentCard];
-
-  // Show management view
-  if (showManagement) {
-    return (
-      <FlashcardManagement
-        cards={cards}
-        onBack={handleBackFromManagement}
-        onSave={handleSaveCards}
-        onUpdateCard={(index, updatedCard) => onEdit?.(index, updatedCard)}
-      />
-    );
-  }
 
   if (!currentCardData) {
     return (
@@ -142,245 +127,34 @@ export function Flashcard({
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-4 py-6 space-y-6">
-      {/* Flashcard */}
-      <div 
-        className="w-full max-w-2xl aspect-[4/3] cursor-pointer relative"
-        onClick={handleFlip}
-        style={{ perspective: '1000px' }}
-      >
-        <div 
-          className="relative w-full h-full transition-transform duration-500"
-          style={{
-            transformStyle: 'preserve-3d',
-            transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
-          }}
-        >
-          {/* Front of card */}
-          <div 
-            className={cn(
-              "absolute w-full h-full rounded-xl p-6",
-              "bg-card dark:bg-card",
-              "border border-border dark:border-border",
-              "shadow-lg"
-            )}
-            style={{ backfaceVisibility: 'hidden' }}
-          >
-            <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center mb-4">
-                <button 
-                  className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowHint(prev => !prev);
-                  }}
-                >
-                  <Lightbulb className={cn(
-                    "w-4 h-4",
-                    showHint ? "text-primary" : "text-muted-foreground dark:text-muted-foreground"
-                  )} />
-                </button>
-                <div className="flex gap-2">
-                  <button 
-                    className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setStarredCards(prev => {
-                        const newSet = new Set(prev);
-                        if (newSet.has(currentCardData.id)) {
-                          newSet.delete(currentCardData.id);
-                        } else {
-                          newSet.add(currentCardData.id);
-                        }
-                        onStar?.(currentCard);
-                        return newSet;
-                      });
-                    }}
-                  >
-                    <Star className={cn(
-                      "w-4 h-4",
-                      starredCards.has(currentCardData.id) 
-                        ? "fill-primary text-primary" 
-                        : "text-muted-foreground"
-                    )} />
-                  </button>
-                  <button 
-                    className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditCard();
-                    }}
-                  >
-                    <Pencil className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </div>
-              </div>
-              <div className="flex-1 flex flex-col items-center justify-center">
-                <p className="text-[22px] text-center text-card-foreground dark:text-card-foreground">
-                  {currentCardData.question}
-                </p>
-                {currentCardData.hint && showHint && (
-                  <div className="mt-4 p-3 bg-muted rounded-lg">
-                    <p className="text-sm text-muted-foreground text-center">
-                      <span className="font-semibold text-primary">Hint: </span>
-                      {currentCardData.hint}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+      <FlashcardDisplay
+        card={currentCardData}
+        isFlipped={isFlipped}
+        showHint={showHint}
+        showExplanation={showExplanation}
+        isStarred={starredCards.has(currentCardData.id)}
+        isShuffled={isShuffled}
+        onFlip={handleFlip}
+        onToggleHint={() => setShowHint(prev => !prev)}
+        onToggleExplanation={() => setShowExplanation(prev => !prev)}
+        onToggleStar={handleToggleStar}
+        onEdit={() => onEdit?.(currentCard, currentCardData)}
+      />
 
-          {/* Back of card */}
-          <div 
-            className={cn(
-              "absolute w-full h-full rounded-xl p-6",
-              "bg-card dark:bg-card",
-              "border border-border dark:border-border",
-              "shadow-lg"
-            )}
-            style={{
-              backfaceVisibility: 'hidden',
-              transform: 'rotateY(180deg)'
-            }}
-          >
-            <div className="flex flex-col h-full">
-              <div className="flex justify-end items-center mb-4">
-                <div className="flex gap-2">
-                  <button 
-                    className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setStarredCards(prev => {
-                        const newSet = new Set(prev);
-                        if (newSet.has(currentCardData.id)) {
-                          newSet.delete(currentCardData.id);
-                        } else {
-                          newSet.add(currentCardData.id);
-                        }
-                        onStar?.(currentCard);
-                        return newSet;
-                      });
-                    }}
-                  >
-                    <Star className={cn(
-                      "w-4 h-4",
-                      starredCards.has(currentCardData.id) 
-                        ? "fill-primary text-primary" 
-                        : "text-muted-foreground"
-                    )} />
-                  </button>
-                  <button 
-                    className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditCard();
-                    }}
-                  >
-                    <Pencil className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </div>
-              </div>
-              <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                <p className="text-[22px] text-center text-card-foreground dark:text-card-foreground">
-                  {currentCardData.answer}
-                </p>
-                {currentCardData.explanation && (
-                  <button 
-                    className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm hover:bg-secondary/80 transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowExplanation(prev => !prev);
-                    }}
-                  >
-                    {showExplanation ? 'Hide Explanation' : 'Show Explanation'}
-                  </button>
-                )}
-                {showExplanation && currentCardData.explanation && (
-                  <div className="mt-2 p-3 bg-muted rounded-lg max-w-md">
-                    <p className="text-sm text-muted-foreground text-center">
-                      {currentCardData.explanation}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+      <FlashcardNavigation
+        currentCard={currentCard}
+        totalCards={cards.length}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+      />
 
-        {/* Shuffle On Badge */}
-        {isShuffled && (
-          <div className="absolute bottom-4 right-4 px-2 py-1 bg-[#00A3FF]/10 border border-[#00A3FF]/20 rounded-md">
-            <span className="text-xs font-medium text-[#00A3FF]">Shuffle On</span>
-          </div>
-        )}
-      </div>
+      <FlashcardControls
+        isShuffled={isShuffled}
+        onManage={() => onManage?.()}
+        onFilter={() => setShowFilterModal(true)}
+        onShuffle={handleShuffle}
+      />
 
-      {/* Navigation */}
-      <div className="w-full max-w-2xl flex items-center justify-between">
-        <button 
-          className={cn(
-            "p-2 rounded-lg transition-colors",
-            "bg-card dark:bg-card border border-border dark:border-border",
-            "shadow-lg",
-            currentCard === 0 
-              ? "text-muted-foreground cursor-not-allowed opacity-50" 
-              : "text-card-foreground hover:bg-card-hover"
-          )}
-          onClick={handlePrevious}
-          disabled={currentCard === 0}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <span className="text-sm text-muted-foreground">
-          {currentCard + 1} / {cards.length}
-        </span>
-        <button 
-          className={cn(
-            "p-2 rounded-lg transition-colors",
-            "bg-card dark:bg-card border border-border dark:border-border",
-            "shadow-lg",
-            currentCard === cards.length - 1 
-              ? "text-muted-foreground cursor-not-allowed opacity-50" 
-              : "text-card-foreground hover:bg-card-hover"
-          )}
-          onClick={handleNext}
-          disabled={currentCard === cards.length - 1}
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Management Bar */}
-      <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-        <button 
-          className="flex items-center gap-2 hover:text-card-foreground transition-colors"
-          onClick={handleManageCards}
-        >
-          <WalletCards className="w-4 h-4" />
-          <span>Manage cards</span>
-        </button>
-        <div className="w-px h-4 bg-border" />
-        <button 
-          className="flex items-center gap-2 hover:text-card-foreground transition-colors"
-          onClick={() => setShowFilterModal(true)}
-        >
-          <SlidersHorizontal className="w-4 h-4" />
-          <span>Filters</span>
-        </button>
-        <div className="w-px h-4 bg-border" />
-        <button 
-          className={cn(
-            "flex items-center gap-2 transition-colors",
-            isShuffled ? "text-primary" : "hover:text-card-foreground"
-          )}
-          onClick={handleShuffle}
-        >
-          <Shuffle className="w-4 h-4" />
-          <span>Shuffle</span>
-        </button>
-      </div>
-
-      {/* Filter Modal */}
       <FilterModal 
         open={showFilterModal}
         onOpenChange={setShowFilterModal}
