@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Room, ContentItem, DeleteItem } from '@/lib/types';
+import { Room, ContentItem } from '@/lib/types';
 import { MyRoomsSection } from './MyRoomsSection';
 import { ContinueLearningSection } from './ContinueLearningSection';
 import { ExploreContentSection } from './ExploreContentSection';
@@ -15,6 +14,8 @@ interface DashboardSectionsProps {
   onCardShare: (item: ContentItem) => void;
   onExploreCardDelete: (item: ContentItem) => void;
   onExploreCardShare: (item: ContentItem) => void;
+  currentRoom?: { id: string; name: string };
+  onUpdateContent?: (content: ContentItem) => void;
 }
 
 export function DashboardSections({
@@ -25,12 +26,19 @@ export function DashboardSections({
   onCardDelete,
   onCardShare,
   onExploreCardDelete,
-  onExploreCardShare
+  onExploreCardShare,
+  currentRoom,
+  onUpdateContent
 }: DashboardSectionsProps) {
   const handleAddToRoom = (item: ContentItem, roomId: string) => {
     const room = rooms.find(r => r.id === roomId);
-    if (room) {
-      // In a real app, this would add the content to the room
+    if (room && onUpdateContent) {
+      // Update the content with the new roomId
+      const updatedContent = {
+        ...item,
+        roomId: roomId
+      };
+      onUpdateContent(updatedContent);
       toast.success(`"${item.title}" added to "${room.name}"`);
     }
   };
@@ -48,11 +56,16 @@ export function DashboardSections({
         onDeleteCard={onCardDelete} 
         onShareCard={onCardShare}
         onAddToRoom={handleAddToRoom}
+        availableRooms={rooms}
+        currentRoom={currentRoom}
       />
 
       <ExploreContentSection 
         onDeleteCard={onExploreCardDelete} 
-        onShareCard={onExploreCardShare} 
+        onShareCard={onExploreCardShare}
+        onAddToRoom={handleAddToRoom}
+        availableRooms={rooms}
+        currentRoom={currentRoom}
       />
     </div>
   );

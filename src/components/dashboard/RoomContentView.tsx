@@ -7,7 +7,8 @@ import {
   Pencil,
   Check,
   Share,
-  Trash2
+  Trash2,
+  Plus
 } from 'lucide-react';
 import {
   Popover,
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/popover';
 import { ContentItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
 interface RoomContentViewProps {
   items: ContentItem[];
@@ -28,6 +30,8 @@ export function RoomContentView({ items, onEdit, onDelete, onShare }: RoomConten
   const [sortBy, setSortBy] = useState('newest');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editedTitle, setEditedTitle] = useState('');
+  const [menuOpen, setMenuOpen] = useState<Set<string>>(new Set());
+  const [addToRoomOpen, setAddToRoomOpen] = useState<Set<string>>(new Set());
 
   const handleEditStart = (item: ContentItem) => {
     setEditingId(item.id);
@@ -74,40 +78,128 @@ export function RoomContentView({ items, onEdit, onDelete, onShare }: RoomConten
               "border border-border/10"
             )}>
               {/* Menu button */}
-              <Popover>
+              <Popover 
+                open={menuOpen.has(item.id)} 
+                onOpenChange={(open) => {
+                  if (!open) {
+                    setMenuOpen(new Set());
+                  }
+                }}
+              >
                 <PopoverTrigger asChild>
-                  <button className={cn(
-                    "absolute z-30 top-2.5 right-2.5",
-                    "p-1 rounded-full",
-                    "bg-transparent group-hover:bg-white/10",
-                    "transition-all duration-200",
-                    "hover:scale-110"
-                  )}>
+                  <button 
+                    className={cn(
+                      "absolute z-30 top-2.5 right-2.5",
+                      "p-1 rounded-full",
+                      "bg-transparent group-hover:bg-white/10",
+                      "transition-all duration-200",
+                      "hover:scale-110"
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setMenuOpen(new Set([item.id]));
+                    }}
+                  >
                     <MoreVertical className="w-3.5 h-3.5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[160px] bg-popover rounded-lg border-border p-1" side="left" align="start" sideOffset={8}>
+                <PopoverContent 
+                  className="w-[200px] p-1 z-[100]" 
+                  align="start"
+                  alignOffset={0}
+                  side="right"
+                  sideOffset={5}
+                  style={{ pointerEvents: 'auto' }}
+                >
                   <div className="flex flex-col">
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
-                      onClick={() => handleEditStart(item)}
+                    <Popover 
+                      open={addToRoomOpen.has(item.id)} 
+                      onOpenChange={(open) => {
+                        if (!open) {
+                          setAddToRoomOpen(new Set());
+                        }
+                      }}
                     >
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
+                      <PopoverTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const newState = new Set(addToRoomOpen);
+                            if (newState.has(item.id)) {
+                              newState.delete(item.id);
+                            } else {
+                              newState.add(item.id);
+                            }
+                            setAddToRoomOpen(newState);
+                          }}
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Add
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent 
+                        className="w-[200px] p-1 z-[101]" 
+                        side="right" 
+                        align="start" 
+                        alignOffset={0}
+                        sideOffset={8}
+                        style={{ pointerEvents: 'auto' }}
+                        onInteractOutside={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                        onPointerDownOutside={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                        onEscapeKeyDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                      >
+                        <div 
+                          className="flex flex-col"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
+                          <div className="px-3 py-2 text-sm text-muted-foreground">
+                            No rooms available
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+
                     <Button 
                       variant="ghost" 
                       className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
-                      onClick={() => onShare(item.id)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setMenuOpen(new Set());
+                        onShare(item.id);
+                      }}
                     >
                       <Share className="mr-2 h-4 w-4" />
                       Share
                     </Button>
+
+                    <Separator className="my-1" />
+
                     <Button 
                       variant="ghost" 
-                      className="w-full justify-start text-red-600 hover:bg-red-100 hover:text-red-600 rounded-md px-3 py-2 text-sm font-normal"
-                      onClick={() => onDelete(item.id)}
+                      className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setMenuOpen(new Set());
+                        onDelete(item.id);
+                      }}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
@@ -120,6 +212,7 @@ export function RoomContentView({ items, onEdit, onDelete, onShare }: RoomConten
               <div className={cn(
                 "w-full h-full",
                 "relative",
+                "flex items-center justify-center",
                 "bg-gradient-to-b from-transparent to-black/5 dark:to-black/20"
               )}>
                 {item.metadata?.thumbnailUrl ? (

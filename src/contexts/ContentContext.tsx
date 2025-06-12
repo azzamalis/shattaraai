@@ -4,6 +4,7 @@ import { ContentItem, ContentHandlers } from '@/lib/types';
 interface ContentContextType extends ContentHandlers {
   content: ContentItem[];
   recentContent: ContentItem[];
+  onUpdateContent: (content: ContentItem) => void;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -108,6 +109,12 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     setContent(prev => prev.filter(item => item.id !== id));
   };
 
+  const onUpdateContent = (updatedContent: ContentItem) => {
+    setContent(prev => prev.map(item => 
+      item.id === updatedContent.id ? updatedContent : item
+    ));
+  };
+
   // Get recent content (last 10 items)
   const recentContent = content.slice(0, 10);
 
@@ -116,7 +123,8 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       content,
       recentContent,
       onAddContent,
-      onDeleteContent
+      onDeleteContent,
+      onUpdateContent
     }}>
       {children}
     </ContentContext.Provider>

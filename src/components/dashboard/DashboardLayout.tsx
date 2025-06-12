@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardDrawer } from './DashboardDrawer';
-import { Room, RoomHandlers } from '@/lib/types';
+import { Room } from '@/lib/types';
 import { toast } from 'sonner';
 import { ContentProvider } from '@/contexts/ContentContext';
 import { useLocation } from 'react-router-dom';
@@ -56,12 +56,6 @@ export function DashboardLayout({
     toast.success("Room deleted successfully");
   };
 
-  const roomHandlers: RoomHandlers = {
-    onAddRoom: handleAddRoom,
-    onEditRoom: handleEditRoom,
-    onDeleteRoom: handleDeleteRoom
-  };
-  
   // Handle screen resize
   useEffect(() => {
     const handleResize = () => {
@@ -109,7 +103,9 @@ export function DashboardLayout({
           open={isDrawerOpen} 
           onOpenChange={setIsDrawerOpen}
           rooms={rooms}
-          {...roomHandlers}
+          onAddRoom={handleAddRoom}
+          onEditRoom={handleEditRoom}
+          onDeleteRoom={handleDeleteRoom}
         />
         <main 
           className={cn(
@@ -120,7 +116,12 @@ export function DashboardLayout({
         >
           {/* Directly pass rooms and roomHandlers to children */}
           {React.isValidElement(children) 
-            ? React.cloneElement(children as React.ReactElement, { rooms, ...roomHandlers }) 
+            ? React.cloneElement(children as React.ReactElement, {
+              rooms,
+              onAddRoom: handleAddRoom,
+              onEditRoom: handleEditRoom,
+              onDeleteRoom: handleDeleteRoom
+            }) 
             : children}
         </main>
       </div>

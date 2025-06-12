@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Globe, MoreVertical, Pencil, Check, Share, Trash2, Plus } from 'lucide-react';
+import { MoreVertical, Pencil, Check, Share, Trash2, Plus, Box } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { ContentItem } from '@/lib/types';
 import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
 interface LearningCardProps {
   content: ContentItem;
   onDelete: () => void;
   onShare: () => void;
   onAddToRoom?: (roomId: string) => void;
+  availableRooms?: Array<{ id: string; name: string }>;
+  currentRoom?: { id: string; name: string };
 }
 
 // Mock rooms data - in a real app, this would come from context or props
@@ -33,7 +36,9 @@ export function LearningCard({
   content,
   onDelete,
   onShare,
-  onAddToRoom
+  onAddToRoom,
+  availableRooms = [],
+  currentRoom
 }: LearningCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(content.title);
@@ -64,6 +69,9 @@ export function LearningCard({
     setAddToRoomOpen(false);
     setMenuOpen(false);
   };
+
+  // Get the room name from availableRooms if content has a roomId
+  const contentRoom = content.roomId ? availableRooms.find(r => r.id === content.roomId) : undefined;
 
   return (
     <div onClick={handleCardClick} className="block w-full cursor-pointer">
@@ -96,7 +104,7 @@ export function LearningCard({
                 <MoreVertical className="w-3.5 h-3.5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
             </PopoverTrigger>
-            <PopoverContent align="end" sideOffset={5} className="w-[140px] bg-popover rounded-lg border-border p-1 px-[2px] py-[2px]">
+            <PopoverContent className="w-[200px] p-1" side="right" align="start" sideOffset={8}>
               <div className="flex flex-col">
                 <Popover open={addToRoomOpen} onOpenChange={setAddToRoomOpen}>
                   <PopoverTrigger asChild>
@@ -108,20 +116,26 @@ export function LearningCard({
                       Add
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[160px] bg-popover rounded-lg border-border p-1" side="left" align="start" sideOffset={8}>
+                  <PopoverContent className="w-[200px] p-1" side="right" align="start" sideOffset={8}>
                     <div className="flex flex-col">
-                      {availableRooms.map(room => (
-                        <Button key={room.id} variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={e => {
-                          e.stopPropagation();
-                          handleAddToRoom(room.id, room.name);
-                        }}>
-                          {room.name}
-                        </Button>
-                      ))}
+                      {availableRooms.length > 0 ? (
+                        availableRooms.map(room => (
+                          <Button key={room.id} variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={e => {
+                            e.stopPropagation();
+                            handleAddToRoom(room.id, room.name);
+                          }}>
+                            {room.name}
+                          </Button>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-muted-foreground">
+                          No rooms available
+                        </div>
+                      )}
                     </div>
                   </PopoverContent>
                 </Popover>
-                
+
                 <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={e => {
                   e.stopPropagation();
                   setMenuOpen(false);
@@ -130,6 +144,9 @@ export function LearningCard({
                   <Share className="mr-2 h-4 w-4" />
                   Share
                 </Button>
+
+                <Separator className="my-1" />
+                
                 <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={e => {
                   e.stopPropagation();
                   setMenuOpen(false);
@@ -146,7 +163,7 @@ export function LearningCard({
           <div className={cn(
             "w-full h-full",
             "relative",
-            "flex items-center justify-center", // Added for placeholder alignment
+            "flex items-center justify-center",
             "bg-gradient-to-b from-transparent to-black/5 dark:to-black/20"
           )}>
             {content.metadata?.thumbnailUrl ? (
@@ -161,12 +178,10 @@ export function LearningCard({
               </div>
             )}
           </div>
-
-          {/* Removed: Progress Overlay */}
         </div>
 
         {/* Content Info Section */}
-        <div className="p-3 flex flex-col justify-between flex-grow">
+        <div className="flex flex-col gap-2 p-2">
           {/* Title */}
           <div className="relative group/title">
             {isEditing ? (
@@ -204,13 +219,13 @@ export function LearningCard({
             )}
           </div>
 
-          {/* Footer Info (Room Name Only) */}
-          <div className="flex items-center mt-2 text-xs text-muted-foreground">
+          {/* Footer Info (Room Name) - Only show if content is in a room */}
+          {contentRoom && (
             <div className="flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5" />
-              <span>Azzam's Room</span> {/* Assuming "Azzam's Room" is a placeholder or always fixed */}
+              <Box className="w-3.5 h-3.5" />
+              <span className="text-sm text-muted-foreground">{contentRoom.name}</span>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
