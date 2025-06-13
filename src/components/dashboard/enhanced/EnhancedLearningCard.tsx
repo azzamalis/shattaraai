@@ -81,7 +81,6 @@ export function EnhancedLearningCard({
   currentRoom
 }: EnhancedLearningCardProps) {
   const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState(false);
   
   const progress = content.metadata?.progress || 0;
   const progressPercentage = Math.round(progress * 100);
@@ -100,8 +99,6 @@ export function EnhancedLearningCard({
     <EnhancedCard
       hover
       className="group relative overflow-hidden border-border/50 hover:border-primary/20"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Content Header */}
       <div className="flex items-start justify-between mb-4">
@@ -126,11 +123,7 @@ export function EnhancedLearningCard({
             <Button
               variant="ghost"
               size="icon"
-              className={cn(
-                "h-8 w-8 rounded-full transition-opacity",
-                "opacity-0 group-hover:opacity-100",
-                isHovered && "opacity-100"
-              )}
+              className="h-8 w-8 rounded-full transition-opacity opacity-0 group-hover:opacity-100"
             >
               <MoreVertical className="h-4 w-4" />
             </Button>
