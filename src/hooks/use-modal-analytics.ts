@@ -1,4 +1,5 @@
 
+
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -15,19 +16,31 @@ export const useModalAnalytics = () => {
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
       
-      // Track the event in the usage_events table
-      // Use type assertion to bypass TypeScript errors until types are regenerated
-      await (supabase
-        .from('usage_events') as any)
+      // Note: usage_events table doesn't exist in the new Supabase project
+      // Commenting out the database insert until the table is created
+      console.log('Analytics event tracked locally:', {
+        user_id: userId || null,
+        type: eventData.event_type,
+        session_id: eventData.event_data?.session_id || null,
+        input_tokens: eventData.event_data?.input_tokens || null,
+        output_tokens: eventData.event_data?.output_tokens || null,
+        total_tokens: eventData.event_data?.total_tokens || null,
+        timestamp: new Date().toISOString()
+      });
+      
+      // TODO: Uncomment when usage_events table is created in Supabase
+      /*
+      await supabase
+        .from('usage_events')
         .insert({
           user_id: userId || null,
           type: eventData.event_type,
-          // Store additional data as metadata if needed
           session_id: eventData.event_data?.session_id || null,
           input_tokens: eventData.event_data?.input_tokens || null,
           output_tokens: eventData.event_data?.output_tokens || null,
           total_tokens: eventData.event_data?.total_tokens || null
         });
+      */
       
       console.log('Event tracked:', eventData.event_type);
     } catch (error) {
@@ -63,3 +76,4 @@ export const useModalAnalytics = () => {
     trackEvent
   };
 };
+
