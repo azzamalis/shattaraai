@@ -1,11 +1,13 @@
+
 import React, { useState } from 'react';
 import { Room, RoomHandlers, DeleteItem, ContentItem } from '@/lib/types';
 import { toast } from "sonner";
-import { DashboardHero } from './DashboardHero';
+import { EnhancedDashboardHero } from './enhanced/EnhancedDashboardHero';
 import { DashboardSections } from './DashboardSections';
 import { DashboardModals } from './DashboardModals';
 import { useContent } from '@/contexts/ContentContext';
 import { useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 interface DashboardProps extends RoomHandlers {
   rooms: Room[];
@@ -76,9 +78,14 @@ export function Dashboard({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <motion.div 
+      className="flex flex-col h-full"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-background transition-colors duration-300">
-        <DashboardHero onPasteClick={() => setIsPasteModalOpen(true)} />
+        <EnhancedDashboardHero onPasteClick={() => setIsPasteModalOpen(true)} />
 
         <DashboardSections
           rooms={rooms}
@@ -106,6 +113,6 @@ export function Dashboard({
           onDeleteRoom={handleDeleteClick}
         />
       </main>
-    </div>
+    </motion.div>
   );
 }
