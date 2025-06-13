@@ -1,13 +1,9 @@
-
 import React from 'react';
-import { EnhancedLearningCard } from './enhanced/EnhancedLearningCard';
+import { LearningCard } from './LearningCard';
 import { useContent } from '@/contexts/ContentContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 import { ContentItem } from '@/lib/types';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, BookOpen } from 'lucide-react';
 
 interface ContinueLearningProps {
   onDeleteCard: (item: ContentItem) => void;
@@ -34,49 +30,29 @@ export function ContinueLearningSection({
 
   if (content.length === 0) {
     return (
-      <motion.section 
-        className="w-full py-12"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Continue Learning</h2>
-            <p className="text-muted-foreground">Pick up where you left off</p>
-          </div>
+      <section className="w-full py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="font-semibold text-foreground text-lg">Continue Learning</h2>
         </div>
-        <div className="text-center py-16 bg-gradient-to-br from-muted/30 to-muted/10 rounded-2xl border border-border/50">
-          <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No content yet</h3>
-          <p className="text-muted-foreground mb-6">Upload, paste, or record something to get started!</p>
-          <Button className="bg-primary hover:bg-primary/90">
-            Add Your First Content
-          </Button>
+        <div className="text-muted-foreground text-center py-12 bg-card/20 rounded-xl border border-border/5">
+          No content yet. Upload, paste, or record something to get started!
         </div>
-      </motion.section>
+      </section>
     );
   }
 
   return (
-    <motion.section 
-      className="w-full py-12"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
-    >
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Continue Learning</h2>
-          <p className="text-muted-foreground">Pick up where you left off</p>
-        </div>
-        <Button 
-          variant="ghost" 
-          className="text-muted-foreground hover:text-foreground group"
-        >
+    <section className="w-full py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold text-foreground">Continue learning</h2>
+        <button className={cn(
+          "text-sm text-muted-foreground",
+          "hover:text-foreground transition-colors",
+          "px-4 py-2 rounded-lg",
+          "hover:bg-accent/50"
+        )}>
           View all
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </Button>
+        </button>
       </div>
       
       <div className="relative -mx-4 px-4">
@@ -87,26 +63,20 @@ export function ContinueLearningSection({
           dragFree: true
         }}>
           <CarouselContent className="-ml-4">
-            {content.map((item, index) => (
+            {content.map(item => (
               <CarouselItem key={item.id} className={cn(
                 "pl-4",
-                "basis-[300px] sm:basis-[340px] md:basis-[380px]",
+                "basis-[280px] sm:basis-[320px] md:basis-[360px]",
                 "first:pl-4"
               )}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <EnhancedLearningCard 
-                    content={item} 
-                    onDelete={() => onDeleteCard(item)} 
-                    onShare={() => onShareCard(item)} 
-                    onAddToRoom={roomId => handleAddToRoom(roomId, item)}
-                    availableRooms={availableRooms}
-                    currentRoom={currentRoom}
-                  />
-                </motion.div>
+                <LearningCard 
+                  content={item} 
+                  onDelete={() => onDeleteCard(item)} 
+                  onShare={() => onShareCard(item)} 
+                  onAddToRoom={roomId => handleAddToRoom(roomId, item)}
+                  availableRooms={availableRooms}
+                  currentRoom={currentRoom}
+                />
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -114,22 +84,22 @@ export function ContinueLearningSection({
             <>
               <CarouselPrevious className={cn(
                 "hidden md:flex -left-12",
-                "bg-background/80 backdrop-blur-sm",
+                "bg-background/80 backdrop-blur",
                 "border-border hover:bg-accent",
-                "text-foreground shadow-lg",
-                "transition-all duration-200"
+                "text-foreground",
+                "transition-colors duration-200"
               )} />
               <CarouselNext className={cn(
                 "hidden md:flex -right-12",
-                "bg-background/80 backdrop-blur-sm",
+                "bg-background/80 backdrop-blur",
                 "border-border hover:bg-accent",
-                "text-foreground shadow-lg",
-                "transition-all duration-200"
+                "text-foreground",
+                "transition-colors duration-200"
               )} />
             </>
           )}
         </Carousel>
       </div>
-    </motion.section>
+    </section>
   );
 }
