@@ -9,39 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      usage_events: {
-        Row: {
-          created_at: string
-          id: string
-          input_tokens: number | null
-          output_tokens: number | null
-          session_id: string | null
-          total_tokens: number | null
-          type: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          input_tokens?: number | null
-          output_tokens?: number | null
-          session_id?: string | null
-          total_tokens?: number | null
-          type: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          input_tokens?: number | null
-          output_tokens?: number | null
-          session_id?: string | null
-          total_tokens?: number | null
-          type?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
