@@ -163,7 +163,7 @@ const UseCases = () => {
                   </div>
                   
                   {/* Testimonial */}
-                  <div className="text-sm text-white/50 italic">
+                  <div className="text-sm text-muted-foreground italic">
                     "{useCase.testimonial.quote}"
                     <div className="text-white/70 mt-1">
                       - {useCase.testimonial.author}
