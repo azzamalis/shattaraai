@@ -26,10 +26,9 @@ interface CommandModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   rooms: Room[];
-  onAddRoom?: () => Promise<string | null>;
 }
 
-export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandModalProps) {
+export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
   const navigate = useNavigate();
   const { recentContent } = useContent();
 
@@ -40,13 +39,6 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
 
   const handleContentClick = (contentId: string, type: string) => {
     navigate(`/content/${contentId}?type=${type}`);
-    onOpenChange(false);
-  };
-
-  const handleAddRoom = async () => {
-    if (onAddRoom) {
-      await onAddRoom();
-    }
     onOpenChange(false);
   };
 
@@ -64,7 +56,7 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
             <Upload size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
             <span>Upload Content</span>
           </CommandItem>
-          <CommandItem onSelect={handleAddRoom}>
+          <CommandItem>
             <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
             <span>Add a Room</span>
           </CommandItem>
