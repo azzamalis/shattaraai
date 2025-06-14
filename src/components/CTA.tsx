@@ -5,7 +5,7 @@ import AnimatedTextCycle from './ui/animated-text-cycle';
 
 const CTA = () => {
   return (
-    <section className="py-24 bg-dark-deeper text-white">
+    <section className="py-24 bg-background text-foreground">
       <div className="container mx-auto px-4 md:px-6 text-center">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -28,7 +28,7 @@ const CTA = () => {
           </h2>
           <SmartCTA 
             type="get-started"
-            className="text-lg px-8 py-4 bg-primary hover:bg-primary-light"
+            className="text-lg px-8 py-4 bg-primary hover:bg-primary/90"
             size="lg"
           >
             Try It Now

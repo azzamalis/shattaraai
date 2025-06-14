@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TestimonialsSection } from '@/components/ui/testimonials-with-marquee';
 import GradientBackground from '@/components/ui/gradient-background';
@@ -52,7 +53,7 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="py-24 bg-dark-deeper relative">
+    <section className="py-24 bg-background relative">
       <GradientBackground />
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <TestimonialsSection

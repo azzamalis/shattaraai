@@ -1,3 +1,4 @@
+
 import React from 'react';
 import SmartCTA from '@/components/SmartCTA';
 import { AnimatedGroup } from '@/components/ui/animated-group';
@@ -61,11 +62,11 @@ const HeroContent = () => {
             },
           }}
           className="absolute inset-0 -z-20">
-          <div className="absolute inset-x-0 top-56 -z-20 hidden lg:top-32 dark:block bg-dark-deeper h-full"></div>
+          <div className="absolute inset-x-0 top-56 -z-20 hidden lg:top-32 dark:block bg-background h-full"></div>
         </AnimatedGroup>
         
         {/* Futuristic gradient background */}
-        <div aria-hidden className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_10%,#000 30%,#2323FF_100%)]" />
+        <div aria-hidden className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_10%,hsl(var(--background))_30%,hsl(var(--primary))_100%)]" />
         
         {/* Animated floating elements */}
         <div className="absolute inset-0 -z-5 overflow-hidden">
@@ -80,11 +81,11 @@ const HeroContent = () => {
               <HeroActionLink to="/signup" text="AI-Powered Learning Platform" />
   
               <h1
-                className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] bg-gradient-to-br from-white to-white/50 bg-clip-text text-transparent">
+                className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] bg-gradient-to-br from-foreground to-foreground/50 bg-clip-text text-transparent">
                 Smarter Learning Powered by AI
               </h1>
               <p
-                className="mx-auto mt-8 max-w-2xl text-balance text-lg text-gray-400">
+                className="mx-auto mt-8 max-w-2xl text-balance text-lg text-muted-foreground">
                 Transform your learning experience with AI-generated study materials, personalized flashcards, and realistic exam simulators.
               </p>
             </AnimatedGroup>
@@ -117,7 +118,7 @@ const HeroContent = () => {
                 key={2}
                 variant="outline"
                 size="lg"
-                className="h-11 rounded-xl px-5 border-white/20 text-white hover:border-primary hover:bg-primary/20"
+                className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/20"
                 onClick={handleFeatureClick}>
                 <Atom className="size-4 mr-1" />
                 <span className="text-nowrap">See features</span>
@@ -141,9 +142,9 @@ const HeroContent = () => {
           <div className="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
             <div
               aria-hidden
-              className="bg-gradient-to-b to-dark-deeper absolute inset-0 z-10 from-transparent from-35%"
+              className="bg-gradient-to-b to-background absolute inset-0 z-10 from-transparent from-35%"
             />
-            <div className="bg-dark/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/10 p-4 shadow-lg shadow-black/15">
+            <div className="bg-background/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/10 p-4 shadow-lg shadow-black/15">
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
               
               {/* Replace static image with the p5.js animation */}

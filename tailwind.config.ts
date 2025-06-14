@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -84,11 +85,6 @@ export default {
 					'button-border': 'hsl(var(--dashboard-button-border))',
 					icons: 'hsl(var(--dashboard-icons))',
 					separator: 'hsl(var(--dashboard-separator))',
-				},
-				// Legacy colors for compatibility
-				dark: {
-					DEFAULT: '#111111',
-					deeper: '#000000',
 				},
 			},
 			maxWidth: {

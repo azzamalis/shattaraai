@@ -4,38 +4,38 @@
 
 @layer base {
   :root {
-    /* Light Mode Colors */
-    --background: 0 0% 100%; /* #FFFFFF */
-    --foreground: 0 0% 4%; /* #0A0A0A */
+    /* Light Mode Colors - Unified System */
+    --background: 0 0% 100%; /* Pure White #FFFFFF */
+    --foreground: 0 0% 0%; /* Pure Black #000000 */
 
-    --card: 0 0% 99%; /* #FDFDFD */
-    --card-foreground: 0 0% 4%; /* #0A0A0A */
-    --card-hover: 0 0% 96%; /* #F5F5F5 */
+    --card: 0 0% 99%; /* Unified component background #FDFDFD */
+    --card-foreground: 0 0% 0%; /* Pure Black text */
+    --card-hover: 0 0% 96%; /* Light Gray #F5F5F5 */
 
     --secondary-card: 0 0% 98%; /* #FBFBFB */
     --secondary-card-hover: 0 0% 96%; /* #F5F5F5 */
 
-    --popover: 0 0% 99%; /* #FDFDFD */
-    --popover-foreground: 0 0% 4%; /* #0A0A0A */
+    --popover: 0 0% 100%; /* Light mode popover background #FFFFFF */
+    --popover-foreground: 0 0% 9%; /* Light mode popover text #171717 */
 
-    --primary: 210 100% 50%; /* #00A3FF */
-    --primary-foreground: 0 0% 100%;
+    --primary: 210 100% 50%; /* Primary Blue #00A3FF */
+    --primary-foreground: 0 0% 98%; /* Light text on blue #FAFAFA */
 
-    --secondary: 0 0% 93%; /* #EEEEEE */
+    --secondary: 0 0% 95%; /* Light mode unfilled #F3F3F3 */
     --secondary-foreground: 0 0% 9%; /* #171717 */
 
-    --muted: 0 0% 98%; /* #FAFAFA */
-    --muted-foreground: 221 14% 53%; /* #737385 */
+    --muted: 0 0% 96%; /* Light Gray #F5F5F5 */
+    --muted-foreground: 0 0% 45%; /* Medium Gray for secondary text */
 
-    --accent: 0 0% 96%; /* #F5F5F5 */
-    --accent-foreground: 0 0% 4%; /* #0A0A0A */
+    --accent: 0 0% 96%; /* Light mode hover background #F5F5F5 */
+    --accent-foreground: 0 0% 9%; /* Light mode hover text #171717 */
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%; /* #E5E5E5 */
-    --input: 0 0% 89%; /* #E3E3E3 */
-    --ring: 210 100% 50%; /* #00A3FF */
+    --border: 221 14% 89%; /* Light borders #E3E3E3 */
+    --input: 221 14% 89%; /* Subtle gray input borders #E3E3E3 */
+    --ring: 210 100% 50%; /* Blue focus ring #00A3FF */
 
     --sidebar-background: 0 0% 98%; /* #FAFAFA */
     --sidebar-foreground: 0 0% 4%; /* #0A0A0A */
@@ -50,47 +50,47 @@
   }
 
   .dark {
-    /* Dark Mode Colors */
-    --background: 0 0% 7%; /* #121212 */
-    --foreground: 0 0% 98%; /* #FAFAFA */
+    /* Dark Mode Colors - Unified System */
+    --background: 0 0% 7%; /* Dark background #121212 */
+    --foreground: 0 0% 98%; /* Light text #FAFAFA */
 
-    --card: 0 0% 8%; /* #141414 */
-    --card-foreground: 0 0% 98%; /* #FAFAFA */
+    --card: 0 0% 8%; /* Dark component background #141414 */
+    --card-foreground: 0 0% 98%; /* Light text */
     --card-hover: 0 0% 15%; /* #262626 */
 
     --secondary-card: 0 0% 9%; /* #161616 */
     --secondary-card-hover: 0 0% 15%; /* #262626 */
 
-    --popover: 0 0% 8%; /* #141414 */
-    --popover-foreground: 0 0% 98%; /* #FAFAFA */
+    --popover: 0 0% 7%; /* Dark mode popover background #121212 */
+    --popover-foreground: 0 0% 98%; /* Dark mode popover text #FAFAFA */
 
-    --primary: 0 0% 80%; /* #CCCCCC */
-    --primary-foreground: 0 0% 0%;
+    --primary: 0 0% 89%; /* Light gray primary #E3E3E3 */
+    --primary-foreground: 0 0% 9%; /* Dark text on light #171717 */
 
-    --secondary: 0 0% 13%; /* #222222 */
-    --secondary-foreground: 0 0% 98%; /* #FAF7F3 */
+    --secondary: 0 0% 16%; /* Dark mode unfilled #292929 */
+    --secondary-foreground: 0 0% 98%; /* #FAFAFA */
 
-    --muted: 0 0% 9%; /* #171717 */
-    --muted-foreground: 0 0% 60%; /* #9A9A9A */
+    --muted: 0 0% 15%; /* Dark muted #262626 */
+    --muted-foreground: 0 0% 60%; /* Medium gray text */
 
-    --accent: 0 0% 15%; /* #262626 */
-    --accent-foreground: 0 0% 98%; /* #FAFAFA */
+    --accent: 0 0% 15%; /* Dark mode hover background #262626 */
+    --accent-foreground: 0 0% 98%; /* Dark mode hover text #FAFAFA */
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 15%; /* #262626 */
-    --input: 0 0% 18%; /* #2E2E2E */
-    --ring: 0 0% 80%; /* #CCCCCC */
+    --border: 0 0% 18%; /* Dark borders #2E2E2E */
+    --input: 0 0% 18%; /* Subtle gray input borders #2E2E2E */
+    --ring: 0 0% 89%; /* Light focus ring #E3E3E3 */
 
     --sidebar-background: 0 0% 9%; /* #171717 */
     --sidebar-foreground: 0 0% 98%; /* #FAFAFA */
-    --sidebar-primary: 0 0% 80%; /* #CCCCCC */
-    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-primary: 0 0% 89%; /* #E3E3E3 */
+    --sidebar-primary-foreground: 0 0% 9%;
     --sidebar-accent: 0 0% 15%; /* #262626 */
     --sidebar-accent-foreground: 0 0% 98%; /* #FAFAFA */
     --sidebar-border: 0 0% 15%; /* #262626 */
-    --sidebar-ring: 0 0% 80%; /* #CCCCCC */
+    --sidebar-ring: 0 0% 89%; /* #E3E3E3 */
   }
 
   * {
