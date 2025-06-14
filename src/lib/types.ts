@@ -44,22 +44,29 @@ export interface CommandOption {
   category: string;
 }
 
-// Content types
-export type ContentType = 'file' | 'video' | 'pdf' | 'recording' | 'youtube' | 'website' | 'text' | 'chat';
+// Content types - expanded to include all used types
+export type ContentType = 'file' | 'video' | 'pdf' | 'recording' | 'youtube' | 'website' | 'text' | 'chat' | 'upload' | 'audio';
 
-// Notes types
+// Notes types - updated to match actual usage
 export interface NotesBlock {
   id: string;
-  type: 'text' | 'heading' | 'bullet' | 'number' | 'quote' | 'code';
+  type: 'paragraph' | 'h1' | 'h2' | 'h3' | 'ul' | 'ol' | 'todo' | 'code' | 'quote' | 'divider';
   content: string;
   level?: number;
 }
 
-// Recording types
+// Recording types - expanded to include missing properties
 export interface RecordingMetadata {
   duration?: number;
   size?: number;
   transcript?: string;
+  audioUrl?: string;
+  chaptersData?: Array<{
+    id: string;
+    title: string;
+    summary: string;
+    startTime: number;
+  }>;
 }
 
 export interface RecordingStateInfo {
@@ -67,6 +74,8 @@ export interface RecordingStateInfo {
   isPaused: boolean;
   duration: number;
   transcript: string;
+  isNewRecording?: boolean;
+  isExistingRecording?: boolean;
 }
 
 // Database types for direct use

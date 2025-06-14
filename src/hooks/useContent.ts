@@ -9,7 +9,7 @@ export interface ContentItem {
   user_id: string;
   room_id: string | null;
   title: string;
-  type: 'file' | 'video' | 'pdf' | 'recording' | 'youtube' | 'website' | 'text';
+  type: 'file' | 'video' | 'pdf' | 'recording' | 'youtube' | 'website' | 'text' | 'chat' | 'upload' | 'audio';
   url?: string;
   text_content?: string;
   filename?: string;
@@ -147,12 +147,12 @@ export const useContent = () => {
     fetchContent();
   }, [user]);
 
-  // Set up real-time subscription for content
+  // Set up real-time subscription for content - fix the multiple subscription issue
   useEffect(() => {
     if (!user) return;
 
     const channel = supabase
-      .channel('content-changes')
+      .channel(`content-changes-${user.id}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',

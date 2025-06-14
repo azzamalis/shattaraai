@@ -35,8 +35,11 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         const contentId = onAddContent({
           title: file.name,
           type: contentType as any,
+          room_id: null,
+          metadata: {
+            fileSize: file.size
+          },
           filename: file.name,
-          fileSize: file.size,
           url: fileUrl  // Add the file URL to the content data
         });
 
@@ -54,7 +57,9 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
     // Add recording to tracking system
     const contentId = onAddContent({
       title: `Recording at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-      type: 'recording'
+      type: 'recording',
+      room_id: null,
+      metadata: {}
     });
     navigate(`/content/${contentId}?type=recording`);
   };

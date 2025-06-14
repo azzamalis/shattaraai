@@ -82,6 +82,11 @@ export function Dashboard({
     setShareModalOpen(true);
   };
 
+  const handleUpdateContent = (content: ContentItem) => {
+    // Adapt the single parameter call to the two-parameter function
+    onUpdateContent(content.id, content);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-background transition-colors duration-300">
@@ -97,7 +102,7 @@ export function Dashboard({
           onExploreCardDelete={handleExploreCardDelete}
           onExploreCardShare={handleExploreCardShare}
           currentRoom={currentRoom}
-          onUpdateContent={onUpdateContent}
+          onUpdateContent={handleUpdateContent}
         />
 
         <DashboardModals

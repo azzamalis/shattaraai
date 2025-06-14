@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
@@ -21,7 +20,9 @@ export function DashboardHero({ onPasteClick }: DashboardHeroProps) {
     const contentId = onAddContent({
       title: 'Chat with Shattara AI',
       type: 'chat',
-      text: value
+      room_id: null,
+      metadata: {},
+      text_content: value
     });
 
     // Navigate to chat page with the query
