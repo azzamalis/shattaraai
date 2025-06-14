@@ -124,15 +124,15 @@ export const useRooms = () => {
     fetchRooms();
   }, [user]);
 
-  // Set up real-time subscription for rooms - fix multiple subscription issue
+  // Set up real-time subscription for rooms - ensure unique channel and proper cleanup
   useEffect(() => {
     if (!user) return;
 
-    // Create a unique channel name with timestamp to avoid conflicts
-    const channelName = `rooms-changes-${user.id}-${Date.now()}`;
+    // Create a completely unique channel name to avoid conflicts
+    const channelId = `rooms-${user.id}-${Math.random().toString(36).substr(2, 9)}`;
     
     const channel = supabase
-      .channel(channelName)
+      .channel(channelId)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -145,6 +145,7 @@ export const useRooms = () => {
       .subscribe();
 
     return () => {
+      // Properly cleanup the channel
       supabase.removeChannel(channel);
     };
   }, [user]);

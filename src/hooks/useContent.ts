@@ -147,15 +147,15 @@ export const useContent = () => {
     fetchContent();
   }, [user]);
 
-  // Set up real-time subscription for content - fix multiple subscription issue
+  // Set up real-time subscription for content - ensure unique channel and proper cleanup
   useEffect(() => {
     if (!user) return;
 
-    // Create a unique channel name with timestamp to avoid conflicts
-    const channelName = `content-changes-${user.id}-${Date.now()}`;
+    // Create a completely unique channel name to avoid conflicts
+    const channelId = `content-${user.id}-${Math.random().toString(36).substr(2, 9)}`;
     
     const channel = supabase
-      .channel(channelName)
+      .channel(channelId)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -168,6 +168,7 @@ export const useContent = () => {
       .subscribe();
 
     return () => {
+      // Properly cleanup the channel
       supabase.removeChannel(channel);
     };
   }, [user]);
