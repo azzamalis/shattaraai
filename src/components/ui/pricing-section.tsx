@@ -40,7 +40,7 @@ function PricingSection({
   return <section className={cn("relative bg-dark-deeper text-white", "py-20 px-4 md:py-28", "overflow-hidden", className)}>
       <div className="w-full max-w-5xl mx-auto">
         <div className="flex flex-col items-center gap-4 mb-12">
-          <h2 className="text-3xl font-bold">
+          <h2 className="text-foreground 3xl font-bold">
             Simple, transparent pricing
           </h2>
           <div className="inline-flex items-center p-1.5 bg-dark-deeper rounded-full border border-zinc-700 shadow-sm">
