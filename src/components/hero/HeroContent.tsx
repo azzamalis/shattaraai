@@ -1,11 +1,10 @@
-
 import React from 'react';
 import SmartCTA from '@/components/SmartCTA';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import HeroActionLink from './HeroActionLink';
 import { Code, Atom, Zap } from 'lucide-react';
+import EducationAnimation from './EducationAnimation';
 import { scrollToElement } from '@/lib/scrollUtils';
-
 const transitionVariants = {
   item: {
     hidden: {
@@ -25,40 +24,37 @@ const transitionVariants = {
     }
   }
 };
-
 const HeroContent = () => {
   const handleFeatureClick = (e: React.MouseEvent) => {
     e.preventDefault();
     scrollToElement('features');
   };
-
-  return (
-    <section>
+  return <section>
       <div className="relative pt-24 md:pt-36">
         <AnimatedGroup variants={{
-          container: {
-            visible: {
-              transition: {
-                delayChildren: 1
-              }
-            }
-          },
-          item: {
-            hidden: {
-              opacity: 0,
-              y: 20
-            },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: {
-                type: "spring" as const,
-                bounce: 0.3,
-                duration: 2
-              }
+        container: {
+          visible: {
+            transition: {
+              delayChildren: 1
             }
           }
-        }} className="absolute inset-0 -z-20">
+        },
+        item: {
+          hidden: {
+            opacity: 0,
+            y: 20
+          },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+              type: "spring" as const,
+              bounce: 0.3,
+              duration: 2
+            }
+          }
+        }
+      }} className="absolute inset-0 -z-20">
           <div className="absolute inset-x-0 top-56 -z-20 hidden lg:top-32 dark:block bg-background h-full"></div>
         </AnimatedGroup>
         
@@ -86,32 +82,32 @@ const HeroContent = () => {
             </AnimatedGroup>
 
             <AnimatedGroup variants={{
-              container: {
-                visible: {
-                  transition: {
-                    staggerChildren: 0.05,
-                    delayChildren: 0.75
-                  }
-                }
-              },
-              item: {
-                hidden: {
-                  opacity: 0,
-                  filter: 'blur(12px)',
-                  y: 12
-                },
-                visible: {
-                  opacity: 1,
-                  filter: 'blur(0px)',
-                  y: 0,
-                  transition: {
-                    type: 'spring' as const,
-                    bounce: 0.3,
-                    duration: 1.5
-                  }
+            container: {
+              visible: {
+                transition: {
+                  staggerChildren: 0.05,
+                  delayChildren: 0.75
                 }
               }
-            }} className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
+            },
+            item: {
+              hidden: {
+                opacity: 0,
+                filter: 'blur(12px)',
+                y: 12
+              },
+              visible: {
+                opacity: 1,
+                filter: 'blur(0px)',
+                y: 0,
+                transition: {
+                  type: 'spring' as const,
+                  bounce: 0.3,
+                  duration: 1.5
+                }
+              }
+            }
+          }} className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
               <div key={1} className="bg-primary/20 rounded-[14px] border border-primary/30 p-0.5 shadow-[0_0_15px_rgba(35,35,255,0.3)]">
                 <SmartCTA type="get-started" size="lg" className="rounded-xl px-5 text-base h-11 bg-primary hover:bg-primary/90">
                   <Zap className="size-4 mr-1" />
@@ -127,58 +123,43 @@ const HeroContent = () => {
         </div>
 
         <AnimatedGroup variants={{
-          container: {
-            visible: {
-              transition: {
-                staggerChildren: 0.05,
-                delayChildren: 0.75
-              }
-            }
-          },
-          item: {
-            hidden: {
-              opacity: 0,
-              filter: 'blur(12px)',
-              y: 12
-            },
-            visible: {
-              opacity: 1,
-              filter: 'blur(0px)',
-              y: 0,
-              transition: {
-                type: 'spring' as const,
-                bounce: 0.3,
-                duration: 1.5
-              }
+        container: {
+          visible: {
+            transition: {
+              staggerChildren: 0.05,
+              delayChildren: 0.75
             }
           }
-        }}>
+        },
+        item: {
+          hidden: {
+            opacity: 0,
+            filter: 'blur(12px)',
+            y: 12
+          },
+          visible: {
+            opacity: 1,
+            filter: 'blur(0px)',
+            y: 0,
+            transition: {
+              type: 'spring' as const,
+              bounce: 0.3,
+              duration: 1.5
+            }
+          }
+        }
+      }}>
           <div className="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-            {/* Reduced gradient overlay opacity */}
-            <div aria-hidden className="bg-gradient-to-b to-background/50 absolute inset-0 z-5 from-transparent from-35%" />
-            <div className="bg-background/10 backdrop-blur-sm relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/20 p-4 shadow-lg shadow-black/15 z-10">
+            <div aria-hidden className="bg-gradient-to-b to-background absolute inset-0 z-10 from-transparent from-35%" />
+            <div className="bg-background/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/10 p-4 shadow-lg shadow-black/15">
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
               
-              {/* Dashboard image with error handling */}
-              <div className="relative z-20">
-                <img 
-                  src="/lovable-uploads/eee30cfe-fda4-4e4c-a696-0038b9c72151.png"
-                  alt="SHATTARA AI Dashboard Interface - AI-powered learning platform with study materials, flashcards, and exam preparation tools"
-                  className="aspect-[16/9] w-full rounded-2xl object-cover object-top shadow-inner"
-                  style={{ minHeight: '360px' }}
-                  onError={(e) => {
-                    console.error('Failed to load dashboard image');
-                    // Fallback: show a placeholder or hide the image
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
+              {/* Replace static image with the p5.js animation */}
+              <EducationAnimation className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px]" />
             </div>
           </div>
         </AnimatedGroup>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroContent;
