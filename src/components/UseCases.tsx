@@ -1,3 +1,4 @@
+
 // Test commit - UseCases component for educational platform
 import React, { useRef, useState, useEffect } from 'react';
 import { 
@@ -12,7 +13,6 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import GradientBackground from '@/components/ui/gradient-background';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const UseCases = () => {
@@ -236,22 +236,12 @@ const UseCases = () => {
                   </div>
                   
                   {/* Testimonial */}
-                  <div className="text-sm text-white/50 italic mb-4">
+                  <div className="text-sm text-white/50 italic">
                     "{useCase.testimonial.quote}"
                     <div className="text-white/70 mt-1">
                       - {useCase.testimonial.author}
                     </div>
                   </div>
-                  
-                  <Button 
-                    variant="ghost" 
-                    className="w-full text-white/90 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-300 group"
-                  >
-                    <span className="flex items-center justify-center gap-2">
-                      Learn More
-                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </Button>
                 </div>
               </motion.div>
             ))}
