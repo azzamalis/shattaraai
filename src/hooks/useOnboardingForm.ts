@@ -34,7 +34,7 @@ export const useOnboardingForm = () => {
   };
 
   // Validate form whenever form data changes
-  use Effect(() => {
+  useEffect(() => {
     const { language, purpose, goal, source } = formData;
     setIsFormValid(!!language && !!purpose && !!goal && !!source);
   }, [formData]);
