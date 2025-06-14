@@ -1,62 +1,162 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { format } from "date-fns";
 import { languages } from "@/components/onboarding/data/languages";
 import { getGoalOptions } from "@/components/onboarding/data/goals";
 import { sourceOptions } from "@/components/onboarding/data/sources";
 import { SubscriptionPlanCard } from "@/components/dashboard/SubscriptionPlanCard";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
+import { Database } from "@/integrations/supabase/types";
 
-const initialUserData = {
-  name: "Alex Johnson",
-  role: "Student",
-  createdAt: "2023-09-15T12:00:00Z",
-  preferences: {
-    language: "en",
-    purpose: "student",
-    goal: "exam-prep",
-    source: "search"
-  },
-  notifications: {
+interface NotificationSettings {
+  aiReplies: boolean;
+  notesGenerated: boolean;
+  quizReady: boolean;
+}
+
+export default function Profile() {
+  const { user, profile, updateProfile, loading } = useAuth();
+  const { t } = useLanguage();
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Local state for form data
+  const [formData, setFormData] = useState({
+    language: '',
+    purpose: '',
+    goal: '',
+    source: ''
+  });
+  
+  const [notifications, setNotifications] = useState<NotificationSettings>({
     aiReplies: true,
     notesGenerated: true,
     quizReady: false
-  },
-  stats: {
+  });
+
+  // Mock stats - in a real app, these would come from the database
+  const mockStats = {
     uploads: 24,
     sessions: 52,
     flashcards: 187,
     progressPercent: 75
-  }
-};
+  };
 
-export default function Profile() {
-  const [userData, setUserData] = useState(initialUserData);
-  const { toast } = useToast();
-  const { t } = useLanguage();
+  // Initialize form data when profile loads
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        language: profile.language || 'en',
+        purpose: profile.purpose || '',
+        goal: profile.goal || '',
+        source: profile.source || ''
+      });
+    }
+  }, [profile]);
 
-  const handleSaveChanges = () => {
-    toast({
-      title: "Changes saved",
-      description: "Your profile has been updated successfully.",
-    });
+  const handleSaveChanges = async () => {
+    if (!user || !profile) {
+      toast.error("Authentication required", {
+        description: "Please sign in to update your profile."
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      // Map form values to database enum values
+      const purposeMap: Record<string, Database['public']['Enums']['user_purpose']> = {
+        'student': 'student',
+        'teacher': 'teacher',
+        'work': 'professional',
+        'research': 'researcher'
+      };
+
+      const goalMap: Record<string, Database['public']['Enums']['user_goal']> = {
+        'exam-prep': 'exam_prep',
+        'research': 'data_analysis',
+        'coursework': 'homework_help',
+        'lesson-planning': 'lesson_planning',
+        'grading': 'student_assessment',
+        'personalization': 'content_creation',
+        'productivity': 'career_advancement',
+        'learning': 'skill_building',
+        'innovation': 'collaboration'
+      };
+
+      const sourceMap: Record<string, Database['public']['Enums']['user_source']> = {
+        'search': 'search_engine',
+        'instagram': 'social_media',
+        'tiktok': 'social_media',
+        'twitter': 'social_media',
+        'youtube': 'social_media',
+        'online-ad': 'advertisement',
+        'friends-family': 'referral'
+      };
+
+      const updates: Partial<Database['public']['Tables']['profiles']['Update']> = {
+        language: formData.language,
+        purpose: formData.purpose ? purposeMap[formData.purpose] : null,
+        goal: formData.goal ? goalMap[formData.goal] : null,
+        source: formData.source ? sourceMap[formData.source] : null
+      };
+
+      const { error } = await updateProfile(updates);
+      
+      if (error) {
+        toast.error("Failed to save changes", {
+          description: error.message
+        });
+      } else {
+        toast.success("Changes saved", {
+          description: "Your profile has been updated successfully."
+        });
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred", {
+        description: "Please try again later."
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDeleteAccount = () => {
-    toast({
-      variant: "destructive",
-      title: "Are you sure?",
+    toast.error("Are you sure?", {
       description: "This action cannot be undone. This will permanently delete your account.",
     });
   };
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="h-full bg-background text-foreground flex items-center justify-center">
+          <div className="text-white">Loading profile...</div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!user || !profile) {
+    return (
+      <DashboardLayout>
+        <div className="h-full bg-background text-foreground flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-foreground mb-2">Profile not found</h2>
+            <p className="text-muted-foreground">Please sign in to view your profile.</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -66,32 +166,36 @@ export default function Profile() {
             <CardContent className="p-6">
               <div className="flex flex-wrap justify-between items-start gap-6">
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">{userData.name}</h1>
-                  <p className="text-muted-foreground mb-2">{userData.role}</p>
+                  <h1 className="text-2xl font-bold text-foreground">
+                    {profile.full_name || user.email?.split('@')[0] || 'User'}
+                  </h1>
+                  <p className="text-muted-foreground mb-2">
+                    {profile.purpose ? profile.purpose.charAt(0).toUpperCase() + profile.purpose.slice(1) : 'User'}
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    Member since {format(new Date(userData.createdAt), "MMMM yyyy")}
+                    Member since {profile.created_at ? format(new Date(profile.created_at), "MMMM yyyy") : 'Recently'}
                   </p>
                 </div>
 
                 <div className="flex flex-wrap gap-8">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-foreground">{userData.stats.uploads}</p>
+                    <p className="text-2xl font-bold text-foreground">{mockStats.uploads}</p>
                     <p className="text-sm text-muted-foreground">Uploads</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-foreground">{userData.stats.sessions}</p>
+                    <p className="text-2xl font-bold text-foreground">{mockStats.sessions}</p>
                     <p className="text-sm text-muted-foreground">Sessions</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-foreground">{userData.stats.flashcards}</p>
+                    <p className="text-2xl font-bold text-foreground">{mockStats.flashcards}</p>
                     <p className="text-sm text-muted-foreground">Flashcards</p>
                   </div>
                   <div className="min-w-[200px]">
                     <div className="flex justify-between mb-2">
                       <span className="text-sm text-muted-foreground">Goal Progress</span>
-                      <span className="text-sm font-bold text-foreground">{userData.stats.progressPercent}%</span>
+                      <span className="text-sm font-bold text-foreground">{mockStats.progressPercent}%</span>
                     </div>
-                    <Progress value={userData.stats.progressPercent} className="h-2" />
+                    <Progress value={mockStats.progressPercent} className="h-2" />
                   </div>
                 </div>
               </div>
@@ -109,12 +213,9 @@ export default function Profile() {
                     Language
                   </label>
                   <Select
-                    value={userData.preferences.language}
+                    value={formData.language}
                     onValueChange={(value) => 
-                      setUserData(prev => ({ 
-                        ...prev, 
-                        preferences: { ...prev.preferences, language: value }
-                      }))
+                      setFormData(prev => ({ ...prev, language: value }))
                     }
                   >
                     <SelectTrigger className="w-full component-base">
@@ -138,12 +239,9 @@ export default function Profile() {
                     How do you want to use Shattara?
                   </label>
                   <Select
-                    value={userData.preferences.purpose}
+                    value={formData.purpose}
                     onValueChange={(value) => 
-                      setUserData(prev => ({ 
-                        ...prev, 
-                        preferences: { ...prev.preferences, purpose: value, goal: '' }
-                      }))
+                      setFormData(prev => ({ ...prev, purpose: value, goal: '' }))
                     }
                   >
                     <SelectTrigger className="w-full component-base">
@@ -153,6 +251,7 @@ export default function Profile() {
                       <SelectItem value="student" className="text-foreground hover:bg-accent">Student</SelectItem>
                       <SelectItem value="teacher" className="text-foreground hover:bg-accent">Teacher</SelectItem>
                       <SelectItem value="work" className="text-foreground hover:bg-accent">Work</SelectItem>
+                      <SelectItem value="research" className="text-foreground hover:bg-accent">Research</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -164,19 +263,16 @@ export default function Profile() {
                     What's your main personal goal with Shattara?
                   </label>
                   <Select
-                    value={userData.preferences.goal}
+                    value={formData.goal}
                     onValueChange={(value) => 
-                      setUserData(prev => ({ 
-                        ...prev, 
-                        preferences: { ...prev.preferences, goal: value }
-                      }))
+                      setFormData(prev => ({ ...prev, goal: value }))
                     }
                   >
                     <SelectTrigger className="w-full component-base">
                       <SelectValue placeholder="Select your goals" />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border">
-                      {getGoalOptions(userData.preferences.purpose).map((option) => (
+                      {getGoalOptions(formData.purpose).map((option) => (
                         <SelectItem 
                           key={option.value} 
                           value={option.value}
@@ -193,12 +289,9 @@ export default function Profile() {
                     How did you hear about us?
                   </label>
                   <Select
-                    value={userData.preferences.source}
+                    value={formData.source}
                     onValueChange={(value) => 
-                      setUserData(prev => ({ 
-                        ...prev, 
-                        preferences: { ...prev.preferences, source: value }
-                      }))
+                      setFormData(prev => ({ ...prev, source: value }))
                     }
                   >
                     <SelectTrigger className="w-full component-base">
@@ -230,12 +323,9 @@ export default function Profile() {
                 <div className="flex items-center justify-between">
                   <label className="text-sm text-muted-foreground">AI Replies</label>
                   <Switch
-                    checked={userData.notifications.aiReplies}
+                    checked={notifications.aiReplies}
                     onCheckedChange={(checked) =>
-                      setUserData(prev => ({
-                        ...prev,
-                        notifications: { ...prev.notifications, aiReplies: checked }
-                      }))
+                      setNotifications(prev => ({ ...prev, aiReplies: checked }))
                     }
                     className="data-[state=checked]:bg-primary"
                   />
@@ -243,12 +333,9 @@ export default function Profile() {
                 <div className="flex items-center justify-between">
                   <label className="text-sm text-muted-foreground">Notes Generated</label>
                   <Switch
-                    checked={userData.notifications.notesGenerated}
+                    checked={notifications.notesGenerated}
                     onCheckedChange={(checked) =>
-                      setUserData(prev => ({
-                        ...prev,
-                        notifications: { ...prev.notifications, notesGenerated: checked }
-                      }))
+                      setNotifications(prev => ({ ...prev, notesGenerated: checked }))
                     }
                     className="data-[state=checked]:bg-primary"
                   />
@@ -256,12 +343,9 @@ export default function Profile() {
                 <div className="flex items-center justify-between">
                   <label className="text-sm text-muted-foreground">Quiz Ready</label>
                   <Switch
-                    checked={userData.notifications.quizReady}
+                    checked={notifications.quizReady}
                     onCheckedChange={(checked) =>
-                      setUserData(prev => ({
-                        ...prev,
-                        notifications: { ...prev.notifications, quizReady: checked }
-                      }))
+                      setNotifications(prev => ({ ...prev, quizReady: checked }))
                     }
                     className="data-[state=checked]:bg-primary"
                   />
@@ -282,9 +366,10 @@ export default function Profile() {
             </Button>
             <Button
               onClick={handleSaveChanges}
+              disabled={isSaving}
               className="bg-foreground text-background hover:bg-foreground/90"
             >
-              Save Changes
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </div>
