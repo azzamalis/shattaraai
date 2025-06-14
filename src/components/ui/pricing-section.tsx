@@ -92,7 +92,7 @@ function PricingSection({
                         <div className="text-sm font-medium text-white">
                           {feature.name}
                         </div>
-                        <div className="text-sm text-zinc-400">
+                        <div className="text-sm text-muted-foreground ">
                           {feature.description}
                         </div>
                       </div>
