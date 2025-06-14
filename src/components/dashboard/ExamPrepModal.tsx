@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -6,71 +7,44 @@ import { ExamPrepStepOne } from './exam-prep/ExamPrepStepOne';
 import { ExamPrepStepTwo } from './exam-prep/ExamPrepStepTwo';
 import { ExamPrepStepThree } from './exam-prep/ExamPrepStepThree';
 import { ContentItem } from './exam-prep/types';
+import { useContent } from '@/hooks/useContent';
 
 interface ExamPrepModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Initial content items for a fresh start
-const initialContentItems: ContentItem[] = [
-  {
-    id: '1',
-    title: 'The British Empire',
-    uploadedDate: '30/05/2025',
-    type: 'Video',
+// Helper function to convert database content items to exam prep format
+const convertToExamPrepFormat = (dbItems: any[]): ContentItem[] => {
+  return dbItems.map(item => ({
+    id: item.id,
+    title: item.title,
+    uploadedDate: new Date(item.created_at).toLocaleDateString('en-GB'),
+    type: getDisplayType(item.type),
     isSelected: false
-  },
-  {
-    id: '2',
-    title: 'Think Fast, Talk Smart',
-    uploadedDate: '30/05/2025',
-    type: 'Video',
-    isSelected: false
-  },
-  {
-    id: '3',
-    title: 'Understanding Applied Psychology',
-    uploadedDate: '30/05/2025',
-    type: 'PDF Files',
-    isSelected: false
-  },
-  {
-    id: '4',
-    title: 'Social Class',
-    uploadedDate: '30/05/2025',
-    type: 'Recording',
-    isSelected: false
-  },
-  {
-    id: '5',
-    title: 'Introduction to Quantum Physics',
-    uploadedDate: '31/05/2025',
-    type: 'Video',
-    isSelected: false
-  },
-  {
-    id: '6',
-    title: 'Advanced Calculus Notes',
-    uploadedDate: '31/05/2025',
-    type: 'PDF Files',
-    isSelected: false
-  },
-  {
-    id: '7',
-    title: 'Machine Learning Lecture',
-    uploadedDate: '31/05/2025',
-    type: 'Youtube URL',
-    isSelected: false
-  },
-  {
-    id: '8',
-    title: 'Chemistry Lab Session',
-    uploadedDate: '31/05/2025',
-    type: 'Recording',
-    isSelected: false
+  }));
+};
+
+// Helper function to get display type for content
+const getDisplayType = (dbType: string): string => {
+  switch (dbType) {
+    case 'video':
+      return 'Video';
+    case 'pdf':
+      return 'PDF Files';
+    case 'recording':
+    case 'audio':
+      return 'Recording';
+    case 'youtube':
+      return 'Youtube URL';
+    case 'website':
+      return 'Website';
+    case 'text':
+      return 'Text';
+    default:
+      return 'File';
   }
-];
+};
 
 export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
   const [step, setStep] = useState(1);
@@ -78,10 +52,19 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
   const [examLength, setExamLength] = useState('60');
   const [questionType, setQuestionType] = useState('Both');
   const navigate = useNavigate();
+  const { content, loading } = useContent();
   
-  const [contentItems, setContentItems] = useState<ContentItem[]>(initialContentItems);
+  const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   
   const totalSteps = 3;
+
+  // Convert database content to exam prep format when content loads
+  useEffect(() => {
+    if (content && content.length > 0) {
+      const convertedItems = convertToExamPrepFormat(content);
+      setContentItems(convertedItems);
+    }
+  }, [content]);
 
   // Effect to reset state when the modal closes
   useEffect(() => {
@@ -90,9 +73,10 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
       setNumQuestions('25'); // Reset number of questions
       setExamLength('60'); // Reset exam length
       setQuestionType('Both'); // Reset question type
-      setContentItems(initialContentItems); // Reset content selections
+      // Reset content selections
+      setContentItems(prev => prev.map(item => ({ ...item, isSelected: false })));
     }
-  }, [isOpen]); // Only re-run when isOpen changes
+  }, [isOpen]);
   
   const handleNext = () => {
     if (step < totalSteps) {
@@ -144,6 +128,22 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
     // Navigate to loading screen
     navigate('/exam-loading');
   };
+
+  // Show loading state while content is being fetched
+  if (loading && contentItems.length === 0) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className={cn(
+          "max-w-3xl p-0 rounded-lg sm:max-w-3xl",
+          "bg-card border-border"
+        )}>
+          <div className="p-6 flex items-center justify-center h-64">
+            <div className="text-muted-foreground">Loading your content...</div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

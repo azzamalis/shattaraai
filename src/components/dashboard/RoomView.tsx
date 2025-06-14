@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { MessageSquare, FileText } from 'lucide-react';
 import { RoomContentView } from './RoomContentView';
 import { ContentItem } from '@/lib/types';
+import { useContent } from '@/hooks/useContent';
+import { useParams } from 'react-router-dom';
 
 interface RoomViewProps {
   title: string;
@@ -18,64 +20,14 @@ export function RoomView({
   isEmpty = true,
   hideHeader = false
 }: RoomViewProps) {
-  const exampleItems: ContentItem[] = [
-    {
-      id: '1',
-      user_id: '',
-      room_id: null,
-      title: 'Introduction to React Hooks',
-      type: 'video',
-      created_at: '2025-05-30T00:00:00.000Z',
-      updated_at: '2025-05-30T00:00:00.000Z',
-      filename: 'react-hooks-intro.mp4',
-      metadata: {
-        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'],
-        progress: 0.75
-      }
-    },
-    {
-      id: '2',
-      user_id: '',
-      room_id: null,
-      title: 'Advanced TypeScript Patterns',
-      type: 'pdf',
-      created_at: '2025-05-29T00:00:00.000Z',
-      updated_at: '2025-05-29T00:00:00.000Z',
-      filename: 'typescript-patterns.pdf',
-      metadata: {
-        contentTags: ['Summary', 'Flashcards', 'Exams'],
-        progress: 0.5
-      }
-    },
-    {
-      id: '3',
-      user_id: '',
-      room_id: null,
-      title: 'System Design Interview Prep',
-      type: 'recording',
-      created_at: '2025-05-28T00:00:00.000Z',
-      updated_at: '2025-05-28T00:00:00.000Z',
-      filename: 'system-design.mp3',
-      metadata: {
-        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'],
-        progress: 0.25
-      }
-    },
-    {
-      id: '4',
-      user_id: '',
-      room_id: null,
-      title: 'Building Modern UIs with TailwindCSS',
-      type: 'youtube',
-      created_at: '2025-05-27T00:00:00.000Z',
-      updated_at: '2025-05-27T00:00:00.000Z',
-      filename: 'tailwind-ui-tutorial',
-      metadata: {
-        contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'],
-        progress: 0.9
-      }
-    }
-  ];
+  const { id: roomId } = useParams<{ id: string }>();
+  const { content } = useContent();
+  
+  // Filter content for the current room if we have a roomId
+  const roomContent = roomId ? content.filter(item => item.room_id === roomId) : content;
+  
+  // Use the actual content to determine if empty, fallback to prop
+  const isActuallyEmpty = roomContent.length === 0;
 
   return (
     <div className="flex flex-col bg-background">
@@ -104,7 +56,7 @@ export function RoomView({
 
       <main>
         <div className="max-w-7xl mx-auto w-full py-6 pb-8">
-          {isEmpty ? (
+          {isActuallyEmpty ? (
             <div className="flex flex-col items-center justify-center text-center">
               <h2 className="text-xl font-bold text-foreground mb-1">No documents yet</h2>
               <p className="text-muted-foreground max-w-md">
@@ -113,7 +65,7 @@ export function RoomView({
             </div>
           ) : (
             <RoomContentView 
-              items={exampleItems} 
+              items={roomContent} 
               onEdit={(id) => console.log('Edit', id)}
               onDelete={(id) => console.log('Delete', id)}
               onShare={(id) => console.log('Share', id)}
