@@ -27,8 +27,9 @@ const SmartCTA: React.FC<SmartCTAProps> = ({
   
   useEffect(() => {
     if (!loading) {
-      if (user) {
-        // User is logged in
+      // Only treat as authenticated if both user exists AND profile exists
+      if (user && profile) {
+        // User is logged in with a valid profile
         if (profile?.onboarding_completed) {
           // User completed onboarding, go to dashboard
           setTargetPath('/dashboard');
@@ -37,7 +38,7 @@ const SmartCTA: React.FC<SmartCTAProps> = ({
           setTargetPath('/onboarding');
         }
       } else {
-        // User is not logged in
+        // User is not logged in OR doesn't have a profile - treat as non-authenticated
         if (type === 'login') {
           setTargetPath('/signin');
         } else {
