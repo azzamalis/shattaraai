@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ActionCards } from './ActionCards';
@@ -36,7 +37,9 @@ export function RoomHeroSection({
     const contentId = onAddContent({
       title: 'Chat with Shattara AI',
       type: 'chat',
-      text: value
+      room_id: null,
+      metadata: {},
+      text_content: value
     });
 
     const searchParams = new URLSearchParams({

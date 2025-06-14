@@ -70,8 +70,8 @@ export function LearningCard({
     setMenuOpen(false);
   };
 
-  // Get the room name from availableRooms if content has a roomId
-  const contentRoom = content.roomId ? availableRooms.find(r => r.id === content.roomId) : undefined;
+  // Get the room name from availableRooms if content has a room_id
+  const contentRoom = content.room_id ? availableRooms.find(r => r.id === content.room_id) : undefined;
 
   return (
     <div onClick={handleCardClick} className="block w-full cursor-pointer">

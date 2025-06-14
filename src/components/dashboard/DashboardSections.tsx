@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Room, ContentItem } from '@/lib/types';
 import { MyRoomsSection } from './MyRoomsSection';
@@ -7,9 +8,9 @@ import { toast } from "sonner";
 
 interface DashboardSectionsProps {
   rooms: Room[];
-  onAddRoom: () => void;
-  onEditRoom: (roomId: string, newName: string) => void;
-  onDeleteRoom: (roomId: string) => void;
+  onAddRoom: () => Promise<string | null>;
+  onEditRoom: (roomId: string, newName: string) => Promise<void>;
+  onDeleteRoom: (roomId: string) => Promise<void>;
   onCardDelete: (item: ContentItem) => void;
   onCardShare: (item: ContentItem) => void;
   onExploreCardDelete: (item: ContentItem) => void;
@@ -36,7 +37,7 @@ export function DashboardSections({
       // Update the content with the new roomId
       const updatedContent = {
         ...item,
-        roomId: roomId
+        room_id: roomId
       };
       onUpdateContent(updatedContent);
       toast.success(`"${item.title}" added to "${room.name}"`);

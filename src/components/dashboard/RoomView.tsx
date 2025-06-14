@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, FileText } from 'lucide-react';
@@ -20,9 +21,12 @@ export function RoomView({
   const exampleItems: ContentItem[] = [
     {
       id: '1',
+      user_id: '',
+      room_id: null,
       title: 'Introduction to React Hooks',
       type: 'video',
-      createdAt: '2025-05-30T00:00:00.000Z',
+      created_at: '2025-05-30T00:00:00.000Z',
+      updated_at: '2025-05-30T00:00:00.000Z',
       filename: 'react-hooks-intro.mp4',
       metadata: {
         contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'],
@@ -31,9 +35,12 @@ export function RoomView({
     },
     {
       id: '2',
+      user_id: '',
+      room_id: null,
       title: 'Advanced TypeScript Patterns',
       type: 'pdf',
-      createdAt: '2025-05-29T00:00:00.000Z',
+      created_at: '2025-05-29T00:00:00.000Z',
+      updated_at: '2025-05-29T00:00:00.000Z',
       filename: 'typescript-patterns.pdf',
       metadata: {
         contentTags: ['Summary', 'Flashcards', 'Exams'],
@@ -42,9 +49,12 @@ export function RoomView({
     },
     {
       id: '3',
+      user_id: '',
+      room_id: null,
       title: 'System Design Interview Prep',
       type: 'recording',
-      createdAt: '2025-05-28T00:00:00.000Z',
+      created_at: '2025-05-28T00:00:00.000Z',
+      updated_at: '2025-05-28T00:00:00.000Z',
       filename: 'system-design.mp3',
       metadata: {
         contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'],
@@ -53,9 +63,12 @@ export function RoomView({
     },
     {
       id: '4',
+      user_id: '',
+      room_id: null,
       title: 'Building Modern UIs with TailwindCSS',
       type: 'youtube',
-      createdAt: '2025-05-27T00:00:00.000Z',
+      created_at: '2025-05-27T00:00:00.000Z',
+      updated_at: '2025-05-27T00:00:00.000Z',
       filename: 'tailwind-ui-tutorial',
       metadata: {
         contentTags: ['Summary', 'Notes', 'Exams', 'Flashcards'],

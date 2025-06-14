@@ -59,23 +59,33 @@ export interface NotesBlock {
 export interface RecordingMetadata {
   duration?: number;
   size?: number;
+  format?: string;
+  sampleRate?: number;
+  createdAt?: string;
+  lastModified?: string;
   transcript?: string;
   audioUrl?: string;
+  transcriptUrl?: string;
   chaptersData?: Array<{
     id: string;
     title: string;
     summary: string;
     startTime: number;
+    endTime?: number;
   }>;
 }
 
 export interface RecordingStateInfo {
+  state?: string;
   isRecording: boolean;
   isPaused: boolean;
   duration: number;
   transcript: string;
   isNewRecording?: boolean;
   isExistingRecording?: boolean;
+  hasAudioFile?: boolean;
+  hasTranscript?: boolean;
+  hasChapters?: boolean;
 }
 
 // Database types for direct use

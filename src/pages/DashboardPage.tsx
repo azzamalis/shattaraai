@@ -1,7 +1,7 @@
+
 import React from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Dashboard } from '@/components/dashboard/Dashboard';
-import { Room, RoomHandlers } from '@/lib/types';
 
 export default function DashboardPage() {
   // The actual values will be provided by DashboardLayout
@@ -10,9 +10,9 @@ export default function DashboardPage() {
     <DashboardLayout className="p-0">
       <Dashboard 
         rooms={[]} 
-        onAddRoom={() => {}}
-        onEditRoom={() => {}}
-        onDeleteRoom={() => {}}
+        onAddRoom={async () => null}
+        onEditRoom={async () => {}}
+        onDeleteRoom={async () => {}}
       />
     </DashboardLayout>
   );

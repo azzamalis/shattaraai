@@ -147,7 +147,7 @@ export function RoomContentTable({
           {currentItems.map(item => {
           const displayType = getDisplayType(item.type);
           const contentTags = item.metadata?.contentTags || [];
-          const uploadDate = new Date(item.createdAt).toLocaleDateString();
+          const uploadDate = new Date(item.created_at).toLocaleDateString();
           return <tr key={item.id} className="border-b border-dashboard-separator hover:bg-dashboard-card-hover transition-colors duration-200">
                 {showSelectionColumn && <td className="py-6 px-4">
                     <div onClick={() => onSelect?.(item.id)} className={cn("w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors duration-200", selectedItems.includes(item.id) ? "bg-primary border-primary" : "border-muted-foreground")}>
