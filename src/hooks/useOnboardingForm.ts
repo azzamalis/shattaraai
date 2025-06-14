@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -91,10 +90,10 @@ export const useOnboardingForm = () => {
         'friends-family': 'referral'
       };
 
-      // Create the profile with onboarding data
+      // Use upsert instead of insert to avoid duplicate key errors
       const { error } = await supabase
         .from('profiles')
-        .insert({
+        .upsert({
           id: user.id,
           email: user.email,
           full_name: user.user_metadata?.full_name || null,
@@ -103,7 +102,7 @@ export const useOnboardingForm = () => {
           goal: goalMap[formData.goal],
           source: sourceMap[formData.source],
           onboarding_completed: true
-        });
+        }, { onConflict: ['id'] });
 
       if (error) {
         toast.error("Failed to save onboarding data", {
@@ -116,7 +115,6 @@ export const useOnboardingForm = () => {
         description: "Your preferences have been saved."
       });
       
-      // Navigate to dashboard after onboarding
       setTimeout(() => {
         navigate('/dashboard');
       }, 1500);
