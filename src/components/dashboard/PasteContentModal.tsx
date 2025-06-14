@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,7 @@ export function PasteContentModal({
         <div className="p-6">
           <DialogHeader className="mb-4">
             <div className="flex items-center gap-2">
-              <Link className="text-muted-foreground h-5 w-5" />
+              <Link className="text-muted-foreground h-4 w-4" />
               <DialogTitle className="text-xl font-bold">YouTube, Website, Etc</DialogTitle>
             </div>
             <p className="text-muted-foreground text-sm mt-1">Enter a YouTube Link, Website URL, Doc, Etc</p>
@@ -74,7 +75,7 @@ export function PasteContentModal({
           {/* Text Input Section */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <FileText className="text-muted-foreground h-5 w-5" />
+              <FileText className="text-muted-foreground h-4 w-4" />
               <h3 className="text-base font-medium">Paste Text</h3>
             </div>
             <p className="text-muted-foreground text-sm mb-2">Copy and paste text to add as content</p>
