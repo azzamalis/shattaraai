@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import Logo from '@/components/Logo';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import AnimatedChatPreview from '@/components/AnimatedChatPreview';
 
 const PasswordReset = () => {
   const { resetPassword } = useAuth();
@@ -55,11 +56,8 @@ const PasswordReset = () => {
             <Logo textColor="text-white" />
           </Link>
         </div>
-        <div className="mb-auto">
-          <h2 className="text-4xl font-bold mb-6 text-white">Forgot your password?</h2>
-          <p className="text-lg text-gray-400 mb-6">
-            No worries, it happens to everyone. We'll send you a secure link to reset your password and get you back on track.
-          </p>
+        <div className="mb-auto flex items-center justify-center py-12">
+          <AnimatedChatPreview />
         </div>
         <div className="mt-auto">
           <p className="text-sm text-gray-500">
