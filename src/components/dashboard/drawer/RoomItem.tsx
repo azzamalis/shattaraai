@@ -34,6 +34,24 @@ export const RoomItem: React.FC<RoomItemProps> = ({
   onCancelRename,
   onDeleteClick
 }) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // Create a mock mouse event for the save handler
+      const mockMouseEvent = {
+        preventDefault: () => {},
+        stopPropagation: () => {}
+      } as React.MouseEvent;
+      onSaveRename(mockMouseEvent, room.id);
+    } else if (e.key === 'Escape') {
+      // Create a mock mouse event for the cancel handler
+      const mockMouseEvent = {
+        preventDefault: () => {},
+        stopPropagation: () => {}
+      } as React.MouseEvent;
+      onCancelRename(mockMouseEvent);
+    }
+  };
+
   return (
     <div className="flex items-center justify-between gap-2">
       {editingRoomId === room.id ? (
@@ -43,13 +61,7 @@ export const RoomItem: React.FC<RoomItemProps> = ({
             onChange={(e) => setEditedRoomName(e.target.value)}
             className="flex-1 h-8"
             autoFocus
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                onSaveRename(e, room.id);
-              } else if (e.key === 'Escape') {
-                onCancelRename(e);
-              }
-            }}
+            onKeyDown={handleKeyDown}
           />
           <Button
             size="sm"
