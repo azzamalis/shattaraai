@@ -1,17 +1,18 @@
 
+import React from 'react';
 import { FileText, Video, Youtube, Mic } from 'lucide-react';
 import { ContentTag, ContentType } from './types';
 
 export const getContentTypeIcon = (type: ContentType) => {
   switch (type) {
     case 'Video':
-      return <Video className="h-4 w-4" />;
+      return React.createElement(Video, { className: "h-4 w-4" });
     case 'PDF Files':
-      return <FileText className="h-4 w-4" />;
+      return React.createElement(FileText, { className: "h-4 w-4" });
     case 'Recording':
-      return <Mic className="h-4 w-4" />;
+      return React.createElement(Mic, { className: "h-4 w-4" });
     case 'Youtube URL':
-      return <Youtube className="h-4 w-4" />;
+      return React.createElement(Youtube, { className: "h-4 w-4" });
   }
 };
 
