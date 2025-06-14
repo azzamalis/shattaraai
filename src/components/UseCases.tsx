@@ -151,7 +151,7 @@ const UseCases = () => {
                   
                   {/* Features List */}
                   <ul className="space-y-2 mb-4">
-                    {useCase.features.map((feature, idx) => <li key={idx} className="flex items-center text-sm text-white/60">
+                    {useCase.features.map((feature, idx) => <li key={idx} className="flex items-center text-sm text-muted-foreground ">
                         <span className="w-1.5 h-1.5 rounded-full bg-primary/60 mr-2" />
                         {feature}
                       </li>)}
