@@ -11,7 +11,7 @@ interface SmartCTAProps {
   variant?: 'primary' | 'outline' | 'ghost' | 'link';
   size?: 'sm' | 'md' | 'lg';
   type?: 'signup' | 'login' | 'get-started';
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent) => void;
 }
 
 const SmartCTA: React.FC<SmartCTAProps> = ({ 
