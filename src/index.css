@@ -1,3 +1,4 @@
+
 @import './styles/flashcard.css';
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -51,22 +52,6 @@
     --sidebar-border: 0 0% 90%; /* #E5E5E5 */
     --sidebar-ring: 210 100% 50%; /* #00A3FF */
 
-    /* Custom dashboard colors */
-    --dashboard-bg: 0 0% 100%; /* #FFFFFF */
-    --dashboard-card: 0 0% 99%; /* #FDFDFD */
-    --dashboard-card-hover: 0 0% 96%; /* #F5F5F5 */
-    --dashboard-secondary-card: 0 0% 98%; /* #FBFBFB */
-    --dashboard-secondary-card-hover: 0 0% 96%; /* #F5F5F5 */
-    --dashboard-text: 0 0% 4%; /* #0A0A0A */
-    --dashboard-text-secondary: 0 0% 79%; /* #CACACA */
-    --dashboard-text-placeholder: 221 14% 53%; /* #737385 */
-    --dashboard-sidebar: 0 0% 98%; /* #FAFAFA */
-    --dashboard-button: 0 0% 93%; /* #EEEEEE */
-    --dashboard-button-text: 0 0% 9%; /* #171717 */
-    --dashboard-button-border: 0 0% 89%; /* #E3E3E3 */
-    --dashboard-icons: 210 100% 50%; /* #00A3FF */
-    --dashboard-separator: 0 0% 90%; /* #E5E5E5 */
-
     --radius: 0.5rem;
   }
 
@@ -112,22 +97,6 @@
     --sidebar-accent-foreground: 0 0% 98%; /* #FAFAFA */
     --sidebar-border: 0 0% 15%; /* #262626 */
     --sidebar-ring: 0 0% 80%; /* #CCCCCC */
-
-    /* Custom dashboard colors - Dark Mode */
-    --dashboard-bg: 0 0% 7%; /* #121212 */
-    --dashboard-card: 0 0% 8%; /* #141414 */
-    --dashboard-card-hover: 0 0% 15%; /* #262626 */
-    --dashboard-secondary-card: 0 0% 9%; /* #161616 */
-    --dashboard-secondary-card-hover: 0 0% 15%; /* #262626 */
-    --dashboard-text: 0 0% 98%; /* #FAFAFA */
-    --dashboard-text-secondary: 0 0% 96%; /* #F5F5F5 */
-    --dashboard-text-placeholder: 0 0% 60%; /* #9A9A9A */
-    --dashboard-sidebar: 0 0% 9%; /* #171717 */
-    --dashboard-button: 0 0% 13%; /* #222222 */
-    --dashboard-button-text: 0 0% 98%; /* #FAF7F3 */
-    --dashboard-button-border: 0 0% 18%; /* #2E2E2E */
-    --dashboard-icons: 0 0% 80%; /* #CCCCCC */
-    --dashboard-separator: 0 0% 15%; /* #262626 */
   }
 
   * {
@@ -199,6 +168,107 @@
   }
 }
 
+/* Dashboard-specific color system - scoped to dashboard areas only */
+.dashboard-layout {
+  /* Light mode dashboard colors */
+  --background: 0 0% 100%; /* Pure White #FFFFFF */
+  --foreground: 0 0% 0%; /* Pure Black #000000 */
+  --primary: 210 100% 50%; /* Primary Blue #00A3FF */
+  --primary-foreground: 0 0% 98%; /* Light text on blue #FAFAFA */
+  --muted: 0 0% 96%; /* Light Gray #F5F5F5 */
+  --muted-foreground: 0 0% 45%; /* Medium Gray for secondary text */
+  
+  /* Unified component colors - all cards, modals, inputs use same base */
+  --card: 0 0% 99%; /* Unified component background #FDFDFD */
+  --card-foreground: 0 0% 0%; /* Pure Black text */
+  
+  /* Dashboard-specific variables */
+  --dashboard-bg: 0 0% 100%; /* #FFFFFF */
+  --dashboard-card: 0 0% 99%; /* #FDFDFD */
+  --dashboard-card-hover: 0 0% 96%; /* #F5F5F5 */
+  --dashboard-secondary-card: 0 0% 98%; /* #FBFBFB */
+  --dashboard-secondary-card-hover: 0 0% 96%; /* #F5F5F5 */
+  --dashboard-text: 0 0% 4%; /* #0A0A0A */
+  --dashboard-text-secondary: 0 0% 79%; /* #CACACA */
+  --dashboard-text-placeholder: 221 14% 53%; /* #737385 */
+  --dashboard-sidebar: 0 0% 98%; /* #FAFAFA */
+  --dashboard-button: 0 0% 93%; /* #EEEEEE */
+  --dashboard-button-text: 0 0% 9%; /* #171717 */
+  --dashboard-button-border: 0 0% 89%; /* #E3E3E3 */
+  --dashboard-icons: 210 100% 50%; /* #00A3FF */
+  --dashboard-separator: 0 0% 90%; /* #E5E5E5 */
+  
+  /* Specific overlay component colors */
+  --popover: 0 0% 100%; /* Light mode popover background #FFFFFF */
+  --popover-foreground: 0 0% 9%; /* Light mode popover text #171717 */
+  --accent: 0 0% 96%; /* Light mode hover background #F5F5F5 */
+  --accent-foreground: 0 0% 9%; /* Light mode hover text #171717 */
+  
+  /* Border and separator system */
+  --border: 221 14% 89%; /* Light borders #E3E3E3 */
+  --input: 221 14% 89%; /* Subtle gray input borders #E3E3E3 */
+  --separator: 0 0% 90%; /* Light separators #E5E5E5 */
+  
+  /* Focus ring system */
+  --ring: 210 100% 50%; /* Blue focus ring #00A3FF */
+  
+  /* Progress and form unfilled colors */
+  --secondary: 0 0% 95%; /* Light mode unfilled #F3F3F3 */
+  
+  /* Hover shadow variables */
+  --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-layout.dark {
+  /* Dark mode dashboard colors */
+  --background: 0 0% 7%; /* Dark background #121212 */
+  --foreground: 0 0% 98%; /* Light text #FAFAFA */
+  --primary: 0 0% 89%; /* Light gray primary #E3E3E3 */
+  --primary-foreground: 0 0% 9%; /* Dark text on light #171717 */
+  --muted: 0 0% 15%; /* Dark muted #262626 */
+  --muted-foreground: 0 0% 60%; /* Medium gray text */
+  
+  /* Unified dark component colors */
+  --card: 0 0% 8%; /* Dark component background #141414 */
+  --card-foreground: 0 0% 98%; /* Light text */
+  
+  /* Dashboard-specific dark variables */
+  --dashboard-bg: 0 0% 7%; /* #121212 */
+  --dashboard-card: 0 0% 8%; /* #141414 */
+  --dashboard-card-hover: 0 0% 15%; /* #262626 */
+  --dashboard-secondary-card: 0 0% 9%; /* #161616 */
+  --dashboard-secondary-card-hover: 0 0% 15%; /* #262626 */
+  --dashboard-text: 0 0% 98%; /* #FAFAFA */
+  --dashboard-text-secondary: 0 0% 96%; /* #F5F5F5 */
+  --dashboard-text-placeholder: 0 0% 60%; /* #9A9A9A */
+  --dashboard-sidebar: 0 0% 9%; /* #171717 */
+  --dashboard-button: 0 0% 13%; /* #222222 */
+  --dashboard-button-text: 0 0% 98%; /* #FAF7F3 */
+  --dashboard-button-border: 0 0% 18%; /* #2E2E2E */
+  --dashboard-icons: 0 0% 80%; /* #CCCCCC */
+  --dashboard-separator: 0 0% 15%; /* #262626 */
+  
+  /* Specific dark overlay component colors */
+  --popover: 0 0% 7%; /* Dark mode popover background #121212 */
+  --popover-foreground: 0 0% 98%; /* Dark mode popover text #FAFAFA */
+  --accent: 0 0% 15%; /* Dark mode hover background #262626 */
+  --accent-foreground: 0 0% 98%; /* Dark mode hover text #FAFAFA */
+  
+  /* Dark border and separator system */
+  --border: 0 0% 18%; /* Dark borders #2E2E2E */
+  --input: 0 0% 18%; /* Subtle gray input borders #2E2E2E */
+  --separator: 0 0% 18%; /* Dark separators #2E2E2E */
+  
+  /* Dark focus ring */
+  --ring: 0 0% 89%; /* Light focus ring #E3E3E3 */
+  
+  /* Progress and form unfilled colors */
+  --secondary: 0 0% 16%; /* Dark mode unfilled #292929 */
+  
+  /* Dark hover shadow */
+  --shadow-hover: 0 2px 8px rgba(255, 255, 255, 0.1);
+}
+
 @layer components {
   .nav-link {
     @apply relative text-dashboard-text hover:text-primary transition-colors duration-200;
@@ -241,20 +311,7 @@
     @apply text-dashboard-text-placeholder;
   }
 
-  /* Glow effects for interactive elements */
-  .glow-effect {
-    @apply relative overflow-hidden transition-all duration-300;
-  }
-  
-  .glow-effect::after {
-    @apply content-[''] absolute inset-0 bg-primary opacity-0 blur-xl transition-opacity duration-300;
-  }
-  
-  .glow-effect:hover::after {
-    @apply opacity-20;
-  }
-
-  /* Dashboard-scoped component styling */
+  /* Scoped to dashboard only */
   .dashboard-layout .component-base {
     background-color: hsl(var(--card));
     color: hsl(var(--card-foreground));
@@ -271,6 +328,19 @@
   .dashboard-layout .hover-shadow {
     @apply transition-all duration-200 hover:shadow-[var(--shadow-hover)];
   }
+
+  /* Glow effects for interactive elements */
+  .glow-effect {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+  
+  .glow-effect::after {
+    @apply content-[''] absolute inset-0 bg-primary opacity-0 blur-xl transition-opacity duration-300;
+  }
+  
+  .glow-effect:hover::after {
+    @apply opacity-20;
+  }
 }
 
 @layer utilities {
@@ -284,71 +354,102 @@
   }
 }
 
-/* Dashboard-specific color system - scoped to dashboard areas only */
-.dashboard-layout {
-  /* Core color system - simplified to 8 essential variables */
-  --background: 0 0% 100%; /* Pure White #FFFFFF */
-  --foreground: 0 0% 0%; /* Pure Black #000000 */
-  --primary: 210 100% 50%; /* Primary Blue #00A3FF */
-  --primary-foreground: 0 0% 98%; /* Light text on blue #FAFAFA */
-  --muted: 0 0% 96%; /* Light Gray #F5F5F5 */
-  --muted-foreground: 0 0% 45%; /* Medium Gray for secondary text */
-  
-  /* Unified component colors - all cards, modals, inputs use same base */
-  --card: 0 0% 99%; /* Unified component background #FDFDFD */
-  --card-foreground: 0 0% 0%; /* Pure Black text */
-  
-  /* Specific overlay component colors */
-  --popover: 0 0% 100%; /* Light mode popover background #FFFFFF */
-  --popover-foreground: 0 0% 9%; /* Light mode popover text #171717 */
-  --accent: 0 0% 96%; /* Light mode hover background #F5F5F5 */
-  --accent-foreground: 0 0% 9%; /* Light mode hover text #171717 */
-  
-  /* Border and separator system */
-  --border: 221 14% 89%; /* Light borders #E3E3E3 */
-  --input: 221 14% 89%; /* Subtle gray input borders #E3E3E3 */
-  --separator: 0 0% 90%; /* Light separators #E5E5E5 */
-  
-  /* Focus ring system */
-  --ring: 210 100% 50%; /* Blue focus ring #00A3FF */
-  
-  /* Progress and form unfilled colors */
-  --secondary: 0 0% 95%; /* Light mode unfilled #F3F3F3 */
-  
-  /* Hover shadow variables */
-  --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.1);
+.active-tab {
+  @apply relative text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary;
 }
 
-.dashboard-layout.dark {
-  /* Dark mode color system */
-  --background: 0 0% 7%; /* Dark background #121212 */
-  --foreground: 0 0% 98%; /* Light text #FAFAFA */
-  --primary: 0 0% 89%; /* Light gray primary #E3E3E3 */
-  --primary-foreground: 0 0% 9%; /* Dark text on light #171717 */
-  --muted: 0 0% 15%; /* Dark muted #262626 */
-  --muted-foreground: 0 0% 60%; /* Medium gray text */
-  
-  /* Unified dark component colors */
-  --card: 0 0% 8%; /* Dark component background #141414 */
-  --card-foreground: 0 0% 98%; /* Light text */
-  
-  /* Specific dark overlay component colors */
-  --popover: 0 0% 7%; /* Dark mode popover background #121212 */
-  --popover-foreground: 0 0% 98%; /* Dark mode popover text #FAFAFA */
-  --accent: 0 0% 15%; /* Dark mode hover background #262626 */
-  --accent-foreground: 0 0% 98%; /* Dark mode hover text #FAFAFA */
-  
-  /* Dark border and separator system */
-  --border: 0 0% 18%; /* Dark borders #2E2E2E */
-  --input: 0 0% 18%; /* Subtle gray input borders #2E2E2E */
-  --separator: 0 0% 18%; /* Dark separators #2E2E2E */
-  
-  /* Dark focus ring */
-  --ring: 0 0% 89%; /* Light focus ring #E3E3E3 */
-  
-  /* Progress and form unfilled colors */
-  --secondary: 0 0% 16%; /* Dark mode unfilled #292929 */
-  
-  /* Dark hover shadow */
-  --shadow-hover: 0 2px 8px rgba(255, 255, 255, 0.1);
+.waveform-bar {
+  transform-origin: bottom;
+}
+
+/* Improved scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Rich tab styling */
+.tab-border-indicator {
+  position: relative;
+}
+
+.tab-border-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.tab-border-indicator[data-state="active"]::after {
+  transform: scaleX(1);
+}
+
+/* Content Page Specific Styles */
+.content-page-layout {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.content-page-layout main {
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+/* Keep existing styles for other pages */
+.dashboard-layout:not(.content-page-layout) {
+  min-height: 100vh;
+}
+
+.dashboard-layout:not(.content-page-layout) main {
+  min-height: calc(100vh - 64px);
+}
+
+/* Content Page Tab Styles */
+.content-right-sidebar .content-page-tab-content {
+  height: calc(100% - 48px); /* Subtract tab height */
+  margin: 0;
+  padding: 0;
+}
+
+/* Keep default tab styles for other pages */
+.tabs-content:not(.content-page-tab-content) {
+  margin-top: 0.5rem;
+}
+
+/* Content Page Chat Styles */
+.content-page-chat {
+  position: relative;
+  height: 100%;
+}
+
+.content-page-chat-input {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: var(--dashboard-bg);
+}
+
+/* Default chat styles for other pages remain unchanged */
+.chat-component:not(.content-page-chat) {
+  min-height: 400px;
 }
