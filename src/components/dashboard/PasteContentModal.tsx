@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Link, FileText } from 'lucide-react';
+import { Link2, FileText } from 'lucide-react';
 
 interface PasteContentModalProps {
   isOpen: boolean;
@@ -46,7 +45,7 @@ export function PasteContentModal({
         <div className="p-6">
           <DialogHeader className="mb-4">
             <div className="flex items-center gap-2">
-              <Link className="text-muted-foreground h-4 w-4" />
+              <Link2 className="text-muted-foreground h-4 w-4" />
               <DialogTitle className="text-xl font-bold">YouTube, Website, Etc</DialogTitle>
             </div>
             <p className="text-muted-foreground text-sm mt-1">Enter a YouTube Link, Website URL, Doc, Etc</p>
