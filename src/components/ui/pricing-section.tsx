@@ -89,7 +89,7 @@ function PricingSection({
                         <Check className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-white">
+                        <div className="text-sm font-medium text-foreground/70">
                           {feature.name}
                         </div>
                         <div className="text-sm text-muted-foreground ">
