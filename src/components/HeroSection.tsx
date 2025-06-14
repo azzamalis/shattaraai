@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import Button from '@/components/Button'; // Changed from { Button } to Button
+import SmartCTA from '@/components/SmartCTA';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
@@ -116,19 +116,20 @@ export function HeroSection() {
                   <div
                     key={1}
                     className="bg-primary/10 rounded-[14px] border p-0.5">
-                    <Button
+                    <SmartCTA
+                      type="get-started"
                       size="lg"
                       className="rounded-xl px-5 text-base h-11">
                       <span className="text-nowrap">Get Started</span>
-                    </Button>
+                    </SmartCTA>
                   </div>
-                  <Button
+                  <SmartCTA
                     key={2}
                     variant="outline"
                     size="lg"
                     className="h-11 rounded-xl px-5">
                     <span className="text-nowrap">See features</span>
-                  </Button>
+                  </SmartCTA>
                 </AnimatedGroup>
               </div>
             </div>
@@ -288,22 +289,25 @@ const HeroHeader = () => {
 
             <div className="mb-6 hidden w-full lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0">
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <Button
+                <SmartCTA
+                  type="login"
                   variant="outline"
                   size="sm"
                   className={cn(isScrolled && 'lg:hidden')}>
                   Login
-                </Button>
-                <Button
+                </SmartCTA>
+                <SmartCTA
+                  type="signup"
                   size="sm"
                   className={cn(isScrolled && 'lg:hidden')}>
                   Sign Up
-                </Button>
-                <Button
+                </SmartCTA>
+                <SmartCTA
+                  type="get-started"
                   size="sm"
                   className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
                   Get Started
-                </Button>
+                </SmartCTA>
               </div>
             </div>
           </div>

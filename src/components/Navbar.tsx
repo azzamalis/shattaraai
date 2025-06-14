@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Logo from './Logo';
-import Button from './Button';
+import SmartCTA from './SmartCTA';
 import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
@@ -39,7 +39,12 @@ const Navbar = () => {
 
           {/* CTA Button */}
           <div className="flex items-center">
-            <Button className="hidden md:inline-flex">Get Started</Button>
+            <SmartCTA 
+              type="get-started"
+              className="hidden md:inline-flex"
+            >
+              Get Started
+            </SmartCTA>
             
             {/* Mobile Menu Button */}
             <button 
@@ -92,9 +97,13 @@ const Navbar = () => {
             >
               The Newsletter
             </a>
-            <Button className="mt-4 w-full" onClick={() => setIsOpen(false)}>
+            <SmartCTA 
+              type="get-started"
+              className="mt-4 w-full" 
+              onClick={() => setIsOpen(false)}
+            >
               Get Started
-            </Button>
+            </SmartCTA>
           </nav>
         </div>
       </div>

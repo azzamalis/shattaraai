@@ -1,6 +1,6 @@
+
 import React from 'react';
-import Button from './Button';
-import { Link } from 'react-router-dom';
+import SmartCTA from './SmartCTA';
 import AnimatedTextCycle from './ui/animated-text-cycle';
 
 const CTA = () => {
@@ -26,14 +26,13 @@ const CTA = () => {
             />
             {' '}you deserve better tools!
           </h2>
-          <Link to="/signup">
-            <Button 
-              className="text-lg px-8 py-4 bg-primary hover:bg-primary-light"
-              size="lg"
-            >
-              Try It Now
-            </Button>
-          </Link>
+          <SmartCTA 
+            type="get-started"
+            className="text-lg px-8 py-4 bg-primary hover:bg-primary-light"
+            size="lg"
+          >
+            Try It Now
+          </SmartCTA>
         </div>
       </div>
     </section>
