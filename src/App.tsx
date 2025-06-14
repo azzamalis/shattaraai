@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ContentProvider } from "@/contexts/ContentContext";
-import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Team from "./pages/Team";
@@ -47,49 +45,47 @@ const queryClient = new QueryClient({
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <LanguageProvider>
-          <ContentProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/team" element={<Team />} />
-                  <Route path="/teachers" element={<Teachers />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/careers" element={<Careers />} />
-                  <Route path="/signup" element={<SignUp />} />
-                  <Route path="/signin" element={<SignIn />} />
-                  <Route path="/password-reset" element={<PasswordReset />} />
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  
-                  {/* Dashboard routes */}
-                  <Route path="/dashboard" element={<DashboardPage />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/rooms/:id" element={<RoomPage />} />
-                  <Route path="/history" element={<HistoryPage />} />
-                  <Route path="/content/:id" element={<ContentPage />} />
-                  <Route path="/chat" element={<ChatPage />} />
-                  <Route path="/chat/:id" element={<ChatPage />} />
-                  <Route path="/pricing" element={<PricingPage />} />
-                  <Route path="/reports" element={<ReportsPage />} />
-                  <Route path="/exam-loading" element={<ExamLoadingPage />} />
-                  <Route path="/exam" element={<ExamPage />} />
-                  <Route path="/exam-results" element={<ExamResultsInterface />} />
-                  <Route path="/exam/results" element={<ExamResultsSummary />} />
-                  
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
-          </ContentProvider>
-        </LanguageProvider>
-      </ThemeProvider>
+      <LanguageProvider>
+        <ContentProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/team" element={<Team />} />
+                <Route path="/teachers" element={<Teachers />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/password-reset" element={<PasswordReset />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                
+                {/* Dashboard routes */}
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/rooms/:id" element={<RoomPage />} />
+                <Route path="/history" element={<HistoryPage />} />
+                <Route path="/content/:id" element={<ContentPage />} />
+                <Route path="/chat" element={<ChatPage />} />
+                <Route path="/chat/:id" element={<ChatPage />} />
+                <Route path="/pricing" element={<PricingPage />} />
+                <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/exam-loading" element={<ExamLoadingPage />} />
+                <Route path="/exam" element={<ExamPage />} />
+                <Route path="/exam-results" element={<ExamResultsInterface />} />
+                <Route path="/exam/results" element={<ExamResultsSummary />} />
+                
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ContentProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 };
