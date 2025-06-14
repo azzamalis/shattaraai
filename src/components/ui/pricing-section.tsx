@@ -64,7 +64,7 @@ function PricingSection({
                   <div className={cn("p-3 rounded-xl", tier.highlight ? "bg-primary/10 text-primary" : "bg-zinc-800 text-zinc-400")}>
                     {tier.icon}
                   </div>
-                  <h3 className="text-xl font-semibold text-white">
+                  <h3 className="text-xl font-semibold text-foreground ">
                     {tier.name}
                   </h3>
                 </div>
