@@ -20,14 +20,14 @@ const PurposeSelector = ({ value, onChange }: PurposeSelectorProps) => {
 
   return (
     <div className={`space-y-2 ${isRTL ? 'text-right' : 'text-left'}`}>
-      <label className="block text-sm font-medium text-white">
+      <label className="block text-sm font-medium text-foreground">
         {t('onboarding.purpose')}
       </label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className={`w-full bg-dark border-zinc-700 text-white ${isRTL ? 'text-right' : 'text-left'}`}>
+        <SelectTrigger className={`w-full bg-background border-border text-foreground ${isRTL ? 'text-right' : 'text-left'}`}>
           <SelectValue placeholder={t('onboarding.purposePlaceholder')} />
         </SelectTrigger>
-        <SelectContent className="bg-dark-deeper border-zinc-700 text-white">
+        <SelectContent className="bg-popover border-border text-popover-foreground">
           <SelectItem value="student" className={`${selectItemClasses} ${isRTL ? 'text-right' : 'text-left'}`}>
             {t('onboarding.purpose.student')}
           </SelectItem>

@@ -21,14 +21,14 @@ const SourceSelector = ({ value, onChange }: SourceSelectorProps) => {
 
   return (
     <div className={`space-y-2 ${isRTL ? 'text-right' : 'text-left'}`}>
-      <label className="block text-sm font-medium text-white">
+      <label className="block text-sm font-medium text-foreground">
         {t('onboarding.source')}
       </label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className={`w-full bg-dark border-zinc-700 text-white ${isRTL ? 'text-right' : 'text-left'}`}>
+        <SelectTrigger className={`w-full bg-background border-border text-foreground ${isRTL ? 'text-right' : 'text-left'}`}>
           <SelectValue placeholder={t('onboarding.sourcePlaceholder')} />
         </SelectTrigger>
-        <SelectContent className="bg-dark-deeper border-zinc-700 text-white">
+        <SelectContent className="bg-popover border-border text-popover-foreground">
           {sourceOptions.map((option) => (
             <SelectItem 
               key={option.value} 

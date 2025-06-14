@@ -56,7 +56,7 @@ const OnboardingForm = () => {
       {/* Continue Button */}
       <Button 
         type="submit" 
-        className={`w-full bg-primary hover:bg-primary-light text-white py-6 mt-8 ${isRTL ? 'flex-row-reverse' : ''}`}
+        className={`w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 mt-8 ${isRTL ? 'flex-row-reverse' : ''}`}
         disabled={!isFormValid}
       >
         {t('onboarding.continue')}
