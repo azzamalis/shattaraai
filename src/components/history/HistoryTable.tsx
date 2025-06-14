@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from 'date-fns';
 import { 
@@ -21,6 +22,7 @@ import {
 import { FileText, Video, Youtube, Mic, Globe, MessageSquare, MoreHorizontal } from 'lucide-react';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
+import { HistoryEmptyState } from './HistoryEmptyState';
 import { Room } from '@/lib/types';
 
 export interface HistoryItem {
@@ -38,6 +40,8 @@ interface HistoryTableProps {
   rooms?: Room[];
   onAddToRoom?: (contentId: string, roomId: string) => void;
   onDelete?: (id: string) => void;
+  searchQuery?: string;
+  onClearFilters?: () => void;
 }
 
 // Helper function to get content type icon
@@ -85,7 +89,9 @@ export function HistoryTable({
   onItemClick, 
   rooms = [], 
   onAddToRoom,
-  onDelete 
+  onDelete,
+  searchQuery = '',
+  onClearFilters
 }: HistoryTableProps) {
   const [shareModalOpen, setShareModalOpen] = React.useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
@@ -94,13 +100,13 @@ export function HistoryTable({
 
   const handleShareClick = (item: HistoryItem) => {
     setSelectedItem(item);
-    setOpenDropdown(null); // Close dropdown
+    setOpenDropdown(null);
     setShareModalOpen(true);
   };
 
   const handleDeleteClick = (item: HistoryItem) => {
     setSelectedItem(item);
-    setOpenDropdown(null); // Close dropdown
+    setOpenDropdown(null);
     setDeleteModalOpen(true);
   };
 
@@ -125,6 +131,16 @@ export function HistoryTable({
       setSelectedItem(null);
     }
   };
+
+  if (items.length === 0) {
+    return (
+      <HistoryEmptyState 
+        hasSearch={searchQuery.length > 0}
+        searchQuery={searchQuery}
+        onClearFilters={onClearFilters}
+      />
+    );
+  }
 
   return (
     <>
@@ -187,7 +203,7 @@ export function HistoryTable({
                             onClick={(e) => {
                               e.stopPropagation();
                               onAddToRoom?.(item.id, room.id);
-                              setOpenDropdown(null); // Close dropdown
+                              setOpenDropdown(null);
                             }}
                           >
                             {room.name}
@@ -216,17 +232,6 @@ export function HistoryTable({
               </TableCell>
             </TableRow>
           ))}
-          
-          {items.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center">
-                <div className="flex flex-col items-center justify-center text-muted-foreground">
-                  <FileText className="h-8 w-8 mb-2" />
-                  <p>No history items found</p>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
         </TableBody>
       </Table>
 
