@@ -16,9 +16,11 @@ export function ContentPreview({ type, filename, title, className = "w-16 h-16" 
       case 'pdf':
       case 'upload':
         return <FileText className={`${className} text-gray-400`} />;
-      case 'audio':
+      case 'audio_file':
       case 'recording':
         return <Music className={`${className} text-gray-400`} />;
+      case 'live_recording':
+        return <Mic className={`${className} text-red-500`} />;
       case 'video':
         return <Video className={`${className} text-gray-400`} />;
       case 'youtube':
