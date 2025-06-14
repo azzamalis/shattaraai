@@ -118,7 +118,7 @@ const UseCases = () => {
           <h2 className="text-3xl font-bold mb-4 text-foreground ">
             Designed for every learning journey
           </h2>
-          <p className="text-lg text-white/70">
+          <p className="text-lg text-muted-foreground ">
             Our platform adapts to your needs, whether you're a student, professional, or lifelong learner.
           </p>
         </div>
