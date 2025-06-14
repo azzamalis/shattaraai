@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -18,7 +19,7 @@ const transitionVariants = {
       filter: 'blur(0px)',
       y: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         bounce: 0.3,
         duration: 1.5,
       },
@@ -58,7 +59,7 @@ export function HeroSection() {
                     opacity: 1,
                     y: 0,
                     transition: {
-                      type: "spring",
+                      type: "spring" as const,
                       bounce: 0.3,
                       duration: 2,
                     },
@@ -110,7 +111,23 @@ export function HeroSection() {
                         },
                       },
                     },
-                    ...transitionVariants,
+                    item: {
+                      hidden: {
+                        opacity: 0,
+                        filter: 'blur(12px)',
+                        y: 12,
+                      },
+                      visible: {
+                        opacity: 1,
+                        filter: 'blur(0px)',
+                        y: 0,
+                        transition: {
+                          type: 'spring' as const,
+                          bounce: 0.3,
+                          duration: 1.5,
+                        },
+                      },
+                    },
                   }}
                   className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
                   <div
@@ -144,7 +161,23 @@ export function HeroSection() {
                     },
                   },
                 },
-                ...transitionVariants,
+                item: {
+                  hidden: {
+                    opacity: 0,
+                    filter: 'blur(12px)',
+                    y: 12,
+                  },
+                  visible: {
+                    opacity: 1,
+                    filter: 'blur(0px)',
+                    y: 0,
+                    transition: {
+                      type: 'spring' as const,
+                      bounce: 0.3,
+                      duration: 1.5,
+                    },
+                  },
+                },
               }}>
               <div className="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
                 <div
