@@ -154,15 +154,15 @@ const HeroContent = () => {
           }
         }}>
           <div className="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-            <div aria-hidden className="bg-gradient-to-b to-background absolute inset-0 z-10 from-transparent from-35%" />
-            <div className="bg-background/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/10 p-4 shadow-lg shadow-black/15">
+            <div aria-hidden className="bg-gradient-to-b to-background absolute inset-0 z-5 from-transparent from-35%" />
+            <div className="bg-background/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-primary/10 p-4 shadow-lg shadow-black/15 z-10">
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
               
-              {/* Replace animation with dashboard image */}
+              {/* Dashboard image with proper z-index */}
               <img 
                 src="/lovable-uploads/eee30cfe-fda4-4e4c-a696-0038b9c72151.png"
                 alt="SHATTARA AI Dashboard Interface - AI-powered learning platform with study materials, flashcards, and exam preparation tools"
-                className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover object-top"
+                className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover object-top z-20"
               />
             </div>
           </div>
