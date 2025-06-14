@@ -3,7 +3,6 @@ import React from 'react';
 import { Room, ContentItem } from '@/lib/types';
 import { MyRoomsSection } from './MyRoomsSection';
 import { ContinueLearningSection } from './ContinueLearningSection';
-import { ExploreContentSection } from './ExploreContentSection';
 import { toast } from "sonner";
 
 interface DashboardSectionsProps {
@@ -26,8 +25,6 @@ export function DashboardSections({
   onDeleteRoom,
   onCardDelete,
   onCardShare,
-  onExploreCardDelete,
-  onExploreCardShare,
   currentRoom,
   onUpdateContent
 }: DashboardSectionsProps) {
@@ -56,14 +53,6 @@ export function DashboardSections({
       <ContinueLearningSection 
         onDeleteCard={onCardDelete} 
         onShareCard={onCardShare}
-        onAddToRoom={handleAddToRoom}
-        availableRooms={rooms}
-        currentRoom={currentRoom}
-      />
-
-      <ExploreContentSection 
-        onDeleteCard={onExploreCardDelete} 
-        onShareCard={onExploreCardShare}
         onAddToRoom={handleAddToRoom}
         availableRooms={rooms}
         currentRoom={currentRoom}
