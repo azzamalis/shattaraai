@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardDrawer } from './DashboardDrawer';
-import { Room } from '@/lib/types';
-import { toast } from 'sonner';
-import { ContentProvider } from '@/contexts/ContentContext';
+import { useAuth } from '@/hooks/useAuth';
+import { useRooms } from '@/hooks/useRooms';
+import { useContent } from '@/hooks/useContent';
 import { useLocation } from 'react-router-dom';
 import { ContentData } from '@/pages/ContentPage';
 
@@ -21,40 +21,11 @@ export function DashboardLayout({
   contentData,
   onUpdateContent 
 }: DashboardLayoutProps) {
+  const { user } = useAuth();
+  const { rooms, addRoom, editRoom, deleteRoom } = useRooms();
+  const { content } = useContent();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  
-  // Room state management
-  const [rooms, setRooms] = useState<Room[]>([
-    { id: "1", name: "Azzam's Room", lastActive: "12:00 PM" },
-    { id: "2", name: "Untitled Room", lastActive: "12:00 PM" },
-    { id: "3", name: "Project 'Neom'", lastActive: "12:00 PM" },
-  ]);
-
-  // Room handlers
-  const handleAddRoom = () => {
-    const newRoom: Room = {
-      id: (rooms.length + 1).toString(),
-      name: "New Room",
-      lastActive: "Just now"
-    };
-    setRooms(prevRooms => [...prevRooms, newRoom]);
-    toast.success("New room created successfully");
-  };
-
-  const handleEditRoom = (roomId: string, newName: string) => {
-    setRooms(prevRooms => 
-      prevRooms.map(room => 
-        room.id === roomId ? { ...room, name: newName } : room
-      )
-    );
-    toast.success("Room name updated successfully");
-  };
-
-  const handleDeleteRoom = (roomId: string) => {
-    setRooms(prevRooms => prevRooms.filter(room => room.id !== roomId));
-    toast.success("Room deleted successfully");
-  };
 
   // Handle screen resize
   useEffect(() => {
@@ -88,43 +59,47 @@ export function DashboardLayout({
     };
   }, []);
 
+  // Don't render if user is not authenticated
+  if (!user) {
+    return null;
+  }
+
   return (
-    <ContentProvider>
-      <div className={cn(
-        "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300 dark"
-      )}>
-        <DashboardHeader 
-          onOpenDrawer={() => setIsDrawerOpen(true)} 
-          contentData={contentData}
-          onUpdateContent={onUpdateContent}
-          rooms={rooms}
-        />
-        <DashboardDrawer 
-          open={isDrawerOpen} 
-          onOpenChange={setIsDrawerOpen}
-          rooms={rooms}
-          onAddRoom={handleAddRoom}
-          onEditRoom={handleEditRoom}
-          onDeleteRoom={handleDeleteRoom}
-        />
-        <main 
-          className={cn(
-            "flex-1 transition-all duration-300 ease-in-out", 
-            isDrawerOpen ? "lg:ml-[300px]" : "ml-0",
-            className
-          )}
-        >
-          {/* Directly pass rooms and roomHandlers to children */}
-          {React.isValidElement(children) 
-            ? React.cloneElement(children as React.ReactElement, {
-              rooms,
-              onAddRoom: handleAddRoom,
-              onEditRoom: handleEditRoom,
-              onDeleteRoom: handleDeleteRoom
-            }) 
-            : children}
-        </main>
-      </div>
-    </ContentProvider>
+    <div className={cn(
+      "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300 dark"
+    )}>
+      <DashboardHeader 
+        onOpenDrawer={() => setIsDrawerOpen(true)} 
+        contentData={contentData}
+        onUpdateContent={onUpdateContent}
+        rooms={rooms}
+      />
+      <DashboardDrawer 
+        open={isDrawerOpen} 
+        onOpenChange={setIsDrawerOpen}
+        rooms={rooms}
+        onAddRoom={addRoom}
+        onEditRoom={editRoom}
+        onDeleteRoom={deleteRoom}
+      />
+      <main 
+        className={cn(
+          "flex-1 transition-all duration-300 ease-in-out", 
+          isDrawerOpen ? "lg:ml-[300px]" : "ml-0",
+          className
+        )}
+      >
+        {/* Pass rooms, content and handlers to children */}
+        {React.isValidElement(children) 
+          ? React.cloneElement(children as React.ReactElement, {
+            rooms,
+            content,
+            onAddRoom: addRoom,
+            onEditRoom: editRoom,
+            onDeleteRoom: deleteRoom
+          }) 
+          : children}
+      </main>
+    </div>
   );
 }

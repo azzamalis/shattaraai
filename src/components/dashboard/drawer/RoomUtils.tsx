@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Box, Pencil, Trash2, Check, X } from 'lucide-react';
-import { Room } from '@/lib/types';
+import { Room } from '@/hooks/useRooms';
 
 interface RoomItemProps {
   room: Room;
@@ -10,7 +11,7 @@ interface RoomItemProps {
   setEditedRoomName: (name: string) => void;
   onRoomClick: (roomId: string) => void;
   onRenameClick: (e: React.MouseEvent, roomId: string) => void;
-  onSaveRename: (e: React.MouseEvent, roomId: string) => void;
+  onSaveRename: (e: React.MouseEvent, roomId: string) => Promise<void>;
   onCancelRename: (e: React.MouseEvent) => void;
   onDeleteClick: (e: React.MouseEvent, roomId: string) => void;
 }
@@ -102,7 +103,7 @@ export const createRoomHandlers = (
 
   const handleSaveRename = (e: React.MouseEvent, roomId: string) => {
     e.stopPropagation();
-    if (setEditedRoomName) {
+    if (set) {
       setEditingRoomId(null);
     }
   };

@@ -1,24 +1,31 @@
 
 import React, { useState } from 'react';
-import { Room, RoomHandlers, DeleteItem, ContentItem } from '@/lib/types';
+import { Room } from '@/hooks/useRooms';
+import { ContentItem } from '@/hooks/useContent';
+import { DeleteItem } from '@/lib/types';
 import { DashboardHero } from './DashboardHero';
 import { DashboardSections } from './DashboardSections';
 import { DashboardModals } from './DashboardModals';
-import { useContent } from '@/contexts/ContentContext';
+import { useContentContext } from '@/contexts/ContentContext';
 import { useLocation } from 'react-router-dom';
 
-interface DashboardProps extends RoomHandlers {
-  rooms: Room[];
+interface DashboardProps {
+  rooms?: Room[];
+  content?: ContentItem[];
+  onAddRoom?: () => Promise<string | null>;
+  onEditRoom?: (id: string, name: string) => Promise<void>;
+  onDeleteRoom?: (id: string) => Promise<void>;
 }
 
 export function Dashboard({
-  rooms,
+  rooms = [],
+  content = [],
   onAddRoom,
   onEditRoom,
   onDeleteRoom
 }: DashboardProps) {
   const location = useLocation();
-  const { onDeleteContent, onUpdateContent } = useContent();
+  const { onDeleteContent, onUpdateContent } = useContentContext();
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -35,7 +42,7 @@ export function Dashboard({
     return undefined;
   }, [location.pathname, rooms]);
 
-  const handleDeleteClick = (roomId: string) => {
+  const handleDeleteClick = async (roomId: string) => {
     const room = rooms.find(r => r.id === roomId);
     if (room) {
       setItemToDelete({
@@ -82,8 +89,8 @@ export function Dashboard({
 
         <DashboardSections
           rooms={rooms}
-          onAddRoom={onAddRoom}
-          onEditRoom={onEditRoom}
+          onAddRoom={onAddRoom || (() => Promise.resolve(null))}
+          onEditRoom={onEditRoom || (() => Promise.resolve())}
           onDeleteRoom={handleDeleteClick}
           onCardDelete={handleCardDelete}
           onCardShare={handleCardShare}

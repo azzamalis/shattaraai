@@ -1,15 +1,16 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, ChevronDown } from 'lucide-react';
-import { Room } from '@/lib/types';
+import { Room } from '@/hooks/useRooms';
 import { RoomItem, createRoomHandlers } from './RoomUtils';
 import { useNavigate } from 'react-router-dom';
 
 interface RoomsSectionProps {
   rooms: Room[];
-  onAddRoom: () => void;
-  onEditRoom: (id: string, newName: string) => void;
-  onDeleteRoom: (id: string) => void;
+  onAddRoom: () => Promise<string | null>;
+  onEditRoom: (id: string, newName: string) => Promise<void>;
+  onDeleteRoom: (id: string) => Promise<void>;
   onOpenChange: (open: boolean) => void;
   setRoomToDelete: (id: string | null) => void;
   setRoomToDeleteName: (name: string) => void;
@@ -50,6 +51,15 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
     setDeleteModalOpen
   );
 
+  const handleAddRoomClick = async () => {
+    await onAddRoom();
+  };
+
+  const handleSaveRenameWithEdit = async (e: React.MouseEvent, id: string) => {
+    handleSaveRename(e, id);
+    await onEditRoom(id, editedRoomName);
+  };
+
   return (
     <div>
       <h2 className="ml-2 text-sm mb-2 font-semibold text-foreground">Rooms</h2>
@@ -60,7 +70,7 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
             bg-transparent border-2 border-dashed border-primary/10 
             text-primary/80 hover:bg-primary/5 hover:text-primary hover:border-primary/10
             transition-colors duration-200 rounded-lg py-2 px-2 mb-1" 
-          onClick={onAddRoom}
+          onClick={handleAddRoomClick}
         >
           <Plus className="h-4 w-4" />
           <span className="text-sm font-normal">Add room</span>
@@ -75,10 +85,7 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
             setEditedRoomName={setEditedRoomName}
             onRoomClick={handleRoomClick}
             onRenameClick={handleRenameClick}
-            onSaveRename={(e, id) => {
-              handleSaveRename(e, id);
-              onEditRoom(id, editedRoomName);
-            }}
+            onSaveRename={handleSaveRenameWithEdit}
             onCancelRename={handleCancelRename}
             onDeleteClick={handleDeleteClick}
           />

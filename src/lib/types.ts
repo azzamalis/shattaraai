@@ -1,98 +1,35 @@
+// Import database types from Supabase
+import { Database } from '@/integrations/supabase/types';
 
-export interface Room {
-  id: string;
-  name: string;
-  lastActive: string;
-}
+// Re-export Room and ContentItem from hooks for backward compatibility
+export type { Room } from '@/hooks/useRooms';
+export type { ContentItem } from '@/hooks/useContent';
 
+// Keep existing types that are still used
 export interface DeleteItem {
   id: string;
   type: 'room' | 'card';
   name: string;
-  parentName?: string;
 }
 
 export interface RoomHandlers {
-  onAddRoom: () => void;
-  onEditRoom: (id: string, newName: string) => void;
-  onDeleteRoom: (id: string) => void;
-}
-
-export type ContentType = 'recording' | 'pdf' | 'video' | 'audio' | 'youtube' | 'website' | 'text' | 'upload' | 'chat';
-
-export type RecordingState = 'new' | 'recording' | 'paused' | 'completed' | 'existing';
-
-export interface RecordingMetadata {
-  duration?: number;
-  fileSize?: number;
-  format?: string;
-  sampleRate?: number;
-  createdAt?: string;
-  lastModified?: string;
-  audioUrl?: string;
-  transcriptUrl?: string;
-  chaptersData?: ChapterData[];
-}
-
-export interface ChapterData {
-  id: string;
-  title: string;
-  startTime: number;
-  endTime: number;
-  summary?: string;
-}
-
-export interface RecordingStateInfo {
-  state: RecordingState;
-  isNewRecording: boolean;
-  isExistingRecording: boolean;
-  hasAudioFile: boolean;
-  hasTranscript: boolean;
-  hasChapters: boolean;
-}
-
-export interface ContentItem {
-  id: string;
-  title: string;
-  type: ContentType;
-  createdAt: string;
-  url?: string;
-  filename?: string;
-  text?: string;
-  fileSize?: number;
-  duration?: number;
-  thumbnail?: string;
-  metadata?: Record<string, any>;
-  recordingMetadata?: RecordingMetadata;
-  roomId?: string;
+  onAddRoom: () => Promise<string | null>;
+  onEditRoom: (id: string, newName: string) => Promise<void>;
+  onDeleteRoom: (id: string) => Promise<void>;
 }
 
 export interface ContentHandlers {
-  onAddContent: (content: Omit<ContentItem, 'id' | 'createdAt'>) => void;
-  onDeleteContent: (id: string) => void;
+  onAddContent: (content: any) => Promise<string | null>;
+  onDeleteContent: (id: string) => Promise<void>;
+  onUpdateContent: (id: string, updates: any) => Promise<void>;
 }
 
-export interface Message {
-  id: string;
-  content: string;
-  sender: 'user' | 'ai';
-  timestamp: Date;
-  copyable?: boolean;
-}
+// Database types for direct use
+export type DbRoom = Database['public']['Tables']['rooms']['Row'];
+export type DbContent = Database['public']['Tables']['content']['Row'];
+export type DbProfile = Database['public']['Tables']['profiles']['Row'];
 
-export interface CommandOption {
-  id: string;
-  label: string;
-  description: string;
-  icon?: string;
-  category: string;
-}
-
-export type ChatTabType = 'chat' | 'flashcards' | 'quizzes' | 'notes';
-
-export interface NotesBlock {
-  id: string;
-  type: 'paragraph' | 'h1' | 'h2' | 'h3' | 'ul' | 'ol' | 'todo' | 'code' | 'quote' | 'table' | 'divider';
-  content: string;
-  data?: any;
-}
+// Enums from database
+export type UserPurpose = Database['public']['Enums']['user_purpose'];
+export type UserGoal = Database['public']['Enums']['user_goal'];
+export type UserSource = Database['public']['Enums']['user_source'];
