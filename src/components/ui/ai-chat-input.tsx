@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -72,7 +73,7 @@ const AIChatInput = ({
       boxShadow: "0 2px 8px 0 rgba(0,0,0,0.08)",
       border: "1px solid hsl(var(--border))",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 120,
         damping: 18
       }
@@ -82,7 +83,7 @@ const AIChatInput = ({
       boxShadow: "0 8px 32px 0 rgba(0,0,0,0.16)",
       border: "1px solid hsl(var(--border))",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 120,
         damping: 18
       }
@@ -122,7 +123,7 @@ const AIChatInput = ({
           duration: 0.4
         },
         y: {
-          type: "spring",
+          type: "spring" as const,
           stiffness: 80,
           damping: 20
         }
@@ -140,7 +141,7 @@ const AIChatInput = ({
           duration: 0.3
         },
         y: {
-          type: "spring",
+          type: "spring" as const,
           stiffness: 80,
           damping: 20
         }

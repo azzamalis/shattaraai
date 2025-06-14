@@ -1,3 +1,4 @@
+
 // src/components/ui/animated-text-cycle.tsx
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
@@ -48,7 +49,7 @@ export default function AnimatedTextCycle({
       filter: "blur(0px)",
       transition: {
         duration: 0.4,
-        ease: "easeOut"
+        ease: "easeOut" as const
       }
     },
     exit: { 
@@ -57,7 +58,7 @@ export default function AnimatedTextCycle({
       filter: "blur(8px)",
       transition: { 
         duration: 0.3, 
-        ease: "easeIn"
+        ease: "easeIn" as const
       }
     },
   };
@@ -82,7 +83,7 @@ export default function AnimatedTextCycle({
         animate={{ 
           width,
           transition: { 
-            type: "spring",
+            type: "spring" as const,
             stiffness: 150,
             damping: 15,
             mass: 1.2,
