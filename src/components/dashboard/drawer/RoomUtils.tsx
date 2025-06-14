@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { useContentContext } from '@/contexts/ContentContext';
@@ -21,13 +22,12 @@ interface RoomUtilsProps {
 }
 
 export function RoomUtils({ content, rooms }: RoomUtilsProps) {
-  const { updateContent } = useContentContext();
+  const { onUpdateContent } = useContentContext();
   const [movingItems, setMovingItems] = useState<Set<string>>(new Set());
 
   const moveToRoom = async (contentId: string, targetRoomId: string) => {
     try {
-      await updateContent(contentId, { room_id: targetRoomId });
-      // Instead of using 'set', use 'Set' constructor
+      await onUpdateContent(contentId, { room_id: targetRoomId });
       setMovingItems(prev => new Set([...prev].filter(id => id !== contentId)));
       toast.success('Content moved successfully');
     } catch (error) {
@@ -72,3 +72,7 @@ export function RoomUtils({ content, rooms }: RoomUtilsProps) {
     </div>
   );
 }
+
+// Export the components that RoomsSection needs
+export { RoomItem } from './RoomItem';
+export { createRoomHandlers } from './RoomHandlers';

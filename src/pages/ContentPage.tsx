@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -31,13 +32,12 @@ export default function ContentPage() {
   
   // Use recording state detection hook
   const { 
-    recordingStateInfo, 
-    recordingMetadata, 
-    isLoading: isRecordingLoading 
-  } = useRecordingState({
-    contentId: id || 'new',
-    contentType: type
-  });
+    state: recordingStateInfo, 
+    metadata: recordingMetadata, 
+    mockChapters,
+    getRecordingState,
+    analyzeRecording
+  } = useRecordingState();
 
   const [contentData, setContentData] = useState<ContentData>({
     id: id || 'new',
@@ -80,7 +80,7 @@ export default function ContentPage() {
 
   // Simulate content processing for non-recording types or modify for existing recordings
   useEffect(() => {
-    if (recordingStateInfo?.isExistingRecording && !isRecordingLoading) {
+    if (recordingStateInfo?.isExistingRecording) {
       // For existing recordings, set processing to false immediately
       setContentData(prev => ({ ...prev, isProcessing: false }));
     } else if (contentData.type !== 'recording' && (contentData.url || contentData.filePath || contentData.text)) {
@@ -92,7 +92,7 @@ export default function ContentPage() {
 
       return () => clearTimeout(timer);
     }
-  }, [contentData.type, contentData.url, contentData.filePath, contentData.text, recordingStateInfo?.isExistingRecording, isRecordingLoading]);
+  }, [contentData.type, contentData.url, contentData.filePath, contentData.text, recordingStateInfo?.isExistingRecording]);
 
   const toggleRecording = () => {
     if (!isRecording) {
@@ -156,7 +156,7 @@ export default function ContentPage() {
                 onMicrophoneClear={handleMicrophoneClear}
                 recordingStateInfo={recordingStateInfo}
                 recordingMetadata={recordingMetadata}
-                isRecordingLoading={isRecordingLoading}
+                isRecordingLoading={false}
                 onTextAction={handleTextAction}
               />
             </ResizablePanel>

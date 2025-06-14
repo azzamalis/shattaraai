@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { File, Video, ImageIcon, Pdf, Mic, Youtube, Link as LinkIcon, Text } from 'lucide-react';
+import { File, Video, ImageIcon, FileText, Mic, Youtube, Link as LinkIcon, Text } from 'lucide-react';
 import { useContentContext } from '@/contexts/ContentContext';
 
 interface ContentTypeIconProps {
@@ -17,7 +18,7 @@ function ContentTypeIcon({ type }: ContentTypeIconProps) {
     case 'image':
       return <ImageIcon className="w-4 h-4" />;
     case 'pdf':
-      return <Pdf className="w-4 h-4" />;
+      return <FileText className="w-4 h-4" />;
     case 'recording':
       return <Mic className="w-4 h-4" />;
     case 'youtube':

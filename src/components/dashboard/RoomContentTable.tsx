@@ -215,7 +215,12 @@ export function RoomContentTable({
       </div>
 
       {/* Edit Modal */}
-      <EditContentModal open={editModalOpen} onOpenChange={handleEditModalClose} contentItem={selectedItem} onSave={handleEditSave} />
+      <EditContentModal 
+        open={editModalOpen} 
+        onOpenChange={handleEditModalClose} 
+        contentItem={selectedItem} 
+        onSave={handleEditSave} 
+      />
 
       {/* Share Modal */}
       <ShareModal open={shareModalOpen} onOpenChange={handleShareModalClose} type="content" itemToShare={{

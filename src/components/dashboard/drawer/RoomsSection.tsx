@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, ChevronDown } from 'lucide-react';
 import { Room } from '@/hooks/useRooms';
-import { RoomItem, createRoomHandlers } from './RoomUtils';
+import { RoomItem } from './RoomItem';
+import { createRoomHandlers } from './RoomHandlers';
 import { useNavigate } from 'react-router-dom';
 
 interface RoomsSectionProps {

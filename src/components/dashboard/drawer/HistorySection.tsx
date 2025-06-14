@@ -1,14 +1,10 @@
+
 import React from 'react';
 import { History } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RecentSection } from './RecentSection';
-import { Room } from '@/lib/types';
 
-interface HistorySectionProps {
-  rooms: Room[];
-}
-
-export const HistorySection: React.FC<HistorySectionProps> = ({ rooms }) => {
+export const HistorySection: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
@@ -23,7 +19,7 @@ export const HistorySection: React.FC<HistorySectionProps> = ({ rooms }) => {
         </Link>
       </div>
       
-      <RecentSection rooms={rooms} />
+      <RecentSection />
     </div>
   );
 };

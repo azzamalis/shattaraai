@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext } from 'react';
 import { useContent, ContentItem } from '@/hooks/useContent';
 
@@ -8,6 +9,7 @@ interface ContentContextType {
   onAddContent: (content: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<string | null>;
   onDeleteContent: (id: string) => Promise<void>;
   onUpdateContent: (id: string, updates: Partial<ContentItem>) => Promise<void>;
+  updateContent: (id: string, updates: Partial<ContentItem>) => Promise<void>;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -29,7 +31,8 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       loading,
       onAddContent: addContent,
       onDeleteContent: deleteContent,
-      onUpdateContent: updateContent
+      onUpdateContent: updateContent,
+      updateContent
     }}>
       {children}
     </ContentContext.Provider>

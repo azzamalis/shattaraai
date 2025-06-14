@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -19,8 +20,9 @@ import { formatDistanceToNow } from 'date-fns';
 
 interface EditContentModalProps {
   open: boolean;
-  setOpen: (open: boolean) => void;
-  content: ContentItem;
+  onOpenChange: (open: boolean) => void;
+  contentItem: ContentItem | null;
+  onSave?: (updatedItem: ContentItem) => void;
 }
 
 // Function to format date to input-friendly format
@@ -34,27 +36,32 @@ const formatDateForInput = (date: Date): string => {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
-export function EditContentModal({ open, setOpen, content }: EditContentModalProps) {
+export function EditContentModal({ open, onOpenChange, contentItem, onSave }: EditContentModalProps) {
   const { onUpdateContent } = useContentContext();
-  const [editedContent, setEditedContent] = useState<Partial<ContentItem>>(content);
+  const [editedContent, setEditedContent] = useState<Partial<ContentItem>>(contentItem || {});
 
   useEffect(() => {
-    // When the content prop changes, update the local state
-    setEditedContent(content);
-  }, [content]);
+    // When the contentItem prop changes, update the local state
+    setEditedContent(contentItem || {});
+  }, [contentItem]);
 
   const handleSave = async () => {
-    if (editedContent.id) {
+    if (editedContent.id && contentItem) {
       await onUpdateContent(editedContent.id, editedContent);
       toast.success("Content updated successfully");
-      setOpen(false);
+      if (onSave) {
+        onSave({ ...contentItem, ...editedContent } as ContentItem);
+      }
+      onOpenChange(false);
     } else {
       toast.error("Content ID is missing");
     }
   };
 
+  if (!contentItem) return null;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Content</DialogTitle>
@@ -81,7 +88,7 @@ export function EditContentModal({ open, setOpen, content }: EditContentModalPro
             </Label>
             <Select onValueChange={(value) => setEditedContent(prev => ({ ...prev, type: value as ContentItem['type'] }))}>
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a type" defaultValue={content.type} />
+                <SelectValue placeholder="Select a type" defaultValue={contentItem.type} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="file">File</SelectItem>
@@ -138,7 +145,7 @@ export function EditContentModal({ open, setOpen, content }: EditContentModalPro
             <Input
               id="created-date"
               type="datetime-local"
-              value={formatDateForInput(new Date(content.created_at))}
+              value={formatDateForInput(new Date(contentItem.created_at))}
               onChange={(e) => {
                 const date = new Date(e.target.value);
                 if (!isNaN(date.getTime())) {
@@ -151,10 +158,10 @@ export function EditContentModal({ open, setOpen, content }: EditContentModalPro
         <DialogFooter>
           <div className="flex items-center space-x-2">
             <p className="text-sm text-muted-foreground">
-              Content ID: {content.id}
+              Content ID: {contentItem.id}
             </p>
             <p className="text-xs text-muted-foreground">
-              Created {formatDistanceToNow(new Date(content.created_at), { addSuffix: true })}
+              Created {formatDistanceToNow(new Date(contentItem.created_at), { addSuffix: true })}
             </p>
           </div>
           <Button type="button" onClick={handleSave}>
