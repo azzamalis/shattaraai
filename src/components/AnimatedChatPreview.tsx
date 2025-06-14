@@ -19,16 +19,18 @@ const AnimatedChatPreview = () => {
     <div className="relative max-w-lg mx-auto">
       {/* Chat Input Container */}
       <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl p-6 border border-zinc-800/50 shadow-2xl">
-        <div className="flex items-center gap-3 bg-zinc-800/30 rounded-xl px-4 py-3">
-          <div className="flex-1 text-zinc-400 text-sm">
-            Ask Shattara AI to{' '}
-            <AnimatedTextCycle 
-              words={tasks}
-              interval={3000}
-              className="text-white font-medium"
-            />
+        <div className="flex items-center gap-3 bg-zinc-800/30 rounded-xl px-4 py-3 h-12">
+          <div className="flex-1 text-zinc-400 text-sm overflow-hidden">
+            <span className="whitespace-nowrap">
+              Ask Shattara AI to{' '}
+              <AnimatedTextCycle 
+                words={tasks}
+                interval={3000}
+                className="text-white font-medium"
+              />
+            </span>
           </div>
-          <button className="p-2 text-zinc-400 hover:text-primary transition-colors rounded-lg hover:bg-zinc-700/50">
+          <button className="flex-shrink-0 p-2 text-zinc-400 hover:text-primary transition-colors rounded-lg hover:bg-zinc-700/50">
             <Send className="w-4 h-4" />
           </button>
         </div>
