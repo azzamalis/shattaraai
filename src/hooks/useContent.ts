@@ -9,7 +9,7 @@ export interface ContentItem {
   user_id: string;
   room_id: string | null;
   title: string;
-  type: 'file' | 'video' | 'pdf' | 'recording' | 'youtube' | 'website' | 'text' | 'chat' | 'upload' | 'audio';
+  type: 'file' | 'video' | 'pdf' | 'live_recording' | 'audio_file' | 'youtube' | 'website' | 'text' | 'chat' | 'upload' | 'recording';
   url?: string;
   text_content?: string;
   filename?: string;

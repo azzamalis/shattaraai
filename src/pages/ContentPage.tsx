@@ -80,10 +80,10 @@ export default function ContentPage() {
 
   // Simulate content processing for non-recording types or modify for existing recordings
   useEffect(() => {
-    if (recordingStateInfo?.isExistingRecording) {
-      // For existing recordings, set processing to false immediately
+    if (recordingStateInfo?.isExistingRecording || type === 'audio_file') {
+      // For existing recordings or uploaded audio files, set processing to false immediately
       setContentData(prev => ({ ...prev, isProcessing: false }));
-    } else if (contentData.type !== 'recording' && (contentData.url || contentData.filePath || contentData.text)) {
+    } else if (type !== 'live_recording' && (contentData.url || contentData.filePath || contentData.text)) {
       setContentData(prev => ({ ...prev, isProcessing: true }));
       
       const timer = setTimeout(() => {
@@ -92,7 +92,7 @@ export default function ContentPage() {
 
       return () => clearTimeout(timer);
     }
-  }, [contentData.type, contentData.url, contentData.filePath, contentData.text, recordingStateInfo?.isExistingRecording]);
+  }, [type, contentData.url, contentData.filePath, contentData.text, recordingStateInfo?.isExistingRecording]);
 
   const toggleRecording = () => {
     if (!isRecording) {
@@ -187,6 +187,10 @@ function getDefaultTitle(type: ContentType, filename?: string | null, isExisting
   const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   
   switch (type) {
+    case 'live_recording':
+      return `Live Recording at ${time}`;
+    case 'audio_file':
+      return filename ? filename : `Audio File at ${time}`;
     case 'recording':
       if (isExistingRecording) {
         return filename ? filename : 'Existing Recording';

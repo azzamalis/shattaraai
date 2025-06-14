@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Upload, FileText, Mic, Link2 } from 'lucide-react';
@@ -18,34 +19,40 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
     fileInputRef.current?.click();
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
-        // Create a temporary URL for the file
-        const fileUrl = URL.createObjectURL(file);
-        
         // Determine content type based on file
         let contentType = 'upload';
         if (file.type.includes('pdf')) contentType = 'pdf';
-        else if (file.type.includes('audio')) contentType = 'audio';
+        else if (file.type.includes('audio')) contentType = 'audio_file'; // Use new audio_file type
         else if (file.type.includes('video')) contentType = 'video';
 
+        // Create a temporary URL for the file
+        const fileUrl = URL.createObjectURL(file);
+        
         // Add content to tracking system with the file URL
-        const contentId = onAddContent({
+        const contentId = await onAddContent({
           title: file.name,
           type: contentType as any,
           room_id: null,
           metadata: {
-            fileSize: file.size
+            fileSize: file.size,
+            fileType: file.type,
+            isUploadedFile: true
           },
           filename: file.name,
-          url: fileUrl  // Add the file URL to the content data
+          url: fileUrl
         });
 
-        // Navigate to content page with the file URL
-        navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}&url=${encodeURIComponent(fileUrl)}`);
-        toast.success(`File "${file.name}" selected successfully`);
+        if (contentId) {
+          // Navigate to content page with the file URL
+          navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}&url=${encodeURIComponent(fileUrl)}`);
+          toast.success(`File "${file.name}" selected successfully`);
+        } else {
+          throw new Error('Failed to create content');
+        }
       } catch (error) {
         console.error('Error handling file upload:', error);
         toast.error('Failed to process the file. Please try again.');
@@ -53,15 +60,29 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
     }
   };
 
-  const handleRecordClick = () => {
-    // Add recording to tracking system
-    const contentId = onAddContent({
-      title: `Recording at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-      type: 'recording',
-      room_id: null,
-      metadata: {}
-    });
-    navigate(`/content/${contentId}?type=recording`);
+  const handleRecordClick = async () => {
+    try {
+      // Add live recording to tracking system
+      const contentId = await onAddContent({
+        title: `Live Recording at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        type: 'live_recording', // Use new live_recording type
+        room_id: null,
+        metadata: {
+          isLiveRecording: true,
+          recordingStatus: 'ready'
+        }
+      });
+
+      if (contentId) {
+        navigate(`/content/${contentId}?type=live_recording`);
+        toast.success('Recording session created');
+      } else {
+        throw new Error('Failed to create recording session');
+      }
+    } catch (error) {
+      console.error('Error creating recording session:', error);
+      toast.error('Failed to create recording session. Please try again.');
+    }
   };
 
   return (

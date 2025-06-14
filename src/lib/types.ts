@@ -44,8 +44,8 @@ export interface CommandOption {
   category: string;
 }
 
-// Content types - expanded to include all used types
-export type ContentType = 'file' | 'video' | 'pdf' | 'recording' | 'youtube' | 'website' | 'text' | 'chat' | 'upload' | 'audio';
+// Content types - expanded to include live recording and audio file types
+export type ContentType = 'file' | 'video' | 'pdf' | 'live_recording' | 'audio_file' | 'youtube' | 'website' | 'text' | 'chat' | 'upload' | 'recording';
 
 // Notes types - updated to match actual usage
 export interface NotesBlock {
@@ -66,6 +66,7 @@ export interface RecordingMetadata {
   transcript?: string;
   audioUrl?: string;
   transcriptUrl?: string;
+  processingStatus?: 'pending' | 'processing' | 'completed' | 'failed';
   chaptersData?: Array<{
     id: string;
     title: string;
@@ -86,11 +87,13 @@ export interface RecordingStateInfo {
   hasAudioFile?: boolean;
   hasTranscript?: boolean;
   hasChapters?: boolean;
+  recordingType?: 'live' | 'uploaded';
 }
 
 // Database types for direct use
 export type DbRoom = Database['public']['Tables']['rooms']['Row'];
 export type DbContent = Database['public']['Tables']['content']['Row'];
+export type DbRecording = Database['public']['Tables']['recordings']['Row'];
 export type DbProfile = Database['public']['Tables']['profiles']['Row'];
 
 // Enums from database

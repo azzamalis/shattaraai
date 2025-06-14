@@ -98,6 +98,53 @@ export type Database = {
         }
         Relationships: []
       }
+      recordings: {
+        Row: {
+          audio_file_path: string | null
+          chapters: Json | null
+          content_id: string | null
+          created_at: string
+          duration: number | null
+          id: string
+          processing_status: string | null
+          transcript: string | null
+          updated_at: string
+          waveform_data: Json | null
+        }
+        Insert: {
+          audio_file_path?: string | null
+          chapters?: Json | null
+          content_id?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          processing_status?: string | null
+          transcript?: string | null
+          updated_at?: string
+          waveform_data?: Json | null
+        }
+        Update: {
+          audio_file_path?: string | null
+          chapters?: Json | null
+          content_id?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          processing_status?: string | null
+          transcript?: string | null
+          updated_at?: string
+          waveform_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recordings_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rooms: {
         Row: {
           created_at: string
