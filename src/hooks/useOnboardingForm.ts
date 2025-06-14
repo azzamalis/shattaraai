@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from './useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
 export interface OnboardingFormData {
@@ -14,7 +15,7 @@ export interface OnboardingFormData {
 
 export const useOnboardingForm = () => {
   const navigate = useNavigate();
-  const { user, updateProfile } = useAuth();
+  const { user } = useAuth();
   const [formData, setFormData] = useState<OnboardingFormData>({
     language: '',
     purpose: '',
@@ -90,13 +91,19 @@ export const useOnboardingForm = () => {
         'friends-family': 'referral'
       };
 
-      const { error } = await updateProfile({
-        language: formData.language,
-        purpose: purposeMap[formData.purpose],
-        goal: goalMap[formData.goal],
-        source: sourceMap[formData.source],
-        onboarding_completed: true
-      });
+      // Create the profile with onboarding data
+      const { error } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || null,
+          language: formData.language,
+          purpose: purposeMap[formData.purpose],
+          goal: goalMap[formData.goal],
+          source: sourceMap[formData.source],
+          onboarding_completed: true
+        });
 
       if (error) {
         toast.error("Failed to save onboarding data", {

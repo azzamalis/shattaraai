@@ -24,6 +24,25 @@ export const useAuth = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [recentLogout, setRecentLogout] = useState(false);
 
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (!error && data) {
+        setProfile(data);
+      } else if (error && error.code !== 'PGRST116') {
+        // PGRST116 is "not found" error, which is expected for new users
+        console.error('Error fetching profile:', error);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -32,22 +51,10 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
-          setTimeout(async () => {
-            try {
-              const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-              
-              if (!error && data) {
-                setProfile(data);
-              }
-            } catch (error) {
-              console.error('Error fetching profile:', error);
-            }
-          }, 0);
+          // Fetch user profile after a brief delay to allow for profile creation
+          setTimeout(() => {
+            fetchProfile(session.user.id);
+          }, 100);
         } else {
           setProfile(null);
         }
@@ -60,6 +67,11 @@ export const useAuth = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
+      
       setLoading(false);
     });
 
@@ -149,6 +161,13 @@ export const useAuth = () => {
     return { data, error };
   };
 
+  // Method to refresh profile data (useful after onboarding completion)
+  const refreshProfile = () => {
+    if (user) {
+      fetchProfile(user.id);
+    }
+  };
+
   return {
     user,
     session,
@@ -160,6 +179,7 @@ export const useAuth = () => {
     signInWithGoogle,
     signOut,
     resetPassword,
-    updateProfile
+    updateProfile,
+    refreshProfile
   };
 };
