@@ -13,7 +13,7 @@ const Pricing = () => {
       description: "Perfect for students just getting started",
       icon: (
         <div className="relative">
-          <Zap className="w-7 h-7 relative z-10" />
+          <Zap className="w-7 h-7" />
         </div>
       ),
       features: [
@@ -50,7 +50,7 @@ const Pricing = () => {
       badge: "Most Popular",
       icon: (
         <div className="relative">
-          <ArrowDownToDot className="w-7 h-7 relative z-10" />
+          <ArrowDownToDot className="w-7 h-7" />
         </div>
       ),
       features: [
@@ -83,6 +83,7 @@ const Pricing = () => {
     },
   ];
 
+  // Use theme-aware bg and text colors at the container if needed in future expansions
   return <PricingSection tiers={pricingTiers} />;
 };
 
