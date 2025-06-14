@@ -1,112 +1,109 @@
 
-import { useState, useEffect, useMemo } from 'react';
-import { RecordingState, RecordingStateInfo, RecordingMetadata } from '@/lib/types';
+import { useState, useEffect } from 'react';
+import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
 
-interface UseRecordingStateProps {
-  contentId: string;
-  contentType: string;
+interface Chapter {
+  id: string;
+  title: string;
+  summary: string;
+  startTime: number;
+  endTime?: number;
 }
 
-export function useRecordingState({ contentId, contentType }: UseRecordingStateProps) {
-  const [recordingMetadata, setRecordingMetadata] = useState<RecordingMetadata | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export const useRecordingState = () => {
+  const [state, setState] = useState<RecordingStateInfo>({
+    state: 'idle',
+    isRecording: false,
+    isPaused: false,
+    duration: 0,
+    transcript: '',
+    isNewRecording: false,
+    isExistingRecording: false,
+    hasAudioFile: false,
+    hasTranscript: false,
+    hasChapters: false
+  });
 
-  // Determine if this is a new recording based on URL pattern
-  const isNewRecording = useMemo(() => {
-    return contentId === 'new' || !contentId;
-  }, [contentId]);
+  const [metadata, setMetadata] = useState<RecordingMetadata>({
+    duration: 0,
+    size: 0,
+    format: 'mp3',
+    sampleRate: 44100,
+    createdAt: new Date().toISOString(),
+    lastModified: new Date().toISOString(),
+    transcript: '',
+    audioUrl: '',
+    transcriptUrl: '',
+    chaptersData: []
+  });
 
-  // Simulate fetching recording metadata for existing recordings
-  useEffect(() => {
-    if (contentType === 'recording' && !isNewRecording) {
-      setIsLoading(true);
-      
-      // Check localStorage first for any cached data
-      const cachedData = localStorage.getItem(`recording_${contentId}`);
-      if (cachedData) {
-        try {
-          const parsed = JSON.parse(cachedData);
-          setRecordingMetadata(parsed);
-        } catch (error) {
-          console.error('Error parsing cached recording data:', error);
-        }
-      }
-
-      // Simulate API call to fetch recording metadata
-      const timer = setTimeout(() => {
-        // Mock existing recording data
-        const mockMetadata: RecordingMetadata = {
-          duration: 1847, // 30:47 in seconds
-          fileSize: 15728640, // ~15MB
-          format: 'mp3',
-          sampleRate: 44100,
-          createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-          lastModified: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-          audioUrl: `/recordings/${contentId}.mp3`,
-          transcriptUrl: `/transcripts/${contentId}.txt`,
-          chaptersData: [
-            {
-              id: '1',
-              title: 'Introduction',
-              startTime: 0,
-              endTime: 180,
-              summary: 'Course introduction and overview'
-            },
-            {
-              id: '2', 
-              title: 'Main Topic',
-              startTime: 180,
-              endTime: 1200,
-              summary: 'Deep dive into the main subject'
-            },
-            {
-              id: '3',
-              title: 'Conclusion',
-              startTime: 1200,
-              endTime: 1847,
-              summary: 'Summary and key takeaways'
-            }
-          ]
-        };
-
-        setRecordingMetadata(mockMetadata);
-        
-        // Cache the data
-        localStorage.setItem(`recording_${contentId}`, JSON.stringify(mockMetadata));
-        setIsLoading(false);
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    } else {
-      setIsLoading(false);
+  const mockChapters: Chapter[] = [
+    {
+      id: '1',
+      title: 'Introduction',
+      summary: 'Overview of the main topics covered in this recording',
+      startTime: 0,
+      endTime: 120
+    },
+    {
+      id: '2',
+      title: 'Key Concepts',
+      summary: 'Detailed explanation of the core concepts and principles',
+      startTime: 120,
+      endTime: 300
+    },
+    {
+      id: '3',
+      title: 'Practical Applications',
+      summary: 'Real-world examples and use cases',
+      startTime: 300,
+      endTime: 480
     }
-  }, [contentId, contentType, isNewRecording]);
+  ];
 
-  const recordingStateInfo: RecordingStateInfo = useMemo(() => {
-    const isExistingRecording = !isNewRecording && contentType === 'recording';
-    
+  const getRecordingState = (isNewRecording = false, isExistingRecording = false) => {
     return {
-      state: isNewRecording ? 'new' : 'existing',
+      state: isNewRecording ? 'new' : isExistingRecording ? 'existing' : 'idle',
+      isRecording: false,
+      isPaused: false,
+      duration: 0,
+      transcript: '',
       isNewRecording,
       isExistingRecording,
-      hasAudioFile: !!recordingMetadata?.audioUrl,
-      hasTranscript: !!recordingMetadata?.transcriptUrl,
-      hasChapters: !!recordingMetadata?.chaptersData?.length
+      hasAudioFile: isExistingRecording,
+      hasTranscript: isExistingRecording,
+      hasChapters: isExistingRecording
     };
-  }, [isNewRecording, contentType, recordingMetadata]);
+  };
 
-  const updateRecordingMetadata = (updates: Partial<RecordingMetadata>) => {
-    setRecordingMetadata(prev => {
-      const updated = { ...prev, ...updates };
-      localStorage.setItem(`recording_${contentId}`, JSON.stringify(updated));
-      return updated;
-    });
+  const analyzeRecording = (recordingMetadata?: RecordingMetadata) => {
+    if (!recordingMetadata) return getRecordingState();
+
+    const hasTranscript = Boolean(recordingMetadata.transcript);
+    const hasChapters = Boolean(recordingMetadata.chaptersData && recordingMetadata.chaptersData.length > 0);
+    const hasAudioFile = Boolean(recordingMetadata.audioUrl);
+
+    return {
+      state: 'existing',
+      isRecording: false,
+      isPaused: false,
+      duration: recordingMetadata.duration || 0,
+      transcript: recordingMetadata.transcript || '',
+      isNewRecording: false,
+      isExistingRecording: true,
+      hasAudioFile,
+      hasTranscript,
+      hasChapters
+    };
   };
 
   return {
-    recordingStateInfo,
-    recordingMetadata,
-    isLoading,
-    updateRecordingMetadata
+    state,
+    setState,
+    metadata,
+    setMetadata,
+    mockChapters,
+    getRecordingState,
+    analyzeRecording
   };
-}
+};

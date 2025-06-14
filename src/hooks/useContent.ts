@@ -147,12 +147,15 @@ export const useContent = () => {
     fetchContent();
   }, [user]);
 
-  // Set up real-time subscription for content - fix the multiple subscription issue
+  // Set up real-time subscription for content - fix multiple subscription issue
   useEffect(() => {
     if (!user) return;
 
+    // Create a unique channel name with timestamp to avoid conflicts
+    const channelName = `content-changes-${user.id}-${Date.now()}`;
+    
     const channel = supabase
-      .channel(`content-changes-${user.id}`)
+      .channel(channelName)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',

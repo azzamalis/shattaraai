@@ -1,345 +1,167 @@
-
 import React, { useState, useEffect } from 'react';
-import { BaseModal } from '@/components/ui/base-modal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { X, Plus, FileText, Video, Youtube, Mic, RotateCcw } from 'lucide-react';
-import { ContentTag, ContentType } from '../RoomContentTable';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ContentItem } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
+import { useContentContext } from '@/contexts/ContentContext';
+import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
 
 interface EditContentModalProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  contentItem: ContentItem | null;
-  onSave?: (updatedItem: ContentItem) => void;
+  setOpen: (open: boolean) => void;
+  content: ContentItem;
 }
 
-const getContentTypeIcon = (type: ContentType) => {
-  switch (type) {
-    case 'Video':
-      return <Video className="h-4 w-4" />;
-    case 'PDF Files':
-      return <FileText className="h-4 w-4" />;
-    case 'Recording':
-      return <Mic className="h-4 w-4" />;
-    case 'Youtube URL':
-      return <Youtube className="h-4 w-4" />;
-  }
+// Function to format date to input-friendly format
+const formatDateForInput = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
-const getTagColor = (tag: ContentTag) => {
-  switch (tag) {
-    case 'Summary':
-      return 'bg-blue-500 text-white';
-    case 'Notes':
-      return 'bg-purple-500 text-white';
-    case 'Exams':
-      return 'bg-orange-500 text-white';
-    case 'Flashcards':
-      return 'bg-green-500 text-white';
-  }
-};
-
-const availableTags: ContentTag[] = ['Summary', 'Notes', 'Exams', 'Flashcards'];
-const availableContentTypes: { value: string; label: ContentType }[] = [
-  { value: 'video', label: 'Video' },
-  { value: 'pdf', label: 'PDF Files' },
-  { value: 'recording', label: 'Recording' },
-  { value: 'youtube', label: 'Youtube URL' }
-];
-
-export function EditContentModal({ open, onOpenChange, contentItem, onSave }: EditContentModalProps) {
-  const [editedItem, setEditedItem] = useState<ContentItem | null>(null);
-  const [originalItem, setOriginalItem] = useState<ContentItem | null>(null);
-  const [newTagInput, setNewTagInput] = useState('');
-  const [hasChanges, setHasChanges] = useState(false);
-  const { toast } = useToast();
+export function EditContentModal({ open, setOpen, content }: EditContentModalProps) {
+  const { onUpdateContent } = useContentContext();
+  const [editedContent, setEditedContent] = useState<Partial<ContentItem>>(content);
 
   useEffect(() => {
-    if (contentItem) {
-      setEditedItem({ ...contentItem });
-      setOriginalItem({ ...contentItem });
-      setHasChanges(false);
-    }
-  }, [contentItem]);
+    // When the content prop changes, update the local state
+    setEditedContent(content);
+  }, [content]);
 
-  useEffect(() => {
-    if (editedItem && originalItem) {
-      const changed = JSON.stringify(editedItem) !== JSON.stringify(originalItem);
-      setHasChanges(changed);
-    }
-  }, [editedItem, originalItem]);
-
-  const handleSave = () => {
-    if (editedItem && onSave) {
-      onSave(editedItem);
-      toast({
-        title: "Content updated",
-        description: "Your changes have been saved successfully.",
-      });
-      onOpenChange(false);
+  const handleSave = async () => {
+    if (editedContent.id) {
+      await onUpdateContent(editedContent.id, editedContent);
+      toast.success("Content updated successfully");
+      setOpen(false);
+    } else {
+      toast.error("Content ID is missing");
     }
   };
-
-  const handleReset = () => {
-    if (originalItem) {
-      setEditedItem({ ...originalItem });
-      setNewTagInput('');
-    }
-  };
-
-  const addTag = (tag: ContentTag) => {
-    if (editedItem && editedItem.metadata?.contentTags && !editedItem.metadata.contentTags.includes(tag)) {
-      setEditedItem({
-        ...editedItem,
-        metadata: {
-          ...editedItem.metadata,
-          contentTags: [...editedItem.metadata.contentTags, tag]
-        }
-      });
-    }
-    setNewTagInput('');
-  };
-
-  const removeTag = (tagToRemove: ContentTag) => {
-    if (editedItem && editedItem.metadata?.contentTags) {
-      setEditedItem({
-        ...editedItem,
-        metadata: {
-          ...editedItem.metadata,
-          contentTags: editedItem.metadata.contentTags.filter(tag => tag !== tagToRemove)
-        }
-      });
-    }
-  };
-
-  const handleContentTypeChange = (value: string) => {
-    if (editedItem) {
-      setEditedItem({
-        ...editedItem,
-        type: value as ContentItem['type']
-      });
-    }
-  };
-
-  const filteredSuggestions = availableTags.filter(tag => 
-    tag.toLowerCase().includes(newTagInput.toLowerCase()) &&
-    !(editedItem?.metadata?.contentTags?.includes(tag))
-  );
-
-  if (!editedItem) return null;
-
-  // Map ContentItem type to display type
-  const getDisplayType = (type: string): ContentType => {
-    switch (type) {
-      case 'video':
-        return 'Video';
-      case 'pdf':
-        return 'PDF Files';
-      case 'recording':
-        return 'Recording';
-      case 'youtube':
-        return 'Youtube URL';
-      default:
-        return 'PDF Files';
-    }
-  };
-
-  const displayType = getDisplayType(editedItem.type);
 
   return (
-    <BaseModal
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Edit Content Details"
-      contentClassName="w-[98vw] max-w-[1400px] max-h-[95vh] overflow-hidden !max-w-none sm:!max-w-[1400px]"
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-        {/* Left Panel - Preview */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Live Preview</h3>
-          <div className="p-6 bg-muted/50 rounded-lg border border-border min-h-[350px]">
-            <div className="space-y-6">
-              <div className="flex items-center gap-2">
-                {getContentTypeIcon(displayType)}
-                <span className="text-sm text-muted-foreground">{displayType}</span>
-              </div>
-              
-              <h4 className="text-xl font-semibold text-foreground">
-                {editedItem.title || 'Untitled'}
-              </h4>
-              
-              <p className="text-sm text-muted-foreground">
-                Uploaded: {new Date(editedItem.createdAt).toLocaleDateString()}
-              </p>
-              
-              <div className="flex flex-wrap gap-2">
-                {editedItem.metadata?.contentTags?.map((tag) => (
-                  <Badge
-                    key={tag}
-                    className={`${getTagColor(tag as ContentTag)} text-xs`}
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Panel - Edit Form */}
-        <div className="space-y-6 overflow-y-auto max-h-[70vh] pr-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-foreground">Edit Details</h3>
-            {hasChanges && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReset}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Reset
-              </Button>
-            )}
-          </div>
-
-          {/* Title */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Title</label>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit Content</DialogTitle>
+          <DialogDescription>
+            Make changes to your content here. Click save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="title" className="text-right">
+              Title
+            </Label>
             <Input
-              value={editedItem.title}
-              onChange={(e) => setEditedItem({ ...editedItem, title: e.target.value })}
-              placeholder="Enter content title"
-              className="component-base"
+              type="text"
+              id="title"
+              value={editedContent.title || ''}
+              onChange={(e) => setEditedContent(prev => ({ ...prev, title: e.target.value }))}
+              className="col-span-3"
             />
           </div>
-
-          {/* Content Type Dropdown */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Content Type</label>
-            <Select value={editedItem.type} onValueChange={handleContentTypeChange}>
-              <SelectTrigger className="component-base">
-                <div className="flex items-center gap-2">
-                  {getContentTypeIcon(displayType)}
-                  <SelectValue />
-                </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="type" className="text-right">
+              Type
+            </Label>
+            <Select onValueChange={(value) => setEditedContent(prev => ({ ...prev, type: value as ContentItem['type'] }))}>
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder="Select a type" defaultValue={content.type} />
               </SelectTrigger>
               <SelectContent>
-                {availableContentTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    <div className="flex items-center gap-2">
-                      {getContentTypeIcon(type.label)}
-                      <span>{type.label}</span>
-                    </div>
-                  </SelectItem>
-                ))}
+                <SelectItem value="file">File</SelectItem>
+                <SelectItem value="video">Video</SelectItem>
+                <SelectItem value="pdf">PDF</SelectItem>
+                <SelectItem value="recording">Recording</SelectItem>
+                <SelectItem value="youtube">YouTube</SelectItem>
+                <SelectItem value="website">Website</SelectItem>
+                <SelectItem value="text">Text</SelectItem>
+                <SelectItem value="chat">Chat</SelectItem>
+                <SelectItem value="upload">Upload</SelectItem>
+                <SelectItem value="audio">Audio</SelectItem>
               </SelectContent>
             </Select>
           </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="url" className="text-right">
+              URL
+            </Label>
+            <Input
+              type="text"
+              id="url"
+              value={editedContent.url || ''}
+              onChange={(e) => setEditedContent(prev => ({ ...prev, url: e.target.value }))}
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="filename" className="text-right">
+              Filename
+            </Label>
+            <Input
+              type="text"
+              id="filename"
+              value={editedContent.filename || ''}
+              onChange={(e) => setEditedContent(prev => ({ ...prev, filename: e.target.value }))}
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-start gap-4">
+            <Label htmlFor="text-content" className="text-right mt-2">
+              Text Content
+            </Label>
+            <Textarea
+              id="text-content"
+              value={editedContent.text_content || ''}
+              onChange={(e) => setEditedContent(prev => ({ ...prev, text_content: e.target.value }))}
+              className="col-span-3"
+            />
+          </div>
 
-          {/* Upload Date (Read-only) */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Upload Date</label>
-            <div className="p-3 bg-muted/30 rounded-md">
-              <span className="text-sm text-muted-foreground">{new Date(editedItem.createdAt).toLocaleDateString()}</span>
-            </div>
-          </div>
-
-          {/* Tags Management */}
-          <div className="space-y-4">
-            <label className="text-sm font-medium text-foreground">AI Content Tags</label>
-            
-            {/* Current Tags */}
-            <div className="flex flex-wrap gap-2">
-              {editedItem.metadata?.contentTags?.map((tag) => (
-                <Badge
-                  key={tag}
-                  className={`${getTagColor(tag as ContentTag)} text-xs flex items-center gap-1 pr-1`}
-                >
-                  {tag}
-                  <button
-                    onClick={() => removeTag(tag as ContentTag)}
-                    className="ml-1 hover:bg-white/20 rounded-full p-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-
-            {/* Add New Tags */}
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <Input
-                  value={newTagInput}
-                  onChange={(e) => setNewTagInput(e.target.value)}
-                  placeholder="Search and add tags..."
-                  className="component-base"
-                />
-              </div>
-              
-              {/* Quick Add Suggestions */}
-              <div className="flex flex-wrap gap-2">
-                {availableTags
-                  .filter(tag => !editedItem.metadata?.contentTags?.includes(tag))
-                  .map((tag) => (
-                    <Button
-                      key={tag}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addTag(tag)}
-                      className="text-xs h-7"
-                    >
-                      <Plus className="h-3 w-3 mr-1" />
-                      {tag}
-                    </Button>
-                  ))}
-              </div>
-
-              {/* Filtered Suggestions */}
-              {newTagInput && filteredSuggestions.length > 0 && (
-                <div className="border border-border rounded-md bg-background p-2 space-y-1">
-                  {filteredSuggestions.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => addTag(tag)}
-                      className="w-full text-left p-2 text-sm hover:bg-accent rounded text-foreground"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <Label htmlFor="created-date">Created Date</Label>
+            <Input
+              id="created-date"
+              type="datetime-local"
+              value={formatDateForInput(new Date(content.created_at))}
+              onChange={(e) => {
+                const date = new Date(e.target.value);
+                if (!isNaN(date.getTime())) {
+                  setEditedContent(prev => ({ ...prev, created_at: date.toISOString() }));
+                }
+              }}
+            />
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between pt-6 border-t border-border mt-6">
-        <div className="text-sm text-muted-foreground">
-          {hasChanges ? "You have unsaved changes" : "No changes made"}
-        </div>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
-            Cancel
+        <DialogFooter>
+          <div className="flex items-center space-x-2">
+            <p className="text-sm text-muted-foreground">
+              Content ID: {content.id}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Created {formatDistanceToNow(new Date(content.created_at), { addSuffix: true })}
+            </p>
+          </div>
+          <Button type="button" onClick={handleSave}>
+            Save changes
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!hasChanges}
-            className="bg-foreground text-background hover:bg-foreground/90"
-          >
-            Save Changes
-          </Button>
-        </div>
-      </div>
-    </BaseModal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

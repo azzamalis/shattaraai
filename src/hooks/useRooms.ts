@@ -124,12 +124,15 @@ export const useRooms = () => {
     fetchRooms();
   }, [user]);
 
-  // Set up real-time subscription for rooms
+  // Set up real-time subscription for rooms - fix multiple subscription issue
   useEffect(() => {
     if (!user) return;
 
+    // Create a unique channel name with timestamp to avoid conflicts
+    const channelName = `rooms-changes-${user.id}-${Date.now()}`;
+    
     const channel = supabase
-      .channel('rooms-changes')
+      .channel(channelName)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',

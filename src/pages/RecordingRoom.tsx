@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { RecordingHeader } from "@/components/recording/RecordingHeader";
@@ -11,7 +10,11 @@ const RecordingRoom = () => {
   const [time, setTime] = useState(0);
   const [currentTime, setCurrentTime] = useState("");
   const [selectedMicrophone, setSelectedMicrophone] = useState("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
-  
+  const dummyRooms = [
+    { id: '1', name: 'Physics Lab', user_id: '', created_at: '', updated_at: '' },
+    { id: '2', name: 'Math Studies', user_id: '', created_at: '', updated_at: '' }
+  ];
+
   useEffect(() => {
     const updateCurrentTime = () => {
       const now = new Date();
@@ -70,10 +73,7 @@ const RecordingRoom = () => {
         selectedMicrophone={selectedMicrophone} 
         onMicrophoneSelect={handleMicrophoneSelect} 
         onMicrophoneClear={handleMicrophoneClear} 
-        rooms={[
-          { id: "1", name: "Room 1", lastActive: "Just now" },
-          { id: "2", name: "Room 2", lastActive: "1 hour ago" }
-        ]} 
+        rooms={dummyRooms} 
       />
       
       <div className="flex-1 overflow-hidden">
