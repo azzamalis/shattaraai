@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, user, profile, loading, recentLogout } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -21,6 +21,17 @@ const SignUp = () => {
     password: '',
     acceptTerms: false
   });
+
+  useEffect(() => {
+    if (!loading && user && !recentLogout) {
+      // Check if user has completed onboarding
+      if (profile?.onboarding_completed) {
+        navigate('/dashboard');
+      } else {
+        navigate('/onboarding');
+      }
+    }
+  }, [user, profile, loading, navigate, recentLogout]);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -86,6 +97,14 @@ const SignUp = () => {
       });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-dark items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-dark">

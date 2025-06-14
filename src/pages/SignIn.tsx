@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { signIn, signInWithGoogle, user, profile, loading } = useAuth();
+  const { signIn, signInWithGoogle, user, profile, loading, recentLogout } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,7 +22,7 @@ const SignIn = () => {
   });
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user && !recentLogout) {
       // Check if user has completed onboarding
       if (profile?.onboarding_completed) {
         navigate('/dashboard');
@@ -30,7 +30,7 @@ const SignIn = () => {
         navigate('/onboarding');
       }
     }
-  }, [user, profile, loading, navigate]);
+  }, [user, profile, loading, navigate, recentLogout]);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

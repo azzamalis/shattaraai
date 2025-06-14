@@ -22,6 +22,7 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [recentLogout, setRecentLogout] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -65,6 +66,17 @@ export const useAuth = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Clear recent logout flag after 30 seconds
+  useEffect(() => {
+    if (recentLogout) {
+      const timer = setTimeout(() => {
+        setRecentLogout(false);
+      }, 30000); // 30 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [recentLogout]);
+
   const signUp = async (email: string, password: string, fullName?: string) => {
     const redirectUrl = `${window.location.origin}/onboarding`;
     
@@ -105,6 +117,7 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
+    setRecentLogout(true);
     const { error } = await supabase.auth.signOut();
     return { error };
   };
@@ -141,6 +154,7 @@ export const useAuth = () => {
     session,
     profile,
     loading,
+    recentLogout,
     signUp,
     signIn,
     signInWithGoogle,

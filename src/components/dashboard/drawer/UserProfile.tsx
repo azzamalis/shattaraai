@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -5,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ChevronUp, Settings, Tag, LogOut, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UserProfileProps {
   onOpenChange: (open: boolean) => void;
@@ -14,6 +16,25 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   onOpenChange
 }) => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await signOut();
+      if (!error) {
+        toast.success('Logged out successfully');
+        navigate('/signin');
+        onOpenChange(false);
+      } else {
+        toast.error('Failed to log out');
+      }
+    } catch (error) {
+      toast.error('An error occurred during logout');
+    }
+  };
+
+  const userEmail = user?.email || 'No email';
+  const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
 
   return (
     <Popover>
@@ -25,10 +46,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-primary">
               <AvatarFallback className="bg-primary text-primary-foreground">
-                <User size={16} />
+                {userInitials}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm text-dashboard-text dark:text-dashboard-text">azzamalis@icloud.com</span>
+            <span className="text-sm text-dashboard-text dark:text-dashboard-text">{userEmail}</span>
           </div>
           <ChevronUp size={16} className="text-dashboard-text-secondary dark:text-dashboard-text-secondary" />
         </Button>
@@ -44,10 +65,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-primary">
               <AvatarFallback className="bg-primary text-primary-foreground">
-                <User size={16} />
+                {userInitials}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm text-dashboard-text dark:text-dashboard-text">azzamalis@icloud.com</span>
+            <span className="text-sm text-dashboard-text dark:text-dashboard-text">{userEmail}</span>
           </div>
         </div>
         
@@ -78,10 +99,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           <Button 
             variant="ghost" 
             className="w-full justify-start px-4 py-2.5 text-red-500 hover:text-red-500 hover:bg-red-500/10" 
-            onClick={() => {
-              toast.success('Logged out successfully');
-              navigate('/login');
-            }}
+            onClick={handleLogout}
           >
             <LogOut size={16} className="mr-3" />
             <span>Log Out</span>
