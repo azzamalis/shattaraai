@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import Logo from '@/components/Logo';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import AnimatedChatPreview from '@/components/AnimatedChatPreview';
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -111,11 +111,8 @@ const SignIn = () => {
             <Logo textColor="text-white" />
           </Link>
         </div>
-        <div className="mb-auto">
-          <h2 className="text-4xl font-bold mb-6 text-white">Welcome back to Shattara AI</h2>
-          <p className="text-lg text-gray-400 mb-6">
-            Log in to continue your learning journey powered by our advanced AI algorithms customized for your educational needs.
-          </p>
+        <div className="mb-auto flex items-center justify-center py-12">
+          <AnimatedChatPreview />
         </div>
         <div className="mt-auto">
           <p className="text-sm text-gray-500">
