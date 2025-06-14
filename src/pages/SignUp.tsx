@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -100,49 +101,49 @@ const SignUp = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-dark items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="flex min-h-screen bg-background items-center justify-center">
+        <div className="text-foreground">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-dark">
+    <div className="flex min-h-screen bg-background">
       {/* Left Column - Information */}
-      <div className="hidden lg:flex lg:w-1/2 bg-dark-deeper flex-col p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-card flex-col p-12">
         <div className="mb-auto">
           <Link to="/" className="inline-block">
-            <Logo textColor="text-white" />
+            <Logo textColor="text-foreground" />
           </Link>
         </div>
         <div className="mb-auto flex items-center justify-center py-12">
           <AnimatedChatPreview />
         </div>
         <div className="mt-auto">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Shattara AI. All rights reserved.
           </p>
         </div>
       </div>
       
       {/* Right Column - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-12 bg-dark">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-12 bg-background">
         <div className="w-full max-w-md">
           <div className="lg:hidden mb-8">
             <Link to="/" className="inline-block">
-              <Logo textColor="text-white" />
+              <Logo textColor="text-foreground" />
             </Link>
           </div>
           
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2 text-white">Create an account</h1>
-            <p className="text-gray-400">Start your personalized learning journey today.</p>
+            <h1 className="text-3xl font-bold mb-2 text-foreground">Create an account</h1>
+            <p className="text-muted-foreground">Start your personalized learning journey today.</p>
           </div>
           
           {/* Google Sign-up Button */}
           <Button 
             variant="outline" 
-            className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 text-white hover:text-white"
+            className="w-full mb-6 bg-background border-border hover:bg-card text-foreground hover:text-foreground"
             onClick={handleGoogleSignUp}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -156,20 +157,20 @@ const SignUp = () => {
           
           {/* Separator */}
           <div className="relative flex items-center mb-6">
-            <div className="flex-grow border-t border-zinc-700"></div>
-            <span className="flex-shrink mx-4 text-gray-400 text-sm">or continue with email</span>
-            <div className="flex-grow border-t border-zinc-700"></div>
+            <div className="flex-grow border-t border-border"></div>
+            <span className="flex-shrink mx-4 text-muted-foreground text-sm">or continue with email</span>
+            <div className="flex-grow border-t border-border"></div>
           </div>
           
           {/* Signup Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-white">Full Name</Label>
+              <Label htmlFor="name" className="text-foreground">Full Name</Label>
               <Input 
                 id="name" 
                 type="text" 
                 placeholder="Enter your name" 
-                className="bg-dark border-zinc-700 text-white"
+                className="bg-background border-border text-foreground"
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -177,12 +178,12 @@ const SignUp = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">Email</Label>
+              <Label htmlFor="email" className="text-foreground">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
                 placeholder="Enter your email" 
-                className="bg-dark border-zinc-700 text-white"
+                className="bg-background border-border text-foreground"
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -190,13 +191,13 @@ const SignUp = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">Password</Label>
+              <Label htmlFor="password" className="text-foreground">Password</Label>
               <div className="relative">
                 <Input 
                   id="password" 
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password" 
-                  className="bg-dark border-zinc-700 text-white pr-10"
+                  className="bg-background border-border text-foreground pr-10"
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -205,7 +206,7 @@ const SignUp = () => {
                 <button 
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -214,36 +215,36 @@ const SignUp = () => {
                   )}
                 </button>
               </div>
-              <p className="text-xs text-gray-400">Must be at least 6 characters</p>
+              <p className="text-xs text-muted-foreground">Must be at least 6 characters</p>
             </div>
             
             <div className="flex items-start space-x-2">
               <Checkbox 
                 id="terms" 
-                className="border-zinc-700 data-[state=checked]:bg-primary mt-1"
+                className="border-border data-[state=checked]:bg-primary mt-1"
                 checked={formData.acceptTerms}
                 onCheckedChange={handleCheckboxChange}
                 required
               />
               <label
                 htmlFor="terms"
-                className="text-sm text-gray-400 leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm text-muted-foreground leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 I agree to the{' '}
                 <Link 
                   to="/terms" 
-                  className="text-white font-medium relative after:absolute 
+                  className="text-foreground font-medium relative after:absolute 
                     after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full 
-                    after:bg-white after:transition-all after:duration-300"
+                    after:bg-foreground after:transition-all after:duration-300"
                 >
                   Terms of Service
                 </Link>
                 {' '}and{' '}
                 <Link 
                   to="/privacy" 
-                  className="text-white font-medium relative after:absolute 
+                  className="text-foreground font-medium relative after:absolute 
                     after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full 
-                    after:bg-white after:transition-all after:duration-300"
+                    after:bg-foreground after:transition-all after:duration-300"
                 >
                   Privacy Policy
                 </Link>
@@ -252,7 +253,7 @@ const SignUp = () => {
             
             <Button 
               type="submit" 
-              className="w-full bg-primary hover:bg-primary-light text-white py-6"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Creating Account...' : 'Create Account'}
@@ -260,13 +261,13 @@ const SignUp = () => {
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-slate-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               Already have an account?{' '}
               <Link 
                 to="/signin" 
-                className="text-white font-medium relative after:absolute 
+                className="text-foreground font-medium relative after:absolute 
                   after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full 
-                  after:bg-white after:transition-all after:duration-300"
+                  after:bg-foreground after:transition-all after:duration-300"
               >
                 Sign in
               </Link>

@@ -18,13 +18,13 @@ import {
 
 const Contact = () => {
   return (
-    <div className="min-h-screen bg-dark text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <HeroSection />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Get in Touch</h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Get in Touch</h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Have questions about our platform? Looking to partner with us? 
             Our team is ready to help you transform education with AI.
           </p>
@@ -32,27 +32,44 @@ const Contact = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="bg-dark-deeper p-8 rounded-xl border border-primary/20">
-            <h2 className="text-2xl font-semibold mb-6">Send Us a Message</h2>
+          <div className="bg-card p-8 rounded-xl border border-border">
+            <h2 className="text-2xl font-semibold mb-6 text-foreground">Send Us a Message</h2>
             <form className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Your Name</Label>
-                <Input id="name" className="bg-dark border-gray-700 focus:border-primary text-white" placeholder="Full Name" />
+                <Label htmlFor="name" className="text-foreground">Your Name</Label>
+                <Input 
+                  id="name" 
+                  className="bg-background border-border focus:border-primary text-foreground" 
+                  placeholder="Full Name" 
+                />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" className="bg-dark border-gray-700 focus:border-primary text-white" placeholder="your@email.com" />
+                <Label htmlFor="email" className="text-foreground">Email Address</Label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  className="bg-background border-border focus:border-primary text-foreground" 
+                  placeholder="your@email.com" 
+                />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Input id="subject" className="bg-dark border-gray-700 focus:border-primary text-white" placeholder="How can we help?" />
+                <Label htmlFor="subject" className="text-foreground">Subject</Label>
+                <Input 
+                  id="subject" 
+                  className="bg-background border-border focus:border-primary text-foreground" 
+                  placeholder="How can we help?" 
+                />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea id="message" className="bg-dark border-gray-700 focus:border-primary text-white h-32" placeholder="Tell us more about your inquiry..." />
+                <Label htmlFor="message" className="text-foreground">Message</Label>
+                <Textarea 
+                  id="message" 
+                  className="bg-background border-border focus:border-primary text-foreground h-32" 
+                  placeholder="Tell us more about your inquiry..." 
+                />
               </div>
               
               <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
@@ -63,8 +80,8 @@ const Contact = () => {
           
           {/* Contact Information */}
           <div className="space-y-8">
-            <div className="bg-dark-deeper p-8 rounded-xl border border-primary/20 mb-8">
-              <h2 className="text-2xl font-semibold mb-6">Contact Information</h2>
+            <div className="bg-card p-8 rounded-xl border border-border mb-8">
+              <h2 className="text-2xl font-semibold mb-6 text-foreground">Contact Information</h2>
               
               <div className="space-y-6">
                 <div className="flex items-start">
@@ -72,8 +89,8 @@ const Contact = () => {
                     <MapPin className="text-primary size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Our Location</h3>
-                    <p className="text-gray-400">Madinah Main Highway Road<br />Al Faisaliyah District<br />Jeddah, KSA</p>
+                    <h3 className="font-medium mb-1 text-foreground">Our Location</h3>
+                    <p className="text-muted-foreground">Madinah Main Highway Road<br />Al Faisaliyah District<br />Jeddah, KSA</p>
                   </div>
                 </div>
                 
@@ -82,8 +99,8 @@ const Contact = () => {
                     <Mail className="text-primary size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Email Us</h3>
-                    <p className="text-gray-400">help@shattara.ai<br />support@shattara.ai</p>
+                    <h3 className="font-medium mb-1 text-foreground">Email Us</h3>
+                    <p className="text-muted-foreground">help@shattara.ai<br />support@shattara.ai</p>
                   </div>
                 </div>
                 
@@ -92,15 +109,15 @@ const Contact = () => {
                     <Phone className="text-primary size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Call Us</h3>
-                    <p className="text-gray-400">+966 53 481 4860<br />+966 55 895 71721</p>
+                    <h3 className="font-medium mb-1 text-foreground">Call Us</h3>
+                    <p className="text-muted-foreground">+966 53 481 4860<br />+966 55 895 71721</p>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-dark-deeper p-8 rounded-xl border border-primary/20">
-              <h2 className="text-2xl font-semibold mb-6">Specialized Inquiries</h2>
+            <div className="bg-card p-8 rounded-xl border border-border">
+              <h2 className="text-2xl font-semibold mb-6 text-foreground">Specialized Inquiries</h2>
               
               <div className="space-y-6">
                 <div className="flex items-start">
@@ -108,8 +125,8 @@ const Contact = () => {
                     <Headphones className="text-primary size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Technical Support</h3>
-                    <p className="text-gray-400">support@shattara.ai<br />+966 53 481 4860</p>
+                    <h3 className="font-medium mb-1 text-foreground">Technical Support</h3>
+                    <p className="text-muted-foreground">support@shattara.ai<br />+966 53 481 4860</p>
                   </div>
                 </div>
                 
@@ -118,8 +135,8 @@ const Contact = () => {
                     <Building className="text-primary size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Partnership Inquiries</h3>
-                    <p className="text-gray-400">partnerships@shattara.ai<br />+966 53 481 4860</p>
+                    <h3 className="font-medium mb-1 text-foreground">Partnership Inquiries</h3>
+                    <p className="text-muted-foreground">partnerships@shattara.ai<br />+966 53 481 4860</p>
                   </div>
                 </div>
                 
@@ -128,8 +145,8 @@ const Contact = () => {
                     <BookOpen className="text-primary size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Educational Resources</h3>
-                    <p className="text-gray-400">resources@shattara.ai<br />+966 53 481 4860</p>
+                    <h3 className="font-medium mb-1 text-foreground">Educational Resources</h3>
+                    <p className="text-muted-foreground">resources@shattara.ai<br />+966 53 481 4860</p>
                   </div>
                 </div>
               </div>
