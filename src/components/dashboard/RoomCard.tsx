@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Pencil, Trash, Plus, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface RoomCardProps {
   id?: string;
@@ -22,25 +23,34 @@ export const RoomCard: React.FC<RoomCardProps> = ({
 
   if (isAddButton) {
     return (
-      <button
-        onClick={onAdd}
-        className={cn(
-          "w-full flex items-center justify-center gap-2",
-          "p-4",
-          "rounded-lg border border-dashed border-border",
-          "hover:border-border hover:bg-accent",
-          "group transition-all duration-300"
-        )}
-      >
-        <Plus 
-          className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-all duration-300" 
-        />
-        <span 
-          className="text-muted-foreground group-hover:text-foreground text-base transition-colors duration-300"
-        >
-          Add room
-        </span>
-      </button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={onAdd}
+              className={cn(
+                "w-full flex items-center justify-center gap-2",
+                "p-4",
+                "rounded-lg border border-dashed border-border",
+                "hover:border-border hover:bg-accent",
+                "group transition-all duration-300"
+              )}
+            >
+              <Plus 
+                className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-all duration-300" 
+              />
+              <span 
+                className="text-muted-foreground group-hover:text-foreground text-base transition-colors duration-300"
+              >
+                Add room
+              </span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Create a room to manage your content</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   }
 
