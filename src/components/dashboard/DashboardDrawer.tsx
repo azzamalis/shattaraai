@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -19,9 +20,9 @@ interface DashboardDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   rooms: Room[];
-  onAddRoom: () => void;
-  onEditRoom: (id: string, newName: string) => void;
-  onDeleteRoom: (id: string) => void;
+  onAddRoom: () => Promise<string | null>;
+  onEditRoom: (id: string, newName: string) => Promise<void>;
+  onDeleteRoom: (id: string) => Promise<void>;
 }
 
 export function DashboardDrawer({
@@ -175,7 +176,7 @@ export function DashboardDrawer({
         onOpenChange={setDeleteModalOpen}
         type="room"
         itemToDelete={{
-          id: roomToDelete,
+          id: roomToDelete || '',
           title: roomToDeleteName,
         }}
         onConfirm={handleDeleteConfirm}

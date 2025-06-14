@@ -46,7 +46,12 @@ export const useContent = () => {
         console.error('Error fetching content:', error);
         toast.error('Failed to load content');
       } else {
-        setContent(data || []);
+        // Cast the data to match our ContentItem interface
+        setContent((data || []).map(item => ({
+          ...item,
+          type: item.type as ContentItem['type'],
+          metadata: item.metadata as Record<string, any>
+        })));
       }
     } catch (error) {
       console.error('Error fetching content:', error);
@@ -72,7 +77,13 @@ export const useContent = () => {
         return null;
       }
 
-      setContent(prev => [data, ...prev]);
+      const newContent = {
+        ...data,
+        type: data.type as ContentItem['type'],
+        metadata: data.metadata as Record<string, any>
+      };
+
+      setContent(prev => [newContent, ...prev]);
       toast.success('Content created successfully');
       return data.id;
     } catch (error) {

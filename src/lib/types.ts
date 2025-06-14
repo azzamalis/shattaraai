@@ -1,3 +1,4 @@
+
 // Import database types from Supabase
 import { Database } from '@/integrations/supabase/types';
 
@@ -10,6 +11,7 @@ export interface DeleteItem {
   id: string;
   type: 'room' | 'card';
   name: string;
+  parentName?: string;
 }
 
 export interface RoomHandlers {
@@ -22,6 +24,49 @@ export interface ContentHandlers {
   onAddContent: (content: any) => Promise<string | null>;
   onDeleteContent: (id: string) => Promise<void>;
   onUpdateContent: (id: string, updates: any) => Promise<void>;
+}
+
+// Chat types
+export type ChatTabType = 'chat' | 'flashcards' | 'quizzes' | 'notes';
+
+export interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'ai';
+  timestamp: Date;
+  copyable?: boolean;
+}
+
+export interface CommandOption {
+  id: string;
+  label: string;
+  description: string;
+  category: string;
+}
+
+// Content types
+export type ContentType = 'file' | 'video' | 'pdf' | 'recording' | 'youtube' | 'website' | 'text' | 'chat';
+
+// Notes types
+export interface NotesBlock {
+  id: string;
+  type: 'text' | 'heading' | 'bullet' | 'number' | 'quote' | 'code';
+  content: string;
+  level?: number;
+}
+
+// Recording types
+export interface RecordingMetadata {
+  duration?: number;
+  size?: number;
+  transcript?: string;
+}
+
+export interface RecordingStateInfo {
+  isRecording: boolean;
+  isPaused: boolean;
+  duration: number;
+  transcript: string;
 }
 
 // Database types for direct use

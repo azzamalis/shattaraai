@@ -54,8 +54,10 @@ export function DashboardModals({
     const contentId = onAddContent({
       title,
       type: contentType as any,
+      room_id: null,
+      metadata: {},
       url: data.url,
-      text: data.text
+      text_content: data.text
     });
 
     // Navigate to content page
