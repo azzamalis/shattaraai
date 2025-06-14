@@ -2,11 +2,11 @@
 import React from 'react';
 import HeroHeader from './HeroHeader';
 import HeroContent from './HeroContent';
-import TrustBar from '@/components/TrustBar';
+import InfiniteTrustBar from './InfiniteTrustBar';
 
 export function HeroSection() {
   return (
-    <div className="bg-dark-deeper text-white">
+    <div className="bg-background text-foreground">
       <HeroHeader />
       <main className="overflow-hidden">
         <div
@@ -17,7 +17,7 @@ export function HeroSection() {
           <div className="h-[80rem] -translate-y-[350px] absolute left-0 top-0 w-56 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,rgba(35,35,255,0.04)_0,rgba(35,35,255,0.02)_80%,transparent_100%)]" />
         </div>
         <HeroContent />
-        <TrustBar className="bg-dark-deeper" />
+        <InfiniteTrustBar />
       </main>
     </div>
   );
