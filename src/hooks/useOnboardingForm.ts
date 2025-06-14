@@ -102,7 +102,7 @@ export const useOnboardingForm = () => {
           goal: goalMap[formData.goal],
           source: sourceMap[formData.source],
           onboarding_completed: true
-        }, { onConflict: ['id'] });
+        }, { onConflict: 'id' });
 
       if (error) {
         toast.error("Failed to save onboarding data", {
