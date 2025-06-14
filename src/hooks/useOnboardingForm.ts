@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from './useAuth';
+import { Database } from '@/integrations/supabase/types';
 
 export interface OnboardingFormData {
   language: string;
@@ -59,15 +60,15 @@ export const useOnboardingForm = () => {
     }
 
     try {
-      // Map form values to database enum values
-      const purposeMap: Record<string, string> = {
+      // Map form values to database enum values with proper typing
+      const purposeMap: Record<string, Database['public']['Enums']['user_purpose']> = {
         'student': 'student',
         'teacher': 'teacher',
         'work': 'professional',
         'research': 'researcher'
       };
 
-      const goalMap: Record<string, string> = {
+      const goalMap: Record<string, Database['public']['Enums']['user_goal']> = {
         'exam-prep': 'exam_prep',
         'research': 'data_analysis',
         'coursework': 'homework_help',
@@ -79,7 +80,7 @@ export const useOnboardingForm = () => {
         'innovation': 'collaboration'
       };
 
-      const sourceMap: Record<string, string> = {
+      const sourceMap: Record<string, Database['public']['Enums']['user_source']> = {
         'search': 'search_engine',
         'instagram': 'social_media',
         'tiktok': 'social_media',
@@ -91,9 +92,9 @@ export const useOnboardingForm = () => {
 
       const { error } = await updateProfile({
         language: formData.language,
-        purpose: purposeMap[formData.purpose] || formData.purpose,
-        goal: goalMap[formData.goal] || formData.goal,
-        source: sourceMap[formData.source] || formData.source,
+        purpose: purposeMap[formData.purpose],
+        goal: goalMap[formData.goal],
+        source: sourceMap[formData.source],
         onboarding_completed: true
       });
 
