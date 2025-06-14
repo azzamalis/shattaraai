@@ -12,7 +12,7 @@ const Logo: React.FC<LogoProps> = ({
       <img alt="SHATTARA AI" className="w-auto h-auto object-contain" style={{
       maxHeight: '40px',
       width: 'auto'
-    }} src="/lovable-uploads/bc26c57b-aba9-45a1-a5ec-9a30966dc5c0.png" />
+    }} src="/lovable-uploads/88dfb89e-dd52-48e1-bad9-3bcf54fae494.png" />
     </div>;
 };
 export default Logo;
