@@ -1,17 +1,18 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { signUp, signInWithGoogle } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,7 +35,7 @@ const SignUp = () => {
     setFormData(prev => ({ ...prev, acceptTerms: checked }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.password || !formData.acceptTerms) {
@@ -46,16 +47,44 @@ const SignUp = () => {
     
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success("Account created successfully!", {
-        description: "Welcome to Shattara AI!"
-      });
+    try {
+      const { data, error } = await signUp(formData.email, formData.password, formData.name);
       
-      // Navigate to onboarding page
-      navigate('/onboarding');
-    }, 1500);
+      if (error) {
+        toast.error("Sign up failed", {
+          description: error.message
+        });
+      } else {
+        toast.success("Account created successfully!", {
+          description: "Please check your email to verify your account."
+        });
+        
+        // Navigate to onboarding page
+        navigate('/onboarding');
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred", {
+        description: "Please try again later."
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      const { error } = await signInWithGoogle();
+      
+      if (error) {
+        toast.error("Google sign up failed", {
+          description: error.message
+        });
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred", {
+        description: "Please try again later."
+      });
+    }
   };
 
   return (
@@ -98,7 +127,7 @@ const SignUp = () => {
           <Button 
             variant="outline" 
             className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 text-white hover:text-white"
-            onClick={() => navigate('/onboarding')}
+            onClick={handleGoogleSignUp}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -127,6 +156,7 @@ const SignUp = () => {
                 className="bg-dark border-zinc-700 text-white"
                 value={formData.name}
                 onChange={handleChange}
+                required
               />
             </div>
             
@@ -139,6 +169,7 @@ const SignUp = () => {
                 className="bg-dark border-zinc-700 text-white"
                 value={formData.email}
                 onChange={handleChange}
+                required
               />
             </div>
             
@@ -152,6 +183,8 @@ const SignUp = () => {
                   className="bg-dark border-zinc-700 text-white pr-10"
                   value={formData.password}
                   onChange={handleChange}
+                  required
+                  minLength={6}
                 />
                 <button 
                   type="button"
@@ -165,7 +198,7 @@ const SignUp = () => {
                   )}
                 </button>
               </div>
-              <p className="text-xs text-gray-400">Must be at least 8 characters</p>
+              <p className="text-xs text-gray-400">Must be at least 6 characters</p>
             </div>
             
             <div className="flex items-start space-x-2">
@@ -174,6 +207,7 @@ const SignUp = () => {
                 className="border-zinc-700 data-[state=checked]:bg-primary mt-1"
                 checked={formData.acceptTerms}
                 onCheckedChange={handleCheckboxChange}
+                required
               />
               <label
                 htmlFor="terms"

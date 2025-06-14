@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
-import { Eye, EyeOff, LucideGithub } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+
 const SignIn = () => {
   const navigate = useNavigate();
+  const { signIn, signInWithGoogle, user, profile, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,47 +20,90 @@ const SignIn = () => {
     password: '',
     rememberMe: false
   });
+
+  useEffect(() => {
+    if (!loading && user) {
+      // Check if user has completed onboarding
+      if (profile?.onboarding_completed) {
+        navigate('/dashboard');
+      } else {
+        navigate('/onboarding');
+      }
+    }
+  }, [user, profile, loading, navigate]);
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {
-      id,
-      value
-    } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
   };
+
   const handleCheckboxChange = (checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      rememberMe: checked
-    }));
+    setFormData(prev => ({ ...prev, rememberMe: checked }));
   };
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!formData.email || !formData.password) {
       toast.error("Missing credentials", {
         description: "Please enter your email and password."
       });
       return;
     }
+    
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success("Signed in successfully!", {
-        description: "Welcome back to Shattara AI!"
+    try {
+      const { data, error } = await signIn(formData.email, formData.password);
+      
+      if (error) {
+        toast.error("Sign in failed", {
+          description: error.message
+        });
+      } else {
+        toast.success("Signed in successfully!", {
+          description: "Welcome back to Shattara AI!"
+        });
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred", {
+        description: "Please try again later."
       });
-
-      // Navigate to dashboard instead of home
-      navigate('/dashboard');
-    }, 1500);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-  return <div className="flex min-h-screen bg-dark">
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await signInWithGoogle();
+      
+      if (error) {
+        toast.error("Google sign in failed", {
+          description: error.message
+        });
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred", {
+        description: "Please try again later."
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-dark items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen bg-dark">
       {/* Left Column - Information */}
       <div className="hidden lg:flex lg:w-1/2 bg-dark-deeper flex-col p-12">
         <div className="mb-auto">
@@ -88,7 +133,6 @@ const SignIn = () => {
             </Link>
           </div>
           
-          {/* form section */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2 text-white">Sign in</h1>
             <p className="text-gray-400">Welcome back! Please enter your details.</p>
@@ -99,7 +143,7 @@ const SignIn = () => {
             variant="outline" 
             className="w-full mb-6 bg-transparent border-zinc-700 hover:bg-zinc-800 
               text-white hover:text-white transition-all duration-200"
-            onClick={() => navigate('/onboarding')}
+            onClick={handleGoogleSignIn}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path 
@@ -121,7 +165,15 @@ const SignIn = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-white">Email</Label>
-              <Input id="email" type="email" placeholder="Enter your email" className="bg-dark border-zinc-700 text-white" value={formData.email} onChange={handleChange} />
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="Enter your email" 
+                className="bg-dark border-zinc-700 text-white" 
+                value={formData.email} 
+                onChange={handleChange}
+                required
+              />
             </div>
             
             <div className="space-y-2">
@@ -135,21 +187,45 @@ const SignIn = () => {
                 </Link>
               </div>
               <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" className="bg-dark border-zinc-700 text-white pr-10" value={formData.password} onChange={handleChange} />
-                <button type="button" onClick={togglePasswordVisibility} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <Input 
+                  id="password" 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="••••••••" 
+                  className="bg-dark border-zinc-700 text-white pr-10" 
+                  value={formData.password} 
+                  onChange={handleChange}
+                  required
+                />
+                <button 
+                  type="button" 
+                  onClick={togglePasswordVisibility} 
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
             
             <div className="flex items-center space-x-2">
-              <Checkbox id="remember" className="border-zinc-700 data-[state=checked]:bg-primary" checked={formData.rememberMe} onCheckedChange={handleCheckboxChange} />
-              <label htmlFor="remember" className="text-sm text-gray-400 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Checkbox 
+                id="remember" 
+                className="border-zinc-700 data-[state=checked]:bg-primary" 
+                checked={formData.rememberMe} 
+                onCheckedChange={handleCheckboxChange} 
+              />
+              <label 
+                htmlFor="remember" 
+                className="text-sm text-gray-400 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Remember me
               </label>
             </div>
             
-            <Button type="submit" className="w-full bg-primary hover:bg-primary-light text-white py-6" disabled={isSubmitting}>
+            <Button 
+              type="submit" 
+              className="w-full bg-primary hover:bg-primary-light text-white py-6" 
+              disabled={isSubmitting}
+            >
               {isSubmitting ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
@@ -167,12 +243,10 @@ const SignIn = () => {
               </Link>
             </p>
           </div>
-          
-          <div className="mt-2 text-center">
-            
-          </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default SignIn;

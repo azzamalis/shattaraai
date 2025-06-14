@@ -1,6 +1,6 @@
+
 import React, { useState } from 'react';
 import { Room, RoomHandlers, DeleteItem, ContentItem } from '@/lib/types';
-import { toast } from "sonner";
 import { DashboardHero } from './DashboardHero';
 import { DashboardSections } from './DashboardSections';
 import { DashboardModals } from './DashboardModals';

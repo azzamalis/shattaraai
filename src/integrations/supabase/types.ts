@@ -9,7 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          goal: Database["public"]["Enums"]["user_goal"] | null
+          id: string
+          language: string
+          onboarding_completed: boolean | null
+          purpose: Database["public"]["Enums"]["user_purpose"] | null
+          source: Database["public"]["Enums"]["user_source"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          goal?: Database["public"]["Enums"]["user_goal"] | null
+          id: string
+          language?: string
+          onboarding_completed?: boolean | null
+          purpose?: Database["public"]["Enums"]["user_purpose"] | null
+          source?: Database["public"]["Enums"]["user_source"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          goal?: Database["public"]["Enums"]["user_goal"] | null
+          id?: string
+          language?: string
+          onboarding_completed?: boolean | null
+          purpose?: Database["public"]["Enums"]["user_purpose"] | null
+          source?: Database["public"]["Enums"]["user_source"] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +56,30 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_goal:
+        | "exam_prep"
+        | "homework_help"
+        | "concept_learning"
+        | "skill_building"
+        | "lesson_planning"
+        | "content_creation"
+        | "student_assessment"
+        | "curriculum_design"
+        | "career_advancement"
+        | "certification_prep"
+        | "networking"
+        | "leadership_development"
+        | "data_analysis"
+        | "publication_support"
+        | "grant_writing"
+        | "collaboration"
+      user_purpose: "student" | "teacher" | "professional" | "researcher"
+      user_source:
+        | "search_engine"
+        | "social_media"
+        | "referral"
+        | "advertisement"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +194,33 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_goal: [
+        "exam_prep",
+        "homework_help",
+        "concept_learning",
+        "skill_building",
+        "lesson_planning",
+        "content_creation",
+        "student_assessment",
+        "curriculum_design",
+        "career_advancement",
+        "certification_prep",
+        "networking",
+        "leadership_development",
+        "data_analysis",
+        "publication_support",
+        "grant_writing",
+        "collaboration",
+      ],
+      user_purpose: ["student", "teacher", "professional", "researcher"],
+      user_source: [
+        "search_engine",
+        "social_media",
+        "referral",
+        "advertisement",
+        "other",
+      ],
+    },
   },
 } as const

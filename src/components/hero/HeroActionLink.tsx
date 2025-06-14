@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface HeroActionLinkProps {
   to: string;
@@ -9,23 +10,26 @@ interface HeroActionLinkProps {
 }
 
 const HeroActionLink: React.FC<HeroActionLinkProps> = ({ to, text }) => {
+  const { user, profile, loading } = useAuth();
   const [authPath, setAuthPath] = useState<string>(to);
   
-  // Check authentication status
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        // User is already logged in, direct to dashboard
-        setAuthPath('/dashboard');
+    if (!loading) {
+      if (user) {
+        // User is logged in
+        if (profile?.onboarding_completed) {
+          // User completed onboarding, go to dashboard
+          setAuthPath('/dashboard');
+        } else {
+          // User needs to complete onboarding
+          setAuthPath('/onboarding');
+        }
       } else {
         // User is not logged in, keep original path (signup)
         setAuthPath(to);
       }
-    };
-    
-    checkAuth();
-  }, [to]);
+    }
+  }, [user, profile, loading, to]);
 
   return (
     <Link

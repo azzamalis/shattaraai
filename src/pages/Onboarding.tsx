@@ -1,11 +1,39 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import OnboardingForm from '@/components/onboarding/OnboardingForm';
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/hooks/useAuth';
 
 const OnboardingContent = () => {
   const { t, isRTL } = useLanguage();
+  const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        // User not authenticated, redirect to sign in
+        navigate('/signin');
+      } else if (profile?.onboarding_completed) {
+        // User already completed onboarding, redirect to dashboard
+        navigate('/dashboard');
+      }
+    }
+  }, [user, profile, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-dark">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect to sign in
+  }
 
   return (
     <div className={`min-h-screen flex flex-col items-center justify-center bg-dark px-4 py-12 ${isRTL ? 'rtl' : 'ltr'}`}>
