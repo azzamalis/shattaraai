@@ -147,7 +147,7 @@ const UseCases = () => {
                     {useCase.icon}
                     <h3 className="text-xl font-bold text-white">{useCase.title}</h3>
                   </div>
-                  <p className="text-white/70 mb-4">{useCase.subtitle}</p>
+                  <p className="text-foreground mb-4">{useCase.subtitle}</p>
                   
                   {/* Features List */}
                   <ul className="space-y-2 mb-4">
