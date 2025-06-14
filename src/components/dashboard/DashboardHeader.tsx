@@ -7,23 +7,23 @@ import { CommandModal } from './CommandModal';
 import { useAuth } from '@/hooks/useAuth';
 import { ContentData } from '@/pages/ContentPage';
 import { Room } from '@/lib/types';
-import { useRooms } from '@/hooks/useRooms';
 
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
   contentData?: ContentData;
   onUpdateContent?: (updates: Partial<ContentData>) => void;
   rooms: Room[];
+  onAddRoom: () => Promise<string | null>;
 }
 
 export function DashboardHeader({ 
   onOpenDrawer, 
   contentData, 
   onUpdateContent,
-  rooms 
+  rooms,
+  onAddRoom
 }: DashboardHeaderProps) {
   const { user } = useAuth();
-  const { addRoom } = useRooms();
   const [commandModalOpen, setCommandModalOpen] = useState(false);
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -81,7 +81,7 @@ export function DashboardHeader({
         open={commandModalOpen} 
         onOpenChange={setCommandModalOpen} 
         rooms={rooms}
-        onAddRoom={addRoom}
+        onAddRoom={onAddRoom}
       />
     </>
   );
