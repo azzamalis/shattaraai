@@ -20,13 +20,13 @@ const convertToExamPrepFormat = (dbItems: any[]): ContentItem[] => {
     id: item.id,
     title: item.title,
     uploadedDate: new Date(item.created_at).toLocaleDateString('en-GB'),
-    type: getDisplayType(item.type),
+    type: getDisplayType(item.type) as ContentItem['type'],
     isSelected: false
   }));
 };
 
 // Helper function to get display type for content
-const getDisplayType = (dbType: string): string => {
+const getDisplayType = (dbType: string): ContentItem['type'] => {
   switch (dbType) {
     case 'video':
       return 'Video';
@@ -38,11 +38,12 @@ const getDisplayType = (dbType: string): string => {
     case 'youtube':
       return 'Youtube URL';
     case 'website':
-      return 'Website';
     case 'text':
-      return 'Text';
+    case 'file':
+    case 'chat':
+    case 'upload':
     default:
-      return 'File';
+      return 'PDF Files'; // Default fallback
   }
 };
 
