@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { LearningCard } from './LearningCard';
 import { useContent } from '@/contexts/ContentContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 import { ContentItem } from '@/lib/types';
+import { useNavigate } from 'react-router-dom';
 
 interface ContinueLearningProps {
   onDeleteCard: (item: ContentItem) => void;
@@ -21,11 +23,16 @@ export function ContinueLearningSection({
   currentRoom
 }: ContinueLearningProps) {
   const { content } = useContent();
+  const navigate = useNavigate();
 
   const handleAddToRoom = (roomId: string, item: ContentItem) => {
     if (onAddToRoom) {
       onAddToRoom(item, roomId);
     }
+  };
+
+  const handleViewAll = () => {
+    navigate('/history');
   };
 
   if (content.length === 0) {
@@ -45,12 +52,15 @@ export function ContinueLearningSection({
     <section className="w-full py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-foreground">Continue learning</h2>
-        <button className={cn(
-          "text-sm text-muted-foreground",
-          "hover:text-foreground transition-colors",
-          "px-4 py-2 rounded-lg",
-          "hover:bg-accent/50"
-        )}>
+        <button 
+          onClick={handleViewAll}
+          className={cn(
+            "text-sm text-muted-foreground",
+            "hover:text-foreground transition-colors",
+            "px-4 py-2 rounded-lg",
+            "hover:bg-accent/50"
+          )}
+        >
           View all
         </button>
       </div>
