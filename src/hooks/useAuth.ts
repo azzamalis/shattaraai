@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
@@ -18,26 +18,14 @@ export interface UserProfile {
 }
 
 export const useAuth = () => {
-  console.log('useAuth hook initializing...');
-  
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [recentLogout, setRecentLogout] = useState(false);
-  const initialized = useRef(false);
-  const profileFetchingRef = useRef(false);
 
   const fetchProfile = async (userId: string) => {
-    if (profileFetchingRef.current) {
-      console.log('Profile fetch already in progress, skipping...');
-      return;
-    }
-    
-    profileFetchingRef.current = true;
-    
     try {
-      console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -45,75 +33,49 @@ export const useAuth = () => {
         .single();
       
       if (!error && data) {
-        console.log('Profile fetched successfully:', data);
         setProfile(data);
       } else if (error && error.code !== 'PGRST116') {
         // PGRST116 is "not found" error, which is expected for new users
         console.error('Error fetching profile:', error);
-      } else {
-        console.log('No profile found for user (expected for new users)');
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-    } finally {
-      profileFetchingRef.current = false;
     }
   };
 
   useEffect(() => {
-    if (initialized.current) {
-      console.log('useAuth already initialized, skipping...');
-      return;
-    }
-    
-    console.log('useAuth effect running...');
-    initialized.current = true;
-    
-    try {
-      // Set up auth state listener
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
-          console.log('Auth state changed:', event, session?.user?.id);
-          setSession(session);
-          setUser(session?.user ?? null);
-          
-          if (session?.user && !profileFetchingRef.current) {
-            // Fetch user profile after a brief delay to allow for profile creation
-            setTimeout(() => {
-              fetchProfile(session.user.id);
-            }, 100);
-          } else if (!session?.user) {
-            setProfile(null);
-          }
-          
-          setLoading(false);
-        }
-      );
-
-      // Check for existing session
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        console.log('Existing session check:', session?.user?.id);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        if (session?.user && !profileFetchingRef.current) {
-          fetchProfile(session.user.id);
+        if (session?.user) {
+          // Fetch user profile after a brief delay to allow for profile creation
+          setTimeout(() => {
+            fetchProfile(session.user.id);
+          }, 100);
+        } else {
+          setProfile(null);
         }
         
         setLoading(false);
-      }).catch((error) => {
-        console.error('Error checking existing session:', error);
-        setLoading(false);
-      });
+      }
+    );
 
-      return () => {
-        console.log('Cleaning up auth subscription');
-        subscription.unsubscribe();
-      };
-    } catch (error) {
-      console.error('Error setting up auth:', error);
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
+      
       setLoading(false);
-    }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   // Clear recent logout flag after 30 seconds
@@ -201,12 +163,10 @@ export const useAuth = () => {
 
   // Method to refresh profile data (useful after onboarding completion)
   const refreshProfile = () => {
-    if (user && !profileFetchingRef.current) {
+    if (user) {
       fetchProfile(user.id);
     }
   };
-
-  console.log('useAuth returning:', { user: !!user, session: !!session, loading, profile: !!profile });
 
   return {
     user,
