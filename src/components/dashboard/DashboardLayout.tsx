@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { DashboardHeader } from './DashboardHeader';
@@ -80,18 +81,10 @@ export function DashboardLayout({
     };
   }, [isDrawerOpen, isMobile]);
 
-  // Force dark mode for dashboard
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-    return () => {
-      // Keep dark mode when component unmounts to maintain consistency
-    };
-  }, []);
-
   return (
     <ContentProvider>
       <div className={cn(
-        "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300 dark"
+        "dashboard-layout flex min-h-screen w-full flex-col bg-background overflow-hidden transition-colors duration-300"
       )}>
         <DashboardHeader 
           onOpenDrawer={() => setIsDrawerOpen(true)} 

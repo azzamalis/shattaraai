@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import Logo from './Logo';
 import SmartCTA from './SmartCTA';
 import { Menu, X } from 'lucide-react';
+import { useThemeContext } from '@/components/ThemeProvider';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { theme } = useThemeContext();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,7 +22,7 @@ const Navbar = () => {
   return (
     <header 
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-sm' : 'bg-white'
+        isScrolled ? 'bg-background/80 backdrop-blur-sm shadow-sm' : 'bg-background'
       }`}
     >
       <div className="container mx-auto px-4 md:px-6">
@@ -32,9 +34,9 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#team" className="nav-link">The Team</a>
-            <a href="#teachers" className="nav-link">For Teachers</a>
-            <a href="#newsletter" className="nav-link">The Newsletter</a>
+            <a href="#team" className="nav-link text-foreground hover:text-primary">The Team</a>
+            <a href="#teachers" className="nav-link text-foreground hover:text-primary">For Teachers</a>
+            <a href="#newsletter" className="nav-link text-foreground hover:text-primary">The Newsletter</a>
           </nav>
 
           {/* CTA Button */}
@@ -48,7 +50,7 @@ const Navbar = () => {
             
             {/* Mobile Menu Button */}
             <button 
-              className="ml-4 p-2 md:hidden focus:outline-none focus:ring-2 focus:ring-primary rounded"
+              className="ml-4 p-2 md:hidden focus:outline-none focus:ring-2 focus:ring-primary rounded text-foreground"
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? 'Close menu' : 'Open menu'}
             >
@@ -60,7 +62,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div 
-        className={`fixed inset-0 bg-white z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed inset-0 bg-background z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -68,7 +70,7 @@ const Navbar = () => {
           <div className="flex items-center justify-between px-4 h-20">
             <Logo />
             <button 
-              className="p-2 focus:outline-none focus:ring-2 focus:ring-primary rounded"
+              className="p-2 focus:outline-none focus:ring-2 focus:ring-primary rounded text-foreground"
               onClick={() => setIsOpen(false)}
               aria-label="Close menu"
             >
@@ -78,21 +80,21 @@ const Navbar = () => {
           <nav className="flex flex-col space-y-6 px-8 py-8">
             <a 
               href="#team" 
-              className="text-xl font-medium"
+              className="text-xl font-medium text-foreground hover:text-primary"
               onClick={() => setIsOpen(false)}
             >
               The Team
             </a>
             <a 
               href="#teachers" 
-              className="text-xl font-medium"
+              className="text-xl font-medium text-foreground hover:text-primary"
               onClick={() => setIsOpen(false)}
             >
               For Teachers
             </a>
             <a 
               href="#newsletter" 
-              className="text-xl font-medium"
+              className="text-xl font-medium text-foreground hover:text-primary"
               onClick={() => setIsOpen(false)}
             >
               The Newsletter
