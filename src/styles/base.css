@@ -1,0 +1,163 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    /* Light Mode Colors */
+    --background: 0 0% 100%; /* #FFFFFF */
+    --foreground: 0 0% 4%; /* #0A0A0A */
+
+    --card: 0 0% 99%; /* #FDFDFD */
+    --card-foreground: 0 0% 4%; /* #0A0A0A */
+    --card-hover: 0 0% 96%; /* #F5F5F5 */
+
+    --secondary-card: 0 0% 98%; /* #FBFBFB */
+    --secondary-card-hover: 0 0% 96%; /* #F5F5F5 */
+
+    --popover: 0 0% 99%; /* #FDFDFD */
+    --popover-foreground: 0 0% 4%; /* #0A0A0A */
+
+    --primary: 210 100% 50%; /* #00A3FF */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 93%; /* #EEEEEE */
+    --secondary-foreground: 0 0% 9%; /* #171717 */
+
+    --muted: 0 0% 98%; /* #FAFAFA */
+    --muted-foreground: 221 14% 53%; /* #737385 */
+
+    --accent: 0 0% 96%; /* #F5F5F5 */
+    --accent-foreground: 0 0% 4%; /* #0A0A0A */
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%; /* #E5E5E5 */
+    --input: 0 0% 89%; /* #E3E3E3 */
+    --ring: 210 100% 50%; /* #00A3FF */
+
+    --sidebar-background: 0 0% 98%; /* #FAFAFA */
+    --sidebar-foreground: 0 0% 4%; /* #0A0A0A */
+    --sidebar-primary: 210 100% 50%; /* #00A3FF */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%; /* #F5F5F5 */
+    --sidebar-accent-foreground: 0 0% 4%; /* #0A0A0A */
+    --sidebar-border: 0 0% 90%; /* #E5E5E5 */
+    --sidebar-ring: 210 100% 50%; /* #00A3FF */
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark Mode Colors */
+    --background: 0 0% 7%; /* #121212 */
+    --foreground: 0 0% 98%; /* #FAFAFA */
+
+    --card: 0 0% 8%; /* #141414 */
+    --card-foreground: 0 0% 98%; /* #FAFAFA */
+    --card-hover: 0 0% 15%; /* #262626 */
+
+    --secondary-card: 0 0% 9%; /* #161616 */
+    --secondary-card-hover: 0 0% 15%; /* #262626 */
+
+    --popover: 0 0% 8%; /* #141414 */
+    --popover-foreground: 0 0% 98%; /* #FAFAFA */
+
+    --primary: 0 0% 80%; /* #CCCCCC */
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 13%; /* #222222 */
+    --secondary-foreground: 0 0% 98%; /* #FAF7F3 */
+
+    --muted: 0 0% 9%; /* #171717 */
+    --muted-foreground: 0 0% 60%; /* #9A9A9A */
+
+    --accent: 0 0% 15%; /* #262626 */
+    --accent-foreground: 0 0% 98%; /* #FAFAFA */
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 15%; /* #262626 */
+    --input: 0 0% 18%; /* #2E2E2E */
+    --ring: 0 0% 80%; /* #CCCCCC */
+
+    --sidebar-background: 0 0% 9%; /* #171717 */
+    --sidebar-foreground: 0 0% 98%; /* #FAFAFA */
+    --sidebar-primary: 0 0% 80%; /* #CCCCCC */
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 15%; /* #262626 */
+    --sidebar-accent-foreground: 0 0% 98%; /* #FAFAFA */
+    --sidebar-border: 0 0% 15%; /* #262626 */
+    --sidebar-ring: 0 0% 80%; /* #CCCCCC */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-[-0.2px];
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl font-bold;
+  }
+
+  h4 {
+    @apply text-lg md:text-xl lg:text-2xl font-semibold;
+  }
+
+  p {
+    @apply text-base leading-relaxed;
+  }
+
+  /* Focus ring for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary transition-shadow duration-200;
+  }
+  
+  /* Custom scrollbar for both themes */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full hover:bg-accent transition-colors;
+  }
+
+  /* RTL Support */
+  [dir="rtl"] {
+    text-align: right;
+  }
+
+  [dir="rtl"] .ltr-only {
+    display: none;
+  }
+
+  [dir="ltr"] .rtl-only {
+    display: none;
+  }
+}

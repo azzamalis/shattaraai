@@ -1,0 +1,110 @@
+
+@layer components {
+  .nav-link {
+    @apply relative text-dashboard-text hover:text-primary transition-colors duration-200;
+  }
+
+  .nav-link::after {
+    @apply content-[''] absolute w-0 h-0.5 bg-primary bottom-0 left-0 transition-all duration-300;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  /* Glow effects for interactive elements */
+  .glow-effect {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+  
+  .glow-effect::after {
+    @apply content-[''] absolute inset-0 bg-primary opacity-0 blur-xl transition-opacity duration-300;
+  }
+  
+  .glow-effect:hover::after {
+    @apply opacity-20;
+  }
+
+  /* Active tab styling */
+  .active-tab {
+    @apply relative text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary;
+  }
+
+  /* Rich tab styling */
+  .tab-border-indicator {
+    position: relative;
+  }
+
+  .tab-border-indicator::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .tab-border-indicator[data-state="active"]::after {
+    transform: scaleX(1);
+  }
+
+  /* Waveform styling */
+  .waveform-bar {
+    transform-origin: bottom;
+  }
+
+  /* Content Page Specific Styles */
+  .content-page-layout {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .content-page-layout main {
+    height: calc(100vh - 64px);
+    overflow: hidden;
+  }
+
+  /* Keep existing styles for other pages */
+  .dashboard-layout:not(.content-page-layout) {
+    min-height: 100vh;
+  }
+
+  .dashboard-layout:not(.content-page-layout) main {
+    min-height: calc(100vh - 64px);
+  }
+
+  /* Content Page Tab Styles */
+  .content-right-sidebar .content-page-tab-content {
+    height: calc(100% - 48px); /* Subtract tab height */
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Keep default tab styles for other pages */
+  .tabs-content:not(.content-page-tab-content) {
+    margin-top: 0.5rem;
+  }
+
+  /* Content Page Chat Styles */
+  .content-page-chat {
+    position: relative;
+    height: 100%;
+  }
+
+  .content-page-chat-input {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: var(--dashboard-bg);
+  }
+
+  /* Default chat styles for other pages remain unchanged */
+  .chat-component:not(.content-page-chat) {
+    min-height: 400px;
+  }
+}
