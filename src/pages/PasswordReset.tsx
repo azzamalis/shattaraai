@@ -60,7 +60,7 @@ const PasswordReset = () => {
           <AnimatedChatPreview />
         </div>
         <div className="mt-auto">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-foreground/60">
             © {new Date().getFullYear()} Shattara AI. All rights reserved.
           </p>
         </div>
@@ -77,7 +77,7 @@ const PasswordReset = () => {
           
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2 text-foreground">Reset password</h1>
-            <p className="text-muted-foreground">
+            <p className="text-foreground/70">
               Enter your email and we'll send you a link to reset your password.
             </p>
           </div>
@@ -107,7 +107,7 @@ const PasswordReset = () => {
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-muted-foreground text-sm">
+            <p className="text-foreground/70 text-sm">
               Remember your password?{' '}
               <Link 
                 to="/signin" 

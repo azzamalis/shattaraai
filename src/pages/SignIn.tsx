@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -116,7 +115,7 @@ const SignIn = () => {
           <AnimatedChatPreview />
         </div>
         <div className="mt-auto">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-foreground/60">
             © {new Date().getFullYear()} Shattara AI. All rights reserved.
           </p>
         </div>
@@ -133,7 +132,7 @@ const SignIn = () => {
           
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2 text-foreground">Sign in</h1>
-            <p className="text-muted-foreground">Welcome back! Please enter your details.</p>
+            <p className="text-foreground/70">Welcome back! Please enter your details.</p>
           </div>
           
           {/* Google Sign-in Button */}
@@ -155,7 +154,7 @@ const SignIn = () => {
           {/* Separator */}
           <div className="relative flex items-center mb-6">
             <div className="flex-grow border-t border-border"></div>
-            <span className="flex-shrink mx-4 text-muted-foreground text-sm">or continue with email</span>
+            <span className="flex-shrink mx-4 text-foreground/60 text-sm">or continue with email</span>
             <div className="flex-grow border-t border-border"></div>
           </div>
           
@@ -179,7 +178,7 @@ const SignIn = () => {
                 <Label htmlFor="password" className="text-foreground">Password</Label>
                 <Link 
                   to="/password-reset" 
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  className="text-sm text-foreground/70 hover:text-foreground transition-colors duration-200"
                 >
                   Forgot password?
                 </Link>
@@ -197,7 +196,7 @@ const SignIn = () => {
                 <button 
                   type="button" 
                   onClick={togglePasswordVisibility} 
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground/70 hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -213,7 +212,7 @@ const SignIn = () => {
               />
               <label 
                 htmlFor="remember" 
-                className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm text-foreground/80 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Remember me
               </label>
@@ -229,7 +228,7 @@ const SignIn = () => {
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-muted-foreground text-sm">
+            <p className="text-foreground/70 text-sm">
               Don't have an account?{' '}
               <Link 
                 to="/signup" 
