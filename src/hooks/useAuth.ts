@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
@@ -24,8 +25,17 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [recentLogout, setRecentLogout] = useState(false);
+  const initialized = useRef(false);
+  const profileFetchingRef = useRef(false);
 
   const fetchProfile = async (userId: string) => {
+    if (profileFetchingRef.current) {
+      console.log('Profile fetch already in progress, skipping...');
+      return;
+    }
+    
+    profileFetchingRef.current = true;
+    
     try {
       console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
@@ -45,11 +55,19 @@ export const useAuth = () => {
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+    } finally {
+      profileFetchingRef.current = false;
     }
   };
 
   useEffect(() => {
+    if (initialized.current) {
+      console.log('useAuth already initialized, skipping...');
+      return;
+    }
+    
     console.log('useAuth effect running...');
+    initialized.current = true;
     
     try {
       // Set up auth state listener
@@ -59,12 +77,12 @@ export const useAuth = () => {
           setSession(session);
           setUser(session?.user ?? null);
           
-          if (session?.user) {
+          if (session?.user && !profileFetchingRef.current) {
             // Fetch user profile after a brief delay to allow for profile creation
             setTimeout(() => {
               fetchProfile(session.user.id);
             }, 100);
-          } else {
+          } else if (!session?.user) {
             setProfile(null);
           }
           
@@ -78,7 +96,7 @@ export const useAuth = () => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        if (session?.user) {
+        if (session?.user && !profileFetchingRef.current) {
           fetchProfile(session.user.id);
         }
         
@@ -183,7 +201,7 @@ export const useAuth = () => {
 
   // Method to refresh profile data (useful after onboarding completion)
   const refreshProfile = () => {
-    if (user) {
+    if (user && !profileFetchingRef.current) {
       fetchProfile(user.id);
     }
   };
