@@ -2,15 +2,16 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
 
 export interface UserProfile {
   id: string;
   email: string | null;
   full_name: string | null;
   language: string;
-  purpose: string | null;
-  goal: string | null;
-  source: string | null;
+  purpose: Database['public']['Enums']['user_purpose'] | null;
+  goal: Database['public']['Enums']['user_goal'] | null;
+  source: Database['public']['Enums']['user_source'] | null;
   onboarding_completed: boolean | null;
   created_at: string | null;
   updated_at: string | null;
@@ -118,7 +119,7 @@ export const useAuth = () => {
     return { data, error };
   };
 
-  const updateProfile = async (updates: Partial<UserProfile>) => {
+  const updateProfile = async (updates: Partial<Database['public']['Tables']['profiles']['Update']>) => {
     if (!user) return { error: new Error('No user logged in') };
 
     const { data, error } = await supabase

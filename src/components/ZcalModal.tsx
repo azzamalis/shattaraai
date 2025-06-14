@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { useModalAnalytics } from '@/hooks/use-modal-analytics';
 import { useToast } from '@/hooks/use-toast';
 
 interface ZcalModalProps {
@@ -32,18 +31,15 @@ const ZcalModal = ({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { trackModalOpen, trackModalAction } = useModalAnalytics();
   const { toast } = useToast();
 
   const handleIframeLoad = () => {
     setIsLoading(false);
-    trackModalAction(modalName, 'iframe_loaded');
   };
 
   const handleIframeError = () => {
     setIsLoading(false);
     setHasError(true);
-    trackModalAction(modalName, 'iframe_error');
     
     toast({
       title: "Booking Calendar Error",
@@ -60,11 +56,6 @@ const ZcalModal = ({
         try {
           const data = event.data;
           if (data.type === 'booking_completed') {
-            // Track successful booking
-            trackModalAction(modalName, 'booking_completed', {
-              booking_id: data.bookingId
-            });
-            
             // Show success toast
             toast({
               title: "Demo Scheduled!",
@@ -82,15 +73,10 @@ const ZcalModal = ({
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [modalName, trackModalAction, toast]);
+  }, [toast]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      setIsOpen(open);
-      if (open) {
-        trackModalOpen(modalName);
-      }
-    }}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
@@ -113,7 +99,6 @@ const ZcalModal = ({
               <Button 
                 onClick={() => {
                   window.open('mailto:contact@shattara.com', '_blank');
-                  trackModalAction(modalName, 'contact_email_clicked');
                 }}
                 className="bg-[#2323FF] hover:bg-[#2323FF]/80"
               >
