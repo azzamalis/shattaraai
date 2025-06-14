@@ -71,7 +71,7 @@ function PricingSection({
 
                 <div className="mb-6">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-white">
+                    <span className="text-4xl font-bold text-foreground ">
                       ${isYearly ? tier.price.yearly : tier.price.monthly}
                     </span>
                     <span className="text-sm text-zinc-400">
