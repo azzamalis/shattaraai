@@ -5,6 +5,7 @@ import HeroActionLink from './HeroActionLink';
 import { Code, Atom, Zap } from 'lucide-react';
 import EducationAnimation from './EducationAnimation';
 import { scrollToElement } from '@/lib/scrollUtils';
+
 const transitionVariants = {
   item: {
     hidden: {
@@ -24,11 +25,13 @@ const transitionVariants = {
     }
   }
 };
+
 const HeroContent = () => {
   const handleFeatureClick = (e: React.MouseEvent) => {
     e.preventDefault();
     scrollToElement('features');
   };
+
   return <section>
       <div className="relative pt-24 md:pt-36">
         <AnimatedGroup variants={{
@@ -114,7 +117,7 @@ const HeroContent = () => {
                   <span className="text-nowrap">Get Started</span>
                 </SmartCTA>
               </div>
-              <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/20" onClick={handleFeatureClick}>
+              <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/70" onClick={handleFeatureClick}>
                 <Atom className="size-4 mr-1" />
                 <span className="text-nowrap">See features</span>
               </SmartCTA>
@@ -162,4 +165,5 @@ const HeroContent = () => {
       </div>
     </section>;
 };
+
 export default HeroContent;
