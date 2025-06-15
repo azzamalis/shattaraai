@@ -26,10 +26,13 @@ export const useContent = () => {
 
   const fetchContent = async (roomId?: string) => {
     if (!user) {
+      console.log('useContent - No user found, setting empty content');
       setContent([]);
       setLoading(false);
       return;
     }
+
+    console.log('useContent - Fetching content for user:', user.id);
 
     try {
       let query = supabase
@@ -41,12 +44,20 @@ export const useContent = () => {
         query = query.eq('room_id', roomId);
       }
 
+      console.log('useContent - Executing query...');
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching content:', error);
-        toast.error('Failed to load content');
+        console.error('useContent - Error fetching content:', error);
+        console.error('useContent - Error details:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
+        toast.error(`Failed to load content: ${error.message}`);
       } else {
+        console.log('useContent - Successfully fetched content:', data);
         // Cast the data to match our ContentItem interface
         setContent((data || []).map(item => ({
           ...item,
@@ -55,7 +66,7 @@ export const useContent = () => {
         })));
       }
     } catch (error) {
-      console.error('Error fetching content:', error);
+      console.error('useContent - Catch block error:', error);
       toast.error('Failed to load content');
     } finally {
       setLoading(false);
@@ -65,6 +76,8 @@ export const useContent = () => {
   const addContent = async (contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
     if (!user) return null;
 
+    console.log('useContent - Adding content:', contentData);
+
     try {
       const { data, error } = await supabase
         .from('content')
@@ -73,10 +86,12 @@ export const useContent = () => {
         .single();
 
       if (error) {
-        console.error('Error creating content:', error);
-        toast.error('Failed to create content');
+        console.error('useContent - Error creating content:', error);
+        toast.error(`Failed to create content: ${error.message}`);
         return null;
       }
+
+      console.log('useContent - Successfully created content:', data);
 
       const newContent = {
         ...data,
@@ -88,7 +103,7 @@ export const useContent = () => {
       toast.success('Content created successfully');
       return data.id;
     } catch (error) {
-      console.error('Error creating content:', error);
+      console.error('useContent - Error creating content:', error);
       toast.error('Failed to create content');
       return null;
     }
@@ -161,12 +176,15 @@ export const useContent = () => {
   };
 
   useEffect(() => {
+    console.log('useContent - useEffect triggered, user:', user?.id);
     fetchContent();
   }, [user]);
 
   // Set up real-time subscription for content - ensure unique channel and proper cleanup
   useEffect(() => {
     if (!user) return;
+
+    console.log('useContent - Setting up realtime subscription for user:', user.id);
 
     // Create a completely unique channel name to avoid conflicts
     const channelId = `content-${user.id}-${Math.random().toString(36).substr(2, 9)}`;
@@ -179,12 +197,13 @@ export const useContent = () => {
         table: 'content',
         filter: `user_id=eq.${user.id}`
       }, (payload) => {
-        console.log('Content change:', payload);
+        console.log('useContent - Content change:', payload);
         fetchContent(); // Refetch on any change
       })
       .subscribe();
 
     return () => {
+      console.log('useContent - Cleaning up realtime subscription');
       // Properly cleanup the channel
       supabase.removeChannel(channel);
     };

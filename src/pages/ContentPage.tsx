@@ -33,7 +33,7 @@ export default function ContentPage() {
   const filename = searchParams.get('filename');
   const text = searchParams.get('text');
   
-  const { content } = useContentContext();
+  const { content, loading } = useContentContext();
   
   // Use recording state detection hook
   const { 
@@ -63,7 +63,7 @@ export default function ContentPage() {
 
   // Primary effect: Load content data from database or URL params
   useEffect(() => {
-    console.log('ContentPage - Loading content data, id:', id, 'content length:', content.length);
+    console.log('ContentPage - Loading content data, id:', id, 'content length:', content.length, 'loading:', loading);
     
     if (!id) {
       // No ID means this is a new content creation from URL params
@@ -82,9 +82,24 @@ export default function ContentPage() {
       return;
     }
 
+    if (loading) {
+      // Content is still being loaded, wait
+      console.log('ContentPage - Content still loading, waiting...');
+      return;
+    }
+
     if (content.length === 0) {
-      // Content not loaded yet, wait
-      console.log('ContentPage - Content not loaded yet, waiting...');
+      // No content found or content loaded but empty
+      console.log('ContentPage - No content found, checking if this is a content access issue');
+      setContentData({
+        id: id,
+        type: 'upload', // Default fallback type
+        title: 'Content Not Found',
+        isProcessing: false,
+        hasError: true,
+        errorMessage: 'Content not found. This might be due to authentication or access issues.'
+      });
+      setIsLoading(false);
       return;
     }
 
@@ -130,7 +145,7 @@ export default function ContentPage() {
     console.log('ContentPage - Setting content data from database:', updatedContentData);
     setContentData(updatedContentData);
     setIsLoading(false);
-  }, [id, content, type, url, filename, text, recordingStateInfo?.isExistingRecording]);
+  }, [id, content, loading, type, url, filename, text, recordingStateInfo?.isExistingRecording]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -196,7 +211,7 @@ export default function ContentPage() {
   };
 
   // Show loading state while content is being loaded
-  if (isLoading) {
+  if (isLoading || loading) {
     return (
       <DashboardLayout className="content-page-layout p-0">
         <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-background">
@@ -217,6 +232,12 @@ export default function ContentPage() {
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <span className="text-lg font-medium">Content Not Found</span>
             <span className="text-sm">{contentData?.errorMessage || 'The requested content could not be loaded.'}</span>
+            <div className="text-xs text-muted-foreground/60 mt-2">
+              <p>Debug info:</p>
+              <p>ID: {id}</p>
+              <p>Content loaded: {content.length} items</p>
+              <p>Loading: {loading.toString()}</p>
+            </div>
           </div>
         </div>
       </DashboardLayout>
