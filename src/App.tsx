@@ -1,93 +1,77 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { ContentProvider } from "@/contexts/ContentContext";
+import { Navbar } from "./components/Navbar";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import Team from "./pages/Team";
-import Teachers from "./pages/Teachers";
-import Contact from "./pages/Contact";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Careers from "./pages/Careers";
-import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import PasswordReset from "./pages/PasswordReset";
-import Onboarding from "./pages/Onboarding";
 import DashboardPage from "./pages/DashboardPage";
 import RoomPage from "./pages/RoomPage";
-import HistoryPage from "./pages/HistoryPage";
+import RecordingRoom from "./pages/RecordingRoom";
 import ContentPage from "./pages/ContentPage";
 import ChatPage from "./pages/ChatPage";
 import PricingPage from "./pages/PricingPage";
+import Contact from "./pages/Contact";
+import HistoryPage from "./pages/HistoryPage";
 import Profile from "./pages/Profile";
-import ReportsPage from "./pages/ReportsPage";
-import ExamLoadingPage from "./pages/ExamLoadingPage";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Teachers from "./pages/Teachers";
+import Team from "./pages/Team";
+import Careers from "./pages/Careers";
+import Onboarding from "./pages/Onboarding";
 import ExamPage from "./pages/ExamPage";
+import ExamLoadingPage from "./pages/ExamLoadingPage";
 import ExamResultsPage from "./pages/ExamResultsPage";
-import ExamResultsInterface from '@/components/dashboard/ExamResultsInterface';
-import { ExamResultsSummary } from '@/components/dashboard/ExamResultsSummary';
-import React from "react";
+import ReportsPage from "./pages/ReportsPage";
+import NotFound from "./pages/NotFound";
 
-// Create QueryClient instance outside the component to avoid recreation on every render
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-const App = () => {
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <ContentProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/team" element={<Team />} />
-                <Route path="/teachers" element={<Teachers />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/careers" element={<Careers />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/password-reset" element={<PasswordReset />} />
-                <Route path="/onboarding" element={<Onboarding />} />
-                
-                {/* Dashboard routes */}
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/rooms/:id" element={<RoomPage />} />
-                <Route path="/history" element={<HistoryPage />} />
-                <Route path="/content/:id" element={<ContentPage />} />
-                <Route path="/chat" element={<ChatPage />} />
-                <Route path="/chat/:id" element={<ChatPage />} />
-                <Route path="/pricing" element={<PricingPage />} />
-                <Route path="/reports" element={<ReportsPage />} />
-                <Route path="/exam-loading" element={<ExamLoadingPage />} />
-                <Route path="/exam" element={<ExamPage />} />
-                <Route path="/exam-results" element={<ExamResultsInterface />} />
-                <Route path="/exam/results" element={<ExamResultsSummary />} />
-                
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </ContentProvider>
-      </LanguageProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <div className="min-h-screen bg-background">
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/password-reset" element={<PasswordReset />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/rooms/:roomId" element={<RoomPage />} />
+              <Route path="/recording/:roomId" element={<RecordingRoom />} />
+              <Route path="/content/:contentId" element={<ContentPage />} />
+              <Route path="/chat/:contentId" element={<ChatPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/teachers" element={<Teachers />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/exam/:contentId" element={<ExamPage />} />
+              <Route path="/exam-loading/:contentId" element={<ExamLoadingPage />} />
+              <Route path="/exam-results/:contentId" element={<ExamResultsPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;

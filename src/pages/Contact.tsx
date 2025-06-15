@@ -1,11 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { HeroSection } from '@/components/hero/HeroSection';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   MapPin, 
   Mail, 
@@ -13,10 +15,119 @@ import {
   MessageCircle,
   Headphones,
   BookOpen,
-  Building 
+  Building,
+  Loader2
 } from 'lucide-react';
 
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+interface FormErrors {
+  name?: string;
+  email?: string;
+  subject?: string;
+  message?: string;
+}
+
 const Contact = () => {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState<ContactFormData>({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Subject is required';
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters long';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (field: keyof ContactFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fix the errors in the form before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Message Sent Successfully!",
+        description: "Thank you for your message. We'll get back to you within 24-48 hours.",
+      });
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+      
+    } catch (error: any) {
+      console.error('Error sending contact form:', error);
+      toast({
+        title: "Failed to Send Message",
+        description: "There was an error sending your message. Please try again or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <HeroSection />
@@ -34,46 +145,77 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="bg-card p-8 rounded-xl border border-border">
             <h2 className="text-2xl font-semibold mb-6 text-foreground">Send Us a Message</h2>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground">Your Name</Label>
+                <Label htmlFor="name" className="text-foreground">Your Name *</Label>
                 <Input 
                   id="name" 
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
                   className="bg-background border-border focus:border-primary text-foreground" 
-                  placeholder="Full Name" 
+                  placeholder="Full Name"
+                  disabled={isSubmitting}
                 />
+                {errors.name && (
+                  <p className="text-sm text-destructive">{errors.name}</p>
+                )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground">Email Address</Label>
+                <Label htmlFor="email" className="text-foreground">Email Address *</Label>
                 <Input 
                   id="email" 
                   type="email" 
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
                   className="bg-background border-border focus:border-primary text-foreground" 
-                  placeholder="your@email.com" 
+                  placeholder="your@email.com"
+                  disabled={isSubmitting}
                 />
+                {errors.email && (
+                  <p className="text-sm text-destructive">{errors.email}</p>
+                )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="subject" className="text-foreground">Subject</Label>
+                <Label htmlFor="subject" className="text-foreground">Subject *</Label>
                 <Input 
                   id="subject" 
+                  value={formData.subject}
+                  onChange={(e) => handleInputChange('subject', e.target.value)}
                   className="bg-background border-border focus:border-primary text-foreground" 
-                  placeholder="How can we help?" 
+                  placeholder="How can we help?"
+                  disabled={isSubmitting}
                 />
+                {errors.subject && (
+                  <p className="text-sm text-destructive">{errors.subject}</p>
+                )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="message" className="text-foreground">Message</Label>
+                <Label htmlFor="message" className="text-foreground">Message *</Label>
                 <Textarea 
                   id="message" 
-                  className="bg-background border-border focus:border-primary text-foreground h-32" 
-                  placeholder="Tell us more about your inquiry..." 
+                  value={formData.message}
+                  onChange={(e) => handleInputChange('message', e.target.value)}
+                  className="bg-background border-border focus:border-primary text-foreground h-32 resize-none" 
+                  placeholder="Tell us more about your inquiry..."
+                  disabled={isSubmitting}
                 />
+                {errors.message && (
+                  <p className="text-sm text-destructive">{errors.message}</p>
+                )}
               </div>
               
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                Send Message
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full bg-primary hover:bg-primary/90 relative"
+              >
+                {isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {isSubmitting ? 'Sending...' : 'Send Message'}
               </Button>
             </form>
           </div>
