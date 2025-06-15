@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
@@ -25,19 +26,18 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
         if (!pdfUrl) {
           console.warn('ContentViewer - No PDF URL available for content:', contentData);
           return (
-            <div className="flex items-center justify-center h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
-              <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+            <div className="flex items-center justify-center h-full bg-card rounded-xl border border-border">
+              <div className="flex flex-col items-center text-muted-foreground">
                 <FileText className="h-12 w-12 mb-4" />
                 <p className="text-lg font-medium">PDF Loading Error</p>
-                <p className="text-sm text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">
+                <p className="text-sm text-muted-foreground/60">
                   Unable to load PDF file
                 </p>
-                <p className="text-xs text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40 mt-2">
-                  Storage path: {contentData.storage_path || 'None'}
-                </p>
-                <p className="text-xs text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40">
-                  URL: {pdfUrl || 'None'}
-                </p>
+                <div className="text-xs text-muted-foreground/40 mt-2 space-y-1">
+                  <p>Storage path: {contentData.storage_path || 'None'}</p>
+                  <p>URL: {pdfUrl || 'None'}</p>
+                  <p>ID: {contentData.id}</p>
+                </div>
               </div>
             </div>
           );
@@ -54,7 +54,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       
       case 'video':
         return (
-          <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+          <div className="w-full h-80 bg-card rounded-xl border border-border overflow-hidden">
             {contentData.url || contentData.filePath ? (
               <video
                 src={contentData.url || contentData.filePath}
@@ -63,10 +63,10 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                <div className="flex flex-col items-center text-muted-foreground">
                   <Video className="h-8 w-8 mb-2" />
                   <span className="text-sm">Video Player</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No video loaded</span>
+                  <span className="text-xs text-muted-foreground/60">No video loaded</span>
                 </div>
               </div>
             )}
@@ -75,7 +75,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       
       case 'youtube':
         return (
-          <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+          <div className="w-full h-80 bg-card rounded-xl border border-border overflow-hidden">
             {contentData.url ? (
               <iframe
                 src={`https://www.youtube.com/embed/${extractYouTubeId(contentData.url)}`}
@@ -85,10 +85,10 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                <div className="flex flex-col items-center text-muted-foreground">
                   <Youtube className="h-8 w-8 mb-2" />
                   <span className="text-sm">YouTube Player</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No YouTube URL provided</span>
+                  <span className="text-xs text-muted-foreground/60">No YouTube URL provided</span>
                 </div>
               </div>
             )}
@@ -97,15 +97,15 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
 
       case 'upload':
         return (
-          <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
+          <div className="w-full h-64 bg-card rounded-xl border border-border">
             <div className="flex items-center justify-center h-full">
-              <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+              <div className="flex flex-col items-center text-muted-foreground">
                 <FileUp className="h-8 w-8 mb-2" />
                 <span className="text-sm">File Upload</span>
                 {contentData.filename ? (
-                  <span className="text-xs text-dashboard-text dark:text-dashboard-text">{contentData.filename}</span>
+                  <span className="text-xs text-foreground">{contentData.filename}</span>
                 ) : (
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No file uploaded</span>
+                  <span className="text-xs text-muted-foreground/60">No file uploaded</span>
                 )}
               </div>
             </div>
@@ -115,9 +115,9 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       case 'text':
       case 'website':
         return (
-          <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator p-4 overflow-auto">
+          <div className="w-full h-64 bg-card rounded-xl border border-border p-4 overflow-auto">
             {contentData.text || contentData.url ? (
-              <div className="text-dashboard-text dark:text-dashboard-text text-sm">
+              <div className="text-foreground text-sm">
                 {contentData.text ? (
                   <pre className="whitespace-pre-wrap font-sans">{contentData.text}</pre>
                 ) : (
@@ -134,10 +134,10 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
               </div>
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                <div className="flex flex-col items-center text-muted-foreground">
                   <ClipboardPaste className="h-8 w-8 mb-2" />
                   <span className="text-sm">Text Content</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No content provided</span>
+                  <span className="text-xs text-muted-foreground/60">No content provided</span>
                 </div>
               </div>
             )}
@@ -146,12 +146,12 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       
       default:
         return (
-          <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
+          <div className="w-full h-64 bg-card rounded-xl border border-border">
             <div className="flex items-center justify-center h-full">
-              <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+              <div className="flex flex-col items-center text-muted-foreground">
                 <Globe className="h-8 w-8 mb-2" />
                 <span className="text-sm">Content Viewer</span>
-                <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">Loading...</span>
+                <span className="text-xs text-muted-foreground/60">Loading...</span>
               </div>
             </div>
           </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -68,38 +69,76 @@ export default function ContentPage() {
     return publicUrl;
   };
 
-  // Load content data from database if we have an ID
+  // Primary effect: Load content data from database
   useEffect(() => {
     console.log('ContentPage - Loading content data, id:', id, 'content length:', content.length);
-    if (id && content.length > 0) {
-      const existingContent = content.find(item => item.id === id);
-      console.log('ContentPage - Found existing content:', existingContent);
-      if (existingContent) {
-        let contentUrl = existingContent.url;
-        
-        // For PDF content with storage_path, generate public URL
-        if (existingContent.type === 'pdf' && existingContent.storage_path && !existingContent.url) {
-          contentUrl = generatePublicURL(existingContent.storage_path);
-          console.log('ContentPage - Generated URL for PDF from storage_path:', contentUrl);
-        }
-        
-        const updatedContentData = {
-          id: existingContent.id,
-          title: existingContent.title,
-          type: existingContent.type as ContentType,
-          url: contentUrl,
-          filename: existingContent.filename,
-          text: existingContent.text_content,
-          storage_path: existingContent.storage_path,
-          metadata: existingContent.metadata,
-          isProcessing: false,
-          hasError: false,
-        };
-        console.log('ContentPage - Setting content data:', updatedContentData);
-        setContentData(updatedContentData);
-      }
+    
+    if (!id) {
+      // No ID means this is a new content creation from URL params
+      console.log('ContentPage - No ID, using URL params for new content');
+      return;
     }
+
+    if (content.length === 0) {
+      // Content not loaded yet, wait
+      console.log('ContentPage - Content not loaded yet, waiting...');
+      return;
+    }
+
+    const existingContent = content.find(item => item.id === id);
+    console.log('ContentPage - Found existing content:', existingContent);
+    
+    if (!existingContent) {
+      console.log('ContentPage - No content found for ID:', id);
+      return;
+    }
+
+    // We have existing content from database - use it
+    let contentUrl = existingContent.url;
+    
+    // For PDF content with storage_path, generate public URL if URL is missing
+    if (existingContent.type === 'pdf' && existingContent.storage_path && !existingContent.url) {
+      contentUrl = generatePublicURL(existingContent.storage_path);
+      console.log('ContentPage - Generated URL for PDF from storage_path:', contentUrl);
+    }
+    
+    const updatedContentData = {
+      id: existingContent.id,
+      title: existingContent.title,
+      type: existingContent.type as ContentType,
+      url: contentUrl,
+      filename: existingContent.filename,
+      text: existingContent.text_content,
+      storage_path: existingContent.storage_path,
+      metadata: existingContent.metadata,
+      isProcessing: false,
+      hasError: false,
+    };
+    
+    console.log('ContentPage - Setting content data from database:', updatedContentData);
+    setContentData(updatedContentData);
   }, [id, content]);
+
+  // Secondary effect: Handle URL params only for new content (no ID)
+  useEffect(() => {
+    if (id && content.length > 0) {
+      // We have an ID and content is loaded - ignore URL params
+      return;
+    }
+
+    if (!id) {
+      // No ID - this is new content creation from URL params
+      console.log('ContentPage - Setting up new content from URL params');
+      setContentData(prev => ({
+        ...prev,
+        type,
+        title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
+        url,
+        filename,
+        text,
+      }));
+    }
+  }, [type, url, filename, text, recordingStateInfo?.isExistingRecording, id, content.length]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -113,23 +152,7 @@ export default function ContentPage() {
     };
   }, [isRecording]);
 
-  // Only update from URL params if we don't have content from database
-  useEffect(() => {
-    console.log('ContentPage - URL params effect, type:', type, 'url:', url, 'filename:', filename);
-    if (!id || content.length === 0) {
-      // Update content data when URL parameters change or recording state is detected
-      setContentData(prev => ({
-        ...prev,
-        type,
-        title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
-        url,
-        filename,
-        text,
-      }));
-    }
-  }, [type, url, filename, text, recordingStateInfo?.isExistingRecording, id, content.length]);
-
-  // Simulate content processing for non-recording types or modify for existing recordings
+  // Processing simulation effect
   useEffect(() => {
     if (recordingStateInfo?.isExistingRecording || type === 'audio_file') {
       // For existing recordings or uploaded audio files, set processing to false immediately

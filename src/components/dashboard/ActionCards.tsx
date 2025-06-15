@@ -87,8 +87,8 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
       });
 
       if (contentId) {
-        // Navigate to content page with the file URL
-        navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}`);
+        // Clean navigation - just use the content ID, no URL parameters
+        navigate(`/content/${contentId}`);
         toast.success(`File "${file.name}" uploaded successfully`);
       } else {
         throw new Error('Failed to create content');
