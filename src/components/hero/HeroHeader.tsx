@@ -39,7 +39,6 @@ const HeroHeader = () => {
                 className="flex items-center space-x-2">
                 <Logo textColor="text-foreground" />
               </Link>
-              
               {/* Mobile menu toggle */}
               <button
                 className="lg:hidden text-foreground"
@@ -89,7 +88,11 @@ const HeroHeader = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className={cn(isScrolled && 'lg:hidden', 'text-foreground border-border hover:border-primary hover:bg-primary/20')}>
+                    className={cn(
+                      isScrolled && 'lg:hidden',
+                      'text-foreground border-border hover:border-primary hover:bg-primary/70'
+                    )}
+                  >
                     Login
                   </Button>
                 </Link>
