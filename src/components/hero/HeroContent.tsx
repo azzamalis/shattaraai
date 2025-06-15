@@ -1,4 +1,3 @@
-
 import React from 'react';
 import SmartCTA from '@/components/SmartCTA';
 import { AnimatedGroup } from '@/components/ui/animated-group';
@@ -118,12 +117,10 @@ const HeroContent = () => {
                   <span className="text-nowrap">Get Started</span>
                 </SmartCTA>
               </div>
-              <div key={2} className="bg-primary/20 rounded-[14px] border border-primary/30 p-0.5 shadow-[0_0_15px_rgba(35,35,255,0.3)]">
-                <SmartCTA variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/70" onClick={handleFeatureClick}>
-                  <Atom className="size-4 mr-1" />
-                  <span className="text-nowrap">See features</span>
-                </SmartCTA>
-              </div>
+              <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/70" onClick={handleFeatureClick}>
+                <Atom className="size-4 mr-1" />
+                <span className="text-nowrap">See features</span>
+              </SmartCTA>
             </AnimatedGroup>
           </div>
         </div>
