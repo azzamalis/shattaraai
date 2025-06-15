@@ -2,7 +2,7 @@
 import * as React from "npm:react@18.3.1";
 import { Section, Text, Hr, List, Item } from "npm:@react-email/components@0.0.22";
 import { EmailLayout } from "./EmailLayout.tsx";
-import { EmailHeader } from "./EmailHeader.tsx";
+import { EmailHeader, BRAND_NAME } from "./EmailHeader.tsx";
 import { EmailFooter } from "./EmailFooter.tsx";
 
 interface ContactConfirmationEmailProps {
@@ -36,7 +36,7 @@ export const ContactConfirmationEmail = ({
         For urgent questions, you can also email <a href="mailto:hello@shattaraai.com" style={{ color: "#00A3FF" }}>hello@shattaraai.com</a> or call +966 53 481 4860.
       </Text>
       <Text style={{ color: "#A6A6A6", fontSize: 15, marginTop: 14 }}>
-        The ShattaraAI.com Team
+        The {BRAND_NAME} Team
       </Text>
     </Section>
     <EmailFooter />

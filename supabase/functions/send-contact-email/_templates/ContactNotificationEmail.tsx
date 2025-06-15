@@ -2,7 +2,7 @@
 import * as React from "npm:react@18.3.1";
 import { Section, Text, Hr, List, Item } from "npm:@react-email/components@0.0.22";
 import { EmailLayout } from "./EmailLayout.tsx";
-import { EmailHeader } from "./EmailHeader.tsx";
+import { EmailHeader, BRAND_NAME } from "./EmailHeader.tsx";
 import { EmailFooter } from "./EmailFooter.tsx";
 
 interface ContactNotificationEmailProps {

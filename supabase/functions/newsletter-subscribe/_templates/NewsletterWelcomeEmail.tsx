@@ -2,7 +2,7 @@
 import * as React from "npm:react@18.3.1";
 import { Section, Text, Hr, List, Item } from "npm:@react-email/components@0.0.22";
 import { EmailLayout } from "./EmailLayout.tsx";
-import { EmailHeader } from "./EmailHeader.tsx";
+import { EmailHeader, BRAND_NAME } from "./EmailHeader.tsx";
 import { EmailFooter } from "./EmailFooter.tsx";
 import { EmailButton } from "./EmailButton.tsx";
 
@@ -16,7 +16,7 @@ export const NewsletterWelcomeEmail = ({ toEmail }: NewsletterWelcomeEmailProps)
     <Section style={{ background: "#222", padding: "36px 32px" }}>
       <Text style={{ color: "#fff", fontSize: 24, fontWeight: 600, marginBottom: 18 }}>Welcome to our Newsletter!</Text>
       <Text style={{ color: "#A6A6A6", fontSize: 18, marginBottom: 15 }}>
-        Thanks for subscribing to ShattaraAI.com, {toEmail}.<br/>We're excited to have you!
+        Thanks for subscribing to {BRAND_NAME}, {toEmail}.<br/>We're excited to have you!
       </Text>
       <Hr style={{border: "none", borderTop: "1px solid #444", margin: "24px 0"}} />
       <Text style={{ color: "#A6A6A6", fontSize: 18 }}>Here’s what you’ll receive:</Text>
@@ -32,7 +32,7 @@ export const NewsletterWelcomeEmail = ({ toEmail }: NewsletterWelcomeEmailProps)
       </Text>
       <Text style={{ color: "#A6A6A6", fontSize: 15, marginTop: 18 }}>
         Best regards,<br />
-        The ShattaraAI.com Team
+        The {BRAND_NAME} Team
       </Text>
     </Section>
     <EmailFooter showUnsubscribe />

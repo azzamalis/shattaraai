@@ -1,13 +1,14 @@
 
 import * as React from "npm:react@18.3.1";
 import { Button } from "npm:@react-email/components@0.0.22";
+import { PRIMARY_COLOR } from "./EmailHeader.tsx";
 
 export const EmailButton = ({ href, children }: { href: string, children: React.ReactNode }) => (
   <Button
     href={href}
     style={{
       display: "inline-block",
-      background: "#00A3FF",
+      background: PRIMARY_COLOR,
       color: "#fff",
       padding: "16px 32px",
       textDecoration: "none",
