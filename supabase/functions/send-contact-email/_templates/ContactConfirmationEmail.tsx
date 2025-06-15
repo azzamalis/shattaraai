@@ -1,6 +1,6 @@
 
 import * as React from "npm:react@18.3.1";
-import { Section, Text, Hr, List, Item } from "npm:@react-email/components@0.0.22";
+import { Section, Text, Hr } from "npm:@react-email/components@0.0.22";
 import { EmailLayout } from "./EmailLayout.tsx";
 import { EmailHeader, BRAND_NAME } from "./EmailHeader.tsx";
 import { EmailFooter } from "./EmailFooter.tsx";
@@ -24,14 +24,14 @@ export const ContactConfirmationEmail = ({
         Dear {name},
       </Text>
       <Text style={{ color: "#A6A6A6", fontSize: 17 }}>
-        We’ve received your message and will get back to you as soon as possible (usually within 24-48 hours).
+        We've received your message and will get back to you as soon as possible (usually within 24-48 hours).
       </Text>
       <Hr style={{border: "none", borderTop: "1px solid #444", margin: "28px 0"}} />
       <Text style={{ color: "#DFDFDF", fontSize: 17, marginBottom: 6 }}>Your Message</Text>
-      <List style={{ color: "#DFDFDF", fontSize: 14, marginLeft: 20 }}>
-        <Item><strong>Subject:</strong> {subject}</Item>
-        <Item><strong>Message:</strong> {message}</Item>
-      </List>
+      <div style={{ color: "#DFDFDF", fontSize: 14, marginLeft: 20 }}>
+        <Text style={{ margin: "4px 0", color: "#DFDFDF" }}><strong>Subject:</strong> {subject}</Text>
+        <Text style={{ margin: "4px 0", color: "#DFDFDF" }}><strong>Message:</strong> {message}</Text>
+      </div>
       <Text style={{ color: "#A6A6A6", fontSize: 15, marginTop: 24 }}>
         For urgent questions, you can also email <a href="mailto:hello@shattaraai.com" style={{ color: "#00A3FF" }}>hello@shattaraai.com</a> or call +966 53 481 4860.
       </Text>

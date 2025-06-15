@@ -1,6 +1,6 @@
 
 import * as React from "npm:react@18.3.1";
-import { Section, Text, Hr, List, Item } from "npm:@react-email/components@0.0.22";
+import { Section, Text, Hr } from "npm:@react-email/components@0.0.22";
 import { EmailLayout } from "./EmailLayout.tsx";
 import { EmailHeader, BRAND_NAME } from "./EmailHeader.tsx";
 import { EmailFooter } from "./EmailFooter.tsx";
@@ -24,11 +24,11 @@ export const ContactNotificationEmail = ({
       <Text style={{ color: "#fff", fontSize: 21, fontWeight: 600, marginBottom: 16 }}>
         New Contact Form Submission
       </Text>
-      <List style={{ color: "#DFDFDF", fontSize: 16, marginLeft: 24, marginBottom: 12 }}>
-        <Item><strong>Name:</strong> {name}</Item>
-        <Item><strong>Email:</strong> {email}</Item>
-        <Item><strong>Subject:</strong> {subject}</Item>
-      </List>
+      <div style={{ color: "#DFDFDF", fontSize: 16, marginBottom: 12 }}>
+        <Text style={{ margin: "8px 0", color: "#DFDFDF" }}><strong>Name:</strong> {name}</Text>
+        <Text style={{ margin: "8px 0", color: "#DFDFDF" }}><strong>Email:</strong> {email}</Text>
+        <Text style={{ margin: "8px 0", color: "#DFDFDF" }}><strong>Subject:</strong> {subject}</Text>
+      </div>
       <Hr style={{border: "none", borderTop: "1px solid #444", margin: "18px 0"}} />
       <Text style={{ color: "#A6A6A6", fontSize: 16, marginBottom: 8 }}>Message:</Text>
       <Text style={{ color: "#DFDFDF", fontSize: 16, whiteSpace: "pre-wrap" }}>{message}</Text>
