@@ -7,6 +7,7 @@ import { ContentRightSidebar } from '@/components/content/ContentRightSidebar';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { ContentType } from '@/lib/types';
 import { useRecordingState } from '@/hooks/useRecordingState';
+import { useContent } from '@/hooks/useContent';
 
 export interface ContentData {
   id: string;
@@ -17,6 +18,7 @@ export interface ContentData {
   filename?: string;
   text?: string;
   metadata?: Record<string, any>;
+  storage_path?: string;
   isProcessing?: boolean;
   hasError?: boolean;
   errorMessage?: string;
@@ -29,6 +31,8 @@ export default function ContentPage() {
   const url = searchParams.get('url');
   const filename = searchParams.get('filename');
   const text = searchParams.get('text');
+  
+  const { content } = useContent();
   
   // Use recording state detection hook
   const { 
@@ -53,6 +57,25 @@ export default function ContentPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedMicrophone, setSelectedMicrophone] = useState("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
+
+  // Load content data from database if we have an ID
+  useEffect(() => {
+    if (id && content.length > 0) {
+      const existingContent = content.find(item => item.id === id);
+      if (existingContent) {
+        setContentData(prev => ({
+          ...prev,
+          title: existingContent.title,
+          type: existingContent.type as ContentType,
+          url: existingContent.url,
+          filename: existingContent.filename,
+          text: existingContent.text_content,
+          storage_path: existingContent.storage_path,
+          metadata: existingContent.metadata
+        }));
+      }
+    }
+  }, [id, content]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;

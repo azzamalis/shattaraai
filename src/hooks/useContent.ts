@@ -14,6 +14,7 @@ export interface ContentItem {
   text_content?: string;
   filename?: string;
   metadata: Record<string, any>;
+  storage_path?: string;
   created_at: string;
   updated_at: string;
 }
@@ -123,6 +124,22 @@ export const useContent = () => {
     if (!user) return;
 
     try {
+      // Get the content item to check if it has a storage path
+      const contentItem = content.find(item => item.id === contentId);
+      
+      // Delete file from storage if it exists
+      if (contentItem?.storage_path) {
+        const { error: storageError } = await supabase.storage
+          .from('pdf-files')
+          .remove([contentItem.storage_path]);
+        
+        if (storageError) {
+          console.warn('Failed to delete file from storage:', storageError);
+          // Don't fail the entire operation if storage deletion fails
+        }
+      }
+
+      // Delete the content record from database
       const { error } = await supabase
         .from('content')
         .delete()

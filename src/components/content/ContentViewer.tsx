@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
@@ -13,9 +14,11 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
   const renderViewer = () => {
     switch (contentData.type) {
       case 'pdf':
+        // Use the storage URL if available, otherwise fall back to the regular URL
+        const pdfUrl = contentData.url;
         return (
           <PDFViewer
-            url={contentData.url}
+            url={pdfUrl}
             filePath={contentData.filePath}
             onTextAction={onTextAction}
           />
