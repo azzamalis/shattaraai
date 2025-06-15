@@ -50,7 +50,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send notification email to business
     const businessEmailResponse = await resend.emails.send({
       from: "Contact Form <noreply@shattaraai.com>",
-      to: ["help@shattaraai.com"],
+      to: ["hello@shattaraai.com"],
       subject: `New Contact Form Submission: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -115,7 +115,7 @@ const handler = async (req: Request): Promise<Response> => {
             </p>
             
             <ul style="color: #555; line-height: 1.6;">
-              <li>Email: help@shattaraai.com</li>
+              <li>Email: hello@shattaraai.com</li>
               <li>Phone: +966 53 481 4860</li>
             </ul>
             

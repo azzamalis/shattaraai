@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { HeroSection } from '@/components/hero/HeroSection';
 import Footer from '@/components/Footer';
@@ -241,7 +242,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1 text-foreground">Email Us</h3>
-                    <p className="text-muted-foreground">help@shattaraai.com<br />support@shattaraai.com</p>
+                    <p className="text-muted-foreground">hello@shattaraai.com</p>
                   </div>
                 </div>
                 
@@ -267,7 +268,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1 text-foreground">Technical Support</h3>
-                    <p className="text-muted-foreground">support@shattaraai.com<br />+966 53 481 4860</p>
+                    <p className="text-muted-foreground">hello@shattaraai.com<br />+966 53 481 4860</p>
                   </div>
                 </div>
                 
@@ -277,7 +278,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1 text-foreground">Partnership Inquiries</h3>
-                    <p className="text-muted-foreground">partnerships@shattaraai.com<br />+966 53 481 4860</p>
+                    <p className="text-muted-foreground">hello@shattaraai.com<br />+966 53 481 4860</p>
                   </div>
                 </div>
                 
@@ -287,7 +288,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1 text-foreground">Educational Resources</h3>
-                    <p className="text-muted-foreground">resources@shattaraai.com<br />+966 53 481 4860</p>
+                    <p className="text-muted-foreground">hello@shattaraai.com<br />+966 53 481 4860</p>
                   </div>
                 </div>
               </div>
