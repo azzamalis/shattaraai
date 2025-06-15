@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
@@ -131,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
           
           <div style="background: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e9ecef;">
             <p style="margin: 0; color: #888; font-size: 14px;">
-              © 2024 Shattara AI - Transforming Education with AI
+              © 2024 Shattara AI - Built by people, Powered by machines
             </p>
           </div>
         </div>

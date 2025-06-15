@@ -67,9 +67,9 @@ const handler = async (req: Request): Promise<Response> => {
       .from("newsletter_subscribers")
       .select("email, status")
       .eq("email", email.toLowerCase())
-      .single();
+      .maybeSingle();
 
-    if (checkError && checkError.code !== "PGRST116") {
+    if (checkError) {
       console.error("Error checking existing subscriber:", checkError);
       throw new Error("Database error occurred");
     }
@@ -174,7 +174,7 @@ const handler = async (req: Request): Promise<Response> => {
               You can unsubscribe from these emails at any time by contacting us at hello@shattaraai.com
             </p>
             <p style="margin: 10px 0 0 0; color: #888; font-size: 12px;">
-              © 2024 Shattara AI - Transforming Education with AI
+              © 2024 Shattara AI - Built by people, Powered by machines
             </p>
           </div>
         </div>
