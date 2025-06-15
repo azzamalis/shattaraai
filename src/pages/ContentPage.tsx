@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -7,7 +6,7 @@ import { ContentRightSidebar } from '@/components/content/ContentRightSidebar';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { ContentType } from '@/lib/types';
 import { useRecordingState } from '@/hooks/useRecordingState';
-import { useContent } from '@/hooks/useContent';
+import { useContentContext } from '@/contexts/ContentContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
@@ -34,7 +33,7 @@ export default function ContentPage() {
   const filename = searchParams.get('filename');
   const text = searchParams.get('text');
   
-  const { content } = useContent();
+  const { content } = useContentContext();
   
   // Use recording state detection hook
   const { 
