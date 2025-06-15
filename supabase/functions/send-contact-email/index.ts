@@ -49,7 +49,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send notification email to business
     const businessEmailResponse = await resend.emails.send({
-      from: "Contact Form <noreply@shattaraai.com>",
+      from: "Contact Form <noreply@updates.shattaraai.com>",
       to: ["hello@shattaraai.com"],
       subject: `New Contact Form Submission: ${subject}`,
       html: `
@@ -81,7 +81,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation email to user
     const userEmailResponse = await resend.emails.send({
-      from: "ShattaraAI.com <noreply@shattaraai.com>",
+      from: "ShattaraAI.com <noreply@updates.shattaraai.com>",
       to: [email],
       subject: "Thank you for contacting ShattaraAI.com",
       html: `
