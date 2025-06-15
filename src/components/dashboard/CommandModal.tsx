@@ -15,7 +15,6 @@ import {
   Box,
   FileText,
   Video,
-  Globe,
   Youtube
 } from 'lucide-react';
 import { useContent } from '@/contexts/ContentContext';
@@ -38,7 +37,7 @@ export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
   };
 
   const handleContentClick = (contentId: string) => {
-    // Always navigate to ContentPage, not directly to content URLs
+    // Always navigate to ContentPage using standard format
     navigate(`/content/${contentId}`);
     onOpenChange(false);
   };
@@ -107,7 +106,7 @@ export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
               No rooms available
             </div>
           )}
-        </CommandGroup>
+        </ChromeGroup>
       </CommandList>
     </CommandDialog>
   );

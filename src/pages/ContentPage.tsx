@@ -58,6 +58,16 @@ export default function ContentPage() {
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedMicrophone, setSelectedMicrophone] = useState("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
 
+  // Generate public URL from storage path
+  const generatePublicURL = (storagePath: string): string => {
+    console.log('ContentPage - Generating public URL for storage path:', storagePath);
+    const { data: { publicUrl } } = supabase.storage
+      .from('pdf-files')
+      .getPublicUrl(storagePath);
+    console.log('ContentPage - Generated public URL:', publicUrl);
+    return publicUrl;
+  };
+
   // Load content data from database if we have an ID
   useEffect(() => {
     console.log('ContentPage - Loading content data, id:', id, 'content length:', content.length);
@@ -65,11 +75,19 @@ export default function ContentPage() {
       const existingContent = content.find(item => item.id === id);
       console.log('ContentPage - Found existing content:', existingContent);
       if (existingContent) {
+        let contentUrl = existingContent.url;
+        
+        // For PDF content with storage_path, generate public URL
+        if (existingContent.type === 'pdf' && existingContent.storage_path && !existingContent.url) {
+          contentUrl = generatePublicURL(existingContent.storage_path);
+          console.log('ContentPage - Generated URL for PDF from storage_path:', contentUrl);
+        }
+        
         const updatedContentData = {
           id: existingContent.id,
           title: existingContent.title,
           type: existingContent.type as ContentType,
-          url: existingContent.url,
+          url: contentUrl,
           filename: existingContent.filename,
           text: existingContent.text_content,
           storage_path: existingContent.storage_path,

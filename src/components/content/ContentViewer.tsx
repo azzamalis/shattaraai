@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
@@ -29,12 +28,15 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
             <div className="flex items-center justify-center h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
               <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                 <FileText className="h-12 w-12 mb-4" />
-                <p className="text-lg font-medium">No PDF loaded</p>
+                <p className="text-lg font-medium">PDF Loading Error</p>
                 <p className="text-sm text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">
-                  Please upload a PDF file to view
+                  Unable to load PDF file
                 </p>
                 <p className="text-xs text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40 mt-2">
-                  Debug: URL={pdfUrl}, Storage={contentData.storage_path}
+                  Storage path: {contentData.storage_path || 'None'}
+                </p>
+                <p className="text-xs text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40">
+                  URL: {pdfUrl || 'None'}
                 </p>
               </div>
             </div>
