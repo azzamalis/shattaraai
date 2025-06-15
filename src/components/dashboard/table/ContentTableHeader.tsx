@@ -1,25 +1,36 @@
 
 import React from 'react';
+import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface ContentTableHeaderProps {
   showSelectionColumn?: boolean;
+  allSelected?: boolean;
+  onSelectAll?: () => void;
 }
 
-export function ContentTableHeader({ showSelectionColumn }: ContentTableHeaderProps) {
+export function ContentTableHeader({ 
+  showSelectionColumn, 
+  allSelected, 
+  onSelectAll 
+}: ContentTableHeaderProps) {
   return (
-    <thead>
-      <tr className="border-b border-dashboard-separator">
+    <TableHeader>
+      <TableRow>
         {showSelectionColumn && (
-          <th className="text-left py-4 px-4 font-medium text-dashboard-text text-base w-10">
-            Select
-          </th>
+          <TableHead className="w-12">
+            <Checkbox
+              checked={allSelected}
+              onCheckedChange={onSelectAll}
+              aria-label="Select all"
+            />
+          </TableHead>
         )}
-        <th className="text-left py-4 px-4 font-medium text-dashboard-text text-base">Title Name</th>
-        <th className="text-center py-4 px-4 font-medium text-dashboard-text text-base">Uploaded Date</th>
-        <th className="text-center py-4 px-4 font-medium text-dashboard-text text-base">AI Content Tags</th>
-        <th className="text-center py-4 px-4 font-medium text-dashboard-text text-base">Type</th>
-        <th className="text-center py-4 px-4 font-medium text-dashboard-text text-base">Actions</th>
-      </tr>
-    </thead>
+        <TableHead>Title</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Created</TableHead>
+        <TableHead className="w-12"></TableHead>
+      </TableRow>
+    </TableHeader>
   );
 }

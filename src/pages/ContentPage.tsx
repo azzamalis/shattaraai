@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -8,6 +7,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/componen
 import { ContentType } from '@/lib/types';
 import { useRecordingState } from '@/hooks/useRecordingState';
 import { useContent } from '@/hooks/useContent';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface ContentData {
   id: string;

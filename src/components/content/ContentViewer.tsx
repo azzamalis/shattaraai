@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
@@ -13,13 +14,17 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
   const renderViewer = () => {
     switch (contentData.type) {
       case 'pdf':
-        // Use the storage URL if available, otherwise fall back to the regular URL
         const pdfUrl = contentData.url;
-        console.log('PDF ContentViewer - contentData:', contentData);
-        console.log('PDF ContentViewer - pdfUrl:', pdfUrl);
+        console.log('ContentViewer - Rendering PDF with data:', {
+          type: contentData.type,
+          url: pdfUrl,
+          storage_path: contentData.storage_path,
+          filename: contentData.filename,
+          title: contentData.title
+        });
         
         if (!pdfUrl) {
-          console.log('PDF ContentViewer - No URL available');
+          console.warn('ContentViewer - No PDF URL available for content:', contentData);
           return (
             <div className="flex items-center justify-center h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
               <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
@@ -28,11 +33,15 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
                 <p className="text-sm text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">
                   Please upload a PDF file to view
                 </p>
+                <p className="text-xs text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40 mt-2">
+                  Debug: URL={pdfUrl}, Storage={contentData.storage_path}
+                </p>
               </div>
             </div>
           );
         }
         
+        console.log('ContentViewer - Rendering PDFViewer with URL:', pdfUrl);
         return (
           <PDFViewer
             url={pdfUrl}
