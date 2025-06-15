@@ -1,15 +1,76 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter, Loader2 } from "lucide-react";
 import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 function StackedCircularFooter() {
   const currentYear = new Date().getFullYear();
+  const { toast } = useToast();
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address to subscribe.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('newsletter-subscribe', {
+        body: { email: email.trim().toLowerCase() }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Successfully Subscribed!",
+        description: "Thank you for subscribing! Check your email for a welcome message.",
+      });
+
+      setEmail(''); // Clear the form
+      
+    } catch (error: any) {
+      console.error('Error subscribing to newsletter:', error);
+      
+      // Handle specific error messages from the backend
+      const errorMessage = error.message || "Failed to subscribe to newsletter. Please try again later.";
+      
+      toast({
+        title: "Subscription Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <footer className="bg-background text-foreground py-12">
@@ -56,13 +117,28 @@ function StackedCircularFooter() {
           </div>
           
           <div className="mb-8 w-full max-w-md">
-            <form className="flex gap-2">
+            <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
               <div className="flex-grow">
-                <Label htmlFor="email" className="sr-only">Email</Label>
-                <Input id="email" placeholder="Enter your email" type="email" className="rounded-full bg-background border-border focus:border-primary text-foreground" />
+                <Label htmlFor="newsletter-email" className="sr-only">Email</Label>
+                <Input 
+                  id="newsletter-email" 
+                  placeholder="Enter your email" 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                  className="rounded-full bg-background border-border focus:border-primary text-foreground" 
+                />
               </div>
-              <Button type="submit" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-                Subscribe
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 relative"
+              >
+                {isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {isSubmitting ? 'Subscribing...' : 'Subscribe'}
               </Button>
             </form>
           </div>

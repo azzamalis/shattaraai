@@ -59,6 +59,36 @@ export type Database = {
           },
         ]
       }
+      newsletter_subscribers: {
+        Row: {
+          confirmation_token: string | null
+          created_at: string
+          email: string
+          id: string
+          status: string
+          subscribed_at: string
+          updated_at: string
+        }
+        Insert: {
+          confirmation_token?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          status?: string
+          subscribed_at?: string
+          updated_at?: string
+        }
+        Update: {
+          confirmation_token?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          status?: string
+          subscribed_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
