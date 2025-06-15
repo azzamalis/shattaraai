@@ -46,6 +46,15 @@ function StackedCircularFooter() {
       });
 
       if (error) {
+        // Check if it's a 409 conflict (already subscribed)
+        if (error.message && error.message.includes('already subscribed')) {
+          toast({
+            title: "Already Subscribed!",
+            description: "You're already subscribed to our newsletter. Thank you!",
+          });
+          setEmail(''); // Clear the form
+          return;
+        }
         throw error;
       }
 
