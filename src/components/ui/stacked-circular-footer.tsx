@@ -145,7 +145,7 @@ function StackedCircularFooter() {
           
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              © {currentYear} SHATTARA — BUILT BY PEOPLE, POWERED BY MACHINES.
+              © {currentYear} SHATTARA AI — BUILT BY PEOPLE, POWERED BY MACHINES.
             </p>
           </div>
         </div>
