@@ -9,6 +9,7 @@ import { ContentType } from '@/lib/types';
 import { useRecordingState } from '@/hooks/useRecordingState';
 import { useContent } from '@/hooks/useContent';
 import { supabase } from '@/integrations/supabase/client';
+import { Loader2 } from 'lucide-react';
 
 export interface ContentData {
   id: string;
@@ -44,16 +45,8 @@ export default function ContentPage() {
     analyzeRecording
   } = useRecordingState();
 
-  const [contentData, setContentData] = useState<ContentData>({
-    id: id || 'new',
-    type,
-    title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
-    url,
-    filename,
-    text,
-    isProcessing: false,
-    hasError: false,
-  });
+  const [contentData, setContentData] = useState<ContentData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -69,13 +62,24 @@ export default function ContentPage() {
     return publicUrl;
   };
 
-  // Primary effect: Load content data from database
+  // Primary effect: Load content data from database or URL params
   useEffect(() => {
     console.log('ContentPage - Loading content data, id:', id, 'content length:', content.length);
     
     if (!id) {
       // No ID means this is a new content creation from URL params
       console.log('ContentPage - No ID, using URL params for new content');
+      setContentData({
+        id: 'new',
+        type,
+        title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
+        url,
+        filename,
+        text,
+        isProcessing: false,
+        hasError: false,
+      });
+      setIsLoading(false);
       return;
     }
 
@@ -90,6 +94,15 @@ export default function ContentPage() {
     
     if (!existingContent) {
       console.log('ContentPage - No content found for ID:', id);
+      setContentData({
+        id: id,
+        type: 'upload', // Default fallback type
+        title: 'Content Not Found',
+        isProcessing: false,
+        hasError: true,
+        errorMessage: 'Content not found in database'
+      });
+      setIsLoading(false);
       return;
     }
 
@@ -105,7 +118,7 @@ export default function ContentPage() {
     const updatedContentData = {
       id: existingContent.id,
       title: existingContent.title,
-      type: existingContent.type as ContentType,
+      type: existingContent.type as ContentType, // Use the database type
       url: contentUrl,
       filename: existingContent.filename,
       text: existingContent.text_content,
@@ -117,28 +130,8 @@ export default function ContentPage() {
     
     console.log('ContentPage - Setting content data from database:', updatedContentData);
     setContentData(updatedContentData);
-  }, [id, content]);
-
-  // Secondary effect: Handle URL params only for new content (no ID)
-  useEffect(() => {
-    if (id && content.length > 0) {
-      // We have an ID and content is loaded - ignore URL params
-      return;
-    }
-
-    if (!id) {
-      // No ID - this is new content creation from URL params
-      console.log('ContentPage - Setting up new content from URL params');
-      setContentData(prev => ({
-        ...prev,
-        type,
-        title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
-        url,
-        filename,
-        text,
-      }));
-    }
-  }, [type, url, filename, text, recordingStateInfo?.isExistingRecording, id, content.length]);
+    setIsLoading(false);
+  }, [id, content, type, url, filename, text, recordingStateInfo?.isExistingRecording]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -154,19 +147,21 @@ export default function ContentPage() {
 
   // Processing simulation effect
   useEffect(() => {
-    if (recordingStateInfo?.isExistingRecording || type === 'audio_file') {
+    if (!contentData) return;
+    
+    if (recordingStateInfo?.isExistingRecording || contentData.type === 'audio_file') {
       // For existing recordings or uploaded audio files, set processing to false immediately
-      setContentData(prev => ({ ...prev, isProcessing: false }));
-    } else if (type !== 'live_recording' && (contentData.url || contentData.filePath || contentData.text)) {
-      setContentData(prev => ({ ...prev, isProcessing: true }));
+      setContentData(prev => prev ? { ...prev, isProcessing: false } : null);
+    } else if (contentData.type !== 'live_recording' && (contentData.url || contentData.filePath || contentData.text)) {
+      setContentData(prev => prev ? { ...prev, isProcessing: true } : null);
       
       const timer = setTimeout(() => {
-        setContentData(prev => ({ ...prev, isProcessing: false }));
+        setContentData(prev => prev ? { ...prev, isProcessing: false } : null);
       }, 2000);
 
       return () => clearTimeout(timer);
     }
-  }, [type, contentData.url, contentData.filePath, contentData.text, recordingStateInfo?.isExistingRecording]);
+  }, [contentData?.type, contentData?.url, contentData?.filePath, contentData?.text, recordingStateInfo?.isExistingRecording]);
 
   const toggleRecording = () => {
     if (!isRecording) {
@@ -190,7 +185,7 @@ export default function ContentPage() {
   };
 
   const updateContentData = (updates: Partial<ContentData>) => {
-    setContentData(prev => ({ ...prev, ...updates }));
+    setContentData(prev => prev ? { ...prev, ...updates } : null);
   };
 
   // New function to handle text actions from PDF viewer
@@ -200,6 +195,34 @@ export default function ContentPage() {
     // You could emit an event, use a context, or pass this to the chat component
     // For now, we'll just log it - integration with chat would be the next step
   };
+
+  // Show loading state while content is being loaded
+  if (isLoading) {
+    return (
+      <DashboardLayout className="content-page-layout p-0">
+        <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-background">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span>Loading content...</span>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show error state if content data is null or has error
+  if (!contentData || contentData.hasError) {
+    return (
+      <DashboardLayout className="content-page-layout p-0">
+        <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-background">
+          <div className="flex flex-col items-center gap-2 text-muted-foreground">
+            <span className="text-lg font-medium">Content Not Found</span>
+            <span className="text-sm">{contentData?.errorMessage || 'The requested content could not be loaded.'}</span>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout 
