@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
@@ -16,6 +15,24 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       case 'pdf':
         // Use the storage URL if available, otherwise fall back to the regular URL
         const pdfUrl = contentData.url;
+        console.log('PDF ContentViewer - contentData:', contentData);
+        console.log('PDF ContentViewer - pdfUrl:', pdfUrl);
+        
+        if (!pdfUrl) {
+          console.log('PDF ContentViewer - No URL available');
+          return (
+            <div className="flex items-center justify-center h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
+              <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                <FileText className="h-12 w-12 mb-4" />
+                <p className="text-lg font-medium">No PDF loaded</p>
+                <p className="text-sm text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">
+                  Please upload a PDF file to view
+                </p>
+              </div>
+            </div>
+          );
+        }
+        
         return (
           <PDFViewer
             url={pdfUrl}

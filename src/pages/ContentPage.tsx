@@ -60,19 +60,25 @@ export default function ContentPage() {
 
   // Load content data from database if we have an ID
   useEffect(() => {
+    console.log('ContentPage - Loading content data, id:', id, 'content length:', content.length);
     if (id && content.length > 0) {
       const existingContent = content.find(item => item.id === id);
+      console.log('ContentPage - Found existing content:', existingContent);
       if (existingContent) {
-        setContentData(prev => ({
-          ...prev,
+        const updatedContentData = {
+          id: existingContent.id,
           title: existingContent.title,
           type: existingContent.type as ContentType,
           url: existingContent.url,
           filename: existingContent.filename,
           text: existingContent.text_content,
           storage_path: existingContent.storage_path,
-          metadata: existingContent.metadata
-        }));
+          metadata: existingContent.metadata,
+          isProcessing: false,
+          hasError: false,
+        };
+        console.log('ContentPage - Setting content data:', updatedContentData);
+        setContentData(updatedContentData);
       }
     }
   }, [id, content]);
@@ -89,17 +95,21 @@ export default function ContentPage() {
     };
   }, [isRecording]);
 
+  // Only update from URL params if we don't have content from database
   useEffect(() => {
-    // Update content data when URL parameters change or recording state is detected
-    setContentData(prev => ({
-      ...prev,
-      type,
-      title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
-      url,
-      filename,
-      text,
-    }));
-  }, [type, url, filename, text, recordingStateInfo?.isExistingRecording]);
+    console.log('ContentPage - URL params effect, type:', type, 'url:', url, 'filename:', filename);
+    if (!id || content.length === 0) {
+      // Update content data when URL parameters change or recording state is detected
+      setContentData(prev => ({
+        ...prev,
+        type,
+        title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
+        url,
+        filename,
+        text,
+      }));
+    }
+  }, [type, url, filename, text, recordingStateInfo?.isExistingRecording, id, content.length]);
 
   // Simulate content processing for non-recording types or modify for existing recordings
   useEffect(() => {

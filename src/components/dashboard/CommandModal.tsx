@@ -37,8 +37,9 @@ export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
     onOpenChange(false);
   };
 
-  const handleContentClick = (contentId: string, type: string) => {
-    navigate(`/content/${contentId}?type=${type}`);
+  const handleContentClick = (contentId: string) => {
+    // Always navigate to ContentPage, not directly to content URLs
+    navigate(`/content/${contentId}`);
     onOpenChange(false);
   };
 
@@ -67,7 +68,7 @@ export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
             recentContent.slice(0, 5).map((content) => (
               <CommandItem 
                 key={content.id}
-                onSelect={() => handleContentClick(content.id, content.type)}
+                onSelect={() => handleContentClick(content.id)}
               >
                 <FileText size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
                 <span>{content.title}</span>
