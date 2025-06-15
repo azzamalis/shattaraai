@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,44 +19,47 @@ export interface ContentItem {
 }
 
 export const useContent = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchContent = async (roomId?: string) => {
+    // Don't fetch if auth is still loading
+    if (authLoading) {
+      console.log('useContent - Auth still loading, waiting...');
+      return;
+    }
+
     if (!user) {
-      console.log('useContent - No user found, setting empty content');
+      console.log('useContent - No user found after auth loaded, setting empty content');
       setContent([]);
       setLoading(false);
       return;
     }
 
-    console.log('useContent - Fetching content for user:', user.id);
+    console.log('useContent - Fetching content for authenticated user:', user.id);
 
     try {
+      setLoading(true);
       let query = supabase
         .from('content')
         .select('*')
+        .eq('user_id', user.id) // Explicitly filter by user_id for RLS
         .order('created_at', { ascending: false });
 
       if (roomId) {
         query = query.eq('room_id', roomId);
       }
 
-      console.log('useContent - Executing query...');
+      console.log('useContent - Executing query with user filter...');
       const { data, error } = await query;
 
       if (error) {
         console.error('useContent - Error fetching content:', error);
-        console.error('useContent - Error details:', {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint
-        });
         toast.error(`Failed to load content: ${error.message}`);
+        setContent([]);
       } else {
-        console.log('useContent - Successfully fetched content:', data);
+        console.log('useContent - Successfully fetched content:', data?.length || 0, 'items');
         // Cast the data to match our ContentItem interface
         setContent((data || []).map(item => ({
           ...item,
@@ -68,13 +70,17 @@ export const useContent = () => {
     } catch (error) {
       console.error('useContent - Catch block error:', error);
       toast.error('Failed to load content');
+      setContent([]);
     } finally {
       setLoading(false);
     }
   };
 
   const addContent = async (contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-    if (!user) return null;
+    if (!user) {
+      console.log('useContent - No user for addContent');
+      return null;
+    }
 
     console.log('useContent - Adding content:', contentData);
 
@@ -175,18 +181,21 @@ export const useContent = () => {
     }
   };
 
+  // Only fetch content when auth loading is complete
   useEffect(() => {
-    console.log('useContent - useEffect triggered, user:', user?.id);
-    fetchContent();
-  }, [user]);
+    console.log('useContent - useEffect triggered, authLoading:', authLoading, 'user:', user?.id);
+    
+    if (!authLoading) {
+      fetchContent();
+    }
+  }, [user, authLoading]);
 
-  // Set up real-time subscription for content - ensure unique channel and proper cleanup
+  // Set up real-time subscription only when user is authenticated
   useEffect(() => {
-    if (!user) return;
+    if (!user || authLoading) return;
 
     console.log('useContent - Setting up realtime subscription for user:', user.id);
 
-    // Create a completely unique channel name to avoid conflicts
     const channelId = `content-${user.id}-${Math.random().toString(36).substr(2, 9)}`;
     
     const channel = supabase
@@ -204,10 +213,9 @@ export const useContent = () => {
 
     return () => {
       console.log('useContent - Cleaning up realtime subscription');
-      // Properly cleanup the channel
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, authLoading]);
 
   return {
     content,

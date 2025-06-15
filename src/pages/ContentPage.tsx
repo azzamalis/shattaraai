@@ -33,7 +33,7 @@ export default function ContentPage() {
   const filename = searchParams.get('filename');
   const text = searchParams.get('text');
   
-  const { content, loading } = useContentContext();
+  const { content, loading: contentLoading, authLoading } = useContentContext();
   
   // Use recording state detection hook
   const { 
@@ -63,8 +63,14 @@ export default function ContentPage() {
 
   // Primary effect: Load content data from database or URL params
   useEffect(() => {
-    console.log('ContentPage - Loading content data, id:', id, 'content length:', content.length, 'loading:', loading);
+    console.log('ContentPage - Loading content data, id:', id, 'authLoading:', authLoading, 'contentLoading:', contentLoading, 'content length:', content.length);
     
+    // Wait for authentication to complete before processing
+    if (authLoading) {
+      console.log('ContentPage - Auth still loading, waiting...');
+      return;
+    }
+
     if (!id) {
       // No ID means this is a new content creation from URL params
       console.log('ContentPage - No ID, using URL params for new content');
@@ -82,29 +88,14 @@ export default function ContentPage() {
       return;
     }
 
-    if (loading) {
+    if (contentLoading) {
       // Content is still being loaded, wait
       console.log('ContentPage - Content still loading, waiting...');
       return;
     }
 
-    if (content.length === 0) {
-      // No content found or content loaded but empty
-      console.log('ContentPage - No content found, checking if this is a content access issue');
-      setContentData({
-        id: id,
-        type: 'upload', // Default fallback type
-        title: 'Content Not Found',
-        isProcessing: false,
-        hasError: true,
-        errorMessage: 'Content not found. This might be due to authentication or access issues.'
-      });
-      setIsLoading(false);
-      return;
-    }
-
     const existingContent = content.find(item => item.id === id);
-    console.log('ContentPage - Found existing content:', existingContent);
+    console.log('ContentPage - Found existing content:', !!existingContent);
     
     if (!existingContent) {
       console.log('ContentPage - No content found for ID:', id);
@@ -114,7 +105,7 @@ export default function ContentPage() {
         title: 'Content Not Found',
         isProcessing: false,
         hasError: true,
-        errorMessage: 'Content not found in database'
+        errorMessage: 'Content not found or you do not have permission to access it'
       });
       setIsLoading(false);
       return;
@@ -145,7 +136,7 @@ export default function ContentPage() {
     console.log('ContentPage - Setting content data from database:', updatedContentData);
     setContentData(updatedContentData);
     setIsLoading(false);
-  }, [id, content, loading, type, url, filename, text, recordingStateInfo?.isExistingRecording]);
+  }, [id, content, contentLoading, authLoading, type, url, filename, text, recordingStateInfo?.isExistingRecording]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -210,14 +201,18 @@ export default function ContentPage() {
     // For now, we'll just log it - integration with chat would be the next step
   };
 
-  // Show loading state while content is being loaded
-  if (isLoading || loading) {
+  // Show loading state while auth or content is being loaded
+  if (authLoading || isLoading || contentLoading) {
     return (
       <DashboardLayout className="content-page-layout p-0">
         <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-background">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span>Loading content...</span>
+            <span>
+              {authLoading ? 'Authenticating...' : 
+               contentLoading ? 'Loading content...' : 
+               'Loading...'}
+            </span>
           </div>
         </div>
       </DashboardLayout>
@@ -236,7 +231,8 @@ export default function ContentPage() {
               <p>Debug info:</p>
               <p>ID: {id}</p>
               <p>Content loaded: {content.length} items</p>
-              <p>Loading: {loading.toString()}</p>
+              <p>Auth loading: {authLoading.toString()}</p>
+              <p>Content loading: {contentLoading.toString()}</p>
             </div>
           </div>
         </div>
