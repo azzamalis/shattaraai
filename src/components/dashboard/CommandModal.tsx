@@ -106,7 +106,7 @@ export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
               No rooms available
             </div>
           )}
-        </ChromeGroup>
+        </CommandGroup>
       </CommandList>
     </CommandDialog>
   );
