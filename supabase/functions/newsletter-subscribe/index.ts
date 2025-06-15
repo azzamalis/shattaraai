@@ -120,20 +120,20 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send welcome email
     const welcomeEmailResponse = await resend.emails.send({
-      from: "ShattaraAI.com <noreply@updates.shattaraai.com>",
+      from: "Shattara AI <noreply@updates.shattaraai.com>",
       to: [email],
-      subject: "Welcome to ShattaraAI.com Newsletter!",
+      subject: "Welcome to Shattara AI Newsletter!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="text-align: center; padding: 20px 0; border-bottom: 1px solid #e9ecef;">
-            <h1 style="color: #00A3FF; margin: 0;">ShattaraAI.com</h1>
+            <h1 style="color: #00A3FF; margin: 0;">Shattara AI</h1>
           </div>
           
           <div style="padding: 30px 20px;">
             <h2 style="color: #333; margin-bottom: 20px;">Welcome to our Newsletter!</h2>
             
             <p style="line-height: 1.6; color: #555;">
-              Thank you for subscribing to the ShattaraAI.com newsletter! 
+              Thank you for subscribing to the Shattara AI newsletter! 
               We're excited to have you join our community of learners and educators.
             </p>
             
@@ -160,12 +160,12 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <p style="line-height: 1.6; color: #555;">
-              Thank you for choosing ShattaraAI.com to enhance your educational journey.
+              Thank you for choosing Shattara AI to enhance your educational journey.
             </p>
             
             <p style="line-height: 1.6; color: #555;">
               Best regards,<br>
-              The ShattaraAI.com Team
+              The Shattara AI Team
             </p>
           </div>
           
@@ -174,7 +174,7 @@ const handler = async (req: Request): Promise<Response> => {
               You can unsubscribe from these emails at any time by contacting us at hello@shattaraai.com
             </p>
             <p style="margin: 10px 0 0 0; color: #888; font-size: 12px;">
-              © 2024 ShattaraAI.com - Transforming Education with AI
+              © 2024 Shattara AI - Transforming Education with AI
             </p>
           </div>
         </div>
