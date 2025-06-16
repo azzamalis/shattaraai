@@ -41,8 +41,20 @@ export function ContentLeftSidebar({
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
 
-  // Check if we should hide tabs (for PDF content)
-  const shouldHideTabs = contentData.type === 'pdf';
+  // For PDF content, we render it in the main content area without tabs
+  if (contentData.type === 'pdf') {
+    return (
+      <div className="h-full flex flex-col min-h-0 bg-background">
+        <div className="flex-1 p-0 bg-card">
+          <ContentViewer 
+            contentData={contentData} 
+            onUpdateContent={onUpdateContent} 
+            onTextAction={onTextAction} 
+          />
+        </div>
+      </div>
+    );
+  }
   
   const renderControls = () => {
     // Show loading state while detecting recording state
@@ -116,19 +128,20 @@ export function ContentLeftSidebar({
       );
     }
 
-    // Default content viewer for other types
-    return (
-      <div className={cn(
-        "shrink-0 bg-card",
-        shouldHideTabs ? "flex-1 p-0" : "p-4"
-      )}>
-        <ContentViewer 
-          contentData={contentData} 
-          onUpdateContent={onUpdateContent} 
-          onTextAction={onTextAction} 
-        />
-      </div>
-    );
+    // For other content types, show a preview in the controls area
+    if (contentData.type !== 'live_recording' && contentData.type !== 'recording') {
+      return (
+        <div className="p-4 shrink-0 bg-card">
+          <ContentViewer 
+            contentData={contentData} 
+            onUpdateContent={onUpdateContent} 
+            onTextAction={onTextAction} 
+          />
+        </div>
+      );
+    }
+
+    return null;
   };
   
   const renderTabContent = () => {
@@ -231,15 +244,6 @@ export function ContentLeftSidebar({
       </>
     );
   };
-
-  // If it's PDF content, render without tabs and give full height to content viewer
-  if (shouldHideTabs) {
-    return (
-      <div className="h-full flex flex-col min-h-0 bg-background">
-        {renderControls()}
-      </div>
-    );
-  }
 
   // Default layout with tabs for other content types
   return (
