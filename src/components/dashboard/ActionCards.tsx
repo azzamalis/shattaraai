@@ -30,11 +30,14 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
     const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
 
+    console.log('ActionCards - Uploading file to storage:', filePath);
+
     const { error: uploadError } = await supabase.storage
       .from('pdf-files')
       .upload(filePath, file);
 
     if (uploadError) {
+      console.error('ActionCards - Upload error:', uploadError);
       throw new Error(`Upload failed: ${uploadError.message}`);
     }
 
@@ -42,6 +45,7 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
       .from('pdf-files')
       .getPublicUrl(filePath);
 
+    console.log('ActionCards - Generated public URL:', publicUrl);
     return { url: publicUrl, path: filePath };
   };
 
@@ -60,14 +64,14 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
       let fileUrl = '';
       let storagePath = '';
 
-      // Upload file to storage if it's a supported type
+      // Upload file to storage for supported types
       if (file.type.includes('pdf') || file.type.includes('audio') || file.type.includes('video')) {
         const uploadResult = await uploadFileToStorage(file);
         fileUrl = uploadResult.url;
         storagePath = uploadResult.path;
+        console.log('ActionCards - File uploaded successfully:', { fileUrl, storagePath });
       } else {
-        // For other files, create a temporary URL (fallback)
-        fileUrl = URL.createObjectURL(file);
+        throw new Error('Unsupported file type. Please upload PDF, audio, or video files.');
       }
         
       // Add content to tracking system with the file URL and storage path
@@ -83,18 +87,19 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         },
         filename: file.name,
         url: fileUrl,
-        storage_path: storagePath || null
+        storage_path: storagePath
       });
 
       if (contentId) {
-        // Clean navigation - just use the content ID, no URL parameters
+        console.log('ActionCards - Content created with ID:', contentId);
+        // Navigate to content page with ID only
         navigate(`/content/${contentId}`);
         toast.success(`File "${file.name}" uploaded successfully`);
       } else {
         throw new Error('Failed to create content');
       }
     } catch (error) {
-      console.error('Error handling file upload:', error);
+      console.error('ActionCards - Error handling file upload:', error);
       toast.error(`Failed to upload file: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setUploading(false);
