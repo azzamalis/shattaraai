@@ -70,28 +70,6 @@ export function ContentLeftSidebar({
     }
 
     // Live recording interface - show recording controls
-    if (contentData.type === 'live_recording') {
-      return (
-        <>
-          <div className="p-4 pb-2 shrink-0 bg-card">
-            <MicrophoneSelector 
-              selected={selectedMicrophone} 
-              onSelect={onMicrophoneSelect} 
-              onClear={onMicrophoneClear} 
-            />
-          </div>
-          <div className="px-4 pb-4 shrink-0 bg-card">
-            <RecordingControls 
-              isRecording={isRecording} 
-              toggleRecording={toggleRecording} 
-              recordingTime={recordingTime} 
-            />
-          </div>
-        </>
-      );
-    }
-
-    // New recording interface
     if (contentData.type === 'recording' && recordingStateInfo?.isNewRecording) {
       return (
         <>
@@ -128,8 +106,8 @@ export function ContentLeftSidebar({
       );
     }
 
-    // For other content types, show a preview in the controls area
-    if (contentData.type !== 'live_recording' && contentData.type !== 'recording') {
+    // For other content types (not recording), show a preview in the controls area
+    if (contentData.type !== 'recording') {
       return (
         <div className="p-4 shrink-0 bg-card">
           <ContentViewer 
@@ -145,9 +123,10 @@ export function ContentLeftSidebar({
   };
   
   const renderTabContent = () => {
-    const hasContent = contentData.type === 'live_recording' ? isRecording : 
+    const hasContent = contentData.type === 'recording' ? 
                       recordingStateInfo?.isNewRecording ? isRecording : 
                       recordingStateInfo?.isExistingRecording ? true : 
+                      false :
                       !!contentData.url || !!contentData.filePath || !!contentData.text;
     
     return (
@@ -156,7 +135,7 @@ export function ContentLeftSidebar({
           <ScrollArea className="h-full">
             {hasContent ? (
               <div className="p-4 space-y-4">
-                {(contentData.type === 'live_recording' || (recordingStateInfo?.isNewRecording && isRecording)) && (
+                {(recordingStateInfo?.isNewRecording && isRecording) && (
                   <div className="text-muted-foreground">
                     Recording in progress...
                   </div>
@@ -185,7 +164,7 @@ export function ContentLeftSidebar({
                     ))}
                   </div>
                 )}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && (
+                {contentData.type !== 'recording' && (
                   <div className="text-muted-foreground">
                     Processing content...
                   </div>
@@ -195,7 +174,7 @@ export function ContentLeftSidebar({
               <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
                 <ClipboardList className="h-8 w-8 mb-4 text-muted-foreground/40" />
                 <p className="text-muted-foreground text-center text-base">
-                  {(contentData.type === 'recording' || contentData.type === 'live_recording') 
+                  {contentData.type === 'recording' 
                     ? 'Start recording to view chapters' 
                     : 'Add content to view chapters'}
                 </p>
@@ -208,7 +187,7 @@ export function ContentLeftSidebar({
           <ScrollArea className="h-full">
             {hasContent ? (
               <div className="p-4 space-y-4">
-                {(contentData.type === 'live_recording' || (recordingStateInfo?.isNewRecording && isRecording)) && (
+                {(recordingStateInfo?.isNewRecording && isRecording) && (
                   <div className="text-muted-foreground">
                     Transcribing in progress...
                   </div>
@@ -223,7 +202,7 @@ export function ContentLeftSidebar({
                     </div>
                   </div>
                 )}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && (
+                {contentData.type !== 'recording' && (
                   <div className="text-muted-foreground">
                     Extracting text...
                   </div>
@@ -233,7 +212,7 @@ export function ContentLeftSidebar({
               <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
                 <FileText className="h-8 w-8 mb-4 text-muted-foreground/40" />
                 <p className="text-muted-foreground text-center text-base">
-                  {(contentData.type === 'recording' || contentData.type === 'live_recording') 
+                  {contentData.type === 'recording' 
                     ? 'Start recording to view transcripts' 
                     : 'Add content to view transcripts'}
                 </p>
