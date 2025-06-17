@@ -75,13 +75,14 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       
       case 'youtube':
         return (
-          <div className="w-full h-80 bg-card rounded-xl border border-border overflow-hidden">
+          <div className="w-full h-full min-h-[500px] bg-card rounded-xl border border-border overflow-hidden">
             {contentData.url ? (
               <iframe
                 src={`https://www.youtube.com/embed/${extractYouTubeId(contentData.url)}`}
                 className="w-full h-full"
                 title="YouTube Player"
                 allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               />
             ) : (
               <div className="flex items-center justify-center h-full">
@@ -115,18 +116,25 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       case 'text':
       case 'website':
         return (
-          <div className="w-full h-64 bg-card rounded-xl border border-border p-4 overflow-auto">
+          <div className="w-full h-full min-h-[400px] bg-card rounded-xl border border-border p-6 overflow-auto">
             {contentData.text || contentData.url ? (
-              <div className="text-foreground text-sm">
+              <div className="text-foreground">
                 {contentData.text ? (
-                  <pre className="whitespace-pre-wrap font-sans">{contentData.text}</pre>
+                  <div className="prose prose-sm max-w-none">
+                    <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">{contentData.text}</pre>
+                  </div>
                 ) : (
                   <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Globe className="h-4 w-4" />
-                      <span className="font-medium">Website Content</span>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Globe className="h-5 w-5" />
+                      <span className="font-medium text-lg">Website Content</span>
                     </div>
-                    <a href={contentData.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    <a 
+                      href={contentData.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-primary hover:underline break-all"
+                    >
                       {contentData.url}
                     </a>
                   </div>
@@ -160,7 +168,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full h-full">
       {renderViewer()}
     </div>
   );
