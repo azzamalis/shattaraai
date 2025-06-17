@@ -32,7 +32,7 @@ export function History({
   const [typeFilter, setTypeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { content, loading, onDeleteContent } = useContent();
+  const { content, loading, deleteContent } = useContent();
   const { rooms: allRooms } = useRooms();
 
   // Filter content based on search query and type filter
@@ -51,7 +51,7 @@ export function History({
   const handleClearHistory = async () => {
     try {
       // Delete all content items
-      await Promise.all(content.map(item => onDeleteContent(item.id)));
+      await Promise.all(content.map(item => deleteContent(item.id)));
       toast.success("History cleared successfully");
     } catch (error) {
       toast.error("Failed to clear history");
@@ -83,7 +83,7 @@ export function History({
 
   const handleDelete = async (id: string) => {
     try {
-      await onDeleteContent(id);
+      await deleteContent(id);
       toast.success("Item deleted successfully");
     } catch (error) {
       toast.error("Failed to delete item");
