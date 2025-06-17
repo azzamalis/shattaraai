@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -24,6 +25,24 @@ export interface ContentData {
   hasError?: boolean;
   errorMessage?: string;
 }
+
+// Helper function to infer content type based on filename and existing type
+const inferContentType = (type: ContentType, filename?: string): ContentType => {
+  if (filename?.toLowerCase().endsWith('.pdf')) {
+    console.log('ContentPage - Inferred type as PDF based on filename:', filename);
+    return 'pdf';
+  }
+  if (filename?.toLowerCase().match(/\.(mp4|mov|avi|wmv|flv|webm)$/)) {
+    console.log('ContentPage - Inferred type as video based on filename:', filename);
+    return 'video';
+  }
+  if (filename?.toLowerCase().match(/\.(mp3|wav|ogg|m4a|aac)$/)) {
+    console.log('ContentPage - Inferred type as audio_file based on filename:', filename);
+    return 'audio_file';
+  }
+  console.log('ContentPage - Using original type:', type, 'for filename:', filename);
+  return type;
+};
 
 export default function ContentPage() {
   const { id } = useParams<{ id: string }>();
@@ -74,10 +93,11 @@ export default function ContentPage() {
     if (!id) {
       // No ID means this is a new content creation from URL params
       console.log('ContentPage - No ID, using URL params for new content');
+      const inferredType = inferContentType(type, filename || undefined);
       setContentData({
         id: 'new',
-        type,
-        title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
+        type: inferredType,
+        title: getDefaultTitle(inferredType, filename, recordingStateInfo?.isExistingRecording),
         url,
         filename,
         text,
@@ -111,11 +131,15 @@ export default function ContentPage() {
       return;
     }
 
+    // Infer the correct content type based on filename and existing type
+    const inferredType = inferContentType(existingContent.type as ContentType, existingContent.filename);
+    console.log('ContentPage - Original type:', existingContent.type, 'Inferred type:', inferredType, 'Filename:', existingContent.filename);
+
     // We have existing content from database - use it
     let contentUrl = existingContent.url;
     
     // For PDF content with storage_path, generate public URL if URL is missing
-    if (existingContent.type === 'pdf' && existingContent.storage_path && !existingContent.url) {
+    if (inferredType === 'pdf' && existingContent.storage_path && !existingContent.url) {
       contentUrl = generatePublicURL(existingContent.storage_path);
       console.log('ContentPage - Generated URL for PDF from storage_path:', contentUrl);
     }
@@ -123,7 +147,7 @@ export default function ContentPage() {
     const updatedContentData = {
       id: existingContent.id,
       title: existingContent.title,
-      type: existingContent.type as ContentType, // Use the database type
+      type: inferredType, // Use the inferred type instead of database type
       url: contentUrl,
       filename: existingContent.filename,
       text: existingContent.text_content,
@@ -133,7 +157,7 @@ export default function ContentPage() {
       hasError: false,
     };
     
-    console.log('ContentPage - Setting content data from database:', updatedContentData);
+    console.log('ContentPage - Setting content data from database with inferred type:', updatedContentData);
     setContentData(updatedContentData);
     setIsLoading(false);
   }, [id, content, contentLoading, authLoading, type, url, filename, text, recordingStateInfo?.isExistingRecording]);

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -41,8 +42,13 @@ export function ContentLeftSidebar({
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
 
+  // Debug logging for content type detection
+  console.log('ContentLeftSidebar - Rendering with contentData.type:', contentData.type);
+  console.log('ContentLeftSidebar - Full contentData:', contentData);
+
   // For PDF content, we render it in the main content area without tabs
   if (contentData.type === 'pdf') {
+    console.log('ContentLeftSidebar - Rendering PDF viewer in full-page mode');
     return (
       <div className="h-full flex flex-col min-h-0 bg-background">
         <div className="flex-1 p-0 bg-card">
