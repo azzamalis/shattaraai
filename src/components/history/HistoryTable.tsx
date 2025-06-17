@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, ExternalLink, Edit2, Trash2 } from 'lucide-react';
+import { MoreHorizontal, ExternalLink, Plus, Share, Trash2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { EditContentModal } from '@/components/dashboard/modals/edit-content-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { useAuth } from '@/hooks/useAuth';
 import { useContent } from '@/contexts/ContentContext';
 import { ContentItem } from '@/hooks/useContent';
+import { Room } from '@/lib/types';
 
 interface HistoryTableProps {
   data: ContentItem[];
@@ -18,13 +18,25 @@ interface HistoryTableProps {
   filterType: string;
   currentPage: number;
   itemsPerPage: number;
+  rooms: Room[];
+  onAddToRoom: (contentId: string, roomId: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+  onShare?: (item: ContentItem) => void;
 }
 
-export function HistoryTable({ data, searchTerm, filterType, currentPage, itemsPerPage }: HistoryTableProps) {
+export function HistoryTable({ 
+  data, 
+  searchTerm, 
+  filterType, 
+  currentPage, 
+  itemsPerPage,
+  rooms,
+  onAddToRoom,
+  onDelete,
+  onShare
+}: HistoryTableProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { updateContent, deleteContent } = useContent();
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
 
@@ -39,14 +51,19 @@ export function HistoryTable({ data, searchTerm, filterType, currentPage, itemsP
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   const handleRowClick = (item: ContentItem) => {
-    // Always navigate to ContentPage for all content types
     navigate(`/content/${item.id}`);
   };
 
-  const handleEditClick = (e: React.MouseEvent, item: ContentItem) => {
+  const handleAddToRoomClick = (e: React.MouseEvent, item: ContentItem, roomId: string) => {
     e.stopPropagation();
-    setSelectedContent(item);
-    setEditModalOpen(true);
+    onAddToRoom(item.id, roomId);
+  };
+
+  const handleShareClick = (e: React.MouseEvent, item: ContentItem) => {
+    e.stopPropagation();
+    if (onShare) {
+      onShare(item);
+    }
   };
 
   const handleDeleteClick = (e: React.MouseEvent, item: ContentItem) => {
@@ -60,17 +77,9 @@ export function HistoryTable({ data, searchTerm, filterType, currentPage, itemsP
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const handleEditSave = async (updates: { title: string }) => {
-    if (selectedContent) {
-      await updateContent(selectedContent.id, updates);
-      setEditModalOpen(false);
-      setSelectedContent(null);
-    }
-  };
-
   const handleDeleteConfirm = async () => {
     if (selectedContent) {
-      await deleteContent(selectedContent.id);
+      await onDelete(selectedContent.id);
       setDeleteModalOpen(false);
       setSelectedContent(null);
     }
@@ -163,12 +172,26 @@ export function HistoryTable({ data, searchTerm, filterType, currentPage, itemsP
                           Open Link
                         </DropdownMenuItem>
                       )}
+                      {rooms.length > 0 && (
+                        <>
+                          {rooms.map((room) => (
+                            <DropdownMenuItem
+                              key={room.id}
+                              onClick={(e) => handleAddToRoomClick(e, item, room.id)}
+                              className="hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                            >
+                              <Plus className="mr-2 h-4 w-4" />
+                              Add to {room.name}
+                            </DropdownMenuItem>
+                          ))}
+                        </>
+                      )}
                       <DropdownMenuItem
-                        onClick={(e) => handleEditClick(e, item)}
+                        onClick={(e) => handleShareClick(e, item)}
                         className="hover:bg-accent hover:text-accent-foreground cursor-pointer"
                       >
-                        <Edit2 className="mr-2 h-4 w-4" />
-                        Edit
+                        <Share className="mr-2 h-4 w-4" />
+                        Share
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={(e) => handleDeleteClick(e, item)}
@@ -187,24 +210,16 @@ export function HistoryTable({ data, searchTerm, filterType, currentPage, itemsP
       </div>
 
       {selectedContent && (
-        <>
-          <EditContentModal
-            open={editModalOpen}
-            onOpenChange={setEditModalOpen}
-            content={selectedContent}
-            onSave={handleEditSave}
-          />
-          <DeleteModal
-            open={deleteModalOpen}
-            onOpenChange={setDeleteModalOpen}
-            type="content"
-            itemToDelete={{
-              id: selectedContent.id,
-              title: selectedContent.title,
-            }}
-            onConfirm={handleDeleteConfirm}
-          />
-        </>
+        <DeleteModal
+          open={deleteModalOpen}
+          onOpenChange={setDeleteModalOpen}
+          type="content"
+          itemToDelete={{
+            id: selectedContent.id,
+            title: selectedContent.title,
+          }}
+          onConfirm={handleDeleteConfirm}
+        />
       )}
     </>
   );
