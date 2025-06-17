@@ -4,14 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { HistoryHeader } from './HistoryHeader';
 import { HistorySearch } from './HistorySearch';
 import { HistoryFilter } from './HistoryFilter';
-import { HistoryTable } from './HistoryTable';
+import { HistoryTable, HistoryItem } from './HistoryTable';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { Room } from '@/lib/types';
 import { useContent } from '@/hooks/useContent';
 import { useRooms } from '@/hooks/useRooms';
 import { Loader2 } from 'lucide-react';
-import { ContentItem } from '@/hooks/useContent';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -35,18 +34,44 @@ export function History({
   const { content, loading, deleteContent } = useContent();
   const { rooms: allRooms } = useRooms();
 
-  // Filter content based on search query and type filter
-  const filteredContent = useMemo(() => {
-    return content.filter(item => {
+  // Convert content items to history items
+  const historyItems: HistoryItem[] = useMemo(() => {
+    return content.map(item => {
+      const room = allRooms.find(r => r.id === item.room_id);
+      return {
+        id: item.id,
+        title: item.title,
+        room: room?.name || 'No Room',
+        date: new Date(item.created_at),
+        type: item.type,
+        url: item.url
+      };
+    });
+  }, [content, allRooms]);
+
+  // Filter history items based on search query and type filter
+  const filteredItems = useMemo(() => {
+    return historyItems.filter(item => {
       const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           item.type.toLowerCase().includes(searchQuery.toLowerCase());
+                           item.room.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesType = typeFilter === 'all' || item.type === typeFilter;
       return matchesSearch && matchesType;
     });
-  }, [content, searchQuery, typeFilter]);
+  }, [historyItems, searchQuery, typeFilter]);
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredContent.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handleItemClick = (id: string) => {
+    const item = content.find(c => c.id === id);
+    if (item?.url) {
+      window.open(item.url, '_blank');
+    } else {
+      console.log(`Navigating to item: ${id}`);
+    }
+  };
 
   const handleClearHistory = async () => {
     try {
@@ -90,12 +115,6 @@ export function History({
     }
   };
 
-  const handleShare = (item: ContentItem) => {
-    // Implement share functionality
-    console.log('Sharing item:', item);
-    toast.success("Share link copied to clipboard");
-  };
-
   if (loading) {
     return (
       <div className="container mx-auto p-6">
@@ -126,15 +145,13 @@ export function History({
           </CardHeader>
           <CardContent className="p-0">
             <HistoryTable 
-              data={filteredContent}
-              searchTerm={searchQuery}
-              filterType={typeFilter}
-              currentPage={currentPage}
-              itemsPerPage={ITEMS_PER_PAGE}
-              rooms={allRooms}
-              onAddToRoom={handleAddToRoom}
+              items={paginatedItems} 
+              onItemClick={handleItemClick} 
+              rooms={allRooms} 
+              onAddToRoom={handleAddToRoom} 
               onDelete={handleDelete}
-              onShare={handleShare}
+              searchQuery={searchQuery}
+              onClearFilters={handleClearFilters}
             />
           </CardContent>
         </Card>

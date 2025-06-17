@@ -12,7 +12,6 @@ interface ContentContextType {
   onDeleteContent: (id: string) => Promise<void>;
   onUpdateContent: (id: string, updates: Partial<ContentItem>) => Promise<void>;
   updateContent: (id: string, updates: Partial<ContentItem>) => Promise<void>;
-  deleteContent: (id: string) => Promise<void>;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -37,8 +36,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       onAddContent: addContent,
       onDeleteContent: deleteContent,
       onUpdateContent: updateContent,
-      updateContent,
-      deleteContent
+      updateContent
     }}>
       {children}
     </ContentContext.Provider>

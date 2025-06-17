@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -45,12 +46,12 @@ export function ContentLeftSidebar({
   console.log('ContentLeftSidebar - Rendering with contentData.type:', contentData.type);
   console.log('ContentLeftSidebar - Full contentData:', contentData);
 
-  // For PDF, YouTube, and text content, we render it in the main content area without tabs
-  if (contentData.type === 'pdf' || contentData.type === 'youtube' || contentData.type === 'text' || contentData.type === 'website') {
-    console.log('ContentLeftSidebar - Rendering content viewer in full-page mode for type:', contentData.type);
+  // For PDF content, we render it in the main content area without tabs
+  if (contentData.type === 'pdf') {
+    console.log('ContentLeftSidebar - Rendering PDF viewer in full-page mode');
     return (
       <div className="h-full flex flex-col min-h-0 bg-background">
-        <div className="flex-1 p-4 bg-card">
+        <div className="flex-1 p-0 bg-card">
           <ContentViewer 
             contentData={contentData} 
             onUpdateContent={onUpdateContent} 
@@ -111,8 +112,8 @@ export function ContentLeftSidebar({
       );
     }
 
-    // For other content types (not recording and not full-page types), show a preview in the controls area
-    if (contentData.type !== 'recording' && contentData.type !== 'pdf' && contentData.type !== 'youtube' && contentData.type !== 'text' && contentData.type !== 'website') {
+    // For other content types (not recording), show a preview in the controls area
+    if (contentData.type !== 'recording') {
       return (
         <div className="p-4 shrink-0 bg-card">
           <ContentViewer 

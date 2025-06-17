@@ -52,7 +52,7 @@ export default function ContentPage() {
   const filename = searchParams.get('filename');
   const text = searchParams.get('text');
   
-  const { content, loading: contentLoading, authLoading, updateContent: contextUpdateContent } = useContentContext();
+  const { content, loading: contentLoading, authLoading } = useContentContext();
   
   // Use recording state detection hook
   const { 
@@ -213,24 +213,8 @@ export default function ContentPage() {
     setSelectedMicrophone("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
   };
 
-  const updateContentData = async (updates: Partial<ContentData>) => {
-    console.log('ContentPage - Updating content data with:', updates);
-    
-    // Update local state immediately for UI responsiveness
+  const updateContentData = (updates: Partial<ContentData>) => {
     setContentData(prev => prev ? { ...prev, ...updates } : null);
-    
-    // If we have a valid content ID (not 'new'), update the database
-    if (contentData && contentData.id !== 'new') {
-      try {
-        // Use the context's updateContent function to ensure database persistence
-        await contextUpdateContent(contentData.id, updates);
-        console.log('ContentPage - Successfully updated content in database');
-      } catch (error) {
-        console.error('ContentPage - Failed to update content in database:', error);
-        // Revert local state on error
-        setContentData(prev => prev ? { ...prev, ...Object.fromEntries(Object.keys(updates).map(key => [key, prev[key as keyof ContentData]])) } : null);
-      }
-    }
   };
 
   // New function to handle text actions from PDF viewer
