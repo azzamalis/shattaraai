@@ -8,7 +8,6 @@ interface LearningCardThumbnailProps {
   title: string;
   contentType?: string;
   pdfUrl?: string;
-  pdfFilePath?: string;
   children?: React.ReactNode;
 }
 
@@ -17,11 +16,10 @@ export function LearningCardThumbnail({
   title, 
   contentType,
   pdfUrl,
-  pdfFilePath,
   children 
 }: LearningCardThumbnailProps) {
   const isPdf = contentType === 'pdf' || contentType === 'file';
-  const hasPdfSource = pdfUrl || pdfFilePath;
+  const hasPdfSource = pdfUrl;
 
   return (
     <div className={cn(
@@ -40,7 +38,6 @@ export function LearningCardThumbnail({
         {isPdf && hasPdfSource ? (
           <PDFThumbnailGenerator
             url={pdfUrl}
-            filePath={pdfFilePath}
             title={title}
             className="w-full h-full"
           />

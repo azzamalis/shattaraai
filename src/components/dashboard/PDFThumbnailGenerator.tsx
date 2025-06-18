@@ -9,24 +9,21 @@ pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 interface PDFThumbnailGeneratorProps {
   url?: string;
-  filePath?: string;
   title: string;
   className?: string;
 }
 
-export function PDFThumbnailGenerator({ url, filePath, title, className }: PDFThumbnailGeneratorProps) {
+export function PDFThumbnailGenerator({ url, title, className }: PDFThumbnailGeneratorProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
 
-  const pdfUrl = url || filePath;
-
   useEffect(() => {
-    if (pdfUrl && pdfUrl.startsWith('blob:')) {
+    if (url && url.startsWith('blob:')) {
       setLoading(true);
       setError(null);
-      fetch(pdfUrl)
+      fetch(url)
         .then(response => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -44,9 +41,9 @@ export function PDFThumbnailGenerator({ url, filePath, title, className }: PDFTh
         });
     } else {
       setPdfBlob(null);
-      setLoading(!!pdfUrl);
+      setLoading(!!url);
     }
-  }, [pdfUrl]);
+  }, [url]);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
@@ -60,7 +57,7 @@ export function PDFThumbnailGenerator({ url, filePath, title, className }: PDFTh
     console.error('PDF load error:', error);
   }, []);
 
-  if (!pdfUrl) {
+  if (!url) {
     return (
       <div className={cn("flex items-center justify-center bg-muted/20", className)}>
         <div className="flex flex-col items-center text-muted-foreground">
@@ -93,7 +90,7 @@ export function PDFThumbnailGenerator({ url, filePath, title, className }: PDFTh
     );
   }
 
-  const fileSource = pdfBlob || pdfUrl;
+  const fileSource = pdfBlob || url;
 
   return (
     <div className={cn("relative overflow-hidden bg-white", className)}>

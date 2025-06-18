@@ -78,7 +78,6 @@ export function LearningCard({
           title={content.title}
           contentType={content.type}
           pdfUrl={content.url}
-          pdfFilePath={content.file_path}
         >
           <LearningCardMenu
             onDelete={onDelete}
