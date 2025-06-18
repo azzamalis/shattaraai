@@ -46,23 +46,32 @@
     --sidebar-border: 0 0% 90%; /* #E5E5E5 */
     --sidebar-ring: 210 100% 50%; /* #00A3FF */
 
+    /* Landing Page Specific Variables */
+    --landing-bg: 0 0% 100%; /* Pure White */
+    --landing-card: 0 0% 99%; /* Unified card background */
+    --landing-card-hover: 0 0% 96%; /* Card hover state */
+    --landing-text: 0 0% 0%; /* Pure Black text */
+    --landing-text-secondary: 0 0% 45%; /* Medium gray secondary text */
+    --landing-border: 221 14% 89%; /* Light borders */
+    --landing-primary: 210 100% 50%; /* Blue primary */
+
     --radius: 0.5rem;
   }
 
   .dark {
     /* Dark Mode Colors - Unified System */
-    --background: 0 0% 7%; /* Dark background #121212 */
-    --foreground: 0 0% 98%; /* Light text #FAFAFA */
+    --background: 0 0% 0%; /* Pure Black #000000 */
+    --foreground: 0 0% 100%; /* Pure White #FFFFFF */
 
-    --card: 0 0% 8%; /* Dark component background #141414 */
-    --card-foreground: 0 0% 98%; /* Light text */
-    --card-hover: 0 0% 15%; /* #262626 */
+    --card: 0 0% 29%; /* Dark Gray #4B4B4B */
+    --card-foreground: 0 0% 100%; /* Pure White text */
+    --card-hover: 0 0% 87%; /* Light Gray hover #DDDDDD */
 
-    --secondary-card: 0 0% 9%; /* #161616 */
-    --secondary-card-hover: 0 0% 15%; /* #262626 */
+    --secondary-card: 0 0% 25%; /* Darker card variant */
+    --secondary-card-hover: 0 0% 87%; /* Light Gray hover */
 
-    --popover: 0 0% 7%; /* Dark mode popover background #121212 */
-    --popover-foreground: 0 0% 98%; /* Dark mode popover text #FAFAFA */
+    --popover: 0 0% 0%; /* Dark mode popover background */
+    --popover-foreground: 0 0% 100%; /* Dark mode popover text */
 
     --primary: 0 0% 89%; /* Light gray primary #E3E3E3 */
     --primary-foreground: 0 0% 9%; /* Dark text on light #171717 */
@@ -71,7 +80,7 @@
     --secondary-foreground: 0 0% 98%; /* #FAFAFA */
 
     --muted: 0 0% 15%; /* Dark muted #262626 */
-    --muted-foreground: 0 0% 60%; /* Medium gray text */
+    --muted-foreground: 0 0% 65%; /* Light gray text #A6A6A6 */
 
     --accent: 0 0% 15%; /* Dark mode hover background #262626 */
     --accent-foreground: 0 0% 98%; /* Dark mode hover text #FAFAFA */
@@ -91,6 +100,30 @@
     --sidebar-accent-foreground: 0 0% 98%; /* #FAFAFA */
     --sidebar-border: 0 0% 15%; /* #262626 */
     --sidebar-ring: 0 0% 89%; /* #E3E3E3 */
+
+    /* Landing Page Dark Mode Variables */
+    --landing-bg: 0 0% 0%; /* Pure Black */
+    --landing-card: 0 0% 29%; /* Dark Gray cards */
+    --landing-card-hover: 0 0% 87%; /* Light Gray hover */
+    --landing-text: 0 0% 100%; /* Pure White text */
+    --landing-text-secondary: 0 0% 65%; /* Light gray secondary text */
+    --landing-border: 0 0% 18%; /* Dark borders */
+    --landing-primary: 0 0% 89%; /* Light gray primary */
+  }
+
+  /* Landing Layout Scoped Styles */
+  .landing-layout {
+    @apply bg-background text-foreground;
+  }
+
+  .landing-layout .landing-card {
+    background: hsl(var(--landing-card));
+    color: hsl(var(--landing-text));
+    border: 1px solid hsl(var(--landing-border));
+  }
+
+  .landing-layout .landing-card:hover {
+    background: hsl(var(--landing-card-hover));
   }
 
   * {
