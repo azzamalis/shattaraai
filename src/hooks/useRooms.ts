@@ -45,27 +45,45 @@ export const useRooms = () => {
   };
 
   const addRoom = async (name: string = 'New Room') => {
-    if (!user) return null;
+    if (!user) {
+      console.error('No authenticated user found');
+      toast.error('You must be logged in to create a room');
+      return null;
+    }
+
+    console.log('Creating room with user_id:', user.id, 'and name:', name);
 
     try {
       const { data, error } = await supabase
         .from('rooms')
-        .insert([{ name, user_id: user.id }])
+        .insert([{ 
+          name, 
+          user_id: user.id 
+        }])
         .select()
         .single();
 
       if (error) {
         console.error('Error creating room:', error);
-        toast.error('Failed to create room');
+        
+        // Provide more specific error messages
+        if (error.message.includes('row-level security')) {
+          toast.error('Permission denied: Unable to create room');
+        } else if (error.message.includes('violates')) {
+          toast.error('Database constraint violation');
+        } else {
+          toast.error(`Failed to create room: ${error.message}`);
+        }
         return null;
       }
 
+      console.log('Room created successfully:', data);
       setRooms(prev => [data, ...prev]);
       toast.success('Room created successfully');
       return data.id;
     } catch (error) {
-      console.error('Error creating room:', error);
-      toast.error('Failed to create room');
+      console.error('Unexpected error creating room:', error);
+      toast.error('An unexpected error occurred while creating the room');
       return null;
     }
   };
