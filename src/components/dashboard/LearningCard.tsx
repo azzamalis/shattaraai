@@ -76,6 +76,9 @@ export function LearningCard({
         <LearningCardThumbnail 
           thumbnailUrl={content.metadata?.thumbnailUrl} 
           title={content.title}
+          contentType={content.type}
+          pdfUrl={content.url}
+          pdfFilePath={content.file_path}
         >
           <LearningCardMenu
             onDelete={onDelete}

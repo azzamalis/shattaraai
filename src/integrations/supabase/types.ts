@@ -16,6 +16,7 @@ export type Database = {
           id: string
           metadata: Json | null
           room_id: string | null
+          storage_path: string | null
           text_content: string | null
           title: string
           type: string
@@ -29,6 +30,7 @@ export type Database = {
           id?: string
           metadata?: Json | null
           room_id?: string | null
+          storage_path?: string | null
           text_content?: string | null
           title: string
           type: string
@@ -42,6 +44,7 @@ export type Database = {
           id?: string
           metadata?: Json | null
           room_id?: string | null
+          storage_path?: string | null
           text_content?: string | null
           title?: string
           type?: string
