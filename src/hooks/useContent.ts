@@ -95,20 +95,21 @@ export const useContent = () => {
   };
 
   const addContentWithFile = async (
-    contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'url'>,
+    contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
     file?: File
   ) => {
     if (!user) return null;
 
     try {
-      let url = contentData.url;
+      let finalContentData = { ...contentData };
       
       // If it's a PDF file, upload to storage
       if (file && contentData.type === 'pdf') {
-        url = await uploadPDFToStorage(file, user.id);
+        const uploadedUrl = await uploadPDFToStorage(file, user.id);
+        finalContentData.url = uploadedUrl;
       }
 
-      return await addContent({ ...contentData, url });
+      return await addContent(finalContentData);
     } catch (error) {
       console.error('Error creating content with file:', error);
       toast.error('Failed to upload file');

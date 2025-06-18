@@ -13,6 +13,7 @@ export interface ContentData {
   type: ContentType;
   title: string;
   url?: string;
+  filePath?: string;
   filename?: string;
   text?: string;
   metadata?: Record<string, any>;

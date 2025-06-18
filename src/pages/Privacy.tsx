@@ -19,7 +19,7 @@ const Privacy = () => {
         
         <div className="h-[800px]">
           <PDFViewer 
-            filePath="/privacy-policy.pdf"
+            url="/privacy-policy.pdf"
           />
         </div>
       </section>

@@ -19,7 +19,7 @@ const Terms = () => {
         
         <div className="h-[800px]">
           <PDFViewer 
-            filePath="/terms-of-service.pdf"
+            url="/terms-of-service.pdf"
           />
         </div>
       </section>

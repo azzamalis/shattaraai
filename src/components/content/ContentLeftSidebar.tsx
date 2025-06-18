@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -100,7 +99,7 @@ export function ContentLeftSidebar({
     const hasContent = contentData.type === 'live_recording' ? isRecording : 
                       recordingStateInfo?.isNewRecording ? isRecording : 
                       recordingStateInfo?.isExistingRecording ? true : 
-                      !!contentData.url || !!contentData.filePath || !!contentData.text;
+                      !!contentData.url || !!contentData.text;
     
     return <>
         <TabsContent value="chapters" className="absolute inset-0">
