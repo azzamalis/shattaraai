@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -59,6 +58,33 @@ export const useContent = () => {
       toast.error('Failed to load content');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchContentById = async (contentId: string): Promise<ContentItem | null> => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('content')
+        .select('*')
+        .eq('id', contentId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching content by ID:', error);
+        return null;
+      }
+
+      return {
+        ...data,
+        type: data.type as ContentItem['type'],
+        metadata: data.metadata as Record<string, any>
+      };
+    } catch (error) {
+      console.error('Error fetching content by ID:', error);
+      return null;
     }
   };
 
@@ -218,6 +244,7 @@ export const useContent = () => {
     updateContent,
     deleteContent,
     refreshContent: fetchContent,
-    recentContent: content.slice(0, 10)
+    recentContent: content.slice(0, 10),
+    fetchContentById
   };
 };

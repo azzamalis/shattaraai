@@ -7,6 +7,8 @@ import { ContentRightSidebar } from '@/components/content/ContentRightSidebar';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { ContentType } from '@/lib/types';
 import { useRecordingState } from '@/hooks/useRecordingState';
+import { useContentContext } from '@/contexts/ContentContext';
+import { Loader2, AlertTriangle } from 'lucide-react';
 
 export interface ContentData {
   id: string;
@@ -25,10 +27,11 @@ export interface ContentData {
 export default function ContentPage() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
-  const type = searchParams.get('type') as ContentType || 'recording';
-  const url = searchParams.get('url');
-  const filename = searchParams.get('filename');
-  const text = searchParams.get('text');
+  const { fetchContentById } = useContentContext();
+  
+  const [contentData, setContentData] = useState<ContentData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // Use recording state detection hook
   const { 
@@ -39,20 +42,66 @@ export default function ContentPage() {
     analyzeRecording
   } = useRecordingState();
 
-  const [contentData, setContentData] = useState<ContentData>({
-    id: id || 'new',
-    type,
-    title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
-    url,
-    filename,
-    text,
-    isProcessing: false,
-    hasError: false,
-  });
-
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedMicrophone, setSelectedMicrophone] = useState("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
+
+  // Fetch content from database
+  useEffect(() => {
+    const fetchContent = async () => {
+      if (!id) {
+        setError('No content ID provided');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const fetchedContent = await fetchContentById(id);
+        
+        if (!fetchedContent) {
+          // If content not found in database, fall back to URL parameters for new content
+          const type = searchParams.get('type') as ContentType || 'recording';
+          const url = searchParams.get('url');
+          const filename = searchParams.get('filename');
+          const text = searchParams.get('text');
+          
+          setContentData({
+            id: id || 'new',
+            type,
+            title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
+            url,
+            filename,
+            text,
+            isProcessing: false,
+            hasError: false,
+          });
+        } else {
+          // Use fetched content from database
+          setContentData({
+            id: fetchedContent.id,
+            type: fetchedContent.type as ContentType,
+            title: fetchedContent.title,
+            url: fetchedContent.url,
+            filename: fetchedContent.filename,
+            text: fetchedContent.text_content,
+            metadata: fetchedContent.metadata,
+            isProcessing: false,
+            hasError: false,
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching content:', err);
+        setError('Failed to load content');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContent();
+  }, [id, fetchContentById, searchParams, recordingStateInfo?.isExistingRecording]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -66,33 +115,23 @@ export default function ContentPage() {
     };
   }, [isRecording]);
 
-  useEffect(() => {
-    // Update content data when URL parameters change or recording state is detected
-    setContentData(prev => ({
-      ...prev,
-      type,
-      title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
-      url,
-      filename,
-      text,
-    }));
-  }, [type, url, filename, text, recordingStateInfo?.isExistingRecording]);
-
   // Simulate content processing for non-recording types or modify for existing recordings
   useEffect(() => {
-    if (recordingStateInfo?.isExistingRecording || type === 'audio_file') {
+    if (!contentData) return;
+
+    if (recordingStateInfo?.isExistingRecording || contentData.type === 'audio_file') {
       // For existing recordings or uploaded audio files, set processing to false immediately
-      setContentData(prev => ({ ...prev, isProcessing: false }));
-    } else if (type !== 'live_recording' && (contentData.url || contentData.text)) {
-      setContentData(prev => ({ ...prev, isProcessing: true }));
+      setContentData(prev => prev ? { ...prev, isProcessing: false } : null);
+    } else if (contentData.type !== 'live_recording' && (contentData.url || contentData.text)) {
+      setContentData(prev => prev ? { ...prev, isProcessing: true } : null);
       
       const timer = setTimeout(() => {
-        setContentData(prev => ({ ...prev, isProcessing: false }));
+        setContentData(prev => prev ? { ...prev, isProcessing: false } : null);
       }, 2000);
 
       return () => clearTimeout(timer);
     }
-  }, [type, contentData.url, contentData.text, recordingStateInfo?.isExistingRecording]);
+  }, [contentData?.type, contentData?.url, contentData?.text, recordingStateInfo?.isExistingRecording]);
 
   const toggleRecording = () => {
     if (!isRecording) {
@@ -116,7 +155,7 @@ export default function ContentPage() {
   };
 
   const updateContentData = (updates: Partial<ContentData>) => {
-    setContentData(prev => ({ ...prev, ...updates }));
+    setContentData(prev => prev ? { ...prev, ...updates } : null);
   };
 
   // New function to handle text actions from PDF viewer
@@ -126,6 +165,50 @@ export default function ContentPage() {
     // You could emit an event, use a context, or pass this to the chat component
     // For now, we'll just log it - integration with chat would be the next step
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <DashboardLayout className="content-page-layout p-0">
+        <div className="flex items-center justify-center h-full">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span>Loading content...</span>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <DashboardLayout className="content-page-layout p-0">
+        <div className="flex items-center justify-center h-full">
+          <div className="flex flex-col items-center gap-2 text-muted-foreground">
+            <AlertTriangle className="h-12 w-12 text-red-500" />
+            <p className="text-lg font-medium">Error loading content</p>
+            <p className="text-sm text-center max-w-md">{error}</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // No content state
+  if (!contentData) {
+    return (
+      <DashboardLayout className="content-page-layout p-0">
+        <div className="flex items-center justify-center h-full">
+          <div className="flex flex-col items-center gap-2 text-muted-foreground">
+            <AlertTriangle className="h-12 w-12" />
+            <p className="text-lg font-medium">Content not found</p>
+            <p className="text-sm text-center max-w-md">The requested content could not be found.</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout 
