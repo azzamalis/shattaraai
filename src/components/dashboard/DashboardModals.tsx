@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
@@ -6,7 +5,7 @@ import { PasteContentModal } from '@/components/dashboard/PasteContentModal';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { DeleteItem, ContentItem } from '@/lib/types';
-import { useContent } from '@/contexts/ContentContext';
+import { useContentContext } from '@/contexts/ContentContext';
 
 interface DashboardModalsProps {
   isPasteModalOpen: boolean;
@@ -34,7 +33,7 @@ export function DashboardModals({
   onDeleteRoom
 }: DashboardModalsProps) {
   const navigate = useNavigate();
-  const { onAddContent, onDeleteContent } = useContent();
+  const { onAddContent, onDeleteContent } = useContentContext();
 
   const handlePasteSubmit = (data: { url?: string; text?: string; }) => {
     // Determine content type based on URL
