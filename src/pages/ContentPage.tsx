@@ -13,7 +13,6 @@ export interface ContentData {
   type: ContentType;
   title: string;
   url?: string;
-  filePath?: string;
   filename?: string;
   text?: string;
   metadata?: Record<string, any>;
@@ -83,7 +82,7 @@ export default function ContentPage() {
     if (recordingStateInfo?.isExistingRecording || type === 'audio_file') {
       // For existing recordings or uploaded audio files, set processing to false immediately
       setContentData(prev => ({ ...prev, isProcessing: false }));
-    } else if (type !== 'live_recording' && (contentData.url || contentData.filePath || contentData.text)) {
+    } else if (type !== 'live_recording' && (contentData.url || contentData.text)) {
       setContentData(prev => ({ ...prev, isProcessing: true }));
       
       const timer = setTimeout(() => {
@@ -92,7 +91,7 @@ export default function ContentPage() {
 
       return () => clearTimeout(timer);
     }
-  }, [type, contentData.url, contentData.filePath, contentData.text, recordingStateInfo?.isExistingRecording]);
+  }, [type, contentData.url, contentData.text, recordingStateInfo?.isExistingRecording]);
 
   const toggleRecording = () => {
     if (!isRecording) {

@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { FileText, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,33 +17,6 @@ export function PDFThumbnailGenerator({ url, title, className }: PDFThumbnailGen
   const [numPages, setNumPages] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
-
-  useEffect(() => {
-    if (url && url.startsWith('blob:')) {
-      setLoading(true);
-      setError(null);
-      fetch(url)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.blob();
-        })
-        .then(blob => {
-          setPdfBlob(blob);
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching PDF blob:', error);
-          setError('Failed to load PDF');
-          setLoading(false);
-        });
-    } else {
-      setPdfBlob(null);
-      setLoading(!!url);
-    }
-  }, [url]);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
@@ -90,12 +63,10 @@ export function PDFThumbnailGenerator({ url, title, className }: PDFThumbnailGen
     );
   }
 
-  const fileSource = pdfBlob || url;
-
   return (
     <div className={cn("relative overflow-hidden bg-white", className)}>
       <Document
-        file={fileSource}
+        file={url}
         onLoadSuccess={onDocumentLoadSuccess}
         onLoadError={onDocumentLoadError}
         loading={null}

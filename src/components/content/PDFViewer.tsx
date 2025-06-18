@@ -15,7 +15,7 @@ import { PDFViewerProps, SearchResult, TextActionPosition } from './pdf/types';
 // Configure PDF.js worker to use the local file
 pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
-export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
+export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
@@ -29,45 +29,18 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
   const [selectedText, setSelectedText] = useState<string>('');
   const [textActionPosition, setTextActionPosition] = useState<TextActionPosition | null>(null);
-  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const [searchPopoverOpen, setSearchPopoverOpen] = useState<boolean>(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const pdfUrl = url || filePath;
 
   useEffect(() => {
-    if (pdfUrl && pdfUrl.startsWith('blob:')) {
+    if (url) {
       setLoading(true);
       setError(null);
-      fetch(pdfUrl)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.blob();
-        })
-        .then(blob => {
-          setPdfBlob(blob);
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching PDF blob:', error);
-          setError('Failed to load PDF content.');
-          setLoading(false);
-        });
-    } else {
-      setPdfBlob(null);
-      setLoading(!!pdfUrl);
     }
-
-    return () => {
-      if (pdfUrl && pdfUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(pdfUrl);
-      }
-    };
-  }, [pdfUrl]);
+  }, [url]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -114,16 +87,16 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
   }, []);
 
   const handleDownload = useCallback(() => {
-    if (pdfUrl) {
+    if (url) {
       const link = document.createElement('a');
-      link.href = pdfUrl;
+      link.href = url;
       link.download = 'document.pdf';
       link.click();
     }
-  }, [pdfUrl]);
+  }, [url]);
 
   const handleSearch = useCallback(async () => {
-    if (!searchTerm.trim() || !pdfBlob) return;
+    if (!searchTerm.trim() || !url) return;
     
     setIsSearching(true);
     try {
@@ -151,7 +124,7 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
     } finally {
       setIsSearching(false);
     }
-  }, [searchTerm, pdfBlob, numPages]);
+  }, [searchTerm, url, numPages]);
 
   const clearSearch = useCallback(() => {
     setSearchTerm('');
@@ -216,7 +189,7 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
     setTextActionPosition(null);
   }, [selectedText, onTextAction]);
 
-  if (!pdfUrl) {
+  if (!url) {
     return (
       <div className="flex items-center justify-center h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
         <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
@@ -229,8 +202,6 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
       </div>
     );
   }
-
-  const fileSource = pdfBlob || pdfUrl;
 
   return (
     <div className="relative h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
@@ -246,7 +217,7 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
         currentSearchIndex={currentSearchIndex}
         isSearching={isSearching}
         searchPopoverOpen={searchPopoverOpen}
-        pdfUrl={pdfUrl}
+        pdfUrl={url}
         onPrevPage={goToPrevPage}
         onNextPage={goToNextPage}
         onZoomIn={handleZoomIn}
@@ -294,10 +265,10 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
                 </div>
               )}
 
-              {!loading && !error && fileSource && (
+              {!loading && !error && url && (
                 <div className="flex justify-center w-full py-4 px-4">
                   <Document
-                    file={fileSource}
+                    file={url}
                     onLoadSuccess={onDocumentLoadSuccess}
                     onLoadError={onDocumentLoadError}
                     loading={null}

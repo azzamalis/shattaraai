@@ -1,7 +1,6 @@
 
 export interface PDFViewerProps {
   url?: string;
-  filePath?: string;
   onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
 }
 

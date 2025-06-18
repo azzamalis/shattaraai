@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { uploadPDFToStorage, deletePDFFromStorage, isPDFStorageUrl } from '@/lib/storage';
 
 export interface ContentItem {
   id: string;
@@ -93,6 +94,28 @@ export const useContent = () => {
     }
   };
 
+  const addContentWithFile = async (
+    contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'url'>,
+    file?: File
+  ) => {
+    if (!user) return null;
+
+    try {
+      let url = contentData.url;
+      
+      // If it's a PDF file, upload to storage
+      if (file && contentData.type === 'pdf') {
+        url = await uploadPDFToStorage(file, user.id);
+      }
+
+      return await addContent({ ...contentData, url });
+    } catch (error) {
+      console.error('Error creating content with file:', error);
+      toast.error('Failed to upload file');
+      return null;
+    }
+  };
+
   const updateContent = async (contentId: string, updates: Partial<ContentItem>) => {
     if (!user) return;
 
@@ -123,6 +146,9 @@ export const useContent = () => {
     if (!user) return;
 
     try {
+      // Get the content item to check if it has a storage URL
+      const contentItem = content.find(item => item.id === contentId);
+      
       const { error } = await supabase
         .from('content')
         .delete()
@@ -133,6 +159,16 @@ export const useContent = () => {
         console.error('Error deleting content:', error);
         toast.error('Failed to delete content');
         return;
+      }
+
+      // If the content has a PDF storage URL, delete the file from storage
+      if (contentItem?.url && isPDFStorageUrl(contentItem.url)) {
+        try {
+          await deletePDFFromStorage(contentItem.url);
+        } catch (storageError) {
+          console.error('Error deleting file from storage:', storageError);
+          // Don't show error to user as the content record was already deleted
+        }
       }
 
       setContent(prev => prev.filter(item => item.id !== contentId));
@@ -177,6 +213,7 @@ export const useContent = () => {
     content,
     loading,
     addContent,
+    addContentWithFile,
     updateContent,
     deleteContent,
     refreshContent: fetchContent,

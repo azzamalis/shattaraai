@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
@@ -16,7 +17,6 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
         return (
           <PDFViewer
             url={contentData.url}
-            filePath={contentData.filePath}
             onTextAction={onTextAction}
           />
         );
@@ -24,9 +24,9 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       case 'video':
         return (
           <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
-            {contentData.url || contentData.filePath ? (
+            {contentData.url ? (
               <video
-                src={contentData.url || contentData.filePath}
+                src={contentData.url}
                 controls
                 className="w-full h-full object-cover"
               />
