@@ -28,6 +28,8 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         else if (file.type.includes('audio')) contentType = 'audio_file';
         else if (file.type.includes('video')) contentType = 'video';
 
+        console.log('Starting file upload:', file.name, 'Type:', contentType);
+
         // Show loading toast
         const loadingToast = toast.loading(`Uploading ${file.name}...`);
 
@@ -60,12 +62,17 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         // Dismiss loading toast
         toast.dismiss(loadingToast);
 
+        console.log('Content created with ID:', contentId);
+
         if (contentId) {
-          // Navigate to content page - Fix: use the returned contentId directly
-          navigate(`/content/${contentId}`);
-          toast.success(`File "${file.name}" uploaded successfully`);
+          // Add a small delay to ensure database transaction is complete
+          setTimeout(() => {
+            console.log('Navigating to content page:', contentId);
+            navigate(`/content/${contentId}`);
+            toast.success(`File "${file.name}" uploaded successfully`);
+          }, 100);
         } else {
-          throw new Error('Failed to create content');
+          throw new Error('Failed to create content - no ID returned');
         }
       } catch (error) {
         console.error('Error handling file upload:', error);

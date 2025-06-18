@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -49,7 +48,10 @@ export default function ContentPage() {
   // Fetch content from database
   useEffect(() => {
     const fetchContent = async () => {
+      console.log('ContentPage: Starting content fetch for ID:', id);
+      
       if (!id) {
+        console.error('ContentPage: No content ID provided');
         setError('No content ID provided');
         setLoading(false);
         return;
@@ -59,14 +61,19 @@ export default function ContentPage() {
         setLoading(true);
         setError(null);
 
+        console.log('ContentPage: Fetching content from database...');
         const fetchedContent = await fetchContentById(id);
+        console.log('ContentPage: Fetched content:', fetchedContent);
         
         if (!fetchedContent) {
+          console.log('ContentPage: Content not found in database, checking URL parameters');
           // If content not found in database, fall back to URL parameters for new content
           const type = searchParams.get('type') as ContentType || 'recording';
           const url = searchParams.get('url');
           const filename = searchParams.get('filename');
           const text = searchParams.get('text');
+          
+          console.log('ContentPage: Creating fallback content data:', { type, url, filename, text });
           
           setContentData({
             id: id || 'new',
@@ -80,6 +87,7 @@ export default function ContentPage() {
           });
         } else {
           // Use fetched content from database
+          console.log('ContentPage: Using fetched content from database');
           setContentData({
             id: fetchedContent.id,
             type: fetchedContent.type as ContentType,
@@ -93,8 +101,8 @@ export default function ContentPage() {
           });
         }
       } catch (err) {
-        console.error('Error fetching content:', err);
-        setError('Failed to load content');
+        console.error('ContentPage: Error fetching content:', err);
+        setError(`Failed to load content: ${err instanceof Error ? err.message : 'Unknown error'}`);
       } finally {
         setLoading(false);
       }
@@ -189,6 +197,7 @@ export default function ContentPage() {
             <AlertTriangle className="h-12 w-12 text-red-500" />
             <p className="text-lg font-medium">Error loading content</p>
             <p className="text-sm text-center max-w-md">{error}</p>
+            <p className="text-xs text-center max-w-md text-muted-foreground/60 mt-2">Content ID: {id}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -204,11 +213,14 @@ export default function ContentPage() {
             <AlertTriangle className="h-12 w-12" />
             <p className="text-lg font-medium">Content not found</p>
             <p className="text-sm text-center max-w-md">The requested content could not be found.</p>
+            <p className="text-xs text-center max-w-md text-muted-foreground/60 mt-2">Content ID: {id}</p>
           </div>
         </div>
       </DashboardLayout>
     );
   }
+
+  console.log('ContentPage: Rendering with content data:', contentData);
 
   return (
     <DashboardLayout 
