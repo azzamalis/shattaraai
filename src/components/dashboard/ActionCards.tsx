@@ -4,7 +4,7 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/comp
 import { Upload, FileText, Mic, Link2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useContent } from '@/contexts/ContentContext';
+import { useContent } from '@/hooks/useContent';
 
 interface ActionCardsProps {
   onPasteClick: () => void;
@@ -12,7 +12,7 @@ interface ActionCardsProps {
 
 export function ActionCards({ onPasteClick }: ActionCardsProps) {
   const navigate = useNavigate();
-  const { onAddContent } = useContent();
+  const { addContent, addContentWithFile } = useContent();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
@@ -26,36 +26,51 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         // Determine content type based on file
         let contentType = 'upload';
         if (file.type.includes('pdf')) contentType = 'pdf';
-        else if (file.type.includes('audio')) contentType = 'audio_file'; // Use new audio_file type
+        else if (file.type.includes('audio')) contentType = 'audio_file';
         else if (file.type.includes('video')) contentType = 'video';
 
-        // Create a temporary URL for the file
-        const fileUrl = URL.createObjectURL(file);
-        
-        // Add content to tracking system with the file URL
-        const contentId = await onAddContent({
-          title: file.name,
-          type: contentType as any,
-          room_id: null,
-          metadata: {
-            fileSize: file.size,
-            fileType: file.type,
-            isUploadedFile: true
-          },
-          filename: file.name,
-          url: fileUrl
-        });
+        // Show loading toast
+        const loadingToast = toast.loading(`Uploading ${file.name}...`);
+
+        // Use addContentWithFile for PDFs to upload to Supabase Storage
+        const contentId = contentType === 'pdf' 
+          ? await addContentWithFile({
+              title: file.name,
+              type: contentType as any,
+              room_id: null,
+              metadata: {
+                fileSize: file.size,
+                fileType: file.type,
+                isUploadedFile: true
+              },
+              filename: file.name
+            }, file)
+          : await addContent({
+              title: file.name,
+              type: contentType as any,
+              room_id: null,
+              metadata: {
+                fileSize: file.size,
+                fileType: file.type,
+                isUploadedFile: true
+              },
+              filename: file.name,
+              url: URL.createObjectURL(file) // Only use blob URLs for non-PDF files
+            });
+
+        // Dismiss loading toast
+        toast.dismiss(loadingToast);
 
         if (contentId) {
-          // Navigate to content page with the file URL
-          navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}&url=${encodeURIComponent(fileUrl)}`);
-          toast.success(`File "${file.name}" selected successfully`);
+          // Navigate to content page
+          navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}`);
+          toast.success(`File "${file.name}" uploaded successfully`);
         } else {
           throw new Error('Failed to create content');
         }
       } catch (error) {
         console.error('Error handling file upload:', error);
-        toast.error('Failed to process the file. Please try again.');
+        toast.error('Failed to upload the file. Please try again.');
       }
     }
   };
@@ -63,9 +78,9 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
   const handleRecordClick = async () => {
     try {
       // Add live recording to tracking system
-      const contentId = await onAddContent({
+      const contentId = await addContent({
         title: `Live Recording at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-        type: 'live_recording', // Use new live_recording type
+        type: 'live_recording',
         room_id: null,
         metadata: {
           isLiveRecording: true,
