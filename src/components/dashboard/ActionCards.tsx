@@ -1,10 +1,9 @@
-
 import React, { useRef } from 'react';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Upload, FileText, Mic, Link2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useContent } from '@/hooks/useContent';
+import { useContentContext } from '@/contexts/ContentContext';
 
 interface ActionCardsProps {
   onPasteClick: () => void;
@@ -12,7 +11,7 @@ interface ActionCardsProps {
 
 export function ActionCards({ onPasteClick }: ActionCardsProps) {
   const navigate = useNavigate();
-  const { addContent, addContentWithFile } = useContent();
+  const { addContent, addContentWithFile } = useContentContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
@@ -62,8 +61,8 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         toast.dismiss(loadingToast);
 
         if (contentId) {
-          // Navigate to content page
-          navigate(`/content/${contentId}?type=${contentType}&filename=${encodeURIComponent(file.name)}`);
+          // Navigate to content page - Fix: use the returned contentId directly
+          navigate(`/content/${contentId}`);
           toast.success(`File "${file.name}" uploaded successfully`);
         } else {
           throw new Error('Failed to create content');

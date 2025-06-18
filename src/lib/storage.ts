@@ -5,19 +5,29 @@ export async function uploadPDFToStorage(file: File, userId: string): Promise<st
   const fileExt = file.name.split('.').pop();
   const fileName = `${userId}/${Date.now()}.${fileExt}`;
   
+  console.log('Uploading PDF to storage:', fileName);
+  
   const { data, error } = await supabase.storage
     .from('pdfs')
-    .upload(fileName, file);
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
 
   if (error) {
+    console.error('Storage upload error:', error);
     throw new Error(`Failed to upload PDF: ${error.message}`);
   }
+
+  console.log('PDF uploaded successfully:', data.path);
 
   // Get the public URL
   const { data: { publicUrl } } = supabase.storage
     .from('pdfs')
     .getPublicUrl(data.path);
 
+  console.log('PDF public URL:', publicUrl);
+  
   return publicUrl;
 }
 

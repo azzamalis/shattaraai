@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { FileText, Loader2 } from 'lucide-react';
+import { FileText, Loader2, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Configure PDF.js worker to use the local file
@@ -19,15 +19,25 @@ export function PDFThumbnailGenerator({ url, title, className }: PDFThumbnailGen
   const [error, setError] = useState<string | null>(null);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
+    console.log('PDF loaded successfully, pages:', numPages);
     setNumPages(numPages);
     setError(null);
     setLoading(false);
   }, []);
 
   const onDocumentLoadError = useCallback((error: Error) => {
+    console.error('PDF load error:', error);
     setError('Failed to load PDF');
     setLoading(false);
-    console.error('PDF load error:', error);
+  }, []);
+
+  const onPageLoadSuccess = useCallback(() => {
+    console.log('PDF page rendered successfully');
+  }, []);
+
+  const onPageLoadError = useCallback((error: Error) => {
+    console.error('PDF page load error:', error);
+    setError('Failed to render PDF page');
   }, []);
 
   if (!url) {
@@ -56,29 +66,36 @@ export function PDFThumbnailGenerator({ url, title, className }: PDFThumbnailGen
     return (
       <div className={cn("flex items-center justify-center bg-muted/20", className)}>
         <div className="flex flex-col items-center text-muted-foreground">
-          <FileText className="h-8 w-8 mb-2" />
-          <span className="text-xs">PDF Preview</span>
+          <AlertTriangle className="h-6 w-6 mb-2 text-orange-500" />
+          <span className="text-xs text-center">PDF Error</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={cn("relative overflow-hidden bg-white", className)}>
+    <div className={cn("relative overflow-hidden bg-white flex items-center justify-center", className)}>
       <Document
         file={url}
         onLoadSuccess={onDocumentLoadSuccess}
         onLoadError={onDocumentLoadError}
         loading={null}
         error={null}
+        options={{
+          cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+          cMapPacked: true,
+          standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
+        }}
       >
         <Page
           pageNumber={1}
-          scale={0.3}
+          scale={0.2}
           renderTextLayer={false}
           renderAnnotationLayer={false}
-          className="pdf-thumbnail-page"
-          width={280}
+          onLoadSuccess={onPageLoadSuccess}
+          onLoadError={onPageLoadError}
+          className="pdf-thumbnail-page max-w-full max-h-full"
+          width={200}
         />
       </Document>
     </div>
