@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -64,7 +63,7 @@ export const useRooms = () => {
         .single();
 
       if (error) {
-        console.error('Error creating room:', error);
+        console.error('Error creating room - Code:', error.code, 'Message:', error.message);
         
         // Provide more specific error messages
         if (error.message.includes('row-level security')) {
@@ -82,7 +81,9 @@ export const useRooms = () => {
       toast.success('Room created successfully');
       return data.id;
     } catch (error) {
-      console.error('Unexpected error creating room:', error);
+      // Safe error logging without circular references
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Unexpected error creating room:', errorMessage);
       toast.error('An unexpected error occurred while creating the room');
       return null;
     }
