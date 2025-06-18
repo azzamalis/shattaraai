@@ -3,10 +3,10 @@ import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import OnboardingForm from '@/components/onboarding/OnboardingForm';
-import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 
-const OnboardingContent = () => {
+const Onboarding = () => {
   const { t, isRTL } = useLanguage();
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
@@ -66,14 +66,6 @@ const OnboardingContent = () => {
         </p>
       </div>
     </div>
-  );
-};
-
-const Onboarding = () => {
-  return (
-    <LanguageProvider>
-      <OnboardingContent />
-    </LanguageProvider>
   );
 };
 
