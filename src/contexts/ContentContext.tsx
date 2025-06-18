@@ -1,13 +1,11 @@
 
 import React, { createContext, useContext } from 'react';
 import { useContent, ContentItem } from '@/hooks/useContent';
-import { useAuth } from '@/hooks/useAuth';
 
 interface ContentContextType {
   content: ContentItem[];
   recentContent: ContentItem[];
   loading: boolean;
-  authLoading: boolean;
   onAddContent: (content: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<string | null>;
   onDeleteContent: (id: string) => Promise<void>;
   onUpdateContent: (id: string, updates: Partial<ContentItem>) => Promise<void>;
@@ -17,7 +15,6 @@ interface ContentContextType {
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
 export function ContentProvider({ children }: { children: React.ReactNode }) {
-  const { loading: authLoading } = useAuth();
   const { 
     content, 
     loading, 
@@ -32,7 +29,6 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       content,
       recentContent,
       loading,
-      authLoading,
       onAddContent: addContent,
       onDeleteContent: deleteContent,
       onUpdateContent: updateContent,

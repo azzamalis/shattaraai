@@ -7,9 +7,6 @@ import { ContentRightSidebar } from '@/components/content/ContentRightSidebar';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { ContentType } from '@/lib/types';
 import { useRecordingState } from '@/hooks/useRecordingState';
-import { useContentContext } from '@/contexts/ContentContext';
-import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
 
 export interface ContentData {
   id: string;
@@ -20,29 +17,10 @@ export interface ContentData {
   filename?: string;
   text?: string;
   metadata?: Record<string, any>;
-  storage_path?: string;
   isProcessing?: boolean;
   hasError?: boolean;
   errorMessage?: string;
 }
-
-// Helper function to infer content type based on filename and existing type
-const inferContentType = (type: ContentType, filename?: string): ContentType => {
-  if (filename?.toLowerCase().endsWith('.pdf')) {
-    console.log('ContentPage - Inferred type as PDF based on filename:', filename);
-    return 'pdf';
-  }
-  if (filename?.toLowerCase().match(/\.(mp4|mov|avi|wmv|flv|webm)$/)) {
-    console.log('ContentPage - Inferred type as video based on filename:', filename);
-    return 'video';
-  }
-  if (filename?.toLowerCase().match(/\.(mp3|wav|ogg|m4a|aac)$/)) {
-    console.log('ContentPage - Inferred type as audio_file based on filename:', filename);
-    return 'audio_file';
-  }
-  console.log('ContentPage - Using original type:', type, 'for filename:', filename);
-  return type;
-};
 
 export default function ContentPage() {
   const { id } = useParams<{ id: string }>();
@@ -51,8 +29,6 @@ export default function ContentPage() {
   const url = searchParams.get('url');
   const filename = searchParams.get('filename');
   const text = searchParams.get('text');
-  
-  const { content, loading: contentLoading, authLoading } = useContentContext();
   
   // Use recording state detection hook
   const { 
@@ -63,104 +39,20 @@ export default function ContentPage() {
     analyzeRecording
   } = useRecordingState();
 
-  const [contentData, setContentData] = useState<ContentData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [contentData, setContentData] = useState<ContentData>({
+    id: id || 'new',
+    type,
+    title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
+    url,
+    filename,
+    text,
+    isProcessing: false,
+    hasError: false,
+  });
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedMicrophone, setSelectedMicrophone] = useState("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
-
-  // Generate public URL from storage path
-  const generatePublicURL = (storagePath: string): string => {
-    console.log('ContentPage - Generating public URL for storage path:', storagePath);
-    const { data: { publicUrl } } = supabase.storage
-      .from('pdf-files')
-      .getPublicUrl(storagePath);
-    console.log('ContentPage - Generated public URL:', publicUrl);
-    return publicUrl;
-  };
-
-  // Primary effect: Load content data from database or URL params
-  useEffect(() => {
-    console.log('ContentPage - Loading content data, id:', id, 'authLoading:', authLoading, 'contentLoading:', contentLoading, 'content length:', content.length);
-    
-    // Wait for authentication to complete before processing
-    if (authLoading) {
-      console.log('ContentPage - Auth still loading, waiting...');
-      return;
-    }
-
-    if (!id) {
-      // No ID means this is a new content creation from URL params
-      console.log('ContentPage - No ID, using URL params for new content');
-      const inferredType = inferContentType(type, filename || undefined);
-      setContentData({
-        id: 'new',
-        type: inferredType,
-        title: getDefaultTitle(inferredType, filename, recordingStateInfo?.isExistingRecording),
-        url,
-        filename,
-        text,
-        isProcessing: false,
-        hasError: false,
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    if (contentLoading) {
-      // Content is still being loaded, wait
-      console.log('ContentPage - Content still loading, waiting...');
-      return;
-    }
-
-    const existingContent = content.find(item => item.id === id);
-    console.log('ContentPage - Found existing content:', !!existingContent);
-    
-    if (!existingContent) {
-      console.log('ContentPage - No content found for ID:', id);
-      setContentData({
-        id: id,
-        type: 'upload', // Default fallback type
-        title: 'Content Not Found',
-        isProcessing: false,
-        hasError: true,
-        errorMessage: 'Content not found or you do not have permission to access it'
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    // Infer the correct content type based on filename and existing type
-    const inferredType = inferContentType(existingContent.type as ContentType, existingContent.filename);
-    console.log('ContentPage - Original type:', existingContent.type, 'Inferred type:', inferredType, 'Filename:', existingContent.filename);
-
-    // We have existing content from database - use it
-    let contentUrl = existingContent.url;
-    
-    // For PDF content with storage_path, generate public URL if URL is missing
-    if (inferredType === 'pdf' && existingContent.storage_path && !existingContent.url) {
-      contentUrl = generatePublicURL(existingContent.storage_path);
-      console.log('ContentPage - Generated URL for PDF from storage_path:', contentUrl);
-    }
-    
-    const updatedContentData = {
-      id: existingContent.id,
-      title: existingContent.title,
-      type: inferredType, // Use the inferred type instead of database type
-      url: contentUrl,
-      filename: existingContent.filename,
-      text: existingContent.text_content,
-      storage_path: existingContent.storage_path,
-      metadata: existingContent.metadata,
-      isProcessing: false,
-      hasError: false,
-    };
-    
-    console.log('ContentPage - Setting content data from database with inferred type:', updatedContentData);
-    setContentData(updatedContentData);
-    setIsLoading(false);
-  }, [id, content, contentLoading, authLoading, type, url, filename, text, recordingStateInfo?.isExistingRecording]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -174,23 +66,33 @@ export default function ContentPage() {
     };
   }, [isRecording]);
 
-  // Processing simulation effect
   useEffect(() => {
-    if (!contentData) return;
-    
-    if (recordingStateInfo?.isExistingRecording || contentData.type === 'audio_file') {
+    // Update content data when URL parameters change or recording state is detected
+    setContentData(prev => ({
+      ...prev,
+      type,
+      title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
+      url,
+      filename,
+      text,
+    }));
+  }, [type, url, filename, text, recordingStateInfo?.isExistingRecording]);
+
+  // Simulate content processing for non-recording types or modify for existing recordings
+  useEffect(() => {
+    if (recordingStateInfo?.isExistingRecording || type === 'audio_file') {
       // For existing recordings or uploaded audio files, set processing to false immediately
-      setContentData(prev => prev ? { ...prev, isProcessing: false } : null);
-    } else if (contentData.type !== 'live_recording' && (contentData.url || contentData.filePath || contentData.text)) {
-      setContentData(prev => prev ? { ...prev, isProcessing: true } : null);
+      setContentData(prev => ({ ...prev, isProcessing: false }));
+    } else if (type !== 'live_recording' && (contentData.url || contentData.filePath || contentData.text)) {
+      setContentData(prev => ({ ...prev, isProcessing: true }));
       
       const timer = setTimeout(() => {
-        setContentData(prev => prev ? { ...prev, isProcessing: false } : null);
+        setContentData(prev => ({ ...prev, isProcessing: false }));
       }, 2000);
 
       return () => clearTimeout(timer);
     }
-  }, [contentData?.type, contentData?.url, contentData?.filePath, contentData?.text, recordingStateInfo?.isExistingRecording]);
+  }, [type, contentData.url, contentData.filePath, contentData.text, recordingStateInfo?.isExistingRecording]);
 
   const toggleRecording = () => {
     if (!isRecording) {
@@ -214,7 +116,7 @@ export default function ContentPage() {
   };
 
   const updateContentData = (updates: Partial<ContentData>) => {
-    setContentData(prev => prev ? { ...prev, ...updates } : null);
+    setContentData(prev => ({ ...prev, ...updates }));
   };
 
   // New function to handle text actions from PDF viewer
@@ -224,45 +126,6 @@ export default function ContentPage() {
     // You could emit an event, use a context, or pass this to the chat component
     // For now, we'll just log it - integration with chat would be the next step
   };
-
-  // Show loading state while auth or content is being loaded
-  if (authLoading || isLoading || contentLoading) {
-    return (
-      <DashboardLayout className="content-page-layout p-0">
-        <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-background">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span>
-              {authLoading ? 'Authenticating...' : 
-               contentLoading ? 'Loading content...' : 
-               'Loading...'}
-            </span>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  // Show error state if content data is null or has error
-  if (!contentData || contentData.hasError) {
-    return (
-      <DashboardLayout className="content-page-layout p-0">
-        <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-background">
-          <div className="flex flex-col items-center gap-2 text-muted-foreground">
-            <span className="text-lg font-medium">Content Not Found</span>
-            <span className="text-sm">{contentData?.errorMessage || 'The requested content could not be loaded.'}</span>
-            <div className="text-xs text-muted-foreground/60 mt-2">
-              <p>Debug info:</p>
-              <p>ID: {id}</p>
-              <p>Content loaded: {content.length} items</p>
-              <p>Auth loading: {authLoading.toString()}</p>
-              <p>Content loading: {contentLoading.toString()}</p>
-            </div>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
 
   return (
     <DashboardLayout 

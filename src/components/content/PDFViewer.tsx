@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -37,36 +38,35 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
   const pdfUrl = url || filePath;
 
   useEffect(() => {
-    if (!pdfUrl) {
+    if (pdfUrl && pdfUrl.startsWith('blob:')) {
+      setLoading(true);
+      setError(null);
+      fetch(pdfUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.blob();
+        })
+        .then(blob => {
+          setPdfBlob(blob);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching PDF blob:', error);
+          setError('Failed to load PDF content.');
+          setLoading(false);
+        });
+    } else {
       setPdfBlob(null);
-      setLoading(false);
-      return;
+      setLoading(!!pdfUrl);
     }
 
-    console.log('PDFViewer - Loading PDF from URL:', pdfUrl);
-    setLoading(true);
-    setError(null);
-
-    // Fetch PDF from any URL (Supabase HTTPS, blob, etc.) and convert to blob
-    fetch(pdfUrl)
-      .then(response => {
-        console.log('PDFViewer - Fetch response status:', response.status);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
-        }
-        return response.blob();
-      })
-      .then(blob => {
-        console.log('PDFViewer - Successfully converted to blob, size:', blob.size);
-        setPdfBlob(blob);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('PDFViewer - Error fetching PDF:', error);
-        setError(`Failed to load PDF: ${error.message}`);
-        setLoading(false);
-        setPdfBlob(null);
-      });
+    return () => {
+      if (pdfUrl && pdfUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
   }, [pdfUrl]);
 
   useEffect(() => {
@@ -82,16 +82,15 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
   }, [showSidebar]);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
-    console.log('PDFViewer - Document loaded successfully, pages:', numPages);
     setNumPages(numPages);
     setError(null);
     setLoading(false);
   }, []);
 
   const onDocumentLoadError = useCallback((error: Error) => {
-    console.error('PDFViewer - Document load error:', error);
-    setError('Failed to load PDF document. Please check the file format.');
+    setError('Failed to load PDF. Please check the file and try again.');
     setLoading(false);
+    console.error('PDF load error:', error);
   }, []);
 
   const goToPrevPage = useCallback(() => {
@@ -231,6 +230,8 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
     );
   }
 
+  const fileSource = pdfBlob || pdfUrl;
+
   return (
     <div className="relative h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
       <PDFToolbar
@@ -289,17 +290,14 @@ export function PDFViewer({ url, filePath, onTextAction }: PDFViewerProps) {
                     <AlertTriangle className="h-12 w-12 text-red-500" />
                     <p className="text-lg font-medium">Error loading PDF</p>
                     <p className="text-sm text-center max-w-md">{error}</p>
-                    <div className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60 mt-2">
-                      <p>URL: {pdfUrl}</p>
-                    </div>
                   </div>
                 </div>
               )}
 
-              {!loading && !error && pdfBlob && (
+              {!loading && !error && fileSource && (
                 <div className="flex justify-center w-full py-4 px-4">
                   <Document
-                    file={pdfBlob}
+                    file={fileSource}
                     onLoadSuccess={onDocumentLoadSuccess}
                     onLoadError={onDocumentLoadError}
                     loading={null}
