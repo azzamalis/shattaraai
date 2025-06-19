@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RoomView } from '@/components/dashboard/RoomView';
 import { RoomHeroSection } from '@/components/dashboard/RoomHeroSection';
+import { RoomPageHeader } from '@/components/dashboard/RoomPageHeader';
+import { RoomPageActions } from '@/components/dashboard/RoomPageActions';
 import { AITutorChatDrawer } from '@/components/dashboard/AITutorChatDrawer';
 import { ExamPrepModal } from '@/components/dashboard/ExamPrepModal';
 import { useParams, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { MessageSquare, FileText, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRooms } from '@/hooks/useRooms';
 import { useContent } from '@/hooks/useContent';
@@ -18,10 +18,6 @@ export default function RoomPage() {
   const { rooms, loading: roomsLoading, editRoom } = useRooms();
   const { content, loading: contentLoading } = useContent();
   
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [isEditingDescription, setIsEditingDescription] = useState(false);
-  const [editedTitle, setEditedTitle] = useState('');
-  const [editedDescription, setEditedDescription] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
 
@@ -46,71 +42,30 @@ export default function RoomPage() {
     }
   }, [roomId]);
 
-  const handleTitleEdit = () => {
-    setEditedTitle(currentRoom?.name || 'Untitled Room');
-    setIsEditingTitle(true);
-  };
-
-  const handleDescriptionEdit = () => {
-    setEditedDescription(currentRoom?.description || '');
-    setIsEditingDescription(true);
-  };
-
-  const handleTitleSave = async () => {
-    if (editedTitle.trim() && currentRoom) {
+  const handleTitleEdit = async (newTitle: string) => {
+    if (currentRoom) {
       try {
-        await editRoom(currentRoom.id, editedTitle.trim());
+        await editRoom(currentRoom.id, newTitle, currentRoom.description);
       } catch (error) {
         console.error('Error updating room title:', error);
         toast.error('Failed to update room title');
       }
     }
-    setIsEditingTitle(false);
   };
 
-  const handleDescriptionSave = async () => {
+  const handleDescriptionEdit = async (newDescription: string) => {
     if (currentRoom) {
       try {
-        await editRoom(currentRoom.id, currentRoom.name, editedDescription.trim());
+        await editRoom(currentRoom.id, currentRoom.name, newDescription);
       } catch (error) {
         console.error('Error updating room description:', error);
         toast.error('Failed to update room description');
       }
     }
-    setIsEditingDescription(false);
-  };
-
-  const handleTitleCancel = () => {
-    setIsEditingTitle(false);
-  };
-
-  const handleDescriptionCancel = () => {
-    setIsEditingDescription(false);
-  };
-
-  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleTitleSave();
-    } else if (e.key === 'Escape') {
-      handleTitleCancel();
-    }
-  };
-
-  const handleDescriptionKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleDescriptionSave();
-    } else if (e.key === 'Escape') {
-      handleDescriptionCancel();
-    }
   };
 
   const handleClickOutside = () => {
-    if (isEditingTitle) {
-      handleTitleCancel();
-    }
-    if (isEditingDescription) {
-      handleDescriptionCancel();
-    }
+    // This function is passed to header for click outside handling
   };
 
   // Loading state
@@ -138,14 +93,11 @@ export default function RoomPage() {
     );
   }
 
-  const roomTitle = currentRoom.name;
-  const roomDescription = currentRoom.description || '';
-
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full bg-background" onClick={handleClickOutside}>
+      <div className="flex flex-col h-full bg-background">
         <div className="py-12">
-          <RoomHeroSection title={roomTitle} description={roomDescription} />
+          <RoomHeroSection title={currentRoom.name} description={currentRoom.description || ''} />
         </div>
         
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -153,88 +105,17 @@ export default function RoomPage() {
             <div className="max-w-7xl mx-auto">
               <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-start gap-2 flex-1 min-w-0">
-                    <div className="group">
-                      <div className="flex items-center gap-3 mb-2">
-                        {isEditingTitle ? (
-                          <input 
-                            type="text" 
-                            value={editedTitle} 
-                            onChange={e => setEditedTitle(e.target.value)} 
-                            onKeyDown={handleTitleKeyDown} 
-                            onClick={e => e.stopPropagation()} 
-                            className="text-2xl font-bold text-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
-                            placeholder="Untitled Room" 
-                            autoFocus 
-                          />
-                        ) : (
-                          <>
-                            <h1 className="font-bold text-foreground text-xl">{roomTitle}</h1>
-                            <button 
-                              onClick={e => {
-                                e.stopPropagation();
-                                handleTitleEdit();
-                              }} 
-                              className="p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground transition-all duration-200"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                      
-                      {isEditingDescription ? (
-                        <input 
-                          type="text" 
-                          value={editedDescription} 
-                          onChange={e => setEditedDescription(e.target.value)} 
-                          onKeyDown={handleDescriptionKeyDown} 
-                          onClick={e => e.stopPropagation()} 
-                          className="text-muted-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full" 
-                          placeholder="Add a description" 
-                          autoFocus 
-                        />
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <p className="text-muted-foreground text-base">
-                            {roomDescription || "No description"}
-                          </p>
-                          <button 
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleDescriptionEdit();
-                            }} 
-                            className="p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground transition-all duration-200"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <RoomPageHeader 
+                    room={currentRoom}
+                    onTitleEdit={handleTitleEdit}
+                    onDescriptionEdit={handleDescriptionEdit}
+                    onClickOutside={handleClickOutside}
+                  />
 
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      className="bg-foreground hover:bg-foreground/90 text-background hover:text-background transition-all duration-200 hover:shadow-sm" 
-                      onClick={e => {
-                        e.stopPropagation();
-                        setIsChatOpen(true);
-                      }}
-                    >
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Room Chat
-                    </Button>
-                    <Button 
-                      className="bg-foreground hover:bg-foreground/90 text-background hover:text-background transition-all duration-200 hover:shadow-sm" 
-                      onClick={e => {
-                        e.stopPropagation();
-                        setIsExamModalOpen(true);
-                      }}
-                    >
-                      <FileText className="mr-2 h-4 w-4" />
-                      Create Exam
-                    </Button>
-                  </div>
+                  <RoomPageActions 
+                    onChatOpen={() => setIsChatOpen(true)}
+                    onExamModalOpen={() => setIsExamModalOpen(true)}
+                  />
                 </div>
 
                 <div className="w-full h-px bg-border" />
@@ -244,8 +125,8 @@ export default function RoomPage() {
           
           <div className="flex-1 overflow-auto">
             <RoomView 
-              title={roomTitle} 
-              description={roomDescription} 
+              title={currentRoom.name} 
+              description={currentRoom.description || ''} 
               isEmpty={roomContent.length === 0} 
               hideHeader={true} 
             />
