@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
@@ -17,7 +18,7 @@ interface DashboardModalsProps {
   itemToDelete: DeleteItem | null;
   setItemToDelete: (item: DeleteItem | null) => void;
   itemToShare: ContentItem | null;
-  onDeleteRoom: (roomId: string) => void;
+  onDeleteRoom: (roomId: string) => Promise<void>;
 }
 
 export function DashboardModals({
@@ -74,15 +75,22 @@ export function DashboardModals({
     setIsPasteModalOpen(false);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!itemToDelete) return;
-    if (itemToDelete.type === 'room') {
-      onDeleteRoom(itemToDelete.id);
-      toast.success(`"${itemToDelete.name}" has been deleted`);
-    } else if (itemToDelete.type === 'card') {
-      onDeleteContent(itemToDelete.id);
-      toast.success(`"${itemToDelete.name}" has been deleted`);
+    
+    try {
+      if (itemToDelete.type === 'room') {
+        await onDeleteRoom(itemToDelete.id);
+        toast.success(`"${itemToDelete.name}" has been deleted`);
+      } else if (itemToDelete.type === 'card') {
+        onDeleteContent(itemToDelete.id);
+        toast.success(`"${itemToDelete.name}" has been deleted`);
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      toast.error('Failed to delete item');
     }
+    
     setItemToDelete(null);
     setDeleteModalOpen(false);
   };

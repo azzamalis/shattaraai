@@ -13,7 +13,7 @@ import { useRooms } from '@/hooks/useRooms';
 import { useContent } from '@/hooks/useContent';
 
 export default function RoomPage() {
-  const { id } = useParams<{ id: string }>();
+  const { roomId } = useParams<{ roomId: string }>();
   const location = useLocation();
   const { rooms, loading: roomsLoading } = useRooms();
   const { content, loading: contentLoading } = useContent();
@@ -26,10 +26,10 @@ export default function RoomPage() {
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
 
   // Find the current room from the database
-  const currentRoom = rooms.find(room => room.id === id);
+  const currentRoom = rooms.find(room => room.id === roomId);
   
   // Filter content for this room
-  const roomContent = content.filter(item => item.room_id === id);
+  const roomContent = content.filter(item => item.room_id === roomId);
 
   // Handle exam modal trigger from exam summary
   useEffect(() => {
@@ -41,10 +41,10 @@ export default function RoomPage() {
 
   // Store room ID when entering the room
   useEffect(() => {
-    if (id) {
-      localStorage.setItem('currentRoomId', id);
+    if (roomId) {
+      localStorage.setItem('currentRoomId', roomId);
     }
-  }, [id]);
+  }, [roomId]);
 
   const handleTitleEdit = () => {
     setEditedTitle(currentRoom?.name || 'Untitled Room');
