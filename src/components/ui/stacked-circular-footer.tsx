@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
@@ -9,83 +8,80 @@ import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-
 function StackedCircularFooter() {
   const currentYear = new Date().getFullYear();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!email.trim()) {
       toast({
         title: "Email Required",
         description: "Please enter your email address to subscribe.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast({
         title: "Invalid Email",
         description: "Please enter a valid email address.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsSubmitting(true);
-
     try {
-      const { data, error } = await supabase.functions.invoke('newsletter-subscribe', {
-        body: { email: email.trim().toLowerCase() }
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('newsletter-subscribe', {
+        body: {
+          email: email.trim().toLowerCase()
+        }
       });
-
       if (error) {
         // Check if it's a 409 conflict (already subscribed)
         if (error.message && error.message.includes('already subscribed')) {
           toast({
             title: "Already Subscribed!",
-            description: "You're already subscribed to our newsletter. Thank you!",
+            description: "You're already subscribed to our newsletter. Thank you!"
           });
           setEmail(''); // Clear the form
           return;
         }
         throw error;
       }
-
       toast({
         title: "Successfully Subscribed!",
-        description: "Thank you for subscribing! Check your email for a welcome message.",
+        description: "Thank you for subscribing! Check your email for a welcome message."
       });
-
       setEmail(''); // Clear the form
-      
     } catch (error: any) {
       console.error('Error subscribing to newsletter:', error);
-      
+
       // Handle specific error messages from the backend
       const errorMessage = error.message || "Failed to subscribe to newsletter. Please try again later.";
-      
       toast({
         title: "Subscription Failed",
         description: errorMessage,
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  return (
-    <footer className="bg-background text-foreground py-12">
+  return <footer className="bg-background text-foreground py-12">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center">
-          <div className="mb-8 rounded-full bg-primary/10 p-4 flex items-center justify-center" style={{ width: '120px', height: '120px' }}>
+          <div style={{
+          width: '120px',
+          height: '120px'
+        }} className="mb-8 rounded-full p-4 flex items-center justify-center">
             <Logo textColor="text-foreground" className="scale-90" />
           </div>
           
@@ -129,24 +125,10 @@ function StackedCircularFooter() {
             <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
               <div className="flex-grow">
                 <Label htmlFor="newsletter-email" className="sr-only">Email</Label>
-                <Input 
-                  id="newsletter-email" 
-                  placeholder="Enter your email" 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isSubmitting}
-                  className="rounded-full bg-background border-border focus:border-primary text-foreground" 
-                />
+                <Input id="newsletter-email" placeholder="Enter your email" type="email" value={email} onChange={e => setEmail(e.target.value)} disabled={isSubmitting} className="rounded-full bg-background border-border focus:border-primary text-foreground" />
               </div>
-              <Button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 relative"
-              >
-                {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+              <Button type="submit" disabled={isSubmitting} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 relative">
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isSubmitting ? 'Subscribing...' : 'Subscribe'}
               </Button>
             </form>
@@ -159,8 +141,6 @@ function StackedCircularFooter() {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 }
-
 export { StackedCircularFooter };
