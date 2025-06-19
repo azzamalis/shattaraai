@@ -32,7 +32,10 @@ export const RoomCard: React.FC<RoomCardProps> = ({
       try {
         const roomId = await onAdd();
         if (roomId) {
-          navigate(`/rooms/${roomId}`);
+          // Add delay before navigation to ensure room is created in Supabase
+          setTimeout(() => {
+            navigate(`/rooms/${roomId}`);
+          }, 800);
         }
       } catch (error) {
         console.error('Error creating room:', error);

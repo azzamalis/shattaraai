@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -7,6 +6,7 @@ import { toast } from 'sonner';
 export interface Room {
   id: string;
   name: string;
+  description?: string | null;
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -88,13 +88,18 @@ export const useRooms = () => {
     }
   };
 
-  const editRoom = async (roomId: string, newName: string) => {
+  const editRoom = async (roomId: string, newName: string, newDescription?: string) => {
     if (!user) return;
 
     try {
+      const updateData: { name: string; description?: string } = { name: newName };
+      if (newDescription !== undefined) {
+        updateData.description = newDescription;
+      }
+
       const { error } = await supabase
         .from('rooms')
-        .update({ name: newName })
+        .update(updateData)
         .eq('id', roomId)
         .eq('user_id', user.id);
 
@@ -105,7 +110,12 @@ export const useRooms = () => {
       }
 
       setRooms(prev => prev.map(room => 
-        room.id === roomId ? { ...room, name: newName, updated_at: new Date().toISOString() } : room
+        room.id === roomId ? { 
+          ...room, 
+          name: newName, 
+          description: newDescription !== undefined ? newDescription : room.description,
+          updated_at: new Date().toISOString() 
+        } : room
       ));
       toast.success('Room updated successfully');
     } catch (error) {

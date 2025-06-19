@@ -15,7 +15,7 @@ import { useContent } from '@/hooks/useContent';
 export default function RoomPage() {
   const { roomId } = useParams<{ roomId: string }>();
   const location = useLocation();
-  const { rooms, loading: roomsLoading } = useRooms();
+  const { rooms, loading: roomsLoading, editRoom } = useRooms();
   const { content, loading: contentLoading } = useContent();
   
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -52,21 +52,31 @@ export default function RoomPage() {
   };
 
   const handleDescriptionEdit = () => {
-    setEditedDescription(''); // Rooms don't have descriptions in the DB yet
+    setEditedDescription(currentRoom?.description || '');
     setIsEditingDescription(true);
   };
 
-  const handleTitleSave = () => {
-    if (editedTitle.trim()) {
-      // TODO: Implement room update functionality
-      toast.success("Room title updated successfully");
+  const handleTitleSave = async () => {
+    if (editedTitle.trim() && currentRoom) {
+      try {
+        await editRoom(currentRoom.id, editedTitle.trim());
+      } catch (error) {
+        console.error('Error updating room title:', error);
+        toast.error('Failed to update room title');
+      }
     }
     setIsEditingTitle(false);
   };
 
-  const handleDescriptionSave = () => {
-    // TODO: Implement room description update functionality
-    toast.success("Room description updated successfully");
+  const handleDescriptionSave = async () => {
+    if (currentRoom) {
+      try {
+        await editRoom(currentRoom.id, currentRoom.name, editedDescription.trim());
+      } catch (error) {
+        console.error('Error updating room description:', error);
+        toast.error('Failed to update room description');
+      }
+    }
     setIsEditingDescription(false);
   };
 
@@ -129,7 +139,7 @@ export default function RoomPage() {
   }
 
   const roomTitle = currentRoom.name;
-  const roomDescription = ''; // Rooms don't have descriptions in DB yet
+  const roomDescription = currentRoom.description || '';
 
   return (
     <DashboardLayout>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   CommandDialog,
@@ -47,8 +48,11 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
     try {
       const roomId = await onAddRoom();
       if (roomId) {
-        navigate(`/rooms/${roomId}`);
         onOpenChange(false);
+        // Add delay before navigation to ensure room is created in Supabase
+        setTimeout(() => {
+          navigate(`/rooms/${roomId}`);
+        }, 800);
       }
     } catch (error) {
       console.error('Error creating room:', error);

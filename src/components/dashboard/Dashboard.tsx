@@ -115,7 +115,7 @@ export function Dashboard({
           itemToDelete={itemToDelete}
           setItemToDelete={setItemToDelete}
           itemToShare={itemToShare}
-          onDeleteRoom={onDeleteRoom || (() => {})}
+          onDeleteRoom={onDeleteRoom || (async () => {})}
         />
       </main>
     </div>
