@@ -46,11 +46,7 @@ export function RecentSection() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-foreground truncate text-sm">{item.title}</p>
-            <p className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(item.created_at), {
-            addSuffix: true
-          })}
-            </p>
+            
           </div>
         </Link>)}
     </div>;
