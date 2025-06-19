@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, ChevronDown } from 'lucide-react';
@@ -7,6 +6,8 @@ import { RoomItem } from './RoomItem';
 import { createRoomHandlers } from './RoomHandlers';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useRooms } from '@/hooks/useRooms';
+import { waitForRoomAndNavigate } from '@/lib/roomNavigation';
 
 interface RoomsSectionProps {
   rooms: Room[];
@@ -29,10 +30,12 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
   setDeleteModalOpen
 }) => {
   const navigate = useNavigate();
+  const { rooms: allRooms } = useRooms();
   const [showMoreRooms, setShowMoreRooms] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
   const [editedRoomName, setEditedRoomName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [creationStatus, setCreationStatus] = useState('');
 
   const visibleRooms = showMoreRooms ? rooms : rooms.slice(0, 3);
   const hasHiddenRooms = rooms.length > 3;
@@ -56,18 +59,31 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
 
   const handleAddRoomClick = async () => {
     setIsCreating(true);
+    setCreationStatus('Creating room...');
+    
     try {
       const roomId = await onAddRoom();
       if (roomId) {
-        onOpenChange(false);
-        // Add delay before navigation to ensure room is created in Supabase
-        setTimeout(() => {
-          navigate(`/rooms/${roomId}`);
-        }, 800);
+        const success = await waitForRoomAndNavigate(
+          roomId,
+          allRooms,
+          navigate,
+          {
+            onProgress: setCreationStatus
+          }
+        );
+
+        if (success) {
+          onOpenChange(false);
+        } else {
+          toast.error('Room creation timed out. Please try again.');
+          setCreationStatus('');
+        }
       }
     } catch (error) {
       console.error('Error creating room:', error);
       toast.error('Failed to create room');
+      setCreationStatus('');
     } finally {
       setIsCreating(false);
     }
@@ -94,7 +110,7 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
         >
           <Plus className="h-4 w-4" />
           <span className="text-sm font-normal">
-            {isCreating ? 'Creating...' : 'Add room'}
+            {isCreating ? creationStatus || 'Creating...' : 'Add room'}
           </span>
         </Button>
 
