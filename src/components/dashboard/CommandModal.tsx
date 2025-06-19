@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   CommandDialog,
@@ -21,8 +22,6 @@ import { useContent } from '@/contexts/ContentContext';
 import { Room } from '@/lib/types';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useRooms } from '@/hooks/useRooms';
-import { waitForRoomAndNavigate } from '@/lib/roomNavigation';
 
 interface CommandModalProps {
   open: boolean;
@@ -34,7 +33,6 @@ interface CommandModalProps {
 export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandModalProps) {
   const navigate = useNavigate();
   const { recentContent } = useContent();
-  const { rooms: allRooms } = useRooms();
 
   const handleRoomClick = (roomId: string) => {
     navigate(`/rooms/${roomId}`);
@@ -50,23 +48,11 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
     try {
       const roomId = await onAddRoom();
       if (roomId) {
-        const success = await waitForRoomAndNavigate(
-          roomId,
-          allRooms,
-          navigate,
-          {
-            onProgress: (status) => {
-              // Could show a loading toast here if needed
-              console.log('Room creation progress:', status);
-            }
-          }
-        );
-
-        if (success) {
-          onOpenChange(false);
-        } else {
-          toast.error('Room creation timed out. Please try again.');
-        }
+        onOpenChange(false);
+        // Add delay before navigation to ensure room is created in Supabase
+        setTimeout(() => {
+          navigate(`/rooms/${roomId}`);
+        }, 800);
       }
     } catch (error) {
       console.error('Error creating room:', error);

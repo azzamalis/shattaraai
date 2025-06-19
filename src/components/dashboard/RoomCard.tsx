@@ -1,11 +1,10 @@
+
 import React, { useState } from 'react';
 import { Pencil, Trash, Plus, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
-import { useRooms } from '@/hooks/useRooms';
-import { waitForRoomAndNavigate } from '@/lib/roomNavigation';
 
 interface RoomCardProps {
   id?: string;
@@ -23,38 +22,24 @@ export const RoomCard: React.FC<RoomCardProps> = ({
   onAdd,
 }) => {
   const navigate = useNavigate();
-  const { rooms } = useRooms();
   const [isCreating, setIsCreating] = useState(false);
-  const [creationStatus, setCreationStatus] = useState('');
 
   if (isAddButton) {
     const handleAddRoom = async () => {
       if (!onAdd) return;
       
       setIsCreating(true);
-      setCreationStatus('Creating room...');
-      
       try {
         const roomId = await onAdd();
         if (roomId) {
-          const success = await waitForRoomAndNavigate(
-            roomId,
-            rooms,
-            navigate,
-            {
-              onProgress: setCreationStatus
-            }
-          );
-
-          if (!success) {
-            toast.error('Room creation timed out. Please try again.');
-            setCreationStatus('');
-          }
+          // Add delay before navigation to ensure room is created in Supabase
+          setTimeout(() => {
+            navigate(`/rooms/${roomId}`);
+          }, 800);
         }
       } catch (error) {
         console.error('Error creating room:', error);
         toast.error('Failed to create room');
-        setCreationStatus('');
       } finally {
         setIsCreating(false);
       }
@@ -68,8 +53,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               onClick={handleAddRoom}
               disabled={isCreating}
               className={cn(
-                "w-full flex flex-col items-center justify-center gap-2",
-                "p-4 min-h-[80px]",
+                "w-full flex items-center justify-center gap-2",
+                "p-4",
                 "rounded-lg border border-dashed border-border",
                 "hover:border-border hover:bg-accent",
                 "group transition-all duration-300",
@@ -82,7 +67,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               <span 
                 className="text-muted-foreground group-hover:text-foreground text-base transition-colors duration-300"
               >
-                {isCreating ? creationStatus || 'Creating...' : 'Add room'}
+                {isCreating ? 'Creating...' : 'Add room'}
               </span>
             </button>
           </TooltipTrigger>
