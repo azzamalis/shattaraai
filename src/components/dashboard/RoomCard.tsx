@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 interface RoomCardProps {
   id?: string;
   name?: string;
+  contentCount?: number;
   onDelete?: (id: string) => void;
   isAddButton?: boolean;
   onAdd?: () => Promise<string | null>;
@@ -17,6 +18,7 @@ interface RoomCardProps {
 export const RoomCard: React.FC<RoomCardProps> = ({
   id,
   name,
+  contentCount = 0,
   onDelete,
   isAddButton,
   onAdd,
@@ -114,12 +116,15 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     >
       <div className="flex flex-col gap-1.5 flex-1 min-w-0">
         <h3 className="text-foreground text-base font-medium truncate transition-colors duration-200">{name}</h3>
+        <p className="text-xs text-muted-foreground">
+          ({contentCount} content)
+        </p>
       </div>
 
       <div className="flex gap-2 ml-4">
         <button 
           onClick={handleDeleteClick}
-          className="p-1 rounded-full text-muted-foreground hover:text-red-500 transition-colors"
+          className="p-1 rounded-full text-muted-foreground hover:text-red-500 transition-all duration-300 opacity-0 group-hover:opacity-100"
           aria-label={`Delete room ${name}`}
         >
           <Trash className="w-5 h-5" />
