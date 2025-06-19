@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Pencil, Trash, Plus, Check, X, Cube } from 'lucide-react';
+import { Pencil, Trash, Plus, Check, X, Box } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -115,7 +114,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
       )}
     >
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        <Cube className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+        <Box className="w-5 h-5 text-muted-foreground flex-shrink-0" />
         <div className="flex items-center gap-2 min-w-0">
           <h3 className="text-foreground text-base font-medium truncate transition-colors duration-200">{name}</h3>
           <span className="text-xs text-muted-foreground whitespace-nowrap">
