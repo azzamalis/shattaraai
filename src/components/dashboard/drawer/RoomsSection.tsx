@@ -6,6 +6,7 @@ import { Room } from '@/hooks/useRooms';
 import { RoomItem } from './RoomItem';
 import { createRoomHandlers } from './RoomHandlers';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface RoomsSectionProps {
   rooms: Room[];
@@ -31,6 +32,7 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
   const [showMoreRooms, setShowMoreRooms] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
   const [editedRoomName, setEditedRoomName] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
 
   const visibleRooms = showMoreRooms ? rooms : rooms.slice(0, 3);
   const hasHiddenRooms = rooms.length > 3;
@@ -53,7 +55,19 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
   );
 
   const handleAddRoomClick = async () => {
-    await onAddRoom();
+    setIsCreating(true);
+    try {
+      const roomId = await onAddRoom();
+      if (roomId) {
+        navigate(`/rooms/${roomId}`);
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error('Error creating room:', error);
+      toast.error('Failed to create room');
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleSaveRenameWithEdit = async (e: React.MouseEvent, id: string) => {
@@ -70,11 +84,15 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
           className="w-full flex items-center justify-start gap-2 
             bg-transparent border-2 border-dashed border-primary/10 
             text-primary/80 hover:bg-primary/5 hover:text-primary hover:border-primary/10
-            transition-colors duration-200 rounded-lg py-2 px-2 mb-1" 
+            transition-colors duration-200 rounded-lg py-2 px-2 mb-1
+            disabled:opacity-50 disabled:cursor-not-allowed" 
           onClick={handleAddRoomClick}
+          disabled={isCreating}
         >
           <Plus className="h-4 w-4" />
-          <span className="text-sm font-normal">Add room</span>
+          <span className="text-sm font-normal">
+            {isCreating ? 'Creating...' : 'Add room'}
+          </span>
         </Button>
 
         {visibleRooms.map((room) => (

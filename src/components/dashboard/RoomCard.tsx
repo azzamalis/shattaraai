@@ -1,15 +1,17 @@
+
 import React, { useState } from 'react';
 import { Pencil, Trash, Plus, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from 'sonner';
 
 interface RoomCardProps {
   id?: string;
   name?: string;
   onDelete?: (id: string) => void;
   isAddButton?: boolean;
-  onAdd?: () => void;
+  onAdd?: () => Promise<string | null>;
 }
 
 export const RoomCard: React.FC<RoomCardProps> = ({
@@ -20,20 +22,40 @@ export const RoomCard: React.FC<RoomCardProps> = ({
   onAdd,
 }) => {
   const navigate = useNavigate();
+  const [isCreating, setIsCreating] = useState(false);
 
   if (isAddButton) {
+    const handleAddRoom = async () => {
+      if (!onAdd) return;
+      
+      setIsCreating(true);
+      try {
+        const roomId = await onAdd();
+        if (roomId) {
+          navigate(`/rooms/${roomId}`);
+        }
+      } catch (error) {
+        console.error('Error creating room:', error);
+        toast.error('Failed to create room');
+      } finally {
+        setIsCreating(false);
+      }
+    };
+
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              onClick={onAdd}
+              onClick={handleAddRoom}
+              disabled={isCreating}
               className={cn(
                 "w-full flex items-center justify-center gap-2",
                 "p-4",
                 "rounded-lg border border-dashed border-border",
                 "hover:border-border hover:bg-accent",
-                "group transition-all duration-300"
+                "group transition-all duration-300",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
             >
               <Plus 
@@ -42,7 +64,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               <span 
                 className="text-muted-foreground group-hover:text-foreground text-base transition-colors duration-300"
               >
-                Add room
+                {isCreating ? 'Creating...' : 'Add room'}
               </span>
             </button>
           </TooltipTrigger>

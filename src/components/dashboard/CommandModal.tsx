@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   CommandDialog,
@@ -21,14 +20,16 @@ import {
 import { useContent } from '@/contexts/ContentContext';
 import { Room } from '@/lib/types';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface CommandModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   rooms: Room[];
+  onAddRoom: () => Promise<string | null>;
 }
 
-export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
+export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandModalProps) {
   const navigate = useNavigate();
   const { recentContent } = useContent();
 
@@ -40,6 +41,19 @@ export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
   const handleContentClick = (contentId: string, type: string) => {
     navigate(`/content/${contentId}?type=${type}`);
     onOpenChange(false);
+  };
+
+  const handleAddRoom = async () => {
+    try {
+      const roomId = await onAddRoom();
+      if (roomId) {
+        navigate(`/rooms/${roomId}`);
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error('Error creating room:', error);
+      toast.error('Failed to create room');
+    }
   };
 
   return (
@@ -56,7 +70,7 @@ export function CommandModal({ open, onOpenChange, rooms }: CommandModalProps) {
             <Upload size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
             <span>Upload Content</span>
           </CommandItem>
-          <CommandItem>
+          <CommandItem onSelect={handleAddRoom}>
             <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
             <span>Add a Room</span>
           </CommandItem>

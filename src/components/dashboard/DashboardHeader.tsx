@@ -14,13 +14,15 @@ interface DashboardHeaderProps {
   contentData?: ContentData;
   onUpdateContent?: (updates: Partial<ContentData>) => void;
   rooms: Room[];
+  onAddRoom: () => Promise<string | null>;
 }
 
 export function DashboardHeader({
   onOpenDrawer,
   contentData,
   onUpdateContent,
-  rooms
+  rooms,
+  onAddRoom
 }: DashboardHeaderProps) {
   const [commandOpen, setCommandOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -174,6 +176,7 @@ export function DashboardHeader({
               open={commandOpen} 
               onOpenChange={setCommandOpen} 
               rooms={rooms}
+              onAddRoom={onAddRoom}
             />
           </Dialog>
         </div>
