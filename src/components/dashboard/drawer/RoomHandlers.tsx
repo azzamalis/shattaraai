@@ -15,7 +15,7 @@ export const createRoomHandlers = (
 ) => {
   const handleRoomClick = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
-    navigate(`/room/${id}`);
+    navigate(`/rooms/${id}`);
     onOpenChange(false);
   };
 
