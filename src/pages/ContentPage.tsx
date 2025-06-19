@@ -24,7 +24,7 @@ export interface ContentData {
 }
 
 export default function ContentPage() {
-  const { id } = useParams<{ id: string }>();
+  const { contentId } = useParams<{ contentId: string }>();
   const [searchParams] = useSearchParams();
   const { fetchContentById } = useContentContext();
   
@@ -48,9 +48,9 @@ export default function ContentPage() {
   // Fetch content from database
   useEffect(() => {
     const fetchContent = async () => {
-      console.log('ContentPage: Starting content fetch for ID:', id);
+      console.log('ContentPage: Starting content fetch for contentId:', contentId);
       
-      if (!id) {
+      if (!contentId) {
         console.error('ContentPage: No content ID provided');
         setError('No content ID provided');
         setLoading(false);
@@ -62,7 +62,7 @@ export default function ContentPage() {
         setError(null);
 
         console.log('ContentPage: Fetching content from database...');
-        const fetchedContent = await fetchContentById(id);
+        const fetchedContent = await fetchContentById(contentId);
         console.log('ContentPage: Fetched content:', fetchedContent);
         
         if (!fetchedContent) {
@@ -76,7 +76,7 @@ export default function ContentPage() {
           console.log('ContentPage: Creating fallback content data:', { type, url, filename, text });
           
           setContentData({
-            id: id || 'new',
+            id: contentId || 'new',
             type,
             title: getDefaultTitle(type, filename, recordingStateInfo?.isExistingRecording),
             url,
@@ -109,7 +109,7 @@ export default function ContentPage() {
     };
 
     fetchContent();
-  }, [id, fetchContentById, searchParams, recordingStateInfo?.isExistingRecording]);
+  }, [contentId, fetchContentById, searchParams, recordingStateInfo?.isExistingRecording]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -197,7 +197,7 @@ export default function ContentPage() {
             <AlertTriangle className="h-12 w-12 text-red-500" />
             <p className="text-lg font-medium">Error loading content</p>
             <p className="text-sm text-center max-w-md">{error}</p>
-            <p className="text-xs text-center max-w-md text-muted-foreground/60 mt-2">Content ID: {id}</p>
+            <p className="text-xs text-center max-w-md text-muted-foreground/60 mt-2">Content ID: {contentId}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -213,7 +213,7 @@ export default function ContentPage() {
             <AlertTriangle className="h-12 w-12" />
             <p className="text-lg font-medium">Content not found</p>
             <p className="text-sm text-center max-w-md">The requested content could not be found.</p>
-            <p className="text-xs text-center max-w-md text-muted-foreground/60 mt-2">Content ID: {id}</p>
+            <p className="text-xs text-center max-w-md text-muted-foreground/60 mt-2">Content ID: {contentId}</p>
           </div>
         </div>
       </DashboardLayout>
