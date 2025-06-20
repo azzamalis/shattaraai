@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
@@ -8,6 +9,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
 import { Room } from '@/lib/types';
+import { useContentContext } from '@/contexts/ContentContext';
+import { toast } from 'sonner';
 
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
@@ -28,6 +31,7 @@ export function DashboardHeader({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(contentData?.title || '');
   const location = useLocation();
+  const { onUpdateContent: updateContentInDB } = useContentContext();
   
   const isContentPage = location.pathname.startsWith('/content/');
 
@@ -48,10 +52,24 @@ export function DashboardHeader({
     setIsEditing(true);
   };
 
-  const handleTitleSave = () => {
-    if (onUpdateContent && contentData && editedTitle.trim() !== '') {
-      onUpdateContent({ title: editedTitle.trim() });
-    } else {
+  const handleTitleSave = async () => {
+    if (contentData && editedTitle.trim() !== '' && editedTitle.trim() !== contentData.title) {
+      try {
+        // Update in database
+        await updateContentInDB(contentData.id, { title: editedTitle.trim() });
+        
+        // Update local state if callback provided
+        if (onUpdateContent) {
+          onUpdateContent({ title: editedTitle.trim() });
+        }
+        
+        toast.success('Title updated successfully');
+      } catch (error) {
+        console.error('Error updating title:', error);
+        toast.error('Failed to update title');
+        setEditedTitle(contentData.title); // Reset to original if failed
+      }
+    } else if (editedTitle.trim() === '') {
       setEditedTitle(contentData?.title || ''); // Reset to original if empty
     }
     setIsEditing(false);
@@ -101,7 +119,7 @@ export function DashboardHeader({
                   value={editedTitle}
                   onChange={(e) => setEditedTitle(e.target.value)}
                   onKeyDown={handleTitleKeyDown}
-                  onBlur={handleTitleCancel}
+                  onBlur={handleTitleSave}
                   className={cn(
                     "bg-transparent text-sm px-1",
                     "text-foreground placeholder-muted-foreground",

@@ -3,28 +3,62 @@ import React, { useState } from 'react';
 import { Check, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useContentContext } from '@/contexts/ContentContext';
 
 interface LearningCardTitleProps {
   title: string;
+  contentId: string;
   onSave?: (newTitle: string) => void;
 }
 
-export function LearningCardTitle({ title, onSave }: LearningCardTitleProps) {
+export function LearningCardTitle({ title, contentId, onSave }: LearningCardTitleProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
+  const { onUpdateContent } = useContentContext();
 
-  const handleSaveTitle = (e: React.MouseEvent) => {
+  const handleSaveTitle = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onSave) {
-      onSave(editedTitle);
+    
+    if (editedTitle.trim() === '' || editedTitle.trim() === title) {
+      setEditedTitle(title); // Reset if empty or unchanged
+      setIsEditing(false);
+      return;
     }
-    toast.success("Title updated successfully");
-    setIsEditing(false);
+
+    try {
+      // Update in database
+      await onUpdateContent(contentId, { title: editedTitle.trim() });
+      
+      // Call optional callback
+      if (onSave) {
+        onSave(editedTitle.trim());
+      }
+      
+      toast.success("Title updated successfully");
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating title:', error);
+      toast.error("Failed to update title");
+      setEditedTitle(title); // Reset to original if failed
+      setIsEditing(false);
+    }
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setEditedTitle(title);
     setIsEditing(true);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveTitle(e as any);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setEditedTitle(title);
+      setIsEditing(false);
+    }
   };
 
   return (
@@ -35,6 +69,8 @@ export function LearningCardTitle({ title, onSave }: LearningCardTitleProps) {
             type="text"
             value={editedTitle}
             onChange={e => setEditedTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSaveTitle}
             className={cn(
               "w-full bg-transparent",
               "text-foreground text-sm font-medium",
@@ -52,7 +88,7 @@ export function LearningCardTitle({ title, onSave }: LearningCardTitleProps) {
       ) : (
         <div className="flex items-start gap-2">
           <h3 className="text-sm font-medium text-foreground pr-8 line-clamp-2 tracking-wide">
-            {editedTitle}
+            {title}
           </h3>
           <button onClick={handleEditClick} className="absolute right-0 opacity-0 group-hover/title:opacity-100 transition-opacity">
             <Pencil className="w-4 h-4 text-primary/40 hover:text-primary transition-colors" />

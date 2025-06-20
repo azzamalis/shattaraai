@@ -97,6 +97,7 @@ export function LearningCard({
         <div className="flex flex-col gap-2 p-2">
           <LearningCardTitle 
             title={content.title} 
+            contentId={content.id}
             onSave={handleTitleUpdate}
           />
           <LearningCardFooter roomName={contentRoom?.name} />

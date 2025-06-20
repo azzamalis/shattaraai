@@ -39,6 +39,7 @@ const formatDateForInput = (date: Date): string => {
 export function EditContentModal({ open, onOpenChange, contentItem, onSave }: EditContentModalProps) {
   const { onUpdateContent } = useContentContext();
   const [editedContent, setEditedContent] = useState<Partial<ContentItem>>(contentItem || {});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // When the contentItem prop changes, update the local state
@@ -46,15 +47,26 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
   }, [contentItem]);
 
   const handleSave = async () => {
-    if (editedContent.id && contentItem) {
+    if (!editedContent.id || !contentItem) {
+      toast.error("Content ID is missing");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
       await onUpdateContent(editedContent.id, editedContent);
       toast.success("Content updated successfully");
+      
       if (onSave) {
         onSave({ ...contentItem, ...editedContent } as ContentItem);
       }
+      
       onOpenChange(false);
-    } else {
-      toast.error("Content ID is missing");
+    } catch (error) {
+      console.error('Error updating content:', error);
+      toast.error("Failed to update content");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,9 +98,12 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
             <Label htmlFor="type" className="text-right">
               Type
             </Label>
-            <Select onValueChange={(value) => setEditedContent(prev => ({ ...prev, type: value as ContentItem['type'] }))}>
+            <Select 
+              value={editedContent.type || contentItem.type} 
+              onValueChange={(value) => setEditedContent(prev => ({ ...prev, type: value as ContentItem['type'] }))}
+            >
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a type" defaultValue={contentItem.type} />
+                <SelectValue placeholder="Select a type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="file">File</SelectItem>
@@ -100,7 +115,8 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
                 <SelectItem value="text">Text</SelectItem>
                 <SelectItem value="chat">Chat</SelectItem>
                 <SelectItem value="upload">Upload</SelectItem>
-                <SelectItem value="audio">Audio</SelectItem>
+                <SelectItem value="audio_file">Audio</SelectItem>
+                <SelectItem value="live_recording">Live Recording</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -164,8 +180,12 @@ export function EditContentModal({ open, onOpenChange, contentItem, onSave }: Ed
               Created {formatDistanceToNow(new Date(contentItem.created_at), { addSuffix: true })}
             </p>
           </div>
-          <Button type="button" onClick={handleSave}>
-            Save changes
+          <Button 
+            type="button" 
+            onClick={handleSave}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Saving...' : 'Save changes'}
           </Button>
         </DialogFooter>
       </DialogContent>
