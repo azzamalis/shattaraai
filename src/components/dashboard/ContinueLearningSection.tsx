@@ -35,18 +35,16 @@ export function ContinueLearningSection({
     navigate('/history');
   };
 
-  // IMPORTANT: Only show content that is NOT assigned to any room (room_id is null)
-  // This ensures we only show unassigned content in the dashboard's Continue Learning section
-  const unassignedContent = content.filter(item => item.room_id === null);
-
-  if (unassignedContent.length === 0) {
+  // Show all content in the Continue Learning section regardless of room assignment
+  // This allows users to see and manage all their content from the main dashboard
+  if (content.length === 0) {
     return (
       <section className="w-full py-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="font-semibold text-foreground text-lg">Continue Learning</h2>
         </div>
         <div className="text-muted-foreground text-center py-12 bg-card/20 rounded-xl border border-border/5">
-          No unassigned content yet. Upload, paste, or record something to get started!
+          No content yet. Upload, paste, or record something to get started!
         </div>
       </section>
     );
@@ -77,7 +75,7 @@ export function ContinueLearningSection({
           dragFree: true
         }}>
           <CarouselContent className="-ml-4">
-            {unassignedContent.map(item => (
+            {content.map(item => (
               <CarouselItem key={item.id} className={cn(
                 "pl-4",
                 "basis-[280px] sm:basis-[320px] md:basis-[360px]",
@@ -94,7 +92,7 @@ export function ContinueLearningSection({
               </CarouselItem>
             ))}
           </CarouselContent>
-          {unassignedContent.length > 1 && (
+          {content.length > 1 && (
             <>
               <CarouselPrevious className={cn(
                 "hidden md:flex -left-12",
