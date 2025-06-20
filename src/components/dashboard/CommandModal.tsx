@@ -16,7 +16,9 @@ import {
   FileText,
   Video,
   Globe,
-  Youtube
+  Youtube,
+  MessageSquare,
+  Music
 } from 'lucide-react';
 import { useContent } from '@/contexts/ContentContext';
 import { Room } from '@/lib/types';
@@ -29,6 +31,30 @@ interface CommandModalProps {
   rooms: Room[];
   onAddRoom: () => Promise<string | null>;
 }
+
+// Helper function to get the appropriate icon for content type
+const getContentTypeIcon = (type: string) => {
+  switch (type) {
+    case 'video':
+      return <Video size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+    case 'pdf':
+    case 'file':
+      return <FileText size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+    case 'recording':
+    case 'live_recording':
+      return <Mic size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+    case 'youtube':
+      return <Youtube size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+    case 'website':
+      return <Globe size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+    case 'text':
+      return <MessageSquare size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+    case 'audio_file':
+      return <Music size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+    default:
+      return <FileText size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+  }
+};
 
 export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandModalProps) {
   const navigate = useNavigate();
@@ -87,7 +113,7 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
                 key={content.id}
                 onSelect={() => handleContentClick(content.id, content.type)}
               >
-                <FileText size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
+                {getContentTypeIcon(content.type)}
                 <span>{content.title}</span>
                 {content.room_id && (
                   <div className="ms-auto flex items-center gap-2">
