@@ -19,6 +19,21 @@ interface LearningCardProps {
   currentRoom?: { id: string; name: string };
 }
 
+// Mock rooms data - in a real app, this would come from context or props
+const availableRooms = [{
+  id: '1',
+  name: "Azzam's Room"
+}, {
+  id: '2',
+  name: 'Project Neom'
+}, {
+  id: '3',
+  name: 'Physics Lab'
+}, {
+  id: '4',
+  name: 'Math Studies'
+}];
+
 export function LearningCard({
   content,
   onDelete,
@@ -34,23 +49,13 @@ export function LearningCard({
     navigate(`/content/${content.id}?type=${content.type}`);
   };
 
-  const handleAddToRoom = async (roomId: string) => {
-    try {
-      // Update the content with the selected room
-      await onUpdateContent(content.id, { room_id: roomId });
-      
-      const room = availableRooms.find(r => r.id === roomId);
-      if (room) {
-        toast.success(`Added to "${room.name}"`);
-      }
-      
-      // Call the parent handler if provided
-      if (onAddToRoom) {
-        onAddToRoom(roomId);
-      }
-    } catch (error) {
-      console.error('Error adding content to room:', error);
-      toast.error('Failed to add content to room');
+  const handleAddToRoom = (roomId: string) => {
+    if (onAddToRoom) {
+      onAddToRoom(roomId);
+    }
+    const room = availableRooms.find(r => r.id === roomId);
+    if (room) {
+      toast.success(`Added to "${room.name}"`);
     }
   };
 

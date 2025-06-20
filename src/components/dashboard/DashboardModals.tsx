@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { PasteContentModal } from '@/components/dashboard/PasteContentModal';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
-import { DeleteItem, ContentItem, Room } from '@/lib/types';
+import { DeleteItem, ContentItem } from '@/lib/types';
 import { useContentContext } from '@/contexts/ContentContext';
 
 interface DashboardModalsProps {
@@ -19,8 +19,6 @@ interface DashboardModalsProps {
   setItemToDelete: (item: DeleteItem | null) => void;
   itemToShare: ContentItem | null;
   onDeleteRoom: (roomId: string) => Promise<void>;
-  availableRooms?: Room[];
-  currentRoom?: { id: string; name: string };
 }
 
 export function DashboardModals({
@@ -33,18 +31,12 @@ export function DashboardModals({
   itemToDelete,
   setItemToDelete,
   itemToShare,
-  onDeleteRoom,
-  availableRooms = [],
-  currentRoom
+  onDeleteRoom
 }: DashboardModalsProps) {
   const navigate = useNavigate();
   const { onAddContent, onDeleteContent } = useContentContext();
 
-  const handlePasteSubmit = (data: { 
-    url?: string; 
-    text?: string; 
-    selectedRoomId?: string; 
-  }) => {
+  const handlePasteSubmit = (data: { url?: string; text?: string; }) => {
     // Determine content type based on URL
     let contentType = 'text';
     let title = 'Text Content';
@@ -58,11 +50,11 @@ export function DashboardModals({
       }
     }
 
-    // Add content to tracking system with selected room
+    // Add content to tracking system
     const contentId = onAddContent({
       title,
       type: contentType as any,
-      room_id: data.selectedRoomId || currentRoom?.id || null,
+      room_id: null,
       metadata: {},
       url: data.url,
       text_content: data.text
@@ -75,7 +67,6 @@ export function DashboardModals({
       ...(data.text && { text: data.text })
     });
     navigate(`/content/${contentId}?${searchParams.toString()}`);
-    
     if (data.url) {
       toast.success("URL content added successfully");
     } else if (data.text) {
@@ -109,9 +100,7 @@ export function DashboardModals({
       <PasteContentModal 
         isOpen={isPasteModalOpen} 
         onClose={() => setIsPasteModalOpen(false)} 
-        onSubmit={handlePasteSubmit}
-        availableRooms={availableRooms}
-        currentRoom={currentRoom}
+        onSubmit={handlePasteSubmit} 
       />
       
       <ShareModal 

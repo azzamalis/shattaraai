@@ -1,12 +1,9 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Link2, FileText, FolderOpen } from 'lucide-react';
-import { Room } from '@/lib/types';
+import { Link2, FileText } from 'lucide-react';
 
 interface PasteContentModalProps {
   isOpen: boolean;
@@ -14,22 +11,16 @@ interface PasteContentModalProps {
   onSubmit: (data: {
     url?: string;
     text?: string;
-    selectedRoomId?: string;
   }) => void;
-  availableRooms?: Room[];
-  currentRoom?: { id: string; name: string };
 }
 
 export function PasteContentModal({
   isOpen,
   onClose,
-  onSubmit,
-  availableRooms = [],
-  currentRoom
+  onSubmit
 }: PasteContentModalProps) {
   const [url, setUrl] = useState('');
   const [text, setText] = useState('');
-  const [selectedRoomId, setSelectedRoomId] = useState<string>(currentRoom?.id || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = () => {
@@ -39,26 +30,17 @@ export function PasteContentModal({
     setTimeout(() => {
       onSubmit({
         url,
-        text,
-        selectedRoomId: selectedRoomId || undefined
+        text
       });
       setIsSubmitting(false);
       setUrl('');
       setText('');
-      setSelectedRoomId(currentRoom?.id || '');
       onClose();
     }, 800);
   };
 
-  const handleClose = () => {
-    setUrl('');
-    setText('');
-    setSelectedRoomId(currentRoom?.id || '');
-    onClose();
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="bg-card border-border text-foreground max-w-md w-full p-0 overflow-hidden">
         <div className="p-6">
           <DialogHeader className="mb-4">
@@ -104,36 +86,12 @@ export function PasteContentModal({
             />
           </div>
 
-          {/* Room Selection */}
-          {availableRooms.length > 0 && (
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <FolderOpen className="text-muted-foreground h-4 w-4" />
-                <h3 className="text-base font-medium">Add to Room</h3>
-              </div>
-              <p className="text-muted-foreground text-sm mb-2">Choose which room to add this content to</p>
-              <Select value={selectedRoomId} onValueChange={setSelectedRoomId}>
-                <SelectTrigger className="bg-muted border-border text-foreground">
-                  <SelectValue placeholder="Select a room (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">No room (General)</SelectItem>
-                  {availableRooms.map((room) => (
-                    <SelectItem key={room.id} value={room.id}>
-                      {room.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
           {/* Action Buttons */}
           <div className="flex justify-end gap-3">
             <Button 
               variant="outline" 
               className="bg-transparent border-border text-muted-foreground hover:bg-accent hover:text-foreground" 
-              onClick={handleClose}
+              onClick={onClose}
             >
               Cancel
             </Button>
