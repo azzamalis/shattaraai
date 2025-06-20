@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Room } from '@/hooks/useRooms';
-import { MoreHorizontal, Check, X } from 'lucide-react';
+import { MoreHorizontal, Check, X, Pencil, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -100,12 +100,14 @@ export const RoomItem: React.FC<RoomItemProps> = ({
                 onClick={(e) => onRenameClick(e, room.id, room.name)}
                 className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
               >
+                <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={(e) => onDeleteClick(e, room.id, room.name)}
                 className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
               >
+                <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
