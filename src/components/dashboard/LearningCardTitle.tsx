@@ -16,9 +16,7 @@ export function LearningCardTitle({ title, contentId, onSave }: LearningCardTitl
   const [editedTitle, setEditedTitle] = useState(title);
   const { onUpdateContent } = useContentContext();
 
-  const handleSaveTitle = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    
+  const handleSaveTitle = async () => {
     if (editedTitle.trim() === '' || editedTitle.trim() === title) {
       setEditedTitle(title); // Reset if empty or unchanged
       setIsEditing(false);
@@ -50,10 +48,19 @@ export function LearningCardTitle({ title, contentId, onSave }: LearningCardTitl
     setIsEditing(true);
   };
 
+  const handleSaveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleSaveTitle();
+  };
+
+  const handleBlur = () => {
+    handleSaveTitle();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      handleSaveTitle(e as any);
+      handleSaveTitle();
     } else if (e.key === 'Escape') {
       e.preventDefault();
       setEditedTitle(title);
@@ -70,7 +77,7 @@ export function LearningCardTitle({ title, contentId, onSave }: LearningCardTitl
             value={editedTitle}
             onChange={e => setEditedTitle(e.target.value)}
             onKeyDown={handleKeyDown}
-            onBlur={handleSaveTitle}
+            onBlur={handleBlur}
             className={cn(
               "w-full bg-transparent",
               "text-foreground text-sm font-medium",
@@ -81,7 +88,7 @@ export function LearningCardTitle({ title, contentId, onSave }: LearningCardTitl
             autoFocus
             spellCheck="false"
           />
-          <button onClick={handleSaveTitle} className="absolute right-0 text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={handleSaveClick} className="absolute right-0 text-muted-foreground hover:text-foreground transition-colors">
             <Check className="w-4 h-4" />
           </button>
         </div>
