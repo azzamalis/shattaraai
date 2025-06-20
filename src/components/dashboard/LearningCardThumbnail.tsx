@@ -11,6 +11,27 @@ interface LearningCardThumbnailProps {
   children?: React.ReactNode;
 }
 
+// Helper function to extract YouTube video ID and generate thumbnail URL
+const getYouTubeThumbnail = (url: string): string | null => {
+  if (!url) return null;
+  
+  // YouTube URL patterns
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /youtube\.com\/v\/([^&\n?#]+)/
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      // Use maxresdefault for best quality, fallback to hqdefault if not available
+      return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
+    }
+  }
+  
+  return null;
+};
+
 export function LearningCardThumbnail({ 
   thumbnailUrl, 
   title, 
@@ -19,7 +40,14 @@ export function LearningCardThumbnail({
   children 
 }: LearningCardThumbnailProps) {
   const isPdf = contentType === 'pdf' || contentType === 'file';
+  const isYoutube = contentType === 'youtube';
   const hasPdfSource = pdfUrl;
+
+  // Generate YouTube thumbnail if it's a YouTube content type
+  const youtubeThumbnail = isYoutube && pdfUrl ? getYouTubeThumbnail(pdfUrl) : null;
+  
+  // Determine which thumbnail to use
+  const displayThumbnail = thumbnailUrl || youtubeThumbnail;
 
   return (
     <div className={cn(
@@ -41,11 +69,18 @@ export function LearningCardThumbnail({
             title={title}
             className="w-full h-full"
           />
-        ) : thumbnailUrl ? (
+        ) : displayThumbnail ? (
           <img
-            src={thumbnailUrl}
+            src={displayThumbnail}
             alt={title}
             className="object-cover w-full h-full absolute inset-0"
+            onError={(e) => {
+              // If maxresdefault fails for YouTube, try hqdefault
+              if (isYoutube && youtubeThumbnail && e.currentTarget.src.includes('maxresdefault')) {
+                const videoId = youtubeThumbnail.split('/')[4];
+                e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+              }
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted/20">
