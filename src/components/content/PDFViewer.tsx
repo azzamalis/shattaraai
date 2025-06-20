@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -283,13 +282,7 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
               {!loading && !error && url && (
                 <div className="flex justify-center w-full py-4 px-4">
                   <Document
-                    file={{
-                      url: url,
-                      httpHeaders: {
-                        'Access-Control-Allow-Origin': '*',
-                      },
-                      withCredentials: false,
-                    }}
+                    file={url}
                     onLoadSuccess={onDocumentLoadSuccess}
                     onLoadError={onDocumentLoadError}
                     loading={null}
@@ -298,7 +291,7 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
                       cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
                       cMapPacked: true,
                       standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
-                      verbosity: 0, // Reduce console noise
+                      verbosity: 0,
                       disableAutoFetch: false,
                       disableStream: false,
                     }}
