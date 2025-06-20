@@ -32,6 +32,33 @@ const getYouTubeThumbnail = (url: string): string | null => {
   return null;
 };
 
+// Helper function to extract video thumbnail from various video platforms
+const getVideoThumbnail = (url: string): string | null => {
+  if (!url) return null;
+  
+  // Vimeo thumbnail extraction
+  const vimeoMatch = url.match(/(?:vimeo\.com\/)(?:.*\/)?(\d+)/);
+  if (vimeoMatch && vimeoMatch[1]) {
+    return `https://vumbnail.com/${vimeoMatch[1]}.jpg`;
+  }
+  
+  // Dailymotion thumbnail extraction
+  const dailymotionMatch = url.match(/(?:dailymotion\.com\/video\/)([^_]+)/);
+  if (dailymotionMatch && dailymotionMatch[1]) {
+    return `https://www.dailymotion.com/thumbnail/video/${dailymotionMatch[1]}`;
+  }
+  
+  // For other video URLs, try to use the URL itself as a potential thumbnail
+  // This works for direct video file URLs that might have associated thumbnail images
+  if (url.match(/\.(mp4|webm|ogg|mov|avi|wmv|flv)$/i)) {
+    // For direct video files, we could potentially generate a thumbnail
+    // but for now, we'll return null and let it fall back to the default
+    return null;
+  }
+  
+  return null;
+};
+
 export function LearningCardThumbnail({ 
   thumbnailUrl, 
   title, 
@@ -41,13 +68,17 @@ export function LearningCardThumbnail({
 }: LearningCardThumbnailProps) {
   const isPdf = contentType === 'pdf' || contentType === 'file';
   const isYoutube = contentType === 'youtube';
+  const isVideo = contentType === 'video';
   const hasPdfSource = pdfUrl;
 
   // Generate YouTube thumbnail if it's a YouTube content type
   const youtubeThumbnail = isYoutube && pdfUrl ? getYouTubeThumbnail(pdfUrl) : null;
   
+  // Generate video thumbnail if it's a video content type
+  const videoThumbnail = isVideo && pdfUrl ? getVideoThumbnail(pdfUrl) : null;
+  
   // Determine which thumbnail to use
-  const displayThumbnail = thumbnailUrl || youtubeThumbnail;
+  const displayThumbnail = thumbnailUrl || youtubeThumbnail || videoThumbnail;
 
   return (
     <div className={cn(
