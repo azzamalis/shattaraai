@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Upload, FileText, Mic, Link2 } from 'lucide-react';
@@ -34,11 +35,12 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         const loadingToast = toast.loading(`Uploading ${file.name}...`);
 
         // Use addContentWithFile for PDFs to upload to Supabase Storage
+        // IMPORTANT: Set room_id to null so content is not automatically assigned to any room
         const contentId = contentType === 'pdf' 
           ? await addContentWithFile({
               title: file.name,
               type: contentType as any,
-              room_id: null,
+              room_id: null, // Do not auto-assign to any room
               metadata: {
                 fileSize: file.size,
                 fileType: file.type,
@@ -49,7 +51,7 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
           : await addContent({
               title: file.name,
               type: contentType as any,
-              room_id: null,
+              room_id: null, // Do not auto-assign to any room
               metadata: {
                 fileSize: file.size,
                 fileType: file.type,
@@ -83,11 +85,11 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
 
   const handleRecordClick = async () => {
     try {
-      // Add live recording to tracking system
+      // Add live recording to tracking system WITHOUT auto-assigning to any room
       const contentId = await addContent({
         title: `Live Recording at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
         type: 'live_recording',
-        room_id: null,
+        room_id: null, // Do not auto-assign to any room
         metadata: {
           isLiveRecording: true,
           recordingStatus: 'ready'
