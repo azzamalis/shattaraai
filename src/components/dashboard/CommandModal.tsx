@@ -93,7 +93,7 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
                   <div className="ms-auto flex items-center gap-2">
                     <div className="flex items-center gap-1 rounded-md border border-border bg-muted px-1.5 py-0.5">
                       <Box size={12} className="opacity-50" />
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-foreground">
                         {rooms.find(r => r.id === content.room_id)?.name || 'Unknown Room'}
                       </span>
                     </div>
