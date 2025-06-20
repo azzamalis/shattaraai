@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Room } from '@/hooks/useRooms';
-import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Check, X } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,17 +66,18 @@ export const RoomItem: React.FC<RoomItemProps> = ({
           <Button
             size="sm"
             onClick={(e) => onSaveRename(e, room.id)}
-            className="h-8 px-2"
+            className="h-8 w-8 p-0"
+            variant="ghost"
           >
-            Save
+            <Check className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            variant="outline"
+            variant="ghost"
             onClick={onCancelRename}
-            className="h-8 px-2"
+            className="h-8 w-8 p-0"
           >
-            Cancel
+            <X className="h-4 w-4" />
           </Button>
         </div>
       ) : (
@@ -94,16 +95,17 @@ export const RoomItem: React.FC<RoomItemProps> = ({
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={(e) => onRenameClick(e, room.id, room.name)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Rename
+            <DropdownMenuContent align="end" className="w-[200px] p-1">
+              <DropdownMenuItem 
+                onClick={(e) => onRenameClick(e, room.id, room.name)}
+                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+              >
+                Edit
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={(e) => onDeleteClick(e, room.id, room.name)}
-                className="text-red-600 focus:text-red-600"
+                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
