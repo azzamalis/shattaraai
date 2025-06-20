@@ -8,10 +8,12 @@ export const useRoomContentCounts = () => {
 
   useEffect(() => {
     // Calculate content counts for each room
+    // IMPORTANT: Only count content that is explicitly assigned to rooms (room_id is not null)
     const counts: Record<string, number> = {};
     
     content.forEach(item => {
-      if (item.room_id) {
+      // Only count content that has been explicitly assigned to a room
+      if (item.room_id && item.room_id !== null) {
         counts[item.room_id] = (counts[item.room_id] || 0) + 1;
       }
     });

@@ -1,11 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, FileText } from 'lucide-react';
-import { RoomContentView } from './RoomContentView';
-import { ContentItem } from '@/lib/types';
-import { useContent } from '@/hooks/useContent';
 import { useParams } from 'react-router-dom';
+import { useContent } from '@/contexts/ContentContext';
+import { ActionCards } from './ActionCards';
+import { LearningCard } from './LearningCard';
+import { PasteContentModal } from './PasteContentModal';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useRooms } from '@/hooks/useRooms';
+import { ContentItem } from '@/lib/types';
 
 interface RoomViewProps {
   title: string;
@@ -14,65 +18,143 @@ interface RoomViewProps {
   hideHeader?: boolean;
 }
 
-export function RoomView({
-  title,
-  description,
-  isEmpty = true,
-  hideHeader = false
-}: RoomViewProps) {
-  const { id: roomId } = useParams<{ id: string }>();
-  const { content } = useContent();
-  
-  // Filter content for the current room if we have a roomId
-  const roomContent = roomId ? content.filter(item => item.room_id === roomId) : content;
-  
-  // Use the actual content to determine if empty, fallback to prop
-  const isActuallyEmpty = roomContent.length === 0;
+export function RoomView({ title, description, isEmpty = false, hideHeader = false }: RoomViewProps) {
+  const { roomId } = useParams<{ roomId: string }>();
+  const navigate = useNavigate();
+  const { content, onAddContent, onDeleteContent, onUpdateContent } = useContent();
+  const { rooms } = useRooms();
+  const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
 
-  return (
-    <div className="flex flex-col bg-background">
-      {!hideHeader && (
-        <header className="flex flex-col border-b border-border bg-background px-4 py-6 sticky top-0 z-10">
-          <div className="mx-auto max-w-7xl w-full">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">{title}</h1>
-                <p className="text-muted-foreground mt-1">{description}</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <Button variant="outline" className="component-base hover:bg-accent hover:text-primary hover:border-primary w-[140px] h-10">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Room Chat
-                </Button>
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-[140px] h-10">
-                  <FileText className="mr-2 h-4 w-4" />
-                  Create Exam
-                </Button>
-              </div>
-            </div>
-          </div>
-        </header>
-      )}
+  // IMPORTANT: Filter content to only show items that belong to this specific room
+  const roomContent = content.filter(item => item.room_id === roomId);
 
-      <main>
-        <div className="max-w-7xl mx-auto w-full py-6 pb-8">
-          {isActuallyEmpty ? (
-            <div className="flex flex-col items-center justify-center text-center">
-              <h2 className="text-xl font-bold text-foreground mb-1">No documents yet</h2>
-              <p className="text-muted-foreground max-w-md">
-                Start adding documents, links, or create content directly to begin building your learning room.
-              </p>
-            </div>
-          ) : (
-            <RoomContentView 
-              items={roomContent} 
-              onEdit={(id) => console.log('Edit', id)}
-              onDelete={(id) => console.log('Delete', id)}
-              onShare={(id) => console.log('Share', id)}
-            />
+  const handlePasteSubmit = async (data: { url?: string; text?: string; }) => {
+    let contentType = 'text';
+    let contentTitle = 'Text Content';
+    if (data.url) {
+      if (data.url.includes('youtube.com') || data.url.includes('youtu.be')) {
+        contentType = 'youtube';
+        contentTitle = 'YouTube Video';
+      } else {
+        contentType = 'website';
+        contentTitle = 'Website Content';
+      }
+    }
+
+    // Create content WITHOUT automatic room assignment
+    const contentId = await onAddContent({
+      title: contentTitle,
+      type: contentType as any,
+      room_id: null, // Do not auto-assign to any room
+      metadata: {},
+      url: data.url,
+      text_content: data.text
+    });
+
+    if (contentId) {
+      const searchParams = new URLSearchParams({
+        type: contentType,
+        ...(data.url && { url: data.url }),
+        ...(data.text && { text: data.text })
+      });
+      navigate(`/content/${contentId}?${searchParams.toString()}`);
+      
+      if (data.url) {
+        toast.success("URL content added successfully");
+      } else if (data.text) {
+        toast.success("Text content added successfully");
+      }
+    }
+    
+    setIsPasteModalOpen(false);
+  };
+
+  const handleDeleteCard = (item: ContentItem) => {
+    onDeleteContent(item.id);
+  };
+
+  const handleShareCard = (item: ContentItem) => {
+    // Handle share functionality
+  };
+
+  const handleAddToRoom = async (item: ContentItem, targetRoomId: string) => {
+    try {
+      await onUpdateContent(item.id, { room_id: targetRoomId });
+      const room = rooms.find(r => r.id === targetRoomId);
+      if (room) {
+        toast.success(`Added to "${room.name}"`);
+      }
+    } catch (error) {
+      console.error('Error adding content to room:', error);
+      toast.error('Failed to add content to room');
+    }
+  };
+
+  if (!hideHeader) {
+    return (
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-foreground mb-4">{title}</h1>
+          {description && (
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{description}</p>
           )}
         </div>
-      </main>
+
+        <div className="mb-8">
+          <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
+        </div>
+
+        {roomContent.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg mb-4">No content in this room yet</p>
+            <p className="text-muted-foreground">Use the actions above to add content to this room</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {roomContent.map(item => (
+              <LearningCard
+                key={item.id}
+                content={item}
+                onDelete={() => handleDeleteCard(item)}
+                onShare={() => handleShareCard(item)}
+                onAddToRoom={(targetRoomId) => handleAddToRoom(item, targetRoomId)}
+                availableRooms={rooms}
+              />
+            ))}
+          </div>
+        )}
+
+        <PasteContentModal 
+          isOpen={isPasteModalOpen} 
+          onClose={() => setIsPasteModalOpen(false)} 
+          onSubmit={handlePasteSubmit} 
+        />
+      </div>
+    );
+  }
+
+  // When hideHeader is true, just show the content grid
+  return (
+    <div className="max-w-7xl mx-auto px-4">
+      {roomContent.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground text-lg mb-4">No content in this room yet</p>
+          <p className="text-muted-foreground">Add content to this room using the "Add" option on any content card</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {roomContent.map(item => (
+            <LearningCard
+              key={item.id}
+              content={item}
+              onDelete={() => handleDeleteCard(item)}
+              onShare={() => handleShareCard(item)}
+              onAddToRoom={(targetRoomId) => handleAddToRoom(item, targetRoomId)}
+              availableRooms={rooms}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
