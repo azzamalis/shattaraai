@@ -1,11 +1,21 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { File, Video, ImageIcon, FileText, Mic, Youtube, Link as LinkIcon, Text } from 'lucide-react';
+import { File, Video, ImageIcon, FileText, Mic, Youtube, Link as LinkIcon, Text, MoreHorizontal, Trash2, Share, Plus } from 'lucide-react';
 import { useContentContext } from '@/contexts/ContentContext';
-import { LearningCardMenu } from '../LearningCardMenu';
 import { useRooms } from '@/hooks/useRooms';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ContentTypeIconProps {
   type: string;
@@ -75,10 +85,10 @@ export function RecentSection() {
 
   return <div className="space-y-1">
       {recentContent.slice(0, 5).map(item => (
-        <div key={item.id} className="relative group">
+        <div key={item.id} className="flex items-center justify-between gap-2">
           <Link 
             to={`/content/${item.id}`} 
-            className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-accent rounded-md transition-colors"
+            className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-accent rounded-md transition-colors flex-1 min-w-0"
           >
             <div className="flex-shrink-0">
               <ContentTypeIcon type={item.type} />
@@ -87,14 +97,51 @@ export function RecentSection() {
               <p className="font-medium text-foreground truncate text-sm">{item.title}</p>
             </div>
           </Link>
-          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <LearningCardMenu
-              onDelete={() => handleDeleteCard(item.id)}
-              onShare={() => handleShareCard(item)}
-              onAddToRoom={(roomId) => handleAddToRoom(item, roomId)}
-              availableRooms={rooms}
-            />
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px] p-1">
+              <DropdownMenuItem 
+                onClick={() => handleShareCard(item)}
+                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+              >
+                <Share className="mr-2 h-4 w-4" />
+                Share
+              </DropdownMenuItem>
+              
+              {rooms.length > 0 && (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add to room
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-48">
+                    {rooms.map((room) => (
+                      <DropdownMenuItem
+                        key={room.id}
+                        onClick={() => handleAddToRoom(item, room.id)}
+                        className="text-foreground hover:bg-accent hover:text-accent-foreground"
+                      >
+                        {room.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              )}
+              
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => handleDeleteCard(item.id)}
+                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       ))}
     </div>;
