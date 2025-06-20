@@ -8,6 +8,7 @@ import { LearningCardMenu } from './LearningCardMenu';
 import { LearningCardThumbnail } from './LearningCardThumbnail';
 import { LearningCardTitle } from './LearningCardTitle';
 import { LearningCardFooter } from './LearningCardFooter';
+import { useContentContext } from '@/contexts/ContentContext';
 
 interface LearningCardProps {
   content: ContentItem;
@@ -42,6 +43,7 @@ export function LearningCard({
   currentRoom
 }: LearningCardProps) {
   const navigate = useNavigate();
+  const { onUpdateContent } = useContentContext();
 
   const handleCardClick = () => {
     navigate(`/content/${content.id}?type=${content.type}`);
@@ -54,6 +56,15 @@ export function LearningCard({
     const room = availableRooms.find(r => r.id === roomId);
     if (room) {
       toast.success(`Added to "${room.name}"`);
+    }
+  };
+
+  const handleTitleUpdate = async (newTitle: string) => {
+    try {
+      await onUpdateContent(content.id, { title: newTitle });
+    } catch (error) {
+      console.error('Error updating content title:', error);
+      toast.error('Failed to update title');
     }
   };
 
@@ -89,7 +100,10 @@ export function LearningCard({
 
         {/* Content Info Section */}
         <div className="flex flex-col gap-2 p-2">
-          <LearningCardTitle title={content.title} />
+          <LearningCardTitle 
+            title={content.title} 
+            onSave={handleTitleUpdate}
+          />
           <LearningCardFooter roomName={contentRoom?.name} />
         </div>
       </div>
