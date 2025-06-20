@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Video } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PDFThumbnailGenerator } from './PDFThumbnailGenerator';
 
@@ -41,6 +42,7 @@ export function LearningCardThumbnail({
 }: LearningCardThumbnailProps) {
   const isPdf = contentType === 'pdf' || contentType === 'file';
   const isYoutube = contentType === 'youtube';
+  const isVideo = contentType === 'video';
   const hasPdfSource = pdfUrl;
 
   // Generate YouTube thumbnail if it's a YouTube content type
@@ -82,6 +84,10 @@ export function LearningCardThumbnail({
               }
             }}
           />
+        ) : isVideo ? (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-purple-600/10">
+            <Video className="w-12 h-12 text-blue-500 opacity-80" />
+          </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted/20">
             <span className="text-muted-foreground text-sm">No thumbnail</span>
