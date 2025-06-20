@@ -97,9 +97,7 @@ export function RoomHeroSection({
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
             What do you need help understanding today?
           </h2>
-          <p className="text-muted-foreground text-lg">
-            Ask any question or paste content to get started
-          </p>
+          <p className="text-muted-foreground text-lg">Ask any question or add content to get started</p>
         </motion.div>
         
         <motion.div initial={{
