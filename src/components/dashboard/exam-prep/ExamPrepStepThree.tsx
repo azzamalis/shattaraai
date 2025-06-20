@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -41,6 +42,13 @@ export function ExamPrepStepThree({
     return numQuestionsValid && questionTypeValid && examLengthValid;
   };
 
+  // Define valid question type options
+  const questionTypeOptions = [
+    { value: 'Both', label: 'Both' },
+    { value: 'Multiple Choice', label: 'Multiple Choice' },
+    { value: 'Free Writing', label: 'Free Writing' }
+  ];
+
   return (
     <div className="text-center">
       <h2 className="text-2xl font-bold text-foreground mb-2">Choose your preference</h2>
@@ -68,9 +76,15 @@ export function ExamPrepStepThree({
               <SelectValue placeholder="Select question type" />
             </SelectTrigger>
             <SelectContent className="bg-popover border-border z-[200]">
-              <SelectItem value="Both" className="text-foreground hover:bg-accent/50">Both</SelectItem>
-              <SelectItem value="Multiple Choice" className="text-foreground hover:bg-accent/50">Multiple Choice</SelectItem>
-              <SelectItem value="Free Writing" className="text-foreground hover:bg-accent/50">Free Writing</SelectItem>
+              {questionTypeOptions.map((option) => (
+                <SelectItem 
+                  key={option.value} 
+                  value={option.value} 
+                  className="text-foreground hover:bg-accent/50"
+                >
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

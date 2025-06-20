@@ -19,6 +19,9 @@ interface SourceSelectorProps {
 const SourceSelector = ({ value, onChange }: SourceSelectorProps) => {
   const { t, isRTL } = useLanguage();
 
+  // Filter out any options with empty values
+  const validSourceOptions = sourceOptions.filter(option => option.value && option.value.trim() !== '');
+
   return (
     <div className={`space-y-2 ${isRTL ? 'text-right' : 'text-left'}`}>
       <label className="block text-sm font-medium text-foreground">
@@ -29,7 +32,7 @@ const SourceSelector = ({ value, onChange }: SourceSelectorProps) => {
           <SelectValue placeholder={t('onboarding.sourcePlaceholder')} />
         </SelectTrigger>
         <SelectContent className="bg-popover border-border text-popover-foreground">
-          {sourceOptions.map((option) => (
+          {validSourceOptions.map((option) => (
             <SelectItem 
               key={option.value} 
               value={option.value}

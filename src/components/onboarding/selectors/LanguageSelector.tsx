@@ -23,6 +23,9 @@ const LanguageSelector = ({ value, onChange }: LanguageSelectorProps) => {
     onChange(newValue);
   };
 
+  // Filter out any languages with empty values
+  const validLanguages = languages.filter(lang => lang.value && lang.value.trim() !== '');
+
   return (
     <div className={`space-y-2 ${isRTL ? 'text-right' : 'text-left'}`}>
       <label className="block text-sm font-medium text-foreground">
@@ -33,7 +36,7 @@ const LanguageSelector = ({ value, onChange }: LanguageSelectorProps) => {
           <SelectValue placeholder={t('onboarding.selectLanguage')} />
         </SelectTrigger>
         <SelectContent className="bg-popover border-border text-popover-foreground">
-          {languages.map((lang) => (
+          {validLanguages.map((lang) => (
             <SelectItem 
               key={lang.value} 
               value={lang.value} 

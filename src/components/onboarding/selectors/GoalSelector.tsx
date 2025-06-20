@@ -21,6 +21,9 @@ const GoalSelector = ({ value, onChange, purpose }: GoalSelectorProps) => {
   const { t, isRTL } = useLanguage();
   const goalOptions = getGoalOptions(purpose);
   
+  // Filter out any options with empty values
+  const validGoalOptions = goalOptions.filter(option => option.value && option.value.trim() !== '');
+  
   return (
     <div className={`space-y-2 ${isRTL ? 'text-right' : 'text-left'}`}>
       <label className="block text-sm font-medium text-foreground">
@@ -31,7 +34,7 @@ const GoalSelector = ({ value, onChange, purpose }: GoalSelectorProps) => {
           <SelectValue placeholder={t('onboarding.goalPlaceholder')} />
         </SelectTrigger>
         <SelectContent className="bg-popover border-border text-popover-foreground">
-          {goalOptions.map((option) => (
+          {validGoalOptions.map((option) => (
             <SelectItem 
               key={option.value} 
               value={option.value}
