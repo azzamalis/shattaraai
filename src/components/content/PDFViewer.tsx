@@ -12,8 +12,16 @@ import { PDFSidebar } from './pdf/PDFSidebar';
 import { PDFTextActionPopover } from './pdf/PDFTextActionPopover';
 import { PDFViewerProps, SearchResult, TextActionPosition } from './pdf/types';
 
-// Configure PDF.js worker to use the local file
-pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
+// Configure PDF.js worker with better compatibility
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
+
+// Fallback worker configuration
+if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+  pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
+}
 
 export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
@@ -37,8 +45,11 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
 
   useEffect(() => {
     if (url) {
+      console.log('PDFViewer: URL changed to:', url);
       setLoading(true);
       setError(null);
+      setPageNumber(1);
+      setNumPages(0);
     }
   }, [url]);
 
@@ -55,15 +66,16 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
   }, [showSidebar]);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
+    console.log('PDFViewer: Document loaded successfully, pages:', numPages);
     setNumPages(numPages);
     setError(null);
     setLoading(false);
   }, []);
 
   const onDocumentLoadError = useCallback((error: Error) => {
-    setError('Failed to load PDF. Please check the file and try again.');
+    console.error('PDFViewer: Document load error:', error);
+    setError(`Failed to load PDF: ${error.message}`);
     setLoading(false);
-    console.error('PDF load error:', error);
   }, []);
 
   const goToPrevPage = useCallback(() => {
@@ -261,6 +273,9 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
                     <AlertTriangle className="h-12 w-12 text-red-500" />
                     <p className="text-lg font-medium">Error loading PDF</p>
                     <p className="text-sm text-center max-w-md">{error}</p>
+                    <p className="text-xs text-center max-w-md text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">
+                      URL: {url}
+                    </p>
                   </div>
                 </div>
               )}
@@ -268,11 +283,25 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
               {!loading && !error && url && (
                 <div className="flex justify-center w-full py-4 px-4">
                   <Document
-                    file={url}
+                    file={{
+                      url: url,
+                      httpHeaders: {
+                        'Access-Control-Allow-Origin': '*',
+                      },
+                      withCredentials: false,
+                    }}
                     onLoadSuccess={onDocumentLoadSuccess}
                     onLoadError={onDocumentLoadError}
                     loading={null}
                     error={null}
+                    options={{
+                      cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+                      cMapPacked: true,
+                      standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
+                      verbosity: 0, // Reduce console noise
+                      disableAutoFetch: false,
+                      disableStream: false,
+                    }}
                   >
                     <Page
                       pageNumber={pageNumber}
@@ -282,6 +311,8 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
                       renderAnnotationLayer={true}
                       className="shadow-lg border border-dashboard-separator/20 dark:border-white/10"
                       width={containerWidth ? Math.min(containerWidth - 64, 800) : undefined}
+                      onLoadSuccess={() => console.log('PDFViewer: Page rendered successfully')}
+                      onLoadError={(error) => console.error('PDFViewer: Page render error:', error)}
                     />
                   </Document>
                 </div>

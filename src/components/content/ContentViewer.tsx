@@ -14,9 +14,13 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
   const renderViewer = () => {
     switch (contentData.type) {
       case 'pdf':
+        // For PDFs, check both url and filePath, and ensure we have a valid URL
+        const pdfUrl = contentData.url || contentData.filePath;
+        console.log('PDF URL for viewer:', pdfUrl, 'Content data:', contentData);
+        
         return (
           <PDFViewer
-            url={contentData.url}
+            url={pdfUrl}
             onTextAction={onTextAction}
           />
         );
