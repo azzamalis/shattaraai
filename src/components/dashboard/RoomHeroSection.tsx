@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ActionCards } from './ActionCards';
 import { AIChatInput } from '@/components/ui/ai-chat-input';
 import { PasteContentModal } from './PasteContentModal';
 import { toast } from 'sonner';
 import { useContent } from '@/contexts/ContentContext';
+import { useRooms } from '@/hooks/useRooms';
 import { motion } from 'framer-motion';
 
 interface RoomHeroSectionProps {
@@ -18,13 +19,50 @@ export function RoomHeroSection({
   description
 }: RoomHeroSectionProps) {
   const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>();
   const { onAddContent } = useContent();
+  const { rooms } = useRooms();
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
+
+  // Get current room info
+  const currentRoom = roomId ? rooms.find(r => r.id === roomId) : undefined;
 
   const handlePasteSubmit = (data: {
     url?: string;
     text?: string;
+    selectedRoomId?: string;
   }) => {
+    // Determine content type based on URL
+    let contentType = 'text';
+    let title = 'Text Content';
+    if (data.url) {
+      if (data.url.includes('youtube.com') || data.url.includes('youtu.be')) {
+        contentType = 'youtube';
+        title = 'YouTube Video';
+      } else {
+        contentType = 'website';
+        title = 'Website Content';
+      }
+    }
+
+    // Add content with selected room (defaults to current room if in a room)
+    const contentId = onAddContent({
+      title,
+      type: contentType as any,
+      room_id: data.selectedRoomId || roomId || null,
+      metadata: {},
+      url: data.url,
+      text_content: data.text
+    });
+
+    // Navigate to content page
+    const searchParams = new URLSearchParams({
+      type: contentType,
+      ...(data.url && { url: data.url }),
+      ...(data.text && { text: data.text })
+    });
+    navigate(`/content/${contentId}?${searchParams.toString()}`);
+    
     if (data.url) {
       toast.success("URL content added successfully");
     } else if (data.text) {
@@ -37,7 +75,7 @@ export function RoomHeroSection({
     const contentId = onAddContent({
       title: 'Chat with Shattara AI',
       type: 'chat',
-      room_id: null,
+      room_id: roomId || null,
       metadata: {},
       text_content: value
     });
@@ -110,7 +148,9 @@ export function RoomHeroSection({
         <PasteContentModal 
           isOpen={isPasteModalOpen} 
           onClose={() => setIsPasteModalOpen(false)} 
-          onSubmit={handlePasteSubmit} 
+          onSubmit={handlePasteSubmit}
+          availableRooms={rooms}
+          currentRoom={currentRoom ? { id: currentRoom.id, name: currentRoom.name } : undefined}
         />
       </div>
     </div>
