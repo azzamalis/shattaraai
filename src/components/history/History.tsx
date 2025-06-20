@@ -1,5 +1,5 @@
-
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HistoryHeader } from './HistoryHeader';
 import { HistorySearch } from './HistorySearch';
@@ -30,6 +30,7 @@ export function History({
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   const { content, loading, deleteContent } = useContent();
   const { rooms: allRooms } = useRooms();
@@ -66,10 +67,8 @@ export function History({
 
   const handleItemClick = (id: string) => {
     const item = content.find(c => c.id === id);
-    if (item?.url) {
-      window.open(item.url, '_blank');
-    } else {
-      console.log(`Navigating to item: ${id}`);
+    if (item) {
+      navigate(`/content/${item.id}?type=${item.type}`);
     }
   };
 
