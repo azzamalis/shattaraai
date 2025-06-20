@@ -36,7 +36,7 @@ export function DashboardModals({
   const navigate = useNavigate();
   const { onAddContent, onDeleteContent } = useContentContext();
 
-  const handlePasteSubmit = (data: { url?: string; text?: string; }) => {
+  const handlePasteSubmit = async (data: { url?: string; text?: string; }) => {
     // Determine content type based on URL
     let contentType = 'text';
     let title = 'Text Content';
@@ -50,28 +50,32 @@ export function DashboardModals({
       }
     }
 
-    // Add content to tracking system
-    const contentId = onAddContent({
+    // Add content WITHOUT automatic room assignment (room_id: null)
+    const contentId = await onAddContent({
       title,
       type: contentType as any,
-      room_id: null,
+      room_id: null, // Explicitly set to null - user can add to room later using the Add dropdown
       metadata: {},
       url: data.url,
       text_content: data.text
     });
 
-    // Navigate to content page
-    const searchParams = new URLSearchParams({
-      type: contentType,
-      ...(data.url && { url: data.url }),
-      ...(data.text && { text: data.text })
-    });
-    navigate(`/content/${contentId}?${searchParams.toString()}`);
-    if (data.url) {
-      toast.success("URL content added successfully");
-    } else if (data.text) {
-      toast.success("Text content added successfully");
+    if (contentId) {
+      // Navigate to content page
+      const searchParams = new URLSearchParams({
+        type: contentType,
+        ...(data.url && { url: data.url }),
+        ...(data.text && { text: data.text })
+      });
+      navigate(`/content/${contentId}?${searchParams.toString()}`);
+      
+      if (data.url) {
+        toast.success("URL content added successfully");
+      } else if (data.text) {
+        toast.success("Text content added successfully");
+      }
     }
+    
     setIsPasteModalOpen(false);
   };
 
@@ -83,7 +87,7 @@ export function DashboardModals({
         await onDeleteRoom(itemToDelete.id);
         toast.success(`"${itemToDelete.name}" has been deleted`);
       } else if (itemToDelete.type === 'card') {
-        onDeleteContent(itemToDelete.id);
+        await onDeleteContent(itemToDelete.id);
         toast.success(`"${itemToDelete.name}" has been deleted`);
       }
     } catch (error) {

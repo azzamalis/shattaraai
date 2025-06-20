@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -29,18 +30,23 @@ export function PasteContentModal({
     // Simulate processing
     setTimeout(() => {
       onSubmit({
-        url,
-        text
+        url: url || undefined,
+        text: text || undefined
       });
       setIsSubmitting(false);
       setUrl('');
       setText('');
-      onClose();
     }, 800);
   };
 
+  const handleClose = () => {
+    setUrl('');
+    setText('');
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
       <DialogContent className="bg-card border-border text-foreground max-w-md w-full p-0 overflow-hidden">
         <div className="p-6">
           <DialogHeader className="mb-4">
@@ -91,13 +97,13 @@ export function PasteContentModal({
             <Button 
               variant="outline" 
               className="bg-transparent border-border text-muted-foreground hover:bg-accent hover:text-foreground" 
-              onClick={onClose}
+              onClick={handleClose}
             >
               Cancel
             </Button>
             <Button 
               onClick={handleSubmit} 
-              disabled={isSubmitting || !url && !text} 
+              disabled={isSubmitting || (!url && !text)} 
               className="bg-accent hover:bg-accent/80 text-foreground font-medium transition-colors duration-200"
             >
               {isSubmitting ? 'Adding...' : 'Add'}

@@ -2,7 +2,7 @@
 import React from 'react';
 import { RoomCard } from './RoomCard';
 import { Room } from '@/hooks/useRooms';
-import { useContentContext } from '@/contexts/ContentContext';
+import { useRoomContentCounts } from '@/hooks/useRoomContentCounts';
 
 interface MyRoomsSectionProps {
   rooms: Room[];
@@ -17,11 +17,7 @@ export function MyRoomsSection({
   onEditRoom,
   onDeleteRoom
 }: MyRoomsSectionProps) {
-  const { content } = useContentContext();
-
-  const getContentCountForRoom = (roomId: string): number => {
-    return content.filter(item => item.room_id === roomId).length;
-  };
+  const { getContentCountForRoom } = useRoomContentCounts();
 
   return (
     <section className="w-full py-8">

@@ -21,32 +21,68 @@ export function RoomHeroSection({
   const { onAddContent } = useContent();
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
 
-  const handlePasteSubmit = (data: {
+  const handlePasteSubmit = async (data: {
     url?: string;
     text?: string;
   }) => {
+    // Determine content type based on URL
+    let contentType = 'text';
+    let title = 'Text Content';
     if (data.url) {
-      toast.success("URL content added successfully");
-    } else if (data.text) {
-      toast.success("Text content added successfully");
+      if (data.url.includes('youtube.com') || data.url.includes('youtu.be')) {
+        contentType = 'youtube';
+        title = 'YouTube Video';
+      } else {
+        contentType = 'website';
+        title = 'Website Content';
+      }
     }
+
+    // Add content WITHOUT automatic room assignment
+    const contentId = await onAddContent({
+      title,
+      type: contentType as any,
+      room_id: null, // No automatic room assignment
+      metadata: {},
+      url: data.url,
+      text_content: data.text
+    });
+
+    if (contentId) {
+      const searchParams = new URLSearchParams({
+        type: contentType,
+        ...(data.url && { url: data.url }),
+        ...(data.text && { text: data.text })
+      });
+      navigate(`/content/${contentId}?${searchParams.toString()}`);
+      
+      if (data.url) {
+        toast.success("URL content added successfully");
+      } else if (data.text) {
+        toast.success("Text content added successfully");
+      }
+    }
+    
     setIsPasteModalOpen(false);
   };
 
-  const handleAISubmit = (value: string) => {
-    const contentId = onAddContent({
+  const handleAISubmit = async (value: string) => {
+    // Create chat content WITHOUT automatic room assignment
+    const contentId = await onAddContent({
       title: 'Chat with Shattara AI',
       type: 'chat',
-      room_id: null,
+      room_id: null, // No automatic room assignment
       metadata: {},
       text_content: value
     });
 
-    const searchParams = new URLSearchParams({
-      query: value
-    });
-    navigate(`/chat/${contentId}?${searchParams.toString()}`);
-    toast.success("Starting conversation with Shattara AI");
+    if (contentId) {
+      const searchParams = new URLSearchParams({
+        query: value
+      });
+      navigate(`/chat/${contentId}?${searchParams.toString()}`);
+      toast.success("Starting conversation with Shattara AI");
+    }
   };
 
   return (
