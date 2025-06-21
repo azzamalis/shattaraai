@@ -1,7 +1,9 @@
+
 import React from 'react';
-import { Video } from 'lucide-react';
+import { Video, Mic, FileText, Globe, MessageSquare, Music, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PDFThumbnailGenerator } from './PDFThumbnailGenerator';
+
 interface LearningCardThumbnailProps {
   thumbnailUrl?: string;
   title: string;
@@ -25,6 +27,7 @@ const getYouTubeThumbnail = (url: string): string | null => {
   }
   return null;
 };
+
 export function LearningCardThumbnail({
   thumbnailUrl,
   title,
@@ -35,6 +38,11 @@ export function LearningCardThumbnail({
   const isPdf = contentType === 'pdf' || contentType === 'file';
   const isYoutube = contentType === 'youtube';
   const isVideo = contentType === 'video';
+  const isRecording = contentType === 'recording' || contentType === 'live_recording';
+  const isAudioFile = contentType === 'audio_file';
+  const isWebsite = contentType === 'website';
+  const isText = contentType === 'text';
+  const isUpload = contentType === 'upload';
   const hasPdfSource = pdfUrl;
 
   // Generate YouTube thumbnail if it's a YouTube content type
@@ -42,21 +50,89 @@ export function LearningCardThumbnail({
 
   // Determine which thumbnail to use
   const displayThumbnail = thumbnailUrl || youtubeThumbnail;
-  return <div className={cn("relative w-full aspect-video", "rounded-lg overflow-hidden", "border border-border/10")}>
+
+  // Function to render icon thumbnails for content types without images
+  const renderIconThumbnail = () => {
+    if (isRecording) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-500/10 to-pink-600/10">
+          <Mic className="w-16 h-16 text-red-500" />
+        </div>
+      );
+    }
+    
+    if (isAudioFile) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-500/10 to-emerald-600/10">
+          <Music className="w-16 h-16 text-green-500" />
+        </div>
+      );
+    }
+    
+    if (isWebsite) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-cyan-600/10">
+          <Globe className="w-16 h-16 text-blue-500" />
+        </div>
+      );
+    }
+    
+    if (isText) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/10 to-indigo-600/10">
+          <MessageSquare className="w-16 h-16 text-purple-500" />
+        </div>
+      );
+    }
+    
+    if (isUpload) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-500/10 to-amber-600/10">
+          <Upload className="w-16 h-16 text-orange-500" />
+        </div>
+      );
+    }
+    
+    if (isVideo) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-purple-600/10">
+          <Video className="w-16 h-16 text-foreground " />
+        </div>
+      );
+    }
+    
+    // Default fallback
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-muted/20">
+        <span className="text-muted-foreground text-sm">No thumbnail</span>
+      </div>
+    );
+  };
+
+  return (
+    <div className={cn("relative w-full aspect-video", "rounded-lg overflow-hidden", "border border-border/10")}>
       {children}
       
       <div className={cn("w-full h-full", "relative", "flex items-center justify-center", "bg-gradient-to-b from-transparent to-black/5 dark:to-black/20")}>
-        {isPdf && hasPdfSource ? <PDFThumbnailGenerator url={pdfUrl} title={title} className="w-full h-full" /> : displayThumbnail ? <img src={displayThumbnail} alt={title} className="object-cover w-full h-full absolute inset-0" onError={e => {
-        // If maxresdefault fails for YouTube, try hqdefault
-        if (isYoutube && youtubeThumbnail && e.currentTarget.src.includes('maxresdefault')) {
-          const videoId = youtubeThumbnail.split('/')[4];
-          e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-        }
-      }} /> : isVideo ? <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-purple-600/10">
-            <Video className="w-16 h-16 text-foreground " />
-          </div> : <div className="w-full h-full flex items-center justify-center bg-muted/20">
-            <span className="text-muted-foreground text-sm">No thumbnail</span>
-          </div>}
+        {isPdf && hasPdfSource ? (
+          <PDFThumbnailGenerator url={pdfUrl} title={title} className="w-full h-full" />
+        ) : displayThumbnail ? (
+          <img 
+            src={displayThumbnail} 
+            alt={title} 
+            className="object-cover w-full h-full absolute inset-0" 
+            onError={e => {
+              // If maxresdefault fails for YouTube, try hqdefault
+              if (isYoutube && youtubeThumbnail && e.currentTarget.src.includes('maxresdefault')) {
+                const videoId = youtubeThumbnail.split('/')[4];
+                e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+              }
+            }} 
+          />
+        ) : (
+          renderIconThumbnail()
+        )}
       </div>
-    </div>;
+    </div>
+  );
 }
