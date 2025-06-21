@@ -24,6 +24,7 @@ import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { HistoryEmptyState } from './HistoryEmptyState';
 import { Room } from '@/lib/types';
+import { toast } from 'sonner';
 
 export interface HistoryItem {
   id: string;
@@ -132,6 +133,22 @@ export function HistoryTable({
     }
   };
 
+  const handleAddToRoom = async (contentId: string, roomId: string) => {
+    try {
+      if (onAddToRoom) {
+        await onAddToRoom(contentId, roomId);
+        const room = rooms.find(r => r.id === roomId);
+        if (room) {
+          toast.success(`Added to "${room.name}"`);
+        }
+      }
+      setOpenDropdown(null);
+    } catch (error) {
+      console.error('Error adding content to room:', error);
+      toast.error('Failed to add content to room');
+    }
+  };
+
   if (items.length === 0) {
     return (
       <HistoryEmptyState 
@@ -191,31 +208,34 @@ export function HistoryTable({
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger>
-                        Add to Room
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent>
-                        {rooms.map((room) => (
-                          <DropdownMenuItem
-                            key={room.id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onAddToRoom?.(item.id, room.id);
-                              setOpenDropdown(null);
-                            }}
-                          >
-                            {room.name}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
+                  <DropdownMenuContent align="end" className="bg-card border-border">
+                    {rooms.length > 0 && (
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="text-foreground">
+                          Add to Room
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent className="bg-card border-border">
+                          {rooms.map((room) => (
+                            <DropdownMenuItem
+                              key={room.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddToRoom(item.id, room.id);
+                              }}
+                              className="text-foreground hover:bg-accent"
+                            >
+                              {room.name}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    )}
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
                         handleShareClick(item);
                       }}
+                      className="text-foreground hover:bg-accent"
                     >
                       Share
                     </DropdownMenuItem>
@@ -224,6 +244,7 @@ export function HistoryTable({
                         e.stopPropagation();
                         handleDeleteClick(item);
                       }}
+                      className="text-foreground hover:bg-accent"
                     >
                       Delete
                     </DropdownMenuItem>

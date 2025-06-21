@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,7 +33,7 @@ export function History({
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
-  const { content, loading, deleteContent } = useContent();
+  const { content, loading, deleteContent, updateContent } = useContent();
   const { rooms: allRooms } = useRooms();
 
   // Convert content items to history items
@@ -97,11 +98,14 @@ export function History({
 
   const handleAddToRoom = async (contentId: string, roomId: string) => {
     try {
-      // This would need to be implemented with the content update function
-      console.log(`Adding content ${contentId} to room ${roomId}`);
-      toast.success("Content added to room");
+      await updateContent(contentId, { room_id: roomId });
+      const room = allRooms.find(r => r.id === roomId);
+      if (room) {
+        toast.success(`Added to "${room.name}"`);
+      }
     } catch (error) {
-      toast.error("Failed to add content to room");
+      console.error('Error adding content to room:', error);
+      toast.error('Failed to add content to room');
     }
   };
 
