@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { 
@@ -19,7 +18,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger
 } from '@/components/ui/dropdown-menu';
-import { FileText, Video, Youtube, Mic, Globe, MessageSquare, MoreHorizontal, Type } from 'lucide-react';
+import { FileText, Video, Youtube, Mic, Globe, MessageSquare, MoreHorizontal, Type, Music } from 'lucide-react';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { HistoryEmptyState } from './HistoryEmptyState';
@@ -51,9 +50,14 @@ const getContentTypeIcon = (type: string) => {
     case 'video':
       return <Video className="h-4 w-4 text-primary" />;
     case 'pdf':
+    case 'file':
+    case 'upload':
       return <FileText className="h-4 w-4 text-primary" />;
     case 'recording':
+    case 'live_recording':
       return <Mic className="h-4 w-4 text-primary" />;
+    case 'audio_file':
+      return <Music className="h-4 w-4 text-primary" />;
     case 'youtube':
       return <Youtube className="h-4 w-4 text-primary" />;
     case 'website':
@@ -74,8 +78,16 @@ const formatContentType = (type: string): string => {
       return 'Video';
     case 'pdf':
       return 'PDF';
+    case 'file':
+      return 'File';
+    case 'upload':
+      return 'Upload';
     case 'recording':
       return 'Recording';
+    case 'live_recording':
+      return 'Live Recording';
+    case 'audio_file':
+      return 'Audio File';
     case 'youtube':
       return 'YouTube';
     case 'website':

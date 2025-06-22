@@ -15,14 +15,20 @@ interface HistoryFilterProps {
 }
 
 export function HistoryFilter({ typeFilter, onFilterChange }: HistoryFilterProps) {
-  // Define valid filter options with non-empty values
+  // Define all content type filter options
   const filterOptions = [
     { value: 'all', label: 'All Types' },
-    { value: 'file', label: 'File' },
     { value: 'video', label: 'Video' },
-    { value: 'website', label: 'Website' },
+    { value: 'pdf', label: 'PDF' },
+    { value: 'file', label: 'File' },
+    { value: 'upload', label: 'Upload' },
+    { value: 'recording', label: 'Recording' },
+    { value: 'live_recording', label: 'Live Recording' },
+    { value: 'audio_file', label: 'Audio File' },
     { value: 'youtube', label: 'YouTube' },
-    { value: 'recording', label: 'Recording' }
+    { value: 'website', label: 'Website' },
+    { value: 'text', label: 'Text' },
+    { value: 'chat', label: 'Chat' }
   ];
 
   return (
