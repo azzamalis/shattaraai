@@ -73,7 +73,7 @@ export function DashboardDrawer({
   
   const getDrawerWidth = () => {
     if (windowWidth < 640) return 'w-[85vw]';
-    if (windowWidth < 768) return 'w-[300px]';
+    if (windowWidth < 768) return 'w-[250px]';
     return 'w-[300px]';
   };
   
