@@ -82,6 +82,8 @@ const formatContentType = (type: string): string => {
       return 'Website';
     case 'text':
       return 'Text';
+    case 'chat':
+      return 'Chat';
     default:
       return 'File';
   }
