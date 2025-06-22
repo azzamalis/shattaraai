@@ -5,8 +5,8 @@ const AnimatedChatPreview = () => {
   const tasks = ["help me prepare for my exam", "explain this concept to me", "create flashcards from my notes", "generate a study plan", "summarize this content", "quiz me on this topic", "translate this text", "help with my research"];
   return <div className="relative max-w-lg mx-auto">
       {/* Chat Input Container */}
-      <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-2xl">
-        <div className="flex items-center gap-3 bg-muted/80 rounded-xl px-4 py-3 h-12">
+      <div className="bg-card/75 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-2xl">
+        <div className="flex items-center gap-3 bg-muted/90 rounded-xl px-4 py-3 h-12">
           <div className="flex-1 text-foreground/70 text-sm overflow-hidden">
             <span className="whitespace-nowrap">
               Ask Shattara AI to{' '}
