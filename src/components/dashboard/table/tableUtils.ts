@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, Video, Youtube, Mic, MessageSquare } from 'lucide-react';
+import { FileText, Video, Youtube, Mic, MessageSquare, Type } from 'lucide-react';
 import { ContentTag, ContentType } from './types';
 
 export const getContentTypeIcon = (type: ContentType) => {

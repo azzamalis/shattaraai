@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Video, Mic, FileText, Globe, MessageSquare, Music, Upload } from 'lucide-react';
+import { Video, Mic, FileText, Globe, MessageSquare, Music, Upload, Type } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PDFThumbnailGenerator } from './PDFThumbnailGenerator';
 
@@ -81,7 +81,7 @@ export function LearningCardThumbnail({
     if (isText) {
       return (
         <div className="w-full h-full flex items-center justify-center bg-card">
-          <MessageSquare className="w-16 h-16 text-muted-foreground" />
+          <Type className="w-16 h-16 text-muted-foreground" />
         </div>
       );
     }

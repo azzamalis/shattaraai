@@ -18,7 +18,8 @@ import {
   Globe,
   Youtube,
   MessageSquare,
-  Music
+  Music,
+  Type
 } from 'lucide-react';
 import { useContent } from '@/contexts/ContentContext';
 import { Room } from '@/lib/types';
@@ -48,9 +49,11 @@ const getContentTypeIcon = (type: string) => {
     case 'website':
       return <Globe size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     case 'text':
-      return <MessageSquare size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+      return <Type size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     case 'audio_file':
       return <Music size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+    case 'chat':
+      return <MessageSquare size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     default:
       return <FileText size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
   }

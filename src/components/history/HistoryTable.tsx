@@ -19,7 +19,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger
 } from '@/components/ui/dropdown-menu';
-import { FileText, Video, Youtube, Mic, Globe, MessageSquare, MoreHorizontal } from 'lucide-react';
+import { FileText, Video, Youtube, Mic, Globe, MessageSquare, MoreHorizontal, Type } from 'lucide-react';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { HistoryEmptyState } from './HistoryEmptyState';
@@ -59,6 +59,8 @@ const getContentTypeIcon = (type: string) => {
     case 'website':
       return <Globe className="h-4 w-4 text-primary" />;
     case 'text':
+      return <Type className="h-4 w-4 text-primary" />;
+    case 'chat':
       return <MessageSquare className="h-4 w-4 text-primary" />;
     default:
       return <FileText className="h-4 w-4 text-primary" />;
