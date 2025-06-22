@@ -13,7 +13,7 @@ const AnimatedChatPreview = () => {
               <AnimatedTextCycle words={tasks} interval={3000} className="text-foreground font-medium" />
             </span>
           </div>
-          <button className="flex-shrink-0 p-2 text-foreground/70 hover:text-foreground transition-colors rounded-lg hover:bg-muted">
+          <button className="flex-shrink-0 p-2 text-foreground/80 hover:text-foreground transition-colors rounded-lg hover:bg-muted">
             <Send className="w-4 h-4" />
           </button>
         </div>
