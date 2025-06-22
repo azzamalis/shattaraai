@@ -43,6 +43,7 @@ export function LearningCardThumbnail({
   const isWebsite = contentType === 'website';
   const isText = contentType === 'text';
   const isUpload = contentType === 'upload';
+  const isChat = contentType === 'chat';
   const hasPdfSource = pdfUrl;
 
   // Generate YouTube thumbnail if it's a YouTube content type
@@ -55,48 +56,56 @@ export function LearningCardThumbnail({
   const renderIconThumbnail = () => {
     if (isRecording) {
       return (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-500/10 to-pink-600/10">
-          <Mic className="w-16 h-16 text-red-500" />
+        <div className="w-full h-full flex items-center justify-center bg-card">
+          <Mic className="w-16 h-16 text-muted-foreground" />
         </div>
       );
     }
     
     if (isAudioFile) {
       return (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-500/10 to-emerald-600/10">
-          <Music className="w-16 h-16 text-green-500" />
+        <div className="w-full h-full flex items-center justify-center bg-card">
+          <Music className="w-16 h-16 text-muted-foreground" />
         </div>
       );
     }
     
     if (isWebsite) {
       return (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-cyan-600/10">
-          <Globe className="w-16 h-16 text-blue-500" />
+        <div className="w-full h-full flex items-center justify-center bg-card">
+          <Globe className="w-16 h-16 text-muted-foreground" />
         </div>
       );
     }
     
     if (isText) {
       return (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/10 to-indigo-600/10">
-          <MessageSquare className="w-16 h-16 text-purple-500" />
+        <div className="w-full h-full flex items-center justify-center bg-card">
+          <MessageSquare className="w-16 h-16 text-muted-foreground" />
         </div>
       );
     }
     
     if (isUpload) {
       return (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-500/10 to-amber-600/10">
-          <Upload className="w-16 h-16 text-orange-500" />
+        <div className="w-full h-full flex items-center justify-center bg-card">
+          <Upload className="w-16 h-16 text-muted-foreground" />
         </div>
       );
     }
     
     if (isVideo) {
       return (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-purple-600/10">
-          <Video className="w-16 h-16 text-foreground " />
+        <div className="w-full h-full flex items-center justify-center bg-card">
+          <Video className="w-16 h-16 text-muted-foreground" />
+        </div>
+      );
+    }
+    
+    if (isChat) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-card">
+          <MessageSquare className="w-16 h-16 text-muted-foreground" />
         </div>
       );
     }
