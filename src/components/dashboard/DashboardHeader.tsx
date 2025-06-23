@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Room } from '@/lib/types';
 import { useContentContext } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
+
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
   contentData?: ContentData;
@@ -17,6 +18,7 @@ interface DashboardHeaderProps {
   rooms: Room[];
   onAddRoom: () => Promise<string | null>;
 }
+
 export function DashboardHeader({
   onOpenDrawer,
   contentData,
@@ -27,11 +29,29 @@ export function DashboardHeader({
   const [commandOpen, setCommandOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(contentData?.title || '');
+  const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
   const {
     onUpdateContent: updateContentInDB
   } = useContentContext();
   const isContentPage = location.pathname.startsWith('/content/');
+
+  // Handle window resize for responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Initial check
+    handleResize();
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -42,10 +62,12 @@ export function DashboardHeader({
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
+
   const handleTitleEdit = () => {
     setEditedTitle(contentData?.title || '');
     setIsEditing(true);
   };
+
   const handleTitleSave = async () => {
     if (contentData && editedTitle.trim() !== '' && editedTitle.trim() !== contentData.title) {
       try {
@@ -71,10 +93,12 @@ export function DashboardHeader({
     }
     setIsEditing(false);
   };
+
   const handleTitleCancel = () => {
     setEditedTitle(contentData?.title || '');
     setIsEditing(false);
   };
+
   const handleTitleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -84,7 +108,9 @@ export function DashboardHeader({
       handleTitleCancel();
     }
   };
-  return <header className="flex items-center p-4 sticky top-0 z-50 bg-background transition-colors duration-300">
+
+  return (
+    <header className="flex items-center p-4 sticky top-0 z-50 bg-background transition-colors duration-300">
       <div className="flex w-full items-center justify-between">
         {/* Left section */}
         <div className="flex items-center gap-3 min-w-0">
@@ -96,43 +122,98 @@ export function DashboardHeader({
           <Logo className="h-8 w-auto shrink-0" textColor="text-foreground" />
           
           {/* Content Title */}
-          {isContentPage && contentData && <div className="flex items-center gap-2 ml-4 group min-w-0 flex-1">
-              {isEditing ? <input type="text" value={editedTitle} onChange={e => setEditedTitle(e.target.value)} onKeyDown={handleTitleKeyDown} onBlur={handleTitleSave} className={cn("bg-transparent text-sm px-1", "text-foreground placeholder-muted-foreground", "outline-none border-none focus:ring-0", "focus:outline-none focus:border-none", "w-full max-w-[500px]", "truncate")} autoFocus /> : <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <span className={cn("text-muted-foreground text-sm cursor-pointer", "hover:text-foreground truncate", "max-w-[500px]")} onClick={handleTitleEdit} title={contentData.title}>
+          {isContentPage && contentData && (
+            <div className="flex items-center gap-2 ml-4 group min-w-0 flex-1">
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editedTitle}
+                  onChange={e => setEditedTitle(e.target.value)}
+                  onKeyDown={handleTitleKeyDown}
+                  onBlur={handleTitleSave}
+                  className={cn(
+                    "bg-transparent text-sm px-1",
+                    "text-foreground placeholder-muted-foreground",
+                    "outline-none border-none focus:ring-0",
+                    "focus:outline-none focus:border-none",
+                    "w-full max-w-[500px]",
+                    "truncate"
+                  )}
+                  autoFocus
+                />
+              ) : (
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span
+                    className={cn(
+                      "text-muted-foreground text-sm cursor-pointer",
+                      "hover:text-foreground truncate",
+                      "max-w-[500px]"
+                    )}
+                    onClick={handleTitleEdit}
+                    title={contentData.title}
+                  >
                     {contentData.title}
                   </span>
-                  <Button variant="ghost" size="icon" className={cn("opacity-0 group-hover:opacity-100 transition-opacity", "h-6 w-6 rounded-full shrink-0", "text-muted-foreground hover:text-foreground", "hover:bg-accent")} onClick={handleTitleEdit}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                      "opacity-0 group-hover:opacity-100 transition-opacity",
+                      "h-6 w-6 rounded-full shrink-0",
+                      "text-muted-foreground hover:text-foreground",
+                      "hover:bg-accent"
+                    )}
+                    onClick={handleTitleEdit}
+                  >
                     <Pencil className="h-3 w-3" />
                   </Button>
-                </div>}
-            </div>}
+                </div>
+              )}
+            </div>
+          )}
         </div>
         
         {/* Right section */}
         <div className="flex items-center justify-end gap-4">
-          {/* Upgrade button */}
-          <Link to="/pricing">
-            <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-full px-8 py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)]">
-              Upgrade
-            </Button>
-          </Link>
+          {/* Upgrade button - Hidden on mobile */}
+          {!isMobile && (
+            <Link to="/pricing">
+              <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-full px-8 py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)]">
+                Upgrade
+              </Button>
+            </Link>
+          )}
 
           {/* Command button */}
           <Dialog open={commandOpen} onOpenChange={setCommandOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="inline-flex h-9 w-fit rounded-lg border border-input bg-background/50 px-3 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                <span className="flex grow items-center">
-                  <Search className="-ms-1 me-3 h-4 w-4" aria-hidden="true" />
-                  <span className="font-normal">Search</span>
-                </span>
-                <kbd className="-me-1 ms-12 inline-flex h-5 max-h-full items-center rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-foreground ">
-                  ⌘K
-                </kbd>
-              </Button>
+              {isMobile ? (
+                // Mobile: Search icon only
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  className="h-9 w-9 rounded-lg border border-input bg-background/50 text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <Search className="h-4 w-4" aria-hidden="true" />
+                  <span className="sr-only">Search</span>
+                </Button>
+              ) : (
+                // Desktop: Full search button with ⌘K
+                <Button variant="outline" className="inline-flex h-9 w-fit rounded-lg border border-input bg-background/50 px-3 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <span className="flex grow items-center">
+                    <Search className="-ms-1 me-3 h-4 w-4" aria-hidden="true" />
+                    <span className="font-normal">Search</span>
+                  </span>
+                  <kbd className="-me-1 ms-12 inline-flex h-5 max-h-full items-center rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-foreground ">
+                    ⌘K
+                  </kbd>
+                </Button>
+              )}
             </DialogTrigger>
             <CommandModal open={commandOpen} onOpenChange={setCommandOpen} rooms={rooms} onAddRoom={onAddRoom} />
           </Dialog>
         </div>
       </div>
-    </header>;
+    </header>
+  );
 }
