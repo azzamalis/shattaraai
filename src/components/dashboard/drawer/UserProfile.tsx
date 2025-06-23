@@ -56,19 +56,19 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       </PopoverTrigger>
       
       <PopoverContent 
-        className="w-[200px] bg-popover p-1 mb-1 shadow-md z-[100] pointer-events-auto" 
+        className="w-[280px] bg-popover p-1 mb-1 shadow-md z-[100] pointer-events-auto" 
         align="end" 
         side="top" 
         sideOffset={5}
       >
-        <div className="p-3 border-b border-border pointer-events-auto">
+        <div className="p-4 border-b border-border pointer-events-auto">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-primary">
               <AvatarFallback className="bg-primary text-primary-foreground">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm text-foreground">{userEmail}</span>
+            <span className="text-sm text-foreground truncate">{userEmail}</span>
           </div>
         </div>
         
