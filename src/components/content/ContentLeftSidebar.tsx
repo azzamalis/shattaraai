@@ -55,14 +55,16 @@ export function ContentLeftSidebar({
         </div>;
     }
 
-    // Live recording interface - show recording controls
+    // Live recording interface - show recording controls with microphone selector below
     if (contentData.type === 'live_recording') {
       return <>
           <div className="p-4 pb-2 shrink-0 bg-dashboard-card dark:bg-dashboard-card">
-            <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
+            <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
           </div>
           <div className="px-4 pb-4 shrink-0 bg-dashboard-card dark:bg-dashboard-card">
-            <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
+            <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
+              <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
+            </div>
           </div>
         </>;
     }
@@ -71,10 +73,12 @@ export function ContentLeftSidebar({
     if (contentData.type === 'recording' && recordingStateInfo?.isNewRecording) {
       return <>
           <div className="p-4 pb-2 shrink-0 bg-dashboard-card dark:bg-dashboard-card">
-            <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
+            <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
           </div>
           <div className="px-4 pb-4 shrink-0 bg-dashboard-card dark:bg-dashboard-card">
-            <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
+            <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
+              <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
+            </div>
           </div>
         </>;
     }

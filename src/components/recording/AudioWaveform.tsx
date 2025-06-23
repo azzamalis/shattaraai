@@ -12,7 +12,7 @@ export function AudioWaveform({ isActive }: AudioWaveformProps) {
   // Generate initial random heights and update when active state changes
   useEffect(() => {
     const generateHeights = () => {
-      return Array.from({ length: 50 }, () => Math.random() * 20 + 5);
+      return Array.from({ length: 60 }, () => Math.random() * 24 + 4);
     };
 
     setBarHeights(generateHeights());
@@ -31,13 +31,14 @@ export function AudioWaveform({ isActive }: AudioWaveformProps) {
   }, [isActive]);
   
   return (
-    <div className={`waveform-container ${isActive ? 'active' : ''}`}>
+    <div className={`waveform-container w-full h-8 flex items-center justify-center gap-[1px] ${isActive ? 'active' : ''}`}>
       {barHeights.map((height, index) => (
         <div 
           key={index}
-          className="waveform-bar"
+          className="waveform-bar bg-dashboard-text-secondary/30 dark:bg-dashboard-text-secondary/30 rounded-full transition-all duration-200"
           style={{
-            height: `${height}px`,
+            height: `${Math.min(height, 28)}px`,
+            width: '2px',
             animationDelay: `${index * 0.05}s`
           }}
         />

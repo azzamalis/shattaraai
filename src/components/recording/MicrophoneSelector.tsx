@@ -22,21 +22,21 @@ export function MicrophoneSelector({ selected, onSelect, onClear }: MicrophoneSe
       <select
         value={selected}
         onChange={e => onSelect(e.target.value)}
-        className="bg-transparent text-dashboard-text/70 dark:text-white text-sm px-0 py-0 focus:outline-none focus:ring-0 border-none w-auto"
+        className="bg-transparent text-dashboard-text-secondary/80 dark:text-dashboard-text-secondary/80 text-xs px-0 py-1 focus:outline-none focus:ring-0 border-none w-auto min-w-0 flex-1 truncate"
         style={{ boxShadow: 'none', appearance: 'none' }}
       >
         {microphones.map(mic => (
-          <option key={mic} value={mic} className="bg-dashboard-card dark:bg-black text-dashboard-text dark:text-white">
+          <option key={mic} value={mic} className="bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text text-xs">
             {mic}
           </option>
         ))}
       </select>
       {selected && onClear && (
         <button
-          className="text-dashboard-text-secondary/70 dark:text-white/70 hover:text-dashboard-text dark:hover:text-white p-1 rounded-full hover:bg-dashboard-card-hover/50 dark:hover:bg-white/10 transition-colors"
+          className="text-dashboard-text-secondary/50 dark:text-dashboard-text-secondary/50 hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary p-1 rounded-full hover:bg-dashboard-card-hover/30 dark:hover:bg-white/5 transition-colors shrink-0"
           onClick={onClear}
         >
-          <X className="h-4 w-4" />
+          <X className="h-3 w-3" />
         </button>
       )}
     </div>
