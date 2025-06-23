@@ -14,11 +14,13 @@ import { SubscriptionPlanCard } from "@/components/dashboard/SubscriptionPlanCar
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Database } from "@/integrations/supabase/types";
+
 interface NotificationSettings {
   aiReplies: boolean;
   notesGenerated: boolean;
   quizReady: boolean;
 }
+
 export default function Profile() {
   const {
     user,
@@ -150,7 +152,7 @@ export default function Profile() {
   return <DashboardLayout>
       <div className="h-full bg-background text-foreground">
         <div className="max-w-7xl mx-auto p-6 space-y-6">
-          <Card className="card-enhanced w-full mb-6">
+          <Card className="card-enhanced w-full mb-6 border-0">
             <CardContent className="p-6">
               <div className="flex flex-wrap justify-between items-start gap-6">
                 <div>
@@ -184,7 +186,7 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          <Card className="card-enhanced">
+          <Card className="card-enhanced border-0">
             <CardHeader>
               <CardTitle className="text-foreground">Preferences</CardTitle>
             </CardHeader>
@@ -271,7 +273,7 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          <Card className="card-enhanced">
+          <Card className="card-enhanced border-0">
             <CardHeader>
               <CardTitle className="text-foreground">Notification Settings</CardTitle>
             </CardHeader>
@@ -302,7 +304,9 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          <SubscriptionPlanCard />
+          <div className="border-0">
+            <SubscriptionPlanCard />
+          </div>
 
           <div className="flex justify-end gap-4 pt-2">
             <Button variant="outline" className="bg-destructive text-white hover:bg-destructive/90 hover:text-white border-destructive" onClick={handleDeleteAccount}>

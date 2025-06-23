@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -87,7 +86,7 @@ export function SubscriptionPlanCard() {
 
   if (subscription.planType === 'pro') {
     return (
-      <Card className="card-enhanced">
+      <Card className="card-enhanced border-0">
         <CardHeader>
           <CardTitle className="text-foreground flex items-center gap-2">
             <Crown className="h-5 w-5 text-yellow-500" />
@@ -130,7 +129,7 @@ export function SubscriptionPlanCard() {
   }
 
   return (
-    <Card className="card-enhanced">
+    <Card className="card-enhanced border-0">
       <CardHeader>
         <CardTitle className="text-foreground flex items-center justify-between">
           <div className="flex items-center gap-2">
