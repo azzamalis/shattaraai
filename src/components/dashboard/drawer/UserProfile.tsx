@@ -56,7 +56,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       </PopoverTrigger>
       
       <PopoverContent 
-        className="w-[280px] bg-popover p-1 mb-1 shadow-md z-[100] pointer-events-auto" 
+        className="w-[240px] bg-popover p-1 mb-1 shadow-md z-[100] pointer-events-auto" 
         align="end" 
         side="top" 
         sideOffset={5}
