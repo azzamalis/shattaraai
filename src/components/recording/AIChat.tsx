@@ -52,7 +52,7 @@ const AIChat = () => {
           <div className={chatMessageStyles.container}>
             {messages.length === 0 ? <div className="h-full flex flex-col items-center justify-center min-h-[400px] text-center px-4">
                 <div className="mb-6">
-                  <MessageSquare className="h-8 w-8 text-dashboard-text-secondary/50 dark:text-[#878787]" />
+                  
                 </div>
                 <h3 className="font-semibold text-dashboard-text dark:text-white mb-3 text-lg">
                   Learn with Shattara AI
