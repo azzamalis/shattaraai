@@ -58,7 +58,7 @@ export function LearningCardThumbnail({
     }
     if (isAudioFile) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Music className="w-16 h-16 text-muted-foreground" />
+          <Music className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isWebsite) {
