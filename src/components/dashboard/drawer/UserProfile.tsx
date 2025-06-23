@@ -56,52 +56,52 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       </PopoverTrigger>
       
       <PopoverContent 
-        className="w-[250px] bg-dashboard-card dark:bg-dashboard-card border border-dashboard-separator dark:border-dashboard-separator text-dashboard-text dark:text-dashboard-text p-0 mb-1 shadow-lg z-[100] pointer-events-auto" 
+        className="w-[200px] bg-popover p-1 mb-1 shadow-md z-[100] pointer-events-auto" 
         align="end" 
         side="top" 
         sideOffset={5}
       >
-        <div className="p-4 border-b border-dashboard-separator dark:border-dashboard-separator pointer-events-auto">
+        <div className="p-3 border-b border-border pointer-events-auto">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-primary">
               <AvatarFallback className="bg-primary text-primary-foreground">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm text-dashboard-text dark:text-dashboard-text">{userEmail}</span>
+            <span className="text-sm text-foreground">{userEmail}</span>
           </div>
         </div>
         
-        <div className="py-2 pointer-events-auto">
+        <div className="flex flex-col pointer-events-auto">
           <Button 
             variant="ghost" 
-            className="w-full justify-start px-4 py-2.5 text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text" 
+            className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" 
             onClick={() => {
               navigate('/profile');
               onOpenChange(false);
             }}
           >
-            <Settings size={16} className="mr-3 text-dashboard-text-secondary dark:text-dashboard-text-secondary" />
+            <Settings size={16} className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </Button>
           
           <Button 
             variant="ghost" 
-            className="w-full justify-start px-4 py-2.5 text-dashboard-text dark:text-dashboard-text hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover hover:text-dashboard-text dark:hover:text-dashboard-text" 
+            className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" 
             asChild
           >
             <Link to="/pricing">
-              <Tag size={16} className="mr-3 text-dashboard-text-secondary dark:text-dashboard-text-secondary" />
+              <Tag size={16} className="mr-2 h-4 w-4" />
               <span>Pricing</span>
             </Link>
           </Button>
           
           <Button 
             variant="ghost" 
-            className="w-full justify-start px-4 py-2.5 text-red-500 hover:text-red-500 hover:bg-red-500/10" 
+            className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" 
             onClick={handleLogout}
           >
-            <LogOut size={16} className="mr-3" />
+            <LogOut size={16} className="mr-2 h-4 w-4" />
             <span>Log Out</span>
           </Button>
         </div>
