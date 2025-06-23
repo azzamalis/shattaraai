@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,18 +14,23 @@ import { SubscriptionPlanCard } from "@/components/dashboard/SubscriptionPlanCar
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Database } from "@/integrations/supabase/types";
-
 interface NotificationSettings {
   aiReplies: boolean;
   notesGenerated: boolean;
   quizReady: boolean;
 }
-
 export default function Profile() {
-  const { user, profile, updateProfile, loading } = useAuth();
-  const { t } = useLanguage();
+  const {
+    user,
+    profile,
+    updateProfile,
+    loading
+  } = useAuth();
+  const {
+    t
+  } = useLanguage();
   const [isSaving, setIsSaving] = useState(false);
-  
+
   // Local state for form data
   const [formData, setFormData] = useState({
     language: '',
@@ -34,7 +38,6 @@ export default function Profile() {
     goal: '',
     source: ''
   });
-  
   const [notifications, setNotifications] = useState<NotificationSettings>({
     aiReplies: true,
     notesGenerated: true,
@@ -60,7 +63,6 @@ export default function Profile() {
       });
     }
   }, [profile]);
-
   const handleSaveChanges = async () => {
     if (!user || !profile) {
       toast.error("Authentication required", {
@@ -68,9 +70,7 @@ export default function Profile() {
       });
       return;
     }
-
     setIsSaving(true);
-    
     try {
       // Map form values to database enum values
       const purposeMap: Record<string, Database['public']['Enums']['user_purpose']> = {
@@ -79,7 +79,6 @@ export default function Profile() {
         'work': 'professional',
         'research': 'researcher'
       };
-
       const goalMap: Record<string, Database['public']['Enums']['user_goal']> = {
         'exam-prep': 'exam_prep',
         'research': 'data_analysis',
@@ -91,7 +90,6 @@ export default function Profile() {
         'learning': 'skill_building',
         'innovation': 'collaboration'
       };
-
       const sourceMap: Record<string, Database['public']['Enums']['user_source']> = {
         'search': 'search_engine',
         'instagram': 'social_media',
@@ -101,16 +99,15 @@ export default function Profile() {
         'online-ad': 'advertisement',
         'friends-family': 'referral'
       };
-
       const updates: Partial<Database['public']['Tables']['profiles']['Update']> = {
         language: formData.language,
         purpose: formData.purpose ? purposeMap[formData.purpose] : null,
         goal: formData.goal ? goalMap[formData.goal] : null,
         source: formData.source ? sourceMap[formData.source] : null
       };
-
-      const { error } = await updateProfile(updates);
-      
+      const {
+        error
+      } = await updateProfile(updates);
       if (error) {
         toast.error("Failed to save changes", {
           description: error.message
@@ -128,38 +125,29 @@ export default function Profile() {
       setIsSaving(false);
     }
   };
-
   const handleDeleteAccount = () => {
     toast.error("Are you sure?", {
-      description: "This action cannot be undone. This will permanently delete your account.",
+      description: "This action cannot be undone. This will permanently delete your account."
     });
   };
-
   if (loading) {
-    return (
-      <DashboardLayout>
+    return <DashboardLayout>
         <div className="h-full bg-background text-foreground flex items-center justify-center">
           <div className="text-white">Loading profile...</div>
         </div>
-      </DashboardLayout>
-    );
+      </DashboardLayout>;
   }
-
   if (!user || !profile) {
-    return (
-      <DashboardLayout>
+    return <DashboardLayout>
         <div className="h-full bg-background text-foreground flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-xl font-bold text-foreground mb-2">Profile not found</h2>
             <p className="text-muted-foreground">Please sign in to view your profile.</p>
           </div>
         </div>
-      </DashboardLayout>
-    );
+      </DashboardLayout>;
   }
-
-  return (
-    <DashboardLayout>
+  return <DashboardLayout>
       <div className="h-full bg-background text-foreground">
         <div className="max-w-7xl mx-auto p-6 space-y-6">
           <Card className="card-enhanced w-full mb-6">
@@ -190,13 +178,7 @@ export default function Profile() {
                     <p className="text-2xl font-bold text-foreground">{mockStats.flashcards}</p>
                     <p className="text-sm text-muted-foreground">Flashcards</p>
                   </div>
-                  <div className="min-w-[200px]">
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">Goal Progress</span>
-                      <span className="text-sm font-bold text-foreground">{mockStats.progressPercent}%</span>
-                    </div>
-                    <Progress value={mockStats.progressPercent} className="h-2" />
-                  </div>
+                  
                 </div>
               </div>
             </CardContent>
@@ -212,25 +194,17 @@ export default function Profile() {
                   <label className="block text-sm text-muted-foreground mb-2">
                     Language
                   </label>
-                  <Select
-                    value={formData.language}
-                    onValueChange={(value) => 
-                      setFormData(prev => ({ ...prev, language: value }))
-                    }
-                  >
+                  <Select value={formData.language} onValueChange={value => setFormData(prev => ({
+                  ...prev,
+                  language: value
+                }))}>
                     <SelectTrigger className="w-full component-base">
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border">
-                      {languages.map((lang) => (
-                        <SelectItem 
-                          key={lang.value} 
-                          value={lang.value}
-                          className="text-foreground hover:bg-accent"
-                        >
+                      {languages.map(lang => <SelectItem key={lang.value} value={lang.value} className="text-foreground hover:bg-accent">
                           {lang.label}
-                        </SelectItem>
-                      ))}
+                        </SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -238,12 +212,11 @@ export default function Profile() {
                   <label className="block text-sm text-muted-foreground mb-2">
                     How do you want to use Shattara?
                   </label>
-                  <Select
-                    value={formData.purpose}
-                    onValueChange={(value) => 
-                      setFormData(prev => ({ ...prev, purpose: value, goal: '' }))
-                    }
-                  >
+                  <Select value={formData.purpose} onValueChange={value => setFormData(prev => ({
+                  ...prev,
+                  purpose: value,
+                  goal: ''
+                }))}>
                     <SelectTrigger className="w-full component-base">
                       <SelectValue placeholder="I'm here for" />
                     </SelectTrigger>
@@ -262,25 +235,17 @@ export default function Profile() {
                   <label className="block text-sm text-muted-foreground mb-2">
                     What's your main personal goal with Shattara?
                   </label>
-                  <Select
-                    value={formData.goal}
-                    onValueChange={(value) => 
-                      setFormData(prev => ({ ...prev, goal: value }))
-                    }
-                  >
+                  <Select value={formData.goal} onValueChange={value => setFormData(prev => ({
+                  ...prev,
+                  goal: value
+                }))}>
                     <SelectTrigger className="w-full component-base">
                       <SelectValue placeholder="Select your goals" />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border">
-                      {getGoalOptions(formData.purpose).map((option) => (
-                        <SelectItem 
-                          key={option.value} 
-                          value={option.value}
-                          className="text-foreground hover:bg-accent"
-                        >
+                      {getGoalOptions(formData.purpose).map(option => <SelectItem key={option.value} value={option.value} className="text-foreground hover:bg-accent">
                           {t(option.labelKey)}
-                        </SelectItem>
-                      ))}
+                        </SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -288,25 +253,17 @@ export default function Profile() {
                   <label className="block text-sm text-muted-foreground mb-2">
                     How did you hear about us?
                   </label>
-                  <Select
-                    value={formData.source}
-                    onValueChange={(value) => 
-                      setFormData(prev => ({ ...prev, source: value }))
-                    }
-                  >
+                  <Select value={formData.source} onValueChange={value => setFormData(prev => ({
+                  ...prev,
+                  source: value
+                }))}>
                     <SelectTrigger className="w-full component-base">
                       <SelectValue placeholder="I found Shattara from" />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border">
-                      {sourceOptions.map((option) => (
-                        <SelectItem 
-                          key={option.value} 
-                          value={option.value}
-                          className="text-foreground hover:bg-accent"
-                        >
+                      {sourceOptions.map(option => <SelectItem key={option.value} value={option.value} className="text-foreground hover:bg-accent">
                           {t(option.labelKey)}
-                        </SelectItem>
-                      ))}
+                        </SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -322,33 +279,24 @@ export default function Profile() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex items-center justify-between">
                   <label className="text-sm text-muted-foreground">AI Replies</label>
-                  <Switch
-                    checked={notifications.aiReplies}
-                    onCheckedChange={(checked) =>
-                      setNotifications(prev => ({ ...prev, aiReplies: checked }))
-                    }
-                    className="data-[state=checked]:bg-primary"
-                  />
+                  <Switch checked={notifications.aiReplies} onCheckedChange={checked => setNotifications(prev => ({
+                  ...prev,
+                  aiReplies: checked
+                }))} className="data-[state=checked]:bg-primary" />
                 </div>
                 <div className="flex items-center justify-between">
                   <label className="text-sm text-muted-foreground">Notes Generated</label>
-                  <Switch
-                    checked={notifications.notesGenerated}
-                    onCheckedChange={(checked) =>
-                      setNotifications(prev => ({ ...prev, notesGenerated: checked }))
-                    }
-                    className="data-[state=checked]:bg-primary"
-                  />
+                  <Switch checked={notifications.notesGenerated} onCheckedChange={checked => setNotifications(prev => ({
+                  ...prev,
+                  notesGenerated: checked
+                }))} className="data-[state=checked]:bg-primary" />
                 </div>
                 <div className="flex items-center justify-between">
                   <label className="text-sm text-muted-foreground">Quiz Ready</label>
-                  <Switch
-                    checked={notifications.quizReady}
-                    onCheckedChange={(checked) =>
-                      setNotifications(prev => ({ ...prev, quizReady: checked }))
-                    }
-                    className="data-[state=checked]:bg-primary"
-                  />
+                  <Switch checked={notifications.quizReady} onCheckedChange={checked => setNotifications(prev => ({
+                  ...prev,
+                  quizReady: checked
+                }))} className="data-[state=checked]:bg-primary" />
                 </div>
               </div>
             </CardContent>
@@ -357,23 +305,14 @@ export default function Profile() {
           <SubscriptionPlanCard />
 
           <div className="flex justify-end gap-4 pt-2">
-            <Button
-              variant="outline"
-              className="bg-destructive text-white hover:bg-destructive/90 hover:text-white border-destructive"
-              onClick={handleDeleteAccount}
-            >
+            <Button variant="outline" className="bg-destructive text-white hover:bg-destructive/90 hover:text-white border-destructive" onClick={handleDeleteAccount}>
               Delete My Account
             </Button>
-            <Button
-              onClick={handleSaveChanges}
-              disabled={isSaving}
-              className="bg-foreground text-background hover:bg-foreground/90"
-            >
+            <Button onClick={handleSaveChanges} disabled={isSaving} className="bg-foreground text-background hover:bg-foreground/90">
               {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </div>
       </div>
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 }
