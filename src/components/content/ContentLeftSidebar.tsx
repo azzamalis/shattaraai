@@ -9,7 +9,6 @@ import { AudioPlayer } from '@/components/content/AudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
 import { cn } from '@/lib/utils';
-
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -24,7 +23,6 @@ interface ContentLeftSidebarProps {
   isRecordingLoading?: boolean;
   onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
 }
-
 export function ContentLeftSidebar({
   contentData,
   onUpdateContent,
@@ -43,7 +41,6 @@ export function ContentLeftSidebar({
 
   // Check if we should hide tabs (for PDF content)
   const shouldHideTabs = contentData.type === 'pdf';
-  
   const renderControls = () => {
     // Show loading state while detecting recording state
     if (contentData.type === 'recording' && isRecordingLoading) {
@@ -98,18 +95,13 @@ export function ContentLeftSidebar({
         <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} onTextAction={onTextAction} />
       </div>;
   };
-  
   const renderTabContent = () => {
-    const hasContent = contentData.type === 'live_recording' ? isRecording : 
-                      recordingStateInfo?.isNewRecording ? isRecording : 
-                      recordingStateInfo?.isExistingRecording ? true : 
-                      !!contentData.url || !!contentData.text;
-    
+    const hasContent = contentData.type === 'live_recording' ? isRecording : recordingStateInfo?.isNewRecording ? isRecording : recordingStateInfo?.isExistingRecording ? true : !!contentData.url || !!contentData.text;
     return <>
         <TabsContent value="chapters" className="absolute inset-0">
           <ScrollArea className="h-full">
             {hasContent ? <div className="p-4 space-y-4">
-                {(contentData.type === 'live_recording' || (recordingStateInfo?.isNewRecording && isRecording)) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {(contentData.type === 'live_recording' || recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Recording in progress...
                   </div>}
                 {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="space-y-3">
@@ -133,9 +125,9 @@ export function ContentLeftSidebar({
                     Processing content...
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                <ClipboardList className="h-8 w-8 mb-4 text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40" />
+                
                 <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-base">
-                  {(contentData.type === 'recording' || contentData.type === 'live_recording') ? 'Start recording to view chapters' : 'Add content to view chapters'}
+                  {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view chapters' : 'Add content to view chapters'}
                 </p>
               </div>}
           </ScrollArea>
@@ -144,7 +136,7 @@ export function ContentLeftSidebar({
         <TabsContent value="transcripts" className="absolute inset-0">
           <ScrollArea className="h-full">
             {hasContent ? <div className="p-4 space-y-4">
-                {(contentData.type === 'live_recording' || (recordingStateInfo?.isNewRecording && isRecording)) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {(contentData.type === 'live_recording' || recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Transcribing in progress...
                   </div>}
                 {recordingStateInfo?.isExistingRecording && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
@@ -159,9 +151,9 @@ export function ContentLeftSidebar({
                     Extracting text...
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                <FileText className="h-8 w-8 mb-4 text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40" />
+                
                 <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-base">
-                  {(contentData.type === 'recording' || contentData.type === 'live_recording') ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
+                  {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
                 </p>
               </div>}
           </ScrollArea>
