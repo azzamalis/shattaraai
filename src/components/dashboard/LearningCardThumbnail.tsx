@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Video, Mic, FileText, Globe, MessageSquare, Music, Upload, Type } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -63,27 +64,27 @@ export function LearningCardThumbnail({
     }
     if (isWebsite) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Globe className="w-16 h-16 text-muted-foreground" />
+          <Globe className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isText) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Type className="w-16 h-16 text-muted-foreground" />
+          <Type className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isUpload) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Upload className="w-16 h-16 text-muted-foreground" />
+          <Upload className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isVideo) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Video className="w-16 h-16 text-muted-foreground" />
+          <Video className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isChat) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <MessageSquare className="w-16 h-16 text-muted-foreground" />
+          <MessageSquare className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
 
