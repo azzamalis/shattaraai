@@ -28,10 +28,10 @@ export function DeleteModal({
       open={open}
       onOpenChange={onOpenChange}
       title=""
-      className="sm:max-w-md"
+      className="sm:max-w-lg"
       showCloseButton={false}
     >
-      <div className="space-y-6 py-2">
+      <div className="space-y-4 py-1">
         {/* Header with close button */}
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-foreground">
