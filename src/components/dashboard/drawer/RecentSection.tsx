@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useContent } from '@/contexts/ContentContext';
@@ -15,7 +14,7 @@ import {
   MoreHorizontal,
   Share,
   Trash2,
-  Edit
+  Pencil
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { EditContentModal } from '@/components/dashboard/modals/edit-content-modal';
 
 // Helper function to get content type icon
 const getContentTypeIcon = (type: string) => {
@@ -57,6 +57,8 @@ const getContentTypeIcon = (type: string) => {
 export const RecentSection: React.FC = () => {
   const { recentContent } = useContent();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingContent, setEditingContent] = useState<any>(null);
 
   if (!recentContent || recentContent.length === 0) {
     return (
@@ -66,9 +68,9 @@ export const RecentSection: React.FC = () => {
     );
   }
 
-  const handleEdit = (contentId: string) => {
-    // Handle edit functionality - you can implement this based on your needs
-    console.log('Edit content:', contentId);
+  const handleEdit = (content: any) => {
+    setEditingContent(content);
+    setEditModalOpen(true);
     setOpenDropdown(null);
   };
 
@@ -85,75 +87,83 @@ export const RecentSection: React.FC = () => {
   };
 
   return (
-    <div className="space-y-1">
-      {recentContent.slice(0, 5).map((content) => (
-        <div key={content.id} className="flex items-center justify-between gap-2 group">
-          <Link
-            to={`/content/${content.id}?type=${content.type}`}
-            className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-accent transition-colors duration-200 flex-1 min-w-0"
-          >
-            {getContentTypeIcon(content.type)}
-            <span className="text-sm text-foreground truncate">
-              {content.title}
-            </span>
-          </Link>
-          
-          <DropdownMenu 
-            open={openDropdown === content.id} 
-            onOpenChange={(open) => setOpenDropdown(open ? content.id : null)}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[200px] p-1">
-              <DropdownMenuItem 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEdit(content.id);
-                }}
-                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleShare(content.id);
-                }}
-                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
-              >
-                <Share className="mr-2 h-4 w-4" />
-                Share
-              </DropdownMenuItem>
-              
-              <Separator className="my-1" />
-              
-              <DropdownMenuItem 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(content.id);
-                }}
-                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="space-y-1">
+        {recentContent.slice(0, 5).map((content) => (
+          <div key={content.id} className="flex items-center justify-between gap-2 group">
+            <Link
+              to={`/content/${content.id}?type=${content.type}`}
+              className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-accent transition-colors duration-200 flex-1 min-w-0"
+            >
+              {getContentTypeIcon(content.type)}
+              <span className="text-sm text-foreground truncate">
+                {content.title}
+              </span>
+            </Link>
+            
+            <DropdownMenu 
+              open={openDropdown === content.id} 
+              onOpenChange={(open) => setOpenDropdown(open ? content.id : null)}
+            >
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px] p-1">
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(content);
+                  }}
+                  className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleShare(content.id);
+                  }}
+                  className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+                >
+                  <Share className="mr-2 h-4 w-4" />
+                  Share
+                </DropdownMenuItem>
+                
+                <Separator className="my-1" />
+                
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(content.id);
+                  }}
+                  className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ))}
+      </div>
+
+      <EditContentModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        contentItem={editingContent}
+      />
+    </>
   );
 };
