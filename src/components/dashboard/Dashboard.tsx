@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardSections } from './DashboardSections';
@@ -31,7 +32,7 @@ export function Dashboard({
     setItemToShare({
       id: contentId,
       title: contentTitle,
-      type: 'content', // Default type, will be updated when we have more context
+      type: 'text', // Use a valid ContentType instead of 'content'
       user_id: '',
       room_id: null,
       metadata: {},
@@ -53,12 +54,21 @@ export function Dashboard({
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader onMenuClick={() => setDrawerOpen(true)} />
+      <DashboardHeader 
+        onOpenDrawer={() => setDrawerOpen(true)}
+        rooms={rooms}
+        onAddRoom={onAddRoom}
+      />
       
       <DashboardSections 
-        onPasteClick={() => setIsPasteModalOpen(true)}
-        onShareClick={handleShareClick}
-        onDeleteClick={handleDeleteClick}
+        rooms={rooms}
+        onAddRoom={onAddRoom}
+        onEditRoom={onEditRoom}
+        onDeleteRoom={onDeleteRoom}
+        onCardDelete={handleDeleteClick}
+        onCardShare={handleShareClick}
+        onExploreCardDelete={handleDeleteClick}
+        onExploreCardShare={handleShareClick}
       />
       
       <DashboardDrawer 
