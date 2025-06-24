@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Room } from '@/hooks/useRooms';
-import { MoreHorizontal, Check, X, Pencil, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Check, X, Pencil, Trash2, Cube } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,7 +87,10 @@ export const RoomItem: React.FC<RoomItemProps> = ({
             className="flex-1 justify-start text-left h-8 px-2"
             onClick={(e) => onRoomClick(e, room.id)}
           >
-            <span className="truncate">{room.name}</span>
+            <div className="flex items-center gap-2">
+              <Cube className="h-4 w-4 text-primary/60" />
+              <span className="truncate">{room.name}</span>
+            </div>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
