@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,8 @@ interface DashboardDrawerProps {
   onAddRoom: () => Promise<string | null>;
   onEditRoom: (id: string, newName: string) => Promise<void>;
   onDeleteRoom: (id: string) => Promise<void>;
+  onShareClick?: (contentId: string, contentTitle: string) => void;
+  onDeleteClick?: (contentId: string, contentTitle: string) => void;
 }
 
 export function DashboardDrawer({
@@ -31,7 +32,9 @@ export function DashboardDrawer({
   rooms,
   onAddRoom,
   onEditRoom,
-  onDeleteRoom
+  onDeleteRoom,
+  onShareClick,
+  onDeleteClick
 }: DashboardDrawerProps) {
   const navigate = useNavigate();
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
@@ -131,7 +134,11 @@ export function DashboardDrawer({
               
               {/* History Section */}
               <div className="w-full">
-                <HistorySection rooms={rooms} />
+                <HistorySection 
+                  rooms={rooms} 
+                  onShareClick={onShareClick}
+                  onDeleteClick={onDeleteClick}
+                />
               </div>
               
               {/* Rooms Section */}
