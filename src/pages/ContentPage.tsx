@@ -238,7 +238,7 @@ export default function ContentPage() {
               defaultSize={50} 
               minSize={25} 
               maxSize={60}
-              className="bg-card rounded-lg border border-border"
+              className="bg-card rounded-lg"
             >
               <ContentLeftSidebar 
                 contentData={contentData}
@@ -266,7 +266,7 @@ export default function ContentPage() {
             <ResizablePanel 
               defaultSize={50} 
               minSize={40}
-              className="bg-card rounded-lg border border-border"
+              className="bg-card rounded-lg"
             >
               <ContentRightSidebar contentData={contentData} />
             </ResizablePanel>
