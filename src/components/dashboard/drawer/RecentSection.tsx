@@ -57,7 +57,15 @@ const getContentTypeIcon = (type: string) => {
   }
 };
 
-export const RecentSection: React.FC = () => {
+interface RecentSectionProps {
+  onShareClick?: (contentId: string, contentTitle: string) => void;
+  onDeleteClick?: (contentId: string, contentTitle: string) => void;
+}
+
+export const RecentSection: React.FC<RecentSectionProps> = ({ 
+  onShareClick, 
+  onDeleteClick 
+}) => {
   const { recentContent, updateContent } = useContent();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [editingContentId, setEditingContentId] = useState<string | null>(null);
@@ -98,15 +106,21 @@ export const RecentSection: React.FC = () => {
     setEditedContentTitle('');
   };
 
-  const handleShare = (contentId: string) => {
-    // Handle share functionality - you can implement this based on your needs
-    console.log('Share content:', contentId);
+  const handleShare = (e: React.MouseEvent, contentId: string, contentTitle: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onShareClick) {
+      onShareClick(contentId, contentTitle);
+    }
     setOpenDropdown(null);
   };
 
-  const handleDelete = (contentId: string) => {
-    // Handle delete functionality - you can implement this based on your needs
-    console.log('Delete content:', contentId);
+  const handleDelete = (e: React.MouseEvent, contentId: string, contentTitle: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onDeleteClick) {
+      onDeleteClick(contentId, contentTitle);
+    }
     setOpenDropdown(null);
   };
 
@@ -197,10 +211,7 @@ export const RecentSection: React.FC = () => {
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleShare(content.id);
-                    }}
+                    onClick={(e) => handleShare(e, content.id, content.title)}
                     className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
                   >
                     <Share className="mr-2 h-4 w-4" />
@@ -210,10 +221,7 @@ export const RecentSection: React.FC = () => {
                   <Separator className="my-1" />
                   
                   <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(content.id);
-                    }}
+                    onClick={(e) => handleDelete(e, content.id, content.title)}
                     className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
