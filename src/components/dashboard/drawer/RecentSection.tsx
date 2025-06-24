@@ -14,7 +14,8 @@ import {
   Type,
   MoreHorizontal,
   Share,
-  Trash2
+  Trash2,
+  Edit
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -65,6 +66,12 @@ export const RecentSection: React.FC = () => {
     );
   }
 
+  const handleEdit = (contentId: string) => {
+    // Handle edit functionality - you can implement this based on your needs
+    console.log('Edit content:', contentId);
+    setOpenDropdown(null);
+  };
+
   const handleShare = (contentId: string) => {
     // Handle share functionality - you can implement this based on your needs
     console.log('Share content:', contentId);
@@ -109,6 +116,17 @@ export const RecentSection: React.FC = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[200px] p-1">
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit(content.id);
+                }}
+                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              
               <DropdownMenuItem 
                 onClick={(e) => {
                   e.stopPropagation();
