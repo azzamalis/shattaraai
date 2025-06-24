@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useContent } from '@/contexts/ContentContext';
@@ -14,7 +15,9 @@ import {
   MoreHorizontal,
   Share,
   Trash2,
-  Pencil
+  Pencil,
+  Check,
+  X
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -23,8 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { EditContentModal } from '@/components/dashboard/modals/edit-content-modal';
 
 // Helper function to get content type icon
 const getContentTypeIcon = (type: string) => {
@@ -55,10 +58,10 @@ const getContentTypeIcon = (type: string) => {
 };
 
 export const RecentSection: React.FC = () => {
-  const { recentContent } = useContent();
+  const { recentContent, updateContent } = useContent();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editingContent, setEditingContent] = useState<any>(null);
+  const [editingContentId, setEditingContentId] = useState<string | null>(null);
+  const [editedContentTitle, setEditedContentTitle] = useState('');
 
   if (!recentContent || recentContent.length === 0) {
     return (
@@ -68,10 +71,31 @@ export const RecentSection: React.FC = () => {
     );
   }
 
-  const handleEdit = (content: any) => {
-    setEditingContent(content);
-    setEditModalOpen(true);
+  const handleRenameClick = (e: React.MouseEvent, contentId: string, currentTitle: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingContentId(contentId);
+    setEditedContentTitle(currentTitle);
     setOpenDropdown(null);
+  };
+
+  const handleSaveRename = async (e: React.MouseEvent, contentId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (editedContentTitle.trim()) {
+      await updateContent(contentId, { title: editedContentTitle.trim() });
+    }
+    
+    setEditingContentId(null);
+    setEditedContentTitle('');
+  };
+
+  const handleCancelRename = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingContentId(null);
+    setEditedContentTitle('');
   };
 
   const handleShare = (contentId: string) => {
@@ -86,84 +110,121 @@ export const RecentSection: React.FC = () => {
     setOpenDropdown(null);
   };
 
-  return (
-    <>
-      <div className="space-y-1">
-        {recentContent.slice(0, 5).map((content) => (
-          <div key={content.id} className="flex items-center justify-between gap-2 group">
-            <Link
-              to={`/content/${content.id}?type=${content.type}`}
-              className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-accent transition-colors duration-200 flex-1 min-w-0"
-            >
-              {getContentTypeIcon(content.type)}
-              <span className="text-sm text-foreground truncate">
-                {content.title}
-              </span>
-            </Link>
-            
-            <DropdownMenu 
-              open={openDropdown === content.id} 
-              onOpenChange={(open) => setOpenDropdown(open ? content.id : null)}
-            >
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px] p-1">
-                <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(content);
-                  }}
-                  className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
-                >
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Edit
-                </DropdownMenuItem>
-                
-                <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleShare(content.id);
-                  }}
-                  className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
-                >
-                  <Share className="mr-2 h-4 w-4" />
-                  Share
-                </DropdownMenuItem>
-                
-                <Separator className="my-1" />
-                
-                <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(content.id);
-                  }}
-                  className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        ))}
-      </div>
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, contentId: string) => {
+    if (e.key === 'Enter') {
+      // Create a mock mouse event for the save handler
+      const mockMouseEvent = {
+        preventDefault: () => {},
+        stopPropagation: () => {}
+      } as React.MouseEvent;
+      handleSaveRename(mockMouseEvent, contentId);
+    } else if (e.key === 'Escape') {
+      // Create a mock mouse event for the cancel handler
+      const mockMouseEvent = {
+        preventDefault: () => {},
+        stopPropagation: () => {}
+      } as React.MouseEvent;
+      handleCancelRename(mockMouseEvent);
+    }
+  };
 
-      <EditContentModal
-        open={editModalOpen}
-        onOpenChange={setEditModalOpen}
-        contentItem={editingContent}
-      />
-    </>
+  return (
+    <div className="space-y-1">
+      {recentContent.slice(0, 5).map((content) => (
+        <div key={content.id} className="flex items-center justify-between gap-2 group">
+          {editingContentId === content.id ? (
+            <div className="flex items-center gap-2 flex-1">
+              <Input
+                value={editedContentTitle}
+                onChange={(e) => setEditedContentTitle(e.target.value)}
+                className="flex-1 h-8"
+                autoFocus
+                onKeyDown={(e) => handleKeyDown(e, content.id)}
+              />
+              <Button
+                size="sm"
+                onClick={(e) => handleSaveRename(e, content.id)}
+                className="h-8 w-8 p-0"
+                variant="ghost"
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleCancelRename}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Link
+                to={`/content/${content.id}?type=${content.type}`}
+                className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-accent transition-colors duration-200 flex-1 min-w-0"
+              >
+                {getContentTypeIcon(content.type)}
+                <span className="text-sm text-foreground truncate">
+                  {content.title}
+                </span>
+              </Link>
+              
+              <DropdownMenu 
+                open={openDropdown === content.id} 
+                onOpenChange={(open) => setOpenDropdown(open ? content.id : null)}
+              >
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[200px] p-1">
+                  <DropdownMenuItem 
+                    onClick={(e) => handleRenameClick(e, content.id, content.title)}
+                    className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+                  >
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShare(content.id);
+                    }}
+                    className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+                  >
+                    <Share className="mr-2 h-4 w-4" />
+                    Share
+                  </DropdownMenuItem>
+                  
+                  <Separator className="my-1" />
+                  
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(content.id);
+                    }}
+                    className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
   );
 };
