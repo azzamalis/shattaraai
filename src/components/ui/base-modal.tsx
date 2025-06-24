@@ -32,7 +32,7 @@ export function BaseModal({
           </button>}
 
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          
           {description}
         </DialogHeader>
 
