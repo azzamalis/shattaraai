@@ -8,7 +8,6 @@ import { ContentType } from '@/lib/types';
 import { useRecordingState } from '@/hooks/useRecordingState';
 import { useContentContext } from '@/contexts/ContentContext';
 import { Loader2, AlertTriangle } from 'lucide-react';
-
 export interface ContentData {
   id: string;
   type: ContentType;
@@ -22,25 +21,28 @@ export interface ContentData {
   hasError?: boolean;
   errorMessage?: string;
 }
-
 export default function ContentPage() {
-  const { contentId } = useParams<{ contentId: string }>();
+  const {
+    contentId
+  } = useParams<{
+    contentId: string;
+  }>();
   const [searchParams] = useSearchParams();
-  const { fetchContentById } = useContentContext();
-  
+  const {
+    fetchContentById
+  } = useContentContext();
   const [contentData, setContentData] = useState<ContentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Use recording state detection hook
-  const { 
-    state: recordingStateInfo, 
-    metadata: recordingMetadata, 
+  const {
+    state: recordingStateInfo,
+    metadata: recordingMetadata,
     mockChapters,
     getRecordingState,
     analyzeRecording
   } = useRecordingState();
-
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedMicrophone, setSelectedMicrophone] = useState("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
@@ -49,22 +51,18 @@ export default function ContentPage() {
   useEffect(() => {
     const fetchContent = async () => {
       console.log('ContentPage: Starting content fetch for contentId:', contentId);
-      
       if (!contentId) {
         console.error('ContentPage: No content ID provided');
         setError('No content ID provided');
         setLoading(false);
         return;
       }
-
       try {
         setLoading(true);
         setError(null);
-
         console.log('ContentPage: Fetching content from database...');
         const fetchedContent = await fetchContentById(contentId);
         console.log('ContentPage: Fetched content:', fetchedContent);
-        
         if (!fetchedContent) {
           console.log('ContentPage: Content not found in database, checking URL parameters');
           // If content not found in database, fall back to URL parameters for new content
@@ -72,9 +70,12 @@ export default function ContentPage() {
           const url = searchParams.get('url');
           const filename = searchParams.get('filename');
           const text = searchParams.get('text');
-          
-          console.log('ContentPage: Creating fallback content data:', { type, url, filename, text });
-          
+          console.log('ContentPage: Creating fallback content data:', {
+            type,
+            url,
+            filename,
+            text
+          });
           setContentData({
             id: contentId || 'new',
             type,
@@ -83,7 +84,7 @@ export default function ContentPage() {
             filename,
             text,
             isProcessing: false,
-            hasError: false,
+            hasError: false
           });
         } else {
           // Use fetched content from database
@@ -97,7 +98,7 @@ export default function ContentPage() {
             text: fetchedContent.text_content,
             metadata: fetchedContent.metadata,
             isProcessing: false,
-            hasError: false,
+            hasError: false
           });
         }
       } catch (err) {
@@ -107,10 +108,8 @@ export default function ContentPage() {
         setLoading(false);
       }
     };
-
     fetchContent();
   }, [contentId, fetchContentById, searchParams, recordingStateInfo?.isExistingRecording]);
-
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isRecording) {
@@ -126,44 +125,48 @@ export default function ContentPage() {
   // Simulate content processing for non-recording types or modify for existing recordings
   useEffect(() => {
     if (!contentData) return;
-
     if (recordingStateInfo?.isExistingRecording || contentData.type === 'audio_file') {
       // For existing recordings or uploaded audio files, set processing to false immediately
-      setContentData(prev => prev ? { ...prev, isProcessing: false } : null);
+      setContentData(prev => prev ? {
+        ...prev,
+        isProcessing: false
+      } : null);
     } else if (contentData.type !== 'live_recording' && (contentData.url || contentData.text)) {
-      setContentData(prev => prev ? { ...prev, isProcessing: true } : null);
-      
+      setContentData(prev => prev ? {
+        ...prev,
+        isProcessing: true
+      } : null);
       const timer = setTimeout(() => {
-        setContentData(prev => prev ? { ...prev, isProcessing: false } : null);
+        setContentData(prev => prev ? {
+          ...prev,
+          isProcessing: false
+        } : null);
       }, 2000);
-
       return () => clearTimeout(timer);
     }
   }, [contentData?.type, contentData?.url, contentData?.text, recordingStateInfo?.isExistingRecording]);
-
   const toggleRecording = () => {
     if (!isRecording) {
       setRecordingTime(0);
     }
     setIsRecording(!isRecording);
   };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
-
   const handleMicrophoneSelect = (value: string) => {
     setSelectedMicrophone(value);
   };
-
   const handleMicrophoneClear = () => {
     setSelectedMicrophone("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
   };
-
   const updateContentData = (updates: Partial<ContentData>) => {
-    setContentData(prev => prev ? { ...prev, ...updates } : null);
+    setContentData(prev => prev ? {
+      ...prev,
+      ...updates
+    } : null);
   };
 
   // New function to handle text actions from PDF viewer
@@ -176,22 +179,19 @@ export default function ContentPage() {
 
   // Loading state
   if (loading) {
-    return (
-      <DashboardLayout className="content-page-layout p-0">
+    return <DashboardLayout className="content-page-layout p-0">
         <div className="flex items-center justify-center h-full">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin" />
             <span>Loading content...</span>
           </div>
         </div>
-      </DashboardLayout>
-    );
+      </DashboardLayout>;
   }
 
   // Error state
   if (error) {
-    return (
-      <DashboardLayout className="content-page-layout p-0">
+    return <DashboardLayout className="content-page-layout p-0">
         <div className="flex items-center justify-center h-full">
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <AlertTriangle className="h-12 w-12 text-red-500" />
@@ -200,14 +200,12 @@ export default function ContentPage() {
             <p className="text-xs text-center max-w-md text-muted-foreground/60 mt-2">Content ID: {contentId}</p>
           </div>
         </div>
-      </DashboardLayout>
-    );
+      </DashboardLayout>;
   }
 
   // No content state
   if (!contentData) {
-    return (
-      <DashboardLayout className="content-page-layout p-0">
+    return <DashboardLayout className="content-page-layout p-0">
         <div className="flex items-center justify-center h-full">
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <AlertTriangle className="h-12 w-12" />
@@ -216,71 +214,35 @@ export default function ContentPage() {
             <p className="text-xs text-center max-w-md text-muted-foreground/60 mt-2">Content ID: {contentId}</p>
           </div>
         </div>
-      </DashboardLayout>
-    );
+      </DashboardLayout>;
   }
-
   console.log('ContentPage: Rendering with content data:', contentData);
-
-  return (
-    <DashboardLayout 
-      className="content-page-layout p-0"
-      contentData={contentData}
-      onUpdateContent={updateContentData}
-    >
+  return <DashboardLayout className="content-page-layout p-0" contentData={contentData} onUpdateContent={updateContentData}>
       <div className="flex flex-col h-[calc(100vh-64px)] bg-background transition-colors duration-300">
-        <div className="h-full px-4 md:px-6 py-4">
-          <ResizablePanelGroup 
-            direction="horizontal"
-            className="h-full gap-4"
-          >
-            <ResizablePanel 
-              defaultSize={50} 
-              minSize={25} 
-              maxSize={60}
-              className="bg-card rounded-lg"
-            >
-              <ContentLeftSidebar 
-                contentData={contentData}
-                onUpdateContent={updateContentData}
-                isRecording={isRecording}
-                toggleRecording={toggleRecording}
-                recordingTime={formatTime(recordingTime)}
-                selectedMicrophone={selectedMicrophone}
-                onMicrophoneSelect={handleMicrophoneSelect}
-                onMicrophoneClear={handleMicrophoneClear}
-                recordingStateInfo={recordingStateInfo}
-                recordingMetadata={recordingMetadata}
-                isRecordingLoading={false}
-                onTextAction={handleTextAction}
-              />
+        <div className="h-full px-4 py-[10px] md:px-[16px]">
+          <ResizablePanelGroup direction="horizontal" className="h-full gap-4">
+            <ResizablePanel defaultSize={50} minSize={25} maxSize={60} className="bg-card rounded-lg">
+              <ContentLeftSidebar contentData={contentData} onUpdateContent={updateContentData} isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={formatTime(recordingTime)} selectedMicrophone={selectedMicrophone} onMicrophoneSelect={handleMicrophoneSelect} onMicrophoneClear={handleMicrophoneClear} recordingStateInfo={recordingStateInfo} recordingMetadata={recordingMetadata} isRecordingLoading={false} onTextAction={handleTextAction} />
             </ResizablePanel>
             
-            <ResizableHandle 
-              withHandle 
-              className="w-1"
-            >
+            <ResizableHandle withHandle className="w-1">
               <div className="w-1 h-10 bg-border rounded-full transition-colors duration-200" />
             </ResizableHandle>
             
-            <ResizablePanel 
-              defaultSize={50} 
-              minSize={40}
-              className="bg-card rounded-lg"
-            >
+            <ResizablePanel defaultSize={50} minSize={40} className="bg-card rounded-lg">
               <ContentRightSidebar contentData={contentData} />
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
       </div>
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 }
-
 function getDefaultTitle(type: ContentType, filename?: string | null, isExistingRecording?: boolean): string {
   const now = new Date();
-  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  
+  const time = now.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
   switch (type) {
     case 'live_recording':
       return `Live Recording at ${time}`;
