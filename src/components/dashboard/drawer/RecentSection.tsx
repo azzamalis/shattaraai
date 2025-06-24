@@ -22,28 +22,14 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
     );
   }
 
-  const handleShare = (contentId: string, contentTitle: string) => {
-    console.log('RecentSection - Share clicked:', contentId, contentTitle);
-    if (onShareClick) {
-      onShareClick(contentId, contentTitle);
-    }
-  };
-
-  const handleDelete = (contentId: string, contentTitle: string) => {
-    console.log('RecentSection - Delete clicked:', contentId, contentTitle);
-    if (onDeleteClick) {
-      onDeleteClick(contentId, contentTitle);
-    }
-  };
-
   return (
     <div className="space-y-1">
       {recentContent.slice(0, 5).map((content) => (
         <RecentItem
           key={content.id}
           content={content}
-          onShareClick={handleShare}
-          onDeleteClick={handleDelete}
+          onShareClick={onShareClick}
+          onDeleteClick={onDeleteClick}
         />
       ))}
     </div>
