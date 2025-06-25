@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -34,6 +33,8 @@ const getDisplayType = (dbType: string): ContentItem['type'] => {
       return 'PDF Files';
     case 'recording':
     case 'audio':
+    case 'audio_file':
+    case 'live_recording':
       return 'Recording';
     case 'youtube':
       return 'Youtube URL';

@@ -1,4 +1,3 @@
-import type { ContentTag, ContentType } from '../RoomContentTable';
 
 export interface ContentItem {
   id: string;
