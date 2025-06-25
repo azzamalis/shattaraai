@@ -35,7 +35,7 @@ export function RoomPageActions({
         className="flex items-center gap-2"
       >
         <MessageCircle className="h-4 w-4" />
-        Chat with AI
+        Room Chat
       </Button>
       
       <Button
