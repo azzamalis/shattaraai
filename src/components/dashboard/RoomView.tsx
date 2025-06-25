@@ -6,7 +6,6 @@ import { useContent } from '@/contexts/ContentContext';
 import { ActionCards } from './ActionCards';
 import { LearningCard } from './LearningCard';
 import { PasteContentModal } from './PasteContentModal';
-import { SelectionOverlay } from './SelectionOverlay';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useRooms } from '@/hooks/useRooms';
@@ -143,39 +142,35 @@ export function RoomView({
 
   if (!hideHeader) {
     return (
-      <SelectionOverlay isVisible={isExamSelectionMode}>
-        <div className="max-w-6xl mx-auto p-6">
-          <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold text-foreground mb-4">{title}</h1>
-            {description && (
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{description}</p>
-            )}
-          </div>
-
-          {!isExamSelectionMode && (
-            <div className="mb-8">
-              <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
-            </div>
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-foreground mb-4">{title}</h1>
+          {description && (
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{description}</p>
           )}
-
-          {renderContent()}
-
-          <PasteContentModal
-            isOpen={isPasteModalOpen}
-            onClose={() => setIsPasteModalOpen(false)}
-            onSubmit={handlePasteSubmit}
-          />
         </div>
-      </SelectionOverlay>
+
+        {!isExamSelectionMode && (
+          <div className="mb-8">
+            <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
+          </div>
+        )}
+
+        {renderContent()}
+
+        <PasteContentModal
+          isOpen={isPasteModalOpen}
+          onClose={() => setIsPasteModalOpen(false)}
+          onSubmit={handlePasteSubmit}
+        />
+      </div>
     );
   }
 
-  // When hideHeader is true, show content grid with selection overlay
+  // When hideHeader is true, show content grid without any overlay
   return (
-    <SelectionOverlay isVisible={isExamSelectionMode}>
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {renderContent()}
-      </div>
-    </SelectionOverlay>
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      {renderContent()}
+    </div>
   );
 }
