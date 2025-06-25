@@ -6,8 +6,9 @@ import { RoomHeroSection } from '@/components/dashboard/RoomHeroSection';
 import { RoomPageHeader } from '@/components/dashboard/RoomPageHeader';
 import { RoomPageActions } from '@/components/dashboard/RoomPageActions';
 import { AITutorChatDrawer } from '@/components/dashboard/AITutorChatDrawer';
-import { ExamPrepModal } from '@/components/dashboard/ExamPrepModal';
-import { useParams, useLocation } from 'react-router-dom';
+import { ExamPrepStepTwo } from '@/components/dashboard/exam-prep/ExamPrepStepTwo';
+import { ExamPrepStepThree } from '@/components/dashboard/exam-prep/ExamPrepStepThree';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useRooms } from '@/hooks/useRooms';
 import { useContent } from '@/hooks/useContent';
@@ -15,13 +16,19 @@ import { useContent } from '@/hooks/useContent';
 export default function RoomPage() {
   const { roomId } = useParams<{ roomId: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const { rooms, loading: roomsLoading, editRoom } = useRooms();
   const { content, loading: contentLoading } = useContent();
   
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isExamModalOpen, setIsExamModalOpen] = useState(false);
-  const [isExamSelectionMode, setIsExamSelectionMode] = useState(false);
+  const [isExamMode, setIsExamMode] = useState(false);
+  const [examStep, setExamStep] = useState(1);
   const [selectedContentIds, setSelectedContentIds] = useState<string[]>([]);
+  
+  // Exam step 3 state
+  const [numQuestions, setNumQuestions] = useState('25');
+  const [examLength, setExamLength] = useState('60');
+  const [questionType, setQuestionType] = useState('Both');
 
   // Find the current room from the database
   const currentRoom = rooms.find(room => room.id === roomId);
@@ -32,7 +39,7 @@ export default function RoomPage() {
   // Handle exam modal trigger from exam summary
   useEffect(() => {
     if (location.state?.openExamModal) {
-      setIsExamModalOpen(true);
+      setIsExamMode(true);
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -43,6 +50,17 @@ export default function RoomPage() {
       localStorage.setItem('currentRoomId', roomId);
     }
   }, [roomId]);
+
+  // Reset exam state when exam mode is disabled
+  useEffect(() => {
+    if (!isExamMode) {
+      setExamStep(1);
+      setSelectedContentIds([]);
+      setNumQuestions('25');
+      setExamLength('60');
+      setQuestionType('Both');
+    }
+  }, [isExamMode]);
 
   const handleTitleEdit = async (newTitle: string) => {
     if (currentRoom) {
@@ -70,23 +88,55 @@ export default function RoomPage() {
     // This function is passed to header for click outside handling
   };
 
-  const handleSelectionModeChange = (isActive: boolean) => {
-    setIsExamSelectionMode(isActive);
-    if (!isActive) {
-      setSelectedContentIds([]);
-    }
-  };
-
-  const handleContentSelectionChange = (selectedIds: string[]) => {
-    setSelectedContentIds(selectedIds);
-  };
-
   const handleContentToggle = (contentId: string) => {
     setSelectedContentIds(prev => 
       prev.includes(contentId) 
         ? prev.filter(id => id !== contentId)
         : [...prev, contentId]
     );
+  };
+
+  const handleToggleSelectAll = () => {
+    const allSelected = selectedContentIds.length === roomContent.length;
+    setSelectedContentIds(allSelected ? [] : roomContent.map(item => item.id));
+  };
+
+  const handleExamNext = () => {
+    if (examStep < 3) {
+      setExamStep(examStep + 1);
+    } else {
+      handleStartExam();
+    }
+  };
+
+  const handleExamBack = () => {
+    if (examStep > 1) {
+      setExamStep(examStep - 1);
+    }
+  };
+
+  const handleExamSkip = () => {
+    if (examStep < 3) {
+      setExamStep(examStep + 1);
+    }
+  };
+
+  const handleStartExam = () => {
+    const selectedItems = roomContent.filter(item => selectedContentIds.includes(item.id));
+    const examConfig = {
+      selectedTopics: selectedItems.map(item => item.title),
+      numQuestions,
+      questionType,
+      examLength
+    };
+    localStorage.setItem('examConfig', JSON.stringify(examConfig));
+    
+    setIsExamMode(false);
+    navigate('/exam-loading');
+  };
+
+  const handleExamCancel = () => {
+    setIsExamMode(false);
   };
 
   // Loading state
@@ -114,11 +164,51 @@ export default function RoomPage() {
     );
   }
 
+  const selectedCount = selectedContentIds.length;
+  const totalCount = roomContent.length;
+  const isAllSelected = selectedCount === totalCount && totalCount > 0;
+
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full bg-background">
+        {/* Hero Section - Default or Exam Mode */}
         <div className="py-12">
-          <RoomHeroSection title={currentRoom.name} description={currentRoom.description || ''} />
+          {examStep === 1 ? (
+            <RoomHeroSection 
+              title={currentRoom.name} 
+              description={currentRoom.description || ''} 
+              isExamMode={isExamMode}
+              examModeData={isExamMode ? {
+                selectedCount,
+                totalCount,
+                isAllSelected,
+                onToggleSelectAll: handleToggleSelectAll,
+                onNext: handleExamNext,
+                onCancel: handleExamCancel
+              } : undefined}
+            />
+          ) : examStep === 2 ? (
+            <div className="max-w-[800px] mx-auto px-4 sm:px-6">
+              <ExamPrepStepTwo
+                onBack={handleExamBack}
+                onNext={handleExamNext}
+                onSkip={handleExamSkip}
+              />
+            </div>
+          ) : (
+            <div className="max-w-[800px] mx-auto px-4 sm:px-6">
+              <ExamPrepStepThree
+                numQuestions={numQuestions}
+                setNumQuestions={setNumQuestions}
+                questionType={questionType}
+                setQuestionType={setQuestionType}
+                examLength={examLength}
+                setExamLength={setExamLength}
+                onBack={handleExamBack}
+                onStartExam={handleStartExam}
+              />
+            </div>
+          )}
         </div>
         
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -135,7 +225,7 @@ export default function RoomPage() {
 
                   <RoomPageActions 
                     onChatOpen={() => setIsChatOpen(true)}
-                    onExamModalOpen={() => setIsExamModalOpen(true)}
+                    onExamModalOpen={() => setIsExamMode(true)}
                     roomId={roomId}
                   />
                 </div>
@@ -151,7 +241,7 @@ export default function RoomPage() {
               description={currentRoom.description || ''} 
               isEmpty={roomContent.length === 0} 
               hideHeader={true}
-              isExamSelectionMode={isExamSelectionMode}
+              isExamSelectionMode={isExamMode && examStep === 1}
               selectedContentIds={selectedContentIds}
               onContentSelectionChange={handleContentToggle}
             />
@@ -159,14 +249,6 @@ export default function RoomPage() {
         </div>
         
         <AITutorChatDrawer open={isChatOpen} onOpenChange={setIsChatOpen} />
-        <ExamPrepModal 
-          isOpen={isExamModalOpen} 
-          onClose={() => setIsExamModalOpen(false)} 
-          roomId={roomId}
-          onSelectionModeChange={handleSelectionModeChange}
-          selectedContentIds={selectedContentIds}
-          onContentSelectionChange={handleContentSelectionChange}
-        />
       </div>
     </DashboardLayout>
   );

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,7 @@ interface ExamPrepStepOneRedesignedProps {
   isAllSelected: boolean;
   onToggleSelectAll: () => void;
   onNext: () => void;
+  onCancel?: () => void;
 }
 
 export function ExamPrepStepOneRedesigned({ 
@@ -18,15 +19,31 @@ export function ExamPrepStepOneRedesigned({
   totalCount,
   isAllSelected,
   onToggleSelectAll,
-  onNext 
+  onNext,
+  onCancel
 }: ExamPrepStepOneRedesignedProps) {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header Section */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">
-          Build Your Perfect Exam
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex-1" />
+          <h2 className="text-2xl font-bold text-foreground">
+            Build Your Perfect Exam
+          </h2>
+          <div className="flex-1 flex justify-end">
+            {onCancel && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onCancel}
+                className="h-8 w-8"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
         <p className="text-muted-foreground">
           You're steps away from a tailored exam — based on the topics you choose
         </p>
