@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RoomView } from '@/components/dashboard/RoomView';
@@ -115,6 +114,7 @@ export default function RoomPage() {
                   <RoomPageActions 
                     onChatOpen={() => setIsChatOpen(true)}
                     onExamModalOpen={() => setIsExamModalOpen(true)}
+                    roomId={roomId}
                   />
                 </div>
 
@@ -134,7 +134,11 @@ export default function RoomPage() {
         </div>
         
         <AITutorChatDrawer open={isChatOpen} onOpenChange={setIsChatOpen} />
-        <ExamPrepModal isOpen={isExamModalOpen} onClose={() => setIsExamModalOpen(false)} />
+        <ExamPrepModal 
+          isOpen={isExamModalOpen} 
+          onClose={() => setIsExamModalOpen(false)} 
+          roomId={roomId}
+        />
       </div>
     </DashboardLayout>
   );

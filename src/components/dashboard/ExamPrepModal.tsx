@@ -11,6 +11,7 @@ import { useContent } from '@/hooks/useContent';
 interface ExamPrepModalProps {
   isOpen: boolean;
   onClose: () => void;
+  roomId?: string; // Add roomId prop to filter content by room
 }
 
 // Helper function to convert database content items to exam prep format
@@ -48,7 +49,7 @@ const getDisplayType = (dbType: string): ContentItem['type'] => {
   }
 };
 
-export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
+export function ExamPrepModal({ isOpen, onClose, roomId }: ExamPrepModalProps) {
   const [step, setStep] = useState(1);
   const [numQuestions, setNumQuestions] = useState('25');
   const [examLength, setExamLength] = useState('60');
@@ -63,10 +64,15 @@ export function ExamPrepModal({ isOpen, onClose }: ExamPrepModalProps) {
   // Convert database content to exam prep format when content loads
   useEffect(() => {
     if (content && content.length > 0) {
-      const convertedItems = convertToExamPrepFormat(content);
+      // Filter content by room if roomId is provided
+      const filteredContent = roomId 
+        ? content.filter(item => item.room_id === roomId)
+        : content;
+      
+      const convertedItems = convertToExamPrepFormat(filteredContent);
       setContentItems(convertedItems);
     }
-  }, [content]);
+  }, [content, roomId]);
 
   // Effect to reset state when the modal closes
   useEffect(() => {

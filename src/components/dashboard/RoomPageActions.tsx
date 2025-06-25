@@ -6,11 +6,13 @@ import { MessageSquare, FileText } from 'lucide-react';
 interface RoomPageActionsProps {
   onChatOpen: () => void;
   onExamModalOpen: () => void;
+  roomId?: string; // Add roomId prop
 }
 
 export const RoomPageActions: React.FC<RoomPageActionsProps> = ({
   onChatOpen,
-  onExamModalOpen
+  onExamModalOpen,
+  roomId
 }) => {
   return (
     <div className="flex items-center gap-4">
