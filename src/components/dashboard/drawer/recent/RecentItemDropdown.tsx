@@ -29,6 +29,20 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
   onShare,
   onDelete
 }) => {
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onShare(e);
+    onOpenChange(false);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete(e);
+    onOpenChange(false);
+  };
+
   return (
     <DropdownMenu open={isOpen} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
@@ -44,7 +58,7 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[200px] p-1">
+      <DropdownMenuContent align="end" className="w-[200px] p-1 bg-popover border border-border">
         <DropdownMenuItem 
           onClick={onRename}
           className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
@@ -54,7 +68,7 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
         </DropdownMenuItem>
         
         <DropdownMenuItem 
-          onClick={onShare}
+          onClick={handleShareClick}
           className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
         >
           <Share className="mr-2 h-4 w-4" />
@@ -64,7 +78,7 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
         <Separator className="my-1" />
         
         <DropdownMenuItem 
-          onClick={onDelete}
+          onClick={handleDeleteClick}
           className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
         >
           <Trash2 className="mr-2 h-4 w-4" />
