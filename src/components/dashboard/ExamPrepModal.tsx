@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { ExamPrepStepOne } from './exam-prep/ExamPrepStepOne';
+import { ExamPrepStepOneRedesigned } from './exam-prep/ExamPrepStepOneRedesigned';
 import { ExamPrepStepTwo } from './exam-prep/ExamPrepStepTwo';
 import { ExamPrepStepThree } from './exam-prep/ExamPrepStepThree';
 import { ContentItem } from './exam-prep/types';
@@ -11,7 +12,10 @@ import { useContent } from '@/hooks/useContent';
 interface ExamPrepModalProps {
   isOpen: boolean;
   onClose: () => void;
-  roomId?: string; // Add roomId prop to filter content by room
+  roomId?: string;
+  onSelectionModeChange?: (isActive: boolean) => void;
+  selectedContentIds?: string[];
+  onContentSelectionChange?: (selectedIds: string[]) => void;
 }
 
 // Helper function to convert database content items to exam prep format
@@ -45,11 +49,18 @@ const getDisplayType = (dbType: string): ContentItem['type'] => {
     case 'chat':
     case 'upload':
     default:
-      return 'PDF Files'; // Default fallback
+      return 'PDF Files';
   }
 };
 
-export function ExamPrepModal({ isOpen, onClose, roomId }: ExamPrepModalProps) {
+export function ExamPrepModal({ 
+  isOpen, 
+  onClose, 
+  roomId,
+  onSelectionModeChange,
+  selectedContentIds = [],
+  onContentSelectionChange
+}: ExamPrepModalProps) {
   const [step, setStep] = useState(1);
   const [numQuestions, setNumQuestions] = useState('25');
   const [examLength, setExamLength] = useState('60');
@@ -64,7 +75,6 @@ export function ExamPrepModal({ isOpen, onClose, roomId }: ExamPrepModalProps) {
   // Convert database content to exam prep format when content loads
   useEffect(() => {
     if (content && content.length > 0) {
-      // Filter content by room if roomId is provided
       const filteredContent = roomId 
         ? content.filter(item => item.room_id === roomId)
         : content;
@@ -74,17 +84,25 @@ export function ExamPrepModal({ isOpen, onClose, roomId }: ExamPrepModalProps) {
     }
   }, [content, roomId]);
 
+  // Notify parent component about selection mode
+  useEffect(() => {
+    if (onSelectionModeChange) {
+      onSelectionModeChange(isOpen && step === 1);
+    }
+  }, [isOpen, step, onSelectionModeChange]);
+
   // Effect to reset state when the modal closes
   useEffect(() => {
     if (!isOpen) {
-      setStep(1); // Reset to Step 1
-      setNumQuestions('25'); // Reset number of questions
-      setExamLength('60'); // Reset exam length
-      setQuestionType('Both'); // Reset question type
-      // Reset content selections
-      setContentItems(prev => prev.map(item => ({ ...item, isSelected: false })));
+      setStep(1);
+      setNumQuestions('25');
+      setExamLength('60');
+      setQuestionType('Both');
+      if (onContentSelectionChange) {
+        onContentSelectionChange([]);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, onContentSelectionChange]);
   
   const handleNext = () => {
     if (step < totalSteps) {
@@ -107,35 +125,30 @@ export function ExamPrepModal({ isOpen, onClose, roomId }: ExamPrepModalProps) {
   };
 
   const toggleSelectAll = () => {
-    const allSelected = contentItems.every(item => item.isSelected);
-    setContentItems(contentItems.map(item => ({
-      ...item,
-      isSelected: !allSelected
-    })));
-  };
-
-  const toggleItemSelection = (id: string) => {
-    setContentItems(contentItems.map(item => 
-      item.id === id ? { ...item, isSelected: !item.isSelected } : item
-    ));
+    const allSelected = selectedContentIds.length === contentItems.length;
+    const newSelection = allSelected ? [] : contentItems.map(item => item.id);
+    if (onContentSelectionChange) {
+      onContentSelectionChange(newSelection);
+    }
   };
 
   const handleStartExam = () => {
-    // Save exam configuration to localStorage
+    const selectedItems = contentItems.filter(item => selectedContentIds.includes(item.id));
     const examConfig = {
-      selectedTopics: contentItems.filter(item => item.isSelected).map(item => item.title),
+      selectedTopics: selectedItems.map(item => item.title),
       numQuestions,
       questionType,
       examLength
     };
     localStorage.setItem('examConfig', JSON.stringify(examConfig));
     
-    // Close the modal
     onClose();
-    
-    // Navigate to loading screen
     navigate('/exam-loading');
   };
+
+  const selectedCount = selectedContentIds.length;
+  const totalCount = contentItems.length;
+  const isAllSelected = selectedCount === totalCount && totalCount > 0;
 
   // Show loading state while content is being fetched
   if (loading && contentItems.length === 0) {
@@ -157,7 +170,8 @@ export function ExamPrepModal({ isOpen, onClose, roomId }: ExamPrepModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={cn(
         "max-w-3xl p-0 rounded-lg sm:max-w-3xl",
-        "bg-card border-border"
+        "bg-card border-border",
+        step === 1 ? "z-[60]" : "z-[51]" // Higher z-index for step 1 to appear above overlay
       )}>
         <div className="p-6">
           {/* Progress bar */}
@@ -178,10 +192,11 @@ export function ExamPrepModal({ isOpen, onClose, roomId }: ExamPrepModalProps) {
           </div>
           
           {step === 1 && (
-            <ExamPrepStepOne
-              contentItems={contentItems}
+            <ExamPrepStepOneRedesigned
+              selectedCount={selectedCount}
+              totalCount={totalCount}
+              isAllSelected={isAllSelected}
               onToggleSelectAll={toggleSelectAll}
-              onToggleItemSelection={toggleItemSelection}
               onNext={handleNext}
             />
           )}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RoomView } from '@/components/dashboard/RoomView';
@@ -19,6 +20,8 @@ export default function RoomPage() {
   
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
+  const [isExamSelectionMode, setIsExamSelectionMode] = useState(false);
+  const [selectedContentIds, setSelectedContentIds] = useState<string[]>([]);
 
   // Find the current room from the database
   const currentRoom = rooms.find(room => room.id === roomId);
@@ -65,6 +68,25 @@ export default function RoomPage() {
 
   const handleClickOutside = () => {
     // This function is passed to header for click outside handling
+  };
+
+  const handleSelectionModeChange = (isActive: boolean) => {
+    setIsExamSelectionMode(isActive);
+    if (!isActive) {
+      setSelectedContentIds([]);
+    }
+  };
+
+  const handleContentSelectionChange = (selectedIds: string[]) => {
+    setSelectedContentIds(selectedIds);
+  };
+
+  const handleContentToggle = (contentId: string) => {
+    setSelectedContentIds(prev => 
+      prev.includes(contentId) 
+        ? prev.filter(id => id !== contentId)
+        : [...prev, contentId]
+    );
   };
 
   // Loading state
@@ -128,7 +150,10 @@ export default function RoomPage() {
               title={currentRoom.name} 
               description={currentRoom.description || ''} 
               isEmpty={roomContent.length === 0} 
-              hideHeader={true} 
+              hideHeader={true}
+              isExamSelectionMode={isExamSelectionMode}
+              selectedContentIds={selectedContentIds}
+              onContentSelectionChange={handleContentToggle}
             />
           </div>
         </div>
@@ -138,6 +163,9 @@ export default function RoomPage() {
           isOpen={isExamModalOpen} 
           onClose={() => setIsExamModalOpen(false)} 
           roomId={roomId}
+          onSelectionModeChange={handleSelectionModeChange}
+          selectedContentIds={selectedContentIds}
+          onContentSelectionChange={handleContentSelectionChange}
         />
       </div>
     </DashboardLayout>

@@ -1,106 +1,112 @@
 
 import React, { useState } from 'react';
-import { Check, Pencil } from 'lucide-react';
-import { toast } from 'sonner';
+import { Edit2, Check, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useContentContext } from '@/contexts/ContentContext';
 
 interface LearningCardTitleProps {
   title: string;
   contentId: string;
-  onSave?: (newTitle: string) => void;
+  onSave: (newTitle: string) => Promise<void>;
+  disabled?: boolean;
 }
 
-export function LearningCardTitle({ title, contentId, onSave }: LearningCardTitleProps) {
+export function LearningCardTitle({ title, contentId, onSave, disabled = false }: LearningCardTitleProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTitle, setEditedTitle] = useState(title);
-  const { onUpdateContent } = useContentContext();
+  const [editValue, setEditValue] = useState(title);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveTitle = async () => {
-    if (editedTitle.trim() === '' || editedTitle.trim() === title) {
-      setEditedTitle(title); // Reset if empty or unchanged
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (disabled) return;
+    setIsEditing(true);
+    setEditValue(title);
+  };
+
+  const handleSave = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (editValue.trim() === '' || editValue === title) {
       setIsEditing(false);
       return;
     }
 
+    setIsSaving(true);
     try {
-      // Update in database
-      await onUpdateContent(contentId, { title: editedTitle.trim() });
-      
-      // Call optional callback
-      if (onSave) {
-        onSave(editedTitle.trim());
-      }
-      
-      toast.success("Title updated successfully");
+      await onSave(editValue.trim());
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating title:', error);
-      toast.error("Failed to update title");
-      setEditedTitle(title); // Reset to original if failed
-      setIsEditing(false);
+      console.error('Error saving title:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleEditClick = (e: React.MouseEvent) => {
+  const handleCancel = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setEditedTitle(title);
-    setIsEditing(true);
-  };
-
-  const handleSaveClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    handleSaveTitle();
-  };
-
-  const handleBlur = () => {
-    handleSaveTitle();
+    setIsEditing(false);
+    setEditValue(title);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      handleSaveTitle();
+      handleSave(e as any);
     } else if (e.key === 'Escape') {
-      e.preventDefault();
-      setEditedTitle(title);
-      setIsEditing(false);
+      handleCancel(e as any);
     }
   };
 
+  if (isEditing && !disabled) {
+    return (
+      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+        <Input
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="h-7 text-sm flex-1 min-w-0"
+          autoFocus
+          disabled={isSaving}
+        />
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 w-7 p-0 hover:bg-green-100"
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          <Check className="h-3 w-3 text-green-600" />
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 w-7 p-0 hover:bg-red-100"
+          onClick={handleCancel}
+          disabled={isSaving}
+        >
+          <X className="h-3 w-3 text-red-600" />
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative group/title">
-      {isEditing ? (
-        <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-          <input
-            type="text"
-            value={editedTitle}
-            onChange={e => setEditedTitle(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            className={cn(
-              "w-full bg-transparent",
-              "text-foreground text-sm font-medium",
-              "focus:outline-none focus:ring-0",
-              "border-b border-border",
-              "pr-8"
-            )}
-            autoFocus
-            spellCheck="false"
-          />
-          <button onClick={handleSaveClick} className="absolute right-0 text-muted-foreground hover:text-foreground transition-colors">
-            <Check className="w-4 h-4" />
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-start gap-2">
-          <h3 className="text-sm font-medium text-foreground pr-8 line-clamp-2 tracking-wide">
-            {title}
-          </h3>
-          <button onClick={handleEditClick} className="absolute right-0 opacity-0 group-hover/title:opacity-100 transition-opacity">
-            <Pencil className="w-4 h-4 text-primary/40 hover:text-primary transition-colors" />
-          </button>
-        </div>
+    <div className="group flex items-center gap-2 min-w-0">
+      <h3 className="text-sm font-medium text-foreground line-clamp-2 flex-1 min-w-0">
+        {title}
+      </h3>
+      {!disabled && (
+        <Button
+          size="sm"
+          variant="ghost"
+          className={cn(
+            "h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity shrink-0",
+            "hover:bg-accent"
+          )}
+          onClick={handleEdit}
+        >
+          <Edit2 className="h-3 w-3" />
+        </Button>
       )}
     </div>
   );

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useParams } from 'react-router-dom';
@@ -5,6 +6,7 @@ import { useContent } from '@/contexts/ContentContext';
 import { ActionCards } from './ActionCards';
 import { LearningCard } from './LearningCard';
 import { PasteContentModal } from './PasteContentModal';
+import { SelectionOverlay } from './SelectionOverlay';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useRooms } from '@/hooks/useRooms';
@@ -15,13 +17,20 @@ interface RoomViewProps {
   description: string;
   isEmpty?: boolean;
   hideHeader?: boolean;
+  // Selection mode props
+  isExamSelectionMode?: boolean;
+  selectedContentIds?: string[];
+  onContentSelectionChange?: (contentId: string) => void;
 }
 
 export function RoomView({
   title,
   description,
   isEmpty = false,
-  hideHeader = false
+  hideHeader = false,
+  isExamSelectionMode = false,
+  selectedContentIds = [],
+  onContentSelectionChange
 }: RoomViewProps) {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
@@ -34,7 +43,7 @@ export function RoomView({
   const { rooms } = useRooms();
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
 
-  // IMPORTANT: Filter content to only show items that belong to this specific room
+  // Filter content to only show items that belong to this specific room
   const roomContent = content.filter(item => item.room_id === roomId);
 
   const handlePasteSubmit = async (data: {
@@ -53,11 +62,10 @@ export function RoomView({
       }
     }
 
-    // Create content WITHOUT automatic room assignment
     const contentId = await onAddContent({
       title: contentTitle,
       type: contentType as any,
-      room_id: null, // Do not auto-assign to any room
+      room_id: null,
       metadata: {},
       url: data.url,
       text_content: data.text
@@ -100,71 +108,74 @@ export function RoomView({
     }
   };
 
-  if (!hideHeader) {
-    return (
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-foreground mb-4">{title}</h1>
-          {description && (
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{description}</p>
+  const renderContent = () => {
+    if (roomContent.length === 0) {
+      return (
+        <div className="text-center py-16">
+          <p className="text-muted-foreground text-lg mb-4">
+            {isExamSelectionMode ? "No content available for exam creation" : "No content in this room yet"}
+          </p>
+          {!isExamSelectionMode && (
+            <p className="text-muted-foreground">Add content to this room using the "Add" option on any content card</p>
           )}
         </div>
+      );
+    }
 
-        <div className="mb-8">
-          <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
-        </div>
-
-        {roomContent.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg mb-4">No content in this room yet</p>
-            <p className="text-muted-foreground">Use the actions above to add content to this room</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-2">
-            {roomContent.map(item => (
-              <LearningCard
-                key={item.id}
-                content={item}
-                onDelete={() => handleDeleteCard(item)}
-                onShare={() => handleShareCard(item)}
-                onAddToRoom={targetRoomId => handleAddToRoom(item, targetRoomId)}
-                availableRooms={rooms}
-              />
-            ))}
-          </div>
-        )}
-
-        <PasteContentModal
-          isOpen={isPasteModalOpen}
-          onClose={() => setIsPasteModalOpen(false)}
-          onSubmit={handlePasteSubmit}
-        />
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {roomContent.map(item => (
+          <LearningCard
+            key={item.id}
+            content={item}
+            onDelete={() => handleDeleteCard(item)}
+            onShare={() => handleShareCard(item)}
+            onAddToRoom={targetRoomId => handleAddToRoom(item, targetRoomId)}
+            availableRooms={rooms}
+            isExamSelectionMode={isExamSelectionMode}
+            isSelected={selectedContentIds.includes(item.id)}
+            onToggleSelection={onContentSelectionChange}
+          />
+        ))}
       </div>
+    );
+  };
+
+  if (!hideHeader) {
+    return (
+      <SelectionOverlay isVisible={isExamSelectionMode}>
+        <div className="max-w-6xl mx-auto p-6">
+          <div className="text-center mb-12">
+            <h1 className="text-3xl font-bold text-foreground mb-4">{title}</h1>
+            {description && (
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{description}</p>
+            )}
+          </div>
+
+          {!isExamSelectionMode && (
+            <div className="mb-8">
+              <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
+            </div>
+          )}
+
+          {renderContent()}
+
+          <PasteContentModal
+            isOpen={isPasteModalOpen}
+            onClose={() => setIsPasteModalOpen(false)}
+            onSubmit={handlePasteSubmit}
+          />
+        </div>
+      </SelectionOverlay>
     );
   }
 
-  // When hideHeader is true, just show the content grid with proper spacing
+  // When hideHeader is true, show content grid with selection overlay
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      {roomContent.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-muted-foreground text-lg mb-4">No content in this room yet</p>
-          <p className="text-muted-foreground">Add content to this room using the "Add" option on any content card</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {roomContent.map(item => (
-            <LearningCard
-              key={item.id}
-              content={item}
-              onDelete={() => handleDeleteCard(item)}
-              onShare={() => handleShareCard(item)}
-              onAddToRoom={targetRoomId => handleAddToRoom(item, targetRoomId)}
-              availableRooms={rooms}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+    <SelectionOverlay isVisible={isExamSelectionMode}>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {renderContent()}
+      </div>
+    </SelectionOverlay>
   );
 }

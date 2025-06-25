@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ContentItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { Check } from 'lucide-react';
 import { LearningCardMenu } from './LearningCardMenu';
 import { LearningCardThumbnail } from './LearningCardThumbnail';
 import { LearningCardTitle } from './LearningCardTitle';
@@ -17,6 +18,10 @@ interface LearningCardProps {
   onAddToRoom?: (roomId: string) => void;
   availableRooms?: Array<{ id: string; name: string }>;
   currentRoom?: { id: string; name: string };
+  // Selection mode props
+  isExamSelectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelection?: (contentId: string) => void;
 }
 
 export function LearningCard({
@@ -25,18 +30,24 @@ export function LearningCard({
   onShare,
   onAddToRoom,
   availableRooms = [],
-  currentRoom
+  currentRoom,
+  isExamSelectionMode = false,
+  isSelected = false,
+  onToggleSelection
 }: LearningCardProps) {
   const navigate = useNavigate();
   const { onUpdateContent } = useContentContext();
 
   const handleCardClick = () => {
-    navigate(`/content/${content.id}?type=${content.type}`);
+    if (isExamSelectionMode && onToggleSelection) {
+      onToggleSelection(content.id);
+    } else {
+      navigate(`/content/${content.id}?type=${content.type}`);
+    }
   };
 
   const handleAddToRoom = async (roomId: string) => {
     try {
-      // Update the content with the selected room_id
       await onUpdateContent(content.id, { room_id: roomId });
       
       const room = availableRooms.find(r => r.id === roomId);
@@ -44,7 +55,6 @@ export function LearningCard({
         toast.success(`Added to "${room.name}"`);
       }
       
-      // Call the optional callback
       if (onAddToRoom) {
         onAddToRoom(roomId);
       }
@@ -63,7 +73,6 @@ export function LearningCard({
     }
   };
 
-  // Get the room name from availableRooms if content has a room_id
   const contentRoom = content.room_id ? availableRooms.find(r => r.id === content.room_id) : undefined;
 
   return (
@@ -76,8 +85,20 @@ export function LearningCard({
         "rounded-xl border border-border/5",
         "transition-all duration-200",
         "hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]",
-        "group relative"
+        "group relative",
+        // Selection mode styles
+        isExamSelectionMode && "hover:border-primary/50",
+        isSelected && "border-primary bg-primary/5 shadow-lg"
       )}>
+        {/* Selection overlay */}
+        {isExamSelectionMode && isSelected && (
+          <div className="absolute inset-0 bg-primary/10 rounded-xl flex items-center justify-center z-10">
+            <div className="bg-primary text-primary-foreground rounded-full p-2">
+              <Check className="h-6 w-6" />
+            </div>
+          </div>
+        )}
+
         {/* Content preview section */}
         <LearningCardThumbnail 
           thumbnailUrl={content.metadata?.thumbnailUrl} 
@@ -85,12 +106,14 @@ export function LearningCard({
           contentType={content.type}
           pdfUrl={content.url}
         >
-          <LearningCardMenu
-            onDelete={onDelete}
-            onShare={onShare}
-            onAddToRoom={handleAddToRoom}
-            availableRooms={availableRooms}
-          />
+          {!isExamSelectionMode && (
+            <LearningCardMenu
+              onDelete={onDelete}
+              onShare={onShare}
+              onAddToRoom={handleAddToRoom}
+              availableRooms={availableRooms}
+            />
+          )}
         </LearningCardThumbnail>
 
         {/* Content Info Section */}
@@ -99,6 +122,7 @@ export function LearningCard({
             title={content.title} 
             contentId={content.id}
             onSave={handleTitleUpdate}
+            disabled={isExamSelectionMode}
           />
           <LearningCardFooter roomName={contentRoom?.name} />
         </div>
