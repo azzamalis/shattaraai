@@ -1,38 +1,32 @@
+
 import React from 'react';
-import { ArrowRight, Check, X } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
+
 interface ExamPrepStepOneRedesignedProps {
   selectedCount: number;
   totalCount: number;
   isAllSelected: boolean;
   onToggleSelectAll: () => void;
   onNext: () => void;
-  onCancel?: () => void;
 }
+
 export function ExamPrepStepOneRedesigned({
   selectedCount,
   totalCount,
   isAllSelected,
   onToggleSelectAll,
-  onNext,
-  onCancel
+  onNext
 }: ExamPrepStepOneRedesignedProps) {
-  return <div className="max-w-4xl mx-auto">
+  return (
+    <div className="max-w-4xl mx-auto">
       {/* Header Section */}
       <div className="text-center mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex-1" />
-          <h2 className="text-2xl font-bold text-foreground">
-            Build Your Perfect Exam
-          </h2>
-          <div className="flex-1 flex justify-end">
-            {onCancel && <Button variant="ghost" size="icon" onClick={onCancel} className="h-8 w-8">
-                <X className="h-4 w-4" />
-              </Button>}
-          </div>
-        </div>
+        <h2 className="text-2xl font-bold text-foreground mb-4">
+          Build Your Perfect Exam
+        </h2>
         <p className="text-muted-foreground">
           You're steps away from a tailored exam — based on the topics you choose
         </p>
@@ -48,8 +42,15 @@ export function ExamPrepStepOneRedesigned({
       {/* Footer with Select All and Continue */}
       <div className="flex items-center justify-between pt-6">
         <div className="flex items-center gap-3">
-          <Checkbox checked={isAllSelected} onCheckedChange={onToggleSelectAll} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
-          <span className="text-sm font-medium text-foreground cursor-pointer select-none" onClick={onToggleSelectAll}>
+          <Checkbox 
+            checked={isAllSelected} 
+            onCheckedChange={onToggleSelectAll} 
+            className="data-[state=checked]:bg-primary data-[state=checked]:border-primary" 
+          />
+          <span 
+            className="text-sm font-medium text-foreground cursor-pointer select-none" 
+            onClick={onToggleSelectAll}
+          >
             Select All
           </span>
           <span className="text-sm text-muted-foreground">
@@ -57,9 +58,17 @@ export function ExamPrepStepOneRedesigned({
           </span>
         </div>
         
-        <Button onClick={onNext} disabled={selectedCount === 0} className={cn("bg-foreground hover:bg-foreground/90 text-background hover:text-background transition-all duration-200 hover:shadow-sm px-6", "disabled:opacity-50 disabled:cursor-not-allowed")}>
+        <Button 
+          onClick={onNext} 
+          disabled={selectedCount === 0} 
+          className={cn(
+            "bg-foreground hover:bg-foreground/90 text-background hover:text-background transition-all duration-200 hover:shadow-sm px-6",
+            "disabled:opacity-50 disabled:cursor-not-allowed"
+          )}
+        >
           Continue <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
-    </div>;
+    </div>
+  );
 }

@@ -1,41 +1,60 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, FileText } from 'lucide-react';
+import { MessageCircle, GraduationCap, X } from 'lucide-react';
 
 interface RoomPageActionsProps {
   onChatOpen: () => void;
   onExamModalOpen: () => void;
-  roomId?: string; // Add roomId prop
+  onExamModalClose?: () => void;
+  roomId?: string;
+  isExamMode?: boolean;
 }
 
-export const RoomPageActions: React.FC<RoomPageActionsProps> = ({
-  onChatOpen,
-  onExamModalOpen,
-  roomId
-}) => {
+export function RoomPageActions({ 
+  onChatOpen, 
+  onExamModalOpen, 
+  onExamModalClose,
+  roomId,
+  isExamMode = false
+}: RoomPageActionsProps) {
+  const handleExamButtonClick = () => {
+    if (isExamMode && onExamModalClose) {
+      onExamModalClose();
+    } else {
+      onExamModalOpen();
+    }
+  };
+
   return (
-    <div className="flex items-center gap-4">
-      <Button 
-        className="bg-foreground hover:bg-foreground/90 text-background hover:text-background transition-all duration-200 hover:shadow-sm" 
-        onClick={e => {
-          e.stopPropagation();
-          onChatOpen();
-        }}
+    <div className="flex items-center gap-3">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onChatOpen}
+        className="flex items-center gap-2"
       >
-        <MessageSquare className="mr-2 h-4 w-4" />
-        Room Chat
+        <MessageCircle className="h-4 w-4" />
+        Chat with AI
       </Button>
-      <Button 
-        className="bg-foreground hover:bg-foreground/90 text-background hover:text-background transition-all duration-200 hover:shadow-sm" 
-        onClick={e => {
-          e.stopPropagation();
-          onExamModalOpen();
-        }}
+      
+      <Button
+        size="sm"
+        onClick={handleExamButtonClick}
+        className="flex items-center gap-2"
       >
-        <FileText className="mr-2 h-4 w-4" />
-        Create Exam
+        {isExamMode ? (
+          <>
+            <X className="h-4 w-4" />
+            Close Exam
+          </>
+        ) : (
+          <>
+            <GraduationCap className="h-4 w-4" />
+            Create Exam
+          </>
+        )}
       </Button>
     </div>
   );
-};
+}

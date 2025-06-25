@@ -226,7 +226,9 @@ export default function RoomPage() {
                   <RoomPageActions 
                     onChatOpen={() => setIsChatOpen(true)}
                     onExamModalOpen={() => setIsExamMode(true)}
+                    onExamModalClose={handleExamCancel}
                     roomId={roomId}
+                    isExamMode={isExamMode}
                   />
                 </div>
 
