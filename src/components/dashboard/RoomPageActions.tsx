@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, GraduationCap } from 'lucide-react';
+import { MessageCircle, GraduationCap, X } from 'lucide-react';
 
 interface RoomPageActionsProps {
   onChatOpen: () => void;
@@ -43,8 +43,17 @@ export function RoomPageActions({
         onClick={handleExamButtonClick}
         className="flex items-center gap-2"
       >
-        <GraduationCap className="h-4 w-4" />
-        {isExamMode ? 'Close Exam' : 'Create Exam'}
+        {isExamMode ? (
+          <>
+            <X className="h-4 w-4" />
+            Close Exam
+          </>
+        ) : (
+          <>
+            <GraduationCap className="h-4 w-4" />
+            Create Exam
+          </>
+        )}
       </Button>
     </div>
   );
