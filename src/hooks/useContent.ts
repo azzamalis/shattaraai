@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { uploadPDFToStorage, deletePDFFromStorage, isPDFStorageUrl } from '@/lib/storage';
+import { uploadFileToStorage, deleteFileFromStorage, isStorageUrl, StorageContentType } from '@/lib/storage';
 
 export interface ContentItem {
   id: string;
@@ -13,6 +14,7 @@ export interface ContentItem {
   url?: string;
   text_content?: string;
   filename?: string;
+  storage_path?: string;
   metadata: Record<string, any>;
   created_at: string;
   updated_at: string;
@@ -129,10 +131,14 @@ export const useContent = () => {
     try {
       let finalContentData = { ...contentData };
       
-      // If it's a PDF file, upload to storage
-      if (file && contentData.type === 'pdf') {
-        const uploadedUrl = await uploadPDFToStorage(file, user.id);
-        finalContentData.url = uploadedUrl;
+      // Handle file upload for supported types
+      if (file) {
+        const storageContentType = mapContentTypeToStorage(contentData.type);
+        if (storageContentType) {
+          const uploadedUrl = await uploadFileToStorage(file, storageContentType, user.id);
+          finalContentData.url = uploadedUrl;
+          finalContentData.storage_path = uploadedUrl;
+        }
       }
 
       return await addContent(finalContentData);
@@ -188,10 +194,11 @@ export const useContent = () => {
         return;
       }
 
-      // If the content has a PDF storage URL, delete the file from storage
-      if (contentItem?.url && isPDFStorageUrl(contentItem.url)) {
+      // If the content has a storage URL, delete the file from storage
+      if (contentItem?.url && isStorageUrl(contentItem.url)) {
         try {
-          await deletePDFFromStorage(contentItem.url);
+          const storageContentType = mapContentTypeToStorage(contentItem.type);
+          await deleteFileFromStorage(contentItem.url, storageContentType);
         } catch (storageError) {
           console.error('Error deleting file from storage:', storageError);
           // Don't show error to user as the content record was already deleted
@@ -206,16 +213,34 @@ export const useContent = () => {
     }
   };
 
+  // Helper function to map content types to storage types
+  const mapContentTypeToStorage = (contentType: ContentItem['type']): StorageContentType | null => {
+    const mapping: Record<ContentItem['type'], StorageContentType | null> = {
+      'pdf': 'pdf',
+      'file': 'file',
+      'video': 'video',
+      'audio_file': 'audio_file',
+      'upload': 'upload',
+      'recording': 'recording',
+      'live_recording': 'live_recording',
+      // Non-file types
+      'youtube': null,
+      'website': null,
+      'text': null,
+      'chat': null
+    };
+    return mapping[contentType];
+  };
+
   useEffect(() => {
     fetchContent();
   }, [user]);
 
-  // Set up real-time subscription for content - ensure unique channel and proper cleanup
+  // Enhanced real-time subscription with better error handling
   useEffect(() => {
     if (!user) return;
 
-    // Create a completely unique channel name to avoid conflicts
-    const channelId = `content-${user.id}-${Math.random().toString(36).substr(2, 9)}`;
+    const channelId = `content-realtime-${user.id}-${Date.now()}`;
     
     const channel = supabase
       .channel(channelId)
@@ -225,13 +250,49 @@ export const useContent = () => {
         table: 'content',
         filter: `user_id=eq.${user.id}`
       }, (payload) => {
-        console.log('Content change:', payload);
-        fetchContent(); // Refetch on any change
+        console.log('Real-time content change:', payload);
+        
+        // Handle different event types
+        switch (payload.eventType) {
+          case 'INSERT':
+            const newItem = {
+              ...payload.new,
+              type: payload.new.type as ContentItem['type'],
+              metadata: payload.new.metadata as Record<string, any>
+            } as ContentItem;
+            setContent(prev => {
+              // Avoid duplicates
+              if (prev.some(item => item.id === newItem.id)) return prev;
+              return [newItem, ...prev];
+            });
+            break;
+            
+          case 'UPDATE':
+            const updatedItem = {
+              ...payload.new,
+              type: payload.new.type as ContentItem['type'],
+              metadata: payload.new.metadata as Record<string, any>
+            } as ContentItem;
+            setContent(prev => prev.map(item => 
+              item.id === updatedItem.id ? updatedItem : item
+            ));
+            break;
+            
+          case 'DELETE':
+            setContent(prev => prev.filter(item => item.id !== payload.old.id));
+            break;
+        }
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Real-time subscription active for content');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('Real-time subscription error for content');
+        }
+      });
 
     return () => {
-      // Properly cleanup the channel
+      console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
   }, [user]);

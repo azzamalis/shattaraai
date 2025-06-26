@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useContent } from '@/contexts/ContentContext';
@@ -62,7 +63,7 @@ export function RoomView({
     const contentId = await onAddContent({
       title: contentTitle,
       type: contentType as any,
-      room_id: null,
+      room_id: roomId, // Assign to current room
       metadata: {},
       url: data.url,
       text_content: data.text

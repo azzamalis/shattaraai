@@ -11,11 +11,39 @@ interface ContentViewerProps {
 }
 
 export function ContentViewer({ contentData, onUpdateContent, onTextAction }: ContentViewerProps) {
+  const renderVideoPlayer = (url: string) => (
+    <video
+      src={url}
+      controls
+      className="w-full h-full object-cover"
+      onError={(e) => {
+        console.error('Video loading error:', e);
+        // Could implement fallback or error handling here
+      }}
+    />
+  );
+
+  const renderAudioPlayer = (url: string) => (
+    <div className="flex flex-col items-center justify-center h-full p-8">
+      <audio
+        src={url}
+        controls
+        className="w-full max-w-md"
+        onError={(e) => {
+          console.error('Audio loading error:', e);
+        }}
+      />
+      <p className="text-sm text-muted-foreground mt-4">
+        {contentData.filename || 'Audio File'}
+      </p>
+    </div>
+  );
+
   const renderViewer = () => {
     switch (contentData.type) {
       case 'pdf':
-        // For PDFs, check both url and filePath, and ensure we have a valid URL
-        const pdfUrl = contentData.url || contentData.filePath;
+        // Use either storage URL or direct URL
+        const pdfUrl = contentData.url;
         console.log('PDF URL for viewer:', pdfUrl, 'Content data:', contentData);
         
         return (
@@ -29,17 +57,32 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
         return (
           <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
             {contentData.url ? (
-              <video
-                src={contentData.url}
-                controls
-                className="w-full h-full object-cover"
-              />
+              renderVideoPlayer(contentData.url)
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                   <Video className="h-8 w-8 mb-2" />
                   <span className="text-sm">Video Player</span>
                   <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No video loaded</span>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      
+      case 'audio_file':
+      case 'recording':
+      case 'live_recording':
+        return (
+          <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+            {contentData.url ? (
+              renderAudioPlayer(contentData.url)
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                  <FileText className="h-8 w-8 mb-2" />
+                  <span className="text-sm">Audio Player</span>
+                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No audio file loaded</span>
                 </div>
               </div>
             )}
@@ -69,19 +112,34 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
         );
 
       case 'upload':
+      case 'file':
+        // Handle various file types from storage
         return (
           <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
-            <div className="flex items-center justify-center h-full">
-              <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                <FileUp className="h-8 w-8 mb-2" />
-                <span className="text-sm">File Upload</span>
-                {contentData.filename ? (
-                  <span className="text-xs text-dashboard-text dark:text-dashboard-text">{contentData.filename}</span>
-                ) : (
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No file uploaded</span>
-                )}
+            {contentData.url ? (
+              <div className="flex flex-col items-center justify-center h-full p-4">
+                <FileText className="h-12 w-12 mb-4 text-primary" />
+                <span className="text-sm font-medium text-dashboard-text dark:text-dashboard-text mb-2">
+                  {contentData.filename || 'Document'}
+                </span>
+                <a
+                  href={contentData.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline text-sm"
+                >
+                  Open File
+                </a>
               </div>
-            </div>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                  <FileUp className="h-8 w-8 mb-2" />
+                  <span className="text-sm">File Upload</span>
+                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No file uploaded</span>
+                </div>
+              </div>
+            )}
           </div>
         );
 
