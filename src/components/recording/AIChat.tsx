@@ -78,7 +78,7 @@ const AIChat = () => {
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 bg-dashboard-card/80 dark:bg-dashboard-card border-t border-dashboard-separator dark:border-dashboard-separator">
-        <div className="pt-4">
+        <div className="pt-4 bg-background ">
           <ChatInput value={inputValue} onChange={setInputValue} onSend={handleSendMessage} />
         </div>
       </div>
