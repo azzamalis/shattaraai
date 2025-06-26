@@ -46,7 +46,7 @@ const AIChat = () => {
       setMessages(prev => [...prev, aiResponse]);
     }, 1000);
   };
-  return <div className="flex flex-col h-full relative bg-transparent">
+  return <div className="flex flex-col h-full relative bg-background ">
       <div className="absolute inset-0 bottom-[140px] overflow-hidden">
         <ScrollArea className="h-full" viewportRef={viewportRef}>
           <div className={chatMessageStyles.container}>
