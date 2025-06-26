@@ -11,8 +11,8 @@ interface RoomPageContentProps {
   isExamMode: boolean;
   examStep: number;
   selectedContentIds: string[];
-  handleTitleEdit: (title: string) => void;
-  handleDescriptionEdit: (description: string) => void;
+  handleTitleEdit: (title: string) => Promise<void>;
+  handleDescriptionEdit: (description: string) => Promise<void>;
   handleContentToggle: (contentId: string) => void;
   setIsChatOpen: (open: boolean) => void;
   setIsExamMode: (mode: boolean) => void;
