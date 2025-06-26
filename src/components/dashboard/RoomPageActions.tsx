@@ -29,7 +29,6 @@ export function RoomPageActions({
   return (
     <div className="flex items-center gap-3">
       <Button
-        variant="outline"
         size="sm"
         onClick={onChatOpen}
         className="flex items-center gap-2"

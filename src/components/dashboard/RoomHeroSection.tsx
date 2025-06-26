@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ActionCards } from './ActionCards';
 import { AIChatInput } from '@/components/ui/ai-chat-input';
 import { PasteContentModal } from './PasteContentModal';
 import { ExamPrepStepOneRedesigned } from './exam-prep/ExamPrepStepOneRedesigned';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { useContent } from '@/contexts/ContentContext';
 import { motion } from 'framer-motion';
@@ -99,13 +99,22 @@ export function RoomHeroSection({
   // Render exam prep mode
   if (isExamMode && examModeData) {
     return (
-      <div className="w-full bg-background">
+      <div className="w-full bg-dashboard-secondary-card">
         <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
+            {/* Progress Bar */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted-foreground">Step 1 of 3</span>
+                <span className="text-sm text-muted-foreground">Select Content</span>
+              </div>
+              <Progress value={33.33} className="h-2" />
+            </div>
+
             <ExamPrepStepOneRedesigned
               selectedCount={examModeData.selectedCount}
               totalCount={examModeData.totalCount}
