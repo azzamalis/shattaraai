@@ -22,13 +22,16 @@ interface RoomHeroSectionProps {
     onNext: () => void;
     onCancel: () => void;
   };
+  // Add exam step prop for progress calculation
+  examStep?: number;
 }
 
 export function RoomHeroSection({
   title,
   description,
   isExamMode = false,
-  examModeData
+  examModeData,
+  examStep = 1
 }: RoomHeroSectionProps) {
   const navigate = useNavigate();
   const { onAddContent } = useContent();
@@ -96,11 +99,25 @@ export function RoomHeroSection({
     }
   };
 
+  // Calculate progress percentage based on current step
+  const getProgressValue = () => {
+    return (examStep / 3) * 100;
+  };
+
+  const getStepLabel = () => {
+    switch (examStep) {
+      case 1: return 'Select Content';
+      case 2: return 'AI Tutor Setup';
+      case 3: return 'Exam Configuration';
+      default: return 'Select Content';
+    }
+  };
+
   // Render exam prep mode
   if (isExamMode && examModeData) {
     return (
-      <div className="w-full bg-dashboard-secondary-card">
-        <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-12">
+      <div className="w-full bg-background">
+        <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-12 bg-dashboard-secondary-card rounded-lg shadow-sm">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -109,10 +126,10 @@ export function RoomHeroSection({
             {/* Progress Bar */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-muted-foreground">Step 1 of 3</span>
-                <span className="text-sm text-muted-foreground">Select Content</span>
+                <span className="text-sm font-medium text-muted-foreground">Step {examStep} of 3</span>
+                <span className="text-sm text-muted-foreground">{getStepLabel()}</span>
               </div>
-              <Progress value={33.33} className="h-2" />
+              <Progress value={getProgressValue()} className="h-2" />
             </div>
 
             <ExamPrepStepOneRedesigned
