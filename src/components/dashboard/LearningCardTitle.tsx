@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Edit2, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -55,7 +54,7 @@ export function LearningCardTitle({
     }
   };
   if (isEditing && !disabled) {
-    return <div onClick={e => e.stopPropagation()} className="flex items-center gap-1.5">
+    return <div onClick={e => e.stopPropagation()} className="flex items-center gap-2">
         <Input value={editValue} onChange={e => setEditValue(e.target.value)} onKeyDown={handleKeyDown} className="h-7 text-sm flex-1 min-w-0" autoFocus disabled={isSaving} />
         <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={handleSave} disabled={isSaving}>
           <Check className="h-3 w-3 text-green-600" />
