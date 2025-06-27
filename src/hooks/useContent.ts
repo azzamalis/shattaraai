@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -94,9 +93,16 @@ export const useContent = () => {
     if (!user) return null;
 
     try {
+      // Ensure we're not storing blob URLs
+      const cleanedContentData = {
+        ...contentData,
+        url: contentData.url && contentData.url.startsWith('blob:') ? undefined : contentData.url,
+        storage_path: contentData.storage_path && contentData.storage_path.startsWith('blob:') ? undefined : contentData.storage_path
+      };
+
       const { data, error } = await supabase
         .from('content')
-        .insert([{ ...contentData, user_id: user.id }])
+        .insert([{ ...cleanedContentData, user_id: user.id }])
         .select()
         .single();
 
@@ -135,11 +141,20 @@ export const useContent = () => {
       if (file) {
         const storageContentType = mapContentTypeToStorage(contentData.type);
         if (storageContentType) {
+          console.log('Uploading file to storage:', file.name, 'Type:', storageContentType);
           const uploadedUrl = await uploadFileToStorage(file, storageContentType, user.id);
+          console.log('File uploaded successfully:', uploadedUrl);
+          
+          // Ensure we store the proper Supabase storage URL
           finalContentData.url = uploadedUrl;
           finalContentData.storage_path = uploadedUrl;
+          finalContentData.filename = file.name;
         }
       }
+
+      // Clean any potential blob URLs before saving
+      finalContentData.url = finalContentData.url && finalContentData.url.startsWith('blob:') ? undefined : finalContentData.url;
+      finalContentData.storage_path = finalContentData.storage_path && finalContentData.storage_path.startsWith('blob:') ? undefined : finalContentData.storage_path;
 
       return await addContent(finalContentData);
     } catch (error) {
@@ -153,9 +168,16 @@ export const useContent = () => {
     if (!user) return;
 
     try {
+      // Clean any potential blob URLs before updating
+      const cleanedUpdates = {
+        ...updates,
+        url: updates.url && updates.url.startsWith('blob:') ? undefined : updates.url,
+        storage_path: updates.storage_path && updates.storage_path.startsWith('blob:') ? undefined : updates.storage_path
+      };
+
       const { error } = await supabase
         .from('content')
-        .update(updates)
+        .update(cleanedUpdates)
         .eq('id', contentId)
         .eq('user_id', user.id);
 
@@ -166,7 +188,7 @@ export const useContent = () => {
       }
 
       setContent(prev => prev.map(item => 
-        item.id === contentId ? { ...item, ...updates, updated_at: new Date().toISOString() } : item
+        item.id === contentId ? { ...item, ...cleanedUpdates, updated_at: new Date().toISOString() } : item
       ));
       toast.success('Content updated successfully');
     } catch (error) {

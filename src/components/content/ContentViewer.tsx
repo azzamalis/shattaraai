@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
@@ -42,9 +41,28 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
   const renderViewer = () => {
     switch (contentData.type) {
       case 'pdf':
-        // Use either storage URL or direct URL
-        const pdfUrl = contentData.url;
+        // Use storage URL instead of blob URL - prefer storage_path or url
+        const pdfUrl = contentData.url && !contentData.url.startsWith('blob:') 
+          ? contentData.url 
+          : contentData.filePath && !contentData.filePath.startsWith('blob:')
+          ? contentData.filePath
+          : null;
+        
         console.log('PDF URL for viewer:', pdfUrl, 'Content data:', contentData);
+        
+        if (!pdfUrl) {
+          return (
+            <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+              <div className="flex items-center justify-center h-full">
+                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                  <FileText className="h-8 w-8 mb-2" />
+                  <span className="text-sm">PDF Viewer</span>
+                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No valid PDF URL available</span>
+                </div>
+              </div>
+            </div>
+          );
+        }
         
         return (
           <PDFViewer
@@ -54,16 +72,17 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
         );
       
       case 'video':
+        const videoUrl = contentData.url && !contentData.url.startsWith('blob:') ? contentData.url : null;
         return (
           <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
-            {contentData.url ? (
-              renderVideoPlayer(contentData.url)
+            {videoUrl ? (
+              renderVideoPlayer(videoUrl)
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                   <Video className="h-8 w-8 mb-2" />
                   <span className="text-sm">Video Player</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No video loaded</span>
+                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No valid video URL available</span>
                 </div>
               </div>
             )}
@@ -73,16 +92,17 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       case 'audio_file':
       case 'recording':
       case 'live_recording':
+        const audioUrl = contentData.url && !contentData.url.startsWith('blob:') ? contentData.url : null;
         return (
           <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
-            {contentData.url ? (
-              renderAudioPlayer(contentData.url)
+            {audioUrl ? (
+              renderAudioPlayer(audioUrl)
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                   <FileText className="h-8 w-8 mb-2" />
                   <span className="text-sm">Audio Player</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No audio file loaded</span>
+                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No valid audio URL available</span>
                 </div>
               </div>
             )}
@@ -114,16 +134,17 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       case 'upload':
       case 'file':
         // Handle various file types from storage
+        const fileUrl = contentData.url && !contentData.url.startsWith('blob:') ? contentData.url : null;
         return (
           <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
-            {contentData.url ? (
+            {fileUrl ? (
               <div className="flex flex-col items-center justify-center h-full p-4">
                 <FileText className="h-12 w-12 mb-4 text-primary" />
                 <span className="text-sm font-medium text-dashboard-text dark:text-dashboard-text mb-2">
                   {contentData.filename || 'Document'}
                 </span>
                 <a
-                  href={contentData.url}
+                  href={fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:underline text-sm"
@@ -136,7 +157,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
                 <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                   <FileUp className="h-8 w-8 mb-2" />
                   <span className="text-sm">File Upload</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No file uploaded</span>
+                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No valid file URL available</span>
                 </div>
               </div>
             )}
