@@ -66,18 +66,18 @@ export const RoomItem: React.FC<RoomItemProps> = ({
           <Button
             size="sm"
             onClick={(e) => onSaveRename(e, room.id)}
-            className="h-6 w-6 p-0"
+            className="h-8 w-8 p-0"
             variant="ghost"
           >
-            <Check className="h-3 w-3 text-green-600" />
+            <Check className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
             variant="ghost"
             onClick={onCancelRename}
-            className="h-6 w-6 p-0"
+            className="h-8 w-8 p-0"
           >
-            <X className="h-3 w-3 text-red-600" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       ) : (
@@ -94,8 +94,8 @@ export const RoomItem: React.FC<RoomItemProps> = ({
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                <MoreHorizontal className="h-3 w-3" />
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[200px] p-1">

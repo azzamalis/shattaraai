@@ -49,13 +49,13 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
         <Button 
           variant="ghost" 
           size="icon" 
-          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
           }}
         >
-          <MoreHorizontal className="h-3 w-3" />
+          <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px] p-1 bg-popover border border-border">
