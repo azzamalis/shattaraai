@@ -16,7 +16,7 @@ export const RecentItemEditor: React.FC<RecentItemEditorProps> = ({
   onCancel,
   onKeyDown
 }) => {
-  return <div className="flex items-center gap-1.5 flex-1">
+  return <div className="flex items-center gap-2 flex-1">
       <Input value={value} onChange={e => onChange(e.target.value)} className="flex-1 h-8" autoFocus onKeyDown={onKeyDown} />
       <Button size="sm" onClick={onSave} className="h-8 w-8 p-0" variant="ghost">
         <Check className="h-4 w-4" />
