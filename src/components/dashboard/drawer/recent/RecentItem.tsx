@@ -56,6 +56,7 @@ export const RecentItem: React.FC<RecentItemProps> = ({
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Share clicked for:', content.id, content.title);
     if (onShareClick) {
       onShareClick(content.id, content.title);
     }
@@ -65,6 +66,7 @@ export const RecentItem: React.FC<RecentItemProps> = ({
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Delete clicked for:', content.id, content.title);
     if (onDeleteClick) {
       onDeleteClick(content.id, content.title);
     }

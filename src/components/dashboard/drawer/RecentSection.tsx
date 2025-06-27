@@ -14,6 +14,20 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
 }) => {
   const { recentContent } = useContent();
 
+  const handleShareClick = (contentId: string, contentTitle: string) => {
+    console.log('RecentSection - Share clicked:', contentId, contentTitle);
+    if (onShareClick) {
+      onShareClick(contentId, contentTitle);
+    }
+  };
+
+  const handleDeleteClick = (contentId: string, contentTitle: string) => {
+    console.log('RecentSection - Delete clicked:', contentId, contentTitle);
+    if (onDeleteClick) {
+      onDeleteClick(contentId, contentTitle);
+    }
+  };
+
   if (!recentContent || recentContent.length === 0) {
     return (
       <div className="text-xs text-muted-foreground text-center py-4">
@@ -28,8 +42,8 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
         <RecentItem
           key={content.id}
           content={content}
-          onShareClick={onShareClick}
-          onDeleteClick={onDeleteClick}
+          onShareClick={handleShareClick}
+          onDeleteClick={handleDeleteClick}
         />
       ))}
     </div>
