@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useContent } from '@/contexts/ContentContext';
@@ -50,21 +49,40 @@ export function RoomView({
   }) => {
     let contentType = 'text';
     let contentTitle = 'Text Content';
+    let metadata = {};
+    
     if (data.url) {
       if (data.url.includes('youtube.com') || data.url.includes('youtu.be')) {
         contentType = 'youtube';
         contentTitle = 'YouTube Video';
+        metadata = {
+          url: data.url,
+          type: 'youtube',
+          extractedAt: new Date().toISOString()
+        };
       } else {
         contentType = 'website';
         contentTitle = 'Website Content';
+        metadata = {
+          url: data.url,
+          type: 'website',
+          extractedAt: new Date().toISOString()
+        };
       }
+    } else if (data.text) {
+      metadata = {
+        textLength: data.text.length,
+        type: 'text',
+          createdAt: new Date().toISOString()
+      };
     }
 
+    // Use addContentWithMetadata to store pasted content with metadata in storage
     const contentId = await onAddContent({
       title: contentTitle,
       type: contentType as any,
       room_id: roomId, // Assign to current room
-      metadata: {},
+      metadata,
       url: data.url,
       text_content: data.text
     });

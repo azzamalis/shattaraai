@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -137,7 +138,7 @@ export const useContent = () => {
     try {
       let finalContentData = { ...contentData };
       
-      // Handle file upload for supported types
+      // Handle file upload for ALL file-based content types
       if (file) {
         const storageContentType = mapContentTypeToStorage(contentData.type);
         if (storageContentType) {
@@ -145,10 +146,19 @@ export const useContent = () => {
           const uploadedUrl = await uploadFileToStorage(file, storageContentType, user.id);
           console.log('File uploaded successfully:', uploadedUrl);
           
-          // Ensure we store the proper Supabase storage URL
+          // Store the proper Supabase storage URL
           finalContentData.url = uploadedUrl;
           finalContentData.storage_path = uploadedUrl;
           finalContentData.filename = file.name;
+          
+          // Add file metadata
+          finalContentData.metadata = {
+            ...finalContentData.metadata,
+            fileSize: file.size,
+            fileType: file.type,
+            isUploadedFile: true,
+            uploadedAt: new Date().toISOString()
+          };
         }
       }
 
@@ -174,7 +184,7 @@ export const useContent = () => {
     try {
       let finalContentData = { ...contentData };
       
-      // For pasted content types, optionally store metadata in their respective storage buckets
+      // For pasted content types, store metadata in their respective storage buckets
       if (metadata && ['youtube', 'website', 'chat', 'text'].includes(contentData.type)) {
         try {
           // Generate a temporary ID for the metadata file
@@ -189,7 +199,8 @@ export const useContent = () => {
           // Store metadata URL in the content metadata
           finalContentData.metadata = {
             ...finalContentData.metadata,
-            metadataStoragePath: metadataUrl
+            metadataStoragePath: metadataUrl,
+            uploadedAt: new Date().toISOString()
           };
         } catch (metadataError) {
           console.warn('Failed to upload metadata to storage:', metadataError);
@@ -269,6 +280,16 @@ export const useContent = () => {
         } catch (storageError) {
           console.error('Error deleting file from storage:', storageError);
           // Don't show error to user as the content record was already deleted
+        }
+      }
+
+      // Also delete metadata files if they exist
+      if (contentItem?.metadata?.metadataStoragePath && isStorageUrl(contentItem.metadata.metadataStoragePath)) {
+        try {
+          const storageContentType = mapContentTypeToStorage(contentItem.type);
+          await deleteFileFromStorage(contentItem.metadata.metadataStoragePath, storageContentType);
+        } catch (storageError) {
+          console.error('Error deleting metadata from storage:', storageError);
         }
       }
 

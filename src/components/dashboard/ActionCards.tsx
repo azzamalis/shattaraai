@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Upload, FileText, Mic, Link2 } from 'lucide-react';
@@ -23,43 +22,39 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
     const file = event.target.files?.[0];
     if (file) {
       try {
-        // Determine content type based on file
+        // Determine content type based on file type and extension
         let contentType = 'upload';
-        if (file.type.includes('pdf')) contentType = 'pdf';
-        else if (file.type.includes('audio')) contentType = 'audio_file';
-        else if (file.type.includes('video')) contentType = 'video';
+        const fileType = file.type.toLowerCase();
+        const fileName = file.name.toLowerCase();
+        
+        if (fileType.includes('pdf') || fileName.endsWith('.pdf')) {
+          contentType = 'pdf';
+        } else if (fileType.includes('audio') || ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'].some(ext => fileName.endsWith(ext))) {
+          contentType = 'audio_file';
+        } else if (fileType.includes('video') || ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm'].some(ext => fileName.endsWith(ext))) {
+          contentType = 'video';
+        } else if (['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx'].some(ext => fileName.endsWith(ext))) {
+          contentType = 'file';
+        }
 
-        console.log('Starting file upload:', file.name, 'Type:', contentType);
+        console.log('Starting file upload:', file.name, 'Type:', contentType, 'File type:', fileType);
 
         // Show loading toast
         const loadingToast = toast.loading(`Uploading ${file.name}...`);
 
-        // Use addContentWithFile for PDFs to upload to Supabase Storage
-        // IMPORTANT: Set room_id to null so content is not automatically assigned to any room
-        const contentId = contentType === 'pdf' 
-          ? await addContentWithFile({
-              title: file.name,
-              type: contentType as any,
-              room_id: null, // Do not auto-assign to any room
-              metadata: {
-                fileSize: file.size,
-                fileType: file.type,
-                isUploadedFile: true
-              },
-              filename: file.name
-            }, file)
-          : await addContent({
-              title: file.name,
-              type: contentType as any,
-              room_id: null, // Do not auto-assign to any room
-              metadata: {
-                fileSize: file.size,
-                fileType: file.type,
-                isUploadedFile: true
-              },
-              filename: file.name,
-              url: URL.createObjectURL(file) // Only use blob URLs for non-PDF files
-            });
+        // Use addContentWithFile for ALL file uploads to ensure proper storage handling
+        const contentId = await addContentWithFile({
+          title: file.name,
+          type: contentType as any,
+          room_id: null, // Do not auto-assign to any room
+          metadata: {
+            fileSize: file.size,
+            fileType: file.type,
+            isUploadedFile: true,
+            uploadedAt: new Date().toISOString()
+          },
+          filename: file.name
+        }, file);
 
         // Dismiss loading toast
         toast.dismiss(loadingToast);
@@ -92,7 +87,8 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         room_id: null, // Do not auto-assign to any room
         metadata: {
           isLiveRecording: true,
-          recordingStatus: 'ready'
+          recordingStatus: 'ready',
+          createdAt: new Date().toISOString()
         }
       });
 
@@ -113,7 +109,7 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
       <input 
         ref={fileInputRef} 
         type="file" 
-        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,audio/*,video/*" 
+        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.csv,.xls,.xlsx,audio/*,video/*,image/*" 
         onChange={handleFileSelect} 
         style={{ display: 'none' }} 
       />
@@ -135,7 +131,7 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
                         <div className="flex items-center gap-x-1">
                           <h3 className="font-normal text-sm sm:text-base text-left text-primary/80 group-hover:text-primary">Upload</h3>
                         </div>
-                        <p className="text-xs sm:text-sm group-hover:text-primary/80 text-left text-primary/60">File, Audio, Video</p>
+                        <p className="text-xs sm:text-sm group-hover:text-primary/80 text-left text-primary/60">File, Audio, Video, PDF</p>
                       </div>
                     </div>
                   </div>
@@ -144,7 +140,7 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
               <TooltipContent className="bg-popover border border-border text-popover-foreground px-3 py-2 text-sm rounded-lg shadow-xl" sideOffset={5}>
                 <p className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-muted-foreground" />
-                  Supported file types: PDF, PPT, DOC, TXT, Audio, Video
+                  Supported: PDF, DOC, PPT, TXT, Audio, Video, Images
                 </p>
               </TooltipContent>
             </Tooltip>

@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export type StorageContentType = 'pdf' | 'video' | 'audio_file' | 'upload' | 'file' | 'recording' | 'live_recording' | 'youtube' | 'website' | 'chat' | 'text';
@@ -20,14 +21,14 @@ const CONTENT_TYPE_TO_BUCKET: Record<StorageContentType, string> = {
 // Allowed file extensions for each content type
 const ALLOWED_EXTENSIONS: Record<string, string[]> = {
   'pdfs': ['.pdf'],
-  'videos': ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm'],
-  'audio-files': ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'],
-  'documents': ['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx'],
-  'images': ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'],
-  'youtube-content': ['.txt', '.json', '.html', '.md'], // For cached content, metadata files
-  'website-content': ['.txt', '.json', '.html', '.md'], // For cached content, metadata files
-  'chat-content': ['.txt', '.json', '.html', '.md'], // For cached content, metadata files
-  'text-content': ['.txt', '.json', '.html', '.md'] // For cached content, metadata files
+  'videos': ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv'],
+  'audio-files': ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac', '.wma'],
+  'documents': ['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx', '.csv'],
+  'images': ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'],
+  'youtube-content': ['.json', '.txt', '.html', '.md'],
+  'website-content': ['.json', '.txt', '.html', '.md'],
+  'chat-content': ['.json', '.txt', '.html', '.md'],
+  'text-content': ['.json', '.txt', '.html', '.md']
 };
 
 export async function uploadFileToStorage(
@@ -47,7 +48,7 @@ export async function uploadFileToStorage(
     throw new Error(`File type ${fileExt} not allowed for ${contentType}. Allowed types: ${allowedExts.join(', ')}`);
   }
 
-  const fileName = `${userId}/${Date.now()}${fileExt}`;
+  const fileName = `${userId}/${Date.now()}_${file.name}`;
   
   console.log(`Uploading ${contentType} to ${bucket}:`, fileName);
   
@@ -75,7 +76,7 @@ export async function uploadFileToStorage(
   return publicUrl;
 }
 
-// Updated function to upload content metadata or cached data for pasted content types
+// Upload content metadata or cached data for pasted content types
 export async function uploadPastedContentMetadata(
   metadata: any,
   contentType: 'youtube' | 'website' | 'chat' | 'text',
@@ -83,7 +84,7 @@ export async function uploadPastedContentMetadata(
   contentId: string
 ): Promise<string> {
   const bucket = CONTENT_TYPE_TO_BUCKET[contentType];
-  const fileName = `${userId}/${contentId}.json`;
+  const fileName = `${userId}/${contentId}_metadata.json`;
   
   // Convert metadata to JSON blob
   const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], {
