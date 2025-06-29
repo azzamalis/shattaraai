@@ -64,7 +64,7 @@ function App() {
                   <Route path="/careers" element={<Careers />} />
                   <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/exam/:contentId" element={<ExamPage />} />
-                  <Route path="/exam-loading/:contentId" element={<ExamLoadingPage />} />
+                  <Route path="/exam-loading/:roomId" element={<ExamLoadingPage />} />
                   <Route path="/exam-results/:contentId" element={<ExamResultsPage />} />
                   <Route path="/reports" element={<ReportsPage />} />
                   <Route path="*" element={<NotFound />} />

@@ -115,12 +115,15 @@ export const useRoomPageLogic = () => {
       selectedTopics: selectedItems.map(item => item.title),
       numQuestions,
       questionType,
-      examLength
+      examLength,
+      roomId,
+      selectedContentIds
     };
     localStorage.setItem('examConfig', JSON.stringify(examConfig));
     
     setIsExamMode(false);
-    navigate('/exam-loading');
+    // Navigate to exam loading page with room ID as parameter
+    navigate(`/exam-loading/${roomId}`);
   };
 
   const handleExamCancel = () => {
