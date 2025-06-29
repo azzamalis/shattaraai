@@ -7,6 +7,7 @@ export const fetchContentFromDB = async (userId: string, roomId?: string) => {
   let query = supabase
     .from('content')
     .select('*')
+    .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
   if (roomId) {
