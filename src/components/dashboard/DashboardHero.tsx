@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
@@ -60,13 +61,10 @@ export function DashboardHero({ onPasteClick }: DashboardHeroProps) {
         transition={{ duration: 0.5 }}
         className="relative my-6 sm:my-8"
       >
-        {/* Updated gradient background with more subtle blur effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-2xl blur-md" />
         <div className="relative">
           <AIChatInput 
             onSubmit={handleAISubmit} 
             initialIsActive={false}
-            className="backdrop-blur-[2px]" 
           />
         </div>
       </motion.div>

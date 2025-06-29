@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { useContent } from '@/contexts/ContentContext';
 import { motion } from 'framer-motion';
+
 interface RoomHeroSectionProps {
   title: string;
   description: string;
@@ -24,6 +25,7 @@ interface RoomHeroSectionProps {
   // Add exam step prop for progress calculation
   examStep?: number;
 }
+
 export function RoomHeroSection({
   title,
   description,
@@ -32,14 +34,10 @@ export function RoomHeroSection({
   examStep = 1
 }: RoomHeroSectionProps) {
   const navigate = useNavigate();
-  const {
-    onAddContent
-  } = useContent();
+  const { onAddContent } = useContent();
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
-  const handlePasteSubmit = async (data: {
-    url?: string;
-    text?: string;
-  }) => {
+
+  const handlePasteSubmit = async (data: { url?: string; text?: string; }) => {
     // Determine content type based on URL
     let contentType = 'text';
     let title = 'Text Content';
@@ -65,12 +63,8 @@ export function RoomHeroSection({
     if (contentId) {
       const searchParams = new URLSearchParams({
         type: contentType,
-        ...(data.url && {
-          url: data.url
-        }),
-        ...(data.text && {
-          text: data.text
-        })
+        ...(data.url && { url: data.url }),
+        ...(data.text && { text: data.text })
       });
       navigate(`/content/${contentId}?${searchParams.toString()}`);
       if (data.url) {
@@ -81,6 +75,7 @@ export function RoomHeroSection({
     }
     setIsPasteModalOpen(false);
   };
+
   const handleAISubmit = async (value: string) => {
     // Create chat content WITHOUT automatic room assignment
     const contentId = await onAddContent({
@@ -103,6 +98,7 @@ export function RoomHeroSection({
   const getProgressValue = () => {
     return examStep / 3 * 100;
   };
+
   const getStepLabel = () => {
     switch (examStep) {
       case 1:
@@ -118,17 +114,14 @@ export function RoomHeroSection({
 
   // Render exam prep mode
   if (isExamMode && examModeData) {
-    return <div className="w-full bg-background">
+    return (
+      <div className="w-full bg-background">
         <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-12 bg-dashboard-secondary-card rounded-lg shadow-sm">
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.5
-        }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             {/* Progress Bar */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-2">
@@ -138,70 +131,71 @@ export function RoomHeroSection({
               <Progress value={getProgressValue()} className="h-2" />
             </div>
 
-            <ExamPrepStepOneRedesigned selectedCount={examModeData.selectedCount} totalCount={examModeData.totalCount} isAllSelected={examModeData.isAllSelected} onToggleSelectAll={examModeData.onToggleSelectAll} onNext={examModeData.onNext} />
+            <ExamPrepStepOneRedesigned
+              selectedCount={examModeData.selectedCount}
+              totalCount={examModeData.totalCount}
+              isAllSelected={examModeData.isAllSelected}
+              onToggleSelectAll={examModeData.onToggleSelectAll}
+              onNext={examModeData.onNext}
+            />
           </motion.div>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   // Render default hero content
-  return <div className="w-full bg-background">
+  return (
+    <div className="w-full bg-background">
       <div className="max-w-[800px] mx-auto px-4 sm:px-6">
-        <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} animate={{
-        opacity: 1,
-        y: 0
-      }} transition={{
-        duration: 0.5
-      }} className="text-center mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-8"
+        >
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
             What do you need help understanding today?
           </h2>
-          
         </motion.div>
         
-        <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} animate={{
-        opacity: 1,
-        y: 0
-      }} transition={{
-        duration: 0.5,
-        delay: 0.2
-      }} className="py-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="py-6"
+        >
           <ActionCards onPasteClick={() => setIsPasteModalOpen(true)} />
         </motion.div>
         
-        <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} animate={{
-        opacity: 1,
-        y: 0
-      }} transition={{
-        duration: 0.5
-      }} className="relative my-6 sm:my-8">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-2xl blur-md" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative my-6 sm:my-8"
+        >
           <div className="relative">
-            <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} className="backdrop-blur-[2px]" />
+            <AIChatInput 
+              onSubmit={handleAISubmit} 
+              initialIsActive={false}
+            />
           </div>
         </motion.div>
 
-        <motion.div initial={{
-        opacity: 0
-      }} animate={{
-        opacity: 1
-      }} transition={{
-        duration: 0.5,
-        delay: 0.6
-      }} className="mt-8 text-center">
-          
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="mt-8 text-center"
+        >
         </motion.div>
         
-        <PasteContentModal isOpen={isPasteModalOpen} onClose={() => setIsPasteModalOpen(false)} onSubmit={handlePasteSubmit} />
+        <PasteContentModal
+          isOpen={isPasteModalOpen}
+          onClose={() => setIsPasteModalOpen(false)}
+          onSubmit={handlePasteSubmit}
+        />
       </div>
-    </div>;
+    </div>
+  );
 }
