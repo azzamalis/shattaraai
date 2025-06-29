@@ -52,7 +52,7 @@ export function ContinueLearningSection({
   }
   return <section className="w-full py-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="font-semibold text-foreground text-lg">Continue learning</h2>
+        <h2 className="font-semibold text-foreground text-lg">Continue Learning</h2>
         <button onClick={handleViewAll} className={cn("text-sm text-muted-foreground", "hover:text-foreground transition-colors", "px-4 py-2 rounded-lg", "hover:bg-accent/50")}>
           View all
         </button>
