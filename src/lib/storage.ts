@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export type StorageContentType = 'pdf' | 'video' | 'audio_file' | 'upload' | 'file' | 'recording' | 'live_recording' | 'youtube' | 'website' | 'chat' | 'text';
@@ -12,10 +11,10 @@ const CONTENT_TYPE_TO_BUCKET: Record<StorageContentType, string> = {
   'file': 'documents',
   'recording': 'audio-files',
   'live_recording': 'audio-files',
-  'youtube': 'pasted-content',
-  'website': 'pasted-content',
-  'chat': 'pasted-content',
-  'text': 'pasted-content'
+  'youtube': 'youtube-content',
+  'website': 'website-content',
+  'chat': 'chat-content',
+  'text': 'text-content'
 };
 
 // Allowed file extensions for each content type
@@ -25,7 +24,10 @@ const ALLOWED_EXTENSIONS: Record<string, string[]> = {
   'audio-files': ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'],
   'documents': ['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx'],
   'images': ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'],
-  'pasted-content': ['.txt', '.json', '.html', '.md'] // For cached content, metadata files
+  'youtube-content': ['.txt', '.json', '.html', '.md'], // For cached content, metadata files
+  'website-content': ['.txt', '.json', '.html', '.md'], // For cached content, metadata files
+  'chat-content': ['.txt', '.json', '.html', '.md'], // For cached content, metadata files
+  'text-content': ['.txt', '.json', '.html', '.md'] // For cached content, metadata files
 };
 
 export async function uploadFileToStorage(
@@ -73,15 +75,15 @@ export async function uploadFileToStorage(
   return publicUrl;
 }
 
-// New function to upload content metadata or cached data for pasted content types
+// Updated function to upload content metadata or cached data for pasted content types
 export async function uploadPastedContentMetadata(
   metadata: any,
   contentType: 'youtube' | 'website' | 'chat' | 'text',
   userId: string,
   contentId: string
 ): Promise<string> {
-  const bucket = 'pasted-content';
-  const fileName = `${userId}/${contentType}/${contentId}.json`;
+  const bucket = CONTENT_TYPE_TO_BUCKET[contentType];
+  const fileName = `${userId}/${contentId}.json`;
   
   // Convert metadata to JSON blob
   const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], {

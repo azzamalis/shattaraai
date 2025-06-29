@@ -174,7 +174,7 @@ export const useContent = () => {
     try {
       let finalContentData = { ...contentData };
       
-      // For pasted content types, optionally store metadata in storage
+      // For pasted content types, optionally store metadata in their respective storage buckets
       if (metadata && ['youtube', 'website', 'chat', 'text'].includes(contentData.type)) {
         try {
           // Generate a temporary ID for the metadata file
@@ -369,7 +369,7 @@ export const useContent = () => {
     loading,
     addContent,
     addContentWithFile,
-    addContentWithMetadata, // New function exposed
+    addContentWithMetadata, // Enhanced function exposed
     updateContent,
     deleteContent,
     refreshContent: fetchContent,
