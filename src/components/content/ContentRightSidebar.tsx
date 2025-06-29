@@ -145,7 +145,7 @@ export function ContentRightSidebar({
   return (
     <div className="h-full flex flex-col content-right-sidebar bg-dashboard-card dark:bg-dashboard-card">
       {/* Header with TabsList */}
-      <div className="px-4 pt-4 pb-0">
+      <div className="px-6 py-4 border-b border-border/10">
         <Tabs defaultValue="chat" onValueChange={setActiveTab} className="w-full">
           <TabsList className={cn(
             "w-full justify-center gap-1 p-1 h-12 shrink-0",
