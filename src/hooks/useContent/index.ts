@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { ContentItem } from './types';
@@ -16,7 +15,7 @@ import {
 } from './storageHelpers';
 import { useContentRealtime } from './realtimeSubscription';
 
-export { ContentItem } from './types';
+export type { ContentItem } from './types';
 
 export const useContent = () => {
   const { user } = useAuth();
