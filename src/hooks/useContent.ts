@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { uploadFileToStorage, deleteFileFromStorage, isStorageUrl, StorageContentType } from '@/lib/storage';
+import { uploadFileToStorage, uploadPastedContentMetadata, deleteFileFromStorage, isStorageUrl, StorageContentType } from '@/lib/storage';
 
 export interface ContentItem {
   id: string;
@@ -164,6 +164,51 @@ export const useContent = () => {
     }
   };
 
+  // Enhanced addContent function to handle pasted content metadata storage
+  const addContentWithMetadata = async (
+    contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
+    metadata?: any
+  ) => {
+    if (!user) return null;
+
+    try {
+      let finalContentData = { ...contentData };
+      
+      // For pasted content types, optionally store metadata in storage
+      if (metadata && ['youtube', 'website', 'chat', 'text'].includes(contentData.type)) {
+        try {
+          // Generate a temporary ID for the metadata file
+          const tempId = crypto.randomUUID();
+          const metadataUrl = await uploadPastedContentMetadata(
+            metadata, 
+            contentData.type as 'youtube' | 'website' | 'chat' | 'text',
+            user.id,
+            tempId
+          );
+          
+          // Store metadata URL in the content metadata
+          finalContentData.metadata = {
+            ...finalContentData.metadata,
+            metadataStoragePath: metadataUrl
+          };
+        } catch (metadataError) {
+          console.warn('Failed to upload metadata to storage:', metadataError);
+          // Continue without storing metadata - not critical
+        }
+      }
+
+      // Clean any potential blob URLs before saving
+      finalContentData.url = finalContentData.url && finalContentData.url.startsWith('blob:') ? undefined : finalContentData.url;
+      finalContentData.storage_path = finalContentData.storage_path && finalContentData.storage_path.startsWith('blob:') ? undefined : finalContentData.storage_path;
+
+      return await addContent(finalContentData);
+    } catch (error) {
+      console.error('Error creating content with metadata:', error);
+      toast.error('Failed to create content');
+      return null;
+    }
+  };
+
   const updateContent = async (contentId: string, updates: Partial<ContentItem>) => {
     if (!user) return;
 
@@ -245,11 +290,11 @@ export const useContent = () => {
       'upload': 'upload',
       'recording': 'recording',
       'live_recording': 'live_recording',
-      // Non-file types
-      'youtube': null,
-      'website': null,
-      'text': null,
-      'chat': null
+      // Pasted content types now have storage support
+      'youtube': 'youtube',
+      'website': 'website',
+      'text': 'text',
+      'chat': 'chat'
     };
     return mapping[contentType];
   };
@@ -324,6 +369,7 @@ export const useContent = () => {
     loading,
     addContent,
     addContentWithFile,
+    addContentWithMetadata, // New function exposed
     updateContent,
     deleteContent,
     refreshContent: fetchContent,

@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-export type StorageContentType = 'pdf' | 'video' | 'audio_file' | 'upload' | 'file' | 'recording' | 'live_recording';
+export type StorageContentType = 'pdf' | 'video' | 'audio_file' | 'upload' | 'file' | 'recording' | 'live_recording' | 'youtube' | 'website' | 'chat' | 'text';
 
 // Mapping content types to storage buckets
 const CONTENT_TYPE_TO_BUCKET: Record<StorageContentType, string> = {
@@ -11,7 +11,11 @@ const CONTENT_TYPE_TO_BUCKET: Record<StorageContentType, string> = {
   'upload': 'documents',
   'file': 'documents',
   'recording': 'audio-files',
-  'live_recording': 'audio-files'
+  'live_recording': 'audio-files',
+  'youtube': 'pasted-content',
+  'website': 'pasted-content',
+  'chat': 'pasted-content',
+  'text': 'pasted-content'
 };
 
 // Allowed file extensions for each content type
@@ -20,7 +24,8 @@ const ALLOWED_EXTENSIONS: Record<string, string[]> = {
   'videos': ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm'],
   'audio-files': ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'],
   'documents': ['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx'],
-  'images': ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
+  'images': ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'],
+  'pasted-content': ['.txt', '.json', '.html', '.md'] // For cached content, metadata files
 };
 
 export async function uploadFileToStorage(
@@ -65,6 +70,45 @@ export async function uploadFileToStorage(
 
   console.log(`${contentType} public URL:`, publicUrl);
   
+  return publicUrl;
+}
+
+// New function to upload content metadata or cached data for pasted content types
+export async function uploadPastedContentMetadata(
+  metadata: any,
+  contentType: 'youtube' | 'website' | 'chat' | 'text',
+  userId: string,
+  contentId: string
+): Promise<string> {
+  const bucket = 'pasted-content';
+  const fileName = `${userId}/${contentType}/${contentId}.json`;
+  
+  // Convert metadata to JSON blob
+  const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], {
+    type: 'application/json'
+  });
+  
+  console.log(`Uploading ${contentType} metadata to ${bucket}:`, fileName);
+  
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(fileName, metadataBlob, {
+      cacheControl: '3600',
+      upsert: true // Allow overwriting existing metadata
+    });
+
+  if (error) {
+    console.error(`Storage upload error for ${contentType} metadata:`, error);
+    throw new Error(`Failed to upload ${contentType} metadata: ${error.message}`);
+  }
+
+  console.log(`${contentType} metadata uploaded successfully:`, data.path);
+
+  // Get the public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(data.path);
+
   return publicUrl;
 }
 
