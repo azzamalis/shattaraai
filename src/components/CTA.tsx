@@ -22,7 +22,7 @@ const CTA = () => {
                 "institution"
               ]}
               interval={3000}
-              className="text-[#E3E3E3]"
+              className="text-[#00A3FF]"
             />
             {' '}you deserve better tools!
           </h2>
