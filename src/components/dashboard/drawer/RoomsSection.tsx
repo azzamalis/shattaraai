@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, ChevronDown } from 'lucide-react';
+import { Plus, ChevronDown, Loader2 } from 'lucide-react';
 import { Room } from '@/hooks/useRooms';
 import { RoomItem } from './RoomItem';
 import { createRoomHandlers } from './RoomHandlers';
@@ -60,10 +60,10 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
       const roomId = await onAddRoom();
       if (roomId) {
         onOpenChange(false);
-        // Add delay before navigation to ensure room is created in Supabase
+        // Increased delay to 1000ms for Supabase sync
         setTimeout(() => {
           navigate(`/rooms/${roomId}`);
-        }, 800);
+        }, 1000);
       }
     } catch (error) {
       console.error('Error creating room:', error);
@@ -92,10 +92,17 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
           onClick={handleAddRoomClick}
           disabled={isCreating}
         >
-          <Plus className="h-4 w-4" />
-          <span className="text-sm font-normal">
-            {isCreating ? 'Creating...' : 'Add room'}
-          </span>
+          {isCreating ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm font-normal">Creating...</span>
+            </>
+          ) : (
+            <>
+              <Plus className="h-4 w-4" />
+              <span className="text-sm font-normal">Add room</span>
+            </>
+          )}
         </Button>
 
         {visibleRooms.map((room) => (
