@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { HeroSection } from '@/components/hero/HeroSection';
+import ContactHero from '@/components/hero/page-specific/ContactHero';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -129,13 +128,13 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <HeroSection />
+    <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
+      <ContactHero />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Get in Touch</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-[#FAFAFA]">Get in Touch</h1>
+          <p className="text-xl text-[#9A9A9A] max-w-3xl mx-auto">
             Have questions about our platform? Looking to partner with us? 
             Our team is ready to help you transform education with AI.
           </p>
@@ -143,74 +142,74 @@ const Contact = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="bg-card p-8 rounded-xl border border-border">
-            <h2 className="text-2xl font-semibold mb-6 text-foreground">Send Us a Message</h2>
+          <div id="contact-form" className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
+            <h2 className="text-2xl font-semibold mb-6 text-[#FAFAFA]">Send Us a Message</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground">Your Name *</Label>
+                <Label htmlFor="name" className="text-[#FAFAFA]">Your Name *</Label>
                 <Input 
                   id="name" 
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="bg-background border-border focus:border-primary text-foreground" 
+                  className="bg-[#121212] border-[#2E2E2E] focus:border-[#E3E3E3] text-[#FAFAFA]" 
                   placeholder="Full Name"
                   disabled={isSubmitting}
                 />
                 {errors.name && (
-                  <p className="text-sm text-destructive">{errors.name}</p>
+                  <p className="text-sm text-red-400">{errors.name}</p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground">Email Address *</Label>
+                <Label htmlFor="email" className="text-[#FAFAFA]">Email Address *</Label>
                 <Input 
                   id="email" 
                   type="email" 
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  className="bg-background border-border focus:border-primary text-foreground" 
+                  className="bg-[#121212] border-[#2E2E2E] focus:border-[#E3E3E3] text-[#FAFAFA]" 
                   placeholder="your@email.com"
                   disabled={isSubmitting}
                 />
                 {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
+                  <p className="text-sm text-red-400">{errors.email}</p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="subject" className="text-foreground">Subject *</Label>
+                <Label htmlFor="subject" className="text-[#FAFAFA]">Subject *</Label>
                 <Input 
                   id="subject" 
                   value={formData.subject}
                   onChange={(e) => handleInputChange('subject', e.target.value)}
-                  className="bg-background border-border focus:border-primary text-foreground" 
+                  className="bg-[#121212] border-[#2E2E2E] focus:border-[#E3E3E3] text-[#FAFAFA]" 
                   placeholder="How can we help?"
                   disabled={isSubmitting}
                 />
                 {errors.subject && (
-                  <p className="text-sm text-destructive">{errors.subject}</p>
+                  <p className="text-sm text-red-400">{errors.subject}</p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="message" className="text-foreground">Message *</Label>
+                <Label htmlFor="message" className="text-[#FAFAFA]">Message *</Label>
                 <Textarea 
                   id="message" 
                   value={formData.message}
                   onChange={(e) => handleInputChange('message', e.target.value)}
-                  className="bg-background border-border focus:border-primary text-foreground h-32 resize-none" 
+                  className="bg-[#121212] border-[#2E2E2E] focus:border-[#E3E3E3] text-[#FAFAFA] h-32 resize-none" 
                   placeholder="Tell us more about your inquiry..."
                   disabled={isSubmitting}
                 />
                 {errors.message && (
-                  <p className="text-sm text-destructive">{errors.message}</p>
+                  <p className="text-sm text-red-400">{errors.message}</p>
                 )}
               </div>
               
               <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full bg-primary hover:bg-primary/90 relative"
+                className="w-full bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90 relative"
               >
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -220,75 +219,74 @@ const Contact = () => {
             </form>
           </div>
           
-          {/* Contact Information */}
           <div className="space-y-8">
-            <div className="bg-card p-8 rounded-xl border border-border mb-8">
-              <h2 className="text-2xl font-semibold mb-6 text-foreground">Contact Information</h2>
+            <div className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E] mb-8">
+              <h2 className="text-2xl font-semibold mb-6 text-[#FAFAFA]">Contact Information</h2>
               
               <div className="space-y-6">
                 <div className="flex items-start">
-                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0">
-                    <MapPin className="text-primary size-5" />
+                  <div className="size-10 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
+                    <MapPin className="text-[#E3E3E3] size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1 text-foreground">Our Location</h3>
-                    <p className="text-muted-foreground">Madinah Main Highway Road<br />Al Faisaliyah District<br />Jeddah, KSA</p>
+                    <h3 className="font-medium mb-1 text-[#FAFAFA]">Our Location</h3>
+                    <p className="text-[#9A9A9A]">Madinah Main Highway Road<br />Al Faisaliyah District<br />Jeddah, KSA</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0">
-                    <Mail className="text-primary size-5" />
+                  <div className="size-10 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
+                    <Mail className="text-[#E3E3E3] size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1 text-foreground">Email Us</h3>
-                    <p className="text-muted-foreground">hello@shattaraai.com</p>
+                    <h3 className="font-medium mb-1 text-[#FAFAFA]">Email Us</h3>
+                    <p className="text-[#9A9A9A]">hello@shattaraai.com</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0">
-                    <Phone className="text-primary size-5" />
+                  <div className="size-10 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
+                    <Phone className="text-[#E3E3E3] size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1 text-foreground">Call Us</h3>
-                    <p className="text-muted-foreground">+966 53 481 4860<br />+966 55 895 71721</p>
+                    <h3 className="font-medium mb-1 text-[#FAFAFA]">Call Us</h3>
+                    <p className="text-[#9A9A9A]">+966 53 481 4860<br />+966 55 895 71721</p>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-card p-8 rounded-xl border border-border">
-              <h2 className="text-2xl font-semibold mb-6 text-foreground">Specialized Inquiries</h2>
+            <div className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
+              <h2 className="text-2xl font-semibold mb-6 text-[#FAFAFA]">Specialized Inquiries</h2>
               
               <div className="space-y-6">
                 <div className="flex items-start">
-                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0">
-                    <Headphones className="text-primary size-5" />
+                  <div className="size-10 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
+                    <Headphones className="text-[#E3E3E3] size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1 text-foreground">Technical Support</h3>
-                    <p className="text-muted-foreground">hello@shattaraai.com<br />+966 53 481 4860</p>
+                    <h3 className="font-medium mb-1 text-[#FAFAFA]">Technical Support</h3>
+                    <p className="text-[#9A9A9A]">hello@shattaraai.com<br />+966 53 481 4860</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0">
-                    <Building className="text-primary size-5" />
+                  <div className="size-10 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
+                    <Building className="text-[#E3E3E3] size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1 text-foreground">Partnership Inquiries</h3>
-                    <p className="text-muted-foreground">hello@shattaraai.com<br />+966 53 481 4860</p>
+                    <h3 className="font-medium mb-1 text-[#FAFAFA]">Partnership Inquiries</h3>
+                    <p className="text-[#9A9A9A]">hello@shattaraai.com<br />+966 53 481 4860</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0">
-                    <BookOpen className="text-primary size-5" />
+                  <div className="size-10 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
+                    <BookOpen className="text-[#E3E3E3] size-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1 text-foreground">Educational Resources</h3>
-                    <p className="text-muted-foreground">hello@shattaraai.com<br />+966 53 481 4860</p>
+                    <h3 className="font-medium mb-1 text-[#FAFAFA]">Educational Resources</h3>
+                    <p className="text-[#9A9A9A]">hello@shattaraai.com<br />+966 53 481 4860</p>
                   </div>
                 </div>
               </div>

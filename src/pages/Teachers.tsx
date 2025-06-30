@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { HeroSection } from '@/components/hero/HeroSection';
+import TeachersHero from '@/components/hero/page-specific/TeachersHero';
 import Footer from '@/components/Footer';
 import { ArrowRight, BookOpen, Layers, BarChart3, Zap, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,7 @@ import ZcalModal from '@/components/ZcalModal';
 const Teachers = () => {
   return (
     <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
-      <HeroSection />
+      <TeachersHero />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-20">

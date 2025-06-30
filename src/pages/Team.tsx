@@ -1,12 +1,11 @@
-
 import React from 'react';
-import { HeroSection } from '@/components/hero/HeroSection';
+import TeamHero from '@/components/hero/page-specific/TeamHero';
 import Footer from '@/components/Footer';
 
 const Team = () => {
   return (
     <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
-      <HeroSection />
+      <TeamHero />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-16 text-[#FAFAFA]">Our Team</h1>
