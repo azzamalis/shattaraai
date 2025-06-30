@@ -4,7 +4,6 @@ import SmartCTA from '@/components/SmartCTA';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import HeroActionLink from './HeroActionLink';
 import { Code, Atom, Zap } from 'lucide-react';
-import EducationAnimation from './EducationAnimation';
 import { scrollToElement } from '@/lib/scrollUtils';
 
 const transitionVariants = {
@@ -158,8 +157,12 @@ const HeroContent = () => {
             <div className="bg-[#141414]/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#E3E3E3]/10 p-4 shadow-lg shadow-black/15">
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-[#E3E3E3] to-transparent"></div>
               
-              {/* Replace static image with the p5.js animation */}
-              <EducationAnimation className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px]" />
+              {/* Replace EducationAnimation with the uploaded image */}
+              <img
+                src="/lovable-uploads/2bc5288d-2915-45fe-ab54-f4b2b3741065.png"
+                alt="Shattara AI Dashboard Interface"
+                className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover"
+              />
             </div>
           </div>
         </AnimatedGroup>
