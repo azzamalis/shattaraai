@@ -1,19 +1,17 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Briefcase, Heart, Rocket, Users } from 'lucide-react';
 import SharedHeroHeader from '../shared/SharedHeroHeader';
-
 const CareersHero = () => {
   const scrollToPositions = () => {
     const positionsElement = document.querySelector('[data-section="positions"]');
     if (positionsElement) {
-      positionsElement.scrollIntoView({ behavior: 'smooth' });
+      positionsElement.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <div className="bg-[#121212] text-[#FAFAFA]">
+  return <div className="bg-[#121212] text-[#FAFAFA]">
       <SharedHeroHeader />
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -38,9 +36,7 @@ const CareersHero = () => {
             <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90" onClick={scrollToPositions}>
               View Open Positions
             </Button>
-            <Button variant="outline" size="lg" className="text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10">
-              Learn About Culture
-            </Button>
+            
           </div>
 
           {/* Company highlights */}
@@ -71,8 +67,6 @@ const CareersHero = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default CareersHero;
