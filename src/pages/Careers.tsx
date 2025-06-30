@@ -3,49 +3,40 @@ import CareersHero from '@/components/hero/page-specific/CareersHero';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Building, Heart, Users, Globe, Zap } from 'lucide-react';
-
 const Careers = () => {
   // Sample job listings
-  const jobListings = [
-    {
-      title: "AI Research Scientist",
-      department: "Research & Development",
-      location: "Jeddah, Saudi Arabia",
-      type: "Full-time"
-    },
-    {
-      title: "Educational Content Developer",
-      department: "Curriculum",
-      location: "Remote",
-      type: "Full-time"
-    },
-    {
-      title: "Frontend Engineer",
-      department: "Engineering",
-      location: "Jeddah, Saudi Arabia",
-      type: "Full-time"
-    },
-    {
-      title: "UI/UX Designer",
-      department: "Design",
-      location: "Jeddah, Saudi Arabia",
-      type: "Full-time"
-    },
-    {
-      title: "Marketing Specialist",
-      department: "Marketing",
-      location: "Remote",
-      type: "Full-time"
-    }
-  ];
+  const jobListings = [{
+    title: "AI Research Scientist",
+    department: "Research & Development",
+    location: "Jeddah, Saudi Arabia",
+    type: "Full-time"
+  }, {
+    title: "Educational Content Developer",
+    department: "Curriculum",
+    location: "Remote",
+    type: "Full-time"
+  }, {
+    title: "Frontend Engineer",
+    department: "Engineering",
+    location: "Jeddah, Saudi Arabia",
+    type: "Full-time"
+  }, {
+    title: "UI/UX Designer",
+    department: "Design",
+    location: "Jeddah, Saudi Arabia",
+    type: "Full-time"
+  }, {
+    title: "Marketing Specialist",
+    department: "Marketing",
+    location: "Remote",
+    type: "Full-time"
+  }];
 
   // Function to handle redirecting to the Tally form
   const handleApplyRedirect = () => {
     window.open('https://tally.so/r/w4q5AA', '_blank');
   };
-
-  return (
-    <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
+  return <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
       <CareersHero />
       
       {/* Hero Section */}
@@ -68,7 +59,7 @@ const Careers = () => {
                   <Heart className="text-[#E3E3E3] size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA]">Passion for Education</h3>
+                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Passion for Education</h3>
                   <p className="text-[#9A9A9A]">We believe in the transformative power of education and are committed to making it accessible to all.</p>
                 </div>
               </div>
@@ -78,7 +69,7 @@ const Careers = () => {
                   <Users className="text-[#E3E3E3] size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA]">Collaborative Environment</h3>
+                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Collaborative Environment</h3>
                   <p className="text-[#9A9A9A]">We foster an inclusive workplace where diverse perspectives are valued and everyone's voice is heard.</p>
                 </div>
               </div>
@@ -88,7 +79,7 @@ const Careers = () => {
                   <Globe className="text-[#E3E3E3] size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA]">Global Impact</h3>
+                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Global Impact</h3>
                   <p className="text-[#9A9A9A]">Our work extends beyond borders, creating positive change in educational systems worldwide.</p>
                 </div>
               </div>
@@ -103,7 +94,7 @@ const Careers = () => {
                   <Building className="text-[#E3E3E3] size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA]">Work Environment</h3>
+                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Work Environment</h3>
                   <p className="text-[#9A9A9A]">Modern offices, flexible remote options, and a culture that prioritizes work-life balance.</p>
                 </div>
               </div>
@@ -113,7 +104,7 @@ const Careers = () => {
                   <Zap className="text-[#E3E3E3] size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA]">Growth Opportunities</h3>
+                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Growth Opportunities</h3>
                   <p className="text-[#9A9A9A]">Continuous learning, professional development funds, and clear career advancement paths.</p>
                 </div>
               </div>
@@ -123,7 +114,7 @@ const Careers = () => {
                   <Heart className="text-[#E3E3E3] size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA]">Comprehensive Benefits</h3>
+                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Comprehensive Benefits</h3>
                   <p className="text-[#9A9A9A]">Competitive salary, health insurance, paid time off, and employee wellness programs.</p>
                 </div>
               </div>
@@ -136,20 +127,15 @@ const Careers = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-[#FAFAFA]">Open Positions</h2>
           
           <div className="bg-[#141414] rounded-xl border border-[#2E2E2E] overflow-hidden">
-            {jobListings.map((job, index) => (
-              <div key={index} className={`p-6 flex flex-col md:flex-row md:items-center md:justify-between ${index !== jobListings.length - 1 ? 'border-b border-[#2E2E2E]' : ''}`}>
+            {jobListings.map((job, index) => <div key={index} className={`p-6 flex flex-col md:flex-row md:items-center md:justify-between ${index !== jobListings.length - 1 ? 'border-b border-[#2E2E2E]' : ''}`}>
                 <div className="mb-4 md:mb-0">
                   <h3 className="text-xl font-semibold mb-1 text-[#FAFAFA]">{job.title}</h3>
                   <p className="text-[#9A9A9A]">{job.department} · {job.location} · {job.type}</p>
                 </div>
-                <Button 
-                  className="self-start md:self-center bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90"
-                  onClick={handleApplyRedirect}
-                >
+                <Button className="self-start md:self-center bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90" onClick={handleApplyRedirect}>
                   Apply Now <ArrowRight className="ml-2 size-4" />
                 </Button>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
         
@@ -160,19 +146,13 @@ const Careers = () => {
             We're always looking for talented individuals. Send us your resume, and we'll 
             keep you in mind for future opportunities.
           </p>
-          <Button 
-            size="lg" 
-            className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90"
-            onClick={handleApplyRedirect}
-          >
+          <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90" onClick={handleApplyRedirect}>
             Send General Application
           </Button>
         </div>
       </section>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Careers;
