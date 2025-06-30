@@ -73,7 +73,6 @@ const Contact = () => {
   const handleInputChange = (field: keyof ContactFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
@@ -107,7 +106,6 @@ const Contact = () => {
         description: "Thank you for your message. We'll get back to you within 24-48 hours.",
       });
 
-      // Reset form
       setFormData({
         name: '',
         email: '',
@@ -141,7 +139,6 @@ const Contact = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
           <div id="contact-form" className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
             <h2 className="text-2xl font-semibold mb-6 text-[#FAFAFA]">Send Us a Message</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -151,7 +148,7 @@ const Contact = () => {
                   id="name" 
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="bg-[#121212] border-[#2E2E2E] focus:border-[#E3E3E3] text-[#FAFAFA]" 
+                  className="bg-[#121212] border-[#2E2E2E] text-[#FAFAFA] focus-visible:border-[#E3E3E3]" 
                   placeholder="Full Name"
                   disabled={isSubmitting}
                 />
@@ -167,7 +164,7 @@ const Contact = () => {
                   type="email" 
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  className="bg-[#121212] border-[#2E2E2E] focus:border-[#E3E3E3] text-[#FAFAFA]" 
+                  className="bg-[#121212] border-[#2E2E2E] text-[#FAFAFA] focus-visible:border-[#E3E3E3]" 
                   placeholder="your@email.com"
                   disabled={isSubmitting}
                 />
@@ -182,7 +179,7 @@ const Contact = () => {
                   id="subject" 
                   value={formData.subject}
                   onChange={(e) => handleInputChange('subject', e.target.value)}
-                  className="bg-[#121212] border-[#2E2E2E] focus:border-[#E3E3E3] text-[#FAFAFA]" 
+                  className="bg-[#121212] border-[#2E2E2E] text-[#FAFAFA] focus-visible:border-[#E3E3E3]" 
                   placeholder="How can we help?"
                   disabled={isSubmitting}
                 />
@@ -197,7 +194,7 @@ const Contact = () => {
                   id="message" 
                   value={formData.message}
                   onChange={(e) => handleInputChange('message', e.target.value)}
-                  className="bg-[#121212] border-[#2E2E2E] focus:border-[#E3E3E3] text-[#FAFAFA] h-32 resize-none" 
+                  className="bg-[#121212] border-[#2E2E2E] text-[#FAFAFA] h-32 resize-none focus-visible:border-[#E3E3E3]" 
                   placeholder="Tell us more about your inquiry..."
                   disabled={isSubmitting}
                 />
