@@ -10,7 +10,7 @@ import Footer from '@/components/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#121212] text-[#FAFAFA]">
       <main className="flex-grow">
         <HeroSection />
         <Features />
