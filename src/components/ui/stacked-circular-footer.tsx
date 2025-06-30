@@ -79,10 +79,10 @@ function StackedCircularFooter() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center">
           <div style={{
-          width: '120px',
-          height: '120px'
-        }} className="mb-8 rounded-full p-4 flex items-center justify-center bg-transparent">
-            <Logo textColor="text-foreground" className="scale-90" />
+          width: '200px',
+          height: '200px'
+        }} className="mb-8 rounded-full p-6 flex items-center justify-center bg-transparent">
+            <Logo textColor="text-foreground" className="scale-125" />
           </div>
           
           <nav className="mb-8 flex flex-wrap justify-center gap-6">
