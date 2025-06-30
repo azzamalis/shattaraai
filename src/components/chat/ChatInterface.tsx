@@ -1,21 +1,19 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { ChatTabType, Message } from '@/lib/types';
 import { ChatTabNavigation } from './ChatTabNavigation';
 import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { NotesEditor } from './NotesEditor/NotesEditor';
-import { EmptyStates } from './EmptyStates';
 import { toast } from 'sonner';
+import { Brain } from 'lucide-react';
 
 interface ChatInterfaceProps {
   activeTab: ChatTabType;
   onTabChange: (tab: ChatTabType) => void;
   initialQuery?: string | null;
-  contentId?: string;
 }
 
-export function ChatInterface({ activeTab, onTabChange, initialQuery, contentId }: ChatInterfaceProps) {
+export function ChatInterface({ activeTab, onTabChange, initialQuery }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -105,7 +103,7 @@ export function ChatInterface({ activeTab, onTabChange, initialQuery, contentId 
         return (
           <div className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <EmptyStates type={activeTab} contentId={contentId} />
+              <EmptyStates type={activeTab} />
             </div>
           </div>
         );
@@ -121,3 +119,35 @@ export function ChatInterface({ activeTab, onTabChange, initialQuery, contentId 
     </div>
   );
 }
+interface EmptyStatesProps {
+  type: ChatTabType;
+}
+
+export function EmptyStates({ type }: EmptyStatesProps) {
+  const getContent = () => {
+    switch (type) {
+      case 'flashcards':
+        return {
+          description: 'Learn with the Shattara AI Tutor using interactive flashcards.'
+        };
+      case 'quizzes':
+        return {
+          description: 'Learn with the Shattara AI Tutor through adaptive quizzes.'
+        };
+      default:
+        return null;
+    }
+  };
+
+  const content = getContent();
+  if (!content) return null;
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-8">
+      <p className="text-muted-foreground text-center max-w-md">
+        {content.description}
+      </p>
+    </div>
+  );
+}
+

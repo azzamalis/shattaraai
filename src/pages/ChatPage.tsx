@@ -36,7 +36,6 @@ export default function ChatPage() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           initialQuery={query}
-          contentId={id}
         />
       </div>
     </DashboardLayout>
