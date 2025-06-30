@@ -81,7 +81,7 @@ function StackedCircularFooter() {
           <div style={{
           width: '120px',
           height: '120px'
-        }} className="mb-8 rounded-full p-4 flex items-center justify-center bg-transparent">
+        }} className="mb-8 rounded-full p-4 flex items-center justify-center bg-transparent py-[12px] px-[38px]">
             <Logo textColor="text-foreground" className="scale-90" />
           </div>
           
