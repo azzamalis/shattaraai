@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Pencil, Trash, Plus, Check, X, Box, Loader2 } from 'lucide-react';
+import { Pencil, Trash, Plus, Check, X, Box } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -33,10 +34,10 @@ export const RoomCard: React.FC<RoomCardProps> = ({
       try {
         const roomId = await onAdd();
         if (roomId) {
-          // Increased delay to 1000ms for Supabase sync
+          // Add delay before navigation to ensure room is created in Supabase
           setTimeout(() => {
             navigate(`/rooms/${roomId}`);
-          }, 1000);
+          }, 800);
         }
       } catch (error) {
         console.error('Error creating room:', error);
@@ -62,25 +63,14 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
             >
-              {isCreating ? (
-                <>
-                  <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
-                  <span className="text-muted-foreground text-base">
-                    Creating...
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Plus 
-                    className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-all duration-300" 
-                  />
-                  <span 
-                    className="text-muted-foreground group-hover:text-foreground text-base transition-colors duration-300"
-                  >
-                    Add room
-                  </span>
-                </>
-              )}
+              <Plus 
+                className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-all duration-300" 
+              />
+              <span 
+                className="text-muted-foreground group-hover:text-foreground text-base transition-colors duration-300"
+              >
+                {isCreating ? 'Creating...' : 'Add room'}
+              </span>
             </button>
           </TooltipTrigger>
           <TooltipContent>
