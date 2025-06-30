@@ -125,7 +125,7 @@ function StackedCircularFooter() {
             <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
               <div className="flex-grow">
                 <Label htmlFor="newsletter-email" className="sr-only">Email</Label>
-                <Input id="newsletter-email" placeholder="Enter your email" type="email" value={email} onChange={e => setEmail(e.target.value)} disabled={isSubmitting} className="rounded-full bg-background border-border focus:border-primary text-foreground" />
+                <Input id="newsletter-email" placeholder="Enter your email" type="email" value={email} onChange={e => setEmail(e.target.value)} disabled={isSubmitting} className="rounded-full bg-background border-border focus:border-primary focus:ring-0 focus:ring-offset-0 text-foreground" />
               </div>
               <Button type="submit" disabled={isSubmitting} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 relative">
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
