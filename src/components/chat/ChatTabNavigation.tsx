@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ChatTabType } from '@/lib/types';
 import { MessageCircle, FileStack, Brain, FileText } from 'lucide-react';
@@ -41,8 +42,8 @@ export function ChatTabNavigation({ activeTab, onTabChange }: ChatTabNavigationP
                 "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
                 "hover:text-dashboard-text dark:hover:text-dashboard-text",
                 "data-[state=active]:text-primary",
-                "data-[state=active]:bg-primary/10",
-                "data-[state=active]:hover:bg-primary/20",
+                "data-[state=active]:bg-dashboard-secondary-card dark:data-[state=active]:bg-dashboard-secondary-card",
+                "data-[state=active]:hover:bg-dashboard-secondary-card/80 dark:data-[state=active]:hover:bg-dashboard-secondary-card/80",
                 "transition-colors duration-200",
                 "focus-visible:ring-0 focus-visible:ring-offset-0",
                 "focus:ring-0 focus:ring-offset-0",
