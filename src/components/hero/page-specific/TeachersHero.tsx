@@ -1,13 +1,10 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { GraduationCap, Users, TrendingUp, Zap } from 'lucide-react';
 import SharedHeroHeader from '../shared/SharedHeroHeader';
 import ZcalModal from '@/components/ZcalModal';
-
 const TeachersHero = () => {
-  return (
-    <div className="bg-[#121212] text-[#FAFAFA]">
+  return <div className="bg-[#121212] text-[#FAFAFA]">
       <SharedHeroHeader />
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -30,20 +27,12 @@ const TeachersHero = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <ZcalModal 
-              bookingUrl="https://zcal.co/i/4vqAOC__?embed=1&embedType=iframe" 
-              title="Schedule a School Demo"
-              embedHeight={966}
-              embedWidth={1096}
-              modalName="teacher_demo"
-            >
+            <ZcalModal bookingUrl="https://zcal.co/i/4vqAOC__?embed=1&embedType=iframe" title="Schedule a School Demo" embedHeight={966} embedWidth={1096} modalName="teacher_demo">
               <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90">
                 Request School Demo
               </Button>
             </ZcalModal>
-            <Button variant="outline" size="lg" className="text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10">
-              Try Free Today
-            </Button>
+            
           </div>
 
           {/* Social proof */}
@@ -74,8 +63,6 @@ const TeachersHero = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default TeachersHero;
