@@ -1,19 +1,17 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Clock, Headphones, Mail } from 'lucide-react';
 import SharedHeroHeader from '../shared/SharedHeroHeader';
-
 const ContactHero = () => {
   const scrollToForm = () => {
     const formElement = document.getElementById('contact-form');
     if (formElement) {
-      formElement.scrollIntoView({ behavior: 'smooth' });
+      formElement.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <div className="bg-[#121212] text-[#FAFAFA]">
+  return <div className="bg-[#121212] text-[#FAFAFA]">
       <SharedHeroHeader />
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -39,9 +37,7 @@ const ContactHero = () => {
             <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90" onClick={scrollToForm}>
               Send Message
             </Button>
-            <Button variant="outline" size="lg" className="text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10">
-              Call Us Now
-            </Button>
+            
           </div>
 
           {/* Support promises */}
@@ -72,8 +68,6 @@ const ContactHero = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default ContactHero;
