@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Document, Page } from 'react-pdf';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -140,14 +139,6 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
                     onLoadError={onDocumentLoadError}
                     loading={null}
                     error={null}
-                    options={{
-                      cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
-                      cMapPacked: true,
-                      standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
-                      verbosity: 0,
-                      disableAutoFetch: false,
-                      disableStream: false,
-                    }}
                   >
                     <Page
                       pageNumber={pageNumber}

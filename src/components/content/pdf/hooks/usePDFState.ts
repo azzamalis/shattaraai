@@ -3,16 +3,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { pdfjs } from 'react-pdf';
 import { SearchResult, TextActionPosition } from '../types';
 
-// Configure PDF.js worker with better compatibility
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
-
-// Fallback worker configuration
-if (!pdfjs.GlobalWorkerOptions.workerSrc) {
-  pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
-}
+// Configure PDF.js worker with a more reliable path
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
 export function usePDFState(url?: string) {
   const [numPages, setNumPages] = useState<number>(0);
