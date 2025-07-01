@@ -141,123 +141,32 @@ export function ContentRightSidebar({
 }: ContentRightSidebarProps) {
   const [activeTab, setActiveTab] = useState("chat");
   const [isRecording, setIsRecording] = useState(false);
-
-  return (
-    <div className="h-full flex flex-col content-right-sidebar bg-dashboard-card dark:bg-dashboard-card">
+  return <div className="h-full flex flex-col content-right-sidebar bg-dashboard-card dark:bg-dashboard-card">
       {/* Header with TabsList */}
       <div className="px-6 py-4 border-b border-border/10">
         <Tabs defaultValue="chat" onValueChange={setActiveTab} className="w-full">
-          <TabsList className={cn(
-            "w-full justify-center gap-1 p-1 h-12 shrink-0",
-            "bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-200",
-            "rounded-xl"
-          )}>
-            <TabsTrigger value="chat" className={cn(
-              "flex-1 h-full rounded-md flex items-center justify-center gap-2",
-              "text-sm font-medium",
-              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
-              "data-[state=active]:shadow-none",
-              "transition-colors duration-200",
-              "focus-visible:ring-0 focus-visible:ring-offset-0",
-              "focus:ring-0 focus:ring-offset-0",
-              "ring-0 ring-offset-0",
-              "border-0 outline-none",
-              "data-[state=active]:ring-0",
-              "data-[state=active]:ring-offset-0",
-              "data-[state=active]:border-0",
-              "data-[state=active]:outline-none"
-            )}>
+          <TabsList className={cn("w-full justify-center gap-1 p-1 h-12 shrink-0", "bg-dashboard-bg dark:bg-dashboard-bg transition-colors duration-200", "rounded-xl")}>
+            <TabsTrigger value="chat" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70", "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary", "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text", "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card", "data-[state=active]:shadow-none", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
               <MessageCircle className="h-[14px] w-[14px]" />
               <span className="text-sm">Chat</span>
             </TabsTrigger>
             
-            <TabsTrigger value="flashcards" className={cn(
-              "flex-1 h-full rounded-md flex items-center justify-center gap-2",
-              "text-sm font-medium",
-              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
-              "data-[state=active]:shadow-none",
-              "transition-colors duration-200",
-              "focus-visible:ring-0 focus-visible:ring-offset-0",
-              "focus:ring-0 focus:ring-offset-0",
-              "ring-0 ring-offset-0",
-              "border-0 outline-none",
-              "data-[state=active]:ring-0",
-              "data-[state=active]:ring-offset-0",
-              "data-[state=active]:border-0",
-              "data-[state=active]:outline-none"
-            )}>
+            <TabsTrigger value="flashcards" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70", "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary", "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text", "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card", "data-[state=active]:shadow-none", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
               <FileStack className="h-[14px] w-[14px]" />
               <span className="text-sm">Flashcards</span>
             </TabsTrigger>
             
-            <TabsTrigger value="exams" className={cn(
-              "flex-1 h-full rounded-md flex items-center justify-center gap-2",
-              "text-sm font-medium",
-              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
-              "data-[state=active]:shadow-none",
-              "transition-colors duration-200",
-              "focus-visible:ring-0 focus-visible:ring-offset-0",
-              "focus:ring-0 focus:ring-offset-0",
-              "ring-0 ring-offset-0",
-              "border-0 outline-none",
-              "data-[state=active]:ring-0",
-              "data-[state=active]:ring-offset-0",
-              "data-[state=active]:border-0",
-              "data-[state=active]:outline-none"
-            )}>
+            <TabsTrigger value="exams" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70", "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary", "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text", "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card", "data-[state=active]:shadow-none", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
               <Brain className="h-[14px] w-[14px]" />
               <span className="text-sm">Exams</span>
             </TabsTrigger>
             
-            <TabsTrigger value="summary" className={cn(
-              "flex-1 h-full rounded-md flex items-center justify-center gap-2",
-              "text-sm font-medium",
-              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
-              "data-[state=active]:shadow-none",
-              "transition-colors duration-200",
-              "focus-visible:ring-0 focus-visible:ring-offset-0",
-              "focus:ring-0 focus:ring-offset-0",
-              "ring-0 ring-offset-0",
-              "border-0 outline-none",
-              "data-[state=active]:ring-0",
-              "data-[state=active]:ring-offset-0",
-              "data-[state=active]:border-0",
-              "data-[state=active]:outline-none"
-            )}>
+            <TabsTrigger value="summary" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70", "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary", "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text", "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card", "data-[state=active]:shadow-none", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
               <BookOpen className="h-[14px] w-[14px]" />
               <span className="text-sm">Summary</span>
             </TabsTrigger>
             
-            <TabsTrigger value="notes" className={cn(
-              "flex-1 h-full rounded-md flex items-center justify-center gap-2",
-              "text-sm font-medium",
-              "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
-              "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
-              "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
-              "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
-              "data-[state=active]:shadow-none",
-              "transition-colors duration-200",
-              "focus-visible:ring-0 focus-visible:ring-offset-0",
-              "focus:ring-0 focus:ring-offset-0",
-              "ring-0 ring-offset-0",
-              "border-0 outline-none",
-              "data-[state=active]:ring-0",
-              "data-[state=active]:ring-offset-0",
-              "data-[state=active]:border-0",
-              "data-[state=active]:outline-none"
-            )}>
+            <TabsTrigger value="notes" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70", "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary", "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text", "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card", "data-[state=active]:shadow-none", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
               <FileText className="h-[14px] w-[14px]" />
               <span className="text-sm">Notes</span>
             </TabsTrigger>
@@ -267,7 +176,7 @@ export function ContentRightSidebar({
 
       {/* Content Area */}
       <div className="flex-1 overflow-hidden">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col bg-dashboard ">
           <TabsContent value="chat" className={cn("flex-1 overflow-hidden mx-4 mb-4", "content-page-tab-content")}>
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
               <ScrollArea className="h-full">
@@ -309,6 +218,5 @@ export function ContentRightSidebar({
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>;
 }
