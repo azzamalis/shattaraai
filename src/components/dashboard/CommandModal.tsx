@@ -69,7 +69,12 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
   };
 
   const handleContentClick = (contentId: string, type: string) => {
-    navigate(`/content/${contentId}?type=${type}`);
+    // Route to chat page for chat content types, otherwise to content page
+    if (type === 'chat') {
+      navigate(`/chat/${contentId}`);
+    } else {
+      navigate(`/content/${contentId}?type=${type}`);
+    }
     onOpenChange(false);
   };
 
