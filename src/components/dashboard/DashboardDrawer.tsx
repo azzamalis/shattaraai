@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,6 @@ import { HelpTools } from './drawer/HelpTools';
 import { UserProfile } from './drawer/UserProfile';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { Room } from '@/lib/types';
-
 interface DashboardDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -24,7 +22,6 @@ interface DashboardDrawerProps {
   onEditRoom: (id: string, newName: string) => Promise<void>;
   onDeleteRoom: (id: string) => Promise<void>;
 }
-
 export function DashboardDrawer({
   open,
   onOpenChange,
@@ -44,7 +41,6 @@ export function DashboardDrawer({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
   const [roomToDeleteName, setRoomToDeleteName] = useState<string>("");
-  
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -52,31 +48,26 @@ export function DashboardDrawer({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
   useEffect(() => {
     if (!tutorialModalOpen) {
       setHasSeenTutorial(localStorage.getItem('hasSeenTutorial') === 'true');
     }
   }, [tutorialModalOpen]);
-  
   const handleFeedbackClick = () => {
     console.log("Feedback button clicked");
     setFeedbackModalOpen(true);
   };
-  
   const handleTutorialClick = () => {
     console.log("Tutorial button clicked");
     setTutorialModalOpen(true);
     setHasSeenTutorial(true);
     localStorage.setItem('hasSeenTutorial', 'true');
   };
-  
   const getDrawerWidth = () => {
     if (windowWidth < 640) return 'w-[85vw]';
     if (windowWidth < 768) return 'w-[350px]';
     return 'w-[300px]';
   };
-  
   const handleDeleteConfirm = () => {
     if (roomToDelete) {
       onDeleteRoom(roomToDelete);
@@ -84,26 +75,15 @@ export function DashboardDrawer({
       setDeleteModalOpen(false);
     }
   };
-  
-  return (
-    <>
+  return <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent 
-          side="left" 
-          className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r border-border`}
-          closeButton={false}
-        >
+        <SheetContent side="left" className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r border-border`} closeButton={false}>
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-4 mb-2">
             <div className="flex items-center gap-3">
               <Logo className="h-8 w-auto" textColor="text-foreground" />
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => onOpenChange(false)} 
-              className="text-foreground hover:text-foreground hover:bg-accent rounded-lg h-8 w-8"
-            >
+            <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-foreground hover:text-foreground hover:bg-accent rounded-lg h-8 w-8">
               <ChevronsLeft className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
             </Button>
@@ -113,17 +93,13 @@ export function DashboardDrawer({
             <div className="flex flex-col space-y-6 px-3 pt-2">
               {/* Add Content Button */}
               <div className="w-full">
-                <Button 
-                  variant="ghost" 
-                  className="w-full flex items-center justify-start gap-2 
+                <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
                     bg-transparent border-2 border-dashed border-primary/10 
                     text-primary hover:bg-primary/5 hover:text-primary hover:border-primary/10
-                    transition-colors duration-200 rounded-lg py-2 px-2" 
-                  onClick={() => {
-                    navigate('/dashboard');
-                    onOpenChange(false);
-                  }}
-                >
+                    transition-colors duration-200 rounded-lg py-2 px-2" onClick={() => {
+                navigate('/dashboard');
+                onOpenChange(false);
+              }}>
                   <Plus className="h-4 w-4" />
                   <span className="text-sm font-medium">Add content</span>
                 </Button>
@@ -136,25 +112,12 @@ export function DashboardDrawer({
               
               {/* Rooms Section */}
               <div className="w-full">
-                <RoomsSection 
-                  rooms={rooms} 
-                  onAddRoom={onAddRoom} 
-                  onEditRoom={onEditRoom} 
-                  onDeleteRoom={onDeleteRoom} 
-                  onOpenChange={onOpenChange} 
-                  setRoomToDelete={setRoomToDelete} 
-                  setRoomToDeleteName={setRoomToDeleteName} 
-                  setDeleteModalOpen={setDeleteModalOpen} 
-                />
+                <RoomsSection rooms={rooms} onAddRoom={onAddRoom} onEditRoom={onEditRoom} onDeleteRoom={onDeleteRoom} onOpenChange={onOpenChange} setRoomToDelete={setRoomToDelete} setRoomToDeleteName={setRoomToDeleteName} setDeleteModalOpen={setDeleteModalOpen} />
               </div>
               
               {/* Help Tools Section */}
               <div className="w-full">
-                <HelpTools 
-                  onTutorialClick={handleTutorialClick} 
-                  onFeedbackClick={handleFeedbackClick} 
-                  onCalculatorClick={() => setCalculatorModalOpen(true)} 
-                />
+                <HelpTools onTutorialClick={handleTutorialClick} onFeedbackClick={handleFeedbackClick} onCalculatorClick={() => setCalculatorModalOpen(true)} />
               </div>
             </div>
           </ScrollArea>
@@ -171,16 +134,9 @@ export function DashboardDrawer({
       <FeedbackModal open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
       <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
       <CalculatorModal open={calculatorModalOpen} onOpenChange={setCalculatorModalOpen} />
-      <DeleteModal
-        open={deleteModalOpen}
-        onOpenChange={setDeleteModalOpen}
-        type="room"
-        itemToDelete={{
-          id: roomToDelete || '',
-          title: roomToDeleteName,
-        }}
-        onConfirm={handleDeleteConfirm}
-      />
-    </>
-  );
+      <DeleteModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} type="room" itemToDelete={{
+      id: roomToDelete || '',
+      title: roomToDeleteName
+    }} onConfirm={handleDeleteConfirm} />
+    </>;
 }

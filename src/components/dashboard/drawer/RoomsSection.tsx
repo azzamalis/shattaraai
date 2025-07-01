@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, ChevronDown } from 'lucide-react';
@@ -7,7 +6,6 @@ import { RoomItem } from './RoomItem';
 import { createRoomHandlers } from './RoomHandlers';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
 interface RoomsSectionProps {
   rooms: Room[];
   onAddRoom: () => Promise<string | null>;
@@ -18,7 +16,6 @@ interface RoomsSectionProps {
   setRoomToDeleteName: (name: string) => void;
   setDeleteModalOpen: (open: boolean) => void;
 }
-
 export const RoomsSection: React.FC<RoomsSectionProps> = ({
   rooms,
   onAddRoom,
@@ -33,27 +30,15 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
   const [editedRoomName, setEditedRoomName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-
   const visibleRooms = showMoreRooms ? rooms : rooms.slice(0, 3);
   const hasHiddenRooms = rooms.length > 3;
-
   const {
     handleRoomClick,
     handleRenameClick,
     handleSaveRename,
     handleCancelRename,
     handleDeleteClick
-  } = createRoomHandlers(
-    rooms,
-    navigate,
-    onOpenChange,
-    setEditingRoomId,
-    setEditedRoomName,
-    setRoomToDelete,
-    setRoomToDeleteName,
-    setDeleteModalOpen
-  );
-
+  } = createRoomHandlers(rooms, navigate, onOpenChange, setEditingRoomId, setEditedRoomName, setRoomToDelete, setRoomToDeleteName, setDeleteModalOpen);
   const handleAddRoomClick = async () => {
     setIsCreating(true);
     try {
@@ -72,62 +57,34 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
       setIsCreating(false);
     }
   };
-
   const handleSaveRenameWithEdit = async (e: React.MouseEvent, id: string) => {
     handleSaveRename(e, id);
     await onEditRoom(id, editedRoomName);
   };
-
-  return (
-    <div>
-      <h2 className="ml-2 text-sm mb-2 font-semibold text-foreground">Rooms</h2>
+  return <div>
+      <h2 className="ml-2 mb-2 text-foreground text-sm font-semibold">Rooms</h2>
       <div className="flex w-full flex-col space-y-1">
-        <Button 
-          variant="ghost" 
-          className="w-full flex items-center justify-start gap-2 
+        <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
             bg-transparent border-2 border-dashed border-primary/10 
             text-primary/80 hover:bg-primary/5 hover:text-primary hover:border-primary/10
             transition-colors duration-200 rounded-lg py-2 px-2 mb-1
-            disabled:opacity-50 disabled:cursor-not-allowed" 
-          onClick={handleAddRoomClick}
-          disabled={isCreating}
-        >
+            disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleAddRoomClick} disabled={isCreating}>
           <Plus className="h-4 w-4" />
-          <span className="text-sm font-normal">
+          <span className="text-sm font-medium">
             {isCreating ? 'Creating...' : 'Add room'}
           </span>
         </Button>
 
-        {visibleRooms.map((room) => (
-          <RoomItem
-            key={room.id}
-            room={room}
-            editingRoomId={editingRoomId}
-            editedRoomName={editedRoomName}
-            setEditedRoomName={setEditedRoomName}
-            onRoomClick={handleRoomClick}
-            onRenameClick={handleRenameClick}
-            onSaveRename={handleSaveRenameWithEdit}
-            onCancelRename={handleCancelRename}
-            onDeleteClick={handleDeleteClick}
-          />
-        ))}
+        {visibleRooms.map(room => <RoomItem key={room.id} room={room} editingRoomId={editingRoomId} editedRoomName={editedRoomName} setEditedRoomName={setEditedRoomName} onRoomClick={handleRoomClick} onRenameClick={handleRenameClick} onSaveRename={handleSaveRenameWithEdit} onCancelRename={handleCancelRename} onDeleteClick={handleDeleteClick} />)}
 
-        {hasHiddenRooms && (
-          <Button
-            variant="ghost"
-            className="w-full flex items-center justify-start gap-2 
+        {hasHiddenRooms && <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
               bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
-              transition-colors duration-200 rounded-lg py-2 px-2"
-            onClick={() => setShowMoreRooms(!showMoreRooms)}
-          >
+              transition-colors duration-200 rounded-lg py-2 px-2" onClick={() => setShowMoreRooms(!showMoreRooms)}>
             <ChevronDown className="h-4 w-4" />
             <span className="text-sm font-normal">
               {showMoreRooms ? 'Show less' : `Show ${rooms.length - 3} more`}
             </span>
-          </Button>
-        )}
+          </Button>}
       </div>
-    </div>
-  );
+    </div>;
 };
