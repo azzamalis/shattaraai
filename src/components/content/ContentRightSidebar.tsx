@@ -176,7 +176,7 @@ export function ContentRightSidebar({
 
       {/* Content Area */}
       <div className="flex-1 overflow-hidden">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col bg-dashboard ">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col bg-background ">
           <TabsContent value="chat" className={cn("flex-1 overflow-hidden mx-4 mb-4", "content-page-tab-content")}>
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
               <ScrollArea className="h-full">
