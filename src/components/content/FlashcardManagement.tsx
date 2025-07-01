@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ManagementHeader } from './ManagementHeader';
 import { ManagementCard } from './ManagementCard';
 import { FlashcardData } from './Flashcard';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface FlashcardManagementProps {
   cards: FlashcardData[];
@@ -82,37 +83,39 @@ export function FlashcardManagement({
   };
 
   return (
-    <div className="min-h-screen bg-dashboard-bg">
+    <div className="min-h-screen bg-dashboard-bg flex flex-col">
       <ManagementHeader
         onBack={onBack}
         onUndoAll={handleUndoAll}
         onDone={handleDone}
       />
 
-      <div className="p-6 max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-dashboard-text mb-2">Manage Cards</h1>
-          <p className="text-dashboard-text-secondary">
-            Edit your flashcards, add new ones, or reorganize them
-          </p>
+      <ScrollArea className="flex-1">
+        <div className="p-6 max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold text-dashboard-text mb-2">Manage Cards</h1>
+            <p className="text-dashboard-text-secondary">
+              Edit your flashcards, add new ones, or reorganize them
+            </p>
+          </div>
+          
+          <div className="space-y-6 pb-6">
+            {managementCards.map((card, index) => (
+              <ManagementCard
+                key={card.id}
+                card={card}
+                index={index}
+                isExpanded={expandedCards.has(card.id)}
+                isStarred={starredCards.has(card.id)}
+                onToggleExpansion={() => toggleCardExpansion(card.id)}
+                onToggleStar={() => toggleStar(card.id)}
+                onAddBelow={() => handleAddCard(index)}
+                onDelete={() => handleDeleteCard(card.id)}
+              />
+            ))}
+          </div>
         </div>
-        
-        <div className="space-y-6">
-          {managementCards.map((card, index) => (
-            <ManagementCard
-              key={card.id}
-              card={card}
-              index={index}
-              isExpanded={expandedCards.has(card.id)}
-              isStarred={starredCards.has(card.id)}
-              onToggleExpansion={() => toggleCardExpansion(card.id)}
-              onToggleStar={() => toggleStar(card.id)}
-              onAddBelow={() => handleAddCard(index)}
-              onDelete={() => handleDeleteCard(card.id)}
-            />
-          ))}
-        </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 }
