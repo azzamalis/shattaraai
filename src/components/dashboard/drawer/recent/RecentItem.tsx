@@ -89,6 +89,14 @@ export const RecentItem: React.FC<RecentItemProps> = ({
     }
   };
 
+  // Determine the correct route based on content type
+  const getRouteForContent = () => {
+    if (content.type === 'chat') {
+      return `/chat/${content.id}`;
+    }
+    return `/content/${content.id}?type=${content.type}`;
+  };
+
   return (
     <div className="flex items-center justify-between gap-2 group">
       {isEditing ? (
@@ -102,7 +110,7 @@ export const RecentItem: React.FC<RecentItemProps> = ({
       ) : (
         <>
           <Link
-            to={`/content/${content.id}?type=${content.type}`}
+            to={getRouteForContent()}
             className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-accent transition-colors duration-200 flex-1 min-w-0"
           >
             <ContentTypeIcon type={content.type} />

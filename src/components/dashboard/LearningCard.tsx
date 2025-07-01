@@ -42,7 +42,12 @@ export function LearningCard({
     if (isExamSelectionMode && onToggleSelection) {
       onToggleSelection(content.id);
     } else {
-      navigate(`/content/${content.id}?type=${content.type}`);
+      // Route to chat page for chat content types, otherwise to content page
+      if (content.type === 'chat') {
+        navigate(`/chat/${content.id}`);
+      } else {
+        navigate(`/content/${content.id}?type=${content.type}`);
+      }
     }
   };
 
