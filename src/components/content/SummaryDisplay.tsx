@@ -129,14 +129,11 @@ export function SummaryDisplay({
           
           <h2 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text">Summary</h2>
         </div>
-        <Button variant="outline" size="sm" onClick={handleCopyAll} className="border-border text-dashboard-text dark:text-dashboard-text hover:bg-accent hover:text-accent-foreground">
-          <Copy className="h-4 w-4 mr-2" />
-          Copy All
-        </Button>
+        
       </div>
 
       <div className="space-y-4">
-        {summaryData.map(item => <div key={item.id} className="p-4 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors">
+        {summaryData.map(item => <div key={item.id} className="p-4 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
