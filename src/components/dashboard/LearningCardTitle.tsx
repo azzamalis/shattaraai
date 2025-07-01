@@ -65,7 +65,7 @@ export function LearningCardTitle({
       </div>;
   }
   return <div className="group flex items-center gap-2 min-w-0">
-      <h3 className="text-sm font-medium text-foreground line-clamp-2 flex-1 min-w-0">
+      <h3 className="text-foreground line-clamp-2 flex-1 min-w-0 text-sm font-medium">
         {title}
       </h3>
       {!disabled && <Button size="sm" variant="ghost" className={cn("h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity shrink-0", "hover:bg-accent")} onClick={handleEdit}>
