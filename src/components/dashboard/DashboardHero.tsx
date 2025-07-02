@@ -44,7 +44,7 @@ export function DashboardHero({
       y: 0
     }} transition={{
       duration: 0.5
-    }} className="text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8 md:mb-12 text-center font-normal md:text-4xl">What do you need help learning?</motion.h1>
+    }} className="text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8 md:mb-12 text-center font-normal md:text-3xl">What do you need help learning?</motion.h1>
       
       <motion.div initial={{
       opacity: 0,
