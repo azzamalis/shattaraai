@@ -12,6 +12,7 @@ export default function RoomPage() {
     currentRoom,
     roomContent,
     roomsLoading,
+    contentLoading,
     isChatOpen,
     setIsChatOpen,
     isExamMode,
@@ -35,8 +36,8 @@ export default function RoomPage() {
     handleExamCancel
   } = useRoomPageLogic();
 
-  // Loading state
-  if (roomsLoading) {
+  // Loading state - check both rooms and content loading
+  if (roomsLoading || contentLoading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
@@ -46,8 +47,8 @@ export default function RoomPage() {
     );
   }
 
-  // Room not found
-  if (!currentRoom) {
+  // Room not found - only show after loading is complete
+  if (!roomsLoading && !contentLoading && !currentRoom) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">

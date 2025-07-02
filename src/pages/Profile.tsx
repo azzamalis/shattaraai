@@ -135,7 +135,7 @@ export default function Profile() {
   if (loading) {
     return <DashboardLayout>
         <div className="h-full bg-background text-foreground flex items-center justify-center">
-          <div className="text-white">Loading profile...</div>
+          <div className="text-muted-foreground">Loading profile...</div>
         </div>
       </DashboardLayout>;
   }
