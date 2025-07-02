@@ -4,20 +4,21 @@ import { Upload, FileText, Mic, Link2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useContentContext } from '@/contexts/ContentContext';
-
 interface ActionCardsProps {
   onPasteClick: () => void;
 }
-
-export function ActionCards({ onPasteClick }: ActionCardsProps) {
+export function ActionCards({
+  onPasteClick
+}: ActionCardsProps) {
   const navigate = useNavigate();
-  const { addContent, addContentWithFile } = useContentContext();
+  const {
+    addContent,
+    addContentWithFile
+  } = useContentContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
-
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -26,7 +27,6 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         let contentType = 'upload';
         const fileType = file.type.toLowerCase();
         const fileName = file.name.toLowerCase();
-        
         if (fileType.includes('pdf') || fileName.endsWith('.pdf')) {
           contentType = 'pdf';
         } else if (fileType.includes('audio') || ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'].some(ext => fileName.endsWith(ext))) {
@@ -36,7 +36,6 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         } else if (['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx'].some(ext => fileName.endsWith(ext))) {
           contentType = 'file';
         }
-
         console.log('Starting file upload:', file.name, 'Type:', contentType, 'File type:', fileType);
 
         // Show loading toast
@@ -46,7 +45,8 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
         const contentId = await addContentWithFile({
           title: file.name,
           type: contentType as any,
-          room_id: null, // Do not auto-assign to any room
+          room_id: null,
+          // Do not auto-assign to any room
           metadata: {
             fileSize: file.size,
             fileType: file.type,
@@ -58,9 +58,7 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
 
         // Dismiss loading toast
         toast.dismiss(loadingToast);
-
         console.log('Content created with ID:', contentId);
-
         if (contentId) {
           // Add a small delay to ensure database transaction is complete
           setTimeout(() => {
@@ -77,21 +75,23 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
       }
     }
   };
-
   const handleRecordClick = async () => {
     try {
       // Add live recording to tracking system WITHOUT auto-assigning to any room
       const contentId = await addContent({
-        title: `Live Recording at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        title: `Live Recording at ${new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        })}`,
         type: 'live_recording',
-        room_id: null, // Do not auto-assign to any room
+        room_id: null,
+        // Do not auto-assign to any room
         metadata: {
           isLiveRecording: true,
           recordingStatus: 'ready',
           createdAt: new Date().toISOString()
         }
       });
-
       if (contentId) {
         navigate(`/content/${contentId}?type=live_recording`);
         toast.success('Recording session created');
@@ -103,16 +103,10 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
       toast.error('Failed to create recording session. Please try again.');
     }
   };
-
-  return (
-    <>
-      <input 
-        ref={fileInputRef} 
-        type="file" 
-        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.csv,.xls,.xlsx,audio/*,video/*,image/*" 
-        onChange={handleFileSelect} 
-        style={{ display: 'none' }} 
-      />
+  return <>
+      <input ref={fileInputRef} type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.csv,.xls,.xlsx,audio/*,video/*,image/*" onChange={handleFileSelect} style={{
+      display: 'none'
+    }} />
       
       <div className="sm:justify-center sm:items-center gap-3 sm:flex grid grid-cols-1 w-full">
         {/* Upload Card */}
@@ -120,16 +114,13 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div 
-                  className="border-border text-card-foreground shadow-sm rounded-2xl group bg-card cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]"
-                  onClick={handleUploadClick}
-                >
+                <div className="border-border text-card-foreground shadow-sm rounded-2xl group bg-card cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]" onClick={handleUploadClick}>
                   <div className="p-4 sm:h-[120px] flex flex-col sm:flex-col items-start justify-center gap-y-1">
                     <div className="flex items-center gap-x-3 sm:block">
                       <Upload className="h-6 w-6 text-primary/80 group-hover:text-primary transition-colors sm:mb-2 flex-shrink-0" />
                       <div className="flex flex-col justify-center">
                         <div className="flex items-center gap-x-1">
-                          <h3 className="font-normal text-sm sm:text-base text-left text-primary/80 group-hover:text-primary">Upload</h3>
+                          <h3 className="text-sm text-left text-primary/80 group-hover:text-primary font-medium sm:text-base">Upload</h3>
                         </div>
                         <p className="text-xs sm:text-sm group-hover:text-primary/80 text-left text-primary/60">File, Audio, Video, PDF</p>
                       </div>
@@ -152,16 +143,13 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div 
-                  className="border-border text-card-foreground shadow-sm rounded-2xl group bg-card cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]"
-                  onClick={onPasteClick}
-                >
+                <div className="border-border text-card-foreground shadow-sm rounded-2xl group bg-card cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]" onClick={onPasteClick}>
                   <div className="p-4 sm:h-[120px] flex flex-col sm:flex-col items-start justify-center gap-y-1">
                     <div className="flex items-center gap-x-3 sm:block">
                       <Link2 className="h-6 w-6 text-primary/80 group-hover:text-primary transition-colors sm:mb-2 flex-shrink-0" />
                       <div className="flex flex-col justify-center">
                         <div className="flex items-center gap-x-1">
-                          <h3 className="font-normal text-sm sm:text-base text-left text-primary/80 group-hover:text-primary">Paste</h3>
+                          <h3 className="text-sm text-left text-primary/80 group-hover:text-primary font-medium sm:text-base">Paste</h3>
                         </div>
                         <p className="text-xs sm:text-sm group-hover:text-primary/80 text-left text-primary/60">YouTube, Website, Text</p>
                       </div>
@@ -184,16 +172,13 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div 
-                  className="border-border text-card-foreground shadow-sm rounded-2xl group bg-card cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]"
-                  onClick={handleRecordClick}
-                >
+                <div className="border-border text-card-foreground shadow-sm rounded-2xl group bg-card cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]" onClick={handleRecordClick}>
                   <div className="p-4 sm:h-[120px] flex flex-col sm:flex-col items-start justify-center gap-y-1">
                     <div className="flex items-center gap-x-3 sm:block">
                       <Mic className="h-6 w-6 text-primary/80 group-hover:text-primary transition-colors sm:mb-2 flex-shrink-0" />
                       <div className="flex flex-col justify-center">
                         <div className="flex items-center gap-x-1">
-                          <h3 className="font-normal text-sm sm:text-base text-left text-primary/80 group-hover:text-primary">Record</h3>
+                          <h3 className="text-sm text-left text-primary/80 group-hover:text-primary font-medium sm:text-base">Record</h3>
                         </div>
                         <p className="text-xs sm:text-sm group-hover:text-primary/80 text-left text-primary/60">Record Your Lecture</p>
                       </div>
@@ -211,6 +196,5 @@ export function ActionCards({ onPasteClick }: ActionCardsProps) {
           </TooltipProvider>
         </div>
       </div>
-    </>
-  );
+    </>;
 }
