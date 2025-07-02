@@ -122,7 +122,7 @@ export function ActionCards({
                         <div className="flex items-center gap-x-1">
                           <h3 className="text-sm text-left text-primary/80 group-hover:text-primary font-medium sm:text-base">Upload</h3>
                         </div>
-                        <p className="text-xs sm:text-sm group-hover:text-primary/80 text-left text-primary/60">File, Audio, Video, PDF</p>
+                        <p className="text-xs group-hover:text-primary/80 text-left text-primary/60 font-medium sm:text-sm">File, Audio, Video, PDF</p>
                       </div>
                     </div>
                   </div>
@@ -151,7 +151,7 @@ export function ActionCards({
                         <div className="flex items-center gap-x-1">
                           <h3 className="text-sm text-left text-primary/80 group-hover:text-primary font-medium sm:text-base">Paste</h3>
                         </div>
-                        <p className="text-xs sm:text-sm group-hover:text-primary/80 text-left text-primary/60">YouTube, Website, Text</p>
+                        <p className="text-xs group-hover:text-primary/80 text-left text-primary/60 font-normal sm:text-sm">YouTube, Website, Text</p>
                       </div>
                     </div>
                   </div>
@@ -180,7 +180,7 @@ export function ActionCards({
                         <div className="flex items-center gap-x-1">
                           <h3 className="text-sm text-left text-primary/80 group-hover:text-primary font-medium sm:text-base">Record</h3>
                         </div>
-                        <p className="text-xs sm:text-sm group-hover:text-primary/80 text-left text-primary/60">Record Your Lecture</p>
+                        <p className="text-xs group-hover:text-primary/80 text-left text-primary/60 font-medium sm:text-sm">Record Your Lecture</p>
                       </div>
                     </div>
                   </div>
