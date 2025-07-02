@@ -111,7 +111,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       
       case 'youtube':
         return (
-          <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+          <div className="w-full h-80 bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
             {contentData.url ? (
               <iframe
                 src={`https://www.youtube.com/embed/${extractYouTubeId(contentData.url)}`}
