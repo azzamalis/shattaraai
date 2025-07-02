@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
@@ -7,15 +6,16 @@ import { NewFeaturePromo } from './NewFeaturePromo';
 import { ActionCards } from './ActionCards';
 import { useContent } from '@/contexts/ContentContext';
 import { motion } from 'framer-motion';
-
 interface DashboardHeroProps {
   onPasteClick: () => void;
 }
-
-export function DashboardHero({ onPasteClick }: DashboardHeroProps) {
+export function DashboardHero({
+  onPasteClick
+}: DashboardHeroProps) {
   const navigate = useNavigate();
-  const { onAddContent } = useContent();
-
+  const {
+    onAddContent
+  } = useContent();
   const handleAISubmit = (value: string) => {
     // Create new chat content
     const contentId = onAddContent({
@@ -33,49 +33,54 @@ export function DashboardHero({ onPasteClick }: DashboardHeroProps) {
     navigate(`/chat/${contentId}?${searchParams.toString()}`);
     toast.success("Starting conversation with Shattara AI");
   };
-
-  return (
-    <div className="max-w-[800px] mx-auto mb-12">
+  return <div className="max-w-[800px] mx-auto mb-12">
       <NewFeaturePromo />
       
-      <motion.h1 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 sm:mb-8 md:mb-12 text-center"
-      >
-        What do you need help understanding today?
-      </motion.h1>
+      <motion.h1 initial={{
+      opacity: 0,
+      y: 20
+    }} animate={{
+      opacity: 1,
+      y: 0
+    }} transition={{
+      duration: 0.5
+    }} className="text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8 md:mb-12 text-center font-normal md:text-4xl">What do you need help learning?</motion.h1>
       
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      <motion.div initial={{
+      opacity: 0,
+      y: 20
+    }} animate={{
+      opacity: 1,
+      y: 0
+    }} transition={{
+      duration: 0.5
+    }}>
         <ActionCards onPasteClick={onPasteClick} />
       </motion.div>
       
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative my-6 sm:my-8"
-      >
+      <motion.div initial={{
+      opacity: 0,
+      y: 20
+    }} animate={{
+      opacity: 1,
+      y: 0
+    }} transition={{
+      duration: 0.5
+    }} className="relative my-6 sm:my-8">
         <div className="relative">
-          <AIChatInput 
-            onSubmit={handleAISubmit} 
-            initialIsActive={false}
-          />
+          <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
         </div>
       </motion.div>
 
       {/* Quick Tips Section with matching subtle styling */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
-        className="text-center"
-      >
+      <motion.div initial={{
+      opacity: 0
+    }} animate={{
+      opacity: 1
+    }} transition={{
+      duration: 0.5,
+      delay: 0.6
+    }} className="text-center">
         <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
           <span className="h-1 w-1 rounded-full bg-primary/30" />
           <span>Try asking about specific topics</span>
@@ -85,6 +90,5 @@ export function DashboardHero({ onPasteClick }: DashboardHeroProps) {
           <span>Get detailed explanations</span>
         </div>
       </motion.div>
-    </div>
-  );
+    </div>;
 }
