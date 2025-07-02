@@ -149,7 +149,7 @@ export function DashboardHeader({
                     <Search className="-ms-1 me-3 h-4 w-4" aria-hidden="true" />
                     <span className="font-normal">Search</span>
                   </span>
-                  <kbd className="-me-1 ms-12 inline-flex h-5 max-h-full items-center rounded border border-border px-1.5 font-mono text-[10px] font-medium text-foreground bg-secondary-foreground ">
+                  <kbd className="-me-1 ms-12 inline-flex h-5 max-h-full items-center rounded border border-border px-1.5 font-mono text-[10px] font-medium text-foreground bg-dashboard-secondary-card ">
                     ⌘K
                   </kbd>
                 </Button>}
