@@ -9,7 +9,6 @@ import { AudioPlayer } from '@/components/content/AudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
 import { cn } from '@/lib/utils';
-
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -24,7 +23,6 @@ interface ContentLeftSidebarProps {
   isRecordingLoading?: boolean;
   onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
 }
-
 export function ContentLeftSidebar({
   contentData,
   onUpdateContent,
@@ -43,7 +41,6 @@ export function ContentLeftSidebar({
 
   // Check if we should hide tabs (for PDF content)
   const shouldHideTabs = contentData.type === 'pdf';
-
   const renderControls = () => {
     // Show loading state while detecting recording state
     if (contentData.type === 'recording' && isRecordingLoading) {
@@ -98,7 +95,6 @@ export function ContentLeftSidebar({
         <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} onTextAction={onTextAction} />
       </div>;
   };
-
   const renderTabContent = () => {
     const hasContent = contentData.type === 'live_recording' ? isRecording : recordingStateInfo?.isNewRecording ? isRecording : recordingStateInfo?.isExistingRecording ? true : !!contentData.url || !!contentData.text;
     return <>
@@ -130,7 +126,7 @@ export function ContentLeftSidebar({
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
                 
-                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-base">
+                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
                   {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view chapters' : 'Add content to view chapters'}
                 </p>
               </div>}
@@ -156,7 +152,7 @@ export function ContentLeftSidebar({
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
                 
-                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-base">
+                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
                   {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
                 </p>
               </div>}
