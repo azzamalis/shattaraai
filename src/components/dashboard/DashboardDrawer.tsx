@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Logo from '@/components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, ChevronsLeft } from 'lucide-react';
-import { FeedbackModal } from './FeedbackModal';
 import { TutorialModal } from './TutorialModal';
 import { CalculatorModal } from './modals/CalculatorModal';
 import { RoomsSection } from './drawer/RoomsSection';
@@ -14,6 +14,7 @@ import { HelpTools } from './drawer/HelpTools';
 import { UserProfile } from './drawer/UserProfile';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { Room } from '@/lib/types';
+
 interface DashboardDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -22,6 +23,7 @@ interface DashboardDrawerProps {
   onEditRoom: (id: string, newName: string) => Promise<void>;
   onDeleteRoom: (id: string) => Promise<void>;
 }
+
 export function DashboardDrawer({
   open,
   onOpenChange,
@@ -31,7 +33,6 @@ export function DashboardDrawer({
   onDeleteRoom
 }: DashboardDrawerProps) {
   const navigate = useNavigate();
-  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [calculatorModalOpen, setCalculatorModalOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -41,6 +42,7 @@ export function DashboardDrawer({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
   const [roomToDeleteName, setRoomToDeleteName] = useState<string>("");
+
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -48,26 +50,31 @@ export function DashboardDrawer({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
   useEffect(() => {
     if (!tutorialModalOpen) {
       setHasSeenTutorial(localStorage.getItem('hasSeenTutorial') === 'true');
     }
   }, [tutorialModalOpen]);
+
   const handleFeedbackClick = () => {
     console.log("Feedback button clicked");
-    setFeedbackModalOpen(true);
+    // This function is kept for compatibility but no longer opens a modal
   };
+
   const handleTutorialClick = () => {
     console.log("Tutorial button clicked");
     setTutorialModalOpen(true);
     setHasSeenTutorial(true);
     localStorage.setItem('hasSeenTutorial', 'true');
   };
+
   const getDrawerWidth = () => {
     if (windowWidth < 640) return 'w-[85vw]';
     if (windowWidth < 768) return 'w-[350px]';
     return 'w-[300px]';
   };
+
   const handleDeleteConfirm = () => {
     if (roomToDelete) {
       onDeleteRoom(roomToDelete);
@@ -75,7 +82,9 @@ export function DashboardDrawer({
       setDeleteModalOpen(false);
     }
   };
-  return <>
+
+  return (
+    <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="left" className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r border-border`} closeButton={false}>
           {/* Header */}
@@ -131,12 +140,12 @@ export function DashboardDrawer({
         </SheetContent>
       </Sheet>
 
-      <FeedbackModal open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
       <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
       <CalculatorModal open={calculatorModalOpen} onOpenChange={setCalculatorModalOpen} />
       <DeleteModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} type="room" itemToDelete={{
       id: roomToDelete || '',
       title: roomToDeleteName
     }} onConfirm={handleDeleteConfirm} />
-    </>;
+    </>
+  );
 }

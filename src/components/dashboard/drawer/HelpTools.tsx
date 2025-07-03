@@ -1,26 +1,36 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Book, MessageCircle, Calculator, BarChart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { FeedbackPopover } from '@/components/dashboard/FeedbackPopover';
+
 interface HelpToolsProps {
   onTutorialClick: () => void;
   onFeedbackClick: () => void;
   onCalculatorClick: () => void;
 }
+
 export const HelpTools: React.FC<HelpToolsProps> = ({
   onTutorialClick,
   onFeedbackClick,
   onCalculatorClick
 }) => {
-  return <div>
+  return (
+    <div>
       <h2 className="ml-2 mb-2 text-foreground text-sm font-semibold">Help & Tools</h2>
       <div className="flex flex-col space-y-1">
-        <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
-            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
-            transition-colors duration-200 rounded-lg py-2 px-2" onClick={onFeedbackClick}>
-          <MessageCircle className="h-4 w-4 text-primary/60" />
-          <span className="text-sm font-medium">Feedback</span>
-        </Button>
+        <FeedbackPopover>
+          <Button 
+            variant="ghost" 
+            className="w-full flex items-center justify-start gap-2 
+              bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
+              transition-colors duration-200 rounded-lg py-2 px-2"
+          >
+            <MessageCircle className="h-4 w-4 text-primary/60" />
+            <span className="text-sm font-medium">Feedback</span>
+          </Button>
+        </FeedbackPopover>
         
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
             bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
@@ -51,5 +61,6 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
           <span className="text-sm font-medium">Calculator</span>
         </Button>
       </div>
-    </div>;
+    </div>
+  );
 };
