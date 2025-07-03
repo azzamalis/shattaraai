@@ -35,6 +35,16 @@ interface UseChatConversationOptions {
   autoCreate?: boolean;
 }
 
+// Helper function to convert database message to ChatMessage
+const convertToChatMessage = (dbMessage: any): ChatMessage => ({
+  id: dbMessage.id,
+  content: dbMessage.content,
+  sender_type: dbMessage.sender_type as 'user' | 'ai' | 'system',
+  message_type: dbMessage.message_type,
+  created_at: dbMessage.created_at,
+  metadata: dbMessage.metadata
+});
+
 export function useChatConversation({
   conversationType,
   contextId,
@@ -125,7 +135,9 @@ export function useChatConversation({
         return;
       }
 
-      setMessages(data || []);
+      // Convert database messages to ChatMessage format
+      const chatMessages = (data || []).map(convertToChatMessage);
+      setMessages(chatMessages);
     } catch (error) {
       console.error('Error loading messages:', error);
     }
@@ -177,11 +189,12 @@ export function useChatConversation({
       }
 
       // Replace optimistic update with real message
+      const realMessage = convertToChatMessage(data);
       setMessages(prev => prev.map(msg => 
-        msg.id === tempMessage.id ? data : msg
+        msg.id === tempMessage.id ? realMessage : msg
       ));
 
-      return data;
+      return realMessage;
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error('Failed to send message');
@@ -217,8 +230,9 @@ export function useChatConversation({
         return;
       }
 
-      setMessages(prev => [...prev, data]);
-      return data;
+      const aiMessage = convertToChatMessage(data);
+      setMessages(prev => [...prev, aiMessage]);
+      return aiMessage;
     } catch (error) {
       console.error('Error adding AI response:', error);
     }
@@ -264,7 +278,7 @@ export function useChatConversation({
           filter: `conversation_id=eq.${conversation.id}`
         },
         (payload) => {
-          const newMessage = payload.new as ChatMessage;
+          const newMessage = convertToChatMessage(payload.new);
           setMessages(prev => {
             // Avoid duplicates (in case of optimistic updates)
             if (prev.some(msg => msg.id === newMessage.id)) {
