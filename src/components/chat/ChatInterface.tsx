@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ChatTabType, Message } from '@/lib/types';
+
+import React, { useEffect } from 'react';
+import { ChatTabType } from '@/lib/types';
 import { ChatTabNavigation } from './ChatTabNavigation';
-import { ChatMessages } from './ChatMessages';
-import { ChatInput } from './ChatInput';
+import { ChatContainer } from './shared/ChatContainer';
 import { NotesEditor } from './NotesEditor/NotesEditor';
-import { toast } from 'sonner';
 import { Brain } from 'lucide-react';
+import { useChatConversation } from '@/hooks/useChatConversation';
 
 interface ChatInterfaceProps {
   activeTab: ChatTabType;
@@ -14,58 +14,31 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ activeTab, onTabChange, initialQuery }: ChatInterfaceProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: 'Hello! How can I assist you today?',
-      sender: 'ai',
-      timestamp: new Date(),
-      copyable: true
-    }
-  ]);
-
-  const [inputValue, setInputValue] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const hasSentInitialQuery = useRef(false);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const {
+    messages,
+    isLoading,
+    isSending,
+    sendMessage,
+    addAIResponse
+  } = useChatConversation({
+    conversationType: 'general',
+    autoCreate: true
+  });
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    if (initialQuery && !hasSentInitialQuery.current) {
+    if (initialQuery && messages.length === 0) {
       handleSendMessage(initialQuery);
-      hasSentInitialQuery.current = true;
     }
-  }, [initialQuery]);
+  }, [initialQuery, messages.length]);
 
-  const handleSendMessage = (content: string) => {
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content,
-      sender: 'user',
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: `I understand you're asking about: "${content}". Let me help you with that!`,
-        sender: 'ai',
-        timestamp: new Date(),
-        copyable: true
-      };
-      setMessages(prev => [...prev, aiMessage]);
-    }, 1000);
-
-    setInputValue('');
+  const handleSendMessage = async (content: string) => {
+    const userMessage = await sendMessage(content);
+    if (userMessage) {
+      // Simulate AI response (replace with actual AI integration)
+      setTimeout(() => {
+        addAIResponse(`I understand you're asking about: "${content}". Let me help you with that!`);
+      }, 1000);
+    }
   };
 
   const renderTabContent = () => {
@@ -74,19 +47,24 @@ export function ChatInterface({ activeTab, onTabChange, initialQuery }: ChatInte
         return (
           <div className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <div className="flex flex-col h-full">
-                <div className="flex-1 overflow-y-auto">
-                  <ChatMessages messages={messages} />
-                  <div ref={messagesEndRef} />
-                </div>
-                <div className="border-t border-border p-4">
-                  <ChatInput 
-                    value={inputValue}
-                    onChange={setInputValue}
-                    onSend={handleSendMessage}
-                  />
-                </div>
-              </div>
+              <ChatContainer
+                messages={messages}
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading}
+                isSending={isSending}
+                inputPlaceholder="Ask me anything..."
+                emptyStateContent={
+                  <div className="text-center">
+                    <Brain className="h-12 w-12 text-dashboard-text-secondary/30 dark:text-dashboard-text-secondary/30 mx-auto mb-4" />
+                    <h3 className="text-dashboard-text dark:text-dashboard-text mb-2 text-lg font-medium">
+                      Learn with the Shattara AI Tutor
+                    </h3>
+                    <p className="text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 text-center max-w-md text-sm">
+                      Start a conversation to get help with any topic, generate quizzes, create flashcards, and more.
+                    </p>
+                  </div>
+                }
+              />
             </div>
           </div>
         );
@@ -119,6 +97,7 @@ export function ChatInterface({ activeTab, onTabChange, initialQuery }: ChatInte
     </div>
   );
 }
+
 interface EmptyStatesProps {
   type: ChatTabType;
 }
@@ -150,4 +129,3 @@ export function EmptyStates({ type }: EmptyStatesProps) {
     </div>
   );
 }
-

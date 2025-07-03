@@ -9,6 +9,95 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chat_conversations: {
+        Row: {
+          context_id: string | null
+          context_type: string | null
+          created_at: string
+          id: string
+          is_archived: boolean | null
+          last_message_at: string | null
+          metadata: Json | null
+          title: string | null
+          type: Database["public"]["Enums"]["conversation_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          id?: string
+          is_archived?: boolean | null
+          last_message_at?: string | null
+          metadata?: Json | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["conversation_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          id?: string
+          is_archived?: boolean | null
+          last_message_at?: string | null
+          metadata?: Json | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["conversation_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          is_deleted: boolean | null
+          message_type: Database["public"]["Enums"]["message_type"] | null
+          metadata: Json | null
+          sender_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean | null
+          message_type?: Database["public"]["Enums"]["message_type"] | null
+          metadata?: Json | null
+          sender_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean | null
+          message_type?: Database["public"]["Enums"]["message_type"] | null
+          metadata?: Json | null
+          sender_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content: {
         Row: {
           created_at: string
@@ -213,6 +302,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      conversation_type:
+        | "general"
+        | "content_discussion"
+        | "room_collaboration"
+        | "exam_support"
+      message_type: "text" | "system" | "ai_response" | "user_query"
       user_goal:
         | "exam_prep"
         | "homework_help"
@@ -352,6 +447,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      conversation_type: [
+        "general",
+        "content_discussion",
+        "room_collaboration",
+        "exam_support",
+      ],
+      message_type: ["text", "system", "ai_response", "user_query"],
       user_goal: [
         "exam_prep",
         "homework_help",
