@@ -9,6 +9,7 @@ import { AudioPlayer } from '@/components/content/AudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
 import { cn } from '@/lib/utils';
+
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -23,6 +24,7 @@ interface ContentLeftSidebarProps {
   isRecordingLoading?: boolean;
   onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
 }
+
 export function ContentLeftSidebar({
   contentData,
   onUpdateContent,
@@ -41,6 +43,7 @@ export function ContentLeftSidebar({
 
   // Check if we should hide tabs (for PDF content)
   const shouldHideTabs = contentData.type === 'pdf';
+
   const renderControls = () => {
     // Show loading state while detecting recording state
     if (contentData.type === 'recording' && isRecordingLoading) {
@@ -95,6 +98,7 @@ export function ContentLeftSidebar({
         <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} onTextAction={onTextAction} />
       </div>;
   };
+
   const renderTabContent = () => {
     const hasContent = contentData.type === 'live_recording' ? isRecording : recordingStateInfo?.isNewRecording ? isRecording : recordingStateInfo?.isExistingRecording ? true : !!contentData.url || !!contentData.text;
     return <>
@@ -174,7 +178,7 @@ export function ContentLeftSidebar({
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-background ">
         <TabsList className={cn("w-fit justify-start gap-4 p-4 h-12 shrink-0 mx-4 my-2", "bg-dashboard-card-hover transition-colors duration-200", "rounded-xl flex")}>
-          <TabsTrigger value="chapters" className={cn("h-full rounded-md flex items-center gap-2", "px-6", "text-sm font-medium", "bg-dashboard-card dark:bg-dashboard-card", "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70", "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary", "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text", "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card", "data-[state=active]:shadow-none", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
+          <TabsTrigger value="chapters" className={cn("h-full rounded-md flex items-center gap-2", "px-6", "text-sm font-medium", "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70", "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary", "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text", "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card", "data-[state=active]:shadow-none", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
             <ListTodo className="h-[14px] w-[14px]" />
             <span>Chapters</span>
           </TabsTrigger>
