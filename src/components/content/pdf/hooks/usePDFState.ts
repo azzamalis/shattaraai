@@ -3,8 +3,13 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { pdfjs } from 'react-pdf';
 import { SearchResult, TextActionPosition } from '../types';
 
-// Configure PDF.js worker with a more reliable path
-pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+// Configure PDF.js worker with fallback
+try {
+  pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+} catch (error) {
+  console.warn('Local PDF worker not found, using CDN fallback');
+  pdfjs.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.mjs';
+}
 
 export function usePDFState(url?: string) {
   const [numPages, setNumPages] = useState<number>(0);
@@ -57,7 +62,20 @@ export function usePDFState(url?: string) {
 
   const onDocumentLoadError = useCallback((error: Error) => {
     console.error('PDFViewer: Document load error:', error);
-    setError(`Failed to load PDF: ${error.message}`);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to load PDF';
+    if (error.message.includes('404') || error.message.includes('Not Found')) {
+      errorMessage = 'PDF file not found. Please check if the file exists.';
+    } else if (error.message.includes('CORS')) {
+      errorMessage = 'PDF access blocked by security policy. Try using a different PDF source.';
+    } else if (error.message.includes('worker')) {
+      errorMessage = 'PDF processing failed. Please refresh the page and try again.';
+    } else {
+      errorMessage = `Failed to load PDF: ${error.message}`;
+    }
+    
+    setError(errorMessage);
     setLoading(false);
   }, []);
 
@@ -93,6 +111,8 @@ export function usePDFState(url?: string) {
     setSelectedText,
     setTextActionPosition,
     setSearchPopoverOpen,
+    setError,
+    setLoading,
     
     // Callbacks
     onDocumentLoadSuccess,

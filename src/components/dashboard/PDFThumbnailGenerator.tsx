@@ -4,8 +4,13 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { FileText, Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Configure PDF.js worker to use the local file
-pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
+// Configure PDF.js worker with fallback
+try {
+  pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+} catch (error) {
+  console.warn('Local PDF worker not found, using CDN fallback');
+  pdfjs.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.mjs';
+}
 
 interface PDFThumbnailGeneratorProps {
   url?: string;

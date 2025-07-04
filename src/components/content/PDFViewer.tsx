@@ -11,6 +11,7 @@ import { usePDFTextSelection } from './pdf/hooks/usePDFTextSelection';
 import { PDFErrorState } from './pdf/components/PDFErrorState';
 import { PDFLoadingState } from './pdf/components/PDFLoadingState';
 import { PDFEmptyState } from './pdf/components/PDFEmptyState';
+import { PDFTimeoutHandler } from './pdf/components/PDFTimeoutHandler';
 
 export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
   const {
@@ -42,6 +43,8 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
     setSelectedText,
     setTextActionPosition,
     setSearchPopoverOpen,
+    setError,
+    setLoading,
     onDocumentLoadSuccess,
     onDocumentLoadError,
   } = usePDFState(url);
@@ -80,12 +83,22 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
     onTextAction,
   });
 
+  const handleTimeout = () => {
+    setError('PDF loading timed out. Please refresh the page and try again.');
+    setLoading(false);
+  };
+
   if (!url) {
     return <PDFEmptyState />;
   }
 
   return (
     <div className="relative h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+      <PDFTimeoutHandler 
+        loading={loading}
+        url={url}
+        onTimeout={handleTimeout}
+      />
       <PDFToolbar
         pageNumber={pageNumber}
         numPages={numPages}
