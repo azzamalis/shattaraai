@@ -149,15 +149,19 @@ export const useRooms = () => {
   };
 
   useEffect(() => {
-    fetchRooms();
-  }, [user]);
+    if (user) {
+      fetchRooms();
+    }
+  }, [user?.id]); // Use user.id instead of user object
 
   // Set up real-time subscription for rooms - ensure unique channel and proper cleanup
   useEffect(() => {
     if (!user) return;
 
+    let mounted = true;
+    
     // Create a completely unique channel name to avoid conflicts
-    const channelId = `rooms-${user.id}-${Math.random().toString(36).substr(2, 9)}`;
+    const channelId = `rooms-${user.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     const channel = supabase
       .channel(channelId)
@@ -167,16 +171,19 @@ export const useRooms = () => {
         table: 'rooms',
         filter: `user_id=eq.${user.id}`
       }, (payload) => {
+        if (!mounted) return;
         console.log('Room change:', payload);
         fetchRooms(); // Refetch on any change
       })
       .subscribe();
 
     return () => {
+      mounted = false;
       // Properly cleanup the channel
+      channel.unsubscribe();
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id]); // Use user.id instead of user object
 
   return {
     rooms,

@@ -321,14 +321,18 @@ export const useContent = () => {
   };
 
   useEffect(() => {
-    fetchContent();
-  }, [user]);
+    if (user) {
+      fetchContent();
+    }
+  }, [user?.id]); // Use user.id instead of user object
 
   // Enhanced real-time subscription with better error handling
   useEffect(() => {
     if (!user) return;
 
-    const channelId = `content-realtime-${user.id}-${Date.now()}`;
+    let mounted = true;
+    
+    const channelId = `content-realtime-${user.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     const channel = supabase
       .channel(channelId)
@@ -338,6 +342,7 @@ export const useContent = () => {
         table: 'content',
         filter: `user_id=eq.${user.id}`
       }, (payload) => {
+        if (!mounted) return;
         console.log('Real-time content change:', payload);
         
         // Handle different event types
@@ -372,6 +377,7 @@ export const useContent = () => {
         }
       })
       .subscribe((status) => {
+        if (!mounted) return;
         if (status === 'SUBSCRIBED') {
           console.log('Real-time subscription active for content');
         } else if (status === 'CHANNEL_ERROR') {
@@ -380,10 +386,12 @@ export const useContent = () => {
       });
 
     return () => {
+      mounted = false;
       console.log('Cleaning up real-time subscription');
+      channel.unsubscribe();
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id]); // Use user.id instead of user object
 
   return {
     content,
