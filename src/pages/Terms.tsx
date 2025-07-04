@@ -12,7 +12,7 @@ const Terms = () => {
           <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#2E2E2E] space-y-8">
             
             <div className="mb-8">
-              <p className="text-[#A6A6A6] leading-relaxed mb-4">
+              <p className="text-2xl font-bold text-[#FAFAFA] mb-4">
                 Welcome to Shattara!
               </p>
               <p className="text-[#A6A6A6] leading-relaxed mb-4">
