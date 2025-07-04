@@ -1,15 +1,22 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FileText, Scale, MessageCircle, Calendar } from 'lucide-react';
 import SharedHeroHeader from '../shared/SharedHeroHeader';
 
 const TermsHero = () => {
+  const navigate = useNavigate();
+  
   const scrollToTerms = () => {
     const termsElement = document.querySelector('[data-section="terms"]');
     if (termsElement) {
       termsElement.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleContactClick = () => {
+    navigate('/contact');
   };
 
   return (
@@ -38,7 +45,7 @@ const TermsHero = () => {
             <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90" onClick={scrollToTerms}>
               Read Terms
             </Button>
-            <Button variant="outline" size="lg" className="text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10">
+            <Button variant="outline" size="lg" className="text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10" onClick={handleContactClick}>
               Have Questions?
             </Button>
           </div>

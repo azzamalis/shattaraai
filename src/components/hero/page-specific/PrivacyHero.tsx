@@ -1,15 +1,22 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Shield, Lock, FileText, Mail } from 'lucide-react';
 import SharedHeroHeader from '../shared/SharedHeroHeader';
 
 const PrivacyHero = () => {
+  const navigate = useNavigate();
+  
   const scrollToPolicy = () => {
     const policyElement = document.querySelector('[data-section="policy"]');
     if (policyElement) {
       policyElement.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleContactClick = () => {
+    navigate('/contact');
   };
 
   return (
@@ -38,7 +45,7 @@ const PrivacyHero = () => {
             <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90" onClick={scrollToPolicy}>
               Read Full Policy
             </Button>
-            <Button variant="outline" size="lg" className="text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10">
+            <Button variant="outline" size="lg" className="text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10" onClick={handleContactClick}>
               Contact Privacy Team
             </Button>
           </div>
