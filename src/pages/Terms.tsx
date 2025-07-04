@@ -2,7 +2,6 @@
 import React from 'react';
 import TermsHero from '@/components/hero/page-specific/TermsHero';
 import Footer from '@/components/Footer';
-import { PDFViewer } from '@/components/content/PDFViewer';
 
 const Terms = () => {
   return (
@@ -17,10 +16,15 @@ const Terms = () => {
           </p>
         </div>
         
-        <div className="h-[800px]">
-          <PDFViewer 
-            url="/terms-of-service.pdf"
-          />
+        <div className="max-w-4xl mx-auto prose prose-invert">
+          <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#2E2E2E]">
+            <p className="text-[#A6A6A6] mb-6">
+              Please provide the actual terms of service text content to replace this placeholder.
+            </p>
+            <p className="text-[#A6A6A6]">
+              The PDF viewer has been removed as requested. You can now paste the actual terms of service text here.
+            </p>
+          </div>
         </div>
       </section>
       
