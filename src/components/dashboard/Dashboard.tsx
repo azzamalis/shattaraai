@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Room } from '@/hooks/useRooms';
+import { Room, useRooms } from '@/hooks/useRooms';
 import { ContentItem } from '@/hooks/useContent';
 import { DeleteItem } from '@/lib/types';
 import { DashboardHero } from './DashboardHero';
@@ -17,15 +17,10 @@ interface DashboardProps {
   onDeleteRoom?: (id: string) => Promise<void>;
 }
 
-export function Dashboard({
-  rooms = [],
-  content = [],
-  onAddRoom,
-  onEditRoom,
-  onDeleteRoom
-}: DashboardProps) {
+export function Dashboard(props: DashboardProps = {}) {
   const location = useLocation();
-  const { onDeleteContent, onUpdateContent } = useContentContext();
+  const { onDeleteContent, onUpdateContent, content } = useContentContext();
+  const { rooms, addRoom, editRoom, deleteRoom } = useRooms();
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -94,8 +89,8 @@ export function Dashboard({
 
         <DashboardSections
           rooms={rooms}
-          onAddRoom={onAddRoom || (() => Promise.resolve(null))}
-          onEditRoom={onEditRoom || (() => Promise.resolve())}
+          onAddRoom={addRoom}
+          onEditRoom={editRoom}
           onDeleteRoom={handleDeleteClick}
           onCardDelete={handleCardDelete}
           onCardShare={handleCardShare}
@@ -115,7 +110,7 @@ export function Dashboard({
           itemToDelete={itemToDelete}
           setItemToDelete={setItemToDelete}
           itemToShare={itemToShare}
-          onDeleteRoom={onDeleteRoom || (async () => {})}
+          onDeleteRoom={deleteRoom}
         />
       </main>
     </div>

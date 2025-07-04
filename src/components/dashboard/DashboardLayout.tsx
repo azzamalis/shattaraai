@@ -90,16 +90,7 @@ export function DashboardLayout({
           className
         )}
       >
-        {/* Pass rooms, content and handlers to children */}
-        {React.isValidElement(children) 
-          ? React.cloneElement(children as React.ReactElement, {
-            rooms,
-            content,
-            onAddRoom: addRoom,
-            onEditRoom: editRoom,
-            onDeleteRoom: deleteRoom
-          }) 
-          : children}
+        {children}
       </main>
     </div>
   );
