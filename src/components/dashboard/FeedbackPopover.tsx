@@ -16,27 +16,29 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
   const { toast } = useToast();
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  // More targeted approach to prevent body interactions
+  // Alternative approach: Use CSS backdrop instead of disabling body pointer events
   useEffect(() => {
     if (open) {
-      // Add a small delay to ensure popover is rendered
-      const timer = setTimeout(() => {
-        document.body.style.pointerEvents = 'none';
-        
-        // Re-enable pointer events for the popover and all its children
-        if (popoverRef.current) {
-          popoverRef.current.style.pointerEvents = 'auto';
-          // Also ensure all interactive elements inside have pointer events
-          const interactiveElements = popoverRef.current.querySelectorAll('button, input, textarea, [role="button"]');
-          interactiveElements.forEach(el => {
-            (el as HTMLElement).style.pointerEvents = 'auto';
-          });
-        }
-      }, 50);
+      // Add backdrop overlay to prevent clicking outside without disabling pointer events
+      const backdrop = document.createElement('div');
+      backdrop.className = 'feedback-popover-backdrop';
+      backdrop.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9998;
+        background: rgba(0, 0, 0, 0.1);
+        pointer-events: auto;
+      `;
+      
+      // Close popover when backdrop is clicked
+      backdrop.addEventListener('click', () => setOpen(false));
+      document.body.appendChild(backdrop);
       
       return () => {
-        clearTimeout(timer);
-        document.body.style.pointerEvents = 'auto';
+        document.body.removeChild(backdrop);
       };
     }
   }, [open]);
@@ -72,6 +74,8 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
         side="top"
         sideOffset={8}
         style={{ pointerEvents: 'auto' }}
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="w-full max-w-md p-4">
           <form className="flex flex-col space-y-4" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
@@ -92,11 +96,14 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
             <div className="space-y-2">
               <Textarea
                 placeholder="Share your thoughts..."
-                className="flex w-full max-h-[80px] rounded-md border border-input bg-background text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 min-h-[120px] max-w-lg resize-none transition-all ring-primary p-3"
+                className="flex w-full rounded-md border border-input bg-background text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[120px] resize-none p-3"
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 name="message"
                 autoFocus
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                onFocus={(e) => e.stopPropagation()}
               />
             </div>
             
