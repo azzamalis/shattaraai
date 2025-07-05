@@ -115,11 +115,28 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
       {/* Full-screen backdrop when popover is open */}
       {open && (
         <div 
-          className="fixed inset-0 z-[10000] bg-black/20 backdrop-blur-[1px]"
+          className="fixed inset-0 z-[50] bg-black/20 backdrop-blur-[1px]"
           onClick={handleClose}
-          onMouseDown={(e) => e.stopPropagation()}
-          onMouseUp={(e) => e.stopPropagation()}
-          style={{ pointerEvents: 'all' }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onMouseUp={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onMouseMove={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onWheel={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          style={{ 
+            pointerEvents: 'all',
+            touchAction: 'none'
+          }}
         />
       )}
     </>
