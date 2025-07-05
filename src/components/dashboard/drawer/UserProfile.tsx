@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -7,20 +6,22 @@ import { ChevronUp, Settings, Tag, LogOut, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
-
 interface UserProfileProps {
   onOpenChange: (open: boolean) => void;
 }
-
 export const UserProfile: React.FC<UserProfileProps> = ({
   onOpenChange
 }) => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-
+  const {
+    user,
+    signOut
+  } = useAuth();
   const handleLogout = async () => {
     try {
-      const { error } = await signOut();
+      const {
+        error
+      } = await signOut();
       if (!error) {
         toast.success('Logged out successfully');
         navigate('/signin');
@@ -32,17 +33,11 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       toast.error('An error occurred during logout');
     }
   };
-
   const userEmail = user?.email || 'No email';
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
-
-  return (
-    <Popover>
+  return <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          className="w-full flex items-center justify-between hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover transition-colors duration-200 py-2 px-2"
-        >
+        <Button variant="ghost" className="w-full flex items-center justify-between hover:bg-dashboard-secondary-card-hover dark:hover:bg-dashboard-card-hover transition-colors duration-200 py-2 px-2">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-primary">
               <AvatarFallback className="bg-primary text-primary-foreground">
@@ -55,12 +50,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
         </Button>
       </PopoverTrigger>
       
-      <PopoverContent 
-        className="w-[240px] bg-popover p-1 mb-1 shadow-md z-[100] pointer-events-auto" 
-        align="end" 
-        side="top" 
-        sideOffset={5}
-      >
+      <PopoverContent className="w-[240px] bg-popover p-1 mb-1 shadow-md z-[100] pointer-events-auto" align="end" side="top" sideOffset={5}>
         <div className="p-4 border-b border-border pointer-events-auto">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-primary">
@@ -73,39 +63,26 @@ export const UserProfile: React.FC<UserProfileProps> = ({
         </div>
         
         <div className="flex flex-col pointer-events-auto">
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" 
-            onClick={() => {
-              navigate('/profile');
-              onOpenChange(false);
-            }}
-          >
+          <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={() => {
+          navigate('/profile');
+          onOpenChange(false);
+        }}>
             <Settings size={16} className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </Button>
           
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" 
-            asChild
-          >
+          <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" asChild>
             <Link to="/pricing">
               <Tag size={16} className="mr-2 h-4 w-4" />
               <span>Pricing</span>
             </Link>
           </Button>
           
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" 
-            onClick={handleLogout}
-          >
+          <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={handleLogout}>
             <LogOut size={16} className="mr-2 h-4 w-4" />
             <span>Log Out</span>
           </Button>
         </div>
       </PopoverContent>
-    </Popover>
-  );
+    </Popover>;
 };
