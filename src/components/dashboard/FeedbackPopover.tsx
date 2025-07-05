@@ -57,81 +57,69 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
         {children}
       </PopoverTrigger>
       <PopoverContent 
-        className="w-[450px] bg-card border-border p-0 rounded-xl shadow-lg z-[9999]"
+        className="w-[450px] bg-card border-border p-5 rounded-xl shadow-lg z-[9999]"
         align="start"
         side="top"
         sideOffset={8}
         style={{ pointerEvents: 'auto' }}
       >
-        <div className="w-full max-w-md p-4" style={{ touchAction: 'manipulation' }}>
-          <form className="flex flex-col space-y-4" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
-              <Button 
-                type="button"
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setOpen(false)} 
-                className="text-muted-foreground hover:text-foreground hover:bg-accent"
-                style={{ pointerEvents: 'auto' }}
-              >
-                <X size={18} />
-                <span className="sr-only">Close</span>
-              </Button>
-            </div>
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setOpen(false)} 
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
+            >
+              <X size={18} />
+              <span className="sr-only">Close</span>
+            </Button>
+          </div>
+          
+          <Textarea
+            placeholder="Share your thoughts..."
+            className="min-h-[120px] bg-muted border-none text-foreground placeholder:text-muted-foreground rounded-lg"
+            style={{ pointerEvents: 'auto' }}
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+          />
+          
+          <div className="flex items-center justify-between pt-2">
+            <Button 
+              variant="outline" 
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
             
-            <div className="space-y-2">
-              <Textarea
-                placeholder="Share your thoughts..."
-                className="flex w-full max-h-[80px] rounded-md border border-input bg-background text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 min-h-[120px] max-w-lg resize-none transition-all ring-primary p-3"
-                style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                name="message"
-              />
-            </div>
-            
-            <div className="flex justify-between items-center gap-x-2">
+            <div className="flex items-center gap-2">
               <Button 
-                type="button"
                 variant="outline" 
+                size="icon" 
                 className="text-muted-foreground hover:text-foreground"
-                onClick={() => setOpen(false)}
-                style={{ pointerEvents: 'auto' }}
               >
-                Cancel
+                <Image size={18} />
+                <span className="sr-only">Attach image</span>
               </Button>
               
-              <div className="flex items-center gap-x-2">
-                <Button 
-                  type="button"
-                  variant="outline" 
-                  size="icon" 
-                  className="text-muted-foreground hover:text-foreground"
-                  style={{ pointerEvents: 'auto' }}
-                >
-                  <Image size={18} />
-                  <span className="sr-only">Attach image</span>
-                </Button>
-                
-                <Button 
-                  type="submit"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={!feedback.trim() || isSubmitting}
-                  style={{ pointerEvents: 'auto' }}
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center gap-2">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
-                      <span>Sending...</span>
-                    </div>
-                  ) : (
-                    <span>Send feedback</span>
-                  )}
-                </Button>
-              </div>
+              <Button 
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={handleSubmit}
+                disabled={!feedback.trim() || isSubmitting}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
+                    <span>Sending...</span>
+                  </div>
+                ) : (
+                  <span>Send feedback</span>
+                )}
+              </Button>
             </div>
-          </form>
+          </div>
         </div>
       </PopoverContent>
     </Popover>
