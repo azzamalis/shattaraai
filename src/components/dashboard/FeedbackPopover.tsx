@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,18 +14,28 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const popoverRef = useRef<HTMLDivElement>(null);
 
-  // Prevent body interactions when popover is open
+  // More targeted approach to prevent body interactions
   useEffect(() => {
     if (open) {
-      document.body.style.pointerEvents = 'none';
-      // Keep the popover content interactive
-      const popoverElements = document.querySelectorAll('[data-radix-popper-content-wrapper]');
-      popoverElements.forEach(el => {
-        (el as HTMLElement).style.pointerEvents = 'auto';
-      });
+      // Add a small delay to ensure popover is rendered
+      const timer = setTimeout(() => {
+        document.body.style.pointerEvents = 'none';
+        
+        // Re-enable pointer events for the popover and all its children
+        if (popoverRef.current) {
+          popoverRef.current.style.pointerEvents = 'auto';
+          // Also ensure all interactive elements inside have pointer events
+          const interactiveElements = popoverRef.current.querySelectorAll('button, input, textarea, [role="button"]');
+          interactiveElements.forEach(el => {
+            (el as HTMLElement).style.pointerEvents = 'auto';
+          });
+        }
+      }, 50);
       
       return () => {
+        clearTimeout(timer);
         document.body.style.pointerEvents = 'auto';
       };
     }
@@ -57,13 +66,14 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
         {children}
       </PopoverTrigger>
       <PopoverContent 
+        ref={popoverRef}
         className="w-[450px] bg-card border-border p-0 rounded-xl shadow-lg z-[9999]"
         align="start"
         side="top"
         sideOffset={8}
         style={{ pointerEvents: 'auto' }}
       >
-        <div className="w-full max-w-md p-4" style={{ touchAction: 'manipulation' }}>
+        <div className="w-full max-w-md p-4">
           <form className="flex flex-col space-y-4" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
@@ -73,7 +83,6 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
                 size="icon" 
                 onClick={() => setOpen(false)} 
                 className="text-muted-foreground hover:text-foreground hover:bg-accent"
-                style={{ pointerEvents: 'auto' }}
               >
                 <X size={18} />
                 <span className="sr-only">Close</span>
@@ -84,10 +93,10 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
               <Textarea
                 placeholder="Share your thoughts..."
                 className="flex w-full max-h-[80px] rounded-md border border-input bg-background text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 min-h-[120px] max-w-lg resize-none transition-all ring-primary p-3"
-                style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 name="message"
+                autoFocus
               />
             </div>
             
@@ -97,7 +106,6 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
                 variant="outline" 
                 className="text-muted-foreground hover:text-foreground"
                 onClick={() => setOpen(false)}
-                style={{ pointerEvents: 'auto' }}
               >
                 Cancel
               </Button>
@@ -108,7 +116,6 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
                   variant="outline" 
                   size="icon" 
                   className="text-muted-foreground hover:text-foreground"
-                  style={{ pointerEvents: 'auto' }}
                 >
                   <Image size={18} />
                   <span className="sr-only">Attach image</span>
@@ -118,7 +125,6 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
                   type="submit"
                   className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   disabled={!feedback.trim() || isSubmitting}
-                  style={{ pointerEvents: 'auto' }}
                 >
                   {isSubmitting ? (
                     <div className="flex items-center gap-2">
