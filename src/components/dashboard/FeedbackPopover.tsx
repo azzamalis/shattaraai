@@ -40,73 +40,78 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
       </div>
       
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-20">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/50" 
+            className="absolute inset-0 bg-black/10" 
             onClick={() => setOpen(false)}
           />
           
-          {/* Modal Content */}
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg w-[450px] p-6 m-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-medium text-gray-900 dark:text-white">Send Feedback</h2>
-                <Button 
-                  type="button"
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setOpen(false)} 
-                  className="h-8 w-8"
-                >
-                  <X size={18} />
-                  <span className="sr-only">Close</span>
-                </Button>
-              </div>
-              
-              <div>
-                <textarea
-                  placeholder="Share your thoughts..."
-                  className="w-full min-h-[120px] p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  autoFocus
-                />
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <Button 
-                  type="button"
-                  variant="outline" 
-                  onClick={() => setOpen(false)}
-                >
-                  Cancel
-                </Button>
+          {/* Modal Content - positioned like a popover */}
+          <div className="relative bg-card border border-border rounded-xl shadow-lg w-[450px] p-0 m-4">
+            <div className="w-full max-w-md p-4">
+              <div className="flex flex-col space-y-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
+                  <Button 
+                    type="button"
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => setOpen(false)} 
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent"
+                  >
+                    <X size={18} />
+                    <span className="sr-only">Close</span>
+                  </Button>
+                </div>
                 
-                <div className="flex items-center gap-2">
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Share your thoughts..."
+                    className="min-h-[120px] resize-none"
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    name="message"
+                    autoFocus
+                  />
+                </div>
+                
+                <div className="flex justify-between items-center gap-x-2">
                   <Button 
                     type="button"
                     variant="outline" 
-                    size="icon"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => setOpen(false)}
                   >
-                    <Image size={18} />
-                    <span className="sr-only">Attach image</span>
+                    Cancel
                   </Button>
                   
-                  <Button 
-                    onClick={handleSubmit}
-                    disabled={!feedback.trim() || isSubmitting}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {isSubmitting ? (
-                      <div className="flex items-center gap-2">
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                        <span>Sending...</span>
-                      </div>
-                    ) : (
-                      <span>Send feedback</span>
-                    )}
-                  </Button>
+                  <div className="flex items-center gap-x-2">
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      size="icon" 
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <Image size={18} />
+                      <span className="sr-only">Attach image</span>
+                    </Button>
+                    
+                    <Button 
+                      onClick={handleSubmit}
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                      disabled={!feedback.trim() || isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
+                          <span>Sending...</span>
+                        </div>
+                      ) : (
+                        <span>Send feedback</span>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
