@@ -80,6 +80,7 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
           <Textarea
             placeholder="Share your thoughts..."
             className="min-h-[120px] bg-muted border-none text-foreground placeholder:text-muted-foreground rounded-lg"
+            style={{ pointerEvents: 'auto' }}
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
           />
