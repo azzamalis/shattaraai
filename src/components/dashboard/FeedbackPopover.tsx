@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +15,22 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+
+  // Prevent body interactions when popover is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.pointerEvents = 'none';
+      // Keep the popover content interactive
+      const popoverElements = document.querySelectorAll('[data-radix-popper-content-wrapper]');
+      popoverElements.forEach(el => {
+        (el as HTMLElement).style.pointerEvents = 'auto';
+      });
+      
+      return () => {
+        document.body.style.pointerEvents = 'auto';
+      };
+    }
+  }, [open]);
 
   const handleSubmit = async () => {
     if (!feedback.trim()) return;
@@ -41,10 +57,11 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
         {children}
       </PopoverTrigger>
       <PopoverContent 
-        className="w-[450px] bg-card border-border p-5 rounded-xl shadow-lg"
+        className="w-[450px] bg-card border-border p-5 rounded-xl shadow-lg z-[9999]"
         align="start"
         side="top"
         sideOffset={8}
+        style={{ pointerEvents: 'auto' }}
       >
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
