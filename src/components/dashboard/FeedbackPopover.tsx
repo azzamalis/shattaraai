@@ -35,110 +35,75 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
     }, 1000);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-    setFeedback('');
-  };
-
   return (
-    <>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          {children}
-        </PopoverTrigger>
-        <PopoverContent 
-          className="w-[450px] bg-card border-border p-5 rounded-xl shadow-lg z-[10001]"
-          align="start"
-          side="top"
-          sideOffset={8}
-        >
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={handleClose}
-                className="text-muted-foreground hover:text-foreground hover:bg-accent"
-              >
-                <X size={18} />
-                <span className="sr-only">Close</span>
-              </Button>
-            </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        {children}
+      </PopoverTrigger>
+      <PopoverContent 
+        className="w-[450px] bg-card border-border p-5 rounded-xl shadow-lg"
+        align="start"
+        side="top"
+        sideOffset={8}
+      >
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setOpen(false)} 
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
+            >
+              <X size={18} />
+              <span className="sr-only">Close</span>
+            </Button>
+          </div>
+          
+          <Textarea
+            placeholder="Share your thoughts..."
+            className="min-h-[120px] bg-muted border-none text-foreground placeholder:text-muted-foreground rounded-lg"
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+          />
+          
+          <div className="flex items-center justify-between pt-2">
+            <Button 
+              variant="outline" 
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
             
-            <Textarea
-              placeholder="Share your thoughts..."
-              className="min-h-[120px] bg-muted border-none text-foreground placeholder:text-muted-foreground rounded-lg"
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-            />
-            
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center gap-2">
               <Button 
                 variant="outline" 
+                size="icon" 
                 className="text-muted-foreground hover:text-foreground"
-                onClick={handleClose}
               >
-                Cancel
+                <Image size={18} />
+                <span className="sr-only">Attach image</span>
               </Button>
               
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <Image size={18} />
-                  <span className="sr-only">Attach image</span>
-                </Button>
-                
-                <Button 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                  onClick={handleSubmit}
-                  disabled={!feedback.trim() || isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center gap-2">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
-                      <span>Sending...</span>
-                    </div>
-                  ) : (
-                    <span>Send feedback</span>
-                  )}
-                </Button>
-              </div>
+              <Button 
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={handleSubmit}
+                disabled={!feedback.trim() || isSubmitting}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
+                    <span>Sending...</span>
+                  </div>
+                ) : (
+                  <span>Send feedback</span>
+                )}
+              </Button>
             </div>
           </div>
-        </PopoverContent>
-      </Popover>
-
-      {/* Full-screen backdrop when popover is open */}
-      {open && (
-        <div 
-          className="fixed inset-0 z-[50] bg-black/20 backdrop-blur-[1px]"
-          onClick={handleClose}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          onMouseUp={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          onMouseMove={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          onWheel={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          style={{ 
-            pointerEvents: 'all',
-            touchAction: 'none'
-          }}
-        />
-      )}
-    </>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
