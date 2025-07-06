@@ -93,40 +93,45 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
   }
 
   return (
-    <div className="relative h-full bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+    <div className="relative h-full bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden flex flex-col">
       <PDFTimeoutHandler 
         loading={loading}
         url={url}
         onTimeout={handleTimeout}
       />
-      <PDFToolbar
-        pageNumber={pageNumber}
-        numPages={numPages}
-        scale={scale}
-        loading={loading}
-        error={error}
-        showSidebar={showSidebar}
-        searchTerm={searchTerm}
-        searchResults={searchResults}
-        currentSearchIndex={currentSearchIndex}
-        isSearching={isSearching}
-        searchPopoverOpen={searchPopoverOpen}
-        pdfUrl={url}
-        onPrevPage={goToPrevPage}
-        onNextPage={goToNextPage}
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        onRotate={handleRotate}
-        onDownload={handleDownload}
-        onToggleSidebar={() => setShowSidebar(!showSidebar)}
-        onSearch={handleSearch}
-        onSearchTermChange={setSearchTerm}
-        onClearSearch={clearSearch}
-        onNavigateToSearchResult={navigateToSearchResult}
-        onSearchPopoverOpenChange={setSearchPopoverOpen}
-      />
+      
+      {/* Fixed Header with PDF Controls */}
+      <div className="shrink-0 bg-dashboard-card dark:bg-dashboard-card rounded-t-xl">
+        <PDFToolbar
+          pageNumber={pageNumber}
+          numPages={numPages}
+          scale={scale}
+          loading={loading}
+          error={error}
+          showSidebar={showSidebar}
+          searchTerm={searchTerm}
+          searchResults={searchResults}
+          currentSearchIndex={currentSearchIndex}
+          isSearching={isSearching}
+          searchPopoverOpen={searchPopoverOpen}
+          pdfUrl={url}
+          onPrevPage={goToPrevPage}
+          onNextPage={goToNextPage}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onRotate={handleRotate}
+          onDownload={handleDownload}
+          onToggleSidebar={() => setShowSidebar(!showSidebar)}
+          onSearch={handleSearch}
+          onSearchTermChange={setSearchTerm}
+          onClearSearch={clearSearch}
+          onNavigateToSearchResult={navigateToSearchResult}
+          onSearchPopoverOpenChange={setSearchPopoverOpen}
+        />
+      </div>
 
-      <div className="flex flex-grow overflow-hidden">
+      {/* Full Height PDF Display Window */}
+      <div className="flex flex-1 overflow-hidden">
         {showSidebar && (
           <PDFSidebar
             numPages={numPages}
