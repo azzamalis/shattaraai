@@ -9,6 +9,7 @@ import { AudioPlayer } from '@/components/content/AudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
 import { cn } from '@/lib/utils';
+
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -23,6 +24,7 @@ interface ContentLeftSidebarProps {
   isRecordingLoading?: boolean;
   onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
 }
+
 export function ContentLeftSidebar({
   contentData,
   onUpdateContent,
@@ -41,6 +43,7 @@ export function ContentLeftSidebar({
 
   // Check if we should hide tabs (for PDF content)
   const shouldHideTabs = contentData.type === 'pdf';
+  
   const renderControls = () => {
     // Show loading state while detecting recording state
     if (contentData.type === 'recording' && isRecordingLoading) {
@@ -91,10 +94,11 @@ export function ContentLeftSidebar({
     }
 
     // Default content viewer for other types
-    return <div className={cn("p-4 shrink-0 bg-dashboard-card dark:bg-dashboard-card", shouldHideTabs && "flex-1")}>
+    return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
         <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} onTextAction={onTextAction} />
       </div>;
   };
+
   const renderTabContent = () => {
     const hasContent = contentData.type === 'live_recording' ? isRecording : recordingStateInfo?.isNewRecording ? isRecording : recordingStateInfo?.isExistingRecording ? true : !!contentData.url || !!contentData.text;
     return <>
