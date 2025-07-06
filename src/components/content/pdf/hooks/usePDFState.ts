@@ -1,15 +1,6 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { pdfjs } from 'react-pdf';
 import { SearchResult, TextActionPosition } from '../types';
-
-// Configure PDF.js worker with fallback
-try {
-  pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
-} catch (error) {
-  console.warn('Local PDF worker not found, using CDN fallback');
-  pdfjs.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.mjs';
-}
 
 export function usePDFState(url?: string) {
   const [numPages, setNumPages] = useState<number>(0);
