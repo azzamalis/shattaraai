@@ -25,10 +25,34 @@ export function usePDFState(url?: string) {
   useEffect(() => {
     if (url) {
       console.log('PDFViewer: URL changed to:', url);
-      setLoading(true);
-      setError(null);
-      setPageNumber(1);
-      setNumPages(0);
+      
+      // Test PDF URL accessibility first
+      const testPDFAccess = async () => {
+        try {
+          console.log('PDFViewer: Testing PDF URL accessibility...');
+          const response = await fetch(url, { 
+            method: 'HEAD',
+            mode: 'cors'
+          });
+          console.log('PDFViewer: PDF URL test response:', response.status, response.statusText);
+          
+          if (!response.ok) {
+            throw new Error(`PDF not accessible: ${response.status} ${response.statusText}`);
+          }
+          
+          // If URL is accessible, proceed with loading
+          setLoading(true);
+          setError(null);
+          setPageNumber(1);
+          setNumPages(0);
+        } catch (error) {
+          console.error('PDFViewer: PDF URL accessibility test failed:', error);
+          setError(`PDF file is not accessible: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          setLoading(false);
+        }
+      };
+      
+      testPDFAccess();
     }
   }, [url]);
 
@@ -53,6 +77,11 @@ export function usePDFState(url?: string) {
 
   const onDocumentLoadError = useCallback((error: Error) => {
     console.error('PDFViewer: Document load error:', error);
+    console.error('PDFViewer: Error details:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    });
     
     // Provide more specific error messages
     let errorMessage = 'Failed to load PDF';
@@ -68,6 +97,10 @@ export function usePDFState(url?: string) {
     
     setError(errorMessage);
     setLoading(false);
+  }, []);
+
+  const onDocumentLoadProgress = useCallback((progressData: { loaded: number; total: number }) => {
+    console.log('PDFViewer: Loading progress:', `${progressData.loaded}/${progressData.total}`);
   }, []);
 
   return {
@@ -108,5 +141,6 @@ export function usePDFState(url?: string) {
     // Callbacks
     onDocumentLoadSuccess,
     onDocumentLoadError,
+    onDocumentLoadProgress,
   };
 }

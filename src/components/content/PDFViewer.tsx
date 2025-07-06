@@ -47,6 +47,7 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
     setLoading,
     onDocumentLoadSuccess,
     onDocumentLoadError,
+    onDocumentLoadProgress,
   } = usePDFState(url);
 
   const {
@@ -155,13 +156,9 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
                     file={url}
                     onLoadSuccess={onDocumentLoadSuccess}
                     onLoadError={onDocumentLoadError}
-                    loading={null}
-                    error={null}
-                    options={{
-                      cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
-                      cMapPacked: true,
-                      standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
-                    }}
+                    onLoadProgress={onDocumentLoadProgress}
+                    loading={<PDFLoadingState />}
+                    error={<PDFErrorState error="Failed to load PDF" url={url} />}
                   >
                     <Page
                       pageNumber={pageNumber}

@@ -14,9 +14,21 @@ export function PDFErrorState({ error, url }: PDFErrorStateProps) {
         <AlertTriangle className="h-12 w-12 text-red-500" />
         <p className="text-lg font-medium">Error loading PDF</p>
         <p className="text-sm text-center max-w-md">{error}</p>
-        <p className="text-xs text-center max-w-md text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">
-          URL: {url}
-        </p>
+        {url && (
+          <div className="flex flex-col items-center gap-2 mt-4">
+            <p className="text-xs text-center max-w-md text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">
+              PDF URL: {url}
+            </p>
+            <a 
+              href={url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline text-sm px-3 py-1 rounded border border-primary/20 hover:border-primary/40 transition-colors"
+            >
+              Open PDF directly
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );
