@@ -78,7 +78,7 @@ const Testimonials = () => {
           className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
         >
           <div className="flex justify-center">
-            <div className="border border-border py-1 px-4 rounded-lg bg-card text-card-foreground">
+            <div className="border border-[#00A3FF]/20 py-1 px-4 rounded-lg bg-[#00A3FF]/10 text-[#00A3FF]">
               Testimonials
             </div>
           </div>
