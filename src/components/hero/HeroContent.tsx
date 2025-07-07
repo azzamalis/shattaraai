@@ -152,7 +152,7 @@ const HeroContent = () => {
           }
         }
       }}>
-          <div className="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
+          <div className="relative mt-8 overflow-hidden px-2 sm:mt-12 md:mt-20">
             <div aria-hidden className="bg-gradient-to-b to-[#121212] absolute inset-0 z-10 from-transparent from-35%" />
             <div className="bg-[#141414]/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#E3E3E3]/10 p-4 shadow-lg shadow-black/15">
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-[#E3E3E3] to-transparent"></div>
