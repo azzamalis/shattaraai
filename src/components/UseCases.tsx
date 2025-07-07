@@ -1,3 +1,4 @@
+
 // Test commit - UseCases component for educational platform
 import React, { useRef, useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, GraduationCap, BookOpen, Languages, Award, Brain, FileSearch } from 'lucide-react';
@@ -124,7 +125,7 @@ const UseCases = () => {
         <div role="region" aria-label="Use Cases Carousel" className="relative">
           {/* Navigation Arrows - Desktop Only */}
           <div className="hidden md:block absolute top-1/2 -left-4 transform -translate-y-1/2 z-10">
-            <button onClick={scrollLeft} className="p-3 rounded-full bg-card/80 backdrop-blur-sm text-foreground hover:bg-primary transition-colors border border-border" aria-label="Scroll left">
+            <button onClick={scrollLeft} className="p-3 rounded-full bg-[#00A3FF]/10 backdrop-blur-sm text-[#00A3FF] hover:bg-[#00A3FF]/20 hover:text-[#00A3FF] transition-colors border border-[#00A3FF]/20 shadow-[0_2px_8px_rgba(0,163,255,0.15)]" aria-label="Scroll left">
               <ArrowLeft size={24} />
             </button>
           </div>
@@ -173,17 +174,18 @@ const UseCases = () => {
           
           {/* Navigation Arrows - Desktop Only */}
           <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-            <button onClick={scrollRight} className="p-3 rounded-full bg-card/80 backdrop-blur-sm text-foreground hover:bg-primary transition-colors border border-border" aria-label="Scroll right">
+            <button onClick={scrollRight} className="p-3 rounded-full bg-[#00A3FF]/10 backdrop-blur-sm text-[#00A3FF] hover:bg-[#00A3FF]/20 hover:text-[#00A3FF] transition-colors border border-[#00A3FF]/20 shadow-[0_2px_8px_rgba(0,163,255,0.15)]" aria-label="Scroll right">
               <ArrowRight size={24} />
             </button>
           </div>
           
           {/* Pagination Dots - Desktop Only */}
           <div className="hidden md:flex justify-center gap-2 mt-6">
-            {useCases.map((_, index) => <button key={index} onClick={() => scrollToCard(index)} className={cn("w-2 h-2 rounded-full transition-colors", activeIndex === index ? "bg-primary" : "bg-muted-foreground/30")} aria-label={`Go to slide ${index + 1}`} />)}
+            {useCases.map((_, index) => <button key={index} onClick={() => scrollToCard(index)} className={cn("w-2 h-2 rounded-full transition-colors", activeIndex === index ? "bg-[#00A3FF]" : "bg-[#00A3FF]/30")} aria-label={`Go to slide ${index + 1}`} />)}
           </div>
         </div>
       </div>
     </section>;
 };
 export default UseCases;
+```
