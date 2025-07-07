@@ -87,8 +87,8 @@ function PricingSection({
             ))}
           </div>
           {isYearly && (
-            <div className="mt-2 inline-flex items-center px-4 py-1.5 bg-primary/10 rounded-full">
-              <span className="text-sm font-medium text-primary">
+            <div className="mt-2 inline-flex items-center px-4 py-1.5 bg-[#00A3FF]/10 border border-[#00A3FF]/20 rounded-full">
+              <span className="text-sm font-medium text-[#00A3FF]">
                 Save 40% with annual billing
               </span>
             </div>
