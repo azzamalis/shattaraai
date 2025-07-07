@@ -1,33 +1,33 @@
 
 import { cn } from "@/lib/utils";
-import { FileText, Book, FileSearch, MessageSquareCode, MessageSquare, FileAudio } from "lucide-react";
+import { Edit, Layers, ListCheck, GraduationCap, Lightbulb, FileCode } from "lucide-react";
 import React from "react";
 
 export function FeaturesSectionWithHoverEffects() {
   const features = [{
     title: "AI-Generated Notes",
     description: "Turn any content into comprehensive study notes with our advanced AI technology.",
-    icon: <FileText className="w-6 h-6" />
+    icon: <Edit className="w-6 h-6" />
   }, {
     title: "Smart Flashcards",
     description: "Create effective flashcards that adapt to your learning progress for better retention.",
-    icon: <Book className="w-6 h-6" />
+    icon: <Layers className="w-6 h-6" />
   }, {
     title: "Open Source Quizzes",
     description: "Access a growing library of community-created quizzes or create your own to share.",
-    icon: <FileSearch className="w-6 h-6" />
+    icon: <ListCheck className="w-6 h-6" />
   }, {
     title: "Exam Preps",
     description: "Practice with realistic exam scenarios tailored to your specific curriculum and goals.",
-    icon: <MessageSquareCode className="w-6 h-6" />
+    icon: <GraduationCap className="w-6 h-6" />
   }, {
     title: "Shattara AI Chat",
     description: "Get immediate answers and explanations from our specialized learning AI assistant.",
-    icon: <MessageSquare className="w-6 h-6" />
+    icon: <Lightbulb className="w-6 h-6" />
   }, {
     title: "Audio & Video Transcripts",
     description: "Convert lectures and educational content into searchable, annotatable text.",
-    icon: <FileAudio className="w-6 h-6" />
+    icon: <FileCode className="w-6 h-6" />
   }];
 
   return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 relative z-10 py-10 max-w-7xl mx-auto">
