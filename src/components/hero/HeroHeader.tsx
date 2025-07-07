@@ -79,6 +79,27 @@ const HeroHeader = () => {
                     </li>
                   ))}
                 </ul>
+                
+                {/* Mobile Auth Buttons */}
+                <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-[#2E2E2E]">
+                  <Link to="/signin" onClick={() => setMenuState(false)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/signup" onClick={() => setMenuState(false)}>
+                    <Button
+                      size="sm"
+                      className="w-full bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90"
+                    >
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
               </div>
             )}
 
