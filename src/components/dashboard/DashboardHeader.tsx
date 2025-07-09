@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
@@ -147,12 +148,12 @@ export function DashboardHeader({
             <DialogTrigger asChild>
               {isMobile ?
             // Mobile: Search icon only
-            <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg border border-input bg-background/50 text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg border border-input bg-background/50 text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0">
                   <Search className="h-4 w-4" aria-hidden="true" />
                   <span className="sr-only">Search</span>
                 </Button> :
-            // Desktop: ⌘K with new styling
-            <Button variant="outline" className="inline-flex h-9 w-fit rounded-lg border border-input bg-background/50 px-3 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            // Desktop: ⌘K with no focus ring
+            <Button variant="outline" className="inline-flex h-9 w-fit rounded-lg border border-input bg-background/50 px-3 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0">
                   ⌘K
                 </Button>}
             </DialogTrigger>
