@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -113,6 +112,30 @@ export const useAuth = () => {
         }
       }
     });
+
+    // Handle referral code if present
+    if (data.user && !error) {
+      const referralCode = localStorage.getItem('referral_code');
+      if (referralCode) {
+        try {
+          // Track signup completion
+          await supabase.functions.invoke('track-referral', {
+            body: {
+              invite_code: referralCode,
+              activity_type: 'signup_completed',
+              metadata: {
+                signup_timestamp: new Date().toISOString()
+              }
+            }
+          });
+          
+          // Clear the referral code from localStorage
+          localStorage.removeItem('referral_code');
+        } catch (referralError) {
+          console.error('Error tracking referral signup:', referralError);
+        }
+      }
+    }
     
     return { data, error };
   };
