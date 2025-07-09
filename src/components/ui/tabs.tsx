@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
@@ -29,20 +30,15 @@ const TabsTrigger = React.forwardRef<
     className={cn(
       "flex-1 h-full rounded-md flex items-center justify-center gap-2",
       "text-sm font-medium",
-      "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
-      "hover:text-dashboard-text-secondary dark:hover:text-dashboard-text-secondary",
-      "data-[state=active]:text-dashboard-text dark:data-[state=active]:text-dashboard-text",
-      "data-[state=active]:bg-dashboard-card dark:data-[state=active]:bg-dashboard-card",
-      "data-[state=active]:shadow-none",
+      "text-muted-foreground",
+      "hover:text-foreground",
+      "data-[state=active]:text-foreground",
+      "data-[state=active]:bg-background",
+      "data-[state=active]:shadow-sm",
       "transition-colors duration-200",
-      "focus-visible:ring-0 focus-visible:ring-offset-0",
-      "focus:ring-0 focus:ring-offset-0",
-      "ring-0 ring-offset-0",
-      "border-0 outline-none",
-      "data-[state=active]:ring-0",
-      "data-[state=active]:ring-offset-0",
-      "data-[state=active]:border-0",
-      "data-[state=active]:outline-none"
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "disabled:pointer-events-none disabled:opacity-50",
+      className
     )}
     {...props}
   />

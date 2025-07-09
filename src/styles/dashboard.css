@@ -1,8 +1,9 @@
 
+
 @layer components {
-  /* Dashboard specific component classes that use global CSS variables */
+  /* Dashboard specific component classes that use semantic CSS variables */
   .dashboard-card {
-    @apply bg-card border-border hover:bg-card-hover transition-all duration-200 ease-in-out;
+    @apply bg-card border-border hover:bg-accent transition-all duration-200 ease-in-out;
   }
 
   .dashboard-card-secondary {
@@ -15,18 +16,6 @@
 
   .dashboard-sidebar {
     @apply bg-sidebar-background border-sidebar-border;
-  }
-
-  .dashboard-text {
-    @apply text-foreground;
-  }
-
-  .dashboard-text-secondary {
-    @apply text-muted-foreground;
-  }
-
-  .dashboard-text-placeholder {
-    @apply text-muted-foreground;
   }
 
   /* Enhanced component styles that work with both themes */
@@ -47,3 +36,4 @@
     @apply transition-all duration-200 hover:shadow-lg;
   }
 }
+
