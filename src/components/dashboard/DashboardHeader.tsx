@@ -145,13 +145,9 @@ export function DashboardHeader({
                   <Search className="h-4 w-4" aria-hidden="true" />
                   <span className="sr-only">Search</span>
                 </Button> :
-            // Desktop: Full search button with ⌘K - Updated styling to match Upgrade button
-            <Button variant="outline" className="inline-flex h-9 w-fit bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-2xl px-[21px] py-2 text-sm shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <span className="flex grow items-center">
-                    <Search className="-ms-1 me-3 h-4 w-4" aria-hidden="true" />
-                    <span className="font-normal">Search</span>
-                  </span>
-                  <kbd className="-me-1 ms-12 inline-flex h-5 max-h-full items-center rounded border border-border px-1.5 font-mono text-[10px] font-medium text-foreground bg-dashboard-secondary-card ">
+            // Desktop: Only ⌘K with same styling as Upgrade button
+            <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-2xl px-[21px] py-5 h-9 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <kbd className="inline-flex h-5 max-h-full items-center rounded border border-border px-1.5 font-mono text-[10px] font-medium text-foreground bg-dashboard-secondary-card">
                     ⌘K
                   </kbd>
                 </Button>}
