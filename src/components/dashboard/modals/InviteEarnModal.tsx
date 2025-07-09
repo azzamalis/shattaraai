@@ -90,7 +90,7 @@ export function InviteEarnModal({
             </div>
             <div className="flex-1">
               <p className="text-sm text-foreground">
-                You get <span className="font-medium">1 month free</span> once they publish their first website
+                You get <span className="font-medium">1 month free</span> once they upload their first content
               </p>
             </div>
           </div>
