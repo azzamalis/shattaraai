@@ -1,7 +1,6 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { CommandOption } from '@/lib/types';
-import { Mic, MicOff, Send, Search, AtSign, Globe, Plus } from 'lucide-react';
+import { Mic, MicOff, Send, Search, AtSign, Globe } from 'lucide-react';
 import { CommandDropdown } from './CommandDropdown';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -188,27 +187,6 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
         
         {/* Command and search options */}
         <div className="flex items-center gap-3 px-3 pb-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button 
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs transition-colors",
-                    "bg-dashboard-bg dark:bg-dashboard-bg",
-                    "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
-                    "hover:bg-dashboard-card dark:hover:bg-dashboard-card",
-                    "hover:text-dashboard-text dark:hover:text-dashboard-text"
-                  )}
-                >
-                  <Plus className="h-[14px] w-[14px]" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Add content</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
