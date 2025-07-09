@@ -41,7 +41,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full flex items-center justify-between hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover transition-colors duration-200 py-2 px-2"
+          className="w-full flex items-center justify-between hover:bg-accent transition-colors duration-200 py-2 px-2"
         >
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-primary">
@@ -49,9 +49,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                 {userInitials}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm text-dashboard-text dark:text-dashboard-text">{userEmail}</span>
+            <span className="text-sm text-foreground truncate max-w-[140px]">{userEmail}</span>
           </div>
-          <ChevronUp size={16} className="text-dashboard-text-secondary dark:text-dashboard-text-secondary" />
+          <ChevronUp size={16} className="text-muted-foreground" />
         </Button>
       </PopoverTrigger>
       
@@ -68,7 +68,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                 {userInitials}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm text-foreground truncate">{userEmail}</span>
+            <span className="text-sm text-foreground truncate max-w-[160px]">{userEmail}</span>
           </div>
         </div>
         
