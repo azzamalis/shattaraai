@@ -147,9 +147,7 @@ export function DashboardHeader({
                 </Button> :
             // Desktop: Only ⌘K with same styling as Upgrade button
             <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-2xl px-[21px] py-5 h-9 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <kbd className="inline-flex h-5 max-h-full items-center rounded border border-border px-1.5 font-mono text-[10px] font-medium text-foreground bg-dashboard-secondary-card">
-                    ⌘K
-                  </kbd>
+                  ⌘K
                 </Button>}
             </DialogTrigger>
             <CommandModal open={commandOpen} onOpenChange={setCommandOpen} rooms={rooms} onAddRoom={onAddRoom} />
