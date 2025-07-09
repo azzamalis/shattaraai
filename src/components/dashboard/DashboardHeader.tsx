@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
@@ -12,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { Room } from '@/lib/types';
 import { useContentContext } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
-
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
   contentData?: ContentData;
@@ -20,7 +17,6 @@ interface DashboardHeaderProps {
   rooms: Room[];
   onAddRoom: () => Promise<string | null>;
 }
-
 export function DashboardHeader({
   onOpenDrawer,
   contentData,
@@ -53,7 +49,6 @@ export function DashboardHeader({
     // Cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -64,12 +59,10 @@ export function DashboardHeader({
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
-
   const handleTitleEdit = () => {
     setEditedTitle(contentData?.title || '');
     setIsEditing(true);
   };
-
   const handleTitleSave = async () => {
     if (contentData && editedTitle.trim() !== '' && editedTitle.trim() !== contentData.title) {
       try {
@@ -95,12 +88,10 @@ export function DashboardHeader({
     }
     setIsEditing(false);
   };
-
   const handleTitleCancel = () => {
     setEditedTitle(contentData?.title || '');
     setIsEditing(false);
   };
-
   const handleTitleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -110,7 +101,6 @@ export function DashboardHeader({
       handleTitleCancel();
     }
   };
-
   return <header className="flex items-center p-4 sticky top-0 z-50 bg-background transition-colors duration-300">
       <div className="flex w-full items-center justify-between">
         {/* Left section */}
@@ -137,9 +127,9 @@ export function DashboardHeader({
         
         {/* Right section */}
         <div className="flex items-center justify-end gap-4">
-          {/* Upgrade button - Hidden on mobile with new #00A3FF color styling */}
+          {/* Upgrade button - Hidden on mobile */}
           {!isMobile && <Link to="/pricing">
-              <Button variant="outline" className="bg-[#00A3FF]/5 border-2 border-[#00A3FF]/80 text-[#00A3FF] hover:text-[#00A3FF] hover:bg-[#00A3FF]/10 hover:border-[#00A3FF] transition-all py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.15)] hover:shadow-[0_4px_16px_rgba(0,163,255,0.25)] rounded-2xl px-[21px] hover:shadow-[#00A3FF]/20">
+              <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-full px-8 py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)]">
                 Upgrade
               </Button>
             </Link>}
@@ -149,13 +139,19 @@ export function DashboardHeader({
             <DialogTrigger asChild>
               {isMobile ?
             // Mobile: Search icon only
-            <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg border border-border/50 bg-background/50 text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0">
+            <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg border border-input bg-background/50 text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                   <Search className="h-4 w-4" aria-hidden="true" />
                   <span className="sr-only">Search</span>
                 </Button> :
-            // Desktop: ⌘K with design system border colors
-            <Button variant="outline" className="inline-flex h-9 w-fit rounded-lg border border-border/50 bg-background/50 px-3 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-0">
-                  ⌘K
+            // Desktop: Full search button with ⌘K
+            <Button variant="outline" className="inline-flex h-9 w-fit rounded-lg border border-input bg-background/50 px-3 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <span className="flex grow items-center">
+                    <Search className="-ms-1 me-3 h-4 w-4" aria-hidden="true" />
+                    <span className="font-normal">Search</span>
+                  </span>
+                  <kbd className="-me-1 ms-12 inline-flex h-5 max-h-full items-center rounded border border-border px-1.5 font-mono text-[10px] font-medium text-foreground bg-dashboard-secondary-card ">
+                    ⌘K
+                  </kbd>
                 </Button>}
             </DialogTrigger>
             <CommandModal open={commandOpen} onOpenChange={setCommandOpen} rooms={rooms} onAddRoom={onAddRoom} />
@@ -164,4 +160,3 @@ export function DashboardHeader({
       </div>
     </header>;
 }
-
