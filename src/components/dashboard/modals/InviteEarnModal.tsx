@@ -1,21 +1,23 @@
+
 import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { Button } from '@/components/ui/button';
-import { Copy, Share2, Gift, Users } from 'lucide-react';
+import { Copy, Share2, Link, Crown, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
 interface InviteEarnModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
 export function InviteEarnModal({
   open,
   onOpenChange
 }: InviteEarnModalProps) {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const inviteCode = "INVITE123";
   const inviteLink = `https://shattara.com/invite/${inviteCode}`;
+
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(inviteLink);
@@ -31,6 +33,7 @@ export function InviteEarnModal({
       });
     }
   };
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -46,66 +49,91 @@ export function InviteEarnModal({
       handleCopyLink();
     }
   };
-  return <BaseModal open={open} onOpenChange={onOpenChange} title="Invite & Earn" description="Share Shattara with friends and earn rewards together" className="max-w-md">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-            <Gift className="h-8 w-8 text-primary" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-lg font-semibold">Spread the love</h3>
-            <p className="text-sm text-muted-foreground">Invite friends and both of you earn free months</p>
-          </div>
-        </div>
 
-        {/* Benefits */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-            <div className="w-8 h-8 bg-green-500/10 rounded-full flex items-center justify-center">
-              <Users className="h-4 w-4 text-green-500" />
-            </div>
-            <div>
-              <p className="text-sm font-medium">Friend joins</p>
-              <p className="text-xs text-muted-foreground">They get 1 month free premium</p>
-            </div>
-          </div>
+  return (
+    <BaseModal 
+      open={open} 
+      onOpenChange={onOpenChange} 
+      title="" 
+      className="max-w-md p-0"
+      showCloseButton={true}
+    >
+      <div className="relative p-6">
+        {/* Header with gradient background */}
+        <div className="text-center space-y-3 mb-6">
+          {/* Decorative gradient background */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 via-purple-500/10 to-pink-500/10 rounded-full blur-3xl -z-10"></div>
           
-          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-            <div className="w-8 h-8 bg-blue-500/10 rounded-full flex items-center justify-center">
-              <Gift className="h-4 w-4 text-blue-500" />
+          <div className="relative">
+            <h2 className="text-xl font-bold text-foreground mb-1">Earn 10+ credits</h2>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Spread the love</h1>
+            <p className="text-sm text-muted-foreground">and earn free credits</p>
+          </div>
+        </div>
+
+        {/* How it works section */}
+        <div className="space-y-4 mb-6">
+          <h3 className="text-sm font-medium text-foreground mb-3">How it works:</h3>
+          
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+              <Zap className="h-3 w-3 text-primary" />
             </div>
-            <div>
-              <p className="text-sm font-medium">You earn</p>
-              <p className="text-xs text-muted-foreground">1 month free premium for each referral</p>
+            <div className="flex-1">
+              <p className="text-sm text-foreground font-medium">Share your invite link</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+              <Crown className="h-3 w-3 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-foreground">
+                They sign up and get <span className="font-medium">extra 10 credits</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+              <div className="w-3 h-3 rounded bg-primary"></div>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-foreground">
+                You get <span className="font-medium">10 credits</span> once they publish their first website
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Invite Link */}
+        {/* Invite link section */}
         <div className="space-y-3">
-          <label className="text-sm font-medium">Your invite link</label>
+          <label className="text-sm font-medium text-foreground">Your invite link:</label>
+          
           <div className="flex gap-2">
-            <div className="flex-1 p-3 bg-muted/50 rounded-lg border text-sm font-mono truncate">
-              {inviteLink}
+            <div className="flex-1 flex items-center gap-2 p-3 bg-muted/30 border border-border rounded-lg">
+              <Link className="h-4 w-4 text-muted-foreground shrink-0" />
+              <span className="text-sm font-mono text-foreground truncate">{inviteLink}</span>
             </div>
-            <Button variant="outline" size="icon" onClick={handleCopyLink} className="shrink-0 py-0 px-0">
-              <Copy className="h-4 w-4" />
-            </Button>
           </div>
-        </div>
 
-        {/* Actions */}
-        <div className="flex gap-2">
-          <Button onClick={handleShare} className="flex-1">
-            <Share2 className="h-4 w-4 mr-2" />
-            Share Link
+          {/* Copy button */}
+          <Button 
+            onClick={handleCopyLink}
+            className="w-full bg-foreground text-background hover:bg-foreground/90 font-medium"
+          >
+            Copy link
           </Button>
-          <Button variant="outline" onClick={handleCopyLink} className="flex-1">
-            <Copy className="h-4 w-4 mr-2" />
-            Copy Link
-          </Button>
+
+          {/* Terms link */}
+          <div className="text-center pt-2">
+            <button className="text-xs text-muted-foreground hover:text-foreground underline">
+              View Terms and Conditions
+            </button>
+          </div>
         </div>
       </div>
-    </BaseModal>;
+    </BaseModal>
+  );
 }
