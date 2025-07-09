@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { CommandOption } from '@/lib/types';
-import { Mic, MicOff, Send, Search, AtSign, Globe } from 'lucide-react';
+import { Mic, MicOff, Send, Search, AtSign, Globe, Plus, X } from 'lucide-react';
 import { CommandDropdown } from './CommandDropdown';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ChatInputProps {
   value: string;
@@ -28,11 +29,21 @@ const commandOptions: CommandOption[] = [
   { id: 'mind-map', label: 'Mind Map', description: 'Create mind map', category: 'Diagrams' }
 ];
 
+const academicLevels = [
+  'Work Professional',
+  'University', 
+  'High School',
+  'Middle School',
+  'Elementary'
+];
+
 export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
   const [showCommandMenu, setShowCommandMenu] = useState(false);
   const [commandSearch, setCommandSearch] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
+  const [academicLevelOpen, setAcademicLevelOpen] = useState(false);
+  const [selectedAcademicLevel, setSelectedAcademicLevel] = useState('University');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -187,6 +198,59 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
         
         {/* Command and search options */}
         <div className="flex items-center gap-3 px-3 pb-2">
+          <Popover open={academicLevelOpen} onOpenChange={setAcademicLevelOpen}>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <PopoverTrigger asChild>
+                    <button
+                      className={cn(
+                        "p-1.5 rounded-full transition-all duration-300",
+                        "bg-dashboard-bg dark:bg-dashboard-bg",
+                        "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
+                        "hover:bg-dashboard-card dark:hover:bg-dashboard-card",
+                        "hover:text-dashboard-text dark:hover:text-dashboard-text"
+                      )}
+                    >
+                      {academicLevelOpen ? (
+                        <X className="h-[14px] w-[14px] transform rotate-0 transition-transform duration-300" />
+                      ) : (
+                        <Plus className="h-[14px] w-[14px] transform rotate-0 transition-transform duration-300" />
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Academic Level</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <PopoverContent className="w-48 p-0" align="start">
+              <div className="p-3">
+                <h4 className="font-medium text-sm mb-2 text-dashboard-text dark:text-dashboard-text">Academic Level</h4>
+                <div className="space-y-1">
+                  {academicLevels.map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => {
+                        setSelectedAcademicLevel(level);
+                        setAcademicLevelOpen(false);
+                      }}
+                      className={cn(
+                        "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
+                        selectedAcademicLevel === level
+                          ? "bg-[#00A3FF]/10 text-[#00A3FF]"
+                          : "text-dashboard-text-secondary dark:text-dashboard-text-secondary hover:bg-dashboard-card dark:hover:bg-dashboard-card hover:text-dashboard-text dark:hover:text-dashboard-text"
+                      )}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
