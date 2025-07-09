@@ -1,3 +1,4 @@
+
 import { cn } from '@/lib/utils';
 
 export const chatMessageStyles = {
@@ -7,11 +8,11 @@ export const chatMessageStyles = {
     "group relative max-w-[80%] rounded-lg px-4 py-3",
     isUser 
       ? "bg-[#00A3FF] text-white" 
-      : "bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text"
+      : "bg-card dark:bg-card text-foreground dark:text-foreground"
   ),
   content: "text-sm",
   timestamp: cn(
-    "text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60 mt-1",
+    "text-xs text-muted-foreground mt-1",
     "flex items-center gap-1"
   ),
   status: {
