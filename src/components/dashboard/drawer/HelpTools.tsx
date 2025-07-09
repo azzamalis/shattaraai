@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Book, MessageCircle, Calculator, BarChart } from 'lucide-react';
+import { Book, MessageCircle, Calculator, BarChart, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FeedbackPopover } from '@/components/dashboard/FeedbackPopover';
 
@@ -9,12 +9,14 @@ interface HelpToolsProps {
   onTutorialClick: () => void;
   onFeedbackClick: () => void;
   onCalculatorClick: () => void;
+  onInviteEarnClick: () => void;
 }
 
 export const HelpTools: React.FC<HelpToolsProps> = ({
   onTutorialClick,
   onFeedbackClick,
-  onCalculatorClick
+  onCalculatorClick,
+  onInviteEarnClick
 }) => {
   return (
     <div>
@@ -59,6 +61,13 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
             transition-colors duration-200 rounded-lg py-2 px-2" onClick={onCalculatorClick}>
           <Calculator className="h-4 w-4 text-primary/60" />
           <span className="text-sm font-medium">Calculator</span>
+        </Button>
+
+        <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
+            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
+            transition-colors duration-200 rounded-lg py-2 px-2" onClick={onInviteEarnClick}>
+          <Gift className="h-4 w-4 text-primary/60" />
+          <span className="text-sm font-medium">Invite & Earn</span>
         </Button>
       </div>
     </div>

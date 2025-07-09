@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, ChevronsLeft } from 'lucide-react';
 import { TutorialModal } from './TutorialModal';
 import { CalculatorModal } from './modals/CalculatorModal';
+import { InviteEarnModal } from './modals/InviteEarnModal';
 import { RoomsSection } from './drawer/RoomsSection';
 import { HistorySection } from './drawer/HistorySection';
 import { HelpTools } from './drawer/HelpTools';
@@ -35,6 +35,7 @@ export function DashboardDrawer({
   const navigate = useNavigate();
   const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [calculatorModalOpen, setCalculatorModalOpen] = useState(false);
+  const [inviteEarnModalOpen, setInviteEarnModalOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [hasSeenTutorial, setHasSeenTutorial] = useState(() => {
     return localStorage.getItem('hasSeenTutorial') === 'true';
@@ -67,6 +68,11 @@ export function DashboardDrawer({
     setTutorialModalOpen(true);
     setHasSeenTutorial(true);
     localStorage.setItem('hasSeenTutorial', 'true');
+  };
+
+  const handleInviteEarnClick = () => {
+    console.log("Invite & Earn button clicked");
+    setInviteEarnModalOpen(true);
   };
 
   const getDrawerWidth = () => {
@@ -126,7 +132,12 @@ export function DashboardDrawer({
               
               {/* Help Tools Section */}
               <div className="w-full">
-                <HelpTools onTutorialClick={handleTutorialClick} onFeedbackClick={handleFeedbackClick} onCalculatorClick={() => setCalculatorModalOpen(true)} />
+                <HelpTools 
+                  onTutorialClick={handleTutorialClick} 
+                  onFeedbackClick={handleFeedbackClick} 
+                  onCalculatorClick={() => setCalculatorModalOpen(true)}
+                  onInviteEarnClick={handleInviteEarnClick}
+                />
               </div>
             </div>
           </ScrollArea>
@@ -142,6 +153,7 @@ export function DashboardDrawer({
 
       <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
       <CalculatorModal open={calculatorModalOpen} onOpenChange={setCalculatorModalOpen} />
+      <InviteEarnModal open={inviteEarnModalOpen} onOpenChange={setInviteEarnModalOpen} />
       <DeleteModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} type="room" itemToDelete={{
       id: roomToDelete || '',
       title: roomToDeleteName
