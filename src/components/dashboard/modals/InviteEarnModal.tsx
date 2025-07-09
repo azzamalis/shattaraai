@@ -1,23 +1,21 @@
-
 import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { Button } from '@/components/ui/button';
 import { Copy, Share2, Link, Crown, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
 interface InviteEarnModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
 export function InviteEarnModal({
   open,
   onOpenChange
 }: InviteEarnModalProps) {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const inviteCode = "INVITE123";
   const inviteLink = `https://shattara.com/invite/${inviteCode}`;
-
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(inviteLink);
@@ -33,7 +31,6 @@ export function InviteEarnModal({
       });
     }
   };
-
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -49,15 +46,7 @@ export function InviteEarnModal({
       handleCopyLink();
     }
   };
-
-  return (
-    <BaseModal 
-      open={open} 
-      onOpenChange={onOpenChange} 
-      title="" 
-      className="max-w-md p-0"
-      showCloseButton={true}
-    >
+  return <BaseModal open={open} onOpenChange={onOpenChange} title="" className="max-w-md p-0" showCloseButton={true}>
       <div className="relative p-6">
         {/* Header with gradient background */}
         <div className="text-center space-y-3 mb-6">
@@ -65,9 +54,9 @@ export function InviteEarnModal({
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 via-purple-500/10 to-pink-500/10 rounded-full blur-3xl -z-10"></div>
           
           <div className="relative">
-            <h2 className="text-xl font-bold text-foreground mb-1">Earn 10+ credits</h2>
+            <h2 className="text-xl font-bold text-foreground mb-1">Earn 1 month free</h2>
             <h1 className="text-2xl font-bold text-foreground mb-2">Spread the love</h1>
-            <p className="text-sm text-muted-foreground">and earn free credits</p>
+            <p className="text-sm text-muted-foreground">and earn free months</p>
           </div>
         </div>
 
@@ -90,7 +79,7 @@ export function InviteEarnModal({
             </div>
             <div className="flex-1">
               <p className="text-sm text-foreground">
-                They sign up and get <span className="font-medium">extra 10 credits</span>
+                They sign up and get <span className="font-medium">1 month free</span>
               </p>
             </div>
           </div>
@@ -101,7 +90,7 @@ export function InviteEarnModal({
             </div>
             <div className="flex-1">
               <p className="text-sm text-foreground">
-                You get <span className="font-medium">10 credits</span> once they publish their first website
+                You get <span className="font-medium">1 month free</span> once they publish their first website
               </p>
             </div>
           </div>
@@ -119,21 +108,15 @@ export function InviteEarnModal({
           </div>
 
           {/* Copy button */}
-          <Button 
-            onClick={handleCopyLink}
-            className="w-full bg-foreground text-background hover:bg-foreground/90 font-medium"
-          >
+          <Button onClick={handleCopyLink} className="w-full bg-foreground text-background hover:bg-foreground/90 font-medium">
             Copy link
           </Button>
 
           {/* Terms link */}
           <div className="text-center pt-2">
-            <button className="text-xs text-muted-foreground hover:text-foreground underline">
-              View Terms and Conditions
-            </button>
+            
           </div>
         </div>
       </div>
-    </BaseModal>
-  );
+    </BaseModal>;
 }
