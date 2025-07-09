@@ -1,15 +1,16 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LandingPage from '@/pages/LandingPage';
+import Index from '@/pages/Index';
 import PricingPage from '@/pages/PricingPage';
-import SignInPage from '@/pages/SignInPage';
-import SignUpPage from '@/pages/SignUpPage';
+import SignIn from '@/pages/SignIn';
+import SignUp from '@/pages/SignUp';
 import DashboardPage from '@/pages/DashboardPage';
 import ContentPage from '@/pages/ContentPage';
-import AccountPage from '@/pages/AccountPage';
-import PasswordResetPage from '@/pages/PasswordResetPage';
-import OnboardingPage from '@/pages/OnboardingPage';
-import NotFoundPage from '@/pages/NotFoundPage';
+import Profile from '@/pages/Profile';
+import PasswordReset from '@/pages/PasswordReset';
+import Onboarding from '@/pages/Onboarding';
+import NotFound from '@/pages/NotFound';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { InviteHandler } from '@/components/InviteHandler';
 
@@ -19,16 +20,16 @@ function App() {
       <div className="flex flex-col min-h-screen">
         <ErrorBoundary>
           <Routes>
-            <Route path="/" element={<LandingPage />} />
+            <Route path="/" element={<Index />} />
             <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/signin" element={<SignInPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/content/:id" element={<ContentPage />} />
-            <Route path="/account" element={<AccountPage />} />
-            <Route path="/password-reset" element={<PasswordResetPage />} />
-            <Route path="/onboarding" element={<OnboardingPage />} />
-            <Route path="*" element={<NotFoundPage />} />
+            <Route path="/account" element={<Profile />} />
+            <Route path="/password-reset" element={<PasswordReset />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="*" element={<NotFound />} />
             
             {/* Add invite handler route */}
             <Route path="/invite/:code" element={<InviteHandler />} />
