@@ -144,8 +144,11 @@ export function DashboardHeader({
                   <span className="sr-only">Search</span>
                 </Button> :
             // Desktop: Full search button with ⌘K
-            <Button variant="outline" className="inline-flex h-9 w-fit border border-input bg-background/50 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-full py-[20px] px-[20px]">
-                  
+            <Button variant="outline" className="inline-flex h-9 w-fit rounded-lg border border-input bg-background/50 px-3 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <span className="flex grow items-center">
+                    <Search className="-ms-1 me-3 h-4 w-4" aria-hidden="true" />
+                    <span className="font-normal">Search</span>
+                  </span>
                   <kbd className="-me-1 ms-12 inline-flex h-5 max-h-full items-center rounded border border-border px-1.5 font-mono text-[10px] font-medium text-foreground bg-dashboard-secondary-card ">
                     ⌘K
                   </kbd>
