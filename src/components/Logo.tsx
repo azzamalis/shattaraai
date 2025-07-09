@@ -13,7 +13,8 @@ const Logo: React.FC<LogoProps> = ({
 }) => {
   return (
     <div className={cn('flex items-center font-bold text-2xl text-foreground transition-colors duration-200', className)}>
-      SHATTARA AI
+      <span>SHATTARA </span>
+      <span style={{ color: '#00A3FF' }}>AI</span>
     </div>
   );
 };
