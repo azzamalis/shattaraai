@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 interface LogoProps {
@@ -11,8 +12,17 @@ const Logo: React.FC<LogoProps> = ({
   className,
   textColor = 'text-foreground'
 }) => {
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate('/dashboard');
+  };
+
   return (
-    <div className={cn('flex items-center font-bold text-2xl text-foreground transition-colors duration-200', className)}>
+    <div 
+      className={cn('flex items-center font-bold text-2xl text-foreground transition-colors duration-200 cursor-pointer hover:opacity-80', className)}
+      onClick={handleLogoClick}
+    >
       <span>SHATTARA </span>
       <span style={{ color: '#00A3FF' }}>AI</span>
     </div>
