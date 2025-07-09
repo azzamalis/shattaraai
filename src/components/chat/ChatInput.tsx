@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { CommandOption } from '@/lib/types';
 import { Mic, MicOff, Send, Search, AtSign, Globe, Plus, X } from 'lucide-react';
@@ -34,7 +35,8 @@ const academicLevels = [
   'University', 
   'High School',
   'Middle School',
-  'Elementary'
+  'Elementary',
+  'None'
 ];
 
 export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
@@ -43,7 +45,7 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
   const [academicLevelOpen, setAcademicLevelOpen] = useState(false);
-  const [selectedAcademicLevel, setSelectedAcademicLevel] = useState('University');
+  const [selectedAcademicLevel, setSelectedAcademicLevel] = useState('None');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
