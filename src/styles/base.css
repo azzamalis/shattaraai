@@ -3,7 +3,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @layer base {
-  :root {
+  :root,
+  [data-theme="light"] {
     /* Light Mode Colors - Unified System */
     --background: 0 0% 100%; /* Pure White #FFFFFF */
     --foreground: 0 0% 0%; /* Pure Black #000000 */
@@ -46,9 +47,26 @@
     --sidebar-border: 0 0% 90%; /* #E5E5E5 */
     --sidebar-ring: 210 100% 50%; /* #00A3FF */
 
+    /* Dashboard-specific variables for light mode */
+    --dashboard-bg: 0 0% 100%; /* #FFFFFF */
+    --dashboard-card: 0 0% 99%; /* #FDFDFD */
+    --dashboard-card-hover: 0 0% 96%; /* #F5F5F5 */
+    --dashboard-secondary-card: 0 0% 98%; /* #FBFBFB */
+    --dashboard-secondary-card-hover: 0 0% 96%; /* #F5F5F5 */
+    --dashboard-text: 0 0% 4%; /* #0A0A0A */
+    --dashboard-text-secondary: 0 0% 45%; /* #737373 */
+    --dashboard-text-placeholder: 221 14% 53%; /* #737385 */
+    --dashboard-sidebar: 0 0% 98%; /* #FAFAFA */
+    --dashboard-button: 0 0% 93%; /* #EEEEEE */
+    --dashboard-button-text: 0 0% 9%; /* #171717 */
+    --dashboard-button-border: 0 0% 89%; /* #E3E3E3 */
+    --dashboard-icons: 210 100% 50%; /* #00A3FF */
+    --dashboard-separator: 0 0% 90%; /* #E5E5E5 */
+
     --radius: 0.5rem;
   }
 
+  [data-theme="dark"],
   .dark {
     /* Dark Mode Colors - Unified System */
     --background: 0 0% 7%; /* Dark background #121212 */
@@ -91,6 +109,22 @@
     --sidebar-accent-foreground: 0 0% 98%; /* #FAFAFA */
     --sidebar-border: 0 0% 15%; /* #262626 */
     --sidebar-ring: 0 0% 89%; /* #E3E3E3 */
+
+    /* Dashboard-specific variables for dark mode */
+    --dashboard-bg: 0 0% 7%; /* #121212 */
+    --dashboard-card: 0 0% 8%; /* #141414 */
+    --dashboard-card-hover: 0 0% 15%; /* #262626 */
+    --dashboard-secondary-card: 0 0% 9%; /* #161616 */
+    --dashboard-secondary-card-hover: 0 0% 15%; /* #262626 */
+    --dashboard-text: 0 0% 98%; /* #FAFAFA */
+    --dashboard-text-secondary: 0 0% 96%; /* #F5F5F5 */
+    --dashboard-text-placeholder: 0 0% 60%; /* #9A9A9A */
+    --dashboard-sidebar: 0 0% 9%; /* #171717 */
+    --dashboard-button: 0 0% 13%; /* #222222 */
+    --dashboard-button-text: 0 0% 98%; /* #FAFAFA */
+    --dashboard-button-border: 0 0% 18%; /* #2E2E2E */
+    --dashboard-icons: 0 0% 80%; /* #CCCCCC */
+    --dashboard-separator: 0 0% 15%; /* #262626 */
   }
 
   * {

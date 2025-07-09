@@ -15,14 +15,21 @@ export function useTheme() {
   useEffect(() => {
     const root = document.documentElement;
     
-    // Remove existing theme classes
+    // Remove existing theme classes and attributes
     root.classList.remove('light', 'dark');
+    root.removeAttribute('data-theme');
     
-    // Add new theme class
+    // Add new theme class and attribute
     root.classList.add(theme);
+    root.setAttribute('data-theme', theme);
     
     // Store in localStorage
     localStorage.setItem('theme', theme);
+    
+    // Force a style recalculation to ensure CSS variables are updated
+    root.style.display = 'none';
+    root.offsetHeight; // Trigger reflow
+    root.style.display = '';
   }, [theme]);
 
   const toggleTheme = () => {
