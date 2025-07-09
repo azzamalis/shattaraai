@@ -1,43 +1,22 @@
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { Button } from '@/components/ui/button';
-import { Link, Crown, Zap } from 'lucide-react';
+import { Copy, Share2, Link, Crown, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useReferrals } from '@/hooks/useReferrals';
-
 interface InviteEarnModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
 export function InviteEarnModal({
   open,
   onOpenChange
 }: InviteEarnModalProps) {
-  const { toast } = useToast();
-  const { userReferral, loading, error, createReferralCode } = useReferrals();
-
-  const inviteCode = userReferral?.invite_code || '';
-  const inviteLink = inviteCode ? `https://shattara.com/invite/${inviteCode}` : '';
-
-  // Create referral code if user doesn't have one
-  useEffect(() => {
-    if (open && !loading && !userReferral && !error) {
-      createReferralCode();
-    }
-  }, [open, loading, userReferral, error, createReferralCode]);
-
+  const {
+    toast
+  } = useToast();
+  const inviteCode = "INVITE123";
+  const inviteLink = `https://shattara.com/invite/${inviteCode}`;
   const handleCopyLink = async () => {
-    if (!inviteLink) {
-      toast({
-        title: "No invite link available",
-        description: "Please try again in a moment.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
       await navigator.clipboard.writeText(inviteLink);
       toast({
@@ -52,13 +31,7 @@ export function InviteEarnModal({
       });
     }
   };
-
   const handleShare = async () => {
-    if (!inviteLink) {
-      handleCopyLink();
-      return;
-    }
-
     if (navigator.share) {
       try {
         await navigator.share({
@@ -67,31 +40,13 @@ export function InviteEarnModal({
           url: inviteLink
         });
       } catch (error) {
-        // User cancelled sharing or error occurred
-        if (error instanceof Error && error.name !== 'AbortError') {
-          handleCopyLink();
-        }
+        // User cancelled sharing
       }
     } else {
       handleCopyLink();
     }
   };
-
-  if (loading) {
-    return (
-      <BaseModal open={open} onOpenChange={onOpenChange} title="" className="max-w-md p-0" showCloseButton={true}>
-        <div className="relative p-6">
-          <div className="text-center space-y-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="text-sm text-muted-foreground">Loading your invite code...</p>
-          </div>
-        </div>
-      </BaseModal>
-    );
-  }
-
-  return (
-    <BaseModal open={open} onOpenChange={onOpenChange} title="" className="max-w-md p-0" showCloseButton={true}>
+  return <BaseModal open={open} onOpenChange={onOpenChange} title="" className="max-w-md p-0" showCloseButton={true}>
       <div className="relative p-6">
         {/* Header with gradient background */}
         <div className="text-center space-y-3 mb-6">
@@ -99,6 +54,7 @@ export function InviteEarnModal({
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 via-purple-500/10 to-pink-500/10 rounded-full blur-3xl -z-10"></div>
           
           <div className="relative">
+            
             <h1 className="text-2xl font-bold text-foreground mb-2">Spread the love</h1>
             <p className="text-sm text-muted-foreground">and earn free months</p>
           </div>
@@ -140,20 +96,6 @@ export function InviteEarnModal({
           </div>
         </div>
 
-        {/* Referral stats */}
-        {userReferral && (
-          <div className="bg-muted/30 rounded-lg p-3 mb-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total Referrals:</span>
-              <span className="font-medium">{userReferral.total_referrals}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Successful:</span>
-              <span className="font-medium text-green-600">{userReferral.successful_referrals}</span>
-            </div>
-          </div>
-        )}
-
         {/* Invite link section */}
         <div className="space-y-3">
           <label className="text-sm font-medium text-foreground">Your invite link:</label>
@@ -161,22 +103,20 @@ export function InviteEarnModal({
           <div className="flex gap-2">
             <div className="flex-1 flex items-center gap-2 p-3 bg-muted/30 border border-border rounded-lg">
               <Link className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-sm font-mono text-foreground truncate">
-                {inviteLink || 'Generating your invite code...'}
-              </span>
+              <span className="text-sm font-mono text-foreground truncate">{inviteLink}</span>
             </div>
           </div>
 
           {/* Copy button */}
-          <Button 
-            onClick={handleCopyLink} 
-            className="w-full bg-foreground text-background hover:bg-foreground/90 font-medium"
-            disabled={!inviteLink}
-          >
+          <Button onClick={handleCopyLink} className="w-full bg-foreground text-background hover:bg-foreground/90 font-medium">
             Copy link
           </Button>
+
+          {/* Terms link */}
+          <div className="text-center pt-2">
+            
+          </div>
         </div>
       </div>
-    </BaseModal>
-  );
+    </BaseModal>;
 }
