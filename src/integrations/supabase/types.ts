@@ -272,6 +272,89 @@ export type Database = {
           },
         ]
       }
+      referral_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          id: string
+          invite_code: string
+          ip_address: unknown | null
+          metadata: Json | null
+          referee_user_id: string | null
+          referrer_user_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          id?: string
+          invite_code: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          referee_user_id?: string | null
+          referrer_user_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          id?: string
+          invite_code?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          referee_user_id?: string | null
+          referrer_user_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      referral_rewards: {
+        Row: {
+          claimed_at: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          referral_activity_id: string
+          reward_type: string
+          reward_value: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          referral_activity_id: string
+          reward_type: string
+          reward_value?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          referral_activity_id?: string
+          reward_type?: string
+          reward_value?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_rewards_referral_activity_id_fkey"
+            columns: ["referral_activity_id"]
+            isOneToOne: false
+            referencedRelation: "referral_activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rooms: {
         Row: {
           created_at: string
@@ -299,12 +382,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_referrals: {
+        Row: {
+          created_at: string
+          id: string
+          invite_code: string
+          is_active: boolean
+          successful_referrals: number
+          total_referrals: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_code: string
+          is_active?: boolean
+          successful_referrals?: number
+          total_referrals?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          is_active?: boolean
+          successful_referrals?: number
+          total_referrals?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_invite_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       conversation_type:

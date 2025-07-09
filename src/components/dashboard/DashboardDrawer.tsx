@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import { HistorySection } from './drawer/HistorySection';
 import { HelpTools } from './drawer/HelpTools';
 import { UserProfile } from './drawer/UserProfile';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Room } from '@/lib/types';
 
 interface DashboardDrawerProps {
@@ -102,6 +104,11 @@ export function DashboardDrawer({
               <ChevronsLeft className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
             </Button>
+          </div>
+
+          {/* Theme Toggle */}
+          <div className="px-4 pt-2 pb-4">
+            <ThemeToggle />
           </div>
 
           <ScrollArea className="flex-1 overflow-y-auto">
