@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { Room } from '@/lib/types';
 import { useContentContext } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
-
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
   contentData?: ContentData;
@@ -18,7 +17,6 @@ interface DashboardHeaderProps {
   rooms: Room[];
   onAddRoom: () => Promise<string | null>;
 }
-
 export function DashboardHeader({
   onOpenDrawer,
   contentData,
@@ -129,9 +127,9 @@ export function DashboardHeader({
         
         {/* Right section */}
         <div className="flex items-center justify-end gap-4">
-          {/* Upgrade button - Hidden on mobile with new #00A3FF color styling */}
+          {/* Upgrade button - Hidden on mobile */}
           {!isMobile && <Link to="/pricing">
-              <Button variant="outline" className="bg-[#00A3FF]/5 border-2 border-[#00A3FF]/80 text-[#00A3FF] hover:text-[#00A3FF] hover:bg-[#00A3FF]/10 hover:border-[#00A3FF] transition-all py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.15)] hover:shadow-[0_4px_16px_rgba(0,163,255,0.25)] rounded-2xl px-[21px] hover:shadow-[#00A3FF]/20">
+              <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)] rounded-2xl px-[21px]">
                 Upgrade
               </Button>
             </Link>}
@@ -145,12 +143,9 @@ export function DashboardHeader({
                   <Search className="h-4 w-4" aria-hidden="true" />
                   <span className="sr-only">Search</span>
                 </Button> :
-            // Desktop: Full search button with ⌘K - Updated styling to match Upgrade button
-            <Button variant="outline" className="inline-flex h-9 w-fit bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-2xl px-[21px] py-2 text-sm shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <span className="flex grow items-center">
-                    <Search className="-ms-1 me-3 h-4 w-4" aria-hidden="true" />
-                    <span className="font-normal">Search</span>
-                  </span>
+            // Desktop: Full search button with ⌘K
+            <Button variant="outline" className="inline-flex h-9 w-fit border border-input bg-background/50 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-full py-[20px] px-[20px]">
+                  
                   <kbd className="-me-1 ms-12 inline-flex h-5 max-h-full items-center rounded border border-border px-1.5 font-mono text-[10px] font-medium text-foreground bg-dashboard-secondary-card ">
                     ⌘K
                   </kbd>
