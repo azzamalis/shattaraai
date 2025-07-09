@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Room } from '@/lib/types';
 import { useContentContext } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
+
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
   contentData?: ContentData;
@@ -17,6 +18,7 @@ interface DashboardHeaderProps {
   rooms: Room[];
   onAddRoom: () => Promise<string | null>;
 }
+
 export function DashboardHeader({
   onOpenDrawer,
   contentData,
@@ -129,7 +131,7 @@ export function DashboardHeader({
         <div className="flex items-center justify-end gap-4">
           {/* Upgrade button - Hidden on mobile */}
           {!isMobile && <Link to="/pricing">
-              <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)] rounded-2xl px-[21px]">
+              <Button variant="outline" className="bg-[#00A3FF]/5 border-2 border-[#00A3FF]/70 text-[#00A3FF] hover:text-[#00A3FF] hover:bg-[#00A3FF]/10 transition-all py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)] rounded-2xl px-[21px] hover:border-[#00A3FF]/90">
                 Upgrade
               </Button>
             </Link>}
