@@ -95,20 +95,16 @@ export function DashboardDrawer({
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="left" className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r border-border`} closeButton={false}>
-          {/* Header */}
+          {/* Header with Logo and Theme Toggle */}
           <div className="flex items-center justify-between px-4 py-4 mb-2">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col items-start gap-2">
               <Logo className="h-8 w-auto" textColor="text-foreground" />
+              <ThemeToggle />
             </div>
             <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-foreground hover:text-foreground hover:bg-accent rounded-lg h-8 w-8">
               <ChevronsLeft className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
             </Button>
-          </div>
-
-          {/* Theme Toggle */}
-          <div className="px-4 pt-2 pb-4">
-            <ThemeToggle />
           </div>
 
           <ScrollArea className="flex-1 overflow-y-auto">
