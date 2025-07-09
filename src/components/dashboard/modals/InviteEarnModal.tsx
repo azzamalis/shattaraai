@@ -54,7 +54,7 @@ export function InviteEarnModal({
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 via-purple-500/10 to-pink-500/10 rounded-full blur-3xl -z-10"></div>
           
           <div className="relative">
-            <h2 className="text-xl font-bold text-foreground mb-1">Earn 1 month free</h2>
+            
             <h1 className="text-2xl font-bold text-foreground mb-2">Spread the love</h1>
             <p className="text-sm text-muted-foreground">and earn free months</p>
           </div>
