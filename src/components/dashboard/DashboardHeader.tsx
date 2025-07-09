@@ -129,9 +129,9 @@ export function DashboardHeader({
         
         {/* Right section */}
         <div className="flex items-center justify-end gap-4">
-          {/* Upgrade button - Hidden on mobile */}
+          {/* Upgrade button - Hidden on mobile with new #00A3FF color styling */}
           {!isMobile && <Link to="/pricing">
-              <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.25)] hover:shadow-[0_2px_12px_rgba(0,163,255,0.35)] rounded-2xl px-[21px]">
+              <Button variant="outline" className="bg-[#00A3FF]/5 border-2 border-[#00A3FF]/80 text-[#00A3FF] hover:text-[#00A3FF] hover:bg-[#00A3FF]/10 hover:border-[#00A3FF] transition-all py-5 h-9 shadow-[0_2px_8px_rgba(0,163,255,0.15)] hover:shadow-[0_4px_16px_rgba(0,163,255,0.25)] rounded-2xl px-[21px] hover:shadow-[#00A3FF]/20">
                 Upgrade
               </Button>
             </Link>}
