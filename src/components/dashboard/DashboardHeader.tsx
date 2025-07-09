@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { Room } from '@/lib/types';
 import { useContentContext } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
-
 interface DashboardHeaderProps {
   onOpenDrawer: () => void;
   contentData?: ContentData;
@@ -18,7 +17,6 @@ interface DashboardHeaderProps {
   rooms: Room[];
   onAddRoom: () => Promise<string | null>;
 }
-
 export function DashboardHeader({
   onOpenDrawer,
   contentData,
@@ -146,7 +144,7 @@ export function DashboardHeader({
                   <span className="sr-only">Search</span>
                 </Button> :
             // Desktop: Only ⌘K with same styling as Upgrade button
-            <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-2xl px-[21px] py-5 h-9 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all h-9 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-full text-center py-[19px] px-[40px]">
                   ⌘K
                 </Button>}
             </DialogTrigger>
