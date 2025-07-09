@@ -1,44 +1,43 @@
-
 import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { Button } from '@/components/ui/button';
 import { Copy, Share2, Gift, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
 interface InviteEarnModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-export function InviteEarnModal({ open, onOpenChange }: InviteEarnModalProps) {
-  const { toast } = useToast();
-
+export function InviteEarnModal({
+  open,
+  onOpenChange
+}: InviteEarnModalProps) {
+  const {
+    toast
+  } = useToast();
   const inviteCode = "INVITE123";
   const inviteLink = `https://shattara.com/invite/${inviteCode}`;
-
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(inviteLink);
       toast({
         title: "Link copied!",
-        description: "Invite link has been copied to your clipboard.",
+        description: "Invite link has been copied to your clipboard."
       });
     } catch (error) {
       toast({
         title: "Failed to copy",
         description: "Please copy the link manually.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'Join Shattara',
           text: 'Join me on Shattara and get exclusive benefits!',
-          url: inviteLink,
+          url: inviteLink
         });
       } catch (error) {
         // User cancelled sharing
@@ -47,15 +46,7 @@ export function InviteEarnModal({ open, onOpenChange }: InviteEarnModalProps) {
       handleCopyLink();
     }
   };
-
-  return (
-    <BaseModal
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Invite & Earn"
-      description="Share Shattara with friends and earn rewards together"
-      className="max-w-md"
-    >
+  return <BaseModal open={open} onOpenChange={onOpenChange} title="Invite & Earn" description="Share Shattara with friends and earn rewards together" className="max-w-md">
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -63,10 +54,8 @@ export function InviteEarnModal({ open, onOpenChange }: InviteEarnModalProps) {
             <Gift className="h-8 w-8 text-primary" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-semibold">Earn Together</h3>
-            <p className="text-sm text-muted-foreground">
-              Invite friends and both of you get premium benefits
-            </p>
+            <h3 className="text-lg font-semibold">Spread the love</h3>
+            <p className="text-sm text-muted-foreground">Invite friends and both of you earn free months</p>
           </div>
         </div>
 
@@ -100,12 +89,7 @@ export function InviteEarnModal({ open, onOpenChange }: InviteEarnModalProps) {
             <div className="flex-1 p-3 bg-muted/50 rounded-lg border text-sm font-mono truncate">
               {inviteLink}
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleCopyLink}
-              className="shrink-0"
-            >
+            <Button variant="outline" size="icon" onClick={handleCopyLink} className="shrink-0 py-0 px-0">
               <Copy className="h-4 w-4" />
             </Button>
           </div>
@@ -123,6 +107,5 @@ export function InviteEarnModal({ open, onOpenChange }: InviteEarnModalProps) {
           </Button>
         </div>
       </div>
-    </BaseModal>
-  );
+    </BaseModal>;
 }

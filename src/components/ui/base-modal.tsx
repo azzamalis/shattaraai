@@ -31,10 +31,7 @@ export function BaseModal({
             <span className="sr-only">Close</span>
           </button>}
 
-        <DialogHeader>
-          
-          {description}
-        </DialogHeader>
+        
 
         {children}
       </DialogContent>
