@@ -2,31 +2,31 @@
 @layer components {
   /* Dashboard specific component classes that use global CSS variables */
   .dashboard-card {
-    @apply bg-dashboard-card border-dashboard-separator hover:bg-dashboard-card-hover transition-all duration-200 ease-in-out;
+    @apply bg-card border-border hover:bg-card-hover transition-all duration-200 ease-in-out;
   }
 
   .dashboard-card-secondary {
-    @apply bg-dashboard-secondary-card border-dashboard-separator hover:bg-dashboard-secondary-card-hover transition-all duration-200 ease-in-out;
+    @apply bg-secondary border-border hover:bg-accent transition-all duration-200 ease-in-out;
   }
 
   .dashboard-button {
-    @apply bg-dashboard-button text-dashboard-button-text border-dashboard-button-border hover:opacity-90 transition-all duration-200;
+    @apply bg-secondary text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground transition-all duration-200;
   }
 
   .dashboard-sidebar {
-    @apply bg-dashboard-sidebar border-dashboard-separator;
+    @apply bg-sidebar-background border-sidebar-border;
   }
 
   .dashboard-text {
-    @apply text-dashboard-text;
+    @apply text-foreground;
   }
 
   .dashboard-text-secondary {
-    @apply text-dashboard-text-secondary;
+    @apply text-muted-foreground;
   }
 
   .dashboard-text-placeholder {
-    @apply text-dashboard-text-placeholder;
+    @apply text-muted-foreground;
   }
 
   /* Enhanced component styles that work with both themes */

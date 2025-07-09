@@ -14,13 +14,22 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
 
   return (
     <div className={cn("flex items-center justify-center gap-2 py-2", className)}>
-      <Sun className={cn("h-4 w-4", isDark ? "text-muted-foreground" : "text-yellow-500")} />
+      <Sun className={cn(
+        "h-4 w-4 transition-colors",
+        isDark ? "text-muted-foreground" : "text-amber-500"
+      )} />
       <Switch
         checked={isDark}
         onCheckedChange={toggleTheme}
-        className="data-[state=checked]:bg-slate-600 data-[state=unchecked]:bg-yellow-200"
+        className={cn(
+          "data-[state=checked]:bg-primary",
+          "data-[state=unchecked]:bg-muted"
+        )}
       />
-      <Moon className={cn("h-4 w-4", isDark ? "text-blue-400" : "text-muted-foreground")} />
+      <Moon className={cn(
+        "h-4 w-4 transition-colors",
+        isDark ? "text-blue-400" : "text-muted-foreground"
+      )} />
     </div>
   );
 }

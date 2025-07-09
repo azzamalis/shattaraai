@@ -13,9 +13,6 @@
     --card-foreground: 0 0% 0%; /* Pure Black text */
     --card-hover: 0 0% 96%; /* Light Gray #F5F5F5 */
 
-    --secondary-card: 0 0% 98%; /* #FBFBFB */
-    --secondary-card-hover: 0 0% 96%; /* #F5F5F5 */
-
     --popover: 0 0% 100%; /* Light mode popover background #FFFFFF */
     --popover-foreground: 0 0% 9%; /* Light mode popover text #171717 */
 
@@ -47,22 +44,6 @@
     --sidebar-border: 0 0% 90%; /* #E5E5E5 */
     --sidebar-ring: 210 100% 50%; /* #00A3FF */
 
-    /* Dashboard-specific variables for light mode */
-    --dashboard-bg: 0 0% 100%; /* #FFFFFF */
-    --dashboard-card: 0 0% 99%; /* #FDFDFD */
-    --dashboard-card-hover: 0 0% 96%; /* #F5F5F5 */
-    --dashboard-secondary-card: 0 0% 98%; /* #FBFBFB */
-    --dashboard-secondary-card-hover: 0 0% 96%; /* #F5F5F5 */
-    --dashboard-text: 0 0% 4%; /* #0A0A0A */
-    --dashboard-text-secondary: 0 0% 45%; /* #737373 */
-    --dashboard-text-placeholder: 221 14% 53%; /* #737385 */
-    --dashboard-sidebar: 0 0% 98%; /* #FAFAFA */
-    --dashboard-button: 0 0% 93%; /* #EEEEEE */
-    --dashboard-button-text: 0 0% 9%; /* #171717 */
-    --dashboard-button-border: 0 0% 89%; /* #E3E3E3 */
-    --dashboard-icons: 210 100% 50%; /* #00A3FF */
-    --dashboard-separator: 0 0% 90%; /* #E5E5E5 */
-
     --radius: 0.5rem;
   }
 
@@ -75,9 +56,6 @@
     --card: 0 0% 8%; /* Dark component background #141414 */
     --card-foreground: 0 0% 98%; /* Light text */
     --card-hover: 0 0% 15%; /* #262626 */
-
-    --secondary-card: 0 0% 9%; /* #161616 */
-    --secondary-card-hover: 0 0% 15%; /* #262626 */
 
     --popover: 0 0% 7%; /* Dark mode popover background #121212 */
     --popover-foreground: 0 0% 98%; /* Dark mode popover text #FAFAFA */
@@ -109,22 +87,6 @@
     --sidebar-accent-foreground: 0 0% 98%; /* #FAFAFA */
     --sidebar-border: 0 0% 15%; /* #262626 */
     --sidebar-ring: 0 0% 89%; /* #E3E3E3 */
-
-    /* Dashboard-specific variables for dark mode */
-    --dashboard-bg: 0 0% 7%; /* #121212 */
-    --dashboard-card: 0 0% 8%; /* #141414 */
-    --dashboard-card-hover: 0 0% 15%; /* #262626 */
-    --dashboard-secondary-card: 0 0% 9%; /* #161616 */
-    --dashboard-secondary-card-hover: 0 0% 15%; /* #262626 */
-    --dashboard-text: 0 0% 98%; /* #FAFAFA */
-    --dashboard-text-secondary: 0 0% 96%; /* #F5F5F5 */
-    --dashboard-text-placeholder: 0 0% 60%; /* #9A9A9A */
-    --dashboard-sidebar: 0 0% 9%; /* #171717 */
-    --dashboard-button: 0 0% 13%; /* #222222 */
-    --dashboard-button-text: 0 0% 98%; /* #FAFAFA */
-    --dashboard-button-border: 0 0% 18%; /* #2E2E2E */
-    --dashboard-icons: 0 0% 80%; /* #CCCCCC */
-    --dashboard-separator: 0 0% 15%; /* #262626 */
   }
 
   * {

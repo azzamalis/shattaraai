@@ -68,24 +68,7 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				},
-				// Custom dashboard colors
-				dashboard: {
-					bg: 'hsl(var(--dashboard-bg))',
-					card: 'hsl(var(--dashboard-card))',
-					'card-hover': 'hsl(var(--dashboard-card-hover))',
-					'secondary-card': 'hsl(var(--dashboard-secondary-card))',
-					'secondary-card-hover': 'hsl(var(--dashboard-secondary-card-hover))',
-					text: 'hsl(var(--dashboard-text))',
-					'text-secondary': 'hsl(var(--dashboard-text-secondary))',
-					'text-placeholder': 'hsl(var(--dashboard-text-placeholder))',
-					sidebar: 'hsl(var(--dashboard-sidebar))',
-					button: 'hsl(var(--dashboard-button))',
-					'button-text': 'hsl(var(--dashboard-button-text))',
-					'button-border': 'hsl(var(--dashboard-button-border))',
-					icons: 'hsl(var(--dashboard-icons))',
-					separator: 'hsl(var(--dashboard-separator))',
-				},
+				}
 			},
 			maxWidth: {
 				container: "1280px",

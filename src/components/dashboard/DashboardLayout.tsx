@@ -6,7 +6,6 @@ import { DashboardDrawer } from './DashboardDrawer';
 import { useAuth } from '@/hooks/useAuth';
 import { useRooms } from '@/hooks/useRooms';
 import { useContent } from '@/hooks/useContent';
-import { useTheme } from '@/hooks/useTheme';
 import { ContentData } from '@/pages/ContentPage';
 
 interface DashboardLayoutProps {
@@ -25,7 +24,6 @@ export function DashboardLayout({
   const { user } = useAuth();
   const { rooms, addRoom, editRoom, deleteRoom } = useRooms();
   const { content } = useContent();
-  const { theme } = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
@@ -59,10 +57,7 @@ export function DashboardLayout({
   }
 
   return (
-    <div className={cn(
-      "dashboard-layout flex min-h-screen w-full flex-col bg-dashboard-bg overflow-hidden transition-colors duration-300",
-      theme === 'dark' ? 'dark' : ''
-    )}>
+    <div className="flex min-h-screen w-full flex-col bg-background transition-colors duration-300">
       <DashboardHeader 
         onOpenDrawer={() => setIsDrawerOpen(true)} 
         contentData={contentData}
@@ -80,7 +75,7 @@ export function DashboardLayout({
       />
       <main 
         className={cn(
-          "flex-1 transition-all duration-300 ease-in-out bg-dashboard-bg", 
+          "flex-1 transition-all duration-300 ease-in-out bg-background", 
           isDrawerOpen ? "lg:ml-[300px]" : "ml-0",
           className
         )}
