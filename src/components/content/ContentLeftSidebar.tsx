@@ -113,54 +113,6 @@ export function ContentLeftSidebar({
       </div>;
   };
 
-  // Helper function to extract transcript segment for a chapter based on timestamps
-  const getChapterTranscript = (chapter: any, fullTranscript: string, chapters: any[]) => {
-    if (!fullTranscript || !chapter.startTime) return 'Transcript not available for this chapter.';
-    
-    // Find current and next chapter for time boundaries
-    const currentChapterIndex = chapters.findIndex((c: any) => c.title === chapter.title);
-    const nextChapter = chapters[currentChapterIndex + 1];
-    
-    const startTime = chapter.startTime; // in seconds
-    const endTime = nextChapter ? nextChapter.startTime : null;
-    
-    // Split transcript by lines/sentences to find timestamp-based segments
-    const transcriptLines = fullTranscript.split(/[.!?]\s+|\n/).filter(line => line.trim().length > 0);
-    
-    // For YouTube transcripts, we need to extract the segment that corresponds to this chapter's timeframe
-    // Since we don't have exact timestamp alignment, we'll use proportional extraction
-    const totalVideoDuration = chapters[chapters.length - 1]?.startTime || startTime + 300; // fallback duration
-    
-    const startRatio = startTime / totalVideoDuration;
-    const endRatio = endTime ? endTime / totalVideoDuration : 1;
-    
-    const startLineIndex = Math.floor(transcriptLines.length * startRatio);
-    const endLineIndex = endTime ? Math.floor(transcriptLines.length * endRatio) : transcriptLines.length;
-    
-    // Extract the relevant transcript segment
-    const chapterTranscript = transcriptLines.slice(startLineIndex, endLineIndex).join('. ');
-    
-    // Ensure we have meaningful content
-    if (chapterTranscript.length < 50 && transcriptLines.length > 0) {
-      // If segment is too short, take a minimum meaningful portion
-      const minLines = Math.min(5, transcriptLines.length - startLineIndex);
-      return transcriptLines.slice(startLineIndex, startLineIndex + minLines).join('. ') + '.';
-    }
-    
-    return chapterTranscript ? chapterTranscript + '.' : 'Transcript segment not available for this chapter.';
-  };
-
-  const formatTimestamp = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-    return `${minutes}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const renderTabContent = () => {
     const hasContent = contentData.type === 'live_recording' ? isRecording : recordingStateInfo?.isNewRecording ? isRecording : recordingStateInfo?.isExistingRecording ? true : !!contentData.url || !!contentData.text;
     return <>
@@ -187,7 +139,7 @@ export function ContentLeftSidebar({
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
                                 <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
-                                  {formatTimestamp(chapter.startTime)}
+                                  {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
                                 </span>
                                 <ChevronDown className={cn(
                                   "h-4 w-4 text-dashboard-text-secondary transition-transform",
@@ -197,11 +149,9 @@ export function ContentLeftSidebar({
                             </div>
                           </CollapsibleTrigger>
                           <CollapsibleContent className="pt-2">
-                            <div className="prose prose-sm max-w-none text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                              <p className="text-xs whitespace-pre-wrap leading-relaxed">
-                                {chapter.summary}
-                              </p>
-                            </div>
+                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
+                              {chapter.summary}
+                            </p>
                           </CollapsibleContent>
                         </div>
                       </Collapsible>
@@ -223,8 +173,8 @@ export function ContentLeftSidebar({
                                 </h4>
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
-                                <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded font-mono whitespace-nowrap">
-                                  {formatTimestamp(chapter.startTime)}
+                                <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
+                                  {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
                                 </span>
                                 <ChevronDown className={cn(
                                   "h-4 w-4 text-dashboard-text-secondary transition-transform",
@@ -233,12 +183,10 @@ export function ContentLeftSidebar({
                               </div>
                             </div>
                           </CollapsibleTrigger>
-                          <CollapsibleContent className="pt-3">
-                            <div className="prose prose-sm max-w-none">
-                              <div className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-pre-wrap leading-relaxed p-3 bg-background/50 dark:bg-background/50 rounded border border-dashboard-separator/10 dark:border-white/5">
-                                {getChapterTranscript(chapter, contentData.text || '', contentData.metadata?.chapters || [])}
-                              </div>
-                            </div>
+                          <CollapsibleContent className="pt-2">
+                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
+                              {chapter.summary || 'Chapter summary not available'}
+                            </p>
                           </CollapsibleContent>
                         </div>
                       </Collapsible>
