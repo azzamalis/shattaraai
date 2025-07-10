@@ -113,18 +113,41 @@ export function ContentLeftSidebar({
       </div>;
   };
 
-  // Helper function to extract transcript segment for a chapter
-  const getChapterTranscript = (chapter: any, fullTranscript: string) => {
+  // Helper function to extract transcript segment for a chapter based on timestamps
+  const getChapterTranscript = (chapter: any, fullTranscript: string, chapters: any[]) => {
     if (!fullTranscript || !chapter.startTime) return 'Transcript not available for this chapter.';
     
-    // For YouTube videos, we'll use a portion of the description/transcript
-    // In a real implementation, you'd extract the actual transcript segment based on timestamps
-    const words = fullTranscript.split(' ');
-    const segmentLength = Math.min(150, Math.floor(words.length / (contentData.metadata?.chapters?.length || 1)));
-    const startIndex = segmentLength * (contentData.metadata?.chapters?.findIndex((c: any) => c.title === chapter.title) || 0);
-    const segment = words.slice(startIndex, startIndex + segmentLength).join(' ');
+    const currentChapterIndex = chapters.findIndex((c: any) => c.title === chapter.title);
+    const nextChapter = chapters[currentChapterIndex + 1];
     
-    return segment || 'Transcript segment not available.';
+    // Calculate the duration for this chapter
+    const startTime = chapter.startTime;
+    const endTime = nextChapter ? nextChapter.startTime : null;
+    
+    // For a more accurate implementation, we would need timestamp-aligned transcript data
+    // For now, we'll extract a meaningful segment based on chapter position and duration
+    const words = fullTranscript.split(' ');
+    const totalWords = words.length;
+    const totalDuration = chapters[chapters.length - 1]?.startTime || 1;
+    
+    // Calculate word boundaries based on timestamp ratios
+    const startRatio = startTime / totalDuration;
+    const endRatio = endTime ? endTime / totalDuration : 1;
+    
+    const startWordIndex = Math.floor(totalWords * startRatio);
+    const endWordIndex = Math.floor(totalWords * endRatio);
+    
+    // Extract the segment and ensure it's meaningful
+    const segment = words.slice(startWordIndex, endWordIndex).join(' ');
+    
+    // If segment is too short, provide a minimum meaningful excerpt
+    if (segment.length < 100 && fullTranscript.length > 100) {
+      const minLength = 200;
+      const safeEndIndex = Math.min(startWordIndex + minLength, totalWords);
+      return words.slice(startWordIndex, safeEndIndex).join(' ');
+    }
+    
+    return segment || 'Transcript segment not available for this chapter.';
   };
 
   const formatTimestamp = (seconds: number) => {
@@ -213,7 +236,7 @@ export function ContentLeftSidebar({
                           <CollapsibleContent className="pt-3">
                             <div className="prose prose-sm max-w-none">
                               <div className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-pre-wrap leading-relaxed p-3 bg-background/50 dark:bg-background/50 rounded border border-dashboard-separator/10 dark:border-white/5">
-                                {getChapterTranscript(chapter, contentData.text || '')}
+                                {getChapterTranscript(chapter, contentData.text || '', contentData.metadata?.chapters || [])}
                               </div>
                             </div>
                           </CollapsibleContent>
