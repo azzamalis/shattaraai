@@ -102,7 +102,12 @@ export default function RoomPage() {
           handleExamCancel={handleExamCancel}
         />
         
-        <AITutorChatDrawer open={isChatOpen} onOpenChange={setIsChatOpen} />
+        <AITutorChatDrawer 
+          open={isChatOpen} 
+          onOpenChange={setIsChatOpen}
+          roomId={roomId}
+          roomContent={roomContent}
+        />
       </div>
     </DashboardLayout>
   );

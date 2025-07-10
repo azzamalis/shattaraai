@@ -1,66 +1,140 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send } from 'lucide-react';
+import { X, Send, Loader2 } from 'lucide-react';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { chatMessageStyles } from '@/lib/chatStyles';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { useChatConversation } from '@/hooks/useChatConversation';
+import { useGeminiChat } from '@/hooks/useGeminiChat';
 
 interface AITutorChatDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  roomId?: string;
+  roomContent?: Array<{
+    id: string;
+    title: string;
+    type: string;
+    text_content?: string;
+  }>;
 }
 
 export function AITutorChatDrawer({
   open,
-  onOpenChange
+  onOpenChange,
+  roomId,
+  roomContent = []
 }: AITutorChatDrawerProps) {
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>([{
-    id: '1',
-    role: 'assistant',
-    content: 'Hello! I\'m Shattara AI Tutor. How can I help you learn today?'
-  }]);
-  
+  const [isAITyping, setIsAITyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize chat conversation for room collaboration
+  const {
+    conversation,
+    messages,
+    isLoading,
+    isSending,
+    sendMessage,
+    addAIResponse
+  } = useChatConversation({
+    conversationType: 'room_collaboration',
+    contextId: roomId,
+    contextType: 'room',
+    autoCreate: true
+  });
+
+  // Prepare conversation history for AI context
+  const conversationHistory = messages.slice(-10).map(msg => ({
+    content: msg.content,
+    sender_type: msg.sender_type as 'user' | 'ai'
+  }));
+
+  // Initialize Gemini chat hook
+  const { sendMessageToAI } = useGeminiChat({
+    conversationId: conversation?.id || '',
+    roomId: roomId || '',
+    roomContent,
+    conversationHistory
+  });
 
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages, isAITyping]);
 
-  const handleSendMessage = () => {
-    if (!input.trim()) return;
+  // Add welcome message when conversation is first created
+  useEffect(() => {
+    if (conversation && messages.length === 0) {
+      const welcomeMessage = roomContent.length > 0
+        ? `Hello! I'm Shattara AI Tutor. I can see you have ${roomContent.length} item(s) in this room. How can I help you learn today?`
+        : "Hello! I'm Shattara AI Tutor. This room doesn't have any content yet. Feel free to add some study materials, and I'll help you learn from them!";
+      
+      addAIResponse(welcomeMessage, 'ai_response', {
+        isWelcome: true,
+        roomContentCount: roomContent.length
+      });
+    }
+  }, [conversation, messages.length, roomContent.length, addAIResponse]);
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input
-    };
-    setMessages(prev => [...prev, userMessage]);
+  const handleSendMessage = async () => {
+    if (!input.trim() || !conversation) return;
+
+    const userMessage = input.trim();
     setInput('');
 
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `I'll help you understand about "${input}". What specific aspects would you like to explore?`
-      };
-      setMessages(prev => [...prev, aiMessage]);
-    }, 1000);
+    try {
+      // Send user message to database
+      await sendMessage(userMessage);
+      
+      // Show AI typing indicator
+      setIsAITyping(true);
+
+      // Get AI response
+      const aiResponse = await sendMessageToAI(userMessage);
+      
+      // Add AI response to database
+      await addAIResponse(aiResponse, 'ai_response', {
+        model: 'gemini-1.5-flash-latest',
+        room_id: roomId,
+        responded_to: userMessage
+      });
+
+    } catch (error) {
+      console.error('Error handling message:', error);
+      // Error handling is done in the hook
+    } finally {
+      setIsAITyping(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSendMessage();
     }
   };
+
+  if (isLoading) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent 
+          side="right" 
+          className="w-full sm:w-[400px] p-0 border-l border-border bg-background"
+          closeButton={false}
+        >
+          <div className="flex items-center justify-center h-full">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Loading chat...</span>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -88,12 +162,12 @@ export function AITutorChatDrawer({
             {messages.map(message => (
               <div 
                 key={message.id} 
-                className={chatMessageStyles.wrapper(message.role === 'user')}
+                className={chatMessageStyles.wrapper(message.sender_type === 'user')}
               >
-                <div className={chatMessageStyles.bubble(message.role === 'user')}>
+                <div className={chatMessageStyles.bubble(message.sender_type === 'user')}>
                   <p className={chatMessageStyles.content}>{message.content}</p>
                   <div className={chatMessageStyles.timestamp}>
-                    {new Date().toLocaleTimeString([], { 
+                    {new Date(message.created_at).toLocaleTimeString([], { 
                       hour: '2-digit', 
                       minute: '2-digit' 
                     })}
@@ -101,6 +175,19 @@ export function AITutorChatDrawer({
                 </div>
               </div>
             ))}
+            
+            {/* AI Typing Indicator */}
+            {isAITyping && (
+              <div className={chatMessageStyles.wrapper(false)}>
+                <div className={chatMessageStyles.bubble(false)}>
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span className="text-sm text-muted-foreground">AI Tutor is thinking...</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div ref={messagesEndRef} />
           </div>
           
@@ -110,19 +197,24 @@ export function AITutorChatDrawer({
                 value={input} 
                 onChange={e => setInput(e.target.value)} 
                 onKeyDown={handleKeyDown} 
-                placeholder="Ask anything..." 
-                className="bg-muted border-border text-foreground placeholder:text-muted-foreground" 
+                placeholder="Ask about your study materials..." 
+                className="bg-muted border-border text-foreground placeholder:text-muted-foreground"
+                disabled={isSending || isAITyping}
               />
               <Button 
                 onClick={handleSendMessage} 
-                disabled={!input.trim()} 
+                disabled={!input.trim() || isSending || isAITyping || !conversation} 
                 className="
                   bg-primary text-primary-foreground hover:bg-primary/90 
                   disabled:opacity-50 disabled:cursor-not-allowed
                   transition-all duration-200 hover:shadow-sm
                 "
               >
-                <Send className="h-4 w-4" />
+                {isSending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
                 <span className="sr-only">Send message</span>
               </Button>
             </div>
