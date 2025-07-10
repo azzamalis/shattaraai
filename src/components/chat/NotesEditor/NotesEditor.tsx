@@ -2,50 +2,52 @@ import React, { useState, useRef, useEffect } from 'react';
 import { NotesBlock } from '@/lib/types';
 import { BlockRenderer } from './BlockRenderer';
 import { SlashCommandMenu } from './SlashCommandMenu';
-
-export function NotesEditor({ useDynamicMenuPosition = false }) {
-  const [blocks, setBlocks] = useState<NotesBlock[]>([
-    { id: '1', type: 'paragraph', content: '' }
-  ]);
+export function NotesEditor({
+  useDynamicMenuPosition = false
+}) {
+  const [blocks, setBlocks] = useState<NotesBlock[]>([{
+    id: '1',
+    type: 'paragraph',
+    content: ''
+  }]);
   const [showSlashMenu, setShowSlashMenu] = useState(false);
-  const [slashMenuPosition, setSlashMenuPosition] = useState({ x: 0, y: 0 });
+  const [slashMenuPosition, setSlashMenuPosition] = useState({
+    x: 0,
+    y: 0
+  });
   const [currentBlockId, setCurrentBlockId] = useState<string>('');
   const editorRef = useRef<HTMLDivElement>(null);
-
   const addBlock = (afterId: string, type: NotesBlock['type'] = 'paragraph') => {
     const newBlock: NotesBlock = {
       id: Date.now().toString(),
       type,
       content: ''
     };
-
     setBlocks(prev => {
       const index = prev.findIndex(block => block.id === afterId);
       const newBlocks = [...prev];
       newBlocks.splice(index + 1, 0, newBlock);
       return newBlocks;
     });
-
     return newBlock.id;
   };
-
   const updateBlock = (id: string, updates: Partial<NotesBlock>) => {
-    setBlocks(prev => prev.map(block => 
-      block.id === id ? { ...block, ...updates } : block
-    ));
+    setBlocks(prev => prev.map(block => block.id === id ? {
+      ...block,
+      ...updates
+    } : block));
   };
-
   const deleteBlock = (id: string) => {
     if (blocks.length === 1) return;
-    
     setBlocks(prev => prev.filter(block => block.id !== id));
   };
-
   const handleSlashCommand = (blockId: string, type: NotesBlock['type']) => {
-    updateBlock(blockId, { type, content: '' });
+    updateBlock(blockId, {
+      type,
+      content: ''
+    });
     setShowSlashMenu(false);
   };
-
   const handleKeyDown = (e: React.KeyboardEvent, blockId: string) => {
     const block = blocks.find(b => b.id === blockId);
     if (!block) return;
@@ -55,11 +57,14 @@ export function NotesEditor({ useDynamicMenuPosition = false }) {
       e.preventDefault();
       setCurrentBlockId(blockId);
       setShowSlashMenu(true);
-      
+
       // Calculate position for slash menu
       const target = e.target as HTMLElement;
       const rect = target.getBoundingClientRect();
-      setSlashMenuPosition({ x: rect.left, y: rect.bottom });
+      setSlashMenuPosition({
+        x: rect.left,
+        y: rect.bottom
+      });
       return;
     }
 
@@ -67,7 +72,7 @@ export function NotesEditor({ useDynamicMenuPosition = false }) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       const newBlockId = addBlock(blockId);
-      
+
       // Focus the new block
       setTimeout(() => {
         const newBlockElement = document.querySelector(`[data-block-id="${newBlockId}"]`) as HTMLElement;
@@ -80,7 +85,6 @@ export function NotesEditor({ useDynamicMenuPosition = false }) {
       e.preventDefault();
       const currentIndex = blocks.findIndex(b => b.id === blockId);
       const prevBlock = blocks[currentIndex - 1];
-      
       if (prevBlock) {
         deleteBlock(blockId);
         setTimeout(() => {
@@ -95,77 +99,76 @@ export function NotesEditor({ useDynamicMenuPosition = false }) {
       switch (e.key) {
         case '1':
           e.preventDefault();
-          updateBlock(blockId, { type: 'h1' });
+          updateBlock(blockId, {
+            type: 'h1'
+          });
           break;
         case '2':
           e.preventDefault();
-          updateBlock(blockId, { type: 'h2' });
+          updateBlock(blockId, {
+            type: 'h2'
+          });
           break;
         case '3':
           e.preventDefault();
-          updateBlock(blockId, { type: 'h3' });
+          updateBlock(blockId, {
+            type: 'h3'
+          });
           break;
         case '0':
           e.preventDefault();
-          updateBlock(blockId, { type: 'paragraph' });
+          updateBlock(blockId, {
+            type: 'paragraph'
+          });
           break;
       }
     }
-
     if (e.ctrlKey && e.shiftKey) {
       switch (e.key) {
         case '7':
           e.preventDefault();
-          updateBlock(blockId, { type: 'ol' });
+          updateBlock(blockId, {
+            type: 'ol'
+          });
           break;
         case '8':
           e.preventDefault();
-          updateBlock(blockId, { type: 'ul' });
+          updateBlock(blockId, {
+            type: 'ul'
+          });
           break;
         case '9':
           e.preventDefault();
-          updateBlock(blockId, { type: 'todo' });
+          updateBlock(blockId, {
+            type: 'todo'
+          });
           break;
       }
     }
   };
-
   const handleShowTypeMenu = (event, blockId) => {
     if (useDynamicMenuPosition && event && event.currentTarget) {
       const rect = event.currentTarget.getBoundingClientRect();
-      setSlashMenuPosition({ x: rect.left, y: rect.bottom });
+      setSlashMenuPosition({
+        x: rect.left,
+        y: rect.bottom
+      });
     } else {
-      setSlashMenuPosition({ x: 200, y: 200 });
+      setSlashMenuPosition({
+        x: 200,
+        y: 200
+      });
     }
     setCurrentBlockId(blockId);
     setShowSlashMenu(true);
   };
-
-  return (
-    <div ref={editorRef} className="h-full overflow-y-auto bg-dashboard-bg dark:bg-dashboard-bg">
+  return <div ref={editorRef} className="h-full overflow-y-auto bg-background ">
       <div className="max-w-4xl mx-auto p-6 pl-16">
         <div className="space-y-1">
-          {blocks.map((block) => (
-            <BlockRenderer
-              key={block.id}
-              block={block}
-              onUpdate={(updates) => updateBlock(block.id, updates)}
-              onKeyDown={(e) => handleKeyDown(e, block.id)}
-              onAddBlock={() => addBlock(block.id)}
-              onDeleteBlock={() => deleteBlock(block.id)}
-              onShowTypeMenu={(event) => handleShowTypeMenu(event, block.id)}
-            />
-          ))}
+          {blocks.map(block => <BlockRenderer key={block.id} block={block} onUpdate={updates => updateBlock(block.id, updates)} onKeyDown={e => handleKeyDown(e, block.id)} onAddBlock={() => addBlock(block.id)} onDeleteBlock={() => deleteBlock(block.id)} onShowTypeMenu={event => handleShowTypeMenu(event, block.id)} />)}
         </div>
       </div>
 
-      {showSlashMenu && (
-        <SlashCommandMenu
-          position={slashMenuPosition}
-          onSelect={(type) => handleSlashCommand(currentBlockId, type)}
-          onClose={() => setShowSlashMenu(false)}
-        />
-      )}
-    </div>
-  );
+      {showSlashMenu && <SlashCommandMenu position={slashMenuPosition} onSelect={type => handleSlashCommand(currentBlockId, type)} onClose={() => setShowSlashMenu(false)} />}
+    </div>;
 }
