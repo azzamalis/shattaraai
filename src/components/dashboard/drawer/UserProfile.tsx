@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
 import { ChevronUp, Settings, Crown, LogOut, User, History } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -79,14 +80,16 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             <span>History</span>
           </Button>
           
-          <Button variant="ghost" className="relative w-full justify-start text-foreground rounded-md px-3 py-2 text-sm font-normal overflow-hidden border-2 border-transparent bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-400 hover:text-white hover:animate-pulse transition-all duration-300" asChild>
+          <Button variant="ghost" className="relative w-full justify-start text-foreground rounded-md px-3 py-2 text-sm font-normal overflow-hidden border-2 border-transparent bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-400 hover:text-white transition-all duration-300" asChild>
             <Link to="/pricing" className="relative z-10">
               <Crown size={16} className="mr-2 h-4 w-4 text-amber-500 group-hover:text-white transition-colors duration-300" />
               <span className="relative z-10">Upgrade</span>
             </Link>
           </Button>
           
-          <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={handleLogout}>
+          <Separator className="my-1" />
+          
+          <Button variant="ghost" className="w-full justify-start text-destructive hover:bg-destructive hover:text-destructive-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={handleLogout}>
             <LogOut size={16} className="mr-2 h-4 w-4" />
             <span>Log Out</span>
           </Button>
