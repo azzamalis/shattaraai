@@ -39,14 +39,37 @@ export function BlockControls({
       
       <div className="relative">
         <button
+          draggable="true"
+          onDragStart={(e) => {
+            e.dataTransfer.setData('text/plain', '');
+            e.dataTransfer.effectAllowed = 'move';
+          }}
+          onDrag={(e) => {
+            if (e.clientX !== 0 && e.clientY !== 0) {
+              const button = e.currentTarget;
+              button.style.position = 'fixed';
+              button.style.left = `${e.clientX - 12}px`;
+              button.style.top = `${e.clientY - 12}px`;
+              button.style.zIndex = '9999';
+              button.style.pointerEvents = 'none';
+            }
+          }}
+          onDragEnd={(e) => {
+            const button = e.currentTarget;
+            button.style.position = 'fixed';
+            button.style.left = `${e.clientX - 12}px`;
+            button.style.top = `${e.clientY - 12}px`;
+            button.style.zIndex = '9999';
+            button.style.pointerEvents = 'auto';
+          }}
           onClick={(e) => onShowTypeMenu(e, block.id)}
           className={cn(
-            "p-1 rounded transition-colors opacity-0 group-hover:opacity-100",
+            "p-1 rounded transition-colors opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing",
             "text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70",
             "hover:bg-dashboard-bg dark:hover:bg-dashboard-bg",
             "hover:text-dashboard-text dark:hover:text-dashboard-text"
           )}
-          title="Block options"
+          title="Drag to move or click for options"
         >
           <GripVertical className="h-[14px] w-[14px]" />
         </button>
