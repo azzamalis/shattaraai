@@ -50,7 +50,7 @@
   [data-theme="dark"],
   .dark {
     /* Dark Mode Colors - Unified System */
-    --background: 0 0% 7%; /* Dark background #1a1919 */
+    --background: 0, 2%, 10%; /* Dark background #121212 */
     --foreground: 0 0% 98%; /* Light text #FAFAFA */
 
     --card: 0 0% 8%; /* Dark component background #141414 */
