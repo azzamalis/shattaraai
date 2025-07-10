@@ -2,14 +2,14 @@
 
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
-import { Globe, Paperclip, Send } from "lucide-react";
+import { Globe, Paperclip, Send, X, FileText, Image } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const PLACEHOLDERS = ["Ask Shattara AI about any topic...", "How can I prepare for my biology exam?", "Create flashcards about neural networks", "Explain quantum physics in simple terms", "Summarize this research paper", "Prepare a study plan for my finals"];
 
 interface AIChatInputProps {
-  onSubmit?: (value: string) => void;
+  onSubmit?: (value: string, files?: File[]) => void;
   className?: string;
   initialIsActive?: boolean;
 }
@@ -24,8 +24,10 @@ const AIChatInput = ({
   const [isActive, setIsActive] = useState(initialIsActive);
   const [deepSearchActive, setDeepSearchActive] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Cycle placeholder text when input is inactive
   useEffect(() => {
@@ -58,14 +60,41 @@ const AIChatInput = ({
     }, 10);
   };
 
+  const handleFileAttach = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(file => {
+      const isPDF = file.type === 'application/pdf';
+      const isImage = file.type.startsWith('image/');
+      return isPDF || isImage;
+    });
+    
+    setAttachedFiles(prev => [...prev, ...validFiles]);
+    
+    // Clear the file input to allow selecting the same file again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() && attachedFiles.length === 0) return;
     if (onSubmit) {
-      onSubmit(inputValue);
+      onSubmit(inputValue, attachedFiles.length > 0 ? attachedFiles : undefined);
     }
     setInputValue("");
+    setAttachedFiles([]);
   };
+
+  const hasContent = inputValue || attachedFiles.length > 0;
 
   const containerVariants = {
     collapsed: {
@@ -156,29 +185,72 @@ const AIChatInput = ({
           ref={wrapperRef} 
           className="w-full" 
           variants={containerVariants} 
-          animate={isActive || inputValue ? "expanded" : "collapsed"} 
+          animate={isActive || hasContent ? "expanded" : "collapsed"} 
           initial="collapsed" 
           style={{
             overflow: "hidden",
             borderRadius: 16,
             backgroundColor: "hsl(var(--card))",
-            borderColor: isActive || inputValue ? "hsl(var(--border))" : "hsl(var(--border))"
+            borderColor: isActive || hasContent ? "hsl(var(--border))" : "hsl(var(--border))"
           }} 
           onClick={handleActivate}
         >
           <div className="flex flex-col items-stretch w-full h-full">
+            {/* Attached Files Display */}
+            {attachedFiles.length > 0 && (
+              <div className="px-4 pt-3 pb-2 border-b border-border">
+                <div className="flex flex-wrap gap-2">
+                  {attachedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 text-sm">
+                      {file.type === 'application/pdf' ? (
+                        <FileText className="h-4 w-4 text-red-500" />
+                      ) : (
+                        <Image className="h-4 w-4 text-blue-500" />
+                      )}
+                      <span className="truncate max-w-32">{file.name}</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFile(index);
+                        }}
+                        className="hover:bg-accent rounded-full p-0.5 transition"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="flex items-center h-full">
               <div className="flex items-center gap-2 p-3 rounded-full max-w-full w-full my-1">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button className="p-2 rounded-full hover:bg-accent transition text-muted-foreground" title="Attach file" type="button" tabIndex={-1}>
+                    <button 
+                      className="p-2 rounded-full hover:bg-accent transition text-muted-foreground" 
+                      title="Attach file" 
+                      type="button" 
+                      tabIndex={-1}
+                      onClick={handleFileAttach}
+                    >
                       <Paperclip size={18} />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Attach a file</p>
+                    <p>Attach PDF or image file</p>
                   </TooltipContent>
                 </Tooltip>
+
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
     
                 <div className="relative flex-1">
                   <input 
@@ -217,6 +289,7 @@ const AIChatInput = ({
                       title="Send" 
                       type="submit" 
                       tabIndex={-1}
+                      disabled={!inputValue.trim() && attachedFiles.length === 0}
                     >
                       <Send size={16} />
                     </button>
@@ -246,7 +319,7 @@ const AIChatInput = ({
                 delay: 0.08
               }
             }
-          }} initial="hidden" animate={isActive || inputValue ? "visible" : "hidden"} style={{
+          }} initial="hidden" animate={isActive || hasContent ? "visible" : "hidden"} style={{
             marginTop: 8
           }}>
               <div className="flex gap-3 items-center py-[4px]">

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
@@ -6,33 +7,83 @@ import { NewFeaturePromo } from './NewFeaturePromo';
 import { ActionCards } from './ActionCards';
 import { useContent } from '@/contexts/ContentContext';
 import { motion } from 'framer-motion';
+
 interface DashboardHeroProps {
   onPasteClick: () => void;
 }
+
 export function DashboardHero({
   onPasteClick
 }: DashboardHeroProps) {
   const navigate = useNavigate();
   const {
-    onAddContent
+    onAddContent,
+    addContentWithFile
   } = useContent();
-  const handleAISubmit = (value: string) => {
-    // Create new chat content
-    const contentId = onAddContent({
-      title: 'Chat with Shattara AI',
-      type: 'chat',
-      room_id: null,
-      metadata: {},
-      text_content: value
-    });
 
-    // Navigate to chat page with the query
-    const searchParams = new URLSearchParams({
-      query: value
-    });
-    navigate(`/chat/${contentId}?${searchParams.toString()}`);
-    toast.success("Starting conversation with Shattara AI");
+  const handleAISubmit = async (value: string, files?: File[]) => {
+    let contentId: string | null = null;
+
+    try {
+      // If files are attached, handle them first
+      if (files && files.length > 0) {
+        for (const file of files) {
+          const contentType = file.type === 'application/pdf' ? 'pdf' : 'upload';
+          
+          const fileContentId = await addContentWithFile({
+            title: file.name,
+            type: contentType,
+            room_id: null,
+            metadata: {
+              originalName: file.name,
+              fileSize: file.size,
+              fileType: file.type
+            }
+          }, file);
+
+          if (!contentId) {
+            contentId = fileContentId;
+          }
+        }
+      }
+
+      // Create chat content with the query
+      if (value.trim()) {
+        const chatContentId = await onAddContent({
+          title: 'Chat with Shattara AI',
+          type: 'chat',
+          room_id: null,
+          metadata: {
+            hasAttachments: files && files.length > 0,
+            attachmentCount: files ? files.length : 0
+          },
+          text_content: value
+        });
+
+        if (!contentId) {
+          contentId = chatContentId;
+        }
+      }
+
+      // Navigate to chat page
+      if (contentId) {
+        const searchParams = new URLSearchParams();
+        if (value.trim()) {
+          searchParams.set('query', value);
+        }
+        if (files && files.length > 0) {
+          searchParams.set('hasFiles', 'true');
+        }
+        
+        navigate(`/chat/${contentId}?${searchParams.toString()}`);
+        toast.success(`Starting conversation with Shattara AI${files && files.length > 0 ? ` with ${files.length} file(s)` : ''}`);
+      }
+    } catch (error) {
+      console.error('Error handling AI submit:', error);
+      toast.error('Failed to start conversation');
+    }
   };
+
   return <div className="max-w-[800px] mx-auto mb-12">
       <NewFeaturePromo />
       
@@ -85,7 +136,7 @@ export function DashboardHero({
           <span className="h-1 w-1 rounded-full bg-primary/30" />
           <span>Try asking about specific topics</span>
           <span className="h-1 w-1 rounded-full bg-primary/30" />
-          <span>Paste content for analysis</span>
+          <span>Attach PDFs or images for analysis</span>
           <span className="h-1 w-1 rounded-full bg-primary/30" />
           <span>Get detailed explanations</span>
         </div>
