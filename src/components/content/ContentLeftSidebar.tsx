@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown } from 'lucide-react';
+import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown, Expand, Minimize2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
@@ -42,6 +43,7 @@ export function ContentLeftSidebar({
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
   const [openChapters, setOpenChapters] = useState<Set<number>>(new Set());
+  const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
 
   const toggleChapter = (index: number) => {
     const newOpenChapters = new Set(openChapters);
@@ -216,14 +218,23 @@ export function ContentLeftSidebar({
                       <p>This is where the full transcript would appear. The transcript would be searchable and time-synced with the audio playback.</p>
                     </div>
                   </div>}
-                {contentData.type === 'youtube' && contentData.text && contentData.text.length > 100 && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
-                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10">
-                      <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed">{contentData.text}</p>
-                    </div>
-                  </div>}
-                {(!contentData.text || contentData.text.length <= 100) && contentData.text && contentData.type === 'youtube' && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
-                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10">
-                      <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap">{contentData.text}</p>
+                {contentData.type === 'youtube' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
+                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)}
+                        className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20"
+                      >
+                        {isTranscriptExpanded ? (
+                          <Minimize2 className="h-4 w-4" />
+                        ) : (
+                          <Expand className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
+                        {contentData.text}
+                      </p>
                     </div>
                   </div>}
                 {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
@@ -248,7 +259,31 @@ export function ContentLeftSidebar({
   }
 
   // Default layout with tabs for other content types
-  return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
+  return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg relative">
+      {/* Full-page transcript overlay */}
+      {isTranscriptExpanded && contentData.type === 'youtube' && contentData.text && (
+        <div className="absolute inset-0 z-50 bg-background flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <h2 className="text-lg font-semibold text-foreground">Full Transcript</h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsTranscriptExpanded(false)}
+              className="h-8 w-8 p-0"
+            >
+              <Minimize2 className="h-4 w-4" />
+            </Button>
+          </div>
+          <ScrollArea className="flex-1 p-6">
+            <div className="max-w-4xl mx-auto">
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                {contentData.text}
+              </p>
+            </div>
+          </ScrollArea>
+        </div>
+      )}
+
       {renderControls()}
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-background ">
