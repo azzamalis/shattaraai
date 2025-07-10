@@ -382,7 +382,7 @@ export function EnhancedBlockRenderer({
   return (
     <div 
       className={cn(
-        "py-1 relative group transition-all duration-200",
+        "py-1 relative group transition-all duration-200 focus:outline-none",
         isSelected && "bg-accent/50",
         isMultiSelected && "bg-blue-50 dark:bg-blue-900/20"
       )}
