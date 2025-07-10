@@ -126,7 +126,6 @@ export function EnhancedBlockRenderer({
       "text-foreground dark:text-foreground",
       "placeholder:text-muted-foreground dark:placeholder:text-muted-foreground",
       "leading-relaxed",
-      "focus:outline-none focus:ring-0 focus:border-0",
       getTextColorClass()
     );
     
@@ -365,18 +364,16 @@ export function EnhancedBlockRenderer({
       
       default:
         return (
-          <div className={containerClass}>
-            <textarea
-              ref={textareaRef}
-              data-block-id={block.id}
-              value={block.content}
-              onChange={(e) => handleContentChange(e.target.value)}
-              onKeyDown={onKeyDown}
-              placeholder={getPlaceholder()}
-              className={getClassName()}
-              rows={1}
-            />
-          </div>
+          <textarea
+            ref={textareaRef}
+            data-block-id={block.id}
+            value={block.content}
+            onChange={(e) => handleContentChange(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder={getPlaceholder()}
+            className={cn(getClassName(), containerClass)}
+            rows={1}
+          />
         );
     }
   };
