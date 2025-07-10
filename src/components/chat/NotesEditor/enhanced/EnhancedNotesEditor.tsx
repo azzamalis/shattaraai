@@ -316,25 +316,6 @@ export function EnhancedNotesEditor({
         "max-w-4xl mx-auto p-6",
         isFullscreen ? "pl-16 pt-12" : "pl-16"
       )}>
-        {/* Header with word count and status */}
-        <div className="mb-6 flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center gap-4">
-            <span>
-              {blocks.reduce((acc, block) => acc + block.content.split(/\s+/).filter(Boolean).length, 0)} words
-            </span>
-            <span>
-              {blocks.length} blocks
-            </span>
-          </div>
-          {isFullscreen && (
-            <button
-              onClick={() => setIsFullscreen(false)}
-              className="px-3 py-1 rounded bg-muted hover:bg-accent transition-colors"
-            >
-              Exit Fullscreen
-            </button>
-          )}
-        </div>
 
         {/* Blocks */}
         <div className="space-y-1">
