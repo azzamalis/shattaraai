@@ -34,7 +34,7 @@ export function AITutorChatDrawer({
   // Initialize chat conversation for room collaboration
   const {
     conversation,
-    messages,
+    messages: persistedMessages,
     isLoading,
     isSending,
     sendMessage,
@@ -46,8 +46,11 @@ export function AITutorChatDrawer({
     autoCreate: true
   });
 
-  // Prepare conversation history for AI context
-  const conversationHistory = messages.slice(-10).map(msg => ({
+  // Local UI messages state (cleared when drawer closes)
+  const [messages, setMessages] = useState<typeof persistedMessages>([]);
+
+  // Prepare conversation history for AI context (use persisted messages)
+  const conversationHistory = persistedMessages.slice(-10).map(msg => ({
     content: msg.content,
     sender_type: msg.sender_type as 'user' | 'ai'
   }));
@@ -60,33 +63,39 @@ export function AITutorChatDrawer({
     conversationHistory
   });
 
+  // Clear UI messages and show fresh welcome when drawer opens
+  useEffect(() => {
+    if (open && conversation) {
+      setMessages([]); // Clear UI messages
+      setWelcomeMessageSent(false); // Reset welcome flag
+      
+      // Add fresh welcome message to UI only
+      const welcomeMessage = roomContent.length > 0
+        ? `Hello! I'm Shattara AI Tutor. I can see you have ${roomContent.length} item(s) in this room. How can I help you learn today?`
+        : "Hello! I'm Shattara AI Tutor. This room doesn't have any content yet. Feel free to add some study materials, and I'll help you learn from them!";
+      
+      const welcomeMsg = {
+        id: `welcome-${Date.now()}`,
+        content: welcomeMessage,
+        sender_type: 'ai' as const,
+        message_type: 'ai_response' as const,
+        created_at: new Date().toISOString(),
+        metadata: { isWelcome: true, roomContentCount: roomContent.length }
+      };
+      
+      setMessages([welcomeMsg]);
+      setWelcomeMessageSent(true);
+    }
+  }, [open, conversation, roomContent.length]);
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isAITyping]);
 
-  // Add welcome message when conversation is first created and no messages exist
-  useEffect(() => {
-    if (conversation && messages.length === 0 && !welcomeMessageSent) {
-      const welcomeMessage = roomContent.length > 0
-        ? `Hello! I'm Shattara AI Tutor. I can see you have ${roomContent.length} item(s) in this room. How can I help you learn today?`
-        : "Hello! I'm Shattara AI Tutor. This room doesn't have any content yet. Feel free to add some study materials, and I'll help you learn from them!";
-      
-      addAIResponse(welcomeMessage, 'ai_response', {
-        isWelcome: true,
-        roomContentCount: roomContent.length
-      });
-      
-      setWelcomeMessageSent(true);
-    }
-  }, [conversation, messages.length, roomContent.length, addAIResponse, welcomeMessageSent]);
-
-  // Reset welcome message flag when conversation changes
-  useEffect(() => {
-    setWelcomeMessageSent(false);
-  }, [conversation?.id]);
-
+  // Remove the old welcome message logic since we handle it above
+  
   const handleSendMessage = async () => {
     if (!input.trim() || !conversation) return;
 
@@ -94,6 +103,17 @@ export function AITutorChatDrawer({
     setInput('');
 
     try {
+      // Add user message to UI immediately
+      const tempUserMsg = {
+        id: `temp-user-${Date.now()}`,
+        content: userMessage,
+        sender_type: 'user' as const,
+        message_type: 'text' as const,
+        created_at: new Date().toISOString(),
+        metadata: {}
+      };
+      setMessages(prev => [...prev, tempUserMsg]);
+
       // Send user message to database
       await sendMessage(userMessage);
       
@@ -109,6 +129,17 @@ export function AITutorChatDrawer({
         room_id: roomId,
         responded_to: userMessage
       });
+
+      // Add AI response to UI
+      const aiMsg = {
+        id: `ai-${Date.now()}`,
+        content: aiResponse,
+        sender_type: 'ai' as const,
+        message_type: 'ai_response' as const,
+        created_at: new Date().toISOString(),
+        metadata: { model: 'gemini-1.5-flash-latest' }
+      };
+      setMessages(prev => [...prev, aiMsg]);
 
     } catch (error) {
       console.error('Error handling message:', error);
