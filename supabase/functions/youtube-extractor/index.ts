@@ -26,6 +26,7 @@ interface YouTubeData {
     title: string;
     startTime: number;
     endTime?: number;
+    transcript?: string; // Add transcript segment for each chapter
   }>;
   metadata: {
     videoId: string;
@@ -33,6 +34,7 @@ interface YouTubeData {
     channelTitle: string;
     viewCount: string;
     thumbnails: any;
+    hasRealTranscript: boolean; // Flag to indicate if we have real transcript vs description
   };
 }
 
@@ -77,6 +79,41 @@ function parseChaptersFromDescription(description: string): Array<{title: string
   return chapters;
 }
 
+function extractChapterTranscripts(transcript: string, chapters: Array<{title: string; startTime: number; endTime?: number}>): Array<{title: string; startTime: number; endTime?: number; transcript?: string}> {
+  // If we have a real transcript with timing info, we could extract segments
+  // For now, we'll just add the transcript property to chapters
+  return chapters.map(chapter => ({
+    ...chapter,
+    transcript: `Chapter content for "${chapter.title}" would be extracted from the full transcript based on timestamp ${chapter.startTime}s${chapter.endTime ? ` to ${chapter.endTime}s` : ''}.`
+  }));
+}
+
+function parseTranscriptXml(xml: string): string {
+  try {
+    // Parse XML and extract text content from transcript tags
+    const textMatches = xml.match(/<text[^>]*>(.*?)<\/text>/g);
+    if (!textMatches) return '';
+    
+    return textMatches
+      .map(match => {
+        // Extract text content and decode HTML entities
+        const textContent = match.replace(/<text[^>]*>/, '').replace(/<\/text>/, '');
+        return textContent
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .trim();
+      })
+      .filter(text => text.length > 0)
+      .join(' ');
+  } catch (error) {
+    console.log('Error parsing transcript XML:', error);
+    return '';
+  }
+}
+
 async function getYouTubeData(videoId: string): Promise<YouTubeData> {
   const apiKey = Deno.env.get('YOUTUBE_API_KEY');
   if (!apiKey) {
@@ -103,34 +140,44 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
   // Parse duration from ISO 8601 format (PT4M13S -> 253 seconds)
   const duration = parseDuration(video.contentDetails.duration);
   
-  // Extract chapters from description
-  const chapters = parseChaptersFromDescription(video.snippet.description);
-  
-  // Try to get captions/transcript
+  // Try to get captions/transcript using unofficial API
   let transcript = '';
   try {
-    const captionsResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoId}&key=${apiKey}`
-    );
+    // Use unofficial transcript API endpoint
+    const transcriptUrl = `https://www.youtube.com/api/timedtext?lang=en&v=${videoId}`;
+    const transcriptResponse = await fetch(transcriptUrl);
     
-    if (captionsResponse.ok) {
-      const captionsData = await captionsResponse.json();
+    if (transcriptResponse.ok) {
+      const transcriptXml = await transcriptResponse.text();
+      transcript = parseTranscriptXml(transcriptXml);
+    } else {
+      // Try auto-generated captions
+      const autoTranscriptUrl = `https://www.youtube.com/api/timedtext?lang=en&v=${videoId}&tlang=en`;
+      const autoResponse = await fetch(autoTranscriptUrl);
       
-      if (captionsData.items && captionsData.items.length > 0) {
-        // Find English captions or first available
-        const englishCaption = captionsData.items.find((item: any) => 
-          item.snippet.language === 'en' || item.snippet.language === 'en-US'
-        ) || captionsData.items[0];
-        
-        // Note: Getting actual transcript content requires additional OAuth setup
-        // For now, we'll use the description as fallback content
-        transcript = video.snippet.description;
+      if (autoResponse.ok) {
+        const autoTranscriptXml = await autoResponse.text();
+        transcript = parseTranscriptXml(autoTranscriptXml);
       }
     }
+    
+    // If no transcript found, fallback to description
+    if (!transcript.trim()) {
+      transcript = video.snippet.description;
+    }
   } catch (error) {
-    console.log('Could not fetch captions:', error);
+    console.log('Could not fetch transcript:', error);
     transcript = video.snippet.description;
   }
+  
+  // Extract chapters from description
+  const rawChapters = parseChaptersFromDescription(video.snippet.description);
+  
+  // Add transcript segments to chapters
+  const chapters = extractChapterTranscripts(transcript, rawChapters);
+  
+  // Determine if we have real transcript or just description
+  const hasRealTranscript = transcript !== video.snippet.description && transcript.trim().length > 0;
   
   return {
     title: video.snippet.title,
@@ -143,7 +190,8 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
       publishedAt: video.snippet.publishedAt,
       channelTitle: video.snippet.channelTitle,
       viewCount: video.statistics.viewCount,
-      thumbnails: video.snippet.thumbnails
+      thumbnails: video.snippet.thumbnails,
+      hasRealTranscript
     }
   };
 }
@@ -187,7 +235,8 @@ serve(async (req) => {
           chapters: youtubeData.chapters,
           extractedAt: new Date().toISOString(),
           hasTranscript: youtubeData.transcript.length > 0,
-          hasChapters: youtubeData.chapters.length > 0
+          hasChapters: youtubeData.chapters.length > 0,
+          hasRealTranscript: youtubeData.metadata.hasRealTranscript
         }
       })
       .eq('id', contentId);

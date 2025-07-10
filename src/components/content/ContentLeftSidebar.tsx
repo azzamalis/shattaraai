@@ -207,9 +207,25 @@ export function ContentLeftSidebar({
                           <Expand className="h-4 w-4" />
                         )}
                       </Button>
-                      <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
-                        {contentData.text}
-                      </p>
+                      {contentData.metadata?.hasRealTranscript ? (
+                        <div>
+                          <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
+                            Video Transcript (Auto-generated)
+                          </p>
+                          <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
+                            {contentData.text}
+                          </p>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
+                            Video Description (No transcript available)
+                          </p>
+                          <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
+                            {contentData.text}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>}
                 {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
@@ -251,9 +267,21 @@ export function ContentLeftSidebar({
           </div>
           <ScrollArea className="flex-1 p-6">
             <div className="max-w-4xl mx-auto">
-              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                {contentData.text}
-              </p>
+              {contentData.metadata?.hasRealTranscript ? (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-4">Video Transcript (Auto-generated)</p>
+                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                    {contentData.text}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-4">Video Description (No transcript available)</p>
+                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                    {contentData.text}
+                  </p>
+                </div>
+              )}
             </div>
           </ScrollArea>
         </div>
