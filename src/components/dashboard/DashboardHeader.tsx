@@ -101,7 +101,7 @@ export function DashboardHeader({
       handleTitleCancel();
     }
   };
-  return <header className="flex items-center p-4 sticky top-0 z-50 bg-background transition-colors duration-300">
+  return <header className="flex items-center p-4 sticky top-0 z-50 bg-background transition-colors duration-300 py-[10px]">
       <div className="flex w-full items-center justify-between">
         {/* Left section */}
         <div className="flex items-center gap-3 min-w-0">
