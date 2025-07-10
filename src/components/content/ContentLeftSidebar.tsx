@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown } from 'lucide-react';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
@@ -40,6 +41,17 @@ export function ContentLeftSidebar({
   onTextAction
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
+  const [openChapters, setOpenChapters] = useState<Set<number>>(new Set());
+
+  const toggleChapter = (index: number) => {
+    const newOpenChapters = new Set(openChapters);
+    if (newOpenChapters.has(index)) {
+      newOpenChapters.delete(index);
+    } else {
+      newOpenChapters.add(index);
+    }
+    setOpenChapters(newOpenChapters);
+  };
 
   // Check if we should hide tabs (for PDF content)
   const shouldHideTabs = contentData.type === 'pdf';
@@ -108,36 +120,75 @@ export function ContentLeftSidebar({
                 {(contentData.type === 'live_recording' || recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Recording in progress...
                   </div>}
-                {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="space-y-3">
-                    {recordingMetadata.chaptersData.map(chapter => <div key={chapter.id} className="p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 cursor-pointer transition-colors">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-lg">
-                              {chapter.title}
-                            </h4>
-                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary mt-1 text-sm">
+                {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="grid grid-cols-2 gap-3">
+                    {recordingMetadata.chaptersData.map((chapter, index) => (
+                      <Collapsible 
+                        key={chapter.id} 
+                        open={openChapters.has(index)}
+                        onOpenChange={() => toggleChapter(index)}
+                      >
+                        <div className="p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors">
+                          <CollapsibleTrigger className="w-full">
+                            <div className="flex items-start justify-between gap-2 w-full">
+                              <div className="flex-1 min-w-0 text-left">
+                                <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
+                                  {chapter.title}
+                                </h4>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
+                                  {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                                </span>
+                                <ChevronDown className={cn(
+                                  "h-4 w-4 text-dashboard-text-secondary transition-transform",
+                                  openChapters.has(index) && "rotate-180"
+                                )} />
+                              </div>
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pt-2">
+                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
                               {chapter.summary}
                             </p>
-                          </div>
-                          <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
-                            {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                          </span>
+                          </CollapsibleContent>
                         </div>
-                      </div>)}
+                      </Collapsible>
+                    ))}
                   </div>}
-                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="space-y-3">
-                    {contentData.metadata.chapters.map((chapter: any, index: number) => <div key={index} className="p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 cursor-pointer transition-colors">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-lg">
-                              {chapter.title}
-                            </h4>
-                          </div>
-                          <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
-                            {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                          </span>
+                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="grid grid-cols-2 gap-3">
+                    {contentData.metadata.chapters.map((chapter: any, index: number) => (
+                      <Collapsible 
+                        key={index} 
+                        open={openChapters.has(index)}
+                        onOpenChange={() => toggleChapter(index)}
+                      >
+                        <div className="p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors">
+                          <CollapsibleTrigger className="w-full">
+                            <div className="flex items-start justify-between gap-2 w-full">
+                              <div className="flex-1 min-w-0 text-left">
+                                <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
+                                  {chapter.title}
+                                </h4>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
+                                  {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                                </span>
+                                <ChevronDown className={cn(
+                                  "h-4 w-4 text-dashboard-text-secondary transition-transform",
+                                  openChapters.has(index) && "rotate-180"
+                                )} />
+                              </div>
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pt-2">
+                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
+                              {chapter.summary || 'Chapter summary not available'}
+                            </p>
+                          </CollapsibleContent>
                         </div>
-                      </div>)}
+                      </Collapsible>
+                    ))}
                   </div>}
                 {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Processing content...
