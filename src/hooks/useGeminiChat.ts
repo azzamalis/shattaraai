@@ -38,6 +38,19 @@ export function useGeminiChat({
 
       if (error) {
         console.error('Supabase function error:', error);
+        
+        // Check for authentication errors
+        if (error.message?.includes('authorization') || error.message?.includes('auth')) {
+          toast.error('Authentication error. Please refresh the page and try again.');
+          return "I'm having trouble authenticating your request. Please refresh the page and try again.";
+        }
+        
+        // Check for API key errors
+        if (error.message?.includes('API key') || error.message?.includes('GOOGLE_GEMINI_API_KEY')) {
+          toast.error('AI service configuration error. Please contact support.');
+          return "I'm having trouble connecting to the AI service. Please contact support for assistance.";
+        }
+        
         throw new Error('Failed to get AI response');
       }
 

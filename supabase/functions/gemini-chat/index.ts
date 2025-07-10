@@ -37,6 +37,12 @@ serve(async (req) => {
       throw new Error('Missing required fields: message, conversationId, or roomId');
     }
 
+    // Get user from auth header
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      throw new Error('Missing authorization header');
+    }
+
     const geminiApiKey = Deno.env.get('GOOGLE_GEMINI_API_KEY');
     if (!geminiApiKey) {
       throw new Error('Google Gemini API key not configured');
@@ -46,6 +52,15 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Get user from JWT token
+    const { data: { user }, error: authError } = await supabase.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+
+    if (authError || !user) {
+      throw new Error('Invalid authorization token');
+    }
 
     // Build context from room content
     const roomContext = roomContent.map(content => 
@@ -126,6 +141,7 @@ Instructions:
       .from('chat_messages')
       .insert({
         conversation_id: conversationId,
+        user_id: user.id,
         content: aiResponse,
         sender_type: 'ai',
         message_type: 'ai_response',
