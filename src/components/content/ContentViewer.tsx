@@ -111,85 +111,142 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       
       case 'youtube':
         const videoId = contentData.url ? extractYouTubeId(contentData.url) : '';
+        const chapters = contentData.metadata?.chapters as Array<{title: string; startTime: number; endTime?: number}> || [];
+        const hasTranscript = contentData.text && contentData.text.length > 100;
+        const hasChapters = chapters.length > 0;
         
         return (
-          <div className="w-full bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+          <div className="w-full space-y-4">
             {/* YouTube Player */}
-            {videoId && (
-              <div className="aspect-video">
-                <iframe
-                  src={`https://www.youtube.com/embed/${videoId}`}
-                  className="w-full h-full"
-                  title="YouTube Player"
-                  allowFullScreen
-                />
-              </div>
-            )}
-            
-            {/* Content Sections */}
-            <div className="p-4 space-y-4 max-h-80 overflow-y-auto">
-              {/* Video Metadata */}
-              {contentData.metadata && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {contentData.metadata.channelTitle && (
-                    <div className="p-3 bg-dashboard-card rounded-lg">
-                      <h4 className="font-medium text-xs text-dashboard-text-secondary">Channel</h4>
-                      <p className="text-sm text-dashboard-text">{contentData.metadata.channelTitle}</p>
-                    </div>
-                  )}
-                  {contentData.metadata.publishedAt && (
-                    <div className="p-3 bg-dashboard-card rounded-lg">
-                      <h4 className="font-medium text-xs text-dashboard-text-secondary">Published</h4>
-                      <p className="text-sm text-dashboard-text">{new Date(contentData.metadata.publishedAt).toLocaleDateString()}</p>
-                    </div>
-                  )}
+            <div className="bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+              {videoId ? (
+                <div className="aspect-video">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${videoId}`}
+                    className="w-full h-full"
+                    title="YouTube Player"
+                    allowFullScreen
+                  />
                 </div>
-              )}
-              
-              {/* Chapters */}
-              {contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && (
-                <div className="p-3 bg-dashboard-card rounded-lg">
-                  <h3 className="font-medium mb-3 text-dashboard-text">Chapters</h3>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {contentData.metadata.chapters.map((chapter: any, index: number) => (
-                      <div key={index} className="flex items-center gap-3 p-2 hover:bg-background rounded transition-colors">
-                        <span className="text-xs font-mono text-dashboard-text-secondary bg-background px-2 py-1 rounded">
-                          {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                        </span>
-                        <span className="text-sm text-dashboard-text">{chapter.title}</span>
-                      </div>
-                    ))}
+              ) : (
+                <div className="flex items-center justify-center h-64">
+                  <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                    <Youtube className="h-8 w-8 mb-2" />
+                    <span className="text-sm">YouTube Player</span>
+                    <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No YouTube URL provided</span>
                   </div>
-                </div>
-              )}
-              
-              {/* Transcript */}
-              {contentData.text && contentData.text.length > 100 && (
-                <div className="p-3 bg-dashboard-card rounded-lg">
-                  <h3 className="font-medium mb-3 text-dashboard-text">Transcript</h3>
-                  <div className="max-h-32 overflow-y-auto">
-                    <p className="text-sm text-dashboard-text whitespace-pre-wrap leading-relaxed">{contentData.text}</p>
-                  </div>
-                </div>
-              )}
-              
-              {/* Description (fallback if no transcript) */}
-              {(!contentData.text || contentData.text.length <= 100) && contentData.text && (
-                <div className="p-3 bg-dashboard-card rounded-lg">
-                  <h3 className="font-medium mb-2 text-dashboard-text">Description</h3>
-                  <p className="text-sm text-dashboard-text whitespace-pre-wrap">{contentData.text}</p>
                 </div>
               )}
             </div>
-            
-            {/* Fallback for no video ID */}
-            {!videoId && (
-              <div className="flex items-center justify-center h-32">
-                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                  <Youtube className="h-8 w-8 mb-2" />
-                  <span className="text-sm">YouTube Player</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No YouTube URL provided</span>
+
+            {/* Video Metadata */}
+            {contentData.metadata && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {contentData.metadata.channelTitle && (
+                  <div className="p-3 bg-dashboard-card rounded-lg border border-dashboard-separator">
+                    <h4 className="font-medium text-xs text-dashboard-text-secondary">Channel</h4>
+                    <p className="text-sm text-dashboard-text">{contentData.metadata.channelTitle}</p>
+                  </div>
+                )}
+                {contentData.metadata.publishedAt && (
+                  <div className="p-3 bg-dashboard-card rounded-lg border border-dashboard-separator">
+                    <h4 className="font-medium text-xs text-dashboard-text-secondary">Published</h4>
+                    <p className="text-sm text-dashboard-text">{new Date(contentData.metadata.publishedAt).toLocaleDateString()}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Chapters & Transcript Tabs */}
+            {(hasChapters || hasTranscript) && (
+              <div className="bg-dashboard-card rounded-xl border border-dashboard-separator">
+                <div className="border-b border-dashboard-separator">
+                  <div className="flex">
+                    {hasChapters && (
+                      <button
+                        className="px-4 py-3 text-sm font-medium text-dashboard-text hover:text-primary border-b-2 border-primary"
+                        onClick={() => {
+                          // Tab switching logic would go here
+                          const chaptersTab = document.getElementById('chapters-tab');
+                          const transcriptTab = document.getElementById('transcript-tab');
+                          const chaptersBtn = document.querySelector('[data-tab="chapters"]');
+                          const transcriptBtn = document.querySelector('[data-tab="transcript"]');
+                          
+                          if (chaptersTab && transcriptTab && chaptersBtn && transcriptBtn) {
+                            chaptersTab.style.display = 'block';
+                            transcriptTab.style.display = 'none';
+                            chaptersBtn.classList.add('border-primary', 'text-primary');
+                            chaptersBtn.classList.remove('border-transparent', 'text-dashboard-text-secondary');
+                            transcriptBtn.classList.remove('border-primary', 'text-primary');
+                            transcriptBtn.classList.add('border-transparent', 'text-dashboard-text-secondary');
+                          }
+                        }}
+                        data-tab="chapters"
+                      >
+                        Chapters
+                      </button>
+                    )}
+                    {hasTranscript && (
+                      <button
+                        className={`px-4 py-3 text-sm font-medium hover:text-primary border-b-2 ${
+                          !hasChapters ? 'border-primary text-primary' : 'border-transparent text-dashboard-text-secondary'
+                        }`}
+                        onClick={() => {
+                          // Tab switching logic would go here
+                          const chaptersTab = document.getElementById('chapters-tab');
+                          const transcriptTab = document.getElementById('transcript-tab');
+                          const chaptersBtn = document.querySelector('[data-tab="chapters"]');
+                          const transcriptBtn = document.querySelector('[data-tab="transcript"]');
+                          
+                          if (chaptersTab && transcriptTab && chaptersBtn && transcriptBtn) {
+                            transcriptTab.style.display = 'block';
+                            chaptersTab.style.display = 'none';
+                            transcriptBtn.classList.add('border-primary', 'text-primary');
+                            transcriptBtn.classList.remove('border-transparent', 'text-dashboard-text-secondary');
+                            chaptersBtn.classList.remove('border-primary', 'text-primary');
+                            chaptersBtn.classList.add('border-transparent', 'text-dashboard-text-secondary');
+                          }
+                        }}
+                        data-tab="transcript"
+                      >
+                        Transcript
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {/* Chapters Content */}
+                {hasChapters && (
+                  <div id="chapters-tab" className="p-4">
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {chapters.map((chapter, index) => (
+                        <div key={index} className="flex items-center gap-3 p-3 hover:bg-background rounded-lg transition-colors">
+                          <span className="text-xs font-mono text-dashboard-text-secondary bg-background px-2 py-1 rounded border">
+                            {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                          </span>
+                          <span className="text-sm text-dashboard-text">{chapter.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Transcript Content */}
+                {hasTranscript && (
+                  <div id="transcript-tab" className={`p-4 ${hasChapters ? 'hidden' : ''}`}>
+                    <div className="max-h-96 overflow-y-auto">
+                      <p className="text-sm text-dashboard-text whitespace-pre-wrap leading-relaxed">{contentData.text}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Description (fallback if no transcript) */}
+            {!hasTranscript && contentData.text && (
+              <div className="p-4 bg-dashboard-card rounded-lg border border-dashboard-separator">
+                <h3 className="font-medium mb-2 text-dashboard-text">Description</h3>
+                <p className="text-sm text-dashboard-text whitespace-pre-wrap">{contentData.text}</p>
               </div>
             )}
           </div>
