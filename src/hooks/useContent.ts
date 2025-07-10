@@ -212,7 +212,26 @@ export const useContent = () => {
       finalContentData.url = finalContentData.url && finalContentData.url.startsWith('blob:') ? undefined : finalContentData.url;
       finalContentData.storage_path = finalContentData.storage_path && finalContentData.storage_path.startsWith('blob:') ? undefined : finalContentData.storage_path;
 
-      return await addContent(finalContentData);
+      const contentId = await addContent(finalContentData);
+      
+      // For YouTube content, trigger extraction of video data
+      if (contentId && contentData.type === 'youtube' && contentData.url) {
+        try {
+          console.log('Triggering YouTube data extraction for:', contentData.url);
+          await supabase.functions.invoke('youtube-extractor', {
+            body: {
+              url: contentData.url,
+              contentId: contentId
+            }
+          });
+          toast.success('YouTube video data is being extracted...');
+        } catch (extractionError) {
+          console.error('Failed to extract YouTube data:', extractionError);
+          toast.error('YouTube data extraction failed, but content was saved');
+        }
+      }
+      
+      return contentId;
     } catch (error) {
       console.error('Error creating content with metadata:', error);
       toast.error('Failed to create content');

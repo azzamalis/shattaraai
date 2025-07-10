@@ -110,17 +110,81 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
         );
       
       case 'youtube':
+        const videoId = contentData.url ? extractYouTubeId(contentData.url) : '';
+        
         return (
-          <div className="w-full h-80 bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
-            {contentData.url ? (
-              <iframe
-                src={`https://www.youtube.com/embed/${extractYouTubeId(contentData.url)}`}
-                className="w-full h-full"
-                title="YouTube Player"
-                allowFullScreen
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full">
+          <div className="w-full bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+            {/* YouTube Player */}
+            {videoId && (
+              <div className="aspect-video">
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  className="w-full h-full"
+                  title="YouTube Player"
+                  allowFullScreen
+                />
+              </div>
+            )}
+            
+            {/* Content Sections */}
+            <div className="p-4 space-y-4 max-h-80 overflow-y-auto">
+              {/* Video Metadata */}
+              {contentData.metadata && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {contentData.metadata.channelTitle && (
+                    <div className="p-3 bg-dashboard-card rounded-lg">
+                      <h4 className="font-medium text-xs text-dashboard-text-secondary">Channel</h4>
+                      <p className="text-sm text-dashboard-text">{contentData.metadata.channelTitle}</p>
+                    </div>
+                  )}
+                  {contentData.metadata.publishedAt && (
+                    <div className="p-3 bg-dashboard-card rounded-lg">
+                      <h4 className="font-medium text-xs text-dashboard-text-secondary">Published</h4>
+                      <p className="text-sm text-dashboard-text">{new Date(contentData.metadata.publishedAt).toLocaleDateString()}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Chapters */}
+              {contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && (
+                <div className="p-3 bg-dashboard-card rounded-lg">
+                  <h3 className="font-medium mb-3 text-dashboard-text">Chapters</h3>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {contentData.metadata.chapters.map((chapter: any, index: number) => (
+                      <div key={index} className="flex items-center gap-3 p-2 hover:bg-background rounded transition-colors">
+                        <span className="text-xs font-mono text-dashboard-text-secondary bg-background px-2 py-1 rounded">
+                          {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                        </span>
+                        <span className="text-sm text-dashboard-text">{chapter.title}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Transcript */}
+              {contentData.text && contentData.text.length > 100 && (
+                <div className="p-3 bg-dashboard-card rounded-lg">
+                  <h3 className="font-medium mb-3 text-dashboard-text">Transcript</h3>
+                  <div className="max-h-32 overflow-y-auto">
+                    <p className="text-sm text-dashboard-text whitespace-pre-wrap leading-relaxed">{contentData.text}</p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Description (fallback if no transcript) */}
+              {(!contentData.text || contentData.text.length <= 100) && contentData.text && (
+                <div className="p-3 bg-dashboard-card rounded-lg">
+                  <h3 className="font-medium mb-2 text-dashboard-text">Description</h3>
+                  <p className="text-sm text-dashboard-text whitespace-pre-wrap">{contentData.text}</p>
+                </div>
+              )}
+            </div>
+            
+            {/* Fallback for no video ID */}
+            {!videoId && (
+              <div className="flex items-center justify-center h-32">
                 <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                   <Youtube className="h-8 w-8 mb-2" />
                   <span className="text-sm">YouTube Player</span>

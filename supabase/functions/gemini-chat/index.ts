@@ -17,6 +17,7 @@ interface ChatRequest {
     title: string;
     type: string;
     text_content?: string;
+    metadata?: any;
   }>;
   conversationHistory?: Array<{
     content: string;
@@ -63,9 +64,39 @@ serve(async (req) => {
     }
 
     // Build context from room content
-    const roomContext = roomContent.map(content => 
-      `${content.title} (${content.type}): ${content.text_content || 'No text content available'}`
-    ).join('\n\n');
+    const roomContext = roomContent.map(content => {
+      let contextText = `${content.title} (${content.type}):`;
+      
+      // Include transcript for YouTube videos
+      if (content.type === 'youtube' && content.text_content) {
+        contextText += `\nTranscript: ${content.text_content}`;
+      }
+      
+      // Include chapters for YouTube videos  
+      if (content.type === 'youtube' && content.metadata?.chapters && Array.isArray(content.metadata.chapters)) {
+        const chapters = content.metadata.chapters.map((chapter: any) => 
+          `${Math.floor(chapter.startTime / 60)}:${(chapter.startTime % 60).toString().padStart(2, '0')} - ${chapter.title}`
+        ).join('\n');
+        contextText += `\n\nChapters:\n${chapters}`;
+      }
+      
+      // Include video metadata
+      if (content.type === 'youtube' && content.metadata?.channelTitle) {
+        contextText += `\nChannel: ${content.metadata.channelTitle}`;
+        if (content.metadata.publishedAt) {
+          contextText += `\nPublished: ${new Date(content.metadata.publishedAt).toLocaleDateString()}`;
+        }
+      }
+      
+      // Fallback to text content for other types
+      if (content.type !== 'youtube' && content.text_content) {
+        contextText += ` ${content.text_content}`;
+      } else if (!content.text_content) {
+        contextText += ' No text content available';
+      }
+      
+      return contextText;
+    }).join('\n\n');
 
     // Build conversation context
     const conversationContext = conversationHistory
