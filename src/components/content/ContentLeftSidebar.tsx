@@ -125,7 +125,21 @@ export function ContentLeftSidebar({
                         </div>
                       </div>)}
                   </div>}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="space-y-3">
+                    {contentData.metadata.chapters.map((chapter: any, index: number) => <div key={index} className="p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 cursor-pointer transition-colors">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-lg">
+                              {chapter.title}
+                            </h4>
+                          </div>
+                          <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
+                            {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                          </span>
+                        </div>
+                      </div>)}
+                  </div>}
+                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Processing content...
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
@@ -151,7 +165,17 @@ export function ContentLeftSidebar({
                       <p>This is where the full transcript would appear. The transcript would be searchable and time-synced with the audio playback.</p>
                     </div>
                   </div>}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {contentData.type === 'youtube' && contentData.text && contentData.text.length > 100 && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
+                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10">
+                      <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed">{contentData.text}</p>
+                    </div>
+                  </div>}
+                {(!contentData.text || contentData.text.length <= 100) && contentData.text && contentData.type === 'youtube' && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
+                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10">
+                      <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap">{contentData.text}</p>
+                    </div>
+                  </div>}
+                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Extracting text...
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
