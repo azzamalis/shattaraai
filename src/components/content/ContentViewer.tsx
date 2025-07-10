@@ -7,9 +7,10 @@ interface ContentViewerProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
   onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
+  currentTimestamp?: number;
 }
 
-export function ContentViewer({ contentData, onUpdateContent, onTextAction }: ContentViewerProps) {
+export function ContentViewer({ contentData, onUpdateContent, onTextAction, currentTimestamp }: ContentViewerProps) {
   const renderVideoPlayer = (url: string) => (
     <video
       src={url}
@@ -111,6 +112,9 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
       
       case 'youtube':
         const videoId = contentData.url ? extractYouTubeId(contentData.url) : '';
+        const embedUrl = currentTimestamp 
+          ? `https://www.youtube.com/embed/${videoId}?start=${currentTimestamp}&autoplay=1`
+          : `https://www.youtube.com/embed/${videoId}`;
         
         return (
           <div className="w-full bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
@@ -118,7 +122,8 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
             {videoId && (
               <div className="aspect-video">
                 <iframe
-                  src={`https://www.youtube.com/embed/${videoId}`}
+                  key={`${videoId}-${currentTimestamp}`}
+                  src={embedUrl}
                   className="w-full h-full"
                   title="YouTube Player"
                   allowFullScreen

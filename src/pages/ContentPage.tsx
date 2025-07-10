@@ -46,6 +46,7 @@ export default function ContentPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedMicrophone, setSelectedMicrophone] = useState("Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)");
+  const [currentTimestamp, setCurrentTimestamp] = useState<number | undefined>();
 
   // Fetch content from database
   useEffect(() => {
@@ -177,6 +178,11 @@ export default function ContentPage() {
     // For now, we'll just log it - integration with chat would be the next step
   };
 
+  // Handle chapter click to jump to timestamp
+  const handleChapterClick = (timestamp: number) => {
+    setCurrentTimestamp(timestamp);
+  };
+
   // Loading state
   if (loading) {
     return <DashboardLayout className="content-page-layout p-0">
@@ -222,7 +228,7 @@ export default function ContentPage() {
         <div className="flex-1 px-4 py-[10px] md:px-[16px] overflow-hidden">
           <ResizablePanelGroup direction="horizontal" className="h-full gap-4 overflow-hidden">
             <ResizablePanel defaultSize={50} minSize={25} maxSize={60} className="bg-card rounded-lg">
-              <ContentLeftSidebar contentData={contentData} onUpdateContent={updateContentData} isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={formatTime(recordingTime)} selectedMicrophone={selectedMicrophone} onMicrophoneSelect={handleMicrophoneSelect} onMicrophoneClear={handleMicrophoneClear} recordingStateInfo={recordingStateInfo} recordingMetadata={recordingMetadata} isRecordingLoading={false} onTextAction={handleTextAction} />
+              <ContentLeftSidebar contentData={contentData} onUpdateContent={updateContentData} isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={formatTime(recordingTime)} selectedMicrophone={selectedMicrophone} onMicrophoneSelect={handleMicrophoneSelect} onMicrophoneClear={handleMicrophoneClear} recordingStateInfo={recordingStateInfo} recordingMetadata={recordingMetadata} isRecordingLoading={false} onTextAction={handleTextAction} onChapterClick={handleChapterClick} currentTimestamp={currentTimestamp} />
             </ResizablePanel>
             
             <ResizableHandle withHandle className="w-0.5 ">
