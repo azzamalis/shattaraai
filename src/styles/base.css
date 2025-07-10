@@ -9,7 +9,7 @@
     --background: 0 0% 100%; /* Pure White #FFFFFF */
     --foreground: 0 0% 0%; /* Pure Black #000000 */
 
-    --card: 0, 0%, 97%; /* Unified component background #f7f7f7 */
+    --card: 0 0% 99%; /* Unified component background #FDFDFD */
     --card-foreground: 0 0% 0%; /* Pure Black text */
     --card-hover: 0 0% 96%; /* Light Gray #F5F5F5 */
 
@@ -50,7 +50,7 @@
   [data-theme="dark"],
   .dark {
     /* Dark Mode Colors - Unified System */
-    --background: 0 0% 7%; /* Dark background #121212 */
+    --background: 0, 2%, 10%; /* Dark background #1a1919 */
     --foreground: 0 0% 98%; /* Light text #FAFAFA */
 
     --card: 0 0% 8%; /* Dark component background #141414 */
