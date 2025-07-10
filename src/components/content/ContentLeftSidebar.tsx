@@ -117,37 +117,37 @@ export function ContentLeftSidebar({
   const getChapterTranscript = (chapter: any, fullTranscript: string, chapters: any[]) => {
     if (!fullTranscript || !chapter.startTime) return 'Transcript not available for this chapter.';
     
+    // Find current and next chapter for time boundaries
     const currentChapterIndex = chapters.findIndex((c: any) => c.title === chapter.title);
     const nextChapter = chapters[currentChapterIndex + 1];
     
-    // Calculate the duration for this chapter
-    const startTime = chapter.startTime;
+    const startTime = chapter.startTime; // in seconds
     const endTime = nextChapter ? nextChapter.startTime : null;
     
-    // For a more accurate implementation, we would need timestamp-aligned transcript data
-    // For now, we'll extract a meaningful segment based on chapter position and duration
-    const words = fullTranscript.split(' ');
-    const totalWords = words.length;
-    const totalDuration = chapters[chapters.length - 1]?.startTime || 1;
+    // Split transcript by lines/sentences to find timestamp-based segments
+    const transcriptLines = fullTranscript.split(/[.!?]\s+|\n/).filter(line => line.trim().length > 0);
     
-    // Calculate word boundaries based on timestamp ratios
-    const startRatio = startTime / totalDuration;
-    const endRatio = endTime ? endTime / totalDuration : 1;
+    // For YouTube transcripts, we need to extract the segment that corresponds to this chapter's timeframe
+    // Since we don't have exact timestamp alignment, we'll use proportional extraction
+    const totalVideoDuration = chapters[chapters.length - 1]?.startTime || startTime + 300; // fallback duration
     
-    const startWordIndex = Math.floor(totalWords * startRatio);
-    const endWordIndex = Math.floor(totalWords * endRatio);
+    const startRatio = startTime / totalVideoDuration;
+    const endRatio = endTime ? endTime / totalVideoDuration : 1;
     
-    // Extract the segment and ensure it's meaningful
-    const segment = words.slice(startWordIndex, endWordIndex).join(' ');
+    const startLineIndex = Math.floor(transcriptLines.length * startRatio);
+    const endLineIndex = endTime ? Math.floor(transcriptLines.length * endRatio) : transcriptLines.length;
     
-    // If segment is too short, provide a minimum meaningful excerpt
-    if (segment.length < 100 && fullTranscript.length > 100) {
-      const minLength = 200;
-      const safeEndIndex = Math.min(startWordIndex + minLength, totalWords);
-      return words.slice(startWordIndex, safeEndIndex).join(' ');
+    // Extract the relevant transcript segment
+    const chapterTranscript = transcriptLines.slice(startLineIndex, endLineIndex).join('. ');
+    
+    // Ensure we have meaningful content
+    if (chapterTranscript.length < 50 && transcriptLines.length > 0) {
+      // If segment is too short, take a minimum meaningful portion
+      const minLines = Math.min(5, transcriptLines.length - startLineIndex);
+      return transcriptLines.slice(startLineIndex, startLineIndex + minLines).join('. ') + '.';
     }
     
-    return segment || 'Transcript segment not available for this chapter.';
+    return chapterTranscript ? chapterTranscript + '.' : 'Transcript segment not available for this chapter.';
   };
 
   const formatTimestamp = (seconds: number) => {
