@@ -139,23 +139,6 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction }: Co
               )}
             </div>
 
-            {/* Video Metadata */}
-            {contentData.metadata && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {contentData.metadata.channelTitle && (
-                  <div className="p-3 bg-dashboard-card rounded-lg border border-dashboard-separator">
-                    <h4 className="font-medium text-xs text-dashboard-text-secondary">Channel</h4>
-                    <p className="text-sm text-dashboard-text">{contentData.metadata.channelTitle}</p>
-                  </div>
-                )}
-                {contentData.metadata.publishedAt && (
-                  <div className="p-3 bg-dashboard-card rounded-lg border border-dashboard-separator">
-                    <h4 className="font-medium text-xs text-dashboard-text-secondary">Published</h4>
-                    <p className="text-sm text-dashboard-text">{new Date(contentData.metadata.publishedAt).toLocaleDateString()}</p>
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* Chapters & Transcript Tabs */}
             {(hasChapters || hasTranscript) && (
