@@ -101,7 +101,7 @@ export function DashboardHeader({
       handleTitleCancel();
     }
   };
-  return <header className="flex items-center p-4 sticky top-0 z-50 bg-background transition-colors duration-300 py-[10px]">
+  return <header className="flex items-center p-4 sticky top-0 z-50 bg-background transition-colors duration-300">
       <div className="flex w-full items-center justify-between">
         {/* Left section */}
         <div className="flex items-center gap-3 min-w-0">
@@ -144,7 +144,7 @@ export function DashboardHeader({
                   <span className="sr-only">Search</span>
                 </Button> :
             // Desktop: Only ⌘K with same styling as Upgrade button
-            <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-2xl py-5 h-9 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring px-[20px]">
+            <Button variant="outline" className="bg-transparent border-2 border-primary text-primary hover:text-primary hover:bg-primary/5 transition-all rounded-2xl py-5 h-9 text-sm">
                   ⌘K
                 </Button>}
             </DialogTrigger>
