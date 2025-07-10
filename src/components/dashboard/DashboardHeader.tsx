@@ -143,7 +143,7 @@ export function DashboardHeader({
                 </Button> :
             // Desktop: Only ⌘K with same styling as Upgrade button
             <Button variant="outline" className="bg-transparent border-border hover:text-primary hover:bg-primary/5 transition-all h-9 px-[30px] text-base py-[20px] rounded-full">
-                   <Search className="h-4 w-4 mr-2" />
+                   <Search className="h-4 w-4 mr-0.5" />
                    ⌘K
                 </Button>}
             </DialogTrigger>
