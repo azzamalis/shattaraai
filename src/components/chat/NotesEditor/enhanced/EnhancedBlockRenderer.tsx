@@ -126,6 +126,7 @@ export function EnhancedBlockRenderer({
       "text-foreground dark:text-foreground",
       "placeholder:text-muted-foreground dark:placeholder:text-muted-foreground",
       "leading-relaxed",
+      "focus:outline-none focus:ring-0 focus:border-0 focus:shadow-none",
       getTextColorClass()
     );
     
