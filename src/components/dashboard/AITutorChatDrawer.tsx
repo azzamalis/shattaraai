@@ -28,6 +28,7 @@ export function AITutorChatDrawer({
 }: AITutorChatDrawerProps) {
   const [input, setInput] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
+  const [welcomeMessageSent, setWelcomeMessageSent] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize chat conversation for room collaboration
@@ -65,9 +66,9 @@ export function AITutorChatDrawer({
     }
   }, [messages, isAITyping]);
 
-  // Add welcome message when conversation is first created
+  // Add welcome message when conversation is first created and no messages exist
   useEffect(() => {
-    if (conversation && messages.length === 0) {
+    if (conversation && messages.length === 0 && !welcomeMessageSent) {
       const welcomeMessage = roomContent.length > 0
         ? `Hello! I'm Shattara AI Tutor. I can see you have ${roomContent.length} item(s) in this room. How can I help you learn today?`
         : "Hello! I'm Shattara AI Tutor. This room doesn't have any content yet. Feel free to add some study materials, and I'll help you learn from them!";
@@ -76,8 +77,15 @@ export function AITutorChatDrawer({
         isWelcome: true,
         roomContentCount: roomContent.length
       });
+      
+      setWelcomeMessageSent(true);
     }
-  }, [conversation, messages.length, roomContent.length, addAIResponse]);
+  }, [conversation, messages.length, roomContent.length, addAIResponse, welcomeMessageSent]);
+
+  // Reset welcome message flag when conversation changes
+  useEffect(() => {
+    setWelcomeMessageSent(false);
+  }, [conversation?.id]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || !conversation) return;
