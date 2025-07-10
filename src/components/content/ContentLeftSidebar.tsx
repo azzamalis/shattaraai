@@ -163,26 +163,7 @@ export function ContentLeftSidebar({
                         onOpenChange={() => toggleChapter(index)}
                       >
                         <div className="p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors">
-                          {chapter.summary ? (
-                            <CollapsibleTrigger className="w-full">
-                              <div className="flex items-start justify-between gap-2 w-full">
-                                <div className="flex-1 min-w-0 text-left">
-                                  <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
-                                    {chapter.title}
-                                  </h4>
-                                </div>
-                                <div className="flex items-center gap-2 shrink-0">
-                                  <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
-                                    {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                                  </span>
-                                  <ChevronDown className={cn(
-                                    "h-4 w-4 text-dashboard-text-secondary transition-transform",
-                                    openChapters.has(index) && "rotate-180"
-                                  )} />
-                                </div>
-                              </div>
-                            </CollapsibleTrigger>
-                          ) : (
+                          <CollapsibleTrigger className="w-full">
                             <div className="flex items-start justify-between gap-2 w-full">
                               <div className="flex-1 min-w-0 text-left">
                                 <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
@@ -193,16 +174,18 @@ export function ContentLeftSidebar({
                                 <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
                                   {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
                                 </span>
+                                <ChevronDown className={cn(
+                                  "h-4 w-4 text-dashboard-text-secondary transition-transform",
+                                  openChapters.has(index) && "rotate-180"
+                                )} />
                               </div>
                             </div>
-                          )}
-                          {chapter.summary && (
-                            <CollapsibleContent className="pt-2">
-                              <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
-                                {chapter.summary}
-                              </p>
-                            </CollapsibleContent>
-                          )}
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pt-2">
+                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
+                              {chapter.summary || 'Chapter summary not available'}
+                            </p>
+                          </CollapsibleContent>
                         </div>
                       </Collapsible>
                     ))}
