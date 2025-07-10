@@ -113,6 +113,31 @@ export function ContentLeftSidebar({
       </div>;
   };
 
+  // Helper function to extract transcript segment for a chapter
+  const getChapterTranscript = (chapter: any, fullTranscript: string) => {
+    if (!fullTranscript || !chapter.startTime) return 'Transcript not available for this chapter.';
+    
+    // For YouTube videos, we'll use a portion of the description/transcript
+    // In a real implementation, you'd extract the actual transcript segment based on timestamps
+    const words = fullTranscript.split(' ');
+    const segmentLength = Math.min(150, Math.floor(words.length / (contentData.metadata?.chapters?.length || 1)));
+    const startIndex = segmentLength * (contentData.metadata?.chapters?.findIndex((c: any) => c.title === chapter.title) || 0);
+    const segment = words.slice(startIndex, startIndex + segmentLength).join(' ');
+    
+    return segment || 'Transcript segment not available.';
+  };
+
+  const formatTimestamp = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const renderTabContent = () => {
     const hasContent = contentData.type === 'live_recording' ? isRecording : recordingStateInfo?.isNewRecording ? isRecording : recordingStateInfo?.isExistingRecording ? true : !!contentData.url || !!contentData.text;
     return <>
@@ -139,7 +164,7 @@ export function ContentLeftSidebar({
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
                                 <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
-                                  {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                                  {formatTimestamp(chapter.startTime)}
                                 </span>
                                 <ChevronDown className={cn(
                                   "h-4 w-4 text-dashboard-text-secondary transition-transform",
@@ -149,9 +174,11 @@ export function ContentLeftSidebar({
                             </div>
                           </CollapsibleTrigger>
                           <CollapsibleContent className="pt-2">
-                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
-                              {chapter.summary}
-                            </p>
+                            <div className="prose prose-sm max-w-none text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                              <p className="text-xs whitespace-pre-wrap leading-relaxed">
+                                {chapter.summary}
+                              </p>
+                            </div>
                           </CollapsibleContent>
                         </div>
                       </Collapsible>
@@ -173,8 +200,8 @@ export function ContentLeftSidebar({
                                 </h4>
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
-                                <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
-                                  {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                                <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded font-mono whitespace-nowrap">
+                                  {formatTimestamp(chapter.startTime)}
                                 </span>
                                 <ChevronDown className={cn(
                                   "h-4 w-4 text-dashboard-text-secondary transition-transform",
@@ -183,10 +210,12 @@ export function ContentLeftSidebar({
                               </div>
                             </div>
                           </CollapsibleTrigger>
-                          <CollapsibleContent className="pt-2">
-                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
-                              {chapter.summary || 'Chapter summary not available'}
-                            </p>
+                          <CollapsibleContent className="pt-3">
+                            <div className="prose prose-sm max-w-none">
+                              <div className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-pre-wrap leading-relaxed p-3 bg-background/50 dark:bg-background/50 rounded border border-dashboard-separator/10 dark:border-white/5">
+                                {getChapterTranscript(chapter, contentData.text || '')}
+                              </div>
+                            </div>
                           </CollapsibleContent>
                         </div>
                       </Collapsible>
