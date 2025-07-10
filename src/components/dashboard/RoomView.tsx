@@ -34,6 +34,7 @@ export function RoomView({
   const {
     content,
     onAddContent,
+    onAddContentWithMetadata,
     onDeleteContent,
     onUpdateContent
   } = useContent();
@@ -78,14 +79,17 @@ export function RoomView({
     }
 
     // Use addContentWithMetadata to store pasted content with metadata in storage
-    const contentId = await onAddContent({
+    const contentData = {
       title: contentTitle,
       type: contentType as any,
       room_id: roomId, // Assign to current room
       metadata,
       url: data.url,
       text_content: data.text
-    });
+    };
+
+    const urlMetadata = data.url ? { url: data.url, extractedAt: new Date().toISOString() } : undefined;
+    const contentId = await onAddContentWithMetadata(contentData, urlMetadata);
 
     if (contentId) {
       const searchParams = new URLSearchParams({

@@ -33,7 +33,8 @@ export function RoomHeroSection({
 }: RoomHeroSectionProps) {
   const navigate = useNavigate();
   const {
-    onAddContent
+    onAddContent,
+    onAddContentWithMetadata
   } = useContent();
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const handlePasteSubmit = async (data: {
@@ -54,14 +55,18 @@ export function RoomHeroSection({
     }
 
     // Add content WITHOUT automatic room assignment
-    const contentId = await onAddContent({
+    // For YouTube/website content, store metadata in appropriate storage bucket
+    const contentData = {
       title,
       type: contentType as any,
       room_id: null,
       metadata: {},
       url: data.url,
       text_content: data.text
-    });
+    };
+
+    const metadata = data.url ? { url: data.url, extractedAt: new Date().toISOString() } : undefined;
+    const contentId = await onAddContentWithMetadata(contentData, metadata);
     if (contentId) {
       const searchParams = new URLSearchParams({
         type: contentType,

@@ -34,7 +34,7 @@ export function DashboardModals({
   onDeleteRoom
 }: DashboardModalsProps) {
   const navigate = useNavigate();
-  const { onAddContent, onDeleteContent } = useContentContext();
+  const { onAddContent, onAddContentWithMetadata, onDeleteContent } = useContentContext();
 
   const handlePasteSubmit = async (data: { url?: string; text?: string; }) => {
     // Determine content type based on URL
@@ -51,14 +51,18 @@ export function DashboardModals({
     }
 
     // Add content WITHOUT automatic room assignment (room_id: null)
-    const contentId = await onAddContent({
+    // For YouTube/website content, store metadata in appropriate storage bucket
+    const contentData = {
       title,
       type: contentType as any,
       room_id: null, // Explicitly set to null - user can add to room later using the Add dropdown
       metadata: {},
       url: data.url,
       text_content: data.text
-    });
+    };
+
+    const metadata = data.url ? { url: data.url, extractedAt: new Date().toISOString() } : undefined;
+    const contentId = await onAddContentWithMetadata(contentData, metadata);
 
     if (contentId) {
       // Navigate to content page
