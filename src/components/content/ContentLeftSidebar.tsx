@@ -41,7 +41,7 @@ export function ContentLeftSidebar({
   isRecordingLoading,
   onTextAction
 }: ContentLeftSidebarProps) {
-  const [activeTab, setActiveTab] = useState("content");
+  const [activeTab, setActiveTab] = useState("chapters");
   const [openChapters, setOpenChapters] = useState<Set<number>>(new Set());
   const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
 
@@ -113,177 +113,137 @@ export function ContentLeftSidebar({
       </div>;
   };
 
-  const getChapterTranscriptSegments = (chapter: any, allText: string, chapterIndex: number) => {
-    // Split transcript into time-based segments for this chapter
-    const words = allText.split(' ');
-    const wordsPerChapter = Math.floor(words.length / (contentData.metadata?.chapters?.length || 1));
-    const startIndex = chapterIndex * wordsPerChapter;
-    const endIndex = Math.min(startIndex + wordsPerChapter, words.length);
-    const chapterText = words.slice(startIndex, endIndex).join(' ');
-    
-    // Create mock segments with timestamps (in real implementation, this would come from actual transcript data)
-    const segments = [];
-    const segmentLength = Math.floor(chapterText.length / 4); // Divide into ~4 segments per chapter
-    const baseTime = chapter.startTime;
-    
-    for (let i = 0; i < 4; i++) {
-      const segmentStart = i * segmentLength;
-      const segmentEnd = Math.min(segmentStart + segmentLength, chapterText.length);
-      const segmentText = chapterText.slice(segmentStart, segmentEnd).trim();
-      
-      if (segmentText) {
-        segments.push({
-          timestamp: baseTime + (i * 30), // 30 seconds between segments
-          text: segmentText
-        });
-      }
-    }
-    
-    return segments;
-  };
-
-  const formatTimestamp = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
   const renderTabContent = () => {
     const hasContent = contentData.type === 'live_recording' ? isRecording : recordingStateInfo?.isNewRecording ? isRecording : recordingStateInfo?.isExistingRecording ? true : !!contentData.url || !!contentData.text;
-    
     return <>
-        <TabsContent value="content" className="absolute inset-0">
+        <TabsContent value="chapters" className="absolute inset-0">
           <ScrollArea className="h-full">
-            {hasContent ? <div className="p-4 space-y-6">
+            {hasContent ? <div className="p-4 space-y-4">
                 {(contentData.type === 'live_recording' || recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Recording in progress...
                   </div>}
-                
-                {/* Combined chapters and transcripts view */}
-                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && contentData.text && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text">Chapters & Transcripts</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)}
-                        className="h-8 w-8 p-0 hover:bg-dashboard-separator/20"
-                      >
-                        <Expand className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    
-                    {contentData.metadata.chapters.map((chapter: any, chapterIndex: number) => {
-                      const segments = getChapterTranscriptSegments(chapter, contentData.text, chapterIndex);
-                      return (
-                        <Collapsible 
-                          key={chapterIndex} 
-                          open={openChapters.has(chapterIndex)}
-                          onOpenChange={() => toggleChapter(chapterIndex)}
-                        >
-                          <div className="space-y-4">
-                            <CollapsibleTrigger className="w-full">
-                              <div className="flex items-center justify-between p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors">
-                                <h4 className="font-semibold text-dashboard-text dark:text-dashboard-text text-base text-left">
-                                  {chapter.title}
-                                </h4>
-                                <ChevronDown className={cn(
-                                  "h-4 w-4 text-dashboard-text-secondary transition-transform",
-                                  openChapters.has(chapterIndex) && "rotate-180"
-                                )} />
-                              </div>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="space-y-3">
-                              {segments.map((segment, segmentIndex) => (
-                                <div key={segmentIndex} className="flex gap-4 items-start">
-                                  <button className="text-sm font-medium text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors min-w-[3rem] text-left shrink-0">
-                                    {formatTimestamp(segment.timestamp)}
-                                  </button>
-                                  <p className="text-sm text-dashboard-text dark:text-dashboard-text leading-relaxed flex-1">
-                                    {segment.text}
-                                  </p>
-                                </div>
-                              ))}
-                            </CollapsibleContent>
-                          </div>
-                        </Collapsible>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Recording content with chapters */}
-                {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && (
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text">Chapters & Transcripts</h3>
-                    {recordingMetadata.chaptersData.map((chapter, chapterIndex) => (
+                {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="grid grid-cols-2 gap-3">
+                    {recordingMetadata.chaptersData.map((chapter, index) => (
                       <Collapsible 
                         key={chapter.id} 
-                        open={openChapters.has(chapterIndex)}
-                        onOpenChange={() => toggleChapter(chapterIndex)}
+                        open={openChapters.has(index)}
+                        onOpenChange={() => toggleChapter(index)}
                       >
-                        <div className="space-y-4">
+                        <div className="p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors">
                           <CollapsibleTrigger className="w-full">
-                            <div className="flex items-center justify-between p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors">
-                              <h4 className="font-semibold text-dashboard-text dark:text-dashboard-text text-base text-left">
-                                {chapter.title}
-                              </h4>
-                              <ChevronDown className={cn(
-                                "h-4 w-4 text-dashboard-text-secondary transition-transform",
-                                openChapters.has(chapterIndex) && "rotate-180"
-                              )} />
-                            </div>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="space-y-3">
-                            <div className="flex gap-4 items-start">
-                              <button className="text-sm font-medium text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors min-w-[3rem] text-left shrink-0">
-                                {formatTimestamp(chapter.startTime)}
-                              </button>
-                              <div className="flex-1 space-y-2">
-                                <p className="text-sm text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                                  {chapter.summary}
-                                </p>
-                                <p className="text-sm text-dashboard-text dark:text-dashboard-text leading-relaxed">
-                                  Chapter transcript would appear here based on timestamps
-                                </p>
+                            <div className="flex items-start justify-between gap-2 w-full">
+                              <div className="flex-1 min-w-0 text-left">
+                                <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
+                                  {chapter.title}
+                                </h4>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
+                                  {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                                </span>
+                                <ChevronDown className={cn(
+                                  "h-4 w-4 text-dashboard-text-secondary transition-transform",
+                                  openChapters.has(index) && "rotate-180"
+                                )} />
                               </div>
                             </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pt-2">
+                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
+                              {chapter.summary}
+                            </p>
                           </CollapsibleContent>
                         </div>
                       </Collapsible>
                     ))}
-                  </div>
-                )}
-
-                {/* Fallback for content without chapters */}
-                {contentData.type === 'youtube' && contentData.text && (!contentData.metadata?.chapters || contentData.metadata.chapters.length === 0) && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text">Full Transcript</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)}
-                        className="h-8 w-8 p-0 hover:bg-dashboard-separator/20"
+                  </div>}
+                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="grid grid-cols-2 gap-3">
+                    {contentData.metadata.chapters.map((chapter: any, index: number) => (
+                      <Collapsible 
+                        key={index} 
+                        open={openChapters.has(index)}
+                        onOpenChange={() => toggleChapter(index)}
                       >
-                        <Expand className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10">
-                      <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed">
-                        {contentData.text}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
+                        <div className="p-3 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors">
+                          <CollapsibleTrigger className="w-full">
+                            <div className="flex items-start justify-between gap-2 w-full">
+                              <div className="flex-1 min-w-0 text-left">
+                                <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
+                                  {chapter.title}
+                                </h4>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary whitespace-nowrap">
+                                  {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                                </span>
+                                <ChevronDown className={cn(
+                                  "h-4 w-4 text-dashboard-text-secondary transition-transform",
+                                  openChapters.has(index) && "rotate-180"
+                                )} />
+                              </div>
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pt-2">
+                            <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-xs">
+                              {chapter.summary || 'Chapter summary not available'}
+                            </p>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
+                    ))}
+                  </div>}
                 {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Processing content...
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+                
                 <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
-                  {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view content' : 'Add content to view chapters and transcripts'}
+                  {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view chapters' : 'Add content to view chapters'}
+                </p>
+              </div>}
+          </ScrollArea>
+        </TabsContent>
+        
+        <TabsContent value="transcripts" className="absolute inset-0">
+          <ScrollArea className="h-full">
+            {hasContent ? <div className="p-4 space-y-4">
+                {(contentData.type === 'live_recording' || recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                    Transcribing in progress...
+                  </div>}
+                {recordingStateInfo?.isExistingRecording && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
+                    <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-4">
+                      Full transcript available
+                    </p>
+                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10">
+                      <p>This is where the full transcript would appear. The transcript would be searchable and time-synced with the audio playback.</p>
+                    </div>
+                  </div>}
+                {contentData.type === 'youtube' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
+                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)}
+                        className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20"
+                      >
+                        {isTranscriptExpanded ? (
+                          <Minimize2 className="h-4 w-4" />
+                        ) : (
+                          <Expand className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
+                        {contentData.text}
+                      </p>
+                    </div>
+                  </div>}
+                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                    Extracting text...
+                  </div>}
+              </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+                
+                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
+                  {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
                 </p>
               </div>}
           </ScrollArea>
@@ -326,11 +286,15 @@ export function ContentLeftSidebar({
 
       {renderControls()}
       
-      <Tabs defaultValue="content" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-background ">
+      <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-background ">
         <TabsList className={cn("w-fit justify-start gap-1 p-1 h-12 shrink-0 mx-4 my-2", "bg-card dark:bg-card", "transition-colors duration-200", "rounded-xl")}>
-          <TabsTrigger value="content" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none", "px-6")}>
-            <FileText className="h-[14px] w-[14px]" />
-            <span>Content</span>
+          <TabsTrigger value="chapters" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none", "px-6")}>
+            <ListTodo className="h-[14px] w-[14px]" />
+            <span>Chapters</span>
+          </TabsTrigger>
+          <TabsTrigger value="transcripts" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none", "px-6")}>
+            <AlignLeft className="h-[14px] w-[14px]" />
+            <span>Transcripts</span>
           </TabsTrigger>
         </TabsList>
 
