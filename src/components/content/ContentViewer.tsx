@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
 import { PDFViewer } from './PDFViewer';
@@ -11,6 +11,30 @@ interface ContentViewerProps {
 }
 
 export function ContentViewer({ contentData, onUpdateContent, onTextAction, currentTimestamp }: ContentViewerProps) {
+  const youtubePlayerRef = useRef<HTMLIFrameElement>(null);
+  // Handle timestamp changes for YouTube videos
+  useEffect(() => {
+    if (contentData.type === 'youtube' && currentTimestamp !== undefined && youtubePlayerRef.current) {
+      // Use postMessage to seek to timestamp in YouTube iframe
+      const iframe = youtubePlayerRef.current;
+      const videoId = contentData.url ? extractYouTubeId(contentData.url) : '';
+      
+      if (videoId) {
+        // Send seekTo command to YouTube player
+        iframe.contentWindow?.postMessage(
+          `{"event":"command","func":"seekTo","args":[${currentTimestamp}, true]}`,
+          'https://www.youtube.com'
+        );
+        
+        // Also send playVideo command to ensure it plays
+        iframe.contentWindow?.postMessage(
+          `{"event":"command","func":"playVideo","args":[]}`,
+          'https://www.youtube.com'
+        );
+      }
+    }
+  }, [currentTimestamp, contentData.type, contentData.url]);
+
   const renderVideoPlayer = (url: string) => (
     <video
       src={url}
@@ -112,9 +136,6 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
       
       case 'youtube':
         const videoId = contentData.url ? extractYouTubeId(contentData.url) : '';
-        const embedUrl = currentTimestamp 
-          ? `https://www.youtube.com/embed/${videoId}?start=${currentTimestamp}&autoplay=1`
-          : `https://www.youtube.com/embed/${videoId}`;
         
         return (
           <div className="w-full bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
@@ -122,11 +143,12 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
             {videoId && (
               <div className="aspect-video">
                 <iframe
-                  key={`${videoId}-${currentTimestamp}`}
-                  src={embedUrl}
+                  ref={youtubePlayerRef}
+                  src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}`}
                   className="w-full h-full"
                   title="YouTube Player"
                   allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 />
               </div>
             )}
