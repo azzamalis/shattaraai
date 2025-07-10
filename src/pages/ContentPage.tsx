@@ -217,10 +217,10 @@ export default function ContentPage() {
       </DashboardLayout>;
   }
   console.log('ContentPage: Rendering with content data:', contentData);
-  return <DashboardLayout className="content-page-layout p-0" contentData={contentData} onUpdateContent={updateContentData}>
-      <div className="flex flex-col h-[calc(100vh-64px)] bg-background transition-colors duration-300 overflow-hidden">
-        <div className="flex-1 px-4 py-[10px] md:px-[16px] overflow-hidden">
-          <ResizablePanelGroup direction="horizontal" className="h-full gap-4 overflow-hidden">
+  return <DashboardLayout className="content-page-layout p-0 overflow-hidden" contentData={contentData} onUpdateContent={updateContentData}>
+      <div className="flex flex-col h-screen bg-background transition-colors duration-300 overflow-hidden">
+        <div className="flex-1 min-h-0 px-4 py-[10px] md:px-[16px]">
+          <ResizablePanelGroup direction="horizontal" className="h-full gap-4">
             <ResizablePanel defaultSize={50} minSize={25} maxSize={60} className="bg-card rounded-lg">
               <ContentLeftSidebar contentData={contentData} onUpdateContent={updateContentData} isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={formatTime(recordingTime)} selectedMicrophone={selectedMicrophone} onMicrophoneSelect={handleMicrophoneSelect} onMicrophoneClear={handleMicrophoneClear} recordingStateInfo={recordingStateInfo} recordingMetadata={recordingMetadata} isRecordingLoading={false} onTextAction={handleTextAction} />
             </ResizablePanel>
