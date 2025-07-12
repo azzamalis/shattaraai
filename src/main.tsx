@@ -7,13 +7,12 @@ import './index.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Configure PDF.js worker - simplified and more reliable approach
+// Configure PDF.js worker with local file
 console.log('DEBUG: PDFViewer - Configuring PDF worker, pdfjs version:', pdfjs.version);
 
-// Set worker source immediately to avoid timing issues
-const workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+// Use the local worker file instead of CDN to avoid CORS and loading issues
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
-console.log('DEBUG: PDFViewer - PDF worker configured with:', workerSrc);
+console.log('DEBUG: PDFViewer - PDF worker configured with local file: /pdf.worker.min.mjs');
 
 createRoot(document.getElementById("root")!).render(<App />);
