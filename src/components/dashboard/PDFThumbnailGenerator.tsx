@@ -11,7 +11,7 @@ interface PDFThumbnailGeneratorProps {
   url?: string;
   title: string;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent) => void;
 }
 
 export function PDFThumbnailGenerator({ url, title, className, onClick }: PDFThumbnailGeneratorProps) {

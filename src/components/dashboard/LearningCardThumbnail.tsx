@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Video, Mic, FileText, Globe, MessageSquare, Music, Upload, Type } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -97,7 +96,11 @@ export function LearningCardThumbnail({
       {children}
       
       <div className={cn("w-full h-full", "relative", "flex items-center justify-center", "bg-gradient-to-b from-transparent to-black/5 dark:to-black/20")}>
-        {isPdf && hasPdfSource ? <PDFThumbnailGenerator url={pdfUrl} title={title} className="w-full h-full" /> : displayThumbnail ? <img src={displayThumbnail} alt={title} className="object-cover w-full h-full absolute inset-0" onError={e => {
+        {isPdf && hasPdfSource ? <PDFThumbnailGenerator 
+          url={pdfUrl} 
+          title={title} 
+          className="w-full h-full" 
+        /> : displayThumbnail ? <img src={displayThumbnail} alt={title} className="object-cover w-full h-full absolute inset-0" onError={e => {
         // If maxresdefault fails for YouTube, try hqdefault
         if (isYoutube && youtubeThumbnail && e.currentTarget.src.includes('maxresdefault')) {
           const videoId = youtubeThumbnail.split('/')[4];
