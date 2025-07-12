@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Document, Page } from 'react-pdf';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -160,22 +159,15 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
           <ScrollArea className="h-full" ref={scrollAreaRef}>
             <div className="min-h-full bg-dashboard-bg dark:bg-dashboard-bg">
               {loading && (
-                <>
-                  <PDFLoadingState />
-                  {console.log('DEBUG: PDFViewer - Showing loading state')}
-                </>
+                <PDFLoadingState />
               )}
 
               {error && (
-                <>
-                  <PDFErrorState error={error} url={url} />
-                  {console.log('DEBUG: PDFViewer - Showing error state:', error)}
-                </>
+                <PDFErrorState error={error} url={url} />
               )}
 
               {!loading && !error && url && (
                 <div className="flex justify-center w-full py-4 px-4">
-                  {console.log('DEBUG: PDFViewer - Rendering Document component with URL:', url)}
                   <Document
                     file={url}
                     onLoadSuccess={(pdf) => {

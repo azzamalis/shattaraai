@@ -468,38 +468,44 @@ export const useContent = () => {
         if (!mounted) return;
         console.log('DEBUG: useContent - Real-time content change received:', {
           eventType: payload.eventType,
-          contentId: payload.new?.id || payload.old?.id,
-          contentTitle: payload.new?.title || 'N/A'
+          contentId: (payload.new as any)?.id || (payload.old as any)?.id,
+          contentTitle: (payload.new as any)?.title || 'N/A'
         });
         
-        // Handle different event types
+        // Handle different event types with proper type guards
         switch (payload.eventType) {
           case 'INSERT':
-            const newItem = {
-              ...payload.new,
-              type: payload.new.type as ContentItem['type'],
-              metadata: payload.new.metadata as Record<string, any>
-            } as ContentItem;
-            setContent(prev => {
-              // Avoid duplicates
-              if (prev.some(item => item.id === newItem.id)) return prev;
-              return [newItem, ...prev];
-            });
+            if (payload.new && typeof payload.new === 'object' && 'id' in payload.new) {
+              const newItem = {
+                ...payload.new,
+                type: (payload.new as any).type as ContentItem['type'],
+                metadata: (payload.new as any).metadata as Record<string, any>
+              } as ContentItem;
+              setContent(prev => {
+                // Avoid duplicates
+                if (prev.some(item => item.id === newItem.id)) return prev;
+                return [newItem, ...prev];
+              });
+            }
             break;
             
           case 'UPDATE':
-            const updatedItem = {
-              ...payload.new,
-              type: payload.new.type as ContentItem['type'],
-              metadata: payload.new.metadata as Record<string, any>
-            } as ContentItem;
-            setContent(prev => prev.map(item => 
-              item.id === updatedItem.id ? updatedItem : item
-            ));
+            if (payload.new && typeof payload.new === 'object' && 'id' in payload.new) {
+              const updatedItem = {
+                ...payload.new,
+                type: (payload.new as any).type as ContentItem['type'],
+                metadata: (payload.new as any).metadata as Record<string, any>
+              } as ContentItem;
+              setContent(prev => prev.map(item => 
+                item.id === updatedItem.id ? updatedItem : item
+              ));
+            }
             break;
             
           case 'DELETE':
-            setContent(prev => prev.filter(item => item.id !== payload.old.id));
+            if (payload.old && typeof payload.old === 'object' && 'id' in payload.old) {
+              setContent(prev => prev.filter(item => item.id !== (payload.old as any).id));
+            }
             break;
         }
       })
