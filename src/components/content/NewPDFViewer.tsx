@@ -169,7 +169,7 @@ export function NewPDFViewer({ contentData, onFileUploaded }: NewPDFViewerProps)
             className="w-full overflow-hidden rounded-md border"
             style={{ height: '90vh' }}
           >
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
+            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
               <Viewer
                 fileUrl={pdfUrl}
                 plugins={[defaultLayoutPluginInstance]}
