@@ -11,7 +11,7 @@ export function PDFTimeoutHandler({
   loading, 
   url, 
   onTimeout, 
-  timeoutMs = 30000  // Reduced to 30 seconds for faster feedback
+  timeoutMs = 60000  // Increased to 60 seconds for larger PDFs
 }: PDFTimeoutHandlerProps) {
   useEffect(() => {
     if (!loading || !url) return;

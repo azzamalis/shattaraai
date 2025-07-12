@@ -170,20 +170,45 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
                 <div className="flex justify-center w-full py-4 px-4">
                   <Document
                     file={url}
+                    options={{
+                      cMapUrl: `https://unpkg.com/pdfjs-dist@${require('react-pdf').pdfjs.version}/cmaps/`,
+                      cMapPacked: true,
+                      standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${require('react-pdf').pdfjs.version}/standard_fonts/`,
+                      verbosity: 1,
+                      disableAutoFetch: false,
+                      disableStream: false
+                    }}
                     onLoadSuccess={(pdf) => {
                       console.log('DEBUG: PDFViewer - Document loaded successfully:', {
                         numPages: pdf.numPages,
-                        url: url
+                        url: url,
+                        fingerprint: pdf.fingerprints?.[0] || 'N/A'
                       });
                       onDocumentLoadSuccess(pdf);
                     }}
                     onLoadError={(error) => {
-                      console.error('DEBUG: PDFViewer - Document load error:', error);
+                      console.error('DEBUG: PDFViewer - Document load error:', {
+                        error: error.message || error,
+                        errorName: error.name,
+                        url: url
+                      });
                       onDocumentLoadError(error);
                     }}
                     onLoadProgress={(progress) => {
-                      console.log('DEBUG: PDFViewer - Document load progress:', progress);
+                      const percent = progress.loaded && progress.total ? 
+                        Math.round((progress.loaded / progress.total) * 100) : 0;
+                      console.log('DEBUG: PDFViewer - Document load progress:', {
+                        loaded: progress.loaded,
+                        total: progress.total,
+                        percent: `${percent}%`
+                      });
                       onDocumentLoadProgress(progress);
+                    }}
+                    onSourceSuccess={() => {
+                      console.log('DEBUG: PDFViewer - PDF source loaded successfully');
+                    }}
+                    onSourceError={(error) => {
+                      console.error('DEBUG: PDFViewer - PDF source error:', error);
                     }}
                     loading={<PDFLoadingState />}
                     error={<PDFErrorState error="Failed to load PDF document" url={url} />}

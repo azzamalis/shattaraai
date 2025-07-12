@@ -7,36 +7,13 @@ import './index.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Configure PDF.js worker with multiple fallbacks
-const configurePDFWorker = () => {
-  try {
-    // Try local worker first
-    if (typeof window !== 'undefined') {
-      const localWorkerPath = '/pdf.worker.min.mjs';
-      // Test if local worker exists
-      fetch(localWorkerPath, { method: 'HEAD' })
-        .then(response => {
-          if (response.ok) {
-            pdfjs.GlobalWorkerOptions.workerSrc = localWorkerPath;
-            console.log('PDFViewer: Using local PDF worker');
-          } else {
-            throw new Error('Local worker not found');
-          }
-        })
-        .catch(() => {
-          // Fallback to CDN
-          const cdnWorkerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-          pdfjs.GlobalWorkerOptions.workerSrc = cdnWorkerSrc;
-          console.log('PDFViewer: Using CDN PDF worker:', cdnWorkerSrc);
-        });
-    }
-  } catch (error) {
-    console.error('PDFViewer: Worker configuration failed:', error);
-    // Last resort fallback
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-  }
-};
+// Configure PDF.js worker - simplified and more reliable approach
+console.log('DEBUG: PDFViewer - Configuring PDF worker, pdfjs version:', pdfjs.version);
 
-configurePDFWorker();
+// Set worker source immediately to avoid timing issues
+const workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+
+console.log('DEBUG: PDFViewer - PDF worker configured with:', workerSrc);
 
 createRoot(document.getElementById("root")!).render(<App />);
