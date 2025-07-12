@@ -2,8 +2,7 @@
 import React, { useRef, useEffect } from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
-import { PDFViewer } from './PDFViewer';
-import { PDFDebugInfo } from './PDFDebugInfo';
+import { NewPDFViewer } from './NewPDFViewer';
 
 interface ContentViewerProps {
   contentData: ContentData;
@@ -86,55 +85,11 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
 
     switch (contentData.type) {
       case 'pdf':
-        // Use storage URL from database - prefer url over filePath
-        const pdfUrl = contentData.url && !contentData.url.startsWith('blob:') 
-          ? contentData.url 
-          : contentData.filePath && !contentData.filePath.startsWith('blob:')
-          ? contentData.filePath
-          : null;
-        
-        console.log('DEBUG: ContentViewer - PDF processing details:', {
-          id: contentData.id,
-          type: contentData.type,
-          originalUrl: contentData.url,
-          originalFilePath: contentData.filePath,
-          filename: contentData.filename,
-          finalPdfUrl: pdfUrl,
-          isValidUrl: !!pdfUrl,
-          isBlobUrl: pdfUrl?.startsWith('blob:') || false,
-          isStorageUrl: pdfUrl?.includes('/storage/v1/object/public/') || false
-        });
-        
-        if (!pdfUrl) {
-          console.error('DEBUG: ContentViewer - No valid PDF URL found in content data');
-          return (
-            <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
-              <div className="flex items-center justify-center h-full">
-                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                  <FileText className="h-8 w-8 mb-2" />
-                  <span className="text-sm">PDF Viewer</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">
-                    No valid PDF URL available
-                  </span>
-                  <span className="text-xs text-dashboard-text-secondary/40 dark:text-dashboard-text-secondary/40 mt-1">
-                    Content ID: {contentData.id}
-                  </span>
-                </div>
-              </div>
-            </div>
-          );
-        }
-        
-        console.log('DEBUG: ContentViewer - Rendering PDFViewer with URL:', pdfUrl);
-        
         return (
-          <div className="space-y-2">
-            <PDFDebugInfo contentData={contentData} pdfUrl={pdfUrl} />
-            <PDFViewer
-              url={pdfUrl}
-              onTextAction={onTextAction}
-            />
-          </div>
+          <NewPDFViewer 
+            contentData={contentData}
+            onFileUploaded={(url) => onUpdateContent({ url })}
+          />
         );
       
       case 'video':
