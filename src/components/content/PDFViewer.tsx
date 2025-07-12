@@ -85,7 +85,8 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
   });
 
   const handleTimeout = () => {
-    setError('PDF loading timed out. Please refresh the page and try again.');
+    console.error('PDFViewer: Timeout handler called for URL:', url);
+    setError('PDF loading timed out. The file may be too large or the connection is slow. Try refreshing the page or opening the PDF directly.');
     setLoading(false);
   };
 
@@ -158,7 +159,7 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
                     onLoadError={onDocumentLoadError}
                     onLoadProgress={onDocumentLoadProgress}
                     loading={<PDFLoadingState />}
-                    error={<PDFErrorState error="Failed to load PDF" url={url} />}
+                    error={<PDFErrorState error="Failed to load PDF document" url={url} />}
                   >
                     <Page
                       pageNumber={pageNumber}
