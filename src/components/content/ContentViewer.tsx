@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
@@ -13,6 +14,17 @@ interface ContentViewerProps {
 
 export function ContentViewer({ contentData, onUpdateContent, onTextAction, currentTimestamp }: ContentViewerProps) {
   const youtubePlayerRef = useRef<HTMLIFrameElement>(null);
+  
+  console.log('DEBUG: ContentViewer - Rendering with content data:', {
+    id: contentData.id,
+    type: contentData.type,
+    title: contentData.title,
+    url: contentData.url,
+    filename: contentData.filename,
+    hasMetadata: !!contentData.metadata,
+    metadataKeys: contentData.metadata ? Object.keys(contentData.metadata) : []
+  });
+
   // Handle timestamp changes for YouTube videos
   useEffect(() => {
     if (contentData.type === 'youtube' && currentTimestamp !== undefined && youtubePlayerRef.current) {
@@ -36,35 +48,42 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
     }
   }, [currentTimestamp, contentData.type, contentData.url]);
 
-  const renderVideoPlayer = (url: string) => (
-    <video
-      src={url}
-      controls
-      className="w-full h-full object-cover"
-      onError={(e) => {
-        console.error('Video loading error:', e);
-        // Could implement fallback or error handling here
-      }}
-    />
-  );
-
-  const renderAudioPlayer = (url: string) => (
-    <div className="flex flex-col items-center justify-center h-full p-8">
-      <audio
+  const renderVideoPlayer = (url: string) => {
+    console.log('DEBUG: ContentViewer - Rendering video player with URL:', url);
+    return (
+      <video
         src={url}
         controls
-        className="w-full max-w-md"
+        className="w-full h-full object-cover"
         onError={(e) => {
-          console.error('Audio loading error:', e);
+          console.error('DEBUG: ContentViewer - Video loading error:', e);
         }}
       />
-      <p className="text-sm text-muted-foreground mt-4">
-        {contentData.filename || 'Audio File'}
-      </p>
-    </div>
-  );
+    );
+  };
+
+  const renderAudioPlayer = (url: string) => {
+    console.log('DEBUG: ContentViewer - Rendering audio player with URL:', url);
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-8">
+        <audio
+          src={url}
+          controls
+          className="w-full max-w-md"
+          onError={(e) => {
+            console.error('DEBUG: ContentViewer - Audio loading error:', e);
+          }}
+        />
+        <p className="text-sm text-muted-foreground mt-4">
+          {contentData.filename || 'Audio File'}
+        </p>
+      </div>
+    );
+  };
 
   const renderViewer = () => {
+    console.log('DEBUG: ContentViewer - renderViewer called for type:', contentData.type);
+
     switch (contentData.type) {
       case 'pdf':
         // Use storage URL from database - prefer url over filePath
@@ -74,17 +93,20 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
           ? contentData.filePath
           : null;
         
-        console.log('PDF ContentViewer - Content data:', {
+        console.log('DEBUG: ContentViewer - PDF processing details:', {
           id: contentData.id,
           type: contentData.type,
-          url: contentData.url,
-          filePath: contentData.filePath,
+          originalUrl: contentData.url,
+          originalFilePath: contentData.filePath,
           filename: contentData.filename,
-          finalPdfUrl: pdfUrl
+          finalPdfUrl: pdfUrl,
+          isValidUrl: !!pdfUrl,
+          isBlobUrl: pdfUrl?.startsWith('blob:') || false,
+          isStorageUrl: pdfUrl?.includes('/storage/v1/object/public/') || false
         });
         
         if (!pdfUrl) {
-          console.error('PDF ContentViewer - No valid PDF URL found in content data');
+          console.error('DEBUG: ContentViewer - No valid PDF URL found in content data');
           return (
             <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
               <div className="flex items-center justify-center h-full">
@@ -103,7 +125,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
           );
         }
         
-        console.log('PDF ContentViewer - Rendering PDFViewer with URL:', pdfUrl);
+        console.log('DEBUG: ContentViewer - Rendering PDFViewer with URL:', pdfUrl);
         
         return (
           <div className="space-y-2">
@@ -117,6 +139,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
       
       case 'video':
         const videoUrl = contentData.url && !contentData.url.startsWith('blob:') ? contentData.url : null;
+        console.log('DEBUG: ContentViewer - Video URL processing:', { originalUrl: contentData.url, finalUrl: videoUrl });
         return (
           <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
             {videoUrl ? (
@@ -137,6 +160,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
       case 'recording':
       case 'live_recording':
         const audioUrl = contentData.url && !contentData.url.startsWith('blob:') ? contentData.url : null;
+        console.log('DEBUG: ContentViewer - Audio URL processing:', { originalUrl: contentData.url, finalUrl: audioUrl });
         return (
           <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
             {audioUrl ? (
@@ -155,6 +179,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
       
       case 'youtube':
         const videoId = contentData.url ? extractYouTubeId(contentData.url) : '';
+        console.log('DEBUG: ContentViewer - YouTube processing:', { originalUrl: contentData.url, extractedVideoId: videoId });
         
         return (
           <div className="w-full bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
@@ -190,6 +215,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
       case 'file':
         // Handle various file types from storage
         const fileUrl = contentData.url && !contentData.url.startsWith('blob:') ? contentData.url : null;
+        console.log('DEBUG: ContentViewer - File URL processing:', { originalUrl: contentData.url, finalUrl: fileUrl });
         return (
           <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
             {fileUrl ? (
@@ -221,6 +247,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
 
       case 'text':
       case 'website':
+        console.log('DEBUG: ContentViewer - Text/Website content:', { text: contentData.text, url: contentData.url });
         return (
           <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator p-4 overflow-auto">
             {contentData.text || contentData.url ? (
@@ -252,6 +279,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
         );
       
       default:
+        console.log('DEBUG: ContentViewer - Default case for unknown content type:', contentData.type);
         return (
           <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator">
             <div className="flex items-center justify-center h-full">

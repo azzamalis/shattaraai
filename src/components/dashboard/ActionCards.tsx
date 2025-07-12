@@ -1,12 +1,15 @@
+
 import React, { useRef } from 'react';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Upload, FileText, Mic, Link2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useContentContext } from '@/contexts/ContentContext';
+
 interface ActionCardsProps {
   onPasteClick: () => void;
 }
+
 export function ActionCards({
   onPasteClick
 }: ActionCardsProps) {
@@ -16,17 +19,35 @@ export function ActionCards({
     addContentWithFile
   } = useContentContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
   const handleUploadClick = () => {
+    console.log('DEBUG: ActionCards - Upload button clicked');
     fileInputRef.current?.click();
   };
+
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    console.log('DEBUG: ActionCards - File selected:', file ? {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      lastModified: file.lastModified
+    } : 'No file selected');
+
     if (file) {
       try {
         // Determine content type based on file type and extension
         let contentType = 'upload';
         const fileType = file.type.toLowerCase();
         const fileName = file.name.toLowerCase();
+        
+        console.log('DEBUG: ActionCards - File type analysis:', {
+          originalFileType: file.type,
+          lowerCaseFileType: fileType,
+          originalFileName: file.name,
+          lowerCaseFileName: fileName
+        });
+
         if (fileType.includes('pdf') || fileName.endsWith('.pdf')) {
           contentType = 'pdf';
         } else if (fileType.includes('audio') || ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'].some(ext => fileName.endsWith(ext))) {
@@ -36,22 +57,42 @@ export function ActionCards({
         } else if (['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx'].some(ext => fileName.endsWith(ext))) {
           contentType = 'file';
         }
-        console.log('ActionCards: Starting file upload:', {
+
+        console.log('DEBUG: ActionCards - Determined content type:', contentType);
+        console.log('DEBUG: ActionCards - Starting file upload process with data:', {
           fileName: file.name,
           fileType: file.type,
           fileSize: file.size,
-          determinedContentType: contentType
+          determinedContentType: contentType,
+          timestamp: new Date().toISOString()
         });
 
         // Show loading toast
         const loadingToast = toast.loading(`Uploading ${file.name}...`);
+        console.log('DEBUG: ActionCards - Loading toast shown for file upload');
 
         // Use addContentWithFile for ALL file uploads to ensure proper storage handling
+        console.log('DEBUG: ActionCards - Calling addContentWithFile with parameters:', {
+          contentData: {
+            title: file.name,
+            type: contentType,
+            room_id: null,
+            metadata: {
+              fileSize: file.size,
+              fileType: file.type,
+              isUploadedFile: true,
+              uploadedAt: new Date().toISOString(),
+              originalFileName: file.name
+            },
+            filename: file.name
+          },
+          fileSize: file.size
+        });
+
         const contentId = await addContentWithFile({
           title: file.name,
           type: contentType as any,
           room_id: null,
-          // Do not auto-assign to any room
           metadata: {
             fileSize: file.size,
             fileType: file.type,
@@ -64,25 +105,44 @@ export function ActionCards({
 
         // Dismiss loading toast
         toast.dismiss(loadingToast);
-        console.log('ActionCards: Content created with ID:', contentId);
+        console.log('DEBUG: ActionCards - Upload completed, content ID received:', contentId);
         
         if (contentId) {
+          console.log('DEBUG: ActionCards - Content created successfully, preparing navigation');
+          console.log('DEBUG: ActionCards - Navigation details:', {
+            contentId,
+            targetRoute: `/content/${contentId}`,
+            timestamp: new Date().toISOString()
+          });
+
           // Add a small delay to ensure database transaction is complete
           setTimeout(() => {
-            console.log('ActionCards: Navigating to content page:', contentId);
+            console.log('DEBUG: ActionCards - Executing navigation to content page:', contentId);
             navigate(`/content/${contentId}`);
             toast.success(`File "${file.name}" uploaded successfully`);
+            console.log('DEBUG: ActionCards - Navigation completed and success toast shown');
           }, 100);
         } else {
+          console.error('DEBUG: ActionCards - Upload failed: No content ID returned');
           throw new Error('Failed to create content - no ID returned');
         }
       } catch (error) {
-        console.error('Error handling file upload:', error);
+        console.error('DEBUG: ActionCards - Error during file upload process:', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          errorStack: error instanceof Error ? error.stack : undefined,
+          fileName: file.name,
+          fileSize: file.size,
+          timestamp: new Date().toISOString()
+        });
         toast.error('Failed to upload the file. Please try again.');
       }
+    } else {
+      console.warn('DEBUG: ActionCards - No file was selected in handleFileSelect');
     }
   };
+
   const handleRecordClick = async () => {
+    console.log('DEBUG: ActionCards - Record button clicked');
     try {
       // Add live recording to tracking system WITHOUT auto-assigning to any room
       const contentId = await addContent({
@@ -92,28 +152,36 @@ export function ActionCards({
         })}`,
         type: 'live_recording',
         room_id: null,
-        // Do not auto-assign to any room
         metadata: {
           isLiveRecording: true,
           recordingStatus: 'ready',
           createdAt: new Date().toISOString()
         }
       });
+
+      console.log('DEBUG: ActionCards - Live recording content created:', contentId);
+
       if (contentId) {
         navigate(`/content/${contentId}?type=live_recording`);
         toast.success('Recording session created');
+        console.log('DEBUG: ActionCards - Navigated to live recording page');
       } else {
         throw new Error('Failed to create recording session');
       }
     } catch (error) {
-      console.error('Error creating recording session:', error);
+      console.error('DEBUG: ActionCards - Error creating recording session:', error);
       toast.error('Failed to create recording session. Please try again.');
     }
   };
+
   return <>
-      <input ref={fileInputRef} type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.csv,.xls,.xlsx,audio/*,video/*,image/*" onChange={handleFileSelect} style={{
-      display: 'none'
-    }} />
+      <input 
+        ref={fileInputRef} 
+        type="file" 
+        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.csv,.xls,.xlsx,audio/*,video/*,image/*" 
+        onChange={handleFileSelect} 
+        style={{ display: 'none' }} 
+      />
       
       <div className="sm:justify-center sm:items-center gap-3 sm:flex grid grid-cols-1 w-full">
         {/* Upload Card */}

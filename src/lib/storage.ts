@@ -1,177 +1,172 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-export type StorageContentType = 'pdf' | 'video' | 'audio_file' | 'upload' | 'file' | 'recording' | 'live_recording' | 'youtube' | 'website' | 'chat' | 'text';
+export type StorageContentType = 
+  | 'pdf' 
+  | 'video' 
+  | 'audio_file' 
+  | 'file' 
+  | 'upload' 
+  | 'recording' 
+  | 'live_recording'
+  | 'youtube'
+  | 'website' 
+  | 'text' 
+  | 'chat';
 
-// Mapping content types to storage buckets
-const CONTENT_TYPE_TO_BUCKET: Record<StorageContentType, string> = {
-  'pdf': 'pdfs',
-  'video': 'videos',
-  'audio_file': 'audio-files',
-  'upload': 'documents',
-  'file': 'documents',
-  'recording': 'audio-files',
-  'live_recording': 'audio-files',
-  'youtube': 'youtube-content',
-  'website': 'website-content',
-  'chat': 'chat-content',
-  'text': 'text-content'
+// Map content types to storage buckets
+export const getStorageBucket = (contentType: StorageContentType): string => {
+  const bucketMap: Record<StorageContentType, string> = {
+    pdf: 'pdfs',
+    video: 'videos',
+    audio_file: 'audio-files',
+    file: 'documents',
+    upload: 'documents',
+    recording: 'audio-recordings',
+    live_recording: 'audio-recordings',
+    youtube: 'youtube-content',
+    website: 'website-content',
+    text: 'text-content',
+    chat: 'chat-content'
+  };
+  return bucketMap[contentType];
 };
 
-// Allowed file extensions for each content type
-const ALLOWED_EXTENSIONS: Record<string, string[]> = {
-  'pdfs': ['.pdf'],
-  'videos': ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv'],
-  'audio-files': ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac', '.wma'],
-  'documents': ['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx', '.csv'],
-  'images': ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'],
-  'youtube-content': ['.json', '.txt', '.html', '.md'],
-  'website-content': ['.json', '.txt', '.html', '.md'],
-  'chat-content': ['.json', '.txt', '.html', '.md'],
-  'text-content': ['.json', '.txt', '.html', '.md']
-};
-
-export async function uploadFileToStorage(
+// Upload file to appropriate storage bucket
+export const uploadFileToStorage = async (
   file: File, 
   contentType: StorageContentType, 
   userId: string
-): Promise<string> {
-  const bucket = CONTENT_TYPE_TO_BUCKET[contentType];
-  if (!bucket) {
-    throw new Error(`Unsupported content type: ${contentType}`);
-  }
+): Promise<string> => {
+  console.log('DEBUG: storage - uploadFileToStorage called with:', {
+    fileName: file.name,
+    fileSize: file.size,
+    fileType: file.type,
+    contentType,
+    userId
+  });
 
-  // Validate file extension
-  const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
-  const allowedExts = ALLOWED_EXTENSIONS[bucket];
-  if (allowedExts && !allowedExts.includes(fileExt)) {
-    throw new Error(`File type ${fileExt} not allowed for ${contentType}. Allowed types: ${allowedExts.join(', ')}`);
-  }
-
-  const fileName = `${userId}/${Date.now()}_${file.name}`;
+  const bucket = getStorageBucket(contentType);
+  const timestamp = Date.now();
+  const fileName = `${userId}/${timestamp}_${file.name}`;
   
-  console.log(`Uploading ${contentType} to ${bucket}:`, fileName);
-  
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: false
-    });
+  console.log('DEBUG: storage - Upload details:', {
+    bucket,
+    fileName,
+    timestamp
+  });
 
-  if (error) {
-    console.error(`Storage upload error for ${contentType}:`, error);
-    throw new Error(`Failed to upload ${contentType}: ${error.message}`);
+  try {
+    console.log(`DEBUG: storage - Uploading ${contentType} to ${bucket}: ${fileName}`);
+    
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error('DEBUG: storage - Upload error:', error);
+      throw new Error(`Failed to upload file: ${error.message}`);
+    }
+
+    console.log('DEBUG: storage - Upload successful:', data.path);
+    
+    // Get the public URL
+    const { data: publicUrlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(data.path);
+    
+    console.log('DEBUG: storage - Public URL generated:', publicUrlData.publicUrl);
+    return publicUrlData.publicUrl;
+  } catch (error) {
+    console.error('DEBUG: storage - Upload exception:', error);
+    throw error;
   }
+};
 
-  console.log(`${contentType} uploaded successfully:`, data.path);
-
-  // Get the public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from(bucket)
-    .getPublicUrl(data.path);
-
-  console.log(`${contentType} public URL:`, publicUrl);
-  
-  return publicUrl;
-}
-
-// Upload content metadata or cached data for pasted content types
-export async function uploadPastedContentMetadata(
+// Upload pasted content metadata to storage
+export const uploadPastedContentMetadata = async (
   metadata: any,
   contentType: 'youtube' | 'website' | 'chat' | 'text',
   userId: string,
   contentId: string
-): Promise<string> {
-  const bucket = CONTENT_TYPE_TO_BUCKET[contentType];
-  const fileName = `${userId}/${contentId}_metadata.json`;
+): Promise<string> => {
+  const bucket = getStorageBucket(contentType);
+  const fileName = `${userId}/${contentId}/metadata.json`;
   
-  // Convert metadata to JSON blob
-  const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], {
-    type: 'application/json'
-  });
-  
-  console.log(`Uploading ${contentType} metadata to ${bucket}:`, fileName);
-  
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .upload(fileName, metadataBlob, {
-      cacheControl: '3600',
-      upsert: true // Allow overwriting existing metadata
+  try {
+    const metadataFile = new Blob([JSON.stringify(metadata, null, 2)], {
+      type: 'application/json'
     });
 
-  if (error) {
-    console.error(`Storage upload error for ${contentType} metadata:`, error);
-    throw new Error(`Failed to upload ${contentType} metadata: ${error.message}`);
-  }
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, metadataFile, {
+        cacheControl: '3600',
+        upsert: true
+      });
 
-  console.log(`${contentType} metadata uploaded successfully:`, data.path);
-
-  // Get the public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from(bucket)
-    .getPublicUrl(data.path);
-
-  return publicUrl;
-}
-
-export async function deleteFileFromStorage(url: string, contentType?: StorageContentType): Promise<void> {
-  if (!url) return;
-
-  // Determine bucket from URL or content type
-  let bucket: string | undefined;
-  
-  if (contentType) {
-    bucket = CONTENT_TYPE_TO_BUCKET[contentType];
-  } else {
-    // Try to extract bucket from URL
-    const bucketMatches = url.match(/\/storage\/v1\/object\/public\/([^\/]+)\//);
-    if (bucketMatches) {
-      bucket = bucketMatches[1];
+    if (error) {
+      throw new Error(`Failed to upload metadata: ${error.message}`);
     }
-  }
 
-  if (!bucket) {
-    console.warn('Could not determine bucket for URL:', url);
+    // Get the public URL
+    const { data: publicUrlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(data.path);
+    
+    return publicUrlData.publicUrl;
+  } catch (error) {
+    console.error('Error uploading pasted content metadata:', error);
+    throw error;
+  }
+};
+
+// Delete file from storage
+export const deleteFileFromStorage = async (
+  url: string, 
+  contentType?: StorageContentType | null
+): Promise<void> => {
+  if (!url || !isStorageUrl(url)) {
     return;
   }
 
-  // Extract the file path from the public URL
-  const urlParts = url.split('/');
-  const bucketIndex = urlParts.indexOf(bucket);
-  if (bucketIndex === -1) return;
-  
-  const filePath = urlParts.slice(bucketIndex + 1).join('/');
-  
-  const { error } = await supabase.storage
-    .from(bucket)
-    .remove([filePath]);
+  try {
+    // Extract bucket and path from URL
+    const urlParts = url.split('/storage/v1/object/public/');
+    if (urlParts.length !== 2) return;
+    
+    const [bucket, ...pathParts] = urlParts[1].split('/');
+    const filePath = pathParts.join('/');
 
-  if (error) {
-    console.error(`Failed to delete file from ${bucket}:`, error);
-    throw new Error(`Failed to delete file: ${error.message}`);
+    const { error } = await supabase.storage
+      .from(bucket)
+      .remove([filePath]);
+
+    if (error) {
+      console.error('Error deleting file from storage:', error);
+    }
+  } catch (error) {
+    console.error('Error deleting file from storage:', error);
   }
+};
 
-  console.log(`File deleted from ${bucket}:`, filePath);
-}
-
-export function isStorageUrl(url: string): boolean {
+// Check if URL is a Supabase storage URL
+export const isStorageUrl = (url: string): boolean => {
   return url.includes('/storage/v1/object/public/');
-}
+};
 
-export function getStorageBucket(contentType: StorageContentType): string {
-  return CONTENT_TYPE_TO_BUCKET[contentType] || 'documents';
-}
-
-// Legacy function for backward compatibility
-export async function uploadPDFToStorage(file: File, userId: string): Promise<string> {
-  return uploadFileToStorage(file, 'pdf', userId);
-}
-
-export async function deletePDFFromStorage(url: string): Promise<void> {
-  return deleteFileFromStorage(url, 'pdf');
-}
-
-export function isPDFStorageUrl(url: string): boolean {
-  return url.includes('/storage/v1/object/public/pdfs/');
-}
+// Get file info from storage URL
+export const getFileInfoFromUrl = (url: string) => {
+  if (!isStorageUrl(url)) return null;
+  
+  const urlParts = url.split('/storage/v1/object/public/');
+  if (urlParts.length !== 2) return null;
+  
+  const [bucket, ...pathParts] = urlParts[1].split('/');
+  const filePath = pathParts.join('/');
+  
+  return { bucket, filePath };
+};

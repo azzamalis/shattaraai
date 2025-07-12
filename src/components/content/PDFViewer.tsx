@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Document, Page } from 'react-pdf';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,6 +15,8 @@ import { PDFEmptyState } from './pdf/components/PDFEmptyState';
 import { PDFTimeoutHandler } from './pdf/components/PDFTimeoutHandler';
 
 export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
+  console.log('DEBUG: PDFViewer - Component initialized with URL:', url);
+
   const {
     numPages,
     pageNumber,
@@ -85,17 +88,23 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
   });
 
   const handleTimeout = () => {
-    console.error('PDFViewer: Timeout handler called for URL:', url);
+    console.error('DEBUG: PDFViewer - Timeout handler called for URL:', url);
     setError('PDF loading timed out. The file may be too large or the connection is slow. Try refreshing the page or opening the PDF directly.');
     setLoading(false);
   };
 
   if (!url) {
-    console.error('PDFViewer: No URL provided');
+    console.error('DEBUG: PDFViewer - No URL provided');
     return <PDFEmptyState />;
   }
 
-  console.log('PDFViewer: Rendering with URL:', url);
+  console.log('DEBUG: PDFViewer - Rendering PDF viewer with:', {
+    url,
+    loading,
+    error,
+    numPages,
+    pageNumber
+  });
 
   return (
     <div className="relative h-full bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden flex flex-col">
@@ -150,17 +159,40 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
         <div className="flex-1 overflow-hidden" ref={containerRef}>
           <ScrollArea className="h-full" ref={scrollAreaRef}>
             <div className="min-h-full bg-dashboard-bg dark:bg-dashboard-bg">
-              {loading && <PDFLoadingState />}
+              {loading && (
+                <>
+                  <PDFLoadingState />
+                  {console.log('DEBUG: PDFViewer - Showing loading state')}
+                </>
+              )}
 
-              {error && <PDFErrorState error={error} url={url} />}
+              {error && (
+                <>
+                  <PDFErrorState error={error} url={url} />
+                  {console.log('DEBUG: PDFViewer - Showing error state:', error)}
+                </>
+              )}
 
               {!loading && !error && url && (
                 <div className="flex justify-center w-full py-4 px-4">
+                  {console.log('DEBUG: PDFViewer - Rendering Document component with URL:', url)}
                   <Document
                     file={url}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                    onLoadError={onDocumentLoadError}
-                    onLoadProgress={onDocumentLoadProgress}
+                    onLoadSuccess={(pdf) => {
+                      console.log('DEBUG: PDFViewer - Document loaded successfully:', {
+                        numPages: pdf.numPages,
+                        url: url
+                      });
+                      onDocumentLoadSuccess(pdf);
+                    }}
+                    onLoadError={(error) => {
+                      console.error('DEBUG: PDFViewer - Document load error:', error);
+                      onDocumentLoadError(error);
+                    }}
+                    onLoadProgress={(progress) => {
+                      console.log('DEBUG: PDFViewer - Document load progress:', progress);
+                      onDocumentLoadProgress(progress);
+                    }}
                     loading={<PDFLoadingState />}
                     error={<PDFErrorState error="Failed to load PDF document" url={url} />}
                   >
@@ -172,8 +204,16 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
                       renderAnnotationLayer={true}
                       className="shadow-lg border border-dashboard-separator/20 dark:border-white/10"
                       width={containerWidth ? Math.min(containerWidth - 64, 800) : undefined}
-                      onLoadSuccess={() => console.log('PDFViewer: Page rendered successfully')}
-                      onLoadError={(error) => console.error('PDFViewer: Page render error:', error)}
+                      onLoadSuccess={() => {
+                        console.log('DEBUG: PDFViewer - Page rendered successfully:', {
+                          pageNumber,
+                          scale,
+                          rotation
+                        });
+                      }}
+                      onLoadError={(error) => {
+                        console.error('DEBUG: PDFViewer - Page render error:', error);
+                      }}
                     />
                   </Document>
                 </div>

@@ -26,28 +26,45 @@ export const useContent = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchContent = async (roomId?: string) => {
+    console.log('DEBUG: useContent - fetchContent called with:', { roomId, userId: user?.id });
+    
     if (!user) {
+      console.log('DEBUG: useContent - No user found, clearing content and stopping fetch');
       setContent([]);
       setLoading(false);
       return;
     }
 
     try {
+      console.log('DEBUG: useContent - Building Supabase query');
       let query = supabase
         .from('content')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (roomId) {
+        console.log('DEBUG: useContent - Adding room filter:', roomId);
         query = query.eq('room_id', roomId);
       }
 
+      console.log('DEBUG: useContent - Executing Supabase query');
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching content:', error);
+        console.error('DEBUG: useContent - Supabase query error:', error);
         toast.error('Failed to load content');
       } else {
+        console.log('DEBUG: useContent - Query successful, received data:', {
+          itemCount: data?.length || 0,
+          items: data?.map(item => ({
+            id: item.id,
+            title: item.title,
+            type: item.type,
+            url: item.url,
+            filename: item.filename
+          }))
+        });
+
         // Cast the data to match our ContentItem interface
         setContent((data || []).map(item => ({
           ...item,
@@ -56,17 +73,24 @@ export const useContent = () => {
         })));
       }
     } catch (error) {
-      console.error('Error fetching content:', error);
+      console.error('DEBUG: useContent - Fetch content error:', error);
       toast.error('Failed to load content');
     } finally {
+      console.log('DEBUG: useContent - Fetch content completed, setting loading to false');
       setLoading(false);
     }
   };
 
   const fetchContentById = async (contentId: string): Promise<ContentItem | null> => {
-    if (!user) return null;
+    console.log('DEBUG: useContent - fetchContentById called with:', { contentId, userId: user?.id });
+    
+    if (!user) {
+      console.log('DEBUG: useContent - No user found for fetchContentById');
+      return null;
+    }
 
     try {
+      console.log('DEBUG: useContent - Executing Supabase query for single content item');
       const { data, error } = await supabase
         .from('content')
         .select('*')
@@ -75,9 +99,19 @@ export const useContent = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching content by ID:', error);
+        console.error('DEBUG: useContent - Error fetching content by ID:', error);
         return null;
       }
+
+      console.log('DEBUG: useContent - Successfully fetched content by ID:', {
+        id: data.id,
+        title: data.title,
+        type: data.type,
+        url: data.url,
+        filename: data.filename,
+        storage_path: data.storage_path,
+        metadata: data.metadata
+      });
 
       return {
         ...data,
@@ -85,13 +119,24 @@ export const useContent = () => {
         metadata: data.metadata as Record<string, any>
       };
     } catch (error) {
-      console.error('Error fetching content by ID:', error);
+      console.error('DEBUG: useContent - Exception in fetchContentById:', error);
       return null;
     }
   };
 
   const addContent = async (contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-    if (!user) return null;
+    console.log('DEBUG: useContent - addContent called with:', {
+      title: contentData.title,
+      type: contentData.type,
+      url: contentData.url,
+      filename: contentData.filename,
+      userId: user?.id
+    });
+
+    if (!user) {
+      console.log('DEBUG: useContent - No user found for addContent');
+      return null;
+    }
 
     try {
       // Ensure we're not storing blob URLs
@@ -101,6 +146,12 @@ export const useContent = () => {
         storage_path: contentData.storage_path && contentData.storage_path.startsWith('blob:') ? undefined : contentData.storage_path
       };
 
+      console.log('DEBUG: useContent - Cleaned content data:', {
+        ...cleanedContentData,
+        user_id: user.id
+      });
+
+      console.log('DEBUG: useContent - Inserting content into Supabase');
       const { data, error } = await supabase
         .from('content')
         .insert([{ ...cleanedContentData, user_id: user.id }])
@@ -108,10 +159,18 @@ export const useContent = () => {
         .single();
 
       if (error) {
-        console.error('Error creating content:', error);
+        console.error('DEBUG: useContent - Error creating content:', error);
         toast.error('Failed to create content');
         return null;
       }
+
+      console.log('DEBUG: useContent - Content created successfully:', {
+        id: data.id,
+        title: data.title,
+        type: data.type,
+        url: data.url,
+        filename: data.filename
+      });
 
       const newContent = {
         ...data,
@@ -123,7 +182,7 @@ export const useContent = () => {
       toast.success('Content created successfully');
       return data.id;
     } catch (error) {
-      console.error('Error creating content:', error);
+      console.error('DEBUG: useContent - Exception in addContent:', error);
       toast.error('Failed to create content');
       return null;
     }
@@ -133,16 +192,31 @@ export const useContent = () => {
     contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
     file?: File
   ) => {
-    if (!user) return null;
+    console.log('DEBUG: useContent - addContentWithFile called with:', {
+      contentTitle: contentData.title,
+      contentType: contentData.type,
+      fileName: file?.name,
+      fileSize: file?.size,
+      fileType: file?.type,
+      userId: user?.id
+    });
+
+    if (!user) {
+      console.log('DEBUG: useContent - No user found for addContentWithFile');
+      return null;
+    }
 
     try {
       let finalContentData = { ...contentData };
       
       // Handle file upload for ALL file-based content types
       if (file) {
+        console.log('DEBUG: useContent - Processing file upload');
         const storageContentType = mapContentTypeToStorage(contentData.type);
+        console.log('DEBUG: useContent - Mapped storage content type:', storageContentType);
+        
         if (storageContentType) {
-          console.log('useContent: Uploading file to storage:', {
+          console.log('DEBUG: useContent - Starting file upload to storage with details:', {
             fileName: file.name,
             fileType: file.type,
             fileSize: file.size,
@@ -151,7 +225,7 @@ export const useContent = () => {
           });
           
           const uploadedUrl = await uploadFileToStorage(file, storageContentType, user.id);
-          console.log('useContent: File uploaded successfully to:', uploadedUrl);
+          console.log('DEBUG: useContent - File uploaded successfully, received URL:', uploadedUrl);
           
           // Store the proper Supabase storage URL
           finalContentData.url = uploadedUrl;
@@ -168,8 +242,16 @@ export const useContent = () => {
             storageUrl: uploadedUrl,
             storageBucket: getStorageBucket(storageContentType)
           };
+
+          console.log('DEBUG: useContent - Final content data prepared:', {
+            title: finalContentData.title,
+            type: finalContentData.type,
+            url: finalContentData.url,
+            filename: finalContentData.filename,
+            metadataKeys: Object.keys(finalContentData.metadata)
+          });
         } else {
-          console.error('useContent: Unsupported file type for storage:', contentData.type);
+          console.error('DEBUG: useContent - Unsupported file type for storage:', contentData.type);
           throw new Error(`Unsupported file type: ${contentData.type}`);
         }
       }
@@ -178,9 +260,13 @@ export const useContent = () => {
       finalContentData.url = finalContentData.url && finalContentData.url.startsWith('blob:') ? undefined : finalContentData.url;
       finalContentData.storage_path = finalContentData.storage_path && finalContentData.storage_path.startsWith('blob:') ? undefined : finalContentData.storage_path;
 
-      return await addContent(finalContentData);
+      console.log('DEBUG: useContent - Calling addContent with final data');
+      const contentId = await addContent(finalContentData);
+      console.log('DEBUG: useContent - addContentWithFile completed, content ID:', contentId);
+      
+      return contentId;
     } catch (error) {
-      console.error('Error creating content with file:', error);
+      console.error('DEBUG: useContent - Error in addContentWithFile:', error);
       toast.error('Failed to upload file');
       return null;
     }
@@ -191,6 +277,8 @@ export const useContent = () => {
     contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
     metadata?: any
   ) => {
+    console.log('DEBUG: useContent - addContentWithMetadata called');
+
     if (!user) return null;
 
     try {
@@ -252,6 +340,8 @@ export const useContent = () => {
   };
 
   const updateContent = async (contentId: string, updates: Partial<ContentItem>) => {
+    console.log('DEBUG: useContent - updateContent called:', { contentId, updates });
+
     if (!user) return;
 
     try {
@@ -352,6 +442,7 @@ export const useContent = () => {
   };
 
   useEffect(() => {
+    console.log('DEBUG: useContent - useEffect triggered for user change:', user?.id);
     if (user) {
       fetchContent();
     }
@@ -364,6 +455,7 @@ export const useContent = () => {
     let mounted = true;
     
     const channelId = `content-realtime-${user.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.log('DEBUG: useContent - Setting up real-time subscription:', channelId);
     
     const channel = supabase
       .channel(channelId)
@@ -374,7 +466,11 @@ export const useContent = () => {
         filter: `user_id=eq.${user.id}`
       }, (payload) => {
         if (!mounted) return;
-        console.log('Real-time content change:', payload);
+        console.log('DEBUG: useContent - Real-time content change received:', {
+          eventType: payload.eventType,
+          contentId: payload.new?.id || payload.old?.id,
+          contentTitle: payload.new?.title || 'N/A'
+        });
         
         // Handle different event types
         switch (payload.eventType) {
@@ -409,16 +505,17 @@ export const useContent = () => {
       })
       .subscribe((status) => {
         if (!mounted) return;
+        console.log('DEBUG: useContent - Real-time subscription status:', status);
         if (status === 'SUBSCRIBED') {
-          console.log('Real-time subscription active for content');
+          console.log('DEBUG: useContent - Real-time subscription active for content');
         } else if (status === 'CHANNEL_ERROR') {
-          console.error('Real-time subscription error for content');
+          console.error('DEBUG: useContent - Real-time subscription error for content');
         }
       });
 
     return () => {
       mounted = false;
-      console.log('Cleaning up real-time subscription');
+      console.log('DEBUG: useContent - Cleaning up real-time subscription');
       channel.unsubscribe();
       supabase.removeChannel(channel);
     };
