@@ -140,14 +140,12 @@ export function NewPDFViewer({
       
 
       <Card className="w-full shadow-lg">
-        <CardContent className="p-2">
-          <div className="w-full overflow-hidden rounded-md border" style={{
+        <CardContent className="p-2 w-full overflow-hidden rounded-md border" style={{
           height: '90vh'
         }}>
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-              <Viewer fileUrl={pdfUrl} plugins={[defaultLayoutPluginInstance]} theme="light" />
-            </Worker>
-          </div>
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+            <Viewer fileUrl={pdfUrl} plugins={[defaultLayoutPluginInstance]} theme="light" />
+          </Worker>
         </CardContent>
       </Card>
     </div>;
