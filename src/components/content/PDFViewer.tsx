@@ -91,8 +91,11 @@ export function PDFViewer({ url, onTextAction }: PDFViewerProps) {
   };
 
   if (!url) {
+    console.error('PDFViewer: No URL provided');
     return <PDFEmptyState />;
   }
+
+  console.log('PDFViewer: Rendering with URL:', url);
 
   return (
     <div className="relative h-full bg-background rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden flex flex-col">

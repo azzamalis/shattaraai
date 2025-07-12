@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { uploadFileToStorage, uploadPastedContentMetadata, deleteFileFromStorage, isStorageUrl, StorageContentType } from '@/lib/storage';
+import { uploadFileToStorage, uploadPastedContentMetadata, deleteFileFromStorage, isStorageUrl, StorageContentType, getStorageBucket } from '@/lib/storage';
 
 export interface ContentItem {
   id: string;
@@ -142,23 +142,35 @@ export const useContent = () => {
       if (file) {
         const storageContentType = mapContentTypeToStorage(contentData.type);
         if (storageContentType) {
-          console.log('Uploading file to storage:', file.name, 'Type:', storageContentType);
+          console.log('useContent: Uploading file to storage:', {
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            storageContentType,
+            userId: user.id
+          });
+          
           const uploadedUrl = await uploadFileToStorage(file, storageContentType, user.id);
-          console.log('File uploaded successfully:', uploadedUrl);
+          console.log('useContent: File uploaded successfully to:', uploadedUrl);
           
           // Store the proper Supabase storage URL
           finalContentData.url = uploadedUrl;
           finalContentData.storage_path = uploadedUrl;
           finalContentData.filename = file.name;
           
-          // Add file metadata
+          // Add comprehensive file metadata
           finalContentData.metadata = {
             ...finalContentData.metadata,
             fileSize: file.size,
             fileType: file.type,
             isUploadedFile: true,
-            uploadedAt: new Date().toISOString()
+            uploadedAt: new Date().toISOString(),
+            storageUrl: uploadedUrl,
+            storageBucket: getStorageBucket(storageContentType)
           };
+        } else {
+          console.error('useContent: Unsupported file type for storage:', contentData.type);
+          throw new Error(`Unsupported file type: ${contentData.type}`);
         }
       }
 

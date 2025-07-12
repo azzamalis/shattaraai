@@ -36,7 +36,12 @@ export function ActionCards({
         } else if (['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx'].some(ext => fileName.endsWith(ext))) {
           contentType = 'file';
         }
-        console.log('Starting file upload:', file.name, 'Type:', contentType, 'File type:', fileType);
+        console.log('ActionCards: Starting file upload:', {
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          determinedContentType: contentType
+        });
 
         // Show loading toast
         const loadingToast = toast.loading(`Uploading ${file.name}...`);
@@ -51,18 +56,20 @@ export function ActionCards({
             fileSize: file.size,
             fileType: file.type,
             isUploadedFile: true,
-            uploadedAt: new Date().toISOString()
+            uploadedAt: new Date().toISOString(),
+            originalFileName: file.name
           },
           filename: file.name
         }, file);
 
         // Dismiss loading toast
         toast.dismiss(loadingToast);
-        console.log('Content created with ID:', contentId);
+        console.log('ActionCards: Content created with ID:', contentId);
+        
         if (contentId) {
           // Add a small delay to ensure database transaction is complete
           setTimeout(() => {
-            console.log('Navigating to content page:', contentId);
+            console.log('ActionCards: Navigating to content page:', contentId);
             navigate(`/content/${contentId}`);
             toast.success(`File "${file.name}" uploaded successfully`);
           }, 100);
