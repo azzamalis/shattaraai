@@ -270,8 +270,8 @@ export const useContent = () => {
             url: finalContentData.url
           });
           
-          // Extract storage path from the URL
-          const storagePath = finalContentData.url.replace(/^.*?\/user-uploads\//, 'user-uploads/');
+          // Extract storage path from the URL for pdfs bucket
+          const storagePath = finalContentData.url.replace(/^.*?\/pdfs\//, '');
           console.log('DEBUG: useContent - Extracted storage path:', storagePath);
           
           // Call the PDF text extraction edge function
