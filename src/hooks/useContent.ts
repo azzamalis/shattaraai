@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -262,8 +261,36 @@ export const useContent = () => {
 
       console.log('DEBUG: useContent - Calling addContent with final data');
       const contentId = await addContent(finalContentData);
-      console.log('DEBUG: useContent - addContentWithFile completed, content ID:', contentId);
       
+      // If PDF content was successfully added, trigger text extraction
+      if (contentId && contentData.type === 'pdf' && finalContentData.url) {
+        try {
+          console.log('DEBUG: useContent - Triggering PDF text extraction for:', {
+            contentId,
+            url: finalContentData.url
+          });
+          
+          // Extract storage path from the URL
+          const storagePath = finalContentData.url.replace(/^.*?\/user-uploads\//, 'user-uploads/');
+          console.log('DEBUG: useContent - Extracted storage path:', storagePath);
+          
+          // Call the PDF text extraction edge function
+          await supabase.functions.invoke('extract-pdf-text', {
+            body: {
+              contentId,
+              storagePath
+            }
+          });
+          
+          console.log('DEBUG: useContent - PDF text extraction triggered successfully');
+          toast.success('PDF uploaded successfully. Text extraction in progress...');
+        } catch (extractionError) {
+          console.error('DEBUG: useContent - PDF text extraction failed:', extractionError);
+          toast.error('PDF uploaded but text extraction failed');
+        }
+      }
+      
+      console.log('DEBUG: useContent - addContentWithFile completed, content ID:', contentId);
       return contentId;
     } catch (error) {
       console.error('DEBUG: useContent - Error in addContentWithFile:', error);
