@@ -271,9 +271,17 @@ export const useContent = () => {
           // Extract PDF text on client side
           const extractedText = await extractPdfText(file);
           console.log('DEBUG: useContent - Extracted text length:', extractedText.length);
+          console.log('DEBUG: useContent - Extracted text preview (first 200 chars):', extractedText.substring(0, 200));
           
           // Update the content with extracted text
-          await supabase.from('content').update({ text_content: extractedText }).eq('id', contentId);
+          const { error: updateError } = await supabase.from('content').update({ text_content: extractedText }).eq('id', contentId);
+          
+          if (updateError) {
+            console.error('DEBUG: useContent - Failed to update content with extracted text:', updateError);
+            throw new Error(`Failed to save extracted text: ${updateError.message}`);
+          }
+          
+          console.log('DEBUG: useContent - Successfully updated content with text_content for contentId:', contentId);
           
           console.log('DEBUG: useContent - PDF text extraction completed successfully');
           toast.success('PDF uploaded and text extracted successfully!');
