@@ -36,7 +36,7 @@ serve(async (req) => {
 
     // Download PDF from storage
     const { data: fileData, error: downloadError } = await supabase.storage
-      .from('user-uploads')
+      .from('pdfs')
       .download(storagePath)
 
     if (downloadError) {
