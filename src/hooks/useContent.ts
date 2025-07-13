@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { uploadFileToStorage, uploadPastedContentMetadata, deleteFileFromStorage, isStorageUrl, StorageContentType, getStorageBucket } from '@/lib/storage';
+import * as pdfjsLib from 'pdfjs-dist';
 
 export interface ContentItem {
   id: string;
@@ -262,28 +263,20 @@ export const useContent = () => {
       console.log('DEBUG: useContent - Calling addContent with final data');
       const contentId = await addContent(finalContentData);
       
-      // If PDF content was successfully added, trigger text extraction
-      if (contentId && contentData.type === 'pdf' && finalContentData.url) {
+      // If PDF content was successfully added, extract text on client side
+      if (contentId && contentData.type === 'pdf' && file) {
         try {
-          console.log('DEBUG: useContent - Triggering PDF text extraction for:', {
-            contentId,
-            url: finalContentData.url
-          });
+          console.log('DEBUG: useContent - Starting client-side PDF text extraction for:', contentId);
           
-          // Extract storage path from the URL for pdfs bucket
-          const storagePath = finalContentData.url.replace(/^.*?\/pdfs\//, '');
-          console.log('DEBUG: useContent - Extracted storage path:', storagePath);
+          // Extract PDF text on client side
+          const extractedText = await extractPdfText(file);
+          console.log('DEBUG: useContent - Extracted text length:', extractedText.length);
           
-          // Call the PDF text extraction edge function
-          await supabase.functions.invoke('extract-pdf-text', {
-            body: {
-              contentId,
-              storagePath
-            }
-          });
+          // Update the content with extracted text
+          await supabase.from('content').update({ text_content: extractedText }).eq('id', contentId);
           
-          console.log('DEBUG: useContent - PDF text extraction triggered successfully');
-          toast.success('PDF uploaded successfully. Text extraction in progress...');
+          console.log('DEBUG: useContent - PDF text extraction completed successfully');
+          toast.success('PDF uploaded and text extracted successfully!');
         } catch (extractionError) {
           console.error('DEBUG: useContent - PDF text extraction failed:', extractionError);
           toast.error('PDF uploaded but text extraction failed');
@@ -447,6 +440,39 @@ export const useContent = () => {
       console.error('Error deleting content:', error);
       toast.error('Failed to delete content');
     }
+  };
+
+  // Helper function to extract PDF text using pdfjs-dist
+  const extractPdfText = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = async () => {
+        try {
+          const typedarray = new Uint8Array(reader.result as ArrayBuffer);
+          const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+          let fullText = '';
+          
+          // Extract text from each page
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items
+              .map((item: any) => item.str)
+              .join(' ');
+            fullText += pageText + '\n';
+          }
+          
+          resolve(fullText.trim());
+        } catch (error) {
+          console.error('Error extracting PDF text:', error);
+          reject(error);
+        }
+      };
+      
+      reader.onerror = () => reject(new Error('Failed to read PDF file'));
+      reader.readAsArrayBuffer(file);
+    });
   };
 
   // Helper function to map content types to storage types
