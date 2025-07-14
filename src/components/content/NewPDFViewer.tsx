@@ -26,12 +26,8 @@ export function NewPDFViewer({
   const [uploading, setUploading] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string>(contentData?.url || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const {
-    toast
-  } = useToast();
-  const {
-    theme
-  } = useTheme();
+  const { toast } = useToast();
+  const { theme } = useTheme();
 
   // Initialize the default layout plugin
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
@@ -100,7 +96,8 @@ export function NewPDFViewer({
 
   // Loading skeleton
   if (uploading) {
-    return <Card className="dashboard-card w-full">
+    return (
+      <Card className="dashboard-card w-full">
         <CardContent className="p-6">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
@@ -112,12 +109,14 @@ export function NewPDFViewer({
             <Skeleton className="h-64 w-full" />
           </div>
         </CardContent>
-      </Card>;
+      </Card>
+    );
   }
 
   // Upload interface when no PDF
   if (!pdfUrl) {
-    return <Card className="dashboard-card w-full transition-all duration-200">
+    return (
+      <Card className="dashboard-card w-full transition-all duration-200">
         <CardContent className="p-6">
           <div className="text-center space-y-4">
             <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center hover:bg-accent transition-colors duration-200">
@@ -136,17 +135,24 @@ export function NewPDFViewer({
             <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" />
           </div>
         </CardContent>
-      </Card>;
+      </Card>
+    );
   }
 
   // PDF Viewer
-  return <div className="w-full h-full">
+  return (
+    <div className="w-full h-full">
       <Card className="dashboard-card w-full hover-shadow transition-all duration-200">
-        <CardContent className="p-2 w-full overflow-hidden h-[90vh] px-0 py-0 rounded-lg">
+        <CardContent className="p-2 w-full overflow-hidden rounded-md h-[90vh]">
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-            <Viewer fileUrl={pdfUrl} plugins={[defaultLayoutPluginInstance]} theme={theme === 'dark' ? 'dark' : 'light'} />
+            <Viewer 
+              fileUrl={pdfUrl} 
+              plugins={[defaultLayoutPluginInstance]} 
+              theme={theme === 'dark' ? 'dark' : 'light'} 
+            />
           </Worker>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 }
