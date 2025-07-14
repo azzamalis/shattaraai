@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/hooks/useTheme';
 import { supabase } from '@/integrations/supabase/client';
 
 // Import CSS
@@ -25,9 +26,8 @@ export function NewPDFViewer({
   const [uploading, setUploading] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string>(contentData?.url || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const { theme } = useTheme();
 
   // Initialize the default layout plugin
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
@@ -96,10 +96,11 @@ export function NewPDFViewer({
 
   // Loading skeleton
   if (uploading) {
-    return <Card className="w-full">
+    return (
+      <Card className="dashboard-card w-full">
         <CardContent className="p-6">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
             <span className="text-sm text-muted-foreground">Uploading PDF...</span>
           </div>
           <div className="space-y-3">
@@ -108,45 +109,50 @@ export function NewPDFViewer({
             <Skeleton className="h-64 w-full" />
           </div>
         </CardContent>
-      </Card>;
+      </Card>
+    );
   }
 
   // Upload interface when no PDF
   if (!pdfUrl) {
-    return <Card className="w-full">
+    return (
+      <Card className="dashboard-card w-full transition-all duration-200">
         <CardContent className="p-6">
           <div className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center hover:bg-accent transition-colors duration-200">
               <FileText className="h-8 w-8 text-muted-foreground" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Upload PDF Document</h3>
+              <h3 className="text-lg font-semibold text-card-foreground">Upload PDF Document</h3>
               <p className="text-sm text-muted-foreground">
                 Select a PDF file to view and interact with
               </p>
             </div>
-            <Button onClick={triggerFileUpload} className="w-full">
+            <Button onClick={triggerFileUpload} className="w-full transition-all duration-200 hover:shadow-lg">
               <Upload className="h-4 w-4 mr-2" />
               Choose PDF File
             </Button>
             <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" />
           </div>
         </CardContent>
-      </Card>;
+      </Card>
+    );
   }
 
   // PDF Viewer
-  return <div className="w-full h-full">
-      
-
-      <Card className="w-full shadow-lg">
-        <CardContent className="p-2 w-full overflow-hidden rounded-md border" style={{
-          height: '90vh'
-        }}>
+  return (
+    <div className="w-full h-full">
+      <Card className="dashboard-card w-full hover-shadow transition-all duration-200">
+        <CardContent className="p-2 w-full overflow-hidden rounded-md h-[90vh]">
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-            <Viewer fileUrl={pdfUrl} plugins={[defaultLayoutPluginInstance]} theme="light" />
+            <Viewer 
+              fileUrl={pdfUrl} 
+              plugins={[defaultLayoutPluginInstance]} 
+              theme={theme === 'dark' ? 'dark' : 'light'} 
+            />
           </Worker>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 }
