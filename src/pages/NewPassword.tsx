@@ -32,20 +32,23 @@ const NewPassword = () => {
       return;
     }
 
-    // Handle both token formats: new format with access_token/refresh_token and old format with token
-    const token = searchParams.get('token');
-    
-    if (type === 'recovery' && (accessToken || token)) {
+    // For Supabase password reset, we should have access_token and refresh_token
+    if (type === 'recovery' && accessToken && refreshToken) {
       setIsValidToken(true);
       
-      // If we have access_token and refresh_token, set the session
-      if (accessToken && refreshToken) {
-        supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken
-        });
-      }
-      // For token format, it will be handled automatically by Supabase
+      // Set the session with proper token format
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      }).then(({ error }) => {
+        if (error) {
+          console.error('Session setting error:', error);
+          toast.error("Reset link invalid", {
+            description: "Unable to establish session. Please request a new reset link."
+          });
+          navigate('/password-reset');
+        }
+      });
     } else {
       toast.error("Reset link invalid", {
         description: "The reset link is invalid or has expired. Please request a new one."
