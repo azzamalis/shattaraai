@@ -211,8 +211,8 @@ export function ContentRightSidebar({
             </div>
           </TabsContent>
           
-          <TabsContent value="notes" className="flex-1 overflow-hidden mx-4 mb-4">
-            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+          <TabsContent value="notes" className="flex-1 overflow-hidden m-0 p-0 h-full">
+            <div className="h-full w-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl overflow-hidden">
               <Notes isRecording={isRecording} />
             </div>
           </TabsContent>

@@ -7,7 +7,7 @@ interface NotesProps {
 
 const Notes = ({ isRecording }: NotesProps): JSX.Element => {
   return (
-    <div className="h-full bg-background">
+    <div className="h-full w-full p-0 m-0 overflow-hidden">
       <NotionEditor />
     </div>
   );
