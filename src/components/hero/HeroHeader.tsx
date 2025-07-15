@@ -5,6 +5,7 @@ import Button from '@/components/Button';
 import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const menuItems = [
   { name: 'The Team', href: '/team' },
@@ -15,6 +16,7 @@ const menuItems = [
 const HeroHeader = () => {
   const [menuState, setMenuState] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user, profile, loading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,55 +84,80 @@ const HeroHeader = () => {
                 
                 {/* Mobile Auth Buttons */}
                 <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-[#2E2E2E]">
-                  <Link to="/signin" onClick={() => setMenuState(false)}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10"
-                    >
-                      Login
-                    </Button>
-                  </Link>
-                  <Link to="/signup" onClick={() => setMenuState(false)}>
-                    <Button
-                      size="sm"
-                      className="w-full bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90"
-                    >
-                      Sign Up
-                    </Button>
-                  </Link>
+                  {!loading && !user ? (
+                    <>
+                      <Link to="/signin" onClick={() => setMenuState(false)}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10"
+                        >
+                          Login
+                        </Button>
+                      </Link>
+                      <Link to="/signup" onClick={() => setMenuState(false)}>
+                        <Button
+                          size="sm"
+                          className="w-full bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90"
+                        >
+                          Sign Up
+                        </Button>
+                      </Link>
+                    </>
+                  ) : (
+                    <Link to="/dashboard" onClick={() => setMenuState(false)}>
+                      <Button
+                        size="sm"
+                        className="w-full bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90"
+                      >
+                        Dashboard
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             )}
 
             <div className="mb-6 hidden w-full lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0">
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <Link to="/signin">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      isScrolled && 'lg:hidden',
-                      'text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10'
-                    )}
-                  >
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/signup">
-                  <Button
-                    size="sm"
-                    className={cn(isScrolled && 'lg:hidden', 'bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90')}>
-                    Sign Up
-                  </Button>
-                </Link>
-                <Link to="/signup">
-                  <Button
-                    size="sm"
-                    className={cn(isScrolled ? 'lg:inline-flex' : 'hidden', 'bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90')}>
-                    Get Started
-                  </Button>
-                </Link>
+                {!loading && !user ? (
+                  <>
+                    <Link to="/signin">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={cn(
+                          isScrolled && 'lg:hidden',
+                          'text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10'
+                        )}
+                      >
+                        Login
+                      </Button>
+                    </Link>
+                    <Link to="/signup">
+                      <Button
+                        size="sm"
+                        className={cn(isScrolled && 'lg:hidden', 'bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90')}>
+                        Sign Up
+                      </Button>
+                    </Link>
+                    <Link to="/signup">
+                      <Button
+                        size="sm"
+                        className={cn(isScrolled ? 'lg:inline-flex' : 'hidden', 'bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90')}>
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <Link to="/dashboard">
+                    <Button
+                      size="sm"
+                      className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90">
+                      Dashboard
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
