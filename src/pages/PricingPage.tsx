@@ -5,9 +5,11 @@ import { Check } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ContactSalesModal } from "@/components/dashboard/modals/ContactSalesModal";
 const PricingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const [isCopied, setIsCopied] = useState(false);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
   const copyPromoCode = () => {
     navigator.clipboard.writeText("SUMMER25");
     setIsCopied(true);
@@ -201,7 +203,10 @@ const PricingPage: React.FC = () => {
                   </ul>
                 </CardContent>
                 <CardFooter className="px-8 pb-8 pt-0">
-                  <Button className="w-full bg-[#121212] text-white hover:bg-[#121212]/90 dark:bg-[#FFFFFF] dark:text-[#1E1E1E] dark:hover:bg-[#FFFFFF]/90 font-medium">
+                  <Button 
+                    className="w-full bg-[#121212] text-white hover:bg-[#121212]/90 dark:bg-[#FFFFFF] dark:text-[#1E1E1E] dark:hover:bg-[#FFFFFF]/90 font-medium"
+                    onClick={() => setContactModalOpen(true)}
+                  >
                     Contact Us
                   </Button>
                 </CardFooter>
@@ -272,6 +277,11 @@ const PricingPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <ContactSalesModal 
+        open={contactModalOpen} 
+        onOpenChange={setContactModalOpen} 
+      />
     </DashboardLayout>;
 };
 export default PricingPage;
