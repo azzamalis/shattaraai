@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import AnimatedChatPreview from '@/components/AnimatedChatPreview';
 
-const ResetPassword = () => {
+const NewPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
@@ -240,4 +240,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default NewPassword;
