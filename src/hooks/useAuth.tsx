@@ -103,7 +103,7 @@ export const useAuth = () => {
   }, [recentLogout]);
 
   const signUp = async (email: string, password: string, fullName?: string) => {
-    const redirectUrl = `${window.location.origin}/onboarding`;
+    const redirectUrl = `${window.location.origin}/dashboard`;
     
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -130,9 +130,9 @@ export const useAuth = () => {
 
   const signInWithGoogle = async () => {
     try {
-      // Use current origin for redirect URL
+      // Use current origin for redirect URL - redirect to dashboard for smart routing
       const currentOrigin = window.location.origin;
-      const redirectUrl = `${currentOrigin}/onboarding`;
+      const redirectUrl = `${currentOrigin}/dashboard`;
       
       console.log('Current origin:', currentOrigin);
       console.log('Initiating Google OAuth with redirect URL:', redirectUrl);
