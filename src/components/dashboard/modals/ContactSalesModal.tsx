@@ -216,7 +216,7 @@ export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps
                 }`}>
                   <SelectValue placeholder="Select team size" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-50 bg-background border border-border shadow-lg">
                   <SelectItem value="1-5">1–5</SelectItem>
                   <SelectItem value="6-20">6–20</SelectItem>
                   <SelectItem value="21-50">21–50</SelectItem>
