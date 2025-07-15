@@ -23,7 +23,7 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
     initialContent: initialContent.length > 0 ? initialContent : [
       {
         type: "paragraph",
-        content: "Welcome to your Notion-like editor! Type '/' for commands...",
+        content: "",
       },
     ],
   });
