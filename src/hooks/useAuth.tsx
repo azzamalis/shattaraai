@@ -164,9 +164,14 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    setRecentLogout(true);
-    const { error } = await supabase.auth.signOut();
-    return { error };
+    try {
+      setRecentLogout(true);
+      const { error } = await supabase.auth.signOut();
+      return { error };
+    } catch (err) {
+      console.error('Logout error:', err);
+      return { error: err };
+    }
   };
 
   const resetPassword = async (email: string) => {
