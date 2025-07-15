@@ -23,7 +23,7 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
     initialContent: initialContent.length > 0 ? initialContent : [
       {
         type: "paragraph",
-        content: "",
+        content: "Welcome to your Notion-like editor! Type '/' for commands...",
       },
     ],
   });
@@ -183,7 +183,7 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
 
         .blocknote-editor .ProseMirror pre {
           background-color: hsl(var(--muted));
-          border: none;
+          border: 1px solid hsl(var(--border));
           border-radius: 0.5rem;
           padding: 1rem;
           margin: 1rem 0;
@@ -194,7 +194,7 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
 
         .blocknote-editor .ProseMirror code {
           background-color: hsl(var(--muted));
-          border: none;
+          border: 1px solid hsl(var(--border));
           border-radius: 0.25rem;
           padding: 0.125rem 0.25rem;
           font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
@@ -204,7 +204,7 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
         /* Slash menu styling */
         .bn-suggestion-menu {
           background-color: hsl(var(--popover)) !important;
-          border: none !important;
+          border: 1px solid hsl(var(--border)) !important;
           border-radius: 0.5rem !important;
           box-shadow: 0 10px 38px -10px hsla(206, 22%, 7%, .35), 0 10px 20px -15px hsla(206, 22%, 7%, .2) !important;
         }
@@ -223,14 +223,14 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
         /* Side menu (drag handle) styling */
         .bn-side-menu {
           background-color: hsl(var(--card)) !important;
-          border: none !important;
+          border: 1px solid hsl(var(--border)) !important;
           border-radius: 0.5rem !important;
         }
 
         /* Formatting toolbar */
         .bn-formatting-toolbar {
           background-color: hsl(var(--popover)) !important;
-          border: none !important;
+          border: 1px solid hsl(var(--border)) !important;
           border-radius: 0.5rem !important;
           box-shadow: 0 10px 38px -10px hsla(206, 22%, 7%, .35), 0 10px 20px -15px hsla(206, 22%, 7%, .2) !important;
         }
