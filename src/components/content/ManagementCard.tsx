@@ -32,7 +32,7 @@ export function ManagementCard({
           <button onClick={onToggleStar} className="p-1 hover:bg-dashboard-bg rounded-lg transition-colors">
             <Star className={cn("w-4 h-4 transition-colors", isStarred ? "text-yellow-500 fill-yellow-500" : "text-dashboard-text-secondary hover:text-dashboard-text")} />
           </button>
-          {card.concept && <span className="bg-dashboard-bg text-dashboard-text px-3 py-1 rounded-full font-medium border border-dashboard-separator/20 text-xs">
+          {card.concept && <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full font-medium text-xs">
               {card.concept}
             </span>}
         </div>
