@@ -63,12 +63,12 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
         .blocknote-editor[data-color-scheme="dark"] {
           --bn-colors-editor-background: transparent;
           --bn-colors-editor-text: hsl(var(--foreground));
-          --bn-colors-menu-background: hsl(var(--popover));
-          --bn-colors-menu-text: hsl(var(--popover-foreground));
-          --bn-colors-tooltip-background: hsl(var(--popover));
-          --bn-colors-tooltip-text: hsl(var(--popover-foreground));
-          --bn-colors-hovered-background: hsl(var(--accent));
-          --bn-colors-selected-background: hsl(var(--accent));
+          --bn-colors-menu-background: hsl(var(--card));
+          --bn-colors-menu-text: hsl(var(--card-foreground));
+          --bn-colors-tooltip-background: hsl(var(--card));
+          --bn-colors-tooltip-text: hsl(var(--card-foreground));
+          --bn-colors-hovered-background: hsl(var(--card-hover));
+          --bn-colors-selected-background: hsl(var(--card-hover));
           --bn-colors-disabled-background: hsl(var(--muted));
           --bn-colors-disabled-text: hsl(var(--muted-foreground));
           --bn-colors-shadow: hsl(var(--border));
@@ -98,12 +98,12 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
         .blocknote-editor[data-color-scheme="light"] {
           --bn-colors-editor-background: transparent;
           --bn-colors-editor-text: hsl(var(--foreground));
-          --bn-colors-menu-background: hsl(var(--popover));
-          --bn-colors-menu-text: hsl(var(--popover-foreground));
-          --bn-colors-tooltip-background: hsl(var(--popover));
-          --bn-colors-tooltip-text: hsl(var(--popover-foreground));
-          --bn-colors-hovered-background: hsl(var(--accent));
-          --bn-colors-selected-background: hsl(var(--accent));
+          --bn-colors-menu-background: hsl(var(--card));
+          --bn-colors-menu-text: hsl(var(--card-foreground));
+          --bn-colors-tooltip-background: hsl(var(--card));
+          --bn-colors-tooltip-text: hsl(var(--card-foreground));
+          --bn-colors-hovered-background: hsl(var(--card-hover));
+          --bn-colors-selected-background: hsl(var(--card-hover));
           --bn-colors-disabled-background: hsl(var(--muted));
           --bn-colors-disabled-text: hsl(var(--muted-foreground));
           --bn-colors-shadow: hsl(var(--border));
