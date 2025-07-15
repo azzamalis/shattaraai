@@ -1,7 +1,7 @@
 import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { Button } from '@/components/ui/button';
-import { Copy, Share2, Link, Crown, Zap } from 'lucide-react';
+import { Copy, Share2, Link, Crown, Zap, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 interface InviteEarnModalProps {
   open: boolean;
@@ -11,11 +11,10 @@ export function InviteEarnModal({
   open,
   onOpenChange
 }: InviteEarnModalProps) {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const inviteCode = "INVITE123";
   const inviteLink = `https://shattara.com/invite/${inviteCode}`;
+
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(inviteLink);
@@ -31,6 +30,7 @@ export function InviteEarnModal({
       });
     }
   };
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -46,23 +46,35 @@ export function InviteEarnModal({
       handleCopyLink();
     }
   };
-  return <BaseModal open={open} onOpenChange={onOpenChange} title="" className="max-w-md p-0" showCloseButton={true}>
-      <div className="relative p-6">
-        {/* Header with gradient background */}
-        <div className="text-center space-y-3 mb-6">
-          {/* Decorative gradient background */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 via-purple-500/10 to-pink-500/10 rounded-full blur-3xl -z-10"></div>
-          
-          <div className="relative">
-            
-            <h1 className="text-2xl font-bold text-foreground mb-2">Spread the love</h1>
+
+  return (
+    <BaseModal 
+      open={open} 
+      onOpenChange={onOpenChange} 
+      title="" 
+      className="w-[450px] bg-card border-border p-0 rounded-xl shadow-lg" 
+      showCloseButton={false}
+    >
+      <div className="p-5">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-medium text-foreground">Spread the love</h2>
             <p className="text-sm text-muted-foreground">and earn free months</p>
           </div>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => onOpenChange(false)} 
+            className="text-muted-foreground hover:text-foreground hover:bg-accent"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </Button>
         </div>
 
         {/* How it works section */}
         <div className="space-y-4 mb-6">
-          <h3 className="text-sm font-medium text-foreground mb-3">How it works:</h3>
+          <h3 className="text-sm font-medium text-foreground">How it works:</h3>
           
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
@@ -100,23 +112,30 @@ export function InviteEarnModal({
         <div className="space-y-3">
           <label className="text-sm font-medium text-foreground">Your invite link:</label>
           
-          <div className="flex gap-2">
-            <div className="flex-1 flex items-center gap-2 p-3 bg-muted/30 border border-border rounded-lg">
-              <Link className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-sm font-mono text-foreground truncate">{inviteLink}</span>
-            </div>
+          <div className="flex items-center gap-2 p-3 bg-muted border-none rounded-lg">
+            <Link className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="text-sm font-mono text-foreground truncate flex-1">{inviteLink}</span>
           </div>
 
-          {/* Copy button */}
-          <Button onClick={handleCopyLink} className="w-full bg-foreground text-background hover:bg-foreground/90 font-medium">
-            Copy link
-          </Button>
+          <div className="flex items-center justify-between pt-2">
+            <Button 
+              variant="ghost" 
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
 
-          {/* Terms link */}
-          <div className="text-center pt-2">
-            
+            <Button 
+              onClick={handleCopyLink} 
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              <Copy className="h-4 w-4 mr-2" />
+              Copy link
+            </Button>
           </div>
         </div>
       </div>
-    </BaseModal>;
+    </BaseModal>
+  );
 }
