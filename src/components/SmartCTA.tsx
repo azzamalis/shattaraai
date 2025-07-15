@@ -27,22 +27,32 @@ const SmartCTA: React.FC<SmartCTAProps> = ({
   
   useEffect(() => {
     if (!loading) {
-      // Only treat as authenticated if both user exists AND profile exists
-      if (user && profile) {
-        // User is logged in with a valid profile
-        if (profile?.onboarding_completed) {
-          // User completed onboarding, go to dashboard
-          setTargetPath('/dashboard');
+      // For login and signup types, ALWAYS go to the respective auth pages first
+      // Let the auth pages handle the redirect logic after authentication
+      if (type === 'login') {
+        setTargetPath('/signin');
+        return;
+      }
+      
+      if (type === 'signup') {
+        setTargetPath('/signup');
+        return;
+      }
+      
+      // Only for 'get-started' type, use smart redirect logic
+      if (type === 'get-started') {
+        // Only treat as authenticated if both user exists AND profile exists
+        if (user && profile) {
+          // User is logged in with a valid profile
+          if (profile?.onboarding_completed) {
+            // User completed onboarding, go to dashboard
+            setTargetPath('/dashboard');
+          } else {
+            // User needs to complete onboarding
+            setTargetPath('/onboarding');
+          }
         } else {
-          // User needs to complete onboarding
-          setTargetPath('/onboarding');
-        }
-      } else {
-        // User is not logged in OR doesn't have a profile - treat as non-authenticated
-        if (type === 'login') {
-          setTargetPath('/signin');
-        } else {
-          // Default to signup for 'signup' and 'get-started' types
+          // User is not logged in OR doesn't have a profile - treat as non-authenticated
           setTargetPath('/signup');
         }
       }
