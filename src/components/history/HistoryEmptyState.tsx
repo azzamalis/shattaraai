@@ -15,18 +15,14 @@ export function HistoryEmptyState({
   const navigate = useNavigate();
   if (hasSearch) {
     return <div className="flex flex-col items-center justify-center py-16 px-4">
-        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-          <FileText className="h-8 w-8 text-muted-foreground" />
-        </div>
+        
         <h3 className="text-lg font-semibold text-foreground mb-2">
           No results found
         </h3>
         <p className="text-muted-foreground text-center mb-4 max-w-md">
           We couldn't find any history items matching "{searchQuery}". Try adjusting your search or filters.
         </p>
-        <Button variant="outline" onClick={onClearFilters} className="hover:bg-accent">
-          Clear filters
-        </Button>
+        
       </div>;
   }
   return <div className="flex flex-col items-center justify-center py-16 px-4">
