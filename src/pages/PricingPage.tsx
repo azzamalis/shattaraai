@@ -62,10 +62,10 @@ const PricingPage: React.FC = () => {
               if (value) setBillingCycle(value as "monthly" | "yearly");
             }} className="relative bg-dashboard-card border border-dashboard-separator rounded-lg p-1">
                 <ToggleGroupItem value="monthly" className={`px-4 py-2 rounded-md text-sm transition-all ${billingCycle === "monthly" ? "bg-[#00A3FF] text-white shadow-sm" : "text-dashboard-text-secondary hover:text-dashboard-text"}`}>
-                  Pay Monthly
+                  Monthly
                 </ToggleGroupItem>
                 <ToggleGroupItem value="yearly" className={`px-4 py-2 rounded-md text-sm flex items-center transition-all ${billingCycle === "yearly" ? "bg-[#00A3FF] text-white shadow-sm" : "text-dashboard-text-secondary hover:text-dashboard-text"}`}>
-                  Pay Yearly
+                  Yearly
                   <span className="ml-2 text-xs bg-[#00A3FF]/40 text-current px-2 py-0.5 rounded-full">
                     Save 40%
                   </span>
