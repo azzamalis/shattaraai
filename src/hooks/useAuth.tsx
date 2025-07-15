@@ -129,28 +129,38 @@ export const useAuth = () => {
   };
 
   const signInWithGoogle = async () => {
-    const redirectUrl = `${window.location.origin}/onboarding`;
-    
-    console.log('Initiating Google OAuth with redirect URL:', redirectUrl);
-    
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
+    try {
+      // Use current origin for redirect URL
+      const currentOrigin = window.location.origin;
+      const redirectUrl = `${currentOrigin}/onboarding`;
+      
+      console.log('Current origin:', currentOrigin);
+      console.log('Initiating Google OAuth with redirect URL:', redirectUrl);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         }
+      });
+      
+      if (error) {
+        console.error('Google OAuth error details:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+      } else {
+        console.log('Google OAuth initiated successfully:', data);
       }
-    });
-    
-    if (error) {
-      console.error('Google OAuth error:', error);
-    } else {
-      console.log('Google OAuth initiated successfully:', data);
+      
+      return { data, error };
+    } catch (err) {
+      console.error('Unexpected error during Google OAuth:', err);
+      return { data: null, error: err };
     }
-    
-    return { data, error };
   };
 
   const signOut = async () => {
