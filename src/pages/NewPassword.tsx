@@ -18,11 +18,24 @@ const NewPassword = () => {
 
   useEffect(() => {
     // Check if we have the necessary parameters from the email link
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    const type = searchParams.get('type');
-    const error = searchParams.get('error');
-    const errorDescription = searchParams.get('error_description');
+    // First check URL search parameters (after ?)
+    let accessToken = searchParams.get('access_token');
+    let refreshToken = searchParams.get('refresh_token');
+    let type = searchParams.get('type');
+    let error = searchParams.get('error');
+    let errorDescription = searchParams.get('error_description');
+
+    // If not found in search params, check hash fragment (after #) as Supabase often uses this
+    if (!accessToken || !refreshToken || !type) {
+      const hash = window.location.hash.substring(1); // Remove the # at the beginning
+      const hashParams = new URLSearchParams(hash);
+      
+      accessToken = accessToken || hashParams.get('access_token');
+      refreshToken = refreshToken || hashParams.get('refresh_token');
+      type = type || hashParams.get('type');
+      error = error || hashParams.get('error');
+      errorDescription = errorDescription || hashParams.get('error_description');
+    }
 
     if (error) {
       toast.error("Reset link invalid", {
