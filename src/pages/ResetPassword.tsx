@@ -18,28 +18,27 @@ const ResetPassword = () => {
 
   useEffect(() => {
     // Check if we have the necessary parameters from the email link
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
+    const token = searchParams.get('token');
     const type = searchParams.get('type');
+    const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
 
-    if (type === 'recovery' && accessToken && refreshToken) {
-      setIsValidToken(true);
-      // Set the session with the tokens from the URL
-      supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken
+    if (error) {
+      toast.error("Reset link invalid", {
+        description: errorDescription || "The reset link is invalid or has expired. Please request a new one."
       });
+      navigate('/password-reset');
+      return;
+    }
+
+    if (type === 'recovery' && token) {
+      setIsValidToken(true);
+      // The token will be automatically handled by Supabase when the user updates their password
     } else {
-      // Check for error parameters
-      const error = searchParams.get('error');
-      const errorDescription = searchParams.get('error_description');
-      
-      if (error) {
-        toast.error("Reset link invalid", {
-          description: errorDescription || "The reset link is invalid or has expired. Please request a new one."
-        });
-        navigate('/password-reset');
-      }
+      toast.error("Reset link invalid", {
+        description: "The reset link is invalid or has expired. Please request a new one."
+      });
+      navigate('/password-reset');
     }
   }, [searchParams, navigate]);
 
