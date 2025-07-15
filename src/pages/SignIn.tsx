@@ -10,6 +10,28 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import AnimatedChatPreview from '@/components/AnimatedChatPreview';
 
+// Validation functions
+const validateEmail = (email: string): string | null => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email.trim()) {
+    return "Email is required";
+  }
+  if (!emailRegex.test(email)) {
+    return "Please enter a valid email address";
+  }
+  return null;
+};
+
+const validatePassword = (password: string): string | null => {
+  if (!password) {
+    return "Password is required";
+  }
+  if (password.length < 6) {
+    return "Password must be at least 6 characters long";
+  }
+  return null;
+};
+
 const SignIn = () => {
   const navigate = useNavigate();
   const { signIn, signInWithGoogle, user, profile, loading, recentLogout } = useAuth();
@@ -48,9 +70,20 @@ const SignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password) {
-      toast.error("Missing credentials", {
-        description: "Please enter your email and password."
+    // Validate email
+    const emailError = validateEmail(formData.email);
+    if (emailError) {
+      toast.error("Invalid email", {
+        description: emailError
+      });
+      return;
+    }
+    
+    // Validate password
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      toast.error("Invalid password", {
+        description: passwordError
       });
       return;
     }
