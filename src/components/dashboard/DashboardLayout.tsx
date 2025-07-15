@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardDrawer } from './DashboardDrawer';
@@ -22,8 +21,7 @@ export function DashboardLayout({
   contentData,
   onUpdateContent 
 }: DashboardLayoutProps) {
-  const navigate = useNavigate();
-  const { user, profile, loading } = useAuth();
+  const { user } = useAuth();
   const { rooms, addRoom, editRoom, deleteRoom } = useRooms();
   const { content } = useContent();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -53,25 +51,9 @@ export function DashboardLayout({
     };
   }, [isDrawerOpen, isMobile]);
 
-  // Redirect to onboarding if user hasn't completed it
-  useEffect(() => {
-    if (!loading && user && profile && !profile.onboarding_completed) {
-      navigate('/onboarding');
-    }
-  }, [user, profile, loading, navigate]);
-
   // Don't render if user is not authenticated
   if (!user) {
     return null;
-  }
-
-  // Don't render if still loading or user needs to complete onboarding
-  if (loading || (user && profile && !profile.onboarding_completed)) {
-    return (
-      <div className="flex min-h-screen bg-background items-center justify-center">
-        <div className="text-foreground">Loading...</div>
-      </div>
-    );
   }
 
   return (

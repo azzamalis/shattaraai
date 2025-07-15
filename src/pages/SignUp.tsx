@@ -10,47 +10,6 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import AnimatedChatPreview from '@/components/AnimatedChatPreview';
 
-// Validation functions
-const validateEmail = (email: string): string | null => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email.trim()) {
-    return "Email is required";
-  }
-  if (!emailRegex.test(email)) {
-    return "Please enter a valid email address";
-  }
-  return null;
-};
-
-const validateName = (name: string): string | null => {
-  if (!name.trim()) {
-    return "Full name is required";
-  }
-  if (name.trim().length < 2) {
-    return "Name must be at least 2 characters long";
-  }
-  return null;
-};
-
-const validatePassword = (password: string): string | null => {
-  if (!password) {
-    return "Password is required";
-  }
-  if (password.length < 6) {
-    return "Password must be at least 6 characters long";
-  }
-  if (!/(?=.*[a-z])/.test(password)) {
-    return "Password must contain at least one lowercase letter";
-  }
-  if (!/(?=.*[A-Z])/.test(password)) {
-    return "Password must contain at least one uppercase letter";
-  }
-  if (!/(?=.*\d)/.test(password)) {
-    return "Password must contain at least one number";
-  }
-  return null;
-};
-
 const SignUp = () => {
   const navigate = useNavigate();
   const { signUp, signInWithGoogle, user, profile, loading, recentLogout } = useAuth();
@@ -90,37 +49,9 @@ const SignUp = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate name
-    const nameError = validateName(formData.name);
-    if (nameError) {
-      toast.error("Invalid name", {
-        description: nameError
-      });
-      return;
-    }
-    
-    // Validate email
-    const emailError = validateEmail(formData.email);
-    if (emailError) {
-      toast.error("Invalid email", {
-        description: emailError
-      });
-      return;
-    }
-    
-    // Validate password
-    const passwordError = validatePassword(formData.password);
-    if (passwordError) {
-      toast.error("Invalid password", {
-        description: passwordError
-      });
-      return;
-    }
-    
-    // Check if terms are accepted
-    if (!formData.acceptTerms) {
-      toast.error("Terms required", {
-        description: "Please accept the Terms of Service and Privacy Policy to continue."
+    if (!formData.name || !formData.email || !formData.password || !formData.acceptTerms) {
+      toast.error("Please complete all fields", {
+        description: "All fields are required to create an account."
       });
       return;
     }
@@ -283,7 +214,7 @@ const SignUp = () => {
                   )}
                 </button>
               </div>
-              <p className="text-xs text-foreground/60">Must be at least 6 characters with uppercase, lowercase, and number</p>
+              <p className="text-xs text-foreground/60">Must be at least 6 characters</p>
             </div>
             
             <div className="flex items-start space-x-2">
