@@ -14,23 +14,24 @@ interface ContactSalesModalProps {
 
 interface FormData {
   fullName: string;
-  workEmail: string;
-  companyName: string;
+  businessEmail: string;
+  organizationName: string;
   teamSize: string;
   message: string;
 }
 
 interface FormErrors {
   fullName?: string;
-  workEmail?: string;
+  businessEmail?: string;
+  organizationName?: string;
   teamSize?: string;
 }
 
 export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps) {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
-    workEmail: '',
-    companyName: '',
+    businessEmail: '',
+    organizationName: '',
     teamSize: '',
     message: '',
   });
@@ -50,10 +51,14 @@ export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps
       newErrors.fullName = 'Full name is required';
     }
 
-    if (!formData.workEmail.trim()) {
-      newErrors.workEmail = 'Work email is required';
-    } else if (!validateEmail(formData.workEmail)) {
-      newErrors.workEmail = 'Please enter a valid email address';
+    if (!formData.businessEmail.trim()) {
+      newErrors.businessEmail = 'Business email is required';
+    } else if (!validateEmail(formData.businessEmail)) {
+      newErrors.businessEmail = 'Please enter a valid email address';
+    }
+
+    if (!formData.organizationName.trim()) {
+      newErrors.organizationName = 'Organization name is required';
     }
 
     if (!formData.teamSize) {
@@ -85,8 +90,8 @@ export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps
       // Reset form and close modal on success
       setFormData({
         fullName: '',
-        workEmail: '',
-        companyName: '',
+        businessEmail: '',
+        organizationName: '',
         teamSize: '',
         message: '',
       });
@@ -163,36 +168,41 @@ export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps
               )}
             </div>
 
-            {/* Work Email */}
+            {/* Business Email */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                Work Email <span className="text-destructive">*</span>
+                Business Email <span className="text-destructive">*</span>
               </label>
               <Input
                 type="email"
-                placeholder="Enter your work email"
-                value={formData.workEmail}
-                onChange={(e) => handleInputChange('workEmail', e.target.value)}
+                placeholder="Enter your business email"
+                value={formData.businessEmail}
+                onChange={(e) => handleInputChange('businessEmail', e.target.value)}
                 className={`bg-muted border-none text-foreground placeholder:text-muted-foreground ${
-                  errors.workEmail ? 'ring-2 ring-destructive' : ''
+                  errors.businessEmail ? 'ring-2 ring-destructive' : ''
                 }`}
               />
-              {errors.workEmail && (
-                <p className="text-sm text-destructive">{errors.workEmail}</p>
+              {errors.businessEmail && (
+                <p className="text-sm text-destructive">{errors.businessEmail}</p>
               )}
             </div>
 
-            {/* Company Name */}
+            {/* Organization Name */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                Company Name
+                Organization Name <span className="text-destructive">*</span>
               </label>
               <Input
-                placeholder="Enter your company name"
-                value={formData.companyName}
-                onChange={(e) => handleInputChange('companyName', e.target.value)}
-                className="bg-muted border-none text-foreground placeholder:text-muted-foreground"
+                placeholder="Enter your organization name"
+                value={formData.organizationName}
+                onChange={(e) => handleInputChange('organizationName', e.target.value)}
+                className={`bg-muted border-none text-foreground placeholder:text-muted-foreground ${
+                  errors.organizationName ? 'ring-2 ring-destructive' : ''
+                }`}
               />
+              {errors.organizationName && (
+                <p className="text-sm text-destructive">{errors.organizationName}</p>
+              )}
             </div>
 
             {/* Team Size */}
