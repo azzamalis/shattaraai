@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -206,23 +208,32 @@ export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps
             </div>
 
             {/* Team Size */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">
                 Team Size <span className="text-destructive">*</span>
               </label>
-              <Select value={formData.teamSize} onValueChange={(value) => handleInputChange('teamSize', value)}>
-                <SelectTrigger className={`bg-muted border-none text-foreground ${
-                  errors.teamSize ? 'ring-2 ring-destructive' : ''
-                }`}>
-                  <SelectValue placeholder="Select team size" />
-                </SelectTrigger>
-                <SelectContent className="z-50 bg-background border border-border shadow-lg">
-                  <SelectItem value="1-5">1–5</SelectItem>
-                  <SelectItem value="6-20">6–20</SelectItem>
-                  <SelectItem value="21-50">21–50</SelectItem>
-                  <SelectItem value="51+">51+</SelectItem>
-                </SelectContent>
-              </Select>
+              <RadioGroup 
+                value={formData.teamSize} 
+                onValueChange={(value) => handleInputChange('teamSize', value)}
+                className="space-y-3"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="1-5" id="1-5" />
+                  <Label htmlFor="1-5" className="text-foreground cursor-pointer">1–5</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="6-20" id="6-20" />
+                  <Label htmlFor="6-20" className="text-foreground cursor-pointer">6–20</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="21-50" id="21-50" />
+                  <Label htmlFor="21-50" className="text-foreground cursor-pointer">21–50</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="51+" id="51+" />
+                  <Label htmlFor="51+" className="text-foreground cursor-pointer">51+</Label>
+                </div>
+              </RadioGroup>
               {errors.teamSize && (
                 <p className="text-sm text-destructive">{errors.teamSize}</p>
               )}
