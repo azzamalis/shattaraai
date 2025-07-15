@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import PasswordReset from "./pages/PasswordReset";
+import ResetPassword from "./pages/ResetPassword";
 import DashboardPage from "./pages/DashboardPage";
 import RoomPage from "./pages/RoomPage";
 import RecordingRoom from "./pages/RecordingRoom";
@@ -47,10 +48,11 @@ function App() {
                 <div className="min-h-screen bg-background">
                   <Routes>
                   <Route path="/" element={<Index />} />
-                  <Route path="/signin" element={<SignIn />} />
-                  <Route path="/signup" element={<SignUp />} />
-                  <Route path="/password-reset" element={<PasswordReset />} />
-                  <Route path="/dashboard" element={<DashboardPage />} />
+                   <Route path="/signin" element={<SignIn />} />
+                   <Route path="/signup" element={<SignUp />} />
+                   <Route path="/password-reset" element={<PasswordReset />} />
+                   <Route path="/reset-password" element={<ResetPassword />} />
+                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/rooms/:roomId" element={<RoomPage />} />
                   <Route path="/recording/:roomId" element={<RecordingRoom />} />
                   <Route path="/content/:contentId" element={<ContentPage />} />
