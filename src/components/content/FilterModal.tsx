@@ -57,17 +57,17 @@ export function FilterModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-dashboard-card text-dashboard-text rounded-xl w-full max-w-md shadow-2xl">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-card border border-border text-card-foreground rounded-xl w-full max-w-md shadow-2xl">
         {/* Header */}
         <div className="flex justify-between items-center p-6 pb-4">
           <div className="flex items-center gap-3">
-            <SlidersHorizontal className="w-5 h-5 text-dashboard-text-secondary" />
-            <h2 className="text-lg font-semibold text-dashboard-text">Filter Options</h2>
+            <SlidersHorizontal className="w-5 h-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold text-card-foreground">Filter Options</h2>
           </div>
           <button 
             onClick={() => onOpenChange(false)} 
-            className="text-dashboard-text-secondary hover:text-dashboard-text transition-colors p-1 rounded-lg hover:bg-dashboard-bg"
+            className="text-muted-foreground hover:text-card-foreground transition-colors p-1 rounded-lg hover:bg-accent"
           >
             <X className="w-5 h-5" />
           </button>
@@ -77,20 +77,20 @@ export function FilterModal({
         <div className="px-6 pb-6 space-y-6">
           {/* Starred Only Filter */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-4 rounded-xl border border-dashboard-separator/20 hover:border-dashboard-separator/40 transition-all hover:bg-dashboard-bg/50">
+            <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 hover:border-border transition-all hover:bg-accent/50">
               <div className="flex items-center gap-3">
                 <Star className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm font-medium text-dashboard-text">Starred only</span>
+                <span className="text-sm font-medium text-card-foreground">Starred only</span>
               </div>
               <Switch
                 checked={tempFilters.starredOnly}
                 onCheckedChange={handleStarredToggle}
                 disabled={!hasStarredCards}
-                className="data-[state=checked]:bg-[#00A3FF] data-[state=unchecked]:bg-dashboard-separator/30"
+                className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted"
               />
             </div>
             {!hasStarredCards && (
-              <p className="text-xs text-dashboard-text-secondary ml-4">
+              <p className="text-xs text-muted-foreground ml-4">
                 No starred cards available
               </p>
             )}
@@ -99,8 +99,8 @@ export function FilterModal({
           {/* Concept Filter */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-dashboard-text">Filter by Key concepts</h3>
-              <span className="text-xs text-dashboard-text-secondary bg-dashboard-bg px-2 py-1 rounded-full">
+              <h3 className="text-sm font-medium text-card-foreground">Filter by Key concepts</h3>
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
                 {tempFilters.concepts.length} selected
               </span>
             </div>
@@ -111,12 +111,12 @@ export function FilterModal({
                 {tempFilters.concepts.map((concept) => (
                   <div 
                     key={concept}
-                    className="inline-flex items-center gap-2 bg-dashboard-bg border border-dashboard-separator/20 rounded-full px-3 py-2 text-sm w-fit"
+                    className="inline-flex items-center gap-2 bg-secondary border border-border/50 rounded-full px-3 py-2 text-sm w-fit"
                   >
-                    <span className="text-dashboard-text whitespace-nowrap">{concept}</span>
+                    <span className="text-secondary-foreground whitespace-nowrap">{concept}</span>
                     <button 
                       onClick={() => removeConcept(concept)}
-                      className="text-dashboard-text-secondary hover:text-dashboard-text transition-colors flex-shrink-0"
+                      className="text-muted-foreground hover:text-secondary-foreground transition-colors flex-shrink-0"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -135,13 +135,13 @@ export function FilterModal({
                       e.target.value = "";
                     }
                   }}
-                  className="w-full bg-dashboard-bg border border-dashboard-separator/20 rounded-xl px-4 py-3 text-sm text-dashboard-text focus:outline-none focus:ring-2 focus:ring-[#00A3FF]/20 focus:border-[#00A3FF]/30 transition-all"
+                  className="w-full bg-background border border-input rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring transition-all"
                 >
                   <option value="">Select key concepts</option>
                   {availableConcepts
                     .filter(concept => !tempFilters.concepts.includes(concept))
                     .map((concept) => (
-                      <option key={concept} value={concept} className="bg-dashboard-bg text-dashboard-text">
+                      <option key={concept} value={concept} className="bg-background text-foreground">
                         {concept}
                       </option>
                     ))
@@ -149,7 +149,7 @@ export function FilterModal({
                 </select>
               </div>
             ) : (
-              <p className="text-xs text-dashboard-text-secondary bg-dashboard-bg/50 p-3 rounded-xl text-center">
+              <p className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-xl text-center">
                 No concepts available
               </p>
             )}
@@ -157,27 +157,28 @@ export function FilterModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 pt-4 border-t border-dashboard-separator/10">
+        <div className="flex items-center justify-between p-6 pt-4 border-t border-border/20">
           <button 
             onClick={handleClearAll}
-            className="text-sm text-dashboard-text-secondary hover:text-dashboard-text transition-colors font-medium"
+            className="text-sm text-muted-foreground hover:text-card-foreground transition-colors font-medium"
           >
             Clear all
           </button>
           
           <div className="flex items-center gap-3">
-            <button 
+            <Button 
+              variant="ghost"
               onClick={() => onOpenChange(false)}
-              className="px-4 py-2 text-sm bg-dashboard-bg text-dashboard-text rounded-lg hover:bg-dashboard-separator/20 transition-colors font-medium border border-dashboard-separator/20"
+              className="px-4 py-2 text-sm"
             >
               Cancel
-            </button>
-            <button 
+            </Button>
+            <Button 
               onClick={handleFilterApply}
-              className="px-4 py-2 text-sm bg-white text-black rounded-lg hover:bg-gray-100 transition-colors font-medium shadow-sm"
+              className="px-4 py-2 text-sm"
             >
               Apply
-            </button>
+            </Button>
           </div>
         </div>
       </div>
