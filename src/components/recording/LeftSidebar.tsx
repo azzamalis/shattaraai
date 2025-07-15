@@ -21,15 +21,26 @@ export function LeftSidebar({
   onMicrophoneClear
 }: LeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
+  const [showMicrophoneControls, setShowMicrophoneControls] = useState(true);
+
+  const handleMicrophoneClear = () => {
+    setShowMicrophoneControls(false);
+    onMicrophoneClear?.();
+  };
+
   return <div className="h-full flex flex-col min-h-0 bg-black">
-      {/* Microphone Selector row */}
-      <div className="p-4 pb-2 shrink-0 bg-[#222222]">
-        <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
-      </div>
-      {/* Recording Controls row */}
-      <div className="px-4 pb-4 shrink-0 bg-[#222222]">
-        <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
-      </div>
+      {showMicrophoneControls && (
+        <>
+          {/* Microphone Selector row */}
+          <div className="p-4 pb-2 shrink-0 bg-[#222222]">
+            <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={handleMicrophoneClear} />
+          </div>
+          {/* Recording Controls row */}
+          <div className="px-4 pb-4 shrink-0 bg-[#222222]">
+            <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
+          </div>
+        </>
+      )}
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-[#222222]">
         <TabsList className="w-full border-b border-white/10 p-0 h-12 px-4 gap-6 mb-2 shrink-0 bg-[#222222]">
