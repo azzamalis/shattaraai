@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { FileText, File, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -15,66 +15,149 @@ interface PDFThumbnailGeneratorProps {
   onClick?: (e?: React.MouseEvent) => void;
 }
 
-export function PDFThumbnailGenerator({ url, title, className, onClick }: PDFThumbnailGeneratorProps) {
+const PDFThumbnailGeneratorComponent = ({ url, title, className, onClick }: PDFThumbnailGeneratorProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
   const { theme } = useTheme();
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleDocumentLoad = () => {
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Set loading timeout
+  useEffect(() => {
+    if (url && loading) {
+      timeoutRef.current = setTimeout(() => {
+        setTimedOut(true);
+        setError(true);
+        setLoading(false);
+      }, 10000); // 10 second timeout
+    }
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [url, loading]);
+
+  const handleDocumentLoad = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     setLoading(false);
     setError(false);
-  };
+    setTimedOut(false);
+  }, []);
+
+  const handleDocumentError = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setLoading(false);
+    setError(true);
+  }, []);
 
   if (!url) {
     return (
-      <div className={cn("w-full h-full flex items-center justify-center bg-card", className)} onClick={onClick}>
-        <File className="w-12 h-12 text-muted-foreground" />
+      <div 
+        className={cn("w-full h-full flex items-center justify-center bg-card", className)} 
+        onClick={onClick}
+        role="img"
+        aria-label={`${title} - No file available`}
+      >
+        <File className="w-12 h-12 text-muted-foreground" aria-hidden="true" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={cn("w-full h-full flex items-center justify-center bg-card", className)} onClick={onClick}>
-        <FileText className="w-12 h-12 text-muted-foreground" />
+      <div 
+        className={cn("w-full h-full flex items-center justify-center bg-card", className)} 
+        onClick={onClick}
+        role="img"
+        aria-label={`${title} - ${timedOut ? 'Loading timed out' : 'Failed to load PDF'}`}
+      >
+        <FileText className="w-12 h-12 text-muted-foreground" aria-hidden="true" />
       </div>
     );
   }
 
   return (
-    <div className={cn("w-full h-full relative overflow-hidden bg-card", className)} onClick={onClick}>
+    <div 
+      ref={containerRef}
+      className={cn("w-full h-full relative overflow-hidden bg-card", className)} 
+      onClick={onClick}
+      role="img"
+      aria-label={`${title} - PDF thumbnail`}
+    >
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-card z-10">
-          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        <div 
+          className="absolute inset-0 flex items-center justify-center bg-card z-10"
+          aria-label="Loading PDF thumbnail"
+        >
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-hidden="true" />
         </div>
       )}
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
         <div 
           className="w-full h-full pdf-thumbnail-container"
-          style={{
-            overflow: 'hidden'
-          }}
+          style={{ overflow: 'hidden' }}
         >
           <style>{`
+            .pdf-thumbnail-container {
+              position: relative;
+            }
             .pdf-thumbnail-container .rpv-core__viewer {
               height: 100% !important;
+              width: 100% !important;
+              overflow: hidden !important;
             }
             .pdf-thumbnail-container .rpv-core__inner-pages {
+              padding: 0 !important;
+              margin: 0 !important;
+              display: flex !important;
+              justify-content: center !important;
+              align-items: center !important;
+              height: 100% !important;
+              width: 100% !important;
+              overflow: hidden !important;
+            }
+            .pdf-thumbnail-container .rpv-core__inner-page {
+              margin: 0 !important;
               padding: 0 !important;
               display: flex !important;
               justify-content: center !important;
               align-items: center !important;
+              height: 100% !important;
+              width: 100% !important;
+              overflow: hidden !important;
             }
-            .pdf-thumbnail-container .rpv-core__inner-page {
-              margin: 0 !important;
-              transform: scale(0.75);
-              transform-origin: center center;
+            .pdf-thumbnail-container .rpv-core__canvas-layer canvas {
+              max-width: 100% !important;
+              max-height: 100% !important;
+              width: auto !important;
+              height: auto !important;
+              object-fit: contain !important;
             }
-            .pdf-thumbnail-container .rpv-core__page-navigation {
+            .pdf-thumbnail-container .rpv-core__page-navigation,
+            .pdf-thumbnail-container .rpv-core__toolbar,
+            .pdf-thumbnail-container .rpv-core__scrollbar,
+            .pdf-thumbnail-container .rpv-core__page-navigation-prev,
+            .pdf-thumbnail-container .rpv-core__page-navigation-next {
               display: none !important;
             }
-            .pdf-thumbnail-container .rpv-core__toolbar {
-              display: none !important;
+            .pdf-thumbnail-container .rpv-core__text-layer,
+            .pdf-thumbnail-container .rpv-core__annotation-layer {
+              pointer-events: none !important;
             }
           `}</style>
           <Viewer
@@ -87,4 +170,7 @@ export function PDFThumbnailGenerator({ url, title, className, onClick }: PDFThu
       </Worker>
     </div>
   );
-}
+};
+
+// Memoize component for performance
+export const PDFThumbnailGenerator = React.memo(PDFThumbnailGeneratorComponent);
