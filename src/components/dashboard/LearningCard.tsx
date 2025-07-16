@@ -83,11 +83,11 @@ export function LearningCard({
   return (
     <div onClick={handleCardClick} className="block w-full cursor-pointer">
       <div className={cn(
-        // Card container
-        "bg-card/20 dark:bg-neutral-900/80",
+        // Card container - matching ActionCard styling
+        "bg-card border-border shadow-sm",
         "flex flex-col justify-between",
         "p-1.5 h-[280px]",
-        "rounded-xl border border-border/5",
+        "rounded-xl",
         "transition-all duration-200",
         "hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]",
         "group relative",
