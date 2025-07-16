@@ -113,51 +113,26 @@ const PDFThumbnailGeneratorComponent = ({ url, title, className, onClick }: PDFT
           style={{ overflow: 'hidden' }}
         >
           <style>{`
-            .pdf-thumbnail-container {
-              position: relative;
-            }
             .pdf-thumbnail-container .rpv-core__viewer {
               height: 100% !important;
-              width: 100% !important;
-              overflow: hidden !important;
             }
             .pdf-thumbnail-container .rpv-core__inner-pages {
               padding: 0 !important;
-              margin: 0 !important;
               display: flex !important;
               justify-content: center !important;
               align-items: center !important;
-              height: 100% !important;
-              width: 100% !important;
-              overflow: hidden !important;
             }
             .pdf-thumbnail-container .rpv-core__inner-page {
               margin: 0 !important;
-              padding: 0 !important;
-              display: flex !important;
-              justify-content: center !important;
-              align-items: center !important;
-              height: 100% !important;
-              width: 100% !important;
-              overflow: hidden !important;
-            }
-            .pdf-thumbnail-container .rpv-core__canvas-layer canvas {
-              max-width: 100% !important;
-              max-height: 100% !important;
-              width: auto !important;
-              height: auto !important;
-              object-fit: contain !important;
+              transform: scale(0.75);
+              transform-origin: center center;
             }
             .pdf-thumbnail-container .rpv-core__page-navigation,
-            .pdf-thumbnail-container .rpv-core__toolbar,
-            .pdf-thumbnail-container .rpv-core__scrollbar,
-            .pdf-thumbnail-container .rpv-core__page-navigation-prev,
-            .pdf-thumbnail-container .rpv-core__page-navigation-next {
+            .pdf-thumbnail-container .rpv-core__toolbar {
               display: none !important;
             }
-            .pdf-thumbnail-container .rpv-core__text-layer,
-            .pdf-thumbnail-container .rpv-core__annotation-layer {
-              pointer-events: none !important;
+            .pdf-thumbnail-container .rpv-core__scrollbar {
+              display: none !important;
             }
           `}</style>
           <Viewer
