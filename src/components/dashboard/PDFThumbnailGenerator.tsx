@@ -115,22 +115,26 @@ const PDFThumbnailGeneratorComponent = ({ url, title, className, onClick }: PDFT
           <style>{`
             .pdf-thumbnail-container .rpv-core__viewer {
               height: 100% !important;
+              overflow: hidden !important;
             }
             .pdf-thumbnail-container .rpv-core__inner-pages {
               padding: 0 !important;
+              margin: 0 !important;
               display: flex !important;
               justify-content: center !important;
-              align-items: center !important;
+              align-items: flex-start !important;
+              overflow: hidden !important;
+              height: 100% !important;
             }
             .pdf-thumbnail-container .rpv-core__inner-page {
               margin: 0 !important;
+              padding: 0 !important;
               transform: scale(0.75);
-              transform-origin: center center;
+              transform-origin: top center;
+              overflow: hidden !important;
             }
             .pdf-thumbnail-container .rpv-core__page-navigation,
-            .pdf-thumbnail-container .rpv-core__toolbar {
-              display: none !important;
-            }
+            .pdf-thumbnail-container .rpv-core__toolbar,
             .pdf-thumbnail-container .rpv-core__scrollbar {
               display: none !important;
             }
