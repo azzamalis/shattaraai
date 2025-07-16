@@ -84,7 +84,7 @@ export function LearningCard({
     <div onClick={handleCardClick} className="block w-full cursor-pointer">
       <div className={cn(
         // Card container
-        "bg-card dark:bg-neutral-900/80",
+        "bg-card/20 dark:bg-neutral-900/80",
         "flex flex-col justify-between",
         "p-1.5 h-[280px]",
         "rounded-xl border border-border/5",
