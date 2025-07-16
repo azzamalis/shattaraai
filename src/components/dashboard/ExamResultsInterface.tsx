@@ -5,7 +5,6 @@ import { ExamResultsHeader } from './exam-results-interface/ExamResultsHeader';
 import { ExamResultsFooter } from './exam-results-interface/ExamResultsFooter';
 import { ChatDrawer } from './exam-results-interface/ChatDrawer';
 import { AnswerBreakdown } from './exam-results-interface/AnswerBreakdown';
-
 interface Question {
   id: number;
   type: 'multiple-choice' | 'free-text';
@@ -19,10 +18,11 @@ interface Question {
   referenceSource?: string;
   isSkipped?: boolean;
 }
-
 interface ExamResults {
   questions: Question[];
-  answers: {[key: number]: any};
+  answers: {
+    [key: number]: any;
+  };
   skippedQuestions: Set<number>;
   score: {
     correct: number;
@@ -31,76 +31,54 @@ interface ExamResults {
     total: number;
   };
 }
-
 const DUMMY_EXAM_DATA = {
-  questions: [
-    {
-      id: 1,
-      type: 'multiple-choice',
-      question: 'What is the primary force responsible for the formation of stars?',
-      options: [
-        'Electromagnetic force',
-        'Gravitational force',
-        'Nuclear force',
-        'Centrifugal force'
-      ],
-      correctAnswer: 1,
-      userAnswer: 0,
-      explanation: 'Gravitational force is the primary force responsible for star formation. It causes clouds of gas and dust in space to collapse, leading to the formation of protostars and eventually stars. The intense pressure and temperature at the core, also a result of gravitational compression, enables nuclear fusion to begin.',
-      referenceTime: '2:15',
-      referenceSource: 'Stellar Formation Basics'
-    },
-    {
-      id: 2,
-      type: 'free-text',
-      question: 'Explain how scientists can detect and study black holes despite them not emitting light.',
-      userAnswer: 'asdfasasdf',
-      feedback: 'While your answer needs more detail, here\'s a comprehensive explanation: Scientists detect black holes through indirect methods such as: 1) Observing the gravitational effects on nearby stars and gas, 2) Detecting X-ray emissions from heated material falling into the black hole, 3) Gravitational lensing effects, and 4) Recently, through gravitational wave detection when black holes merge.',
-      referenceTime: '5:30',
-      referenceSource: 'Black Hole Detection Methods'
-    },
-    {
-      id: 3,
-      type: 'multiple-choice',
-      question: 'How does the size of a black hole affect the experience of traveling inside it?',
-      options: [
-        'Supermassive black holes kill instantly upon crossing the event horizon.',
-        'Larger black holes have stronger tidal forces that cause immediate death.',
-        'Smaller black holes kill before the event horizon; supermassive ones allow longer survival.',
-        'Smaller black holes allow for longer survival due to weaker gravity effects.'
-      ],
-      correctAnswer: 2,
-      userAnswer: 2,
-      explanation: 'Correct! In smaller black holes, tidal forces are much stronger near the event horizon, leading to "spaghettification" before reaching it. In supermassive black holes, these forces are relatively weaker at the event horizon, theoretically allowing for longer survival past this point, though eventual destruction is still certain.',
-      referenceTime: '8:45',
-      referenceSource: 'Black Hole Physics'
-    },
-    {
-      id: 4,
-      type: 'free-text',
-      question: 'Describe the process of nuclear fusion in stars and its role in stellar evolution.',
-      isSkipped: true,
-      feedback: 'Nuclear fusion in stars primarily involves the fusion of hydrogen nuclei into helium through the proton-proton chain reaction or CNO cycle. This process releases enormous energy, providing the outward pressure that balances the star\'s gravitational collapse. As stars age, they can fuse heavier elements, leading to different evolutionary stages. The type of fusion occurring in a star\'s core determines its position on the main sequence and its eventual fate.',
-      referenceTime: '12:20',
-      referenceSource: 'Stellar Evolution'
-    },
-    {
-      id: 5,
-      type: 'multiple-choice',
-      question: 'Which of the following best describes the relationship between a star\'s mass and its lifespan?',
-      options: [
-        'More massive stars live longer than less massive stars',
-        'A star\'s mass has no effect on its lifespan',
-        'Less massive stars live longer than more massive stars',
-        'All stars have approximately the same lifespan'
-      ],
-      correctAnswer: 2,
-      userAnswer: 1,
-      explanation: 'Incorrect. Less massive stars actually live longer than more massive stars. This is because massive stars burn through their nuclear fuel much more quickly due to the intense gravitational pressure and higher core temperatures. A low-mass red dwarf might live for trillions of years, while a very massive star might only live for a few million years.',
-      referenceTime: '15:10',
-      referenceSource: 'Stellar Lifespans'
-    }
-  ],
+  questions: [{
+    id: 1,
+    type: 'multiple-choice',
+    question: 'What is the primary force responsible for the formation of stars?',
+    options: ['Electromagnetic force', 'Gravitational force', 'Nuclear force', 'Centrifugal force'],
+    correctAnswer: 1,
+    userAnswer: 0,
+    explanation: 'Gravitational force is the primary force responsible for star formation. It causes clouds of gas and dust in space to collapse, leading to the formation of protostars and eventually stars. The intense pressure and temperature at the core, also a result of gravitational compression, enables nuclear fusion to begin.',
+    referenceTime: '2:15',
+    referenceSource: 'Stellar Formation Basics'
+  }, {
+    id: 2,
+    type: 'free-text',
+    question: 'Explain how scientists can detect and study black holes despite them not emitting light.',
+    userAnswer: 'asdfasasdf',
+    feedback: 'While your answer needs more detail, here\'s a comprehensive explanation: Scientists detect black holes through indirect methods such as: 1) Observing the gravitational effects on nearby stars and gas, 2) Detecting X-ray emissions from heated material falling into the black hole, 3) Gravitational lensing effects, and 4) Recently, through gravitational wave detection when black holes merge.',
+    referenceTime: '5:30',
+    referenceSource: 'Black Hole Detection Methods'
+  }, {
+    id: 3,
+    type: 'multiple-choice',
+    question: 'How does the size of a black hole affect the experience of traveling inside it?',
+    options: ['Supermassive black holes kill instantly upon crossing the event horizon.', 'Larger black holes have stronger tidal forces that cause immediate death.', 'Smaller black holes kill before the event horizon; supermassive ones allow longer survival.', 'Smaller black holes allow for longer survival due to weaker gravity effects.'],
+    correctAnswer: 2,
+    userAnswer: 2,
+    explanation: 'Correct! In smaller black holes, tidal forces are much stronger near the event horizon, leading to "spaghettification" before reaching it. In supermassive black holes, these forces are relatively weaker at the event horizon, theoretically allowing for longer survival past this point, though eventual destruction is still certain.',
+    referenceTime: '8:45',
+    referenceSource: 'Black Hole Physics'
+  }, {
+    id: 4,
+    type: 'free-text',
+    question: 'Describe the process of nuclear fusion in stars and its role in stellar evolution.',
+    isSkipped: true,
+    feedback: 'Nuclear fusion in stars primarily involves the fusion of hydrogen nuclei into helium through the proton-proton chain reaction or CNO cycle. This process releases enormous energy, providing the outward pressure that balances the star\'s gravitational collapse. As stars age, they can fuse heavier elements, leading to different evolutionary stages. The type of fusion occurring in a star\'s core determines its position on the main sequence and its eventual fate.',
+    referenceTime: '12:20',
+    referenceSource: 'Stellar Evolution'
+  }, {
+    id: 5,
+    type: 'multiple-choice',
+    question: 'Which of the following best describes the relationship between a star\'s mass and its lifespan?',
+    options: ['More massive stars live longer than less massive stars', 'A star\'s mass has no effect on its lifespan', 'Less massive stars live longer than more massive stars', 'All stars have approximately the same lifespan'],
+    correctAnswer: 2,
+    userAnswer: 1,
+    explanation: 'Incorrect. Less massive stars actually live longer than more massive stars. This is because massive stars burn through their nuclear fuel much more quickly due to the intense gravitational pressure and higher core temperatures. A low-mass red dwarf might live for trillions of years, while a very massive star might only live for a few million years.',
+    referenceTime: '15:10',
+    referenceSource: 'Stellar Lifespans'
+  }],
   answers: {
     1: 0,
     2: 'asdfasasdf',
@@ -115,7 +93,6 @@ const DUMMY_EXAM_DATA = {
     total: 5
   }
 };
-
 const ExamResultsInterface: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentChatQuestion, setCurrentChatQuestion] = useState<number | null>(null);
@@ -154,62 +131,41 @@ const ExamResultsInterface: React.FC = () => {
     navigate('/exam');
     return null;
   })();
-
   const openChatForQuestion = (questionId: number) => {
     setCurrentChatQuestion(questionId);
     setIsChatOpen(true);
   };
-
   if (!examResults) {
     return null;
   }
-
-  return (
-    <div className="h-full bg-background text-foreground">
-      <ExamResultsHeader
-        totalQuestions={examResults.score.total}
-        onOpenChat={() => setIsChatOpen(true)}
-      />
+  return <div className="h-full bg-background text-foreground">
+      <ExamResultsHeader totalQuestions={examResults.score.total} onOpenChat={() => setIsChatOpen(true)} />
 
       {/* Main Content Area */}
       <main className="pb-24 pt-8">
         <div className="mx-auto max-w-4xl px-6">
           <h1 className="mb-8 text-center text-2xl font-semibold">Answer Breakdown</h1>
           
-          {examResults.questions.map((question) => (
-            <div key={question.id} className="mb-8 rounded-lg bg-card p-6">
+          {examResults.questions.map(question => <div key={question.id} className="mb-8 rounded-lg bg-card p-6">
               <div className="mb-4 flex items-start justify-between">
                 <div>
                   <div className="mb-2 text-lg font-medium">{question.id}.</div>
-                  <h3 className="text-xl leading-relaxed">{question.question}</h3>
+                  <h3 className="leading-relaxed text-lg">{question.question}</h3>
                 </div>
-                <button 
-                  onClick={() => openChatForQuestion(question.id)}
-                  className="flex items-center whitespace-nowrap gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
-                >
+                <button onClick={() => openChatForQuestion(question.id)} className="flex items-center whitespace-nowrap gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
                   <span>Ask chat</span>
                   <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
               
               <AnswerBreakdown question={question} />
-            </div>
-          ))}
+            </div>)}
         </div>
       </main>
 
-      <ExamResultsFooter
-        onTryAgain={() => {}}
-        onViewResults={() => navigate('/exam/results')}
-      />
+      <ExamResultsFooter onTryAgain={() => {}} onViewResults={() => navigate('/exam/results')} />
 
-      <ChatDrawer
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        currentQuestionId={currentChatQuestion}
-      />
-    </div>
-  );
+      <ChatDrawer isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} currentQuestionId={currentChatQuestion} />
+    </div>;
 };
-
 export default ExamResultsInterface;
