@@ -11,7 +11,7 @@ export function ManagementHeader({
   onUndoAll,
   onDone
 }: ManagementHeaderProps) {
-  return <div className="flex items-center justify-between p-6 border-b border-border bg-card">
+  return <div className="flex items-center justify-between p-6 border-b border-border bg-background ">
       <Button onClick={onBack} variant="default" className="flex items-center gap-2 px-3 py-2 text-sm font-medium">
         <ArrowLeft className="w-4 h-4" />
         <span>Go Back</span>
