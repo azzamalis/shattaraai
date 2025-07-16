@@ -115,7 +115,6 @@ const PDFThumbnailGeneratorComponent = ({ url, title, className, onClick }: PDFT
           <style>{`
             .pdf-thumbnail-container .rpv-core__viewer {
               height: 100% !important;
-              width: 100% !important;
               overflow: hidden !important;
             }
             .pdf-thumbnail-container .rpv-core__inner-pages {
@@ -126,27 +125,13 @@ const PDFThumbnailGeneratorComponent = ({ url, title, className, onClick }: PDFT
               align-items: flex-start !important;
               overflow: hidden !important;
               height: 100% !important;
-              width: 100% !important;
             }
             .pdf-thumbnail-container .rpv-core__inner-page {
               margin: 0 !important;
               padding: 0 !important;
-              transform: scale(1.2);
+              transform: scale(0.75);
               transform-origin: top center;
               overflow: hidden !important;
-              width: 100% !important;
-              display: flex !important;
-              justify-content: center !important;
-            }
-            .pdf-thumbnail-container .rpv-core__canvas-layer {
-              width: 100% !important;
-              display: flex !important;
-              justify-content: center !important;
-            }
-            .pdf-thumbnail-container .rpv-core__canvas-layer canvas {
-              width: 100% !important;
-              height: auto !important;
-              max-width: none !important;
             }
             .pdf-thumbnail-container .rpv-core__page-navigation,
             .pdf-thumbnail-container .rpv-core__toolbar,
