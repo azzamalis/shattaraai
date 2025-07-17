@@ -18,7 +18,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger
 } from '@/components/ui/dropdown-menu';
-import { FileText, Play, Youtube, Mic, Globe, MessageSquare, MoreHorizontal, Type, Music } from 'lucide-react';
+import { FileText, Play, Youtube, Mic, Globe, MessageSquare, MoreHorizontal, Type, Music, Text } from 'lucide-react';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { HistoryEmptyState } from './HistoryEmptyState';
@@ -50,6 +50,7 @@ const getContentTypeIcon = (type: string) => {
     case 'video':
       return <Play className="h-4 w-4 text-primary" />;
     case 'pdf':
+      return <Text className="h-4 w-4 text-primary" />;
     case 'file':
     case 'upload':
       return <FileText className="h-4 w-4 text-primary" />;
