@@ -180,23 +180,13 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
           display: flex !important;
           align-items: center !important;
           gap: 0.75rem !important;
-          background-color: transparent !important;
         }
 
         .bn-suggestion-menu-item:hover,
         .bn-suggestion-menu-item[data-highlighted="true"] {
-          background-color: hsl(var(--accent)) !important;
-          color: hsl(var(--accent-foreground)) !important;
+          background-color: hsl(var(--primary)) !important;
+          color: hsl(var(--primary-foreground)) !important;
           transform: translateX(4px) !important;
-        }
-
-        .bn-suggestion-menu-item .bn-suggestion-menu-item-icon {
-          color: hsl(var(--muted-foreground)) !important;
-        }
-
-        .bn-suggestion-menu-item:hover .bn-suggestion-menu-item-icon,
-        .bn-suggestion-menu-item[data-highlighted="true"] .bn-suggestion-menu-item-icon {
-          color: hsl(var(--accent-foreground)) !important;
         }
 
         /* Enhanced Side Menu (Drag Handle) with Separated Actions */
