@@ -21,7 +21,7 @@ export function DocumentHeader() {
   const handleSearch = () => {
     setIsSearching(!isSearching);
   };
-  return <div className="flex items-center justify-between p-2 border-b border-border bg-background ">
+  return <div className="flex items-center justify-between p-2 border-b border-border bg-inherit">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" onClick={toggleSidebar} className="h-8 w-8 p-0">
           <Menu className="h-4 w-4" />
