@@ -1,8 +1,9 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { ContentData } from '@/pages/ContentPage';
-import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste } from 'lucide-react';
+import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste, Expand, Minimize2 } from 'lucide-react';
 import { NewPDFViewer } from './NewPDFViewer';
+import { Button } from '@/components/ui/button';
 
 interface ContentViewerProps {
   contentData: ContentData;
@@ -13,6 +14,7 @@ interface ContentViewerProps {
 
 export function ContentViewer({ contentData, onUpdateContent, onTextAction, currentTimestamp }: ContentViewerProps) {
   const youtubePlayerRef = useRef<HTMLIFrameElement>(null);
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
   
   console.log('DEBUG: ContentViewer - Rendering with content data:', {
     id: contentData.id,
@@ -202,10 +204,28 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
       case 'text':
       case 'website':
         console.log('DEBUG: ContentViewer - Text/Website content:', { text: contentData.text, url: contentData.url });
+        
         return (
-          <div className="w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator p-4 overflow-auto">
+          <div className={`relative w-full ${isTextExpanded ? 'h-auto' : 'h-64'} bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator p-4 overflow-auto transition-all duration-200`}>
+            {/* Expand/Collapse Button */}
+            {(contentData.text || contentData.url) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsTextExpanded(!isTextExpanded)}
+                className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20 z-10 transition-colors"
+                aria-label={isTextExpanded ? "Collapse content" : "Expand content"}
+              >
+                {isTextExpanded ? (
+                  <Minimize2 className="h-4 w-4 text-foreground" />
+                ) : (
+                  <Expand className="h-4 w-4 text-foreground" />
+                )}
+              </Button>
+            )}
+            
             {contentData.text || contentData.url ? (
-              <div className="text-dashboard-text dark:text-dashboard-text text-sm">
+              <div className="text-dashboard-text dark:text-dashboard-text text-sm pr-10">
                 {contentData.text ? (
                   <pre className="whitespace-pre-wrap font-sans">{contentData.text}</pre>
                 ) : (
