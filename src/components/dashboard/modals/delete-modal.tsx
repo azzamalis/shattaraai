@@ -34,7 +34,7 @@ export function DeleteModal({
 
         {/* Subtitle */}
         <p className="text-sm text-muted-foreground">
-          "{itemToDelete.title}" will be permanently deleted.
+          "<span className="truncate inline-block max-w-[300px]">{itemToDelete.title}</span>" will be permanently deleted.
         </p>
 
         {/* Actions */}
