@@ -54,26 +54,26 @@ export function LearningCardMenu({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-1" side="right" align="start" sideOffset={8}>
-        <div className="flex flex-col">
+        <div className="flex flex-col max-w-full">
           <Popover open={addToRoomOpen} onOpenChange={setAddToRoomOpen}>
             <PopoverTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={e => {
+              <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal min-w-0" onClick={e => {
                 e.stopPropagation();
                 setAddToRoomOpen(true);
               }}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add
+                <Plus className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="truncate overflow-hidden">Add</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-1" side="right" align="start" sideOffset={8}>
-              <div className="flex flex-col">
+              <div className="flex flex-col max-w-full">
                 {availableRooms.length > 0 ? (
                   availableRooms.map(room => (
-                    <Button key={room.id} variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={e => {
+                    <Button key={room.id} variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal min-w-0" onClick={e => {
                       e.stopPropagation();
                       handleAddToRoom(room.id, room.name);
                     }}>
-                      {room.name}
+                      <span className="truncate overflow-hidden">{room.name}</span>
                     </Button>
                   ))
                 ) : (
@@ -85,24 +85,24 @@ export function LearningCardMenu({
             </PopoverContent>
           </Popover>
 
-          <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={e => {
+          <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal min-w-0" onClick={e => {
             e.stopPropagation();
             setMenuOpen(false);
             onShare();
           }}>
-            <Share className="mr-2 h-4 w-4" />
-            Share
+            <Share className="mr-2 h-4 w-4 flex-shrink-0" />
+            <span className="truncate overflow-hidden">Share</span>
           </Button>
 
           <Separator className="my-1" />
           
-          <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal" onClick={e => {
+          <Button variant="ghost" className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal min-w-0" onClick={e => {
             e.stopPropagation();
             setMenuOpen(false);
             onDelete();
           }}>
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            <Trash2 className="mr-2 h-4 w-4 flex-shrink-0" />
+            <span className="truncate overflow-hidden">Delete</span>
           </Button>
         </div>
       </PopoverContent>
