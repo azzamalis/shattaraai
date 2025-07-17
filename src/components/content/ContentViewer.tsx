@@ -64,23 +64,18 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
   const renderAudioPlayer = (url: string) => {
     console.log('DEBUG: ContentViewer - Rendering audio player with URL:', url);
     return (
-      <div className="w-full sticky top-0 z-10 flex flex-col bg-card border-b border-border min-w-0 flex-shrink-0 transition-all duration-200">
+      <div className="w-full sticky top-0 z-10 flex flex-col bg-background border-b border-border min-w-0 flex-shrink-0">
         <div className="w-full p-4">
           <div className="flex items-center justify-center">
             <audio 
               controls 
-              className="w-full h-12 bg-card border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
-              style={{
-                filter: 'invert(0)',
-                background: 'hsl(var(--card))',
-                color: 'hsl(var(--foreground))'
-              }}
+              className="w-full"
               onError={(e) => {
                 console.error('DEBUG: ContentViewer - Audio loading error:', e);
               }}
             >
               <source src={url} type="audio/mpeg" />
-              <span className="text-foreground text-sm">Your browser does not support the audio element.</span>
+              Your browser does not support the audio element.
             </audio>
           </div>
         </div>
@@ -127,11 +122,11 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
         return audioUrl ? (
           renderAudioPlayer(audioUrl)
         ) : (
-          <div className="w-full sticky top-0 z-10 bg-card border-b border-border flex-shrink-0 min-w-0 p-4 transition-all duration-200">
-            <div className="flex flex-col items-center text-foreground">
+          <div className="w-full sticky top-0 z-10 bg-background border-b border-border flex-shrink-0 min-w-0 p-4">
+            <div className="flex flex-col items-center text-foreground/60">
               <FileText className="h-8 w-8 mb-2" />
               <span className="text-sm">Audio Player</span>
-              <span className="text-xs text-foreground/60">No valid audio URL available</span>
+              <span className="text-xs">No valid audio URL available</span>
             </div>
           </div>
         );
