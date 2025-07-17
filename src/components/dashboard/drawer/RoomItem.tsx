@@ -53,10 +53,12 @@ export const RoomItem: React.FC<RoomItemProps> = ({
             <X className="h-4 w-4" />
           </Button>
         </div> : <>
-          <Button variant="ghost" className="flex-1 justify-start text-left h-8 px-2" onClick={e => onRoomClick(e, room.id)}>
-            <div className="flex items-center gap-2">
-              <Box className="h-4 w-4 text-primary/60" />
-              <span className="truncate text-sm font-medium">{room.name}</span>
+          <Button variant="ghost" className="flex-1 justify-start text-left h-8 px-2 min-w-0" onClick={e => onRoomClick(e, room.id)}>
+            <div className="flex items-center gap-2 min-w-0 w-full">
+              <div className="flex-shrink-0 w-4 h-4">
+                <Box className="h-4 w-4 text-primary/60" />
+              </div>
+              <span className="truncate text-sm font-medium min-w-0">{room.name}</span>
             </div>
           </Button>
           <DropdownMenu>
