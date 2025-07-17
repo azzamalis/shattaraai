@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown, Expand, Minimize2 } from 'lucide-react';
+import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown, Expand, Minimize2, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
@@ -47,6 +47,7 @@ export function ContentLeftSidebar({
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
   const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
 
   const handleChapterClick = (timestamp: number) => {
     if (onChapterClick) {
@@ -108,7 +109,13 @@ export function ContentLeftSidebar({
 
     // Default content viewer for other types
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
-        <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} onTextAction={onTextAction} currentTimestamp={currentTimestamp} />
+        <ContentViewer 
+          contentData={contentData} 
+          onUpdateContent={onUpdateContent} 
+          onTextAction={onTextAction} 
+          currentTimestamp={currentTimestamp}
+          onExpandText={() => setIsTextExpanded(true)}
+        />
       </div>;
   };
 
@@ -280,6 +287,40 @@ export function ContentLeftSidebar({
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                     {contentData.text}
                   </p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      )}
+      
+      {/* Full-page text content overlay */}
+      {isTextExpanded && (contentData.type === 'text' || contentData.type === 'website') && contentData.text && (
+        <div className="absolute inset-0 z-50 bg-background flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <h2 className="text-lg font-semibold text-foreground">{contentData.title || 'Text Content'}</h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsTextExpanded(false)}
+              className="h-8 w-8 p-0"
+            >
+              <Minimize2 className="h-4 w-4" />
+            </Button>
+          </div>
+          <ScrollArea className="flex-1 p-6">
+            <div className="max-w-4xl mx-auto">
+              {contentData.text ? (
+                <pre className="whitespace-pre-wrap font-sans text-foreground">{contentData.text}</pre>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Globe className="h-5 w-5" />
+                    <span className="font-medium text-foreground">Website Content</span>
+                  </div>
+                  <a href={contentData.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    {contentData.url}
+                  </a>
                 </div>
               )}
             </div>

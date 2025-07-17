@@ -11,11 +11,11 @@ interface ContentViewerProps {
   onUpdateContent: (updates: Partial<ContentData>) => void;
   onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
   currentTimestamp?: number;
+  onExpandText?: () => void;
 }
 
-export function ContentViewer({ contentData, onUpdateContent, onTextAction, currentTimestamp }: ContentViewerProps) {
+export function ContentViewer({ contentData, onUpdateContent, onTextAction, currentTimestamp, onExpandText }: ContentViewerProps) {
   const youtubePlayerRef = useRef<HTMLIFrameElement>(null);
-  const [isTextExpanded, setIsTextExpanded] = useState(false);
   
   console.log('DEBUG: ContentViewer - Rendering with content data:', {
     id: contentData.id,
@@ -207,83 +207,46 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
         console.log('DEBUG: ContentViewer - Text/Website content:', { text: contentData.text, url: contentData.url });
         
         return (
-          <>
-            {/* Full-page text overlay when expanded */}
-            {isTextExpanded && (contentData.text || contentData.url) && (
-              <div className="fixed inset-0 z-50 bg-background flex flex-col">
-                <div className="flex items-center justify-between p-4 border-b border-border">
-                  <h2 className="text-lg font-semibold text-foreground">{contentData.title || 'Text Content'}</h2>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsTextExpanded(false)}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Minimize2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                <ScrollArea className="flex-1 p-6">
-                  <div className="max-w-4xl mx-auto">
-                    {contentData.text ? (
-                      <pre className="whitespace-pre-wrap font-sans text-foreground">{contentData.text}</pre>
-                    ) : (
-                      <div>
-                        <div className="flex items-center gap-2 mb-4">
-                          <Globe className="h-5 w-5" />
-                          <span className="font-medium text-foreground">Website Content</span>
-                        </div>
-                        <a href={contentData.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                          {contentData.url}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
-              </div>
+          <div className="relative w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator p-4 overflow-auto">
+            {/* Expand Button */}
+            {(contentData.text || contentData.url) && onExpandText && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onExpandText}
+                className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20 z-10 transition-colors"
+                aria-label="Expand content"
+              >
+                <Expand className="h-4 w-4 text-foreground" />
+              </Button>
             )}
             
-            {/* Regular container with expand button */}
-            <div className="relative w-full h-64 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator p-4 overflow-auto">
-              {/* Expand Button */}
-              {(contentData.text || contentData.url) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsTextExpanded(true)}
-                  className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20 z-10 transition-colors"
-                  aria-label="Expand content"
-                >
-                  <Expand className="h-4 w-4 text-foreground" />
-                </Button>
-              )}
-              
-              {contentData.text || contentData.url ? (
-                <div className="text-dashboard-text dark:text-dashboard-text text-sm pr-10">
-                  {contentData.text ? (
-                    <pre className="whitespace-pre-wrap font-sans">{contentData.text}</pre>
-                  ) : (
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Globe className="h-4 w-4" />
-                        <span className="font-medium">Website Content</span>
-                      </div>
-                      <a href={contentData.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                        {contentData.url}
-                      </a>
+            {contentData.text || contentData.url ? (
+              <div className="text-dashboard-text dark:text-dashboard-text text-sm pr-10">
+                {contentData.text ? (
+                  <pre className="whitespace-pre-wrap font-sans">{contentData.text}</pre>
+                ) : (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Globe className="h-4 w-4" />
+                      <span className="font-medium">Website Content</span>
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                    <ClipboardPaste className="h-8 w-8 mb-2" />
-                    <span className="text-sm">Text Content</span>
-                    <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No content provided</span>
+                    <a href={contentData.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      {contentData.url}
+                    </a>
                   </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                  <ClipboardPaste className="h-8 w-8 mb-2" />
+                  <span className="text-sm">Text Content</span>
+                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No content provided</span>
                 </div>
-              )}
-            </div>
-          </>
+              </div>
+            )}
+          </div>
         );
       
       default:
