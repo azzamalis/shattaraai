@@ -64,18 +64,21 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
   const renderAudioPlayer = (url: string) => {
     console.log('DEBUG: ContentViewer - Rendering audio player with URL:', url);
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8">
-        <audio
-          src={url}
-          controls
-          className="w-full max-w-md"
-          onError={(e) => {
-            console.error('DEBUG: ContentViewer - Audio loading error:', e);
-          }}
-        />
-        <p className="text-sm text-muted-foreground mt-4">
-          {contentData.filename || 'Audio File'}
-        </p>
+      <div className="w-full sticky top-0 z-10 flex flex-col bg-background border-b border-border min-w-0 flex-shrink-0">
+        <div className="w-full p-4">
+          <div className="flex items-center justify-center">
+            <audio 
+              controls 
+              className="w-full"
+              onError={(e) => {
+                console.error('DEBUG: ContentViewer - Audio loading error:', e);
+              }}
+            >
+              <source src={url} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        </div>
       </div>
     );
   };
@@ -116,19 +119,15 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
       case 'live_recording':
         const audioUrl = contentData.url && !contentData.url.startsWith('blob:') ? contentData.url : null;
         console.log('DEBUG: ContentViewer - Audio URL processing:', { originalUrl: contentData.url, finalUrl: audioUrl });
-        return (
-          <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
-            {audioUrl ? (
-              renderAudioPlayer(audioUrl)
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="flex flex-col items-center text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                  <FileText className="h-8 w-8 mb-2" />
-                  <span className="text-sm">Audio Player</span>
-                  <span className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60">No valid audio URL available</span>
-                </div>
-              </div>
-            )}
+        return audioUrl ? (
+          renderAudioPlayer(audioUrl)
+        ) : (
+          <div className="w-full sticky top-0 z-10 bg-background border-b border-border flex-shrink-0 min-w-0 p-4">
+            <div className="flex flex-col items-center text-foreground/60">
+              <FileText className="h-8 w-8 mb-2" />
+              <span className="text-sm">Audio Player</span>
+              <span className="text-xs">No valid audio URL available</span>
+            </div>
           </div>
         );
       
