@@ -13,7 +13,7 @@ import {
   Upload,
   Box,
   FileText,
-  Video,
+  Play,
   Globe,
   Youtube,
   MessageSquare,
@@ -36,7 +36,7 @@ interface CommandModalProps {
 const getContentTypeIcon = (type: string) => {
   switch (type) {
     case 'video':
-      return <Video size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+      return <Play size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     case 'pdf':
     case 'file':
       return <FileText size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;

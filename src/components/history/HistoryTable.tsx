@@ -18,7 +18,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger
 } from '@/components/ui/dropdown-menu';
-import { FileText, Video, Youtube, Mic, Globe, MessageSquare, MoreHorizontal, Type, Music } from 'lucide-react';
+import { FileText, Play, Youtube, Mic, Globe, MessageSquare, MoreHorizontal, Type, Music } from 'lucide-react';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { HistoryEmptyState } from './HistoryEmptyState';
@@ -48,7 +48,7 @@ interface HistoryTableProps {
 const getContentTypeIcon = (type: string) => {
   switch (type) {
     case 'video':
-      return <Video className="h-4 w-4 text-primary" />;
+      return <Play className="h-4 w-4 text-primary" />;
     case 'pdf':
     case 'file':
     case 'upload':
