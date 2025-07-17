@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, Share2, X } from 'lucide-react';
 import Logo from '@/components/Logo';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { CircularProgress } from './exam-results/CircularProgress';
 import { ChapterBreakdown } from './exam-results/ChapterBreakdown';
@@ -42,16 +42,14 @@ const chapters: ChapterData[] = [
 export function ExamResultsSummary() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { contentId } = useParams<{ contentId: string }>();
 
   // Get the room ID from localStorage or state management
   const roomId = localStorage.getItem('currentRoomId') || '';
 
   const handleTryAgain = () => {
-    // Keep the same exam config and navigate back to exam
-    const examConfig = localStorage.getItem('examConfig');
-    if (examConfig) {
-      navigate('/exam');
-    }
+    // Keep the same exam config and navigate back to exam with the same data
+    navigate(`/exam/${contentId}`);
   };
 
   const handleRetake = () => {
@@ -60,7 +58,7 @@ export function ExamResultsSummary() {
     if (examConfig) {
       // Clear only the results, keep the config
       localStorage.removeItem('examResults');
-      navigate('/exam-loading');
+      navigate(`/exam-loading/${roomId}`);
     }
   };
 

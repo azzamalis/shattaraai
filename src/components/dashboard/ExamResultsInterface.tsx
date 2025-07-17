@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ExamResultsHeader } from './exam-results-interface/ExamResultsHeader';
 import { ExamResultsFooter } from './exam-results-interface/ExamResultsFooter';
 import { ChatDrawer } from './exam-results-interface/ChatDrawer';
@@ -97,6 +97,7 @@ const ExamResultsInterface: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentChatQuestion, setCurrentChatQuestion] = useState<number | null>(null);
   const navigate = useNavigate();
+  const { contentId } = useParams<{ contentId: string }>();
 
   // Add dummy data when component mounts
   useEffect(() => {
@@ -163,7 +164,10 @@ const ExamResultsInterface: React.FC = () => {
         </div>
       </main>
 
-      <ExamResultsFooter onTryAgain={() => {}} onViewResults={() => navigate('/exam/results')} />
+      <ExamResultsFooter 
+        onTryAgain={() => navigate(`/exam/${contentId}`)} 
+        onViewResults={() => navigate(`/exam-summary/${contentId}`)} 
+      />
 
       <ChatDrawer isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} currentQuestionId={currentChatQuestion} />
     </div>;

@@ -30,6 +30,7 @@ import Onboarding from "./pages/Onboarding";
 import ExamPage from "./pages/ExamPage";
 import ExamLoadingPage from "./pages/ExamLoadingPage";
 import ExamResultsPage from "./pages/ExamResultsPage";
+import { ExamResultsSummary } from "./components/dashboard/ExamResultsSummary";
 import ReportsPage from "./pages/ReportsPage";
 import NotFound from "./pages/NotFound";
 
@@ -67,9 +68,10 @@ function App() {
                   <Route path="/team" element={<Team />} />
                   <Route path="/careers" element={<Careers />} />
                   <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/exam/:contentId" element={<ExamPage />} />
-                  <Route path="/exam-loading/:roomId" element={<ExamLoadingPage />} />
-                  <Route path="/exam-results/:contentId" element={<ExamResultsPage />} />
+                   <Route path="/exam/:contentId" element={<ExamPage />} />
+                   <Route path="/exam-loading/:roomId" element={<ExamLoadingPage />} />
+                   <Route path="/exam-results/:contentId" element={<ExamResultsPage />} />
+                   <Route path="/exam-summary/:contentId" element={<ExamResultsSummary />} />
                   <Route path="/reports" element={<ReportsPage />} />
                   <Route path="*" element={<NotFound />} />
                   </Routes>
