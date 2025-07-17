@@ -6,9 +6,11 @@ import { useDocumentViewer } from './DocumentViewerContext';
 import { ContentData } from '@/pages/ContentPage';
 interface DocumentContentProps {
   contentData: ContentData;
+  onUpdateContent: (updates: Partial<ContentData>) => void;
 }
 export function DocumentContent({
-  contentData
+  contentData,
+  onUpdateContent
 }: DocumentContentProps) {
   const {
     zoom,
