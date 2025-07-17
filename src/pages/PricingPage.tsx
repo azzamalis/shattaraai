@@ -91,11 +91,11 @@ const PricingPage: React.FC = () => {
                   <ul className="space-y-4 mt-6">
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-[#121212] dark:text-[#FFFFFF]">3 uploads, pastes, and records / day</span>
+                      <span className="text-[#121212] dark:text-[#FFFFFF]">3 uploads, pastes, and recordings / day</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-[#121212] dark:text-[#FFFFFF]">5 chat credits / day (3 / chat conversation with Search+ mode)</span>
+                      <span className="text-[#121212] dark:text-[#FFFFFF]">5 chat credits / day (3 uploads / chat conversation with Search+ mode)</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
