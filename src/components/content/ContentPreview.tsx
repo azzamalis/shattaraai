@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ContentType } from '@/lib/types';
-import { FileText, Music, Video, Globe, MessageSquare, Upload, Mic, Type } from 'lucide-react';
+import { FileText, Music, Play, Globe, MessageSquare, Upload, Mic, Type } from 'lucide-react';
 
 interface ContentPreviewProps {
   type: ContentType;
@@ -22,9 +22,9 @@ export function ContentPreview({ type, filename, title, className = "w-16 h-16" 
       case 'live_recording':
         return <Mic className={`${className} text-red-500`} />;
       case 'video':
-        return <Video className={`${className} text-gray-400`} />;
+        return <Play className={`${className} text-gray-400`} />;
       case 'youtube':
-        return <Video className={`${className} text-red-500`} />;
+        return <Play className={`${className} text-red-500`} />;
       case 'website':
         return <Globe className={`${className} text-blue-400`} />;
       case 'text':

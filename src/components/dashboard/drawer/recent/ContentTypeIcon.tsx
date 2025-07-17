@@ -2,7 +2,7 @@
 import React from 'react';
 import { 
   FileText, 
-  Video, 
+  Play, 
   Youtube, 
   Mic, 
   Globe, 
@@ -19,7 +19,7 @@ interface ContentTypeIconProps {
 export const ContentTypeIcon: React.FC<ContentTypeIconProps> = ({ type }) => {
   switch (type) {
     case 'video':
-      return <Video className="h-4 w-4 text-primary/60" />;
+      return <Play className="h-4 w-4 text-primary/60" />;
     case 'pdf':
     case 'file':
       return <FileText className="h-4 w-4 text-primary/60" />;

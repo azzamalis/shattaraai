@@ -1,5 +1,5 @@
 import React from 'react';
-import { Video, Mic, FileText, Globe, MessageSquare, Music, Upload, Type } from 'lucide-react';
+import { Play, Mic, FileText, Globe, MessageSquare, Music, Upload, Type } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PDFThumbnailGenerator } from './PDFThumbnailGenerator';
 interface LearningCardThumbnailProps {
@@ -78,7 +78,7 @@ export function LearningCardThumbnail({
     }
     if (isVideo) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Video className="w-12 h-12 text-muted-foreground" />
+          <Play className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isChat) {
