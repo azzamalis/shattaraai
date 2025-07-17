@@ -77,7 +77,7 @@ export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch('/api/send-contact-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,8 +86,12 @@ export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send message');
       }
+
+      const result = await response.json();
+      console.log('Email sent successfully:', result);
 
       // Reset form and close modal on success
       setFormData({
@@ -101,14 +105,15 @@ export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps
       onOpenChange(false);
       
       toast({
-        title: "Message Sent",
-        description: "Thank you for your interest! Our sales team will contact you soon.",
-        duration: 5000,
+        title: "Message Sent Successfully!",
+        description: "Thank you for your interest! Our sales team will contact you within 24 hours. Check your email for confirmation.",
+        duration: 6000,
       });
     } catch (error) {
+      console.error('Contact form error:', error);
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again later.",
+        description: error instanceof Error ? error.message : "Failed to send message. Please try again later.",
         variant: "destructive",
         duration: 5000,
       });
