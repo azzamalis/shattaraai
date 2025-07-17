@@ -189,72 +189,9 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
           transform: translateX(4px) !important;
         }
 
-        /* Enhanced Side Menu (Drag Handle) with Separated Actions */
+        /* Hide Side Menu (Drag Handle and Action Buttons) */
         .bn-side-menu {
-          background-color: hsl(var(--card)) !important;
-          border: 1px solid hsl(var(--border)) !important;
-          border-radius: 0.5rem !important;
-          padding: 0.25rem !important;
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 0.25rem !important;
-          min-width: 40px !important;
-        }
-
-        /* Drag Handle */
-        .bn-side-menu button[data-test="dragHandleMenu"] {
-          background-color: transparent !important;
-          color: hsl(var(--muted-foreground)) !important;
-          border: none !important;
-          border-radius: 0.375rem !important;
-          padding: 0.5rem !important;
-          cursor: grab !important;
-          transition: all 0.15s ease-in-out !important;
-        }
-
-        .bn-side-menu button[data-test="dragHandleMenu"]:hover {
-          background-color: hsl(var(--accent)) !important;
-          color: hsl(var(--accent-foreground)) !important;
-          cursor: grab !important;
-        }
-
-        .bn-side-menu button[data-test="dragHandleMenu"]:active {
-          cursor: grabbing !important;
-        }
-
-        /* Add Block Button */
-        .bn-side-menu button[aria-label*="add"] {
-          background-color: hsl(var(--primary)) !important;
-          color: hsl(var(--primary-foreground)) !important;
-          border: none !important;
-          border-radius: 0.375rem !important;
-          padding: 0.5rem !important;
-          font-size: 14px !important;
-          font-weight: 500 !important;
-          transition: all 0.15s ease-in-out !important;
-        }
-
-        .bn-side-menu button[aria-label*="add"]:hover {
-          background-color: hsl(var(--primary)) !important;
-          opacity: 0.9 !important;
-          transform: scale(1.05) !important;
-        }
-
-        /* Delete Block Button - Red Styling */
-        .bn-side-menu button[aria-label*="delete"],
-        .bn-side-menu button[data-test*="delete"] {
-          background-color: hsl(0 84% 60%) !important;
-          color: white !important;
-          border: none !important;
-          border-radius: 0.375rem !important;
-          padding: 0.5rem !important;
-          transition: all 0.15s ease-in-out !important;
-        }
-
-        .bn-side-menu button[aria-label*="delete"]:hover,
-        .bn-side-menu button[data-test*="delete"]:hover {
-          background-color: hsl(0 84% 50%) !important;
-          transform: scale(1.05) !important;
+          display: none !important;
         }
 
         /* Formatting Toolbar Enhanced */
