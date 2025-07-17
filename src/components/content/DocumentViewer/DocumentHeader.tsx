@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ZoomIn, ZoomOut, Download, Search, Maximize, Minimize, Maximize2, Menu } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, Search, Maximize, Minimize, Maximize2, Columns2 } from 'lucide-react';
 import { useDocumentViewer } from './DocumentViewerContext';
 export function DocumentHeader() {
   const {
@@ -24,7 +24,7 @@ export function DocumentHeader() {
   return <div className="flex items-center justify-between p-2 border-b border-border bg-inherit">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" onClick={toggleSidebar} className="h-8 w-8 p-0">
-          <Menu className="h-4 w-4" />
+          <Columns2 className="h-4 w-4" />
         </Button>
         
         <div className="flex items-center gap-1">
