@@ -40,10 +40,8 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
     return theme === 'dark' ? 'dark' : 'light';
   }, [theme]);
 
-  return (
-    <div className="h-full w-full overflow-hidden bg-transparent">
-      <style dangerouslySetInnerHTML={{
-        __html: `
+  // Memoize styles to update when theme changes
+  const editorStyles = useMemo(() => `
         /* Reset and full height layout */
         .notion-editor-wrapper {
           height: 100%;
@@ -354,8 +352,11 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
             flex-wrap: wrap !important;
           }
         }
-        `
-      }} />
+  `, [theme]);
+
+  return (
+    <div className="h-full w-full overflow-hidden bg-transparent">
+      <style dangerouslySetInnerHTML={{ __html: editorStyles }} />
       
       <div className="notion-editor-wrapper">
         <BlockNoteView
