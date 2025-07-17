@@ -9,7 +9,8 @@ import {
   MessageSquare, 
   Music, 
   Upload, 
-  Type 
+  Type,
+  Text 
 } from 'lucide-react';
 
 interface ContentTypeIconProps {
@@ -21,6 +22,7 @@ export const ContentTypeIcon: React.FC<ContentTypeIconProps> = ({ type }) => {
     case 'video':
       return <Play className="h-4 w-4 text-primary/60" />;
     case 'pdf':
+      return <Text className="h-4 w-4 text-primary/60" />;
     case 'file':
       return <FileText className="h-4 w-4 text-primary/60" />;
     case 'recording':

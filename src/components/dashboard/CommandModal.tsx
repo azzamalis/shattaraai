@@ -18,7 +18,8 @@ import {
   Youtube,
   MessageSquare,
   Music,
-  Type
+  Type,
+  Text
 } from 'lucide-react';
 import { useContent } from '@/contexts/ContentContext';
 import { Room } from '@/lib/types';
@@ -38,6 +39,7 @@ const getContentTypeIcon = (type: string) => {
     case 'video':
       return <Play size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     case 'pdf':
+      return <Text size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     case 'file':
       return <FileText size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     case 'recording':
