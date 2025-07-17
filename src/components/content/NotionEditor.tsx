@@ -184,9 +184,14 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
 
         .bn-suggestion-menu-item:hover,
         .bn-suggestion-menu-item[data-highlighted="true"] {
-          background-color: hsl(var(--primary)) !important;
-          color: hsl(var(--primary-foreground)) !important;
+          background-color: hsl(var(--accent)) !important;
+          color: hsl(var(--accent-foreground)) !important;
           transform: translateX(4px) !important;
+        }
+
+        .bn-suggestion-menu-item:hover *,
+        .bn-suggestion-menu-item[data-highlighted="true"] * {
+          color: hsl(var(--accent-foreground)) !important;
         }
 
         /* Hide Side Menu (Drag Handle and Action Buttons) */
