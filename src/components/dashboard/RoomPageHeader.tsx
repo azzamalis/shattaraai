@@ -66,7 +66,7 @@ export const RoomPageHeader: React.FC<RoomPageHeaderProps> = ({
       <div className="group">
         <div className="flex items-center gap-3 mb-2">
           {isEditingTitle ? <input type="text" value={editedTitle} onChange={e => setEditedTitle(e.target.value)} onKeyDown={handleTitleKeyDown} onClick={e => e.stopPropagation()} className="text-2xl font-bold text-foreground bg-transparent border-none outline-none focus:ring-0 p-0 w-full" placeholder="Untitled Room" autoFocus /> : <>
-              <h1 className="text-foreground text-2xl font-medium truncate">{room.name}</h1>
+              <h1 className="text-foreground text-2xl font-medium truncate min-w-0 max-w-full">{room.name}</h1>
               <button onClick={e => {
             e.stopPropagation();
             handleTitleEditStart();
