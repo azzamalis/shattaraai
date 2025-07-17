@@ -268,7 +268,7 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
 
         /* Placeholder Text Styling */
         .ProseMirror p.is-empty::before {
-          color: hsl(var(--foreground) / 0.5) !important;
+          color: hsl(var(--muted)) !important;
           font-style: italic !important;
           content: attr(data-placeholder) !important;
         }
