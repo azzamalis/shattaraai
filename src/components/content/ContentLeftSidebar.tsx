@@ -107,7 +107,11 @@ export function ContentLeftSidebar({
         </div>;
     }
 
-    // Default content viewer for other types
+    // Default content viewer for other types (excluding website)
+    if (contentData.type === 'website') {
+      return null; // Website content is handled in tabs
+    }
+    
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
         <ContentViewer 
           contentData={contentData} 
@@ -174,7 +178,31 @@ export function ContentLeftSidebar({
                       </Button>
                     ))}
                   </div>}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
+                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsTextExpanded(!isTextExpanded)}
+                        className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20"
+                      >
+                        {isTextExpanded ? (
+                          <Minimize2 className="h-4 w-4" />
+                        ) : (
+                          <Expand className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <div>
+                        <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
+                          Website Content Summary
+                        </p>
+                        <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10 line-clamp-6">
+                          {contentData.text}
+                        </p>
+                      </div>
+                    </div>
+                  </div>}
+                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Processing content...
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
@@ -235,7 +263,31 @@ export function ContentLeftSidebar({
                       )}
                     </div>
                   </div>}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
+                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsTextExpanded(!isTextExpanded)}
+                        className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20"
+                      >
+                        {isTextExpanded ? (
+                          <Minimize2 className="h-4 w-4" />
+                        ) : (
+                          <Expand className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <div>
+                        <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
+                          Website Full Text Content
+                        </p>
+                        <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
+                          {contentData.text}
+                        </p>
+                      </div>
+                    </div>
+                  </div>}
+                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Extracting text...
                   </div>}
               </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
