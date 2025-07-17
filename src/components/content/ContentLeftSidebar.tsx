@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
+import { DocumentViewer } from '@/components/content/DocumentViewer/DocumentViewer';
 import { AudioPlayer } from '@/components/content/AudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
@@ -55,8 +56,11 @@ export function ContentLeftSidebar({
     }
   };
 
-  // Check if we should hide tabs (for PDF content)
+  // Check if we should hide tabs (for PDF content or use DocumentViewer)
   const shouldHideTabs = contentData.type === 'pdf';
+  const shouldUseDocumentViewer = (contentData.type === 'file' && contentData.filename && 
+    contentData.filename.match(/\.(docx?|txt|rtf|odt|xlsx?|csv|pptx?|ppt|odp|jpe?g|png|gif|svg|webp)$/i)) ||
+    contentData.type === 'text' || contentData.type === 'website';
   
   const renderControls = () => {
     // Show loading state while detecting recording state
@@ -110,6 +114,16 @@ export function ContentLeftSidebar({
     // Default content viewer for other types (excluding website)
     if (contentData.type === 'website') {
       return null; // Website content is handled in tabs
+    }
+    
+    if (shouldUseDocumentViewer) {
+      return <div className="flex-1 min-h-0">
+          <DocumentViewer 
+            contentData={contentData} 
+            onUpdateContent={onUpdateContent} 
+            onTextAction={onTextAction}
+          />
+        </div>;
     }
     
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
@@ -301,8 +315,8 @@ export function ContentLeftSidebar({
       </>;
   };
 
-  // If it's PDF content, render without tabs
-  if (shouldHideTabs) {
+  // If it's PDF content or uses DocumentViewer, render without tabs
+  if (shouldHideTabs || shouldUseDocumentViewer) {
     return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
         {renderControls()}
       </div>;
