@@ -69,7 +69,7 @@ export function SlashCommandMenu({ position, onSelect, onClose }: SlashCommandMe
               onClick={() => onSelect(command.type)}
               className={cn(
                 "w-full flex items-center gap-3 px-2 py-2 text-left",
-                "hover:bg-dashboard-bg dark:hover:bg-dashboard-bg",
+                "hover:bg-accent hover:text-accent-foreground",
                 "rounded-md transition-colors"
               )}
             >
