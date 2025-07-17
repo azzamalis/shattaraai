@@ -1,27 +1,46 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ZoomIn, ZoomOut, Download, Search, Maximize, Minimize, Maximize2, Columns2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, Search, Maximize, Minimize, Columns2 } from 'lucide-react';
 import { useDocumentViewer } from './DocumentViewerContext';
-export function DocumentHeader() {
+
+interface DocumentHeaderProps {
+  contentData?: {
+    url?: string;
+    filename?: string;
+  };
+}
+
+export function DocumentHeader({ contentData }: DocumentHeaderProps) {
   const {
     zoom,
     searchTerm,
     isSearching,
     isFullscreen,
-    isSidebarOpen,
     zoomIn,
     zoomOut,
-    fitToWidth,
     setSearchTerm,
     setIsSearching,
     toggleFullscreen,
     toggleSidebar
   } = useDocumentViewer();
+
   const handleSearch = () => {
     setIsSearching(!isSearching);
+    if (!isSearching) {
+      // Clear search term when closing search
+      setSearchTerm('');
+    }
   };
-  return <div className="flex items-center justify-between p-2 border-b border-border bg-inherit">
+
+  const handleDownload = () => {
+    if (contentData?.url) {
+      window.open(contentData.url, '_blank');
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between p-2 border-b border-border bg-inherit">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" onClick={toggleSidebar} className="h-8 w-8 p-0">
           <Columns2 className="h-4 w-4" />
@@ -39,19 +58,31 @@ export function DocumentHeader() {
           <Button variant="ghost" size="sm" onClick={zoomIn} disabled={zoom >= 200} className="h-8 w-8 p-0">
             <ZoomIn className="h-4 w-4" />
           </Button>
-          
-          
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        {isSearching && <Input placeholder="Search document..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-48 h-8" />}
+        {isSearching && (
+          <Input 
+            placeholder="Search document..." 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
+            className="w-48 h-8"
+            autoFocus
+          />
+        )}
         
         <Button variant="ghost" size="sm" onClick={handleSearch} className="h-8 w-8 p-0">
           <Search className="h-4 w-4" />
         </Button>
         
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleDownload}
+          disabled={!contentData?.url}
+          className="h-8 w-8 p-0"
+        >
           <Download className="h-4 w-4" />
         </Button>
         
@@ -59,5 +90,6 @@ export function DocumentHeader() {
           {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
         </Button>
       </div>
-    </div>;
+    </div>
+  );
 }

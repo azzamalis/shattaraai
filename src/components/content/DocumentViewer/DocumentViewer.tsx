@@ -15,10 +15,10 @@ export function DocumentViewer({ contentData, onUpdateContent }: DocumentViewerP
   return (
     <DocumentViewerProvider>
       <div className="h-full flex flex-col bg-background">
-        <DocumentHeader />
+        <DocumentHeader contentData={contentData} />
         <div className="flex-1 flex min-h-0">
           <DocumentSidebar />
-          <DocumentContent contentData={contentData} />
+          <DocumentContent contentData={contentData} onUpdateContent={onUpdateContent} />
         </div>
         <DocumentStatusBar />
       </div>
