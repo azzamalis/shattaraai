@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
+import { DocumentViewer } from '@/components/content/DocumentViewer/DocumentViewer';
 import { AudioPlayer } from '@/components/content/AudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
@@ -55,8 +56,13 @@ export function ContentLeftSidebar({
     }
   };
 
-  // Check if we should hide tabs (for PDF content)
+  // Check if we should hide tabs (for PDF content or Word documents)
   const shouldHideTabs = contentData.type === 'pdf';
+  
+  // Check if it's a Word document
+  const isWordDocument = (contentData.type === 'file' || contentData.type === 'upload') && 
+    contentData.filename?.match(/\.(doc|docx)$/i);
+  const shouldHideTabsForDocument = isWordDocument;
   
   const renderControls = () => {
     // Show loading state while detecting recording state
@@ -110,6 +116,11 @@ export function ContentLeftSidebar({
     // Default content viewer for other types (excluding website)
     if (contentData.type === 'website') {
       return null; // Website content is handled in tabs
+    }
+    
+    // Show DocumentViewer for Word documents
+    if (isWordDocument) {
+      return null; // Document viewer will be rendered in the main layout
     }
     
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
@@ -305,6 +316,16 @@ export function ContentLeftSidebar({
   if (shouldHideTabs) {
     return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
         {renderControls()}
+      </div>;
+  }
+
+  // If it's a Word document, render the DocumentViewer without tabs
+  if (shouldHideTabsForDocument) {
+    return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
+        <DocumentViewer 
+          contentData={contentData} 
+          onUpdateContent={onUpdateContent}
+        />
       </div>;
   }
 
