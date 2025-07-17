@@ -105,11 +105,12 @@ export function AudioPlayer({ metadata, onTimeUpdate }: AudioPlayerProps) {
   };
 
   return (
-    <div className="w-full bg-dashboard-card dark:bg-dashboard-card rounded-lg p-4 space-y-4">
+    <div className="w-full flex-shrink-0 min-w-0 sticky top-0 z-10 bg-background border-b border-border p-4 transition-all duration-200">
       <audio
         ref={audioRef}
         src={metadata.audioUrl}
         preload="metadata"
+        className="hidden"
       />
       
       {/* Progress Bar */}
@@ -121,26 +122,26 @@ export function AudioPlayer({ metadata, onTimeUpdate }: AudioPlayerProps) {
           onValueChange={handleSeek}
           className="w-full"
         />
-        <div className="flex justify-between text-sm text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+        <div className="flex justify-between text-xs text-foreground/60">
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center gap-4 mt-2">
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={() => skip(-10)}
-          className="h-8 w-8 p-0"
         >
           <SkipBack className="h-4 w-4" />
         </Button>
         
         <Button
           onClick={togglePlayback}
-          className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90"
+          size="icon"
+          className="rounded-full bg-primary hover:bg-primary/90"
         >
           {isPlaying ? (
             <Pause className="h-5 w-5" />
@@ -151,34 +152,10 @@ export function AudioPlayer({ metadata, onTimeUpdate }: AudioPlayerProps) {
         
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={() => skip(10)}
-          className="h-8 w-8 p-0"
         >
           <SkipForward className="h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* Additional Controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Volume2 className="h-4 w-4 text-dashboard-text-secondary dark:text-dashboard-text-secondary" />
-          <Slider
-            value={[volume]}
-            max={1}
-            step={0.1}
-            onValueChange={handleVolumeChange}
-            className="w-20"
-          />
-        </div>
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={changePlaybackRate}
-          className="text-sm"
-        >
-          {playbackRate}x
         </Button>
       </div>
     </div>
