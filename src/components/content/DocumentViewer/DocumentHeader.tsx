@@ -40,9 +40,7 @@ export function DocumentHeader() {
             <ZoomIn className="h-4 w-4" />
           </Button>
           
-          <Button variant="ghost" size="sm" onClick={fitToWidth} className="h-8 w-8 p-0" title="Fit to width">
-            <Maximize2 className="h-4 w-4" />
-          </Button>
+          
         </div>
       </div>
 
