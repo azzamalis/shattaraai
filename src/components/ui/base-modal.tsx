@@ -25,7 +25,7 @@ export function BaseModal({
   contentClassName
 }: BaseModalProps) {
   return <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn("bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border border-border/50", contentClassName, className)}>
+      <DialogContent className={cn("bg-card border border-border", contentClassName, className)}>
         {showCloseButton && <button onClick={() => onOpenChange(false)} className="absolute right-4 top-4 z-50 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
