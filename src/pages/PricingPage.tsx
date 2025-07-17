@@ -99,7 +99,7 @@ const PricingPage: React.FC = () => {
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span className="text-[#121212] dark:text-[#FFFFFF]">10 quiz answers / day</span>
+                      <span className="text-[#121212] dark:text-[#FFFFFF]">10 quiz Q&A / day</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
@@ -203,10 +203,7 @@ const PricingPage: React.FC = () => {
                   </ul>
                 </CardContent>
                 <CardFooter className="px-8 pb-8 pt-0">
-                  <Button 
-                    className="w-full bg-[#121212] text-white hover:bg-[#121212]/90 dark:bg-[#FFFFFF] dark:text-[#1E1E1E] dark:hover:bg-[#FFFFFF]/90 font-medium"
-                    onClick={() => setContactModalOpen(true)}
-                  >
+                  <Button className="w-full bg-[#121212] text-white hover:bg-[#121212]/90 dark:bg-[#FFFFFF] dark:text-[#1E1E1E] dark:hover:bg-[#FFFFFF]/90 font-medium" onClick={() => setContactModalOpen(true)}>
                     Contact Us
                   </Button>
                 </CardFooter>
@@ -278,10 +275,7 @@ const PricingPage: React.FC = () => {
         </div>
       </div>
 
-      <ContactSalesModal 
-        open={contactModalOpen} 
-        onOpenChange={setContactModalOpen} 
-      />
+      <ContactSalesModal open={contactModalOpen} onOpenChange={setContactModalOpen} />
     </DashboardLayout>;
 };
 export default PricingPage;
