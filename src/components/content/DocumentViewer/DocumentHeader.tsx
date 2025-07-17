@@ -1,148 +1,93 @@
 import React from 'react';
-import { ContentData } from '@/pages/ContentPage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Search, 
-  Download, 
-  ChevronUp, 
-  ChevronDown, 
-  X, 
-  Columns2,
-  ChevronLeft,
-  ChevronRight,
-  Loader2
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ZoomIn, ZoomOut, Download, Search, Maximize, Minimize, Columns2 } from 'lucide-react';
+import { useDocumentViewer } from './DocumentViewerContext';
 
 interface DocumentHeaderProps {
-  contentData: ContentData;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  searchResults: number;
-  currentSearchIndex: number;
-  onSearchNavigate: (direction: 'next' | 'prev') => void;
-  onSearchClear: () => void;
-  isSearching: boolean;
-  onDownload: () => void;
-  onExpandToggle: () => void;
-  isExpanded: boolean;
+  contentData?: {
+    url?: string;
+    filename?: string;
+  };
 }
 
-export function DocumentHeader({
-  contentData,
-  searchQuery,
-  onSearchChange,
-  searchResults,
-  currentSearchIndex,
-  onSearchNavigate,
-  onSearchClear,
-  isSearching,
-  onDownload,
-  onExpandToggle,
-  isExpanded
-}: DocumentHeaderProps) {
+export function DocumentHeader({ contentData }: DocumentHeaderProps) {
+  const {
+    zoom,
+    searchTerm,
+    isSearching,
+    isFullscreen,
+    zoomIn,
+    zoomOut,
+    setSearchTerm,
+    setIsSearching,
+    toggleFullscreen,
+    toggleSidebar
+  } = useDocumentViewer();
+
+  const handleSearch = () => {
+    setIsSearching(!isSearching);
+    if (!isSearching) {
+      // Clear search term when closing search
+      setSearchTerm('');
+    }
+  };
+
+  const handleDownload = () => {
+    if (contentData?.url) {
+      window.open(contentData.url, '_blank');
+    }
+  };
+
   return (
-    <div className="flex items-center justify-between p-3 bg-muted/50 border-b">
-      {/* Left: Document Title */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        <Columns2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-        <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-medium text-foreground truncate">
-            {contentData.title || contentData.filename || 'Document'}
-          </h3>
-          <p className="text-xs text-muted-foreground truncate">
-            {contentData.type?.toUpperCase()} Document
-          </p>
-        </div>
-      </div>
-
-      {/* Center: Search */}
-      <div className="flex items-center gap-2 flex-1 max-w-md">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-          <Input
-            placeholder="Search document..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-7 pr-8 h-8 text-xs"
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onSearchClear}
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-destructive/10"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          )}
-        </div>
-
-        {/* Search Results */}
-        {searchQuery && (
-          <div className="flex items-center gap-1">
-            {isSearching ? (
-              <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-            ) : searchResults > 0 ? (
-              <>
-                <Badge variant="secondary" className="text-xs px-2 py-0">
-                  {currentSearchIndex + 1} of {searchResults}
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onSearchNavigate('prev')}
-                  disabled={searchResults === 0}
-                  className="h-6 w-6 p-0"
-                >
-                  <ChevronUp className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onSearchNavigate('next')}
-                  disabled={searchResults === 0}
-                  className="h-6 w-6 p-0"
-                >
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </>
-            ) : (
-              <Badge variant="outline" className="text-xs px-2 py-0">
-                No results
-              </Badge>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Right: Actions */}
-      <div className="flex items-center gap-2 flex-1 justify-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onDownload}
-          className="h-8 px-3 text-xs"
-          disabled={!contentData.url}
-        >
-          <Download className="h-3 w-3 mr-1" />
-          Download
+    <div className="flex items-center justify-between p-2 border-b border-border bg-inherit">
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" onClick={toggleSidebar} className="h-8 w-8 p-0">
+          <Columns2 className="h-4 w-4" />
         </Button>
         
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onExpandToggle}
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="sm" onClick={zoomOut} disabled={zoom <= 25} className="h-8 w-8 p-0">
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          
+          <span className="text-sm text-muted-foreground min-w-[60px] text-center">
+            {zoom}%
+          </span>
+          
+          <Button variant="ghost" size="sm" onClick={zoomIn} disabled={zoom >= 200} className="h-8 w-8 p-0">
+            <ZoomIn className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        {isSearching && (
+          <Input 
+            placeholder="Search document..." 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
+            className="w-48 h-8"
+            autoFocus
+          />
+        )}
+        
+        <Button variant="ghost" size="sm" onClick={handleSearch} className="h-8 w-8 p-0">
+          <Search className="h-4 w-4" />
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleDownload}
+          disabled={!contentData?.url}
           className="h-8 w-8 p-0"
-          title={isExpanded ? "Collapse toolbar" : "Expand toolbar"}
         >
-          {isExpanded ? (
-            <ChevronUp className="h-3 w-3" />
-          ) : (
-            <ChevronDown className="h-3 w-3" />
-          )}
+          <Download className="h-4 w-4" />
+        </Button>
+        
+        <Button variant="ghost" size="sm" onClick={toggleFullscreen} className="h-8 w-8 p-0">
+          {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
         </Button>
       </div>
     </div>

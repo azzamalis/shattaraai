@@ -56,11 +56,13 @@ export function ContentLeftSidebar({
     }
   };
 
-  // Check if we should hide tabs (for PDF content or use DocumentViewer)
+  // Check if we should hide tabs (for PDF content or Word documents)
   const shouldHideTabs = contentData.type === 'pdf';
-  const shouldUseDocumentViewer = (contentData.type === 'file' && contentData.filename && 
-    contentData.filename.match(/\.(docx?|txt|rtf|odt|xlsx?|csv|pptx?|ppt|odp|jpe?g|png|gif|svg|webp)$/i)) ||
-    contentData.type === 'text' || contentData.type === 'website';
+  
+  // Check if it's a Word document
+  const isWordDocument = (contentData.type === 'file' || contentData.type === 'upload') && 
+    contentData.filename?.match(/\.(doc|docx)$/i);
+  const shouldHideTabsForDocument = isWordDocument;
   
   const renderControls = () => {
     // Show loading state while detecting recording state
@@ -116,14 +118,9 @@ export function ContentLeftSidebar({
       return null; // Website content is handled in tabs
     }
     
-    if (shouldUseDocumentViewer) {
-      return <div className="flex-1 min-h-0">
-          <DocumentViewer 
-            contentData={contentData} 
-            onUpdateContent={onUpdateContent} 
-            onTextAction={onTextAction}
-          />
-        </div>;
+    // Show DocumentViewer for Word documents
+    if (isWordDocument) {
+      return null; // Document viewer will be rendered in the main layout
     }
     
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
@@ -315,10 +312,20 @@ export function ContentLeftSidebar({
       </>;
   };
 
-  // If it's PDF content or uses DocumentViewer, render without tabs
-  if (shouldHideTabs || shouldUseDocumentViewer) {
+  // If it's PDF content, render without tabs
+  if (shouldHideTabs) {
     return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
         {renderControls()}
+      </div>;
+  }
+
+  // If it's a Word document, render the DocumentViewer without tabs
+  if (shouldHideTabsForDocument) {
+    return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
+        <DocumentViewer 
+          contentData={contentData} 
+          onUpdateContent={onUpdateContent}
+        />
       </div>;
   }
 
