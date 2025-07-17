@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ContactSalesModalProps {
   open: boolean;
@@ -77,21 +78,18 @@ export function ContactSalesModal({ open, onOpenChange }: ContactSalesModalProps
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('/api/send-contact-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      console.log('Submitting contact sales form with data:', formData);
+      
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send message');
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to send message');
       }
 
-      const result = await response.json();
-      console.log('Email sent successfully:', result);
+      console.log('Email sent successfully:', data);
 
       // Reset form and close modal on success
       setFormData({
