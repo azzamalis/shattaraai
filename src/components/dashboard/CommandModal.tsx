@@ -200,17 +200,23 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Quick start">
-            <CommandItem onSelect={handleNewRecording}>
-              <Mic size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
-              <span>New Recording</span>
+            <CommandItem onSelect={handleNewRecording} className="flex items-center">
+              <div className="flex-shrink-0 w-4 h-4 mr-2">
+                <Mic size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
+              </div>
+              <span className="truncate flex-1 min-w-0">New Recording</span>
             </CommandItem>
-            <CommandItem onSelect={handleUploadClick}>
-              <Upload size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
-              <span>Upload Content</span>
+            <CommandItem onSelect={handleUploadClick} className="flex items-center">
+              <div className="flex-shrink-0 w-4 h-4 mr-2">
+                <Upload size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
+              </div>
+              <span className="truncate flex-1 min-w-0">Upload Content</span>
             </CommandItem>
-            <CommandItem onSelect={handleAddRoom}>
-              <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
-              <span>Add a Room</span>
+            <CommandItem onSelect={handleAddRoom} className="flex items-center">
+              <div className="flex-shrink-0 w-4 h-4 mr-2">
+                <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
+              </div>
+              <span className="truncate flex-1 min-w-0">Add a Room</span>
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />
@@ -220,14 +226,17 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
                 <CommandItem 
                   key={content.id}
                   onSelect={() => handleContentClick(content.id, content.type)}
+                  className="flex items-center"
                 >
-                  {getContentTypeIcon(content.type)}
-                  <span>{content.title}</span>
+                  <div className="flex-shrink-0 w-4 h-4 mr-2">
+                    {getContentTypeIcon(content.type)}
+                  </div>
+                  <span className="truncate flex-1 min-w-0">{content.title}</span>
                   {content.room_id && (
-                    <div className="ms-auto flex items-center gap-2">
+                    <div className="ms-auto flex items-center gap-2 flex-shrink-0">
                       <div className="flex items-center gap-1 rounded-md border border-border bg-muted px-1.5 py-0.5">
-                        <Box size={12} />
-                        <span className="text-xs text-foreground">
+                        <Box size={12} className="flex-shrink-0" />
+                        <span className="text-xs text-foreground truncate max-w-[100px]">
                           {rooms.find(r => r.id === content.room_id)?.name || 'Unknown Room'}
                         </span>
                       </div>
@@ -248,9 +257,12 @@ export function CommandModal({ open, onOpenChange, rooms, onAddRoom }: CommandMo
                 <CommandItem 
                   key={room.id}
                   onSelect={() => handleRoomClick(room.id)}
+                  className="flex items-center"
                 >
-                  <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
-                  <span>Go to {room.name}</span>
+                  <div className="flex-shrink-0 w-4 h-4 mr-2">
+                    <Box size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />
+                  </div>
+                  <span className="truncate flex-1 min-w-0">Go to {room.name}</span>
                 </CommandItem>
               ))
             ) : (
