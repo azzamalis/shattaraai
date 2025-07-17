@@ -11,11 +11,8 @@ export function ExamResultsHeader({ totalQuestions, onOpenChat }: ExamResultsHea
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card">
       <div className="flex items-center justify-between px-6 py-3">
-        {/* Left: Share Button */}
-        <button className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm hover:bg-accent/80">
-          <Share2 className="h-4 w-4" />
-          Share exam
-        </button>
+        {/* Left: Empty space for alignment */}
+        <div className="w-24"></div>
         
         {/* Center: Progress Bar (completed) */}
         <div className="flex items-center gap-4">
