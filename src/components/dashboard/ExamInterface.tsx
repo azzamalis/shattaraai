@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { QuestionRenderer } from './exam/QuestionRenderer';
 import { ExamHeader } from './exam/ExamHeader';
 import { debounce, generateQuestions, Question, ExamConfig } from './exam/examUtils';
@@ -18,6 +18,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
   const [isSaving, setIsSaving] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<number | null>(null);
   const navigate = useNavigate();
+  const { contentId } = useParams();
 
   const questions = useMemo(() => generateQuestions(examConfig), [examConfig]);
 
@@ -92,7 +93,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
     };
     
     localStorage.setItem('examResults', JSON.stringify(examResults));
-    navigate('/exam-results');
+    navigate(`/exam-results/${contentId || 'default'}`);
   };
 
   return (
