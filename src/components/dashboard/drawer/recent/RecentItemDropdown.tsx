@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { BaseModal } from '@/components/ui/base-modal';
+import { Input } from '@/components/ui/input';
 import { useContent } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
 import {
@@ -10,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Share, Trash2, Pencil, X } from 'lucide-react';
+import { MoreHorizontal, Share, Trash2, Pencil, X, Copy, Check, Link2, Twitter, Linkedin, MessageCircle } from 'lucide-react';
 
 interface RecentItemDropdownProps {
   contentId: string;
@@ -32,7 +33,11 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
   onDelete
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { deleteContent } = useContent();
+
+  const shareUrl = `${window.location.origin}/content/${contentId}`;
 
   // Disable body interactions when dropdown is open
   useEffect(() => {
@@ -50,9 +55,29 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
   const handleShareClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Share clicked for:', contentId, contentTitle);
-    onShare(e);
+    setShowShareModal(true);
     onOpenChange(false);
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast.success('Link copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast.error('Failed to copy link');
+    }
+  };
+
+  const handleSocialShare = (platform: string) => {
+    const text = `Check out this content: ${contentTitle}`;
+    const urls = {
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`,
+      whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + shareUrl)}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
+    };
+    window.open(urls[platform as keyof typeof urls], '_blank');
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -181,6 +206,88 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
             >
               Delete
             </Button>
+          </div>
+        </div>
+      </BaseModal>
+
+      {/* Share Modal */}
+      <BaseModal 
+        open={showShareModal} 
+        onOpenChange={setShowShareModal} 
+        title="Share Content" 
+        description="Share this content with others"
+        className="sm:max-w-md"
+      >
+        <div className="space-y-6 py-4">
+          {/* URL Input Section */}
+          <div className="space-y-2">
+            <label htmlFor="share-url" className="text-sm font-medium text-foreground">
+              Share Link
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  id="share-url" 
+                  readOnly 
+                  value={shareUrl} 
+                  className="pl-9 bg-muted/50 border-border/50 text-foreground" 
+                />
+              </div>
+              <Button 
+                onClick={handleCopy} 
+                variant="outline" 
+                className="flex items-center gap-2 min-w-[100px]"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span>Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Social Share Section */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Share via
+            </label>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="flex-1 hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]" 
+                onClick={() => handleSocialShare('twitter')}
+              >
+                <Twitter className="h-4 w-4" />
+                <span className="sr-only">Share on Twitter</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="flex-1 hover:bg-[#25D366]/10 hover:text-[#25D366]" 
+                onClick={() => handleSocialShare('whatsapp')}
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span className="sr-only">Share on WhatsApp</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="flex-1 hover:bg-[#0A66C2]/10 hover:text-[#0A66C2]" 
+                onClick={() => handleSocialShare('linkedin')}
+              >
+                <Linkedin className="h-4 w-4" />
+                <span className="sr-only">Share on LinkedIn</span>
+              </Button>
+            </div>
           </div>
         </div>
       </BaseModal>
