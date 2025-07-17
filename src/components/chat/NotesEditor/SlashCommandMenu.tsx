@@ -51,14 +51,13 @@ export function SlashCommandMenu({ position, onSelect, onClose }: SlashCommandMe
     <div
       ref={menuRef}
       className={cn(
-        "fixed bg-dashboard-card dark:bg-dashboard-card",
-        "border border-dashboard-separator dark:border-dashboard-separator",
+        "fixed bg-card border border-border",
         "rounded-lg shadow-lg z-50 w-72 max-h-60 overflow-y-auto"
       )}
       style={{ left: position.x, top: position.y }}
     >
       <div className="p-2">
-        <div className="text-xs font-medium text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 px-2 py-1 mb-1">
+        <div className="text-xs font-medium text-muted-foreground px-2 py-1 mb-1">
           Basic Blocks
         </div>
         {slashCommands.map((command) => {
@@ -73,14 +72,14 @@ export function SlashCommandMenu({ position, onSelect, onClose }: SlashCommandMe
                 "rounded-md transition-colors"
               )}
             >
-              <Icon className="h-[14px] w-[14px] text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70" />
+              <Icon className="h-[14px] w-[14px] text-muted-foreground" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-dashboard-text dark:text-dashboard-text">
+                <div className="text-sm font-medium text-card-foreground">
                   {command.label}
                 </div>
               </div>
               {command.shortcut && (
-                <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
+                <div className="text-xs text-muted-foreground">
                   {command.shortcut}
                 </div>
               )}
