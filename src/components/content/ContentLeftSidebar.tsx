@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
+import { DocumentViewer } from '@/components/content/DocumentViewer/DocumentViewer';
 import { AudioPlayer } from '@/components/content/AudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
@@ -113,13 +114,21 @@ export function ContentLeftSidebar({
     }
     
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
-        <ContentViewer 
-          contentData={contentData} 
-          onUpdateContent={onUpdateContent} 
-          onTextAction={onTextAction} 
-          currentTimestamp={currentTimestamp}
-          onExpandText={() => setIsTextExpanded(true)}
-        />
+        {contentData.type === 'pdf' || contentData.type === 'file' ? (
+          <DocumentViewer 
+            contentData={contentData} 
+            onUpdateContent={onUpdateContent}
+            fullWidth={shouldHideTabs} 
+          />
+        ) : (
+          <ContentViewer 
+            contentData={contentData} 
+            onUpdateContent={onUpdateContent} 
+            onTextAction={onTextAction} 
+            currentTimestamp={currentTimestamp}
+            onExpandText={() => setIsTextExpanded(true)}
+          />
+        )}
       </div>;
   };
 
