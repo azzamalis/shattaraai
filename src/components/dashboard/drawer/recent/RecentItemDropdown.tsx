@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { BaseModal } from '@/components/ui/base-modal';
+import { useContent } from '@/contexts/ContentContext';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +32,7 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
   onDelete
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { deleteContent } = useContent();
 
   // Disable body interactions when dropdown is open
   useEffect(() => {
@@ -59,10 +62,15 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
     onOpenChange(false);
   };
 
-  const handleDeleteConfirm = () => {
-    const mockEvent = { preventDefault: () => {}, stopPropagation: () => {} } as React.MouseEvent;
-    onDelete(mockEvent);
-    setShowDeleteModal(false);
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteContent(contentId);
+      setShowDeleteModal(false);
+      toast.success('Content deleted successfully');
+    } catch (error) {
+      console.error('Error deleting content:', error);
+      toast.error('Failed to delete content');
+    }
   };
 
   const handleRenameClick = (e: React.MouseEvent) => {
