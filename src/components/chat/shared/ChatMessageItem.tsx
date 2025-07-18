@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Copy, Check, User, Bot, Paperclip } from 'lucide-react';
+import { Copy, Check, Paperclip } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from '@/hooks/useChatConversation';
@@ -47,22 +47,6 @@ export function ChatMessageItem({
       isUser && "flex-row-reverse",
       isSystem && "justify-center"
     )}>
-      {/* Avatar */}
-      {!isSystem && (
-        <div className={cn(
-          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
-          isUser 
-            ? "bg-[#00A3FF] text-white" 
-            : "bg-dashboard-card dark:bg-dashboard-card border border-dashboard-separator/20 dark:border-white/10"
-        )}>
-          {isUser ? (
-            <User className="h-4 w-4" />
-          ) : (
-            <Bot className="h-4 w-4 text-dashboard-text-secondary dark:text-dashboard-text-secondary" />
-          )}
-        </div>
-      )}
-
       {/* Message Content */}
       <div className={cn(
         "group relative max-w-[80%]",
