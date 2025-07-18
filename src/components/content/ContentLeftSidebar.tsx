@@ -12,7 +12,6 @@ import { AudioPlayer } from '@/components/content/AudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
 import { cn } from '@/lib/utils';
-
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -29,7 +28,6 @@ interface ContentLeftSidebarProps {
   onChapterClick?: (timestamp: number) => void;
   currentTimestamp?: number;
 }
-
 export function ContentLeftSidebar({
   contentData,
   onUpdateContent,
@@ -49,7 +47,6 @@ export function ContentLeftSidebar({
   const [activeTab, setActiveTab] = useState("chapters");
   const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
   const [isTextExpanded, setIsTextExpanded] = useState(false);
-
   const handleChapterClick = (timestamp: number) => {
     if (onChapterClick) {
       onChapterClick(timestamp);
@@ -58,12 +55,10 @@ export function ContentLeftSidebar({
 
   // Check if we should hide tabs (for PDF content or Word documents)
   const shouldHideTabs = contentData.type === 'pdf';
-  
+
   // Check if it's a Word document
-  const isWordDocument = (contentData.type === 'file' || contentData.type === 'upload') && 
-    contentData.filename?.match(/\.(doc|docx)$/i);
+  const isWordDocument = (contentData.type === 'file' || contentData.type === 'upload') && contentData.filename?.match(/\.(doc|docx)$/i);
   const shouldHideTabsForDocument = isWordDocument;
-  
   const renderControls = () => {
     // Show loading state while detecting recording state
     if (contentData.type === 'recording' && isRecordingLoading) {
@@ -78,7 +73,7 @@ export function ContentLeftSidebar({
     // Live recording interface - show recording controls with microphone selector below
     if (contentData.type === 'live_recording') {
       return <>
-          <div className="p-4 pb-2 shrink-0 bg-background ">
+          <div className="p-4 pb-2 shrink-0 bg-background px-0 py-[8px]">
             <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
           </div>
           <div className="px-4 pb-4 shrink-0 bg-background ">
@@ -117,23 +112,15 @@ export function ContentLeftSidebar({
     if (contentData.type === 'website') {
       return null; // Website content is handled in tabs
     }
-    
+
     // Show DocumentViewer for Word documents
     if (isWordDocument) {
       return null; // Document viewer will be rendered in the main layout
     }
-    
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
-        <ContentViewer 
-          contentData={contentData} 
-          onUpdateContent={onUpdateContent} 
-          onTextAction={onTextAction} 
-          currentTimestamp={currentTimestamp}
-          onExpandText={() => setIsTextExpanded(true)}
-        />
+        <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} onTextAction={onTextAction} currentTimestamp={currentTimestamp} onExpandText={() => setIsTextExpanded(true)} />
       </div>;
   };
-
   const renderTabContent = () => {
     const hasContent = contentData.type === 'live_recording' ? isRecording : recordingStateInfo?.isNewRecording ? isRecording : recordingStateInfo?.isExistingRecording ? true : !!contentData.url || !!contentData.text;
     return <>
@@ -144,13 +131,7 @@ export function ContentLeftSidebar({
                     Recording in progress...
                   </div>}
                 {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="grid grid-cols-2 gap-3">
-                    {recordingMetadata.chaptersData.map((chapter, index) => (
-                      <Button
-                        key={chapter.id}
-                        variant="ghost"
-                        className="p-3 h-auto rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                        onClick={() => handleChapterClick(chapter.startTime)}
-                      >
+                    {recordingMetadata.chaptersData.map((chapter, index) => <Button key={chapter.id} variant="ghost" className="p-3 h-auto rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
                         <div className="flex items-start justify-between gap-2 w-full">
                           <div className="flex-1 min-w-0 text-left">
                             <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
@@ -163,17 +144,10 @@ export function ContentLeftSidebar({
                             </span>
                           </div>
                         </div>
-                      </Button>
-                    ))}
+                      </Button>)}
                   </div>}
                 {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="grid grid-cols-2 gap-3">
-                    {contentData.metadata.chapters.map((chapter: any, index: number) => (
-                      <Button
-                        key={index}
-                        variant="ghost"
-                        className="p-3 h-auto rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                        onClick={() => handleChapterClick(chapter.startTime)}
-                      >
+                    {contentData.metadata.chapters.map((chapter: any, index: number) => <Button key={index} variant="ghost" className="p-3 h-auto rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
                         <div className="flex items-start justify-between gap-2 w-full">
                           <div className="flex-1 min-w-0 text-left">
                             <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
@@ -186,22 +160,12 @@ export function ContentLeftSidebar({
                             </span>
                           </div>
                         </div>
-                      </Button>
-                    ))}
+                      </Button>)}
                   </div>}
                 {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
                     <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsTextExpanded(!isTextExpanded)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20"
-                      >
-                        {isTextExpanded ? (
-                          <Minimize2 className="h-4 w-4" />
-                        ) : (
-                          <Expand className="h-4 w-4" />
-                        )}
+                      <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(!isTextExpanded)} className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20">
+                        {isTextExpanded ? <Minimize2 className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
                       </Button>
                       <div>
                         <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
@@ -241,52 +205,30 @@ export function ContentLeftSidebar({
                   </div>}
                 {contentData.type === 'youtube' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
                     <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20"
-                      >
-                        {isTranscriptExpanded ? (
-                          <Minimize2 className="h-4 w-4" />
-                        ) : (
-                          <Expand className="h-4 w-4" />
-                        )}
+                      <Button variant="ghost" size="sm" onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)} className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20">
+                        {isTranscriptExpanded ? <Minimize2 className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
                       </Button>
-                      {contentData.metadata?.hasRealTranscript ? (
-                        <div>
+                      {contentData.metadata?.hasRealTranscript ? <div>
                           <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
                             Video Transcript (Auto-generated)
                           </p>
                           <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
                             {contentData.text}
                           </p>
-                        </div>
-                      ) : (
-                        <div>
+                        </div> : <div>
                           <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
                             Video Description (No transcript available)
                           </p>
                           <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
                             {contentData.text}
                           </p>
-                        </div>
-                      )}
+                        </div>}
                     </div>
                   </div>}
                 {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
                     <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsTextExpanded(!isTextExpanded)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20"
-                      >
-                        {isTextExpanded ? (
-                          <Minimize2 className="h-4 w-4" />
-                        ) : (
-                          <Expand className="h-4 w-4" />
-                        )}
+                      <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(!isTextExpanded)} className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20">
+                        {isTextExpanded ? <Minimize2 className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
                       </Button>
                       <div>
                         <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
@@ -322,71 +264,48 @@ export function ContentLeftSidebar({
   // If it's a Word document, render the DocumentViewer without tabs
   if (shouldHideTabsForDocument) {
     return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
-        <DocumentViewer 
-          contentData={contentData} 
-          onUpdateContent={onUpdateContent}
-        />
+        <DocumentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
       </div>;
   }
 
   // Default layout with tabs for other content types
   return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg relative">
       {/* Full-page transcript overlay */}
-      {isTranscriptExpanded && contentData.type === 'youtube' && contentData.text && (
-        <div className="absolute inset-0 z-50 bg-background flex flex-col">
+      {isTranscriptExpanded && contentData.type === 'youtube' && contentData.text && <div className="absolute inset-0 z-50 bg-background flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-lg font-semibold text-foreground">Full Transcript</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsTranscriptExpanded(false)}
-              className="h-8 w-8 p-0"
-            >
+            <Button variant="ghost" size="sm" onClick={() => setIsTranscriptExpanded(false)} className="h-8 w-8 p-0">
               <Minimize2 className="h-4 w-4" />
             </Button>
           </div>
           <ScrollArea className="flex-1 p-6">
             <div className="max-w-4xl mx-auto">
-              {contentData.metadata?.hasRealTranscript ? (
-                <div>
+              {contentData.metadata?.hasRealTranscript ? <div>
                   <p className="text-xs text-muted-foreground mb-4">Video Transcript (Auto-generated)</p>
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                     {contentData.text}
                   </p>
-                </div>
-              ) : (
-                <div>
+                </div> : <div>
                   <p className="text-xs text-muted-foreground mb-4">Video Description (No transcript available)</p>
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                     {contentData.text}
                   </p>
-                </div>
-              )}
+                </div>}
             </div>
           </ScrollArea>
-        </div>
-      )}
+        </div>}
       
       {/* Full-page text content overlay */}
-      {isTextExpanded && (contentData.type === 'text' || contentData.type === 'website') && contentData.text && (
-        <div className="absolute inset-0 z-50 bg-background flex flex-col">
+      {isTextExpanded && (contentData.type === 'text' || contentData.type === 'website') && contentData.text && <div className="absolute inset-0 z-50 bg-background flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-lg font-semibold text-foreground">{contentData.title || 'Text Content'}</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsTextExpanded(false)}
-              className="h-8 w-8 p-0"
-            >
+            <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(false)} className="h-8 w-8 p-0">
               <Minimize2 className="h-4 w-4" />
             </Button>
           </div>
           <ScrollArea className="flex-1 p-6">
             <div className="max-w-4xl mx-auto">
-              {contentData.text ? (
-                <pre className="whitespace-pre-wrap font-sans text-foreground">{contentData.text}</pre>
-              ) : (
-                <div>
+              {contentData.text ? <pre className="whitespace-pre-wrap font-sans text-foreground">{contentData.text}</pre> : <div>
                   <div className="flex items-center gap-2 mb-4">
                     <Globe className="h-5 w-5" />
                     <span className="font-medium text-foreground">Website Content</span>
@@ -394,12 +313,10 @@ export function ContentLeftSidebar({
                   <a href={contentData.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                     {contentData.url}
                   </a>
-                </div>
-              )}
+                </div>}
             </div>
           </ScrollArea>
-        </div>
-      )}
+        </div>}
 
       {renderControls()}
       
