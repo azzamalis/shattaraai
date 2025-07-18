@@ -81,8 +81,8 @@ export function DocumentContent({
         <div style={{
         transform: `scale(${zoom / 100})`,
         transformOrigin: 'top left'
-      }} className="p-6 py-[10px] px-[10px]">
-          {isWordDocument ? <div className="max-w-4xl mx-auto bg-card border border-border rounded-lg shadow-sm">
+      }} className="p-6 px-0 py-[12px]">
+          {isWordDocument ? <div className="max-w-4xl mx-auto bg-card border border-border rounded-lg shadow-sm px-0">
               <div className="p-8 space-y-6 py-[16px] px-[16px]">
                 
                 
