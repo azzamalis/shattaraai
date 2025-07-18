@@ -39,8 +39,7 @@ export function ChatContainer({
   }, [messages]);
 
   const handleSendMessage = (content: string, attachments?: File[]) => {
-    // For now, we'll just pass the content. File handling can be implemented later
-    // when the backend is ready to process attachments
+    console.log('ChatContainer - Sending message with attachments:', attachments);
     onSendMessage(content, attachments);
   };
 
@@ -66,13 +65,16 @@ export function ChatContainer({
             </div>
           ) : (
             <div className="space-y-1">
-              {messages.map((message) => (
-                <ChatMessageItem
-                  key={message.id}
-                  message={message}
-                  showTimestamp={showTimestamps}
-                />
-              ))}
+              {messages.map((message) => {
+                console.log('ChatContainer - Rendering message:', message.id, 'with attachments:', message.attachments);
+                return (
+                  <ChatMessageItem
+                    key={message.id}
+                    message={message}
+                    showTimestamp={showTimestamps}
+                  />
+                );
+              })}
               <div ref={messagesEndRef} />
             </div>
           )}

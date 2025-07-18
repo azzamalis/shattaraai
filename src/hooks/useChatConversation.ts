@@ -71,6 +71,7 @@ export function useChatConversation({
         };
       });
 
+      console.log('Fetched messages with attachments:', formattedMessages);
       setMessages(formattedMessages);
     } finally {
       setIsLoading(false);
@@ -182,6 +183,8 @@ export function useChatConversation({
         size: file.size
       })) || [];
 
+      console.log('Sending message with processed attachments:', processedAttachments);
+
       const { data, error } = await supabase
         .from('chat_messages')
         .insert({
@@ -207,6 +210,7 @@ export function useChatConversation({
         attachments: processedAttachments
       };
 
+      console.log('Created new message with attachments:', newMessage);
       setMessages(prevMessages => [...prevMessages, newMessage]);
       return newMessage;
     } finally {

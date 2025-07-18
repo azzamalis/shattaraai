@@ -38,6 +38,9 @@ export function ChatMessageItem({
   const isUser = message.sender_type === 'user';
   const isSystem = message.sender_type === 'system';
 
+  // Log for debugging
+  console.log('ChatMessageItem - Rendering message:', message.id, 'attachments:', message.attachments);
+
   return (
     <div className={cn(
       "flex gap-3 p-4",
@@ -67,12 +70,12 @@ export function ChatMessageItem({
         !isUser && !isSystem && "bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text border border-dashboard-separator/20 dark:border-white/10",
         isSystem && "bg-dashboard-separator/10 dark:bg-white/5 text-dashboard-text-secondary dark:text-dashboard-text-secondary text-sm rounded-full px-4 py-2"
       )}>
-        {/* File Attachments */}
+        {/* File Attachments - Show above message content */}
         {message.attachments && message.attachments.length > 0 && !isSystem && (
           <div className="mb-3 flex flex-wrap gap-2">
-            {message.attachments.map((attachment) => (
+            {message.attachments.map((attachment, index) => (
               <div
-                key={attachment.id}
+                key={`${attachment.id || index}`}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 rounded-full text-xs",
                   "border transition-colors",
@@ -85,9 +88,11 @@ export function ChatMessageItem({
                 <span className="truncate max-w-32 font-medium">
                   {attachment.name}
                 </span>
-                <span className="text-xs opacity-70 flex-shrink-0">
-                  {formatFileSize(attachment.size)}
-                </span>
+                {attachment.size && (
+                  <span className="text-xs opacity-70 flex-shrink-0">
+                    {formatFileSize(attachment.size)}
+                  </span>
+                )}
               </div>
             ))}
           </div>
