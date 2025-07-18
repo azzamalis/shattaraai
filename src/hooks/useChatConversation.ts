@@ -54,13 +54,22 @@ export function useChatConversation({
         return;
       }
 
-      const formattedMessages: ChatMessage[] = data.map(message => ({
-        id: message.id,
-        content: message.content,
-        sender_type: message.sender_type,
-        created_at: message.created_at,
-        attachments: message.metadata?.attachments || []
-      }));
+      const formattedMessages: ChatMessage[] = data.map(message => {
+        // Safely parse metadata and get attachments
+        let attachments: any[] = [];
+        if (message.metadata && typeof message.metadata === 'object' && message.metadata !== null) {
+          const metadata = message.metadata as any;
+          attachments = metadata.attachments || [];
+        }
+
+        return {
+          id: message.id,
+          content: message.content,
+          sender_type: message.sender_type as 'user' | 'ai' | 'system',
+          created_at: message.created_at,
+          attachments: attachments
+        };
+      });
 
       setMessages(formattedMessages);
     } finally {
@@ -175,15 +184,13 @@ export function useChatConversation({
 
       const { data, error } = await supabase
         .from('chat_messages')
-        .insert([
-          {
-            conversation_id: conversationId,
-            sender_type: 'user',
-            content: content,
-            user_id: user.id,
-            metadata: { attachments: processedAttachments }
-          }
-        ])
+        .insert({
+          conversation_id: conversationId,
+          sender_type: 'user',
+          content: content,
+          user_id: user.id,
+          metadata: { attachments: processedAttachments }
+        })
         .select()
         .single();
 
@@ -195,7 +202,7 @@ export function useChatConversation({
       const newMessage: ChatMessage = {
         id: data.id,
         content: data.content,
-        sender_type: data.sender_type,
+        sender_type: data.sender_type as 'user' | 'ai' | 'system',
         created_at: data.created_at,
         attachments: processedAttachments
       };
@@ -216,16 +223,14 @@ export function useChatConversation({
     try {
       const { data, error } = await supabase
         .from('chat_messages')
-        .insert([
-          {
-            conversation_id: conversationId,
-            sender_type: 'ai',
-            content: content,
-            user_id: user?.id || '',
-            message_type: messageType || 'ai_response',
-            metadata: metadata || {}
-          }
-        ])
+        .insert({
+          conversation_id: conversationId,
+          sender_type: 'ai',
+          content: content,
+          user_id: user?.id || '',
+          message_type: (messageType as 'text' | 'system' | 'ai_response' | 'user_query') || 'ai_response',
+          metadata: metadata || {}
+        })
         .select()
         .single();
 
@@ -234,12 +239,19 @@ export function useChatConversation({
         return;
       }
 
+      // Safely parse metadata for attachments
+      let attachments: any[] = [];
+      if (data.metadata && typeof data.metadata === 'object' && data.metadata !== null) {
+        const parsedMetadata = data.metadata as any;
+        attachments = parsedMetadata.attachments || [];
+      }
+
       const aiMessage: ChatMessage = {
         id: data.id,
         content: data.content,
-        sender_type: data.sender_type,
+        sender_type: data.sender_type as 'user' | 'ai' | 'system',
         created_at: data.created_at,
-        attachments: data.metadata?.attachments || []
+        attachments: attachments
       };
 
       setMessages(prevMessages => [...prevMessages, aiMessage]);
