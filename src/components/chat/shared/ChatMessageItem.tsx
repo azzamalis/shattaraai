@@ -65,73 +65,87 @@ export function ChatMessageItem({
 
       {/* Message Content */}
       <div className={cn(
-        "group relative max-w-[80%] rounded-lg px-4 py-3",
-        isUser && "bg-[#00A3FF] text-white",
-        !isUser && !isSystem && "bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text border border-dashboard-separator/20 dark:border-white/10",
+        "group relative max-w-[80%]",
         isSystem && "bg-dashboard-separator/10 dark:bg-white/5 text-dashboard-text-secondary dark:text-dashboard-text-secondary text-sm rounded-full px-4 py-2"
       )}>
-        {/* File Attachments - Show above message content */}
-        {message.attachments && message.attachments.length > 0 && !isSystem && (
-          <div className="mb-3 flex flex-wrap gap-2">
+        {/* File Attachments - Show above message content for user messages */}
+        {message.attachments && message.attachments.length > 0 && !isSystem && isUser && (
+          <div className="mb-2 flex flex-wrap gap-2">
             {message.attachments.map((attachment, index) => (
               <div
                 key={`${attachment.id || index}`}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-full text-xs",
-                  "border transition-colors",
-                  isUser 
-                    ? "bg-white/10 border-white/20 text-white/90 hover:bg-white/20" 
-                    : "bg-dashboard-separator/10 dark:bg-white/5 border-dashboard-separator/20 dark:border-white/10 text-dashboard-text-secondary dark:text-dashboard-text-secondary hover:bg-dashboard-separator/20 dark:hover:bg-white/10"
+                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm border",
+                  "bg-[#00A3FF]/10 border-[#00A3FF]/20 text-[#00A3FF]",
+                  "hover:bg-[#00A3FF]/20 transition-colors cursor-pointer"
                 )}
               >
-                <Paperclip className="h-3 w-3 flex-shrink-0" />
-                <span className="truncate max-w-32 font-medium">
-                  {attachment.name}
-                </span>
-                {attachment.size && (
-                  <span className="text-xs opacity-70 flex-shrink-0">
-                    {formatFileSize(attachment.size)}
+                <div className="p-1 rounded bg-[#00A3FF]/20">
+                  <Paperclip className="h-3 w-3" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="truncate max-w-40 font-medium text-xs">
+                    {attachment.name}
                   </span>
-                )}
+                  {attachment.size && (
+                    <span className="text-xs opacity-70">
+                      {formatFileSize(attachment.size)}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        <div className="whitespace-pre-wrap break-words">
-          {message.content}
-        </div>
-
-        {/* Copy Button */}
+        {/* Main message bubble */}
         {!isSystem && (
-          <button
-            onClick={() => copyToClipboard(message.content, message.id)}
-            className={cn(
-              "absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded",
-              "hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover"
+          <div className={cn(
+            "rounded-lg px-4 py-3 relative",
+            isUser && "bg-[#00A3FF] text-white",
+            !isUser && "bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text border border-dashboard-separator/20 dark:border-white/10"
+          )}>
+            <div className="whitespace-pre-wrap break-words">
+              {message.content}
+            </div>
+
+            {/* Copy Button */}
+            <button
+              onClick={() => copyToClipboard(message.content, message.id)}
+              className={cn(
+                "absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded",
+                "hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover"
+              )}
+              title="Copy message"
+            >
+              {copiedId === message.id ? (
+                <Check className="h-3 w-3 text-[#00A3FF]" />
+              ) : (
+                <Copy className="h-3 w-3 text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70" />
+              )}
+            </button>
+
+            {/* Timestamp */}
+            {showTimestamp && (
+              <div className={cn(
+                "text-xs mt-2",
+                isUser 
+                  ? "text-white/70" 
+                  : "text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60"
+              )}>
+                {new Date(message.created_at).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
             )}
-            title="Copy message"
-          >
-            {copiedId === message.id ? (
-              <Check className="h-3 w-3 text-[#00A3FF]" />
-            ) : (
-              <Copy className="h-3 w-3 text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70" />
-            )}
-          </button>
+          </div>
         )}
 
-        {/* Timestamp */}
-        {showTimestamp && (
-          <div className={cn(
-            "text-xs mt-2",
-            isUser 
-              ? "text-white/70" 
-              : "text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60"
-          )}>
-            {new Date(message.created_at).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
+        {/* System message content */}
+        {isSystem && (
+          <div className="whitespace-pre-wrap break-words">
+            {message.content}
           </div>
         )}
       </div>

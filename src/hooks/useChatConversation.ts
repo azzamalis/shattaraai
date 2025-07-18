@@ -59,8 +59,10 @@ export function useChatConversation({
         let attachments: any[] = [];
         if (message.metadata && typeof message.metadata === 'object' && message.metadata !== null) {
           const metadata = message.metadata as any;
-          attachments = metadata.attachments || [];
+          attachments = Array.isArray(metadata.attachments) ? metadata.attachments : [];
         }
+
+        console.log('Processing message:', message.id, 'metadata:', message.metadata, 'attachments:', attachments);
 
         return {
           id: message.id,
@@ -147,7 +149,6 @@ export function useChatConversation({
           const newConversationId = await createConversation();
           if (newConversationId) {
             setConversationId(newConversationId);
-            // Create a basic conversation object
             const newConversation = {
               id: newConversationId,
               type: conversationType,
@@ -176,14 +177,17 @@ export function useChatConversation({
     setIsSending(true);
     try {
       // Process attachments into the format we need
-      const processedAttachments = attachments?.map(file => ({
-        id: `temp-${Date.now()}-${Math.random()}`,
+      const processedAttachments = attachments?.map((file, index) => ({
+        id: `temp-${Date.now()}-${index}`,
         name: file.name,
         type: file.type,
         size: file.size
       })) || [];
 
       console.log('Sending message with processed attachments:', processedAttachments);
+
+      // Create the metadata object with attachments
+      const metadata = processedAttachments.length > 0 ? { attachments: processedAttachments } : null;
 
       const { data, error } = await supabase
         .from('chat_messages')
@@ -192,7 +196,7 @@ export function useChatConversation({
           sender_type: 'user',
           content: content,
           user_id: user.id,
-          metadata: { attachments: processedAttachments }
+          metadata: metadata
         })
         .select()
         .single();
@@ -233,7 +237,7 @@ export function useChatConversation({
           content: content,
           user_id: user?.id || '',
           message_type: (messageType as 'text' | 'system' | 'ai_response' | 'user_query') || 'ai_response',
-          metadata: metadata || {}
+          metadata: metadata || null
         })
         .select()
         .single();
@@ -247,7 +251,7 @@ export function useChatConversation({
       let attachments: any[] = [];
       if (data.metadata && typeof data.metadata === 'object' && data.metadata !== null) {
         const parsedMetadata = data.metadata as any;
-        attachments = parsedMetadata.attachments || [];
+        attachments = Array.isArray(parsedMetadata.attachments) ? parsedMetadata.attachments : [];
       }
 
       const aiMessage: ChatMessage = {
