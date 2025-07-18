@@ -1,6 +1,5 @@
 
 import React, { useEffect, useState } from 'react';
-import '@/styles/waveform.css';
 
 interface AudioWaveformProps {
   isActive: boolean;
@@ -31,15 +30,19 @@ export function AudioWaveform({ isActive }: AudioWaveformProps) {
   }, [isActive]);
   
   return (
-    <div className={`waveform-container w-full h-8 flex items-center justify-center gap-[1px] ${isActive ? 'active' : ''}`}>
+    <div className={`w-full h-8 flex items-center justify-center gap-[1px] ${isActive ? 'active' : ''}`}>
       {barHeights.map((height, index) => (
         <div 
           key={index}
-          className="waveform-bar bg-dashboard-text-secondary/30 dark:bg-dashboard-text-secondary/30 rounded-full transition-all duration-200"
+          className={`rounded-full transition-all duration-300 ${
+            isActive 
+              ? 'bg-primary animate-pulse' 
+              : 'bg-muted-foreground/30'
+          }`}
           style={{
             height: `${Math.min(height, 28)}px`,
             width: '2px',
-            animationDelay: `${index * 0.05}s`
+            animationDelay: isActive ? `${index * 0.05}s` : '0s'
           }}
         />
       ))}
