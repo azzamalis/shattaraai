@@ -30,8 +30,9 @@ export function ChatInterface({
       handleSendMessage(initialQuery);
     }
   }, [initialQuery, messages.length]);
-  const handleSendMessage = async (content: string) => {
-    const userMessage = await sendMessage(content);
+  const handleSendMessage = async (content: string, attachments?: File[]) => {
+    console.log('ChatInterface - handleSendMessage called with attachments:', attachments);
+    const userMessage = await sendMessage(content, attachments);
     if (userMessage) {
       // Simulate AI response (replace with actual AI integration)
       setTimeout(() => {

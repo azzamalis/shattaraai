@@ -184,6 +184,7 @@ export function useChatConversation({
         size: file.size
       })) || [];
 
+      console.log('Sending message with files:', attachments);
       console.log('Sending message with processed attachments:', processedAttachments);
 
       // Create the metadata object with attachments
