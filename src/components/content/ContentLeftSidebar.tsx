@@ -73,10 +73,10 @@ export function ContentLeftSidebar({
     // Live recording interface - show recording controls with microphone selector below
     if (contentData.type === 'live_recording') {
       return <>
-          <div className="p-4 pb-2 shrink-0 bg-background px-0 py-[8px]">
+          <div className="p-4 pb-2 shrink-0 bg-background px-0 py-[14px]">
             <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
           </div>
-          <div className="px-4 pb-4 shrink-0 bg-background ">
+          <div className="pb-4 shrink-0 bg-background px-[5px] py-[6px]">
             <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
               <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
             </div>

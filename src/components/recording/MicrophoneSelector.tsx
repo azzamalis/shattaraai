@@ -15,7 +15,7 @@ export function MicrophoneSelector({
   return <div className="flex items-center gap-2 w-full">
       <select value={selected} onChange={e => onSelect(e.target.value)} style={{
       appearance: 'none'
-    }} className="bg-popover text-popover-foreground text-xs px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring w-auto min-w-0 flex-1 truncate z-50">
+    }} className="bg-popover text-popover-foreground text-xs py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring w-auto min-w-0 flex-1 truncate z-50 px-[7px]">
         {microphones.map(mic => <option key={mic} value={mic} className="bg-popover text-popover-foreground text-xs py-1">
             {mic}
           </option>)}

@@ -13,7 +13,7 @@ export function RecordingControls({
   recordingTime
 }: RecordingControlsProps) {
   return <div className="w-full">
-      <div className="flex items-center w-full bg-card rounded-xl px-3 py-3 min-h-[48px] gap-2">
+      <div className="flex items-center w-full bg-card rounded-xl min-h-[48px] gap-2 py-[10px] px-[12px]">
         <Button onClick={toggleRecording} className={`h-10 px-4 flex items-center justify-center gap-2 border-border transition-all duration-300 text-sm font-medium shrink-0 ${isRecording ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : 'bg-primary text-primary-foreground hover:bg-primary/90'}`} style={{
         minWidth: 'auto',
         boxShadow: 'none'
