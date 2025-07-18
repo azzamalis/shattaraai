@@ -78,9 +78,8 @@ export function AITutorChatDrawer({
         id: `welcome-${Date.now()}`,
         content: welcomeMessage,
         sender_type: 'ai' as const,
-        message_type: 'ai_response' as const,
         created_at: new Date().toISOString(),
-        metadata: { isWelcome: true, roomContentCount: roomContent.length }
+        attachments: []
       };
       
       setMessages([welcomeMsg]);
@@ -94,8 +93,6 @@ export function AITutorChatDrawer({
     }
   }, [messages, isAITyping]);
 
-  // Remove the old welcome message logic since we handle it above
-  
   const handleSendMessage = async () => {
     if (!input.trim() || !conversation) return;
 
@@ -108,9 +105,8 @@ export function AITutorChatDrawer({
         id: `temp-user-${Date.now()}`,
         content: userMessage,
         sender_type: 'user' as const,
-        message_type: 'text' as const,
         created_at: new Date().toISOString(),
-        metadata: {}
+        attachments: []
       };
       setMessages(prev => [...prev, tempUserMsg]);
 
@@ -135,9 +131,8 @@ export function AITutorChatDrawer({
         id: `ai-${Date.now()}`,
         content: aiResponse,
         sender_type: 'ai' as const,
-        message_type: 'ai_response' as const,
         created_at: new Date().toISOString(),
-        metadata: { model: 'gemini-1.5-flash-latest' }
+        attachments: []
       };
       setMessages(prev => [...prev, aiMsg]);
 

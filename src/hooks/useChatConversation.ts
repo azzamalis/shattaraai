@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { Database } from '@/integrations/supabase/types';
@@ -18,14 +19,16 @@ export interface ChatMessage {
 }
 
 interface UseChatConversationProps {
-  conversationType: 'general' | 'content';
-  contentId?: string;
+  conversationType: 'general' | 'content_discussion' | 'room_collaboration' | 'exam_support';
+  contextId?: string;
+  contextType?: string;
   autoCreate?: boolean;
 }
 
 export function useChatConversation({
   conversationType,
-  contentId,
+  contextId,
+  contextType,
   autoCreate = false
 }: UseChatConversationProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -33,12 +36,13 @@ export function useChatConversation({
   const [isSending, setIsSending] = useState(false);
   const { user } = useAuth();
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [conversation, setConversation] = useState<any>(null);
 
   const fetchMessages = useCallback(async (conversationId: string) => {
     setIsLoading(true);
     try {
       let query = supabase
-        .from('messages')
+        .from('chat_messages')
         .select('*')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
@@ -55,7 +59,7 @@ export function useChatConversation({
         content: message.content,
         sender_type: message.sender_type,
         created_at: message.created_at,
-        attachments: message.attachments
+        attachments: message.metadata?.attachments || []
       }));
 
       setMessages(formattedMessages);
@@ -72,11 +76,12 @@ export function useChatConversation({
 
     try {
       const { data, error } = await supabase
-        .from('conversations')
+        .from('chat_conversations')
         .insert([
           {
             type: conversationType,
-            content_id: contentId,
+            context_id: contextId,
+            context_type: contextType,
             user_id: user.id
           }
         ])
@@ -93,7 +98,7 @@ export function useChatConversation({
       console.error('Error creating conversation:', error);
       return null;
     }
-  }, [conversationType, contentId, user]);
+  }, [conversationType, contextId, contextType, user]);
 
   useEffect(() => {
     const loadConversation = async () => {
@@ -102,27 +107,22 @@ export function useChatConversation({
       setIsLoading(true);
       try {
         let query = supabase
-          .from('conversations')
+          .from('chat_conversations')
           .select('*')
           .eq('type', conversationType)
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+          .limit(1);
 
-        if (contentId) {
-          query = supabase
-            .from('conversations')
-            .select('*')
-            .eq('type', conversationType)
-            .eq('content_id', contentId)
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
+        if (contextId) {
+          query = query.eq('context_id', contextId);
         }
 
-        const { data: existingConversation, error } = await query;
+        if (contextType) {
+          query = query.eq('context_type', contextType);
+        }
+
+        const { data: existingConversation, error } = await query.maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching conversation:', error);
@@ -131,11 +131,22 @@ export function useChatConversation({
 
         if (existingConversation) {
           setConversationId(existingConversation.id);
+          setConversation(existingConversation);
           await fetchMessages(existingConversation.id);
         } else if (autoCreate) {
           const newConversationId = await createConversation();
           if (newConversationId) {
             setConversationId(newConversationId);
+            // Create a basic conversation object
+            const newConversation = {
+              id: newConversationId,
+              type: conversationType,
+              context_id: contextId,
+              context_type: contextType,
+              user_id: user.id,
+              created_at: new Date().toISOString()
+            };
+            setConversation(newConversation);
           }
         }
       } finally {
@@ -144,9 +155,9 @@ export function useChatConversation({
     };
 
     loadConversation();
-  }, [conversationType, contentId, user, fetchMessages, autoCreate, createConversation]);
+  }, [conversationType, contextId, contextType, user, fetchMessages, autoCreate, createConversation]);
 
-  const sendMessage = async (content: string, attachments?: any): Promise<ChatMessage | null> => {
+  const sendMessage = async (content: string, attachments?: File[]): Promise<ChatMessage | null> => {
     if (!user || !conversationId) {
       console.error('User not authenticated or conversation not initialized');
       return null;
@@ -154,15 +165,23 @@ export function useChatConversation({
 
     setIsSending(true);
     try {
+      // Process attachments into the format we need
+      const processedAttachments = attachments?.map(file => ({
+        id: `temp-${Date.now()}-${Math.random()}`,
+        name: file.name,
+        type: file.type,
+        size: file.size
+      })) || [];
+
       const { data, error } = await supabase
-        .from('messages')
+        .from('chat_messages')
         .insert([
           {
             conversation_id: conversationId,
             sender_type: 'user',
             content: content,
             user_id: user.id,
-            attachments: attachments || null
+            metadata: { attachments: processedAttachments }
           }
         ])
         .select()
@@ -178,7 +197,7 @@ export function useChatConversation({
         content: data.content,
         sender_type: data.sender_type,
         created_at: data.created_at,
-        attachments: data.attachments
+        attachments: processedAttachments
       };
 
       setMessages(prevMessages => [...prevMessages, newMessage]);
@@ -188,7 +207,7 @@ export function useChatConversation({
     }
   };
 
-  const addAIResponse = async (content: string) => {
+  const addAIResponse = async (content: string, messageType?: string, metadata?: any) => {
     if (!conversationId) {
       console.error('Conversation not initialized');
       return;
@@ -196,12 +215,15 @@ export function useChatConversation({
 
     try {
       const { data, error } = await supabase
-        .from('messages')
+        .from('chat_messages')
         .insert([
           {
             conversation_id: conversationId,
             sender_type: 'ai',
-            content: content
+            content: content,
+            user_id: user?.id || '',
+            message_type: messageType || 'ai_response',
+            metadata: metadata || {}
           }
         ])
         .select()
@@ -217,7 +239,7 @@ export function useChatConversation({
         content: data.content,
         sender_type: data.sender_type,
         created_at: data.created_at,
-        attachments: data.attachments
+        attachments: data.metadata?.attachments || []
       };
 
       setMessages(prevMessages => [...prevMessages, aiMessage]);
@@ -227,6 +249,7 @@ export function useChatConversation({
   };
 
   return {
+    conversation,
     messages,
     isLoading,
     isSending,
