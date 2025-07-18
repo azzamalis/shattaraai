@@ -81,7 +81,7 @@ export function DocumentContent({
         <div style={{
         transform: `scale(${zoom / 100})`,
         transformOrigin: 'top left'
-      }} className="p-6 px-[16px] py-[16px]">
+      }} className="p-6 py-[10px] px-[10px]">
           {isWordDocument ? <div className="max-w-4xl mx-auto bg-card border border-border rounded-lg shadow-sm">
               <div className="p-8 space-y-6 py-[16px] px-[16px]">
                 
@@ -93,7 +93,7 @@ export function DocumentContent({
                   </div> : processedText ? <div className="prose prose-sm max-w-none text-foreground">
                     <div dangerouslySetInnerHTML={{
                 __html: highlightSearchTerm(processedText)
-              }} className="whitespace-pre-wrap leading-relaxed text-sm mx-0 px-px" />
+              }} className="whitespace-pre-wrap leading-relaxed text-sm mx-0 px-0" />
                   </div> : <div className="text-center py-12">
                     <p className="text-muted-foreground mb-4">
                       Document content is not yet available for preview.
