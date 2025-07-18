@@ -83,7 +83,7 @@ export function DocumentContent({
         transformOrigin: 'top left'
       }} className="p-6 px-[16px] py-[16px]">
           {isWordDocument ? <div className="max-w-4xl mx-auto bg-card border border-border rounded-lg shadow-sm">
-              <div className="p-8 space-y-6 py-[16px] px-[16px]">
+              <div className="p-8 space-y-6 py-[16px] px-[16px] bg-background ">
                 
                 
                 {isProcessing ? <div className="flex flex-col items-center justify-center py-12">
