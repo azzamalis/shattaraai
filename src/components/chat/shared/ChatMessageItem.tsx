@@ -1,17 +1,21 @@
+
 import React, { useState } from 'react';
-import { Copy, Check, User, Bot } from 'lucide-react';
+import { Copy, Check, User, Bot, Paperclip } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from '@/hooks/useChatConversation';
+
 interface ChatMessageItemProps {
   message: ChatMessage;
   showTimestamp?: boolean;
 }
+
 export function ChatMessageItem({
   message,
   showTimestamp = true
 }: ChatMessageItemProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
   const copyToClipboard = async (content: string, messageId: string) => {
     try {
       await navigator.clipboard.writeText(content);
@@ -22,30 +26,110 @@ export function ChatMessageItem({
       toast.error('Failed to copy message');
     }
   };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const isUser = message.sender_type === 'user';
   const isSystem = message.sender_type === 'system';
-  return <div className={cn("flex gap-3 p-4", isUser && "flex-row-reverse", isSystem && "justify-center")}>
+
+  return (
+    <div className={cn(
+      "flex gap-3 p-4",
+      isUser && "flex-row-reverse",
+      isSystem && "justify-center"
+    )}>
       {/* Avatar */}
-      {!isSystem}
+      {!isSystem && (
+        <div className={cn(
+          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+          isUser 
+            ? "bg-[#00A3FF] text-white" 
+            : "bg-dashboard-card dark:bg-dashboard-card border border-dashboard-separator/20 dark:border-white/10"
+        )}>
+          {isUser ? (
+            <User className="h-4 w-4" />
+          ) : (
+            <Bot className="h-4 w-4 text-dashboard-text-secondary dark:text-dashboard-text-secondary" />
+          )}
+        </div>
+      )}
 
       {/* Message Content */}
-      <div className={cn("group relative max-w-[80%] rounded-lg px-4 py-3", isUser && "bg-[#00A3FF] text-white", !isUser && !isSystem && "bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text border border-dashboard-separator/20 dark:border-white/10", isSystem && "bg-dashboard-separator/10 dark:bg-white/5 text-dashboard-text-secondary dark:text-dashboard-text-secondary text-sm rounded-full px-4 py-2")}>
+      <div className={cn(
+        "group relative max-w-[80%] rounded-lg px-4 py-3",
+        isUser && "bg-[#00A3FF] text-white",
+        !isUser && !isSystem && "bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text border border-dashboard-separator/20 dark:border-white/10",
+        isSystem && "bg-dashboard-separator/10 dark:bg-white/5 text-dashboard-text-secondary dark:text-dashboard-text-secondary text-sm rounded-full px-4 py-2"
+      )}>
+        {/* File Attachments */}
+        {message.attachments && message.attachments.length > 0 && !isSystem && (
+          <div className="mb-3 flex flex-wrap gap-2">
+            {message.attachments.map((attachment) => (
+              <div
+                key={attachment.id}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-full text-xs",
+                  "border transition-colors",
+                  isUser 
+                    ? "bg-white/10 border-white/20 text-white/90 hover:bg-white/20" 
+                    : "bg-dashboard-separator/10 dark:bg-white/5 border-dashboard-separator/20 dark:border-white/10 text-dashboard-text-secondary dark:text-dashboard-text-secondary hover:bg-dashboard-separator/20 dark:hover:bg-white/10"
+                )}
+              >
+                <Paperclip className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate max-w-32 font-medium">
+                  {attachment.name}
+                </span>
+                <span className="text-xs opacity-70 flex-shrink-0">
+                  {formatFileSize(attachment.size)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="whitespace-pre-wrap break-words">
           {message.content}
         </div>
 
         {/* Copy Button */}
-        {!isSystem && <button onClick={() => copyToClipboard(message.content, message.id)} className={cn("absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded", "hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover")} title="Copy message">
-            {copiedId === message.id ? <Check className="h-3 w-3 text-[#00A3FF]" /> : <Copy className="h-3 w-3 text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70" />}
-          </button>}
+        {!isSystem && (
+          <button
+            onClick={() => copyToClipboard(message.content, message.id)}
+            className={cn(
+              "absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded",
+              "hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover"
+            )}
+            title="Copy message"
+          >
+            {copiedId === message.id ? (
+              <Check className="h-3 w-3 text-[#00A3FF]" />
+            ) : (
+              <Copy className="h-3 w-3 text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70" />
+            )}
+          </button>
+        )}
 
         {/* Timestamp */}
-        {showTimestamp && <div className={cn("text-xs mt-2", isUser ? "text-white/70" : "text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60")}>
+        {showTimestamp && (
+          <div className={cn(
+            "text-xs mt-2",
+            isUser 
+              ? "text-white/70" 
+              : "text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60"
+          )}>
             {new Date(message.created_at).toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        })}
-          </div>}
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 }
