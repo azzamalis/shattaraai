@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import React, { useState, useRef, ChangeEvent } from 'react';
+import { Send, Loader2, Paperclip, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
 interface ChatInputProps {
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string, attachments?: File[]) => void;
   disabled?: boolean;
   placeholder?: string;
   className?: string;
@@ -19,12 +19,15 @@ export function ChatInput({
   className
 }: ChatInputProps) {
   const [inputValue, setInputValue] = useState('');
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputValue.trim() && !disabled) {
-      onSendMessage(inputValue.trim());
+    if ((inputValue.trim() || attachments.length > 0) && !disabled) {
+      onSendMessage(inputValue.trim(), attachments);
       setInputValue('');
+      setAttachments([]);
     }
   };
 
@@ -35,40 +38,114 @@ export function ChatInput({
     }
   };
 
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setAttachments(prev => [...prev, ...files]);
+    // Reset the input so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const triggerFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
-    <form onSubmit={handleSubmit} className={cn("flex gap-2 items-end", className)}>
-      <div className="flex-1">
-        <Textarea
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+    <form onSubmit={handleSubmit} className={cn("space-y-3", className)}>
+      {/* Attachments Preview */}
+      {attachments.length > 0 && (
+        <div className="flex flex-wrap gap-2 p-3 bg-card dark:bg-card border border-border dark:border-border rounded-lg">
+          {attachments.map((file, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 px-3 py-2 bg-muted dark:bg-muted text-muted-foreground dark:text-muted-foreground rounded-md text-sm"
+            >
+              <span className="truncate max-w-32">{file.name}</span>
+              <button
+                type="button"
+                onClick={() => removeAttachment(index)}
+                className="text-muted-foreground dark:text-muted-foreground hover:text-foreground dark:hover:text-foreground transition-colors"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Input Area */}
+      <div className="flex gap-2 items-end">
+        <div className="flex-1">
+          <Textarea
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            disabled={disabled}
+            className={cn(
+              "min-h-[44px] max-h-32 resize-none",
+              "bg-background dark:bg-background text-foreground dark:text-foreground",
+              "border-border dark:border-border",
+              "placeholder:text-muted-foreground dark:placeholder:text-muted-foreground",
+              "focus:border-primary dark:focus:border-primary focus:ring-primary/20 dark:focus:ring-primary/20"
+            )}
+            rows={1}
+          />
+        </div>
+
+        {/* File Attachment Button */}
+        <Button
+          type="button"
+          variant="outline" 
+          size="sm"
           disabled={disabled}
+          onClick={triggerFileSelect}
           className={cn(
-            "min-h-[44px] max-h-32 resize-none",
-            "bg-dashboard-bg dark:bg-dashboard-bg",
-            "border-dashboard-separator/20 dark:border-white/10",
-            "focus:border-[#00A3FF] focus:ring-[#00A3FF]/20"
+            "h-11 px-3",
+            "bg-background dark:bg-background text-foreground dark:text-foreground",
+            "border-border dark:border-border",
+            "hover:bg-muted dark:hover:bg-muted",
+            "disabled:opacity-50 disabled:cursor-not-allowed"
           )}
-          rows={1}
-        />
+        >
+          <Paperclip className="h-4 w-4" />
+        </Button>
+
+        {/* Send Button */}
+        <Button
+          type="submit"
+          disabled={disabled || (!inputValue.trim() && attachments.length === 0)}
+          size="sm"
+          className={cn(
+            "h-11 px-4",
+            "bg-primary dark:bg-primary text-primary-foreground dark:text-primary-foreground",
+            "hover:bg-primary/90 dark:hover:bg-primary/90",
+            "disabled:bg-muted dark:disabled:bg-muted disabled:text-muted-foreground dark:disabled:text-muted-foreground",
+            "disabled:opacity-50 disabled:cursor-not-allowed"
+          )}
+        >
+          {disabled ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
+        </Button>
       </div>
-      <Button
-        type="submit"
-        disabled={disabled || !inputValue.trim()}
-        size="sm"
-        className={cn(
-          "h-11 px-4",
-          "bg-[#00A3FF] hover:bg-[#00A3FF]/90 text-white",
-          "disabled:bg-dashboard-separator/20 disabled:text-dashboard-text-secondary/50"
-        )}
-      >
-        {disabled ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Send className="h-4 w-4" />
-        )}
-      </Button>
+
+      {/* Hidden File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="image/*,.pdf,.doc,.docx,.txt"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
     </form>
   );
 }

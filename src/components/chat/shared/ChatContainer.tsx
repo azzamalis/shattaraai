@@ -9,7 +9,7 @@ import { ChatMessage } from '@/hooks/useChatConversation';
 
 interface ChatContainerProps {
   messages: ChatMessage[];
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string, attachments?: File[]) => void;
   isLoading?: boolean;
   isSending?: boolean;
   emptyStateContent?: React.ReactNode;
@@ -38,10 +38,16 @@ export function ChatContainer({
     scrollToBottom();
   }, [messages]);
 
+  const handleSendMessage = (content: string, attachments?: File[]) => {
+    // For now, we'll just pass the content. File handling can be implemented later
+    // when the backend is ready to process attachments
+    onSendMessage(content, attachments);
+  };
+
   if (isLoading) {
     return (
       <div className={cn("flex items-center justify-center h-full", className)}>
-        <div className="flex items-center gap-2 text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+        <div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>Loading conversation...</span>
         </div>
@@ -74,9 +80,9 @@ export function ChatContainer({
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-dashboard-separator/20 dark:border-white/10 p-4 bg-dashboard-bg dark:bg-dashboard-bg">
+      <div className="border-t border-border dark:border-border p-4 bg-background dark:bg-background">
         <ChatInput
-          onSendMessage={onSendMessage}
+          onSendMessage={handleSendMessage}
           disabled={isSending}
           placeholder={inputPlaceholder}
         />
