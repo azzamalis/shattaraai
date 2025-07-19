@@ -123,7 +123,7 @@ export function DocumentContent({
                 ) : documentHtml ? (
                   <div 
                     ref={documentRef}
-                    className="document-content p-16 prose prose-sm max-w-none text-foreground leading-relaxed"
+                    className="document-content p-4 sm:p-8 lg:p-16 prose prose-sm max-w-none text-foreground leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
                     style={{
                       fontSize: '12pt',
