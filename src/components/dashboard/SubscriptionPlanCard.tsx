@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -188,7 +189,7 @@ export function SubscriptionPlanCard() {
         </div>
         
         <div className="pt-4 border-t border-border">
-          <Button className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90">
+          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
             <Crown className="h-4 w-4 mr-2" />
             Upgrade to Pro
           </Button>
