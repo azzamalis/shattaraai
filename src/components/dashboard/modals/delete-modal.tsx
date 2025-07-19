@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,7 @@ export function DeleteModal({
 
         {/* Subtitle */}
         <p className="text-sm text-muted-foreground">
-          "<span className="truncate inline-block max-w-[300px]">{itemToDelete.title}</span>" will be permanently deleted.
+          "<span className="truncate max-w-[300px]">{itemToDelete.title}</span>" will be permanently deleted.
         </p>
 
         {/* Actions */}
