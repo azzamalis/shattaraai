@@ -187,7 +187,7 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
 
           {/* Subtitle */}
           <p className="text-sm text-muted-foreground">
-            "<span className="truncate inline-block max-w-[300px]">{contentTitle}</span>" will be permanently deleted.
+            "<span className="truncate max-w-[300px]">{contentTitle}</span>" will be permanently deleted.
           </p>
 
           {/* Actions */}
