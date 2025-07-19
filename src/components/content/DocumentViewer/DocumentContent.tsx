@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, Loader2 } from 'lucide-react';
+import { Download, FileText, Loader2, AlertCircle } from 'lucide-react';
 import { useDocumentViewer } from './DocumentViewerContext';
 import { ContentData } from '@/pages/ContentPage';
-import { supabase } from '@/integrations/supabase/client';
+import mammoth from 'mammoth';
 interface DocumentContentProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -16,51 +16,63 @@ export function DocumentContent({
   const {
     zoom,
     searchTerm,
-    setTotalPages
+    documentHtml,
+    setTotalPages,
+    setDocumentHtml
   } = useDocumentViewer();
+  
   const [isProcessing, setIsProcessing] = useState(false);
-  const [processedText, setProcessedText] = useState<string | null>(null);
-  useEffect(() => {
-    setTotalPages(1); // Word documents are shown as single scrollable content
-    setProcessedText(contentData.text || null);
-  }, [setTotalPages, contentData.text]);
-
-  // Auto-trigger text extraction for Word documents without text content
+  const [error, setError] = useState<string | null>(null);
+  const documentRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const isWordDocument = contentData.filename?.toLowerCase().endsWith('.docx') || contentData.filename?.toLowerCase().endsWith('.doc');
-    if (isWordDocument && !contentData.text && !isProcessing && contentData.url) {
-      extractWordText();
+    if (isWordDocument && contentData.url && !documentHtml && !isProcessing) {
+      processWordDocument();
     }
-  }, [contentData]);
-  const extractWordText = async () => {
-    if (!contentData.url || !contentData.id) return;
-    setIsProcessing(true);
-    try {
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('extract-word-text', {
-        body: {
-          contentId: contentData.id,
-          storageUrl: contentData.url
-        }
-      });
-      if (error) throw error;
+  }, [contentData, documentHtml, isProcessing]);
 
-      // Refetch the updated content
-      const {
-        data: updatedContent,
-        error: fetchError
-      } = await supabase.from('content').select('*').eq('id', contentData.id).single();
-      if (fetchError) throw fetchError;
-      if (updatedContent?.text_content) {
-        setProcessedText(updatedContent.text_content);
-        onUpdateContent({
-          text: updatedContent.text_content
-        });
+  // Update total pages based on processed content
+  useEffect(() => {
+    if (documentHtml) {
+      // For now, set as single page - you could implement pagination logic here
+      setTotalPages(1);
+    }
+  }, [documentHtml, setTotalPages]);
+  const processWordDocument = async () => {
+    if (!contentData.url) return;
+    
+    setIsProcessing(true);
+    setError(null);
+    
+    try {
+      // Fetch the Word document
+      const response = await fetch(contentData.url);
+      if (!response.ok) throw new Error('Failed to fetch document');
+      
+      const arrayBuffer = await response.arrayBuffer();
+      
+      // Convert to HTML using mammoth
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      
+      if (result.messages.length > 0) {
+        console.warn('Mammoth conversion warnings:', result.messages);
       }
+      
+      // Set the HTML content
+      setDocumentHtml(result.value);
+      
+      // Also update the text content for backwards compatibility
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = result.value;
+      const textContent = tempDiv.textContent || tempDiv.innerText || '';
+      
+      onUpdateContent({
+        text: textContent
+      });
+      
     } catch (error) {
-      console.error('Error extracting Word text:', error);
+      console.error('Error processing Word document:', error);
+      setError(error instanceof Error ? error.message : 'Failed to process document');
     } finally {
       setIsProcessing(false);
     }
@@ -70,48 +82,83 @@ export function DocumentContent({
       window.open(contentData.url, '_blank');
     }
   };
-  const highlightSearchTerm = (text: string) => {
-    if (!searchTerm.trim()) return text;
+  const getHighlightedContent = () => {
+    if (!documentHtml) return '';
+    if (!searchTerm.trim()) return documentHtml;
+    
     const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-900">$1</mark>');
+    return documentHtml.replace(regex, '<mark class="bg-yellow-300 dark:bg-yellow-700 dark:text-yellow-100">$1</mark>');
   };
   const isWordDocument = contentData.filename?.toLowerCase().endsWith('.docx') || contentData.filename?.toLowerCase().endsWith('.doc');
-  return <div className="flex-1 bg-background">
+  
+  return (
+    <div className="flex-1 bg-background">
       <ScrollArea className="h-full">
-        <div style={{
-        transform: `scale(${zoom / 100})`,
-        transformOrigin: 'top left'
-      }} className="p-6 px-0 py-[12px]">
-          {isWordDocument ? <div className="max-w-4xl mx-auto bg-card border border-border rounded-lg shadow-sm px-0">
-              <div className="p-8 space-y-6 py-[16px] px-[16px]">
-                
-                
-                {isProcessing ? <div className="flex flex-col items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                    <p className="text-muted-foreground">Processing document...</p>
-                    <p className="text-xs text-muted-foreground mt-1">Extracting text content</p>
-                  </div> : processedText ? <div className="prose prose-sm max-w-none text-foreground">
-                    <div dangerouslySetInnerHTML={{
-                __html: highlightSearchTerm(processedText)
-              }} className="whitespace-pre-wrap leading-relaxed text-sm mx-0 px-0" />
-                  </div> : <div className="text-center py-12">
-                    <p className="text-muted-foreground mb-4">
+        <div className="p-6 flex justify-center">
+          <div 
+            style={{
+              transform: `scale(${zoom / 100})`,
+              transformOrigin: 'top center'
+            }}
+            className="transition-transform duration-200"
+          >
+            {isWordDocument ? (
+              <div className="bg-card border border-border shadow-lg min-h-[11in] w-[8.5in] mx-auto">
+                {isProcessing ? (
+                  <div className="flex flex-col items-center justify-center py-24">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary mb-6" />
+                    <p className="text-lg text-muted-foreground">Processing document...</p>
+                    <p className="text-sm text-muted-foreground mt-2">Converting to visual format</p>
+                  </div>
+                ) : error ? (
+                  <div className="flex flex-col items-center justify-center py-24">
+                    <AlertCircle className="h-12 w-12 text-destructive mb-6" />
+                    <p className="text-lg text-foreground mb-2">Failed to process document</p>
+                    <p className="text-sm text-muted-foreground mb-6">{error}</p>
+                    <Button onClick={processWordDocument} variant="outline" className="gap-2">
+                      <FileText className="h-4 w-4" />
+                      Try Again
+                    </Button>
+                  </div>
+                ) : documentHtml ? (
+                  <div 
+                    ref={documentRef}
+                    className="document-content p-16 prose prose-sm max-w-none text-foreground leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
+                    style={{
+                      fontSize: '12pt',
+                      lineHeight: '1.6',
+                      color: 'inherit',
+                      fontFamily: '"Times New Roman", Times, serif'
+                    }}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-24">
+                    <FileText className="h-12 w-12 text-muted-foreground mb-6" />
+                    <p className="text-lg text-muted-foreground mb-2">
                       Document content is not yet available for preview.
                     </p>
-                    <Button onClick={extractWordText} variant="outline" className="gap-2">
+                    <Button onClick={processWordDocument} variant="outline" className="gap-2">
                       <FileText className="h-4 w-4" />
-                      Extract Text Content
+                      Process Document
                     </Button>
-                  </div>}
-                
-                
+                  </div>
+                )}
               </div>
-            </div> : <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                Document format not supported for preview.
-              </p>
-            </div>}
+            ) : (
+              <div className="text-center py-24">
+                <AlertCircle className="h-12 w-12 text-muted-foreground mb-6 mx-auto" />
+                <p className="text-lg text-muted-foreground">
+                  Document format not supported for visual preview.
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Only Word documents (.docx, .doc) are supported.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </ScrollArea>
-    </div>;
+    </div>
+  );
 }
