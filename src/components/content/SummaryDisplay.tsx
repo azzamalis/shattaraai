@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Copy, Clock, FileText, Video, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -120,19 +119,16 @@ export function SummaryDisplay({
   const summaryData = getSampleSummaryData(contentData.type);
   const ContentIcon = getContentIcon(contentData.type);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-
   const handleCopyAll = () => {
     const fullSummary = summaryData.map(item => `${item.title}\n${item.summary.map(point => `• ${point}`).join('\n')}`).join('\n\n');
     navigator.clipboard.writeText(fullSummary);
     console.log('Summary copied to clipboard');
   };
-
   const handleCopyItem = (item: SummaryItem) => {
     const itemText = `${item.title}\n${item.summary.map(point => `• ${point}`).join('\n')}`;
     navigator.clipboard.writeText(itemText);
     console.log('Item copied to clipboard');
   };
-
   return <div className="h-full p-4">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
@@ -143,12 +139,7 @@ export function SummaryDisplay({
       </div>
 
       <div className="space-y-4">
-        {summaryData.map(item => <div 
-            key={item.id} 
-            className="p-4 rounded-lg bg-dashboard-bg dark:bg-dashboard-bg transition-colors"
-            onMouseEnter={() => setHoveredCard(item.id)}
-            onMouseLeave={() => setHoveredCard(null)}
-          >
+        {summaryData.map(item => <div key={item.id} onMouseEnter={() => setHoveredCard(item.id)} onMouseLeave={() => setHoveredCard(null)} className="p-4 rounded-lg bg-card transition-colors">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
@@ -160,17 +151,11 @@ export function SummaryDisplay({
                   {item.title}
                 </h3>
               </div>
-              {hoveredCard === item.id && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => handleCopyItem(item)}
-                  className="text-dashboard-text-secondary dark:text-dashboard-text-secondary hover:text-dashboard-text dark:hover:text-dashboard-text opacity-0 animate-fade-in"
-                  style={{ opacity: 1 }}
-                >
+              {hoveredCard === item.id && <Button variant="ghost" size="sm" onClick={() => handleCopyItem(item)} className="text-dashboard-text-secondary dark:text-dashboard-text-secondary hover:text-dashboard-text dark:hover:text-dashboard-text opacity-0 animate-fade-in" style={{
+            opacity: 1
+          }}>
                   <Copy className="h-4 w-4" />
-                </Button>
-              )}
+                </Button>}
             </div>
             
             <div className="space-y-1">
