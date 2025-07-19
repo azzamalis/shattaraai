@@ -376,7 +376,7 @@ const AIChatInput = ({
                             <ChevronDown className="h-3 w-3 ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuContent align="end" side="top" className="w-48">
                           {AI_MODELS.map((model) => (
                             <DropdownMenuItem
                               key={model}
