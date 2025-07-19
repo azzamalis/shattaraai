@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ZoomIn, ZoomOut, Download, Search, Maximize, Minimize, Columns2, ChevronUp, ChevronDown, FileText, Monitor } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, Search, Maximize, Minimize, Columns2, ChevronUp, ChevronDown, Monitor, FileText } from 'lucide-react';
 import { useDocumentViewer } from './DocumentViewerContext';
 
 interface DocumentHeaderProps {
@@ -34,6 +34,7 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
   const handleSearch = () => {
     setIsSearching(!isSearching);
     if (!isSearching) {
+      // Clear search when closing
       performSearch('');
     }
   };
@@ -45,99 +46,58 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
-      {/* Left side controls */}
-      <div className="flex items-center gap-1">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={toggleSidebar} 
-          className="h-8 w-8 p-0 hover:bg-gray-200"
-        >
+    <div className="flex items-center justify-between p-2 border-b border-border bg-inherit">
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" onClick={toggleSidebar} className="h-8 w-8 p-0">
           <Columns2 className="h-4 w-4" />
         </Button>
         
-        <div className="h-6 w-px bg-gray-300 mx-2" />
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={zoomOut} 
-          disabled={zoom <= 25} 
-          className="h-8 w-8 p-0 hover:bg-gray-200"
-        >
-          <ZoomOut className="h-4 w-4" />
-        </Button>
-        
-        <div className="flex items-center min-w-[60px] justify-center">
-          <span className="text-sm text-gray-700 font-medium">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="sm" onClick={zoomOut} disabled={zoom <= 25} className="h-8 w-8 p-0">
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          
+          <span className="text-sm text-muted-foreground min-w-[60px] text-center">
             {zoom}%
           </span>
+          
+          <Button variant="ghost" size="sm" onClick={zoomIn} disabled={zoom >= 300} className="h-8 w-8 p-0">
+            <ZoomIn className="h-4 w-4" />
+          </Button>
         </div>
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={zoomIn} 
-          disabled={zoom >= 300} 
-          className="h-8 w-8 p-0 hover:bg-gray-200"
-        >
-          <ZoomIn className="h-4 w-4" />
-        </Button>
-        
-        <div className="h-6 w-px bg-gray-300 mx-2" />
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={fitToPage} 
-          className="h-8 px-3 text-sm hover:bg-gray-200"
-        >
-          <FileText className="h-3 w-3 mr-1" />
-          Fit Page
-        </Button>
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={fitToWidth} 
-          className="h-8 px-3 text-sm hover:bg-gray-200"
-        >
-          <Monitor className="h-3 w-3 mr-1" />
-          Fit Width
-        </Button>
+
+        <div className="flex items-center gap-1 border-l border-border pl-2 ml-2">
+          <Button variant="ghost" size="sm" onClick={fitToPage} className="h-8 px-2 text-xs">
+            <FileText className="h-3 w-3 mr-1" />
+            Fit Page
+          </Button>
+          
+          <Button variant="ghost" size="sm" onClick={fitToWidth} className="h-8 px-2 text-xs">
+            <Monitor className="h-3 w-3 mr-1" />
+            Fit Width
+          </Button>
+        </div>
       </div>
 
-      {/* Right side controls */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         {isSearching && (
-          <div className="flex items-center gap-1 mr-2">
+          <div className="flex items-center gap-1">
             <Input 
               placeholder="Search document..." 
               value={searchTerm} 
               onChange={(e) => performSearch(e.target.value)} 
-              className="w-48 h-8 text-sm border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-48 h-8"
               autoFocus
             />
             {searchResults.length > 0 && (
               <>
-                <span className="text-xs text-gray-600 mx-2 whitespace-nowrap">
+                <span className="text-xs text-muted-foreground">
                   {currentSearchIndex + 1} of {searchResults.length}
                 </span>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={previousSearchResult} 
-                  className="h-8 w-8 p-0 hover:bg-gray-200"
-                >
+                <Button variant="ghost" size="sm" onClick={previousSearchResult} className="h-8 w-8 p-0">
                   <ChevronUp className="h-4 w-4" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={nextSearchResult} 
-                  className="h-8 w-8 p-0 hover:bg-gray-200"
-                >
+                <Button variant="ghost" size="sm" onClick={nextSearchResult} className="h-8 w-8 p-0">
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </>
@@ -145,12 +105,7 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
           </div>
         )}
         
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleSearch} 
-          className="h-8 w-8 p-0 hover:bg-gray-200"
-        >
+        <Button variant="ghost" size="sm" onClick={handleSearch} className="h-8 w-8 p-0">
           <Search className="h-4 w-4" />
         </Button>
         
@@ -159,17 +114,12 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
           size="sm" 
           onClick={handleDownload}
           disabled={!contentData?.url}
-          className="h-8 w-8 p-0 hover:bg-gray-200"
+          className="h-8 w-8 p-0"
         >
           <Download className="h-4 w-4" />
         </Button>
         
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={toggleFullscreen} 
-          className="h-8 w-8 p-0 hover:bg-gray-200"
-        >
+        <Button variant="ghost" size="sm" onClick={toggleFullscreen} className="h-8 w-8 p-0">
           {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
         </Button>
       </div>
