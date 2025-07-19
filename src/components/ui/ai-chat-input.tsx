@@ -7,8 +7,18 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const PLACEHOLDERS = ["Ask Shattara AI about any topic...", "How can I prepare for my biology exam?", "Create flashcards about neural networks", "Explain quantum physics in simple terms", "Summarize this research paper", "Prepare a study plan for my finals"];
+
+const AI_MODELS = [
+  "Gemini 2.5 Flash",
+  "Claude 4 Sonnet", 
+  "GPT4.1",
+  "Gemini 2.5 Pro",
+  "Grok4",
+  "GPT4.1 Mini"
+];
 
 interface AIChatInputProps {
   onSubmit?: (value: string, files?: File[]) => void;
@@ -27,7 +37,7 @@ const AIChatInput = ({
   const [deepSearchActive, setDeepSearchActive] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [selectedModel, setSelectedModel] = useState("Claude 3.5 Sonnet");
+  const [selectedModel, setSelectedModel] = useState("Claude 4 Sonnet");
   const wrapperRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -355,15 +365,29 @@ const AIChatInput = ({
 
                     {/* Model Selector */}
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="hidden sm:inline">Model:</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2 text-xs font-medium hover:bg-accent"
-                      >
-                        {selectedModel}
-                        <ChevronDown className="h-3 w-3 ml-1" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2 text-xs font-medium hover:bg-accent"
+                          >
+                            {selectedModel}
+                            <ChevronDown className="h-3 w-3 ml-1" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          {AI_MODELS.map((model) => (
+                            <DropdownMenuItem
+                              key={model}
+                              onClick={() => setSelectedModel(model)}
+                              className={selectedModel === model ? "bg-accent" : ""}
+                            >
+                              {model}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </motion.div>
