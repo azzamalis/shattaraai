@@ -60,7 +60,6 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-8 px-3 rounded-full">
-              <Settings className="h-4 w-4 mr-2" />
               Page & Zoom
             </Button>
           </DropdownMenuTrigger>
