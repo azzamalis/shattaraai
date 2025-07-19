@@ -370,6 +370,7 @@ const AIChatInput = ({
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={(e) => e.stopPropagation()}
                             className="h-8 px-2 text-xs font-medium hover:bg-accent"
                           >
                             {selectedModel}
