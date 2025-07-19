@@ -56,14 +56,16 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
         <Button variant="ghost" size="sm" onClick={toggleSidebar} className="h-8 w-8 p-0">
           <Columns2 className="h-4 w-4" />
         </Button>
-        
+      </div>
+
+      <div className="flex items-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-8 px-3 rounded-full">
               Page & Zoom
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-64 z-50 bg-background">
+          <DropdownMenuContent align="center" className="w-64 z-50 bg-background">
             {/* Page Controls */}
             <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Page Navigation</div>
             <div className="flex items-center justify-between px-2 py-1">
