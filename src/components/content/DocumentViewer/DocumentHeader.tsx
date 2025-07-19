@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ZoomIn, ZoomOut, Download, Search, Maximize, Minimize, Columns2, ChevronUp, ChevronDown, Monitor, FileText } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, Search, Maximize, Minimize, Columns2, ChevronUp, ChevronDown, Monitor, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useDocumentViewer } from './DocumentViewerContext';
 
 interface DocumentHeaderProps {
@@ -19,6 +19,8 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
     isFullscreen,
     searchResults,
     currentSearchIndex,
+    currentPage,
+    totalPages,
     zoomIn,
     zoomOut,
     fitToWidth,
@@ -28,7 +30,9 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
     previousSearchResult,
     setIsSearching,
     toggleFullscreen,
-    toggleSidebar
+    toggleSidebar,
+    nextPage,
+    previousPage
   } = useDocumentViewer();
 
   const handleSearch = () => {
@@ -80,8 +84,22 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={previousPage} disabled={currentPage <= 1} className="h-8 w-8 p-0">
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </span>
+          
+          <Button variant="ghost" size="sm" onClick={nextPage} disabled={currentPage >= totalPages} className="h-8 w-8 p-0">
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
         {isSearching && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 border-l border-border pl-2 ml-2">
             <Input 
               placeholder="Search document..." 
               value={searchTerm} 
