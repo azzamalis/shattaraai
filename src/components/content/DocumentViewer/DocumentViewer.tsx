@@ -2,7 +2,6 @@ import React from 'react';
 import { DocumentHeader } from './DocumentHeader';
 import { DocumentSidebar } from './DocumentSidebar';
 import { DocumentContent } from './DocumentContent';
-import { DocumentStatusBar } from './DocumentStatusBar';
 import { DocumentViewerProvider } from './DocumentViewerContext';
 import { ContentData } from '@/pages/ContentPage';
 
@@ -20,7 +19,6 @@ export function DocumentViewer({ contentData, onUpdateContent }: DocumentViewerP
           <DocumentSidebar />
           <DocumentContent contentData={contentData} onUpdateContent={onUpdateContent} />
         </div>
-        <DocumentStatusBar />
       </div>
     </DocumentViewerProvider>
   );
