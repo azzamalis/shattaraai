@@ -61,7 +61,7 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-8 px-3 rounded-full">
               <Settings className="h-4 w-4 mr-2" />
-              Document Controls
+              Page & Zoom
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-64 z-50 bg-background">
@@ -104,61 +104,55 @@ export function DocumentHeader({ contentData }: DocumentHeaderProps) {
               <Monitor className="h-4 w-4 mr-2" />
               Fit to Width
             </DropdownMenuItem>
-            
-            <DropdownMenuSeparator />
-            
-            {/* Action Controls */}
-            <DropdownMenuItem onClick={handleSearch}>
-              <Search className="h-4 w-4 mr-2" />
-              {isSearching ? 'Close Search' : 'Search Document'}
-            </DropdownMenuItem>
-            
-            <DropdownMenuItem onClick={handleDownload} disabled={!contentData?.url}>
-              <Download className="h-4 w-4 mr-2" />
-              Download Document
-            </DropdownMenuItem>
-            
-            <DropdownMenuItem onClick={toggleFullscreen}>
-              {isFullscreen ? (
-                <>
-                  <Minimize className="h-4 w-4 mr-2" />
-                  Exit Fullscreen
-                </>
-              ) : (
-                <>
-                  <Maximize className="h-4 w-4 mr-2" />
-                  Enter Fullscreen
-                </>
-              )}
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      {isSearching && (
-        <div className="flex items-center gap-1">
-          <Input 
-            placeholder="Search document..." 
-            value={searchTerm} 
-            onChange={(e) => performSearch(e.target.value)} 
-            className="w-48 h-8"
-            autoFocus
-          />
-          {searchResults.length > 0 && (
-            <>
-              <span className="text-xs text-muted-foreground">
-                {currentSearchIndex + 1} of {searchResults.length}
-              </span>
-              <Button variant="ghost" size="sm" onClick={previousSearchResult} className="h-8 w-8 p-0">
-                <ChevronUp className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={nextSearchResult} className="h-8 w-8 p-0">
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </>
-          )}
-        </div>
-      )}
+      <div className="flex items-center gap-2">
+
+        {isSearching && (
+          <div className="flex items-center gap-1">
+            <Input 
+              placeholder="Search document..." 
+              value={searchTerm} 
+              onChange={(e) => performSearch(e.target.value)} 
+              className="w-48 h-8"
+              autoFocus
+            />
+            {searchResults.length > 0 && (
+              <>
+                <span className="text-xs text-muted-foreground">
+                  {currentSearchIndex + 1} of {searchResults.length}
+                </span>
+                <Button variant="ghost" size="sm" onClick={previousSearchResult} className="h-8 w-8 p-0">
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={nextSearchResult} className="h-8 w-8 p-0">
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
+        )}
+        
+        <Button variant="ghost" size="sm" onClick={handleSearch} className="h-8 w-8 p-0">
+          <Search className="h-4 w-4" />
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleDownload}
+          disabled={!contentData?.url}
+          className="h-8 w-8 p-0"
+        >
+          <Download className="h-4 w-4" />
+        </Button>
+        
+        <Button variant="ghost" size="sm" onClick={toggleFullscreen} className="h-8 w-8 p-0">
+          {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+        </Button>
+      </div>
     </div>
   );
 }
