@@ -14,7 +14,7 @@ interface DocumentViewerProps {
 export function DocumentViewer({ contentData, onUpdateContent }: DocumentViewerProps) {
   return (
     <DocumentViewerProvider>
-      <div className="h-full flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="h-full flex flex-col bg-background">
         <DocumentHeader contentData={contentData} />
         <div className="flex-1 flex min-h-0">
           <DocumentSidebar />
