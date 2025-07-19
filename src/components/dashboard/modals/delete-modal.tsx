@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,12 @@ interface DeleteModalProps {
   };
   onConfirm: () => void;
 }
+
+const truncateText = (text: string, maxLength: number = 40) => {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
+};
+
 export function DeleteModal({
   open,
   onOpenChange,
@@ -35,7 +42,7 @@ export function DeleteModal({
 
         {/* Subtitle */}
         <p className="text-sm text-muted-foreground">
-          "<span className="truncate max-w-[300px]">{itemToDelete.title}</span>" will be permanently deleted.
+          "{truncateText(itemToDelete.title)}" will be permanently deleted.
         </p>
 
         {/* Actions */}
@@ -53,3 +60,4 @@ export function DeleteModal({
       </div>
     </BaseModal>;
 }
+

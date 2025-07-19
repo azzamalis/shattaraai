@@ -23,6 +23,11 @@ interface RecentItemDropdownProps {
   onDelete: (e: React.MouseEvent) => void;
 }
 
+const truncateText = (text: string, maxLength: number = 40) => {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
+};
+
 export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
   contentId,
   contentTitle,
@@ -187,7 +192,7 @@ export const RecentItemDropdown: React.FC<RecentItemDropdownProps> = ({
 
           {/* Subtitle */}
           <p className="text-sm text-muted-foreground">
-            "<span className="truncate max-w-[300px]">{contentTitle}</span>" will be permanently deleted.
+            "{truncateText(contentTitle)}" will be permanently deleted.
           </p>
 
           {/* Actions */}
