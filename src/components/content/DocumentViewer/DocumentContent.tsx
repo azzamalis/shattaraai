@@ -92,71 +92,69 @@ export function DocumentContent({
   const isWordDocument = contentData.filename?.toLowerCase().endsWith('.docx') || contentData.filename?.toLowerCase().endsWith('.doc');
   
   return (
-    <div className="flex-1 bg-background">
-      <ScrollArea className="h-full">
-        <div className="p-6 flex justify-center">
-          <div 
-            style={{
-              transform: `scale(${zoom / 100})`,
-              transformOrigin: 'top center'
-            }}
-            className="transition-transform duration-200"
-          >
-            {isWordDocument ? (
-              <div className="bg-card border border-border shadow-lg min-h-[11in] w-[8.5in] mx-auto">
-                {isProcessing ? (
-                  <div className="flex flex-col items-center justify-center py-24">
-                    <Loader2 className="h-12 w-12 animate-spin text-primary mb-6" />
-                    <p className="text-lg text-muted-foreground">Processing document...</p>
-                    <p className="text-sm text-muted-foreground mt-2">Converting to visual format</p>
-                  </div>
-                ) : error ? (
-                  <div className="flex flex-col items-center justify-center py-24">
-                    <AlertCircle className="h-12 w-12 text-destructive mb-6" />
-                    <p className="text-lg text-foreground mb-2">Failed to process document</p>
-                    <p className="text-sm text-muted-foreground mb-6">{error}</p>
-                    <Button onClick={processWordDocument} variant="outline" className="gap-2">
-                      <FileText className="h-4 w-4" />
-                      Try Again
-                    </Button>
-                  </div>
-                ) : documentHtml ? (
-                  <div 
-                    ref={documentRef}
-                    className="document-content p-16 prose prose-sm max-w-none text-foreground leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
-                    style={{
-                      fontSize: '12pt',
-                      lineHeight: '1.6',
-                      color: 'inherit',
-                      fontFamily: '"Times New Roman", Times, serif'
-                    }}
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-24">
-                    <FileText className="h-12 w-12 text-muted-foreground mb-6" />
-                    <p className="text-lg text-muted-foreground mb-2">
-                      Document content is not yet available for preview.
-                    </p>
-                    <Button onClick={processWordDocument} variant="outline" className="gap-2">
-                      <FileText className="h-4 w-4" />
-                      Process Document
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-24">
-                <AlertCircle className="h-12 w-12 text-muted-foreground mb-6 mx-auto" />
-                <p className="text-lg text-muted-foreground">
-                  Document format not supported for visual preview.
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Only Word documents (.docx, .doc) are supported.
-                </p>
-              </div>
-            )}
-          </div>
+    <div className="flex-1 bg-background overflow-hidden">
+      <ScrollArea className="h-full w-full">
+        <div 
+          className="min-h-full w-full flex justify-center p-6"
+          style={{
+            transform: `scale(${zoom / 100})`,
+            transformOrigin: 'top center'
+          }}
+        >
+          {isWordDocument ? (
+            <div className="bg-card border border-border shadow-lg min-h-[11in] w-full max-w-[8.5in] mx-auto">
+              {isProcessing ? (
+                <div className="flex flex-col items-center justify-center py-24">
+                  <Loader2 className="h-12 w-12 animate-spin text-primary mb-6" />
+                  <p className="text-lg text-muted-foreground">Processing document...</p>
+                  <p className="text-sm text-muted-foreground mt-2">Converting to visual format</p>
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center py-24">
+                  <AlertCircle className="h-12 w-12 text-destructive mb-6" />
+                  <p className="text-lg text-foreground mb-2">Failed to process document</p>
+                  <p className="text-sm text-muted-foreground mb-6">{error}</p>
+                  <Button onClick={processWordDocument} variant="outline" className="gap-2">
+                    <FileText className="h-4 w-4" />
+                    Try Again
+                  </Button>
+                </div>
+              ) : documentHtml ? (
+                <div 
+                  ref={documentRef}
+                  className="p-16 prose prose-sm max-w-none text-foreground leading-relaxed w-full"
+                  dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
+                  style={{
+                    fontSize: '12pt',
+                    lineHeight: '1.6',
+                    color: 'inherit',
+                    fontFamily: '"Times New Roman", Times, serif'
+                  }}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center py-24">
+                  <FileText className="h-12 w-12 text-muted-foreground mb-6" />
+                  <p className="text-lg text-muted-foreground mb-2">
+                    Document content is not yet available for preview.
+                  </p>
+                  <Button onClick={processWordDocument} variant="outline" className="gap-2">
+                    <FileText className="h-4 w-4" />
+                    Process Document
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-24">
+              <AlertCircle className="h-12 w-12 text-muted-foreground mb-6 mx-auto" />
+              <p className="text-lg text-muted-foreground">
+                Document format not supported for visual preview.
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Only Word documents (.docx, .doc) are supported.
+              </p>
+            </div>
+          )}
         </div>
       </ScrollArea>
     </div>
