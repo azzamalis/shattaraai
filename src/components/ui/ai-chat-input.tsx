@@ -126,7 +126,7 @@ const AIChatInput = ({
 
   const hasContent = inputValue || attachedFiles.length > 0;
 
-  // Improved animation variants for placeholder text
+  // Fixed animation variants with proper Framer Motion easing
   const placeholderContainerVariants = {
     initial: {},
     animate: {
@@ -158,7 +158,7 @@ const AIChatInput = ({
       scale: 1,
       transition: {
         duration: 0.4,
-        ease: [0.25, 0.1, 0.25, 1]
+        ease: "easeOut"
       }
     },
     exit: {
@@ -168,7 +168,7 @@ const AIChatInput = ({
       scale: 0.98,
       transition: {
         duration: 0.3,
-        ease: [0.4, 0, 0.6, 1]
+        ease: "easeIn"
       }
     }
   };
@@ -187,7 +187,7 @@ const AIChatInput = ({
                 scale: 1,
                 transition: {
                   duration: 0.3,
-                  ease: [0.25, 0.1, 0.25, 1]
+                  ease: "easeOut"
                 }
               }}
               exit={{ 
@@ -196,7 +196,7 @@ const AIChatInput = ({
                 scale: 0.98,
                 transition: {
                   duration: 0.2,
-                  ease: [0.4, 0, 0.6, 1]
+                  ease: "easeIn"
                 }
               }}
               className="mb-3 space-y-2"
@@ -212,7 +212,7 @@ const AIChatInput = ({
                     transition: {
                       duration: 0.3,
                       delay: index * 0.05,
-                      ease: [0.25, 0.1, 0.25, 1]
+                      ease: "easeOut"
                     }
                   }}
                   exit={{ 
@@ -221,7 +221,7 @@ const AIChatInput = ({
                     y: -10,
                     transition: {
                       duration: 0.2,
-                      ease: [0.4, 0, 0.6, 1]
+                      ease: "easeIn"
                     }
                   }}
                   className="flex items-center gap-3 p-3 bg-card border border-border rounded-lg shadow-sm"
@@ -276,7 +276,7 @@ const AIChatInput = ({
             }}
             transition={{
               duration: 0.3,
-              ease: [0.25, 0.1, 0.25, 1]
+              ease: "easeOut"
             }}
             onClick={handleActivate}
           >
@@ -329,7 +329,7 @@ const AIChatInput = ({
                   }}
                   transition={{
                     duration: 0.2,
-                    ease: [0.25, 0.1, 0.25, 1]
+                    ease: "easeOut"
                   }}
                 >
                   <Button
@@ -361,7 +361,7 @@ const AIChatInput = ({
                     height: "auto",
                     transition: {
                       duration: 0.3,
-                      ease: [0.25, 0.1, 0.25, 1]
+                      ease: "easeOut"
                     }
                   }}
                   exit={{ 
@@ -369,7 +369,7 @@ const AIChatInput = ({
                     height: 0,
                     transition: {
                       duration: 0.2,
-                      ease: [0.4, 0, 0.6, 1]
+                      ease: "easeIn"
                     }
                   }}
                   className="border-t border-border px-3 py-2"
