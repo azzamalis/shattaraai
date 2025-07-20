@@ -50,8 +50,8 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider 
           attribute="data-theme" 
-          defaultTheme="system" 
-          enableSystem
+          defaultTheme="light" 
+          enableSystem={false}
           disableTransitionOnChange={false}
         >
           <TooltipProvider>

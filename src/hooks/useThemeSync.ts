@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,7 +25,10 @@ export function useThemeSync() {
           return;
         }
 
-        if (data?.theme_preference && data.theme_preference !== theme) {
+        // Only apply if it's light or dark, ignore system
+        if (data?.theme_preference && 
+            (data.theme_preference === 'light' || data.theme_preference === 'dark') && 
+            data.theme_preference !== theme) {
           setTheme(data.theme_preference);
         }
       } catch (error) {
@@ -37,7 +41,7 @@ export function useThemeSync() {
 
   // Save theme to database when it changes (and user is logged in)
   useEffect(() => {
-    if (!user || !theme) return;
+    if (!user || !theme || (theme !== 'light' && theme !== 'dark')) return;
 
     const saveUserTheme = async () => {
       try {

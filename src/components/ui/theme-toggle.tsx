@@ -10,15 +10,16 @@ interface ThemeToggleProps {
 }
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   
-  // Handle the toggle - switch between light and dark, ignore system
+  // Handle the toggle - switch between light and dark only
   const handleToggle = (checked: boolean) => {
     setTheme(checked ? 'dark' : 'light');
   };
   
   // Determine if switch should be checked (dark mode)
-  const isChecked = theme === 'dark';
+  // Use resolvedTheme to get the actual applied theme
+  const isChecked = resolvedTheme === 'dark';
 
   return (
     <div className={cn("flex items-center space-x-2", className)}>
