@@ -200,7 +200,11 @@ export function AITutorChatDrawer({
               >
                 <div className={chatMessageStyles.bubble(message.sender_type === 'user')}>
                   <p className={chatMessageStyles.content}>{message.content}</p>
-                  <div className={chatMessageStyles.timestamp}>
+                  <div className={`text-xs mt-1 ${
+                    message.sender_type === 'user' 
+                      ? 'text-white/80' 
+                      : 'text-foreground/60 dark:text-foreground/50'
+                  }`}>
                     {new Date(message.created_at).toLocaleTimeString([], { 
                       hour: '2-digit', 
                       minute: '2-digit' 
