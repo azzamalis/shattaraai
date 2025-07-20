@@ -3,7 +3,7 @@ import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
 import { Block, BlockNoteEditor, PartialBlock } from '@blocknote/core';
 import '@blocknote/mantine/style.css';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from 'next-themes';
 
 interface NotionEditorProps {
   initialContent?: PartialBlock[];

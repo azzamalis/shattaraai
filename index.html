@@ -20,10 +20,25 @@
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
 
-    <!-- Force dark mode for entire application -->
+    <!-- Smart theme initialization -->
     <script>
-      // Force dark mode for all pages to maintain consistency
-      document.documentElement.classList.add('dark');
+      // Initialize theme immediately to prevent FOUC
+      (function() {
+        try {
+          const theme = localStorage.getItem('theme') || 'system';
+          if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {
+          // Fallback to dark theme if localStorage is not available
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
     </script>
   </head>
 
