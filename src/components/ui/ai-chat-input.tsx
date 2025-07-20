@@ -126,7 +126,7 @@ const AIChatInput = ({
 
   const hasContent = inputValue || attachedFiles.length > 0;
 
-  // Fixed animation variants with proper Framer Motion easing
+  // Fixed animation variants
   const placeholderContainerVariants = {
     initial: {},
     animate: {
@@ -155,8 +155,7 @@ const AIChatInput = ({
       y: 0,
       scale: 1,
       transition: {
-        duration: 0.4,
-        ease: [0.25, 0.46, 0.45, 0.94]
+        duration: 0.4
       }
     },
     exit: {
@@ -165,8 +164,7 @@ const AIChatInput = ({
       y: -8,
       scale: 0.98,
       transition: {
-        duration: 0.3,
-        ease: [0.55, 0.06, 0.68, 0.19]
+        duration: 0.3
       }
     }
   };
