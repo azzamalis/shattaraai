@@ -156,7 +156,7 @@ const AIChatInput = ({
       scale: 1,
       transition: {
         duration: 0.4,
-        ease: "easeOut"
+        ease: [0.25, 0.46, 0.45, 0.94]
       }
     },
     exit: {
@@ -166,7 +166,7 @@ const AIChatInput = ({
       scale: 0.98,
       transition: {
         duration: 0.3,
-        ease: "easeIn"
+        ease: [0.55, 0.06, 0.68, 0.19]
       }
     }
   };
@@ -185,7 +185,7 @@ const AIChatInput = ({
                 scale: 1,
                 transition: {
                   duration: 0.3,
-                  ease: "easeOut"
+                  ease: [0.25, 0.46, 0.45, 0.94]
                 }
               }}
               exit={{ 
@@ -194,7 +194,7 @@ const AIChatInput = ({
                 scale: 0.98,
                 transition: {
                   duration: 0.2,
-                  ease: "easeIn"
+                  ease: [0.55, 0.06, 0.68, 0.19]
                 }
               }}
               className="mb-3 space-y-2"
@@ -210,7 +210,7 @@ const AIChatInput = ({
                     transition: {
                       duration: 0.3,
                       delay: index * 0.05,
-                      ease: "easeOut"
+                      ease: [0.25, 0.46, 0.45, 0.94]
                     }
                   }}
                   exit={{ 
@@ -219,7 +219,7 @@ const AIChatInput = ({
                     y: -10,
                     transition: {
                       duration: 0.2,
-                      ease: "easeIn"
+                      ease: [0.55, 0.06, 0.68, 0.19]
                     }
                   }}
                   className="flex items-center gap-3 p-3 bg-card border border-border rounded-lg shadow-sm"
@@ -262,7 +262,7 @@ const AIChatInput = ({
         <div className="relative">
           <motion.div
             className={`
-              relative rounded-xl border bg-card shadow-sm
+              relative rounded-xl border bg-card shadow-sm transition-all duration-300
               ${isActive || hasContent ? 'border-border shadow-md' : 'border-border'}
               ${isActive ? 'ring-1 ring-ring/20' : ''}
             `}
@@ -274,7 +274,7 @@ const AIChatInput = ({
             }}
             transition={{
               duration: 0.3,
-              ease: "easeOut"
+              ease: [0.25, 0.46, 0.45, 0.94]
             }}
             onClick={handleActivate}
           >
@@ -327,7 +327,7 @@ const AIChatInput = ({
                   }}
                   transition={{
                     duration: 0.2,
-                    ease: "easeOut"
+                    ease: [0.25, 0.46, 0.45, 0.94]
                   }}
                 >
                   <Button
@@ -359,7 +359,7 @@ const AIChatInput = ({
                     height: "auto",
                     transition: {
                       duration: 0.3,
-                      ease: "easeOut"
+                      ease: [0.25, 0.46, 0.45, 0.94]
                     }
                   }}
                   exit={{ 
@@ -367,7 +367,7 @@ const AIChatInput = ({
                     height: 0,
                     transition: {
                       duration: 0.2,
-                      ease: "easeIn"
+                      ease: [0.55, 0.06, 0.68, 0.19]
                     }
                   }}
                   className="border-t border-border px-3 py-2"
