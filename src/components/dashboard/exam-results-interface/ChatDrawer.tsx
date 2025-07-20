@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Copy, Trash2, Check, Clock } from 'lucide-react';
 import { toast } from 'sonner';
@@ -161,7 +162,11 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId }: ChatDrawerPro
             >
               <div className={chatMessageStyles.bubble(message.isUser)}>
                 <p className={chatMessageStyles.content}>{message.content}</p>
-                <div className="text-xs text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60 mt-1">
+                <div className={`text-xs mt-1 ${
+                  message.isUser 
+                    ? 'text-white/80' 
+                    : 'text-foreground/60 dark:text-foreground/50'
+                }`}>
                   {formatTimestamp(message.timestamp)}
                   {message.isUser && (
                     <span className="flex items-center ml-2">
@@ -206,7 +211,7 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId }: ChatDrawerPro
             <button 
               onClick={sendMessage}
               disabled={!chatInput.trim()}
-              className="rounded-lg bg-primary px-3 py-2 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-lg bg-primary px-3 py-2 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
             >
               <Send className="h-4 w-4" />
             </button>
