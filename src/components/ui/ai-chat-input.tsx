@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -50,7 +51,7 @@ const AIChatInput = ({
       setTimeout(() => {
         setPlaceholderIndex(prev => (prev + 1) % PLACEHOLDERS.length);
         setShowPlaceholder(true);
-      }, 400);
+      }, 200);
     }, 3000);
     return () => clearInterval(interval);
   }, [isActive, inputValue]);
@@ -125,18 +126,20 @@ const AIChatInput = ({
 
   const hasContent = inputValue || attachedFiles.length > 0;
 
-  // Animation variants for placeholder text
+  // Improved animation variants for placeholder text
   const placeholderContainerVariants = {
     initial: {},
     animate: {
       transition: {
-        staggerChildren: 0.025
+        staggerChildren: 0.02,
+        ease: "easeInOut"
       }
     },
     exit: {
       transition: {
-        staggerChildren: 0.015,
-        staggerDirection: -1
+        staggerChildren: 0.01,
+        staggerDirection: -1,
+        ease: "easeInOut"
       }
     }
   };
@@ -144,43 +147,28 @@ const AIChatInput = ({
   const letterVariants = {
     initial: {
       opacity: 0,
-      filter: "blur(12px)",
-      y: 10
+      filter: "blur(8px)",
+      y: 8,
+      scale: 0.98
     },
     animate: {
       opacity: 1,
       filter: "blur(0px)",
       y: 0,
+      scale: 1,
       transition: {
-        opacity: {
-          duration: 0.25
-        },
-        filter: {
-          duration: 0.4
-        },
-        y: {
-          type: "spring" as const,
-          stiffness: 80,
-          damping: 20
-        }
+        duration: 0.4,
+        ease: [0.25, 0.1, 0.25, 1]
       }
     },
     exit: {
       opacity: 0,
-      filter: "blur(12px)",
-      y: -10,
+      filter: "blur(8px)",
+      y: -8,
+      scale: 0.98,
       transition: {
-        opacity: {
-          duration: 0.2
-        },
-        filter: {
-          duration: 0.3
-        },
-        y: {
-          type: "spring" as const,
-          stiffness: 80,
-          damping: 20
-        }
+        duration: 0.3,
+        ease: [0.4, 0, 0.6, 1]
       }
     }
   };
@@ -192,17 +180,50 @@ const AIChatInput = ({
         <AnimatePresence>
           {attachedFiles.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0, 
+                scale: 1,
+                transition: {
+                  duration: 0.3,
+                  ease: [0.25, 0.1, 0.25, 1]
+                }
+              }}
+              exit={{ 
+                opacity: 0, 
+                y: -10, 
+                scale: 0.98,
+                transition: {
+                  duration: 0.2,
+                  ease: [0.4, 0, 0.6, 1]
+                }
+              }}
               className="mb-3 space-y-2"
             >
               {attachedFiles.map((file, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ 
+                    opacity: 1, 
+                    scale: 1, 
+                    y: 0,
+                    transition: {
+                      duration: 0.3,
+                      delay: index * 0.05,
+                      ease: [0.25, 0.1, 0.25, 1]
+                    }
+                  }}
+                  exit={{ 
+                    opacity: 0, 
+                    scale: 0.95, 
+                    y: -10,
+                    transition: {
+                      duration: 0.2,
+                      ease: [0.4, 0, 0.6, 1]
+                    }
+                  }}
                   className="flex items-center gap-3 p-3 bg-card border border-border rounded-lg shadow-sm"
                 >
                   <div className="flex-shrink-0">
@@ -229,7 +250,7 @@ const AIChatInput = ({
                       e.stopPropagation();
                       removeFile(index);
                     }}
-                    className="h-8 w-8 p-0 hover:bg-accent"
+                    className="h-8 w-8 p-0 hover:bg-accent transition-colors duration-200"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -241,12 +262,22 @@ const AIChatInput = ({
 
         {/* Main Input Container */}
         <div className="relative">
-          <div
+          <motion.div
             className={`
-              relative rounded-xl border bg-card shadow-sm transition-all duration-200
+              relative rounded-xl border bg-card shadow-sm
               ${isActive || hasContent ? 'border-border shadow-md' : 'border-border'}
               ${isActive ? 'ring-1 ring-ring/20' : ''}
             `}
+            animate={{
+              scale: isActive ? 1.01 : 1,
+              boxShadow: isActive 
+                ? "0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
+                : "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)"
+            }}
+            transition={{
+              duration: 0.3,
+              ease: [0.25, 0.1, 0.25, 1]
+            }}
             onClick={handleActivate}
           >
             {/* Main Input Area */}
@@ -291,21 +322,32 @@ const AIChatInput = ({
 
               {/* Send Button */}
               <div className="absolute bottom-2 right-2">
-                <Button
-                  type="submit"
-                  size="sm"
-                  onClick={handleSubmit}
-                  disabled={!inputValue.trim() && attachedFiles.length === 0}
-                  className={`
-                    h-8 w-8 p-0 rounded-lg transition-all duration-200
-                    ${hasContent 
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm' 
-                      : 'bg-muted text-muted-foreground hover:bg-accent'
-                    }
-                  `}
+                <motion.div
+                  animate={{
+                    scale: hasContent ? 1.05 : 1,
+                    opacity: hasContent ? 1 : 0.7
+                  }}
+                  transition={{
+                    duration: 0.2,
+                    ease: [0.25, 0.1, 0.25, 1]
+                  }}
                 >
-                  <ArrowUp className="h-4 w-4" />
-                </Button>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    onClick={handleSubmit}
+                    disabled={!inputValue.trim() && attachedFiles.length === 0}
+                    className={`
+                      h-8 w-8 p-0 rounded-lg transition-all duration-300 ease-in-out
+                      ${hasContent 
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md' 
+                        : 'bg-muted text-muted-foreground hover:bg-accent'
+                      }
+                    `}
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
+                </motion.div>
               </div>
             </div>
 
@@ -314,8 +356,22 @@ const AIChatInput = ({
               {(isActive || hasContent) && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
+                  animate={{ 
+                    opacity: 1, 
+                    height: "auto",
+                    transition: {
+                      duration: 0.3,
+                      ease: [0.25, 0.1, 0.25, 1]
+                    }
+                  }}
+                  exit={{ 
+                    opacity: 0, 
+                    height: 0,
+                    transition: {
+                      duration: 0.2,
+                      ease: [0.4, 0, 0.6, 1]
+                    }
+                  }}
                   className="border-t border-border px-3 py-2"
                 >
                   <div className="flex items-center justify-between">
@@ -327,7 +383,7 @@ const AIChatInput = ({
                             variant="ghost"
                             size="sm"
                             onClick={handleFileAttach}
-                            className="h-8 w-8 p-0 hover:bg-accent"
+                            className="h-8 w-8 p-0 hover:bg-accent transition-colors duration-200"
                           >
                             <Plus className="h-4 w-4" />
                           </Button>
@@ -347,7 +403,7 @@ const AIChatInput = ({
                               e.stopPropagation();
                               setDeepSearchActive(!deepSearchActive);
                             }}
-                            className={`h-8 px-3 text-xs ${
+                            className={`h-8 px-3 text-xs transition-all duration-200 ease-in-out ${
                               deepSearchActive 
                                 ? 'bg-primary/10 text-primary hover:bg-primary/20' 
                                 : 'hover:bg-accent'
@@ -371,7 +427,7 @@ const AIChatInput = ({
                             variant="ghost"
                             size="sm"
                             onClick={(e) => e.stopPropagation()}
-                            className="h-8 px-2 text-xs font-medium hover:bg-accent"
+                            className="h-8 px-2 text-xs font-medium hover:bg-accent transition-colors duration-200"
                           >
                             {selectedModel}
                             <ChevronDown className="h-3 w-3 ml-1" />
@@ -404,7 +460,7 @@ const AIChatInput = ({
               className="hidden"
               onChange={handleFileChange}
             />
-          </div>
+          </motion.div>
         </div>
       </div>
     </TooltipProvider>
