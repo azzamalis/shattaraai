@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { FileText, File, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/hooks/useTheme';
 
 // Import CSS
 import '@react-pdf-viewer/core/lib/styles/index.css';

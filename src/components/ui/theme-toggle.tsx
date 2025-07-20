@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';
 
 interface ThemeToggleProps {
@@ -10,26 +10,26 @@ interface ThemeToggleProps {
 }
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  
-  // Handle the toggle - switch between light and dark only
-  const handleToggle = (checked: boolean) => {
-    setTheme(checked ? 'dark' : 'light');
-  };
-  
-  // Determine if switch should be checked (dark mode)
-  // Use resolvedTheme to get the actual applied theme
-  const isChecked = resolvedTheme === 'dark';
+  const { isDark, toggleTheme } = useTheme();
 
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
-      <Sun className="h-4 w-4 text-muted-foreground" />
+    <div className={cn("flex items-center justify-center gap-2 py-2", className)}>
+      <Sun className={cn(
+        "h-4 w-4 transition-colors",
+        isDark ? "text-muted-foreground" : "text-amber-500"
+      )} />
       <Switch
-        checked={isChecked}
-        onCheckedChange={handleToggle}
-        aria-label="Toggle theme"
+        checked={isDark}
+        onCheckedChange={toggleTheme}
+        className={cn(
+          "data-[state=checked]:bg-primary",
+          "data-[state=unchecked]:bg-muted"
+        )}
       />
-      <Moon className="h-4 w-4 text-muted-foreground" />
+      <Moon className={cn(
+        "h-4 w-4 transition-colors",
+        isDark ? "text-blue-400" : "text-muted-foreground"
+      )} />
     </div>
   );
 }

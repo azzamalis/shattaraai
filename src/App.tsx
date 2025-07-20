@@ -4,11 +4,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "next-themes";
 import { ContentProvider } from "@/contexts/ContentContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { useThemeSync } from "@/hooks/useThemeSync";
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -38,26 +36,13 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Theme sync component
-function ThemeSyncComponent() {
-  useThemeSync();
-  return null;
-}
-
 function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider 
-          attribute="data-theme" 
-          defaultTheme="light" 
-          enableSystem={false}
-          disableTransitionOnChange={false}
-        >
-          <TooltipProvider>
-            <LanguageProvider>
-              <ContentProvider>
-                <ThemeSyncComponent />
+        <TooltipProvider>
+          <LanguageProvider>
+            <ContentProvider>
               <Toaster />
               <Sonner />
               <BrowserRouter>
@@ -92,10 +77,9 @@ function App() {
                   </Routes>
                 </div>
               </BrowserRouter>
-              </ContentProvider>
-            </LanguageProvider>
-          </TooltipProvider>
-        </ThemeProvider>
+            </ContentProvider>
+          </LanguageProvider>
+        </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

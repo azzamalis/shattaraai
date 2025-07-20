@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/hooks/useTheme';
 import { supabase } from '@/integrations/supabase/client';
 
 // Import CSS
