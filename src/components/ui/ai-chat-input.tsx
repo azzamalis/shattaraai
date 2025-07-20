@@ -131,15 +131,13 @@ const AIChatInput = ({
     initial: {},
     animate: {
       transition: {
-        staggerChildren: 0.02,
-        ease: "easeInOut"
+        staggerChildren: 0.02
       }
     },
     exit: {
       transition: {
         staggerChildren: 0.01,
-        staggerDirection: -1,
-        ease: "easeInOut"
+        staggerDirection: -1
       }
     }
   };
