@@ -8,20 +8,20 @@ const Privacy = () => {
       <section data-section="policy" className="px-6 max-w-6xl mx-auto py-[24px]">
         
         
-        <div className="max-w-4xl mx-auto prose prose-invert">
-          <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#2E2E2E] space-y-8">
+        <div className="max-w-4xl mx-auto prose">
+          <div className="bg-card rounded-xl p-8 border border-border space-y-8">
             
             <section>
-              <h2 className="text-2xl font-bold text-[#FAFAFA] mb-4">1. DEFINITIONS</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">1. DEFINITIONS</h2>
               
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-xl font-semibold text-[#E3E3E3] mb-2">1.1. DATA CONTROLLER (WE, US, OUR)</h3>
-                  <p className="text-[#A6A6A6] leading-relaxed">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">1.1. DATA CONTROLLER (WE, US, OUR)</h3>
+                  <p className="text-muted-foreground leading-relaxed">
                     Shattara AI LLC as an entity processing your personal data.
                     Shattara acts as a data controller for the processing of your personal data in the following situations:
                   </p>
-                  <ul className="list-disc list-inside text-[#A6A6A6] mt-2 space-y-1 ml-4">
+                  <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1 ml-4">
                     <li>WHEN YOU VISIT OUR WEBSITE (cookies and similar tracking technologies)</li>
                     <li>WHEN YOU CREATE AN ACCOUNT for our User Service and use our User Service</li>
                     <li>WHEN YOU COMMUNICATE WITH US</li>
@@ -29,7 +29,7 @@ const Privacy = () => {
                     <li>IF YOU VISIT OUR SOCIAL MEDIA PLATFORMS (Facebook, Instagram, Twitter)</li>
                     <li>WHEN YOU REPRESENT A SUPPLIER, VENDOR OR OTHER THIRD PARTY</li>
                   </ul>
-                  <p className="text-[#A6A6A6] leading-relaxed mt-2">
+                  <p className="text-muted-foreground leading-relaxed mt-2">
                     Below, you can read more about the various purposes of our processing of your personal data in the
                     different situations. You can also see which data we process, what the legal basis for our processing is, for
                     how long we store the personal data and who we share it with.
@@ -37,28 +37,28 @@ const Privacy = () => {
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-semibold text-[#E3E3E3] mb-2">1.2. DATA SUBJECT</h3>
-                  <p className="text-[#A6A6A6] leading-relaxed">You as a user of our website or Customer of our Platform</p>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">1.2. DATA SUBJECT</h3>
+                  <p className="text-muted-foreground leading-relaxed">You as a user of our website or Customer of our Platform</p>
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-semibold text-[#E3E3E3] mb-2">1.3. PROCESSOR</h3>
-                  <p className="text-[#A6A6A6] leading-relaxed">Means companies processing personal data on behalf of Us.</p>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">1.3. PROCESSOR</h3>
+                  <p className="text-muted-foreground leading-relaxed">Means companies processing personal data on behalf of Us.</p>
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-semibold text-[#E3E3E3] mb-2">1.4. WEBSITE</h3>
-                  <p className="text-[#A6A6A6] leading-relaxed">Means our website at shattara.com and other sites and apps we operate.</p>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">1.4. WEBSITE</h3>
+                  <p className="text-muted-foreground leading-relaxed">Means our website at shattara.com and other sites and apps we operate.</p>
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-semibold text-[#E3E3E3] mb-2">1.5. PLATFORM</h3>
-                  <p className="text-[#A6A6A6] leading-relaxed">The online contract drafting and management system provided by us</p>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">1.5. PLATFORM</h3>
+                  <p className="text-muted-foreground leading-relaxed">The online contract drafting and management system provided by us</p>
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-semibold text-[#E3E3E3] mb-2">1.6. SERVICES</h3>
-                  <p className="text-[#A6A6A6] leading-relaxed">Services and solutions delivered by us to you.</p>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">1.6. SERVICES</h3>
+                  <p className="text-muted-foreground leading-relaxed">Services and solutions delivered by us to you.</p>
                 </div>
               </div>
             </section>

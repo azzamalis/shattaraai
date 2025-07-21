@@ -31,61 +31,61 @@ const Teachers = () => {
           </div>
           
           {/* Feature 2 */}
-          <div className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
-            <div className="size-14 rounded-full bg-[#E3E3E3]/10 mb-6 flex items-center justify-center">
-              <Layers className="text-[#E3E3E3] size-7" />
+          <div className="bg-card p-8 rounded-xl border border-border">
+            <div className="size-14 rounded-full bg-muted mb-6 flex items-center justify-center">
+              <Layers className="text-muted-foreground size-7" />
             </div>
-            <h3 className="text-xl font-semibold mb-4 text-[#FAFAFA]">Adaptive Learning Paths</h3>
-            <p className="text-[#9A9A9A]">
+            <h3 className="text-xl font-semibold mb-4 text-card-foreground">Adaptive Learning Paths</h3>
+            <p className="text-muted-foreground">
               Create personalized learning journeys that adjust to each student's pace and 
               comprehension level, ensuring no student is left behind.
             </p>
           </div>
           
           {/* Feature 3 */}
-          <div className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
-            <div className="size-14 rounded-full bg-[#E3E3E3]/10 mb-6 flex items-center justify-center">
-              <BarChart3 className="text-[#E3E3E3] size-7" />
+          <div className="bg-card p-8 rounded-xl border border-border">
+            <div className="size-14 rounded-full bg-muted mb-6 flex items-center justify-center">
+              <BarChart3 className="text-muted-foreground size-7" />
             </div>
-            <h3 className="text-xl font-semibold mb-4 text-[#FAFAFA]">Insightful Analytics</h3>
-            <p className="text-[#9A9A9A]">
+            <h3 className="text-xl font-semibold mb-4 text-card-foreground">Insightful Analytics</h3>
+            <p className="text-muted-foreground">
               Track student progress with comprehensive analytics. Identify strengths, weaknesses, 
               and learning patterns to optimize your teaching approach.
             </p>
           </div>
           
           {/* Feature 4 */}
-          <div className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
-            <div className="size-14 rounded-full bg-[#E3E3E3]/10 mb-6 flex items-center justify-center">
-              <Zap className="text-[#E3E3E3] size-7" />
+          <div className="bg-card p-8 rounded-xl border border-border">
+            <div className="size-14 rounded-full bg-muted mb-6 flex items-center justify-center">
+              <Zap className="text-muted-foreground size-7" />
             </div>
-            <h3 className="text-xl font-semibold mb-4 text-[#FAFAFA]">Time-Saving Automation</h3>
-            <p className="text-[#9A9A9A]">
+            <h3 className="text-xl font-semibold mb-4 text-card-foreground">Time-Saving Automation</h3>
+            <p className="text-muted-foreground">
               Automate grading, feedback, and administrative tasks. Reclaim hours of your week 
               to focus on what matters most: teaching.
             </p>
           </div>
           
           {/* Feature 5 */}
-          <div className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
-            <div className="size-14 rounded-full bg-[#E3E3E3]/10 mb-6 flex items-center justify-center">
-              <Award className="text-[#E3E3E3] size-7" />
+          <div className="bg-card p-8 rounded-xl border border-border">
+            <div className="size-14 rounded-full bg-muted mb-6 flex items-center justify-center">
+              <Award className="text-muted-foreground size-7" />
             </div>
-            <h3 className="text-xl font-semibold mb-4 text-[#FAFAFA]">Professional Development</h3>
-            <p className="text-[#9A9A9A]">
+            <h3 className="text-xl font-semibold mb-4 text-card-foreground">Professional Development</h3>
+            <p className="text-muted-foreground">
               Access a growing library of teaching resources, methodologies, and best practices to 
               continuously enhance your teaching skills.
             </p>
           </div>
           
           {/* CTA with ZcalModal */}
-          <div className="bg-[#E3E3E3]/10 p-8 rounded-xl border border-[#E3E3E3]/30">
-            <h3 className="text-xl font-semibold mb-4 text-[#FAFAFA]">Ready to Transform Your Classroom?</h3>
-            <p className="text-[#9A9A9A] mb-6">
+          <div className="bg-accent p-8 rounded-xl border border-border">
+            <h3 className="text-xl font-semibold mb-4 text-foreground">Ready to Transform Your Classroom?</h3>
+            <p className="text-muted-foreground mb-6">
               Join thousands of educators who are already using Shattara to revolutionize their teaching.
             </p>
             <ZcalModal bookingUrl="https://zcal.co/i/4vqAOC__?embed=1&embedType=iframe" title="Schedule a School Demo" embedHeight={966} embedWidth={1096} modalName="teacher_demo">
-              <Button className="w-full bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90">
+              <Button className="w-full">
                 Request School Demo <ArrowRight className="ml-2 size-4" />
               </Button>
             </ZcalModal>
@@ -93,17 +93,17 @@ const Teachers = () => {
         </div>
         
         {/* Testimonial */}
-        <div className="bg-[#141414] p-10 rounded-xl border border-[#2E2E2E] max-w-4xl mx-auto">
+        <div className="bg-card p-10 rounded-xl border border-border max-w-4xl mx-auto">
           <div className="flex flex-col items-center text-center">
             
-            <blockquote className="text-xl italic mb-6 text-[#FAFAFA]">
+            <blockquote className="text-xl italic mb-6 text-foreground">
               "Shattara has transformed how I teach mathematics. I can create personalized problem sets in minutes, 
               track student progress in real-time, and provide targeted support exactly when it's needed. My students' 
               engagement and test scores have never been higher."
             </blockquote>
             <cite className="not-italic">
-              <div className="font-semibold text-[#FAFAFA]">Professor Huda M. Barak</div>
-              <div className="text-[#9A9A9A]">Mathematics Department, Arab Open University</div>
+              <div className="font-semibold text-foreground">Professor Huda M. Barak</div>
+              <div className="text-muted-foreground">Mathematics Department, Arab Open University</div>
             </cite>
           </div>
         </div>

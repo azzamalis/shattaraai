@@ -8,14 +8,14 @@ const Terms = () => {
       <section data-section="terms" className="px-6 max-w-6xl mx-auto py-[24px]">
         
         
-        <div className="max-w-4xl mx-auto prose prose-invert">
-          <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#2E2E2E] space-y-8">
+        <div className="max-w-4xl mx-auto prose">
+          <div className="bg-card rounded-xl p-8 border border-border space-y-8">
             
             <div className="mb-8">
-              <p className="text-2xl font-bold text-[#FAFAFA] mb-4">
+              <p className="text-2xl font-bold text-foreground mb-4">
                 Welcome to Shattara!
               </p>
-              <p className="text-[#A6A6A6] leading-relaxed mb-4">
+              <p className="text-muted-foreground leading-relaxed mb-4">
                 Please take time to read these terms and conditions of use for Shattara and any terms and policies that
                 they reference (jointly "Shattara Terms"). The Shattara Terms are a legally binding agreement between the
                 consumer that makes the order ("You") and the seller Shattara AI LLC, contact, registration number
@@ -23,21 +23,21 @@ const Terms = () => {
                 support, related software applications and all the content and other material offered on the service by
                 Shattara from time to time (jointly "Shattara Service").
               </p>
-              <p className="text-[#A6A6A6] leading-relaxed mb-4">
+              <p className="text-muted-foreground leading-relaxed mb-4">
                 You acknowledge that the Shattara Service is only available to individuals who:
               </p>
-              <ul className="list-disc list-inside text-[#A6A6A6] mt-2 space-y-1 ml-4 mb-4">
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1 ml-4 mb-4">
                 <li>(i) are 18 years or older, or between 13 and 18 years old and have parental consent,</li>
                 <li>(ii) have the power to enter into a binding agreement with Shattara, and are not barred from doing so under any applicable law,</li>
                 <li>(iii) are a resident of Saudi Arabia or a country in which the Shattara Service is available, and</li>
                 <li>(iv) use the Shattara Service for private non-commercial use.</li>
               </ul>
-              <p className="text-[#A6A6A6] leading-relaxed mb-4">
+              <p className="text-muted-foreground leading-relaxed mb-4">
                 By accepting the Shattara Terms and/or accessing or using the Shattara Service, you acknowledge that
                 you have entered into an agreement with Shattara and represent and warrant that you meet the above
                 requirements.
               </p>
-              <p className="text-[#A6A6A6] leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 Our terms of use and all other related documents are written in Arabic and English. The Arabic version
                 shall prevail in case of discrepancy between the two versions. By entering into an agreement with
                 Shattara, you accept and agree to the use of these languages in these matters.
@@ -45,26 +45,26 @@ const Terms = () => {
             </div>
 
             <section>
-              <h2 className="text-2xl font-bold text-[#FAFAFA] mb-4">1. Definitions</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">1. Definitions</h2>
               
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-xl font-semibold text-[#E3E3E3] mb-2">1.1. Shattara</h3>
-                  <p className="text-[#A6A6A6] leading-relaxed">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">1.1. Shattara</h3>
+                  <p className="text-muted-foreground leading-relaxed">
                     We as a company, Shattara AI LLC (Registration Number: [REGISTRATION NUMBER])
                   </p>
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-semibold text-[#E3E3E3] mb-2">1.2. You / Customer / User</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">1.2. You / Customer / User</h3>
                   <div className="ml-4 space-y-2">
                     <div>
-                      <h4 className="text-lg font-medium text-[#E3E3E3] mb-1">1.2.1. Paying customer</h4>
-                      <p className="text-[#A6A6A6] leading-relaxed">Refer to any Customer having an active Order Confirmation.</p>
+                      <h4 className="text-lg font-medium text-foreground mb-1">1.2.1. Paying customer</h4>
+                      <p className="text-muted-foreground leading-relaxed">Refer to any Customer having an active Order Confirmation.</p>
                     </div>
                     <div>
-                      <h4 className="text-lg font-medium text-[#E3E3E3] mb-1">1.2.2. Free customer</h4>
-                      <p className="text-[#A6A6A6] leading-relaxed">A Customer without a valid Subscription.</p>
+                      <h4 className="text-lg font-medium text-foreground mb-1">1.2.2. Free customer</h4>
+                      <p className="text-muted-foreground leading-relaxed">A Customer without a valid Subscription.</p>
                     </div>
                   </div>
                 </div>

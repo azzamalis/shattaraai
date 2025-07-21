@@ -4,19 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Users, Award, Globe } from 'lucide-react';
 import SharedHeroHeader from '../shared/SharedHeroHeader';
 const TeamHero = () => {
-  return <div className="bg-[#121212] text-[#FAFAFA]">
+  return <div className="bg-background text-foreground">
       <SharedHeroHeader />
-      <section className="pt-32 pb-20 px-6 bg-background ">
+      <section className="pt-32 pb-20 px-6 bg-background">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
             
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#FAFAFA]">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
               Meet the Minds Behind{' '}
-              <span className="text-[#E3E3E3]">Shattara</span>
+              <span className="text-primary">Shattara</span>
             </h1>
             
-            <p className="text-xl text-[#9A9A9A] max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
               Our diverse team of educators, AI researchers, and technology experts is united by 
               one mission: making quality education accessible to all through innovative AI technology.
             </p>
@@ -24,12 +24,12 @@ const TeamHero = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link to="/careers">
-              <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90">
+              <Button size="lg">
                 Join Our Mission
               </Button>
             </Link>
             <Link to="/signup">
-              <Button variant="outline" size="lg" className="text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10">
+              <Button variant="outline" size="lg">
                 Get Started
               </Button>
             </Link>
@@ -38,27 +38,27 @@ const TeamHero = () => {
           {/* Trust indicators */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="size-12 rounded-full bg-[#E3E3E3]/10 mx-auto mb-3 flex items-center justify-center">
-                <Award className="size-6 text-[#E3E3E3]" />
+              <div className="size-12 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center">
+                <Award className="size-6 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold text-[#FAFAFA] mb-1">15+</div>
-              <div className="text-sm text-[#9A9A9A]">Years Combined Experience</div>
+              <div className="text-2xl font-bold text-foreground mb-1">15+</div>
+              <div className="text-sm text-muted-foreground">Years Combined Experience</div>
             </div>
             
             <div className="text-center">
-              <div className="size-12 rounded-full bg-[#E3E3E3]/10 mx-auto mb-3 flex items-center justify-center">
-                <Globe className="size-6 text-[#E3E3E3]" />
+              <div className="size-12 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center">
+                <Globe className="size-6 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold text-[#FAFAFA] mb-1">5K+</div>
-              <div className="text-sm text-[#9A9A9A]">Students Helped</div>
+              <div className="text-2xl font-bold text-foreground mb-1">5K+</div>
+              <div className="text-sm text-muted-foreground">Students Helped</div>
             </div>
             
             <div className="text-center">
-              <div className="size-12 rounded-full bg-[#E3E3E3]/10 mx-auto mb-3 flex items-center justify-center">
-                <Users className="size-6 text-[#E3E3E3]" />
+              <div className="size-12 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center">
+                <Users className="size-6 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold text-[#FAFAFA] mb-1">20+</div>
-              <div className="text-sm text-[#9A9A9A]">Partner Institutions</div>
+              <div className="text-2xl font-bold text-foreground mb-1">20+</div>
+              <div className="text-sm text-muted-foreground">Partner Institutions</div>
             </div>
           </div>
         </div>
