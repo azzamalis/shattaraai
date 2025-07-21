@@ -2,7 +2,7 @@ import React from 'react';
 import TermsHero from '@/components/hero/page-specific/TermsHero';
 import Footer from '@/components/Footer';
 const Terms = () => {
-  return <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
+  return <div className="min-h-screen bg-background text-foreground">
       <TermsHero />
       
       <section data-section="terms" className="px-6 max-w-6xl mx-auto py-[24px]">

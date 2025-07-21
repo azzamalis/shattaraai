@@ -5,13 +5,13 @@ import { ArrowRight, BookOpen, Layers, BarChart3, Zap, Award } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import ZcalModal from '@/components/ZcalModal';
 const Teachers = () => {
-  return <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
+  return <div className="min-h-screen bg-background text-foreground">
       <TeachersHero />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-[#FAFAFA]">Empower Your Teaching</h1>
-          <p className="text-xl text-[#9A9A9A] max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Empower Your Teaching</h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Transform your classroom with AI-powered tools designed specifically for educators.
             Save time, personalize learning, and engage your students like never before.
           </p>
@@ -19,12 +19,12 @@ const Teachers = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20">
           {/* Feature 1 */}
-          <div className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
-            <div className="size-14 rounded-full bg-[#E3E3E3]/10 mb-6 flex items-center justify-center">
-              <BookOpen className="text-[#E3E3E3] size-7" />
+          <div className="bg-card p-8 rounded-xl border border-border">
+            <div className="size-14 rounded-full bg-muted mb-6 flex items-center justify-center">
+              <BookOpen className="text-muted-foreground size-7" />
             </div>
-            <h3 className="text-xl font-semibold mb-4 text-[#FAFAFA]">Instant Study Materials</h3>
-            <p className="text-[#9A9A9A]">
+            <h3 className="text-xl font-semibold mb-4 text-card-foreground">Instant Study Materials</h3>
+            <p className="text-muted-foreground">
               Generate customized worksheets, quizzes, and study guides in seconds. Tailor content 
               to your curriculum and student needs.
             </p>

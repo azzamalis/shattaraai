@@ -2,7 +2,7 @@ import React from 'react';
 import PrivacyHero from '@/components/hero/page-specific/PrivacyHero';
 import Footer from '@/components/Footer';
 const Privacy = () => {
-  return <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
+  return <div className="min-h-screen bg-background text-foreground">
       <PrivacyHero />
       
       <section data-section="policy" className="px-6 max-w-6xl mx-auto py-[24px]">

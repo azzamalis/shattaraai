@@ -107,25 +107,25 @@ const Contact = () => {
       setIsSubmitting(false);
     }
   };
-  return <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
+  return <div className="min-h-screen bg-background text-foreground">
       <ContactHero />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-[#FAFAFA]">Get in Touch</h1>
-          <p className="text-xl text-[#9A9A9A] max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Get in Touch</h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Have questions about our platform? Looking to partner with us? 
             Our team is ready to help you transform education with AI.
           </p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div id="contact-form" className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
-            <h2 className="text-2xl font-semibold mb-6 text-[#FAFAFA]">Send Us a Message</h2>
+          <div id="contact-form" className="bg-card p-8 rounded-xl border border-border">
+            <h2 className="text-2xl font-semibold mb-6 text-card-foreground">Send Us a Message</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-[#FAFAFA]">Your Name *</Label>
-                <Input id="name" value={formData.name} onChange={e => handleInputChange('name', e.target.value)} className="bg-[#121212] border-[#2E2E2E] text-[#FAFAFA] focus-visible:border-[#E3E3E3]" placeholder="Full Name" disabled={isSubmitting} />
+                <Label htmlFor="name" className="text-card-foreground">Your Name *</Label>
+                <Input id="name" value={formData.name} onChange={e => handleInputChange('name', e.target.value)} className="bg-background border-input text-foreground focus-visible:border-primary" placeholder="Full Name" disabled={isSubmitting} />
                 {errors.name && <p className="text-sm text-red-400">{errors.name}</p>}
               </div>
               

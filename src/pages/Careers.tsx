@@ -36,14 +36,14 @@ const Careers = () => {
   const handleApplyRedirect = () => {
     window.open('https://tally.so/r/w4q5AA', '_blank');
   };
-  return <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
+  return <div className="min-h-screen bg-background text-foreground">
       <CareersHero />
       
       {/* Hero Section */}
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-[#FAFAFA]">Join Our Mission</h1>
-          <p className="text-xl text-[#9A9A9A] max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Join Our Mission</h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Help us transform education through AI. We're looking for passionate individuals 
             who believe in making quality education accessible to all.
           </p>
@@ -51,43 +51,43 @@ const Careers = () => {
         
         {/* Company Values */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-24">
-          <div className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
-            <h2 className="text-2xl font-semibold mb-6 text-[#FAFAFA]">Our Culture</h2>
+          <div className="bg-card p-8 rounded-xl border border-border">
+            <h2 className="text-2xl font-semibold mb-6 text-card-foreground">Our Culture</h2>
             <div className="space-y-6">
               <div className="flex items-start">
-                <div className="size-12 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
-                  <Heart className="text-[#E3E3E3] size-6" />
+                <div className="size-12 rounded-full bg-muted flex items-center justify-center mr-4 flex-shrink-0">
+                  <Heart className="text-muted-foreground size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Passion for Education</h3>
-                  <p className="text-[#9A9A9A]">We believe in the transformative power of education and are committed to making it accessible to all.</p>
+                  <h3 className="font-medium mb-1 text-card-foreground text-2xl">Passion for Education</h3>
+                  <p className="text-muted-foreground">We believe in the transformative power of education and are committed to making it accessible to all.</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="size-12 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
-                  <Users className="text-[#E3E3E3] size-6" />
+                <div className="size-12 rounded-full bg-muted flex items-center justify-center mr-4 flex-shrink-0">
+                  <Users className="text-muted-foreground size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Collaborative Environment</h3>
-                  <p className="text-[#9A9A9A]">We foster an inclusive workplace where diverse perspectives are valued and everyone's voice is heard.</p>
+                  <h3 className="font-medium mb-1 text-card-foreground text-2xl">Collaborative Environment</h3>
+                  <p className="text-muted-foreground">We foster an inclusive workplace where diverse perspectives are valued and everyone's voice is heard.</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="size-12 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
-                  <Globe className="text-[#E3E3E3] size-6" />
+                <div className="size-12 rounded-full bg-muted flex items-center justify-center mr-4 flex-shrink-0">
+                  <Globe className="text-muted-foreground size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Global Impact</h3>
-                  <p className="text-[#9A9A9A]">Our work extends beyond borders, creating positive change in educational systems worldwide.</p>
+                  <h3 className="font-medium mb-1 text-card-foreground text-2xl">Global Impact</h3>
+                  <p className="text-muted-foreground">Our work extends beyond borders, creating positive change in educational systems worldwide.</p>
                 </div>
               </div>
             </div>
           </div>
           
-          <div className="bg-[#141414] p-8 rounded-xl border border-[#2E2E2E]">
-            <h2 className="text-2xl font-semibold mb-6 text-[#FAFAFA]">Benefits & Perks</h2>
+          <div className="bg-card p-8 rounded-xl border border-border">
+            <h2 className="text-2xl font-semibold mb-6 text-card-foreground">Benefits & Perks</h2>
             <div className="space-y-6">
               <div className="flex items-start">
                 <div className="size-12 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
@@ -124,9 +124,9 @@ const Careers = () => {
         
         {/* Open Positions */}
         <div className="mb-24" data-section="positions">
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#FAFAFA]">Open Positions</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-foreground">Open Positions</h2>
           
-          <div className="bg-[#141414] rounded-xl border border-[#2E2E2E] overflow-hidden">
+          <div className="bg-card rounded-xl border border-border overflow-hidden">
             {jobListings.map((job, index) => <div key={index} className={`p-6 flex flex-col md:flex-row md:items-center md:justify-between ${index !== jobListings.length - 1 ? 'border-b border-[#2E2E2E]' : ''}`}>
                 <div className="mb-4 md:mb-0">
                   <h3 className="text-xl font-semibold mb-1 text-[#FAFAFA]">{job.title}</h3>

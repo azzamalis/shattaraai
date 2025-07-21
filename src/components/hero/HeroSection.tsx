@@ -6,7 +6,7 @@ import InfiniteTrustBar from './InfiniteTrustBar';
 
 export function HeroSection() {
   return (
-    <div className="bg-[#121212] text-[#FAFAFA]">
+    <div className="bg-background text-foreground">
       <HeroHeader />
       <main className="overflow-hidden">
         <div

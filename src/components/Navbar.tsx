@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Logo from './Logo';
 import SmartCTA from './SmartCTA';
+import { ThemeToggle } from './ui/theme-toggle';
 import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
@@ -20,7 +21,7 @@ const Navbar = () => {
   return (
     <header 
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-sm' : 'bg-white'
+        isScrolled ? 'bg-background/95 backdrop-blur-sm shadow-sm' : 'bg-background/95 backdrop-blur-sm'
       }`}
     >
       <div className="container mx-auto px-4 md:px-6">
@@ -38,7 +39,8 @@ const Navbar = () => {
           </nav>
 
           {/* CTA Button */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
+            <ThemeToggle className="hidden md:flex" />
             <SmartCTA 
               type="get-started"
               className="hidden md:inline-flex"
@@ -60,7 +62,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div 
-        className={`fixed inset-0 bg-white z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed inset-0 bg-background z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -97,6 +99,7 @@ const Navbar = () => {
             >
               The Newsletter
             </a>
+            <ThemeToggle className="mt-4" />
             <SmartCTA 
               type="get-started"
               className="mt-4 w-full" 
