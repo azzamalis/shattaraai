@@ -90,32 +90,32 @@ const Careers = () => {
             <h2 className="text-2xl font-semibold mb-6 text-card-foreground">Benefits & Perks</h2>
             <div className="space-y-6">
               <div className="flex items-start">
-                <div className="size-12 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
-                  <Building className="text-[#E3E3E3] size-6" />
+                <div className="size-12 rounded-full bg-muted flex items-center justify-center mr-4 flex-shrink-0">
+                  <Building className="text-muted-foreground size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Work Environment</h3>
-                  <p className="text-[#9A9A9A]">Modern offices, flexible remote options, and a culture that prioritizes work-life balance.</p>
+                  <h3 className="font-medium mb-1 text-card-foreground text-2xl">Work Environment</h3>
+                  <p className="text-muted-foreground">Modern offices, flexible remote options, and a culture that prioritizes work-life balance.</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="size-12 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
-                  <Zap className="text-[#E3E3E3] size-6" />
+                <div className="size-12 rounded-full bg-muted flex items-center justify-center mr-4 flex-shrink-0">
+                  <Zap className="text-muted-foreground size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Growth Opportunities</h3>
-                  <p className="text-[#9A9A9A]">Continuous learning, professional development funds, and clear career advancement paths.</p>
+                  <h3 className="font-medium mb-1 text-card-foreground text-2xl">Growth Opportunities</h3>
+                  <p className="text-muted-foreground">Continuous learning, professional development funds, and clear career advancement paths.</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="size-12 rounded-full bg-[#E3E3E3]/10 flex items-center justify-center mr-4 flex-shrink-0">
-                  <Heart className="text-[#E3E3E3] size-6" />
+                <div className="size-12 rounded-full bg-muted flex items-center justify-center mr-4 flex-shrink-0">
+                  <Heart className="text-muted-foreground size-6" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Comprehensive Benefits</h3>
-                  <p className="text-[#9A9A9A]">Competitive salary, health insurance, paid time off, and employee wellness programs.</p>
+                  <h3 className="font-medium mb-1 text-card-foreground text-2xl">Comprehensive Benefits</h3>
+                  <p className="text-muted-foreground">Competitive salary, health insurance, paid time off, and employee wellness programs.</p>
                 </div>
               </div>
             </div>
@@ -127,12 +127,12 @@ const Careers = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-foreground">Open Positions</h2>
           
           <div className="bg-card rounded-xl border border-border overflow-hidden">
-            {jobListings.map((job, index) => <div key={index} className={`p-6 flex flex-col md:flex-row md:items-center md:justify-between ${index !== jobListings.length - 1 ? 'border-b border-[#2E2E2E]' : ''}`}>
+            {jobListings.map((job, index) => <div key={index} className={`p-6 flex flex-col md:flex-row md:items-center md:justify-between ${index !== jobListings.length - 1 ? 'border-b border-border' : ''}`}>
                 <div className="mb-4 md:mb-0">
-                  <h3 className="text-xl font-semibold mb-1 text-[#FAFAFA]">{job.title}</h3>
-                  <p className="text-[#9A9A9A]">{job.department} · {job.location} · {job.type}</p>
+                  <h3 className="text-xl font-semibold mb-1 text-card-foreground">{job.title}</h3>
+                  <p className="text-muted-foreground">{job.department} · {job.location} · {job.type}</p>
                 </div>
-                <Button className="self-start md:self-center bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90" onClick={handleApplyRedirect}>
+                <Button className="self-start md:self-center" onClick={handleApplyRedirect}>
                   Apply Now <ArrowRight className="ml-2 size-4" />
                 </Button>
               </div>)}
@@ -141,12 +141,12 @@ const Careers = () => {
         
         {/* Application CTA */}
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6 text-[#FAFAFA]">Don't See a Fit?</h2>
-          <p className="text-xl text-[#9A9A9A] mb-8">
+          <h2 className="text-3xl font-bold mb-6 text-foreground">Don't See a Fit?</h2>
+          <p className="text-xl text-muted-foreground mb-8">
             We're always looking for talented individuals. Send us your resume, and we'll 
             keep you in mind for future opportunities.
           </p>
-          <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90" onClick={handleApplyRedirect}>
+          <Button size="lg" onClick={handleApplyRedirect}>
             Send General Application
           </Button>
         </div>
