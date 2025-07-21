@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -30,10 +31,25 @@
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
 
-    <!-- Force dark mode for entire application -->
+    <!-- Theme initialization script - prevents flash of wrong theme -->
     <script>
-      // Force dark mode for all pages to maintain consistency
-      document.documentElement.classList.add('dark');
+      (function() {
+        try {
+          // Get theme from localStorage or default to system preference
+          const stored = localStorage.getItem('theme');
+          const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          
+          // Apply theme immediately to prevent flash
+          const root = document.documentElement;
+          root.classList.remove('light', 'dark');
+          root.classList.add(theme);
+          root.setAttribute('data-theme', theme);
+        } catch (e) {
+          // Fallback to light theme if anything goes wrong
+          document.documentElement.classList.add('light');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
     </script>
   </head>
 

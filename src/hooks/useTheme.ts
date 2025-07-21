@@ -5,11 +5,10 @@ export type Theme = 'light' | 'dark';
 
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
-    // Check localStorage first, then system preference
-    const stored = localStorage.getItem('theme') as Theme;
-    if (stored) return stored;
-    
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Since the HTML script already set the initial theme, read from DOM
+    const root = document.documentElement;
+    const currentTheme = root.getAttribute('data-theme') as Theme;
+    return currentTheme || 'light';
   });
 
   useEffect(() => {
