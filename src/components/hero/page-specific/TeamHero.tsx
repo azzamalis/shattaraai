@@ -49,7 +49,7 @@ const TeamHero = () => {
               <div className="size-12 rounded-full bg-[#E3E3E3]/10 mx-auto mb-3 flex items-center justify-center">
                 <Globe className="size-6 text-[#E3E3E3]" />
               </div>
-              <div className="text-2xl font-bold text-[#FAFAFA] mb-1">50K+</div>
+              <div className="text-2xl font-bold text-[#FAFAFA] mb-1">5K+</div>
               <div className="text-sm text-[#9A9A9A]">Students Helped</div>
             </div>
             
@@ -57,7 +57,7 @@ const TeamHero = () => {
               <div className="size-12 rounded-full bg-[#E3E3E3]/10 mx-auto mb-3 flex items-center justify-center">
                 <Users className="size-6 text-[#E3E3E3]" />
               </div>
-              <div className="text-2xl font-bold text-[#FAFAFA] mb-1">100+</div>
+              <div className="text-2xl font-bold text-[#FAFAFA] mb-1">20+</div>
               <div className="text-sm text-[#9A9A9A]">Partner Institutions</div>
             </div>
           </div>
