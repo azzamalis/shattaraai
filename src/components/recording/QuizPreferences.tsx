@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const QuizPreferences = () => {
   const [questionFormat, setQuestionFormat] = useState<string>("multiple-choice");
   const [difficulty, setDifficulty] = useState<string>("medium");
-  return <div className="w-[70%] max-w-md mx-auto px-6 flex flex-col items-center space-y-4 py-0 border-border ">
+  return <div className="w-[70%] max-w-md mx-auto px-6 flex flex-col items-center space-y-4 py-0">
       <h2 className="text-foreground text-xl font-semibold">Quiz Preferences</h2>
       
       {/* Question Format Options */}
