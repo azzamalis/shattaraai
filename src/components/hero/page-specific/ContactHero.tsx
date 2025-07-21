@@ -16,10 +16,7 @@ const ContactHero = () => {
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-[#141414] px-4 py-2 rounded-full border border-[#2E2E2E] mb-6">
-              <MessageCircle className="size-4 text-[#E3E3E3]" />
-              <span className="text-sm text-[#9A9A9A]">Get Support</span>
-            </div>
+            
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#FAFAFA]">
               Get the{' '}
