@@ -41,7 +41,7 @@ const TeachersHero = () => {
               <div className="size-12 rounded-full bg-[#E3E3E3]/10 mx-auto mb-3 flex items-center justify-center">
                 <Users className="size-6 text-[#E3E3E3]" />
               </div>
-              <div className="text-2xl font-bold text-[#FAFAFA] mb-1">5,000+</div>
+              <div className="text-2xl font-bold text-[#FAFAFA] mb-1">500+</div>
               <div className="text-sm text-[#9A9A9A]">Active Teachers</div>
             </div>
             
