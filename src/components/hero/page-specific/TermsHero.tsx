@@ -65,7 +65,7 @@ const TermsHero = () => {
               <div className="size-12 rounded-full bg-[#E3E3E3]/10 mx-auto mb-3 flex items-center justify-center">
                 <Calendar className="size-6 text-[#E3E3E3]" />
               </div>
-              <div className="text-lg font-semibold text-[#FAFAFA] mb-1">Updated Dec 2024</div>
+              <div className="text-lg font-semibold text-[#FAFAFA] mb-1">Updated Jul 2025</div>
               <div className="text-sm text-[#9A9A9A]">Latest Version</div>
             </div>
           </div>
