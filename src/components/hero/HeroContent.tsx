@@ -154,7 +154,7 @@ const HeroContent = () => {
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-[#E3E3E3] to-transparent"></div>
               
               {/* Replace EducationAnimation with the uploaded image */}
-              <img src="/lovable-uploads/2bc5288d-2915-45fe-ab54-f4b2b3741065.png" alt="Shattara AI Dashboard Interface" className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover" />
+              <img src="/lovable-uploads/1e757815-04af-4b95-9f57-c03d74558704.png" alt="Shattara AI Dashboard Interface" className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover" />
             </div>
           </div>
         </AnimatedGroup>
