@@ -325,15 +325,7 @@ const Terms = () => {
                   
                   <div>
                     <h4 className="text-lg font-medium text-[#E3E3E3] mb-2">2.5.1. Money-back guarantee</h4>
-                    <p className="text-[#A6A6A6] leading-relaxed">
-                      If the subscription plan the Customer has signed up on offers a money-back guarantee in the case the
-                      Customer fails a course, the Customer can contact support@shattara.com to claim the money back. In
-                      order to be qualified for the money-back guarantee, the Customer must have received a final course
-                      assessment (i.e., grade or "Pass/Fail") on a course that does not qualify for an official passing grade at the
-                      university the Customer attends. To be qualified for the money-back guarantee, the Customer must have
-                      spent a meaningful amount of time on the Shattara platform. Shattara reserves the right to require proof
-                      of the assessment via the official grade print-out from the Customer's university.
-                    </p>
+                    <p className="text-[#A6A6A6] leading-relaxed">If the subscription plan the Customer has signed up on offers a money-back guarantee in the case the Customer fails a course, the Customer can contact hello@shattaraai.com to claim the money back. In order to be qualified for the money-back guarantee, the Customer must have received a final course assessment (i.e., grade or &quot;Pass/Fail&quot;) on a course that does not qualify for an official passing grade at the university the Customer attends. To be qualified for the money-back guarantee, the Customer must have spent a meaningful amount of time on the Shattara platform. Shattara reserves the right to require proof of the assessment via the official grade print-out from the Customer's university.</p>
                   </div>
                 </div>
               </div>
