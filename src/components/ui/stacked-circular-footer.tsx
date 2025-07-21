@@ -8,6 +8,7 @@ import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ThemeToggle } from './theme-toggle';
 
 function StackedCircularFooter() {
   const currentYear = new Date().getFullYear();
@@ -141,6 +142,10 @@ function StackedCircularFooter() {
                 {isSubmitting ? 'Subscribing...' : 'Subscribe'}
               </Button>
             </form>
+          </div>
+
+          <div className="mb-6 flex justify-center">
+            <ThemeToggle />
           </div>
           
           <div className="text-center">
