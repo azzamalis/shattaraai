@@ -409,7 +409,7 @@ const Terms = () => {
                     Most disputes can be solved without legal action. If the Customer has a legal issue with Shattara, the
                     Parties agree to try to work things out together.
                   </p>
-                  <p className="text-[#A6A6A6] leading-relaxed mb-3 font-normal">Before any formal actions or legal proceedings, the Customer shall contact Shattara's support at hello@shattara.ai. The message shall provide a brief written description and include contact details.</p>
+                  <p className="text-[#A6A6A6] leading-relaxed mb-3 font-normal">Before any formal actions or legal proceedings, the Customer shall contact Shattara's support at hello@shattaraai.com. The message shall provide a brief written description and include contact details.</p>
                   <p className="text-[#A6A6A6] leading-relaxed">
                     Shattara does its best to resolve disputes through friendly discussions and sincere efforts. It is important
                     that both Parties genuinely aim to find a solution before pursuing the legal route. This is for the benefit of
