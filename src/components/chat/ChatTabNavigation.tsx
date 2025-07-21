@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ChatTabType } from '@/lib/types';
-import { MessageCircle, FileStack, Brain, FileText } from 'lucide-react';
+import { MessageCircle, FileStack, BookCheck, FileText } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +21,7 @@ const tabs = [{
 }, {
   id: 'quizzes' as ChatTabType,
   label: 'Quizzes',
-  icon: Brain
+  icon: BookCheck
 }, {
   id: 'notes' as ChatTabType,
   label: 'Notes',

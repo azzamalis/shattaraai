@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ChatTabType } from '@/lib/types';
-import { FileStack, Brain } from 'lucide-react';
+import { FileStack, BookCheck } from 'lucide-react';
 
 interface EmptyStatesProps {
   type: ChatTabType;
@@ -18,7 +18,7 @@ export function EmptyStates({ type }: EmptyStatesProps) {
         };
       case 'quizzes':
         return {
-          icon: Brain,
+          icon: BookCheck,
           title: 'Quizzes',
           description: 'Learn with the Shattara AI Tutor through adaptive quizzes.'
         };
