@@ -1,8 +1,6 @@
-
 import { cn } from "@/lib/utils";
 import { Edit, Layers, ListCheck, GraduationCap, Lightbulb, FileCode } from "lucide-react";
 import React from "react";
-
 export function FeaturesSectionWithHoverEffects() {
   const features = [{
     title: "AI-Generated Notes",
@@ -29,12 +27,10 @@ export function FeaturesSectionWithHoverEffects() {
     description: "Convert lectures and educational content into searchable, annotatable text.",
     icon: <FileCode className="w-6 h-6" />
   }];
-
   return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 relative z-10 py-10 max-w-7xl mx-auto">
       {features.map((feature, index) => <Feature key={feature.title} {...feature} index={index} />)}
     </div>;
 }
-
 const Feature = ({
   title,
   description,
@@ -58,7 +54,7 @@ const Feature = ({
           {title}
         </span>
       </div>
-      <p className="text-sm text-[#9A9A9A] max-w-xs relative z-10 px-10">
+      <p className="text-sm text-foreground max-w-xs relative z-10 px-10">
         {description}
       </p>
     </div>;
