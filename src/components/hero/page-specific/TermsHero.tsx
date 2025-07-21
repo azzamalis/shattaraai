@@ -1,34 +1,27 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FileText, Scale, MessageCircle, Calendar } from 'lucide-react';
 import SharedHeroHeader from '../shared/SharedHeroHeader';
-
 const TermsHero = () => {
   const navigate = useNavigate();
-  
   const scrollToTerms = () => {
     const termsElement = document.querySelector('[data-section="terms"]');
     if (termsElement) {
-      termsElement.scrollIntoView({ behavior: 'smooth' });
+      termsElement.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
   const handleContactClick = () => {
     navigate('/contact');
   };
-
-  return (
-    <div className="bg-[#121212] text-[#FAFAFA]">
+  return <div className="bg-[#121212] text-[#FAFAFA]">
       <SharedHeroHeader />
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-[#141414] px-4 py-2 rounded-full border border-[#2E2E2E] mb-6">
-              <Scale className="size-4 text-[#E3E3E3]" />
-              <span className="text-sm text-[#9A9A9A]">Terms of Service</span>
-            </div>
+            
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#FAFAFA]">
               Clear Terms,{' '}
@@ -78,8 +71,6 @@ const TermsHero = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default TermsHero;
