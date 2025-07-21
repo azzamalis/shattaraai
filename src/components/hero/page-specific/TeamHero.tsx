@@ -13,7 +13,7 @@ const TeamHero = () => {
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
               Meet the Minds Behind{' '}
-              <span className="text-primary">Shattara</span>
+              <span className="text-primary">Shattara AI</span>
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
