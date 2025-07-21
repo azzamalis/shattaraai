@@ -5,7 +5,7 @@ export function FeaturesSectionWithHoverEffects() {
   const features = [{
     title: "AI-Generated Notes",
     description: "Turn any content into comprehensive study notes with our advanced AI technology.",
-    icon: <Edit className="w-6 h-6 bg-muted-foreground " />
+    icon: <Edit className="w-6 h-6" />
   }, {
     title: "Smart Flashcards",
     description: "Create effective flashcards that adapt to your learning progress for better retention.",
