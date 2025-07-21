@@ -10,6 +10,8 @@ export default function ChatPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('query');
   
+  console.log('ChatPage - Received query:', query);
+  
   const [contentData, setContentData] = useState({
     id: id || 'new-chat',
     type: 'chat' as ContentType,
