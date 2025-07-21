@@ -77,7 +77,7 @@ const Privacy = () => {
                 
                 <div>
                   <h3 className="text-xl font-semibold text-[#E3E3E3] mb-2">HOW TO CONTACT US?</h3>
-                  <p className="text-[#A6A6A6] leading-relaxed">You may contact us by sending an email to support@shattara.com</p>
+                  <p className="text-[#A6A6A6] leading-relaxed">You may contact us by sending an email to hello@shattaraai.com</p>
                 </div>
               </div>
             </section>
