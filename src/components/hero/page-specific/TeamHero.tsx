@@ -24,12 +24,12 @@ const TeamHero = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link to="/careers">
-              <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90">
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Join Our Mission
               </Button>
             </Link>
             <Link to="/signup">
-              <Button variant="outline" size="lg" className="text-[#FAFAFA] border-[#2E2E2E] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10">
+              <Button variant="outline" size="lg" className="text-foreground border-border hover:border-primary hover:bg-accent">
                 Get Started
               </Button>
             </Link>

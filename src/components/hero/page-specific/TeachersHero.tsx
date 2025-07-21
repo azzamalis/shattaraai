@@ -28,7 +28,7 @@ const TeachersHero = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <ZcalModal bookingUrl="https://zcal.co/i/4vqAOC__?embed=1&embedType=iframe" title="Schedule a School Demo" embedHeight={966} embedWidth={1096} modalName="teacher_demo">
-              <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90">
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Request School Demo
               </Button>
             </ZcalModal>

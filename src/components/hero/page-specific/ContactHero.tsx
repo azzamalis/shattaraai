@@ -31,7 +31,7 @@ const ContactHero = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90" onClick={scrollToForm}>
+            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={scrollToForm}>
               Send Message
             </Button>
             

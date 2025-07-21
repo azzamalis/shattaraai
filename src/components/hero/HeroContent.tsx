@@ -107,13 +107,13 @@ const HeroContent = () => {
               }
             }
           }} className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
-              <div key={1} className="bg-[#E3E3E3]/20 rounded-[14px] border border-[#E3E3E3]/30 p-0.5 shadow-[0_0_15px_rgba(227,227,227,0.3)]">
-                <SmartCTA type="get-started" size="lg" className="rounded-xl px-5 text-base h-11 bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90">
+              <div key={1} className="bg-primary/20 rounded-[14px] border border-primary/30 p-0.5 shadow-[0_0_15px_hsl(var(--primary)/0.3)]">
+                <SmartCTA type="get-started" size="lg" className="rounded-xl px-5 text-base h-11 bg-primary text-primary-foreground hover:bg-primary/90">
                   <Zap className="size-4 mr-1" />
                   <span className="text-nowrap">Get Started</span>
                 </SmartCTA>
               </div>
-              <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-[#2E2E2E] text-[#FAFAFA] hover:border-[#E3E3E3] hover:bg-[#E3E3E3]/10" onClick={handleFeatureClick}>
+              <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-accent" onClick={handleFeatureClick}>
                 <Atom className="size-4 mr-1" />
                 <span className="text-nowrap">See features</span>
               </SmartCTA>
