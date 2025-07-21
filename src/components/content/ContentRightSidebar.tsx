@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, FileText, BookOpen, BookCheck, FileStack } from "lucide-react";
+import { MessageSquare, FileText, BookOpen, BookCheck, FileStack } from "lucide-react";
 import AIChat from "@/components/recording/AIChat";
 import QuizPreferences from '@/components/recording/QuizPreferences';
 import Notes from '@/components/recording/Notes';
@@ -133,9 +133,11 @@ const sampleFlashcards: FlashcardData[] = [{
   correct: true,
   isStarred: false
 }];
+
 interface ContentRightSidebarProps {
   contentData: ContentData;
 }
+
 export function ContentRightSidebar({
   contentData
 }: ContentRightSidebarProps) {
@@ -147,7 +149,7 @@ export function ContentRightSidebar({
         <Tabs defaultValue="chat" onValueChange={setActiveTab} className="w-full">
           <TabsList className={cn("w-full justify-center gap-1 p-1 h-12 shrink-0", "bg-card dark:bg-card", "transition-colors duration-200", "rounded-xl")}>
             <TabsTrigger value="chat" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <MessageCircle className="h-[14px] w-[14px]" />
+              <MessageSquare className="h-[14px] w-[14px]" />
               <span className="text-sm">Chat</span>
             </TabsTrigger>
             

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ChatTabType } from '@/lib/types';
-import { MessageCircle, FileStack, BookCheck, FileText } from 'lucide-react';
+import { MessageSquare, FileStack, BookCheck, FileText } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +13,7 @@ interface ChatTabNavigationProps {
 const tabs = [{
   id: 'chat' as ChatTabType,
   label: 'Chat',
-  icon: MessageCircle
+  icon: MessageSquare
 }, {
   id: 'flashcards' as ChatTabType,
   label: 'Flashcards',
