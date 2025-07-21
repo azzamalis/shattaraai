@@ -4,10 +4,8 @@ import Footer from '@/components/Footer';
 import { ArrowRight, BookOpen, Layers, BarChart3, Zap, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ZcalModal from '@/components/ZcalModal';
-
 const Teachers = () => {
-  return (
-    <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
+  return <div className="min-h-screen bg-[#121212] text-[#FAFAFA]">
       <TeachersHero />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
@@ -86,13 +84,7 @@ const Teachers = () => {
             <p className="text-[#9A9A9A] mb-6">
               Join thousands of educators who are already using Shattara to revolutionize their teaching.
             </p>
-            <ZcalModal 
-              bookingUrl="https://zcal.co/i/4vqAOC__?embed=1&embedType=iframe" 
-              title="Schedule a School Demo"
-              embedHeight={966}
-              embedWidth={1096}
-              modalName="teacher_demo"
-            >
+            <ZcalModal bookingUrl="https://zcal.co/i/4vqAOC__?embed=1&embedType=iframe" title="Schedule a School Demo" embedHeight={966} embedWidth={1096} modalName="teacher_demo">
               <Button className="w-full bg-[#E3E3E3] text-[#171717] hover:bg-[#E3E3E3]/90">
                 Request School Demo <ArrowRight className="ml-2 size-4" />
               </Button>
@@ -103,11 +95,7 @@ const Teachers = () => {
         {/* Testimonial */}
         <div className="bg-[#141414] p-10 rounded-xl border border-[#2E2E2E] max-w-4xl mx-auto">
           <div className="flex flex-col items-center text-center">
-            <div className="size-20 rounded-full bg-[#E3E3E3]/10 mb-6 flex items-center justify-center">
-              <svg className="text-[#E3E3E3] size-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
+            
             <blockquote className="text-xl italic mb-6 text-[#FAFAFA]">
               "Shattara has transformed how I teach mathematics. I can create personalized problem sets in minutes, 
               track student progress in real-time, and provide targeted support exactly when it's needed. My students' 
@@ -122,8 +110,6 @@ const Teachers = () => {
       </section>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Teachers;
