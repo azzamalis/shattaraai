@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Link2, FileText } from 'lucide-react';
+import { Link2, ClipboardPaste } from 'lucide-react';
 interface PasteContentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -68,7 +68,7 @@ export function PasteContentModal({
           {/* Text Input Section */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <FileText className="text-muted-foreground h-4 w-4" />
+              <<ClipboardPaste className="text-muted-foreground h-4 w-4" />
               <h3 className="text-lg font-medium">Paste Text</h3>
             </div>
             <p className="text-muted-foreground text-sm mb-2">Copy and paste text to add as content</p>
