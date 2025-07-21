@@ -1,8 +1,9 @@
 
 import React, { useState, useRef, ChangeEvent } from 'react';
-import { Send, Loader2, Paperclip, X } from 'lucide-react';
+import { Send, Loader2, Paperclip, X, Brain, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
 interface ChatInputProps {
@@ -12,6 +13,15 @@ interface ChatInputProps {
   className?: string;
 }
 
+const AI_MODELS = [
+  "Gemini 2.5 Flash",
+  "Claude 4 Sonnet", 
+  "GPT4.1",
+  "Gemini 2.5 Pro",
+  "Grok4",
+  "GPT4.1 Mini"
+];
+
 export function ChatInput({
   onSendMessage,
   disabled = false,
@@ -20,6 +30,7 @@ export function ChatInput({
 }: ChatInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [selectedModel, setSelectedModel] = useState("Claude 4 Sonnet");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -97,6 +108,38 @@ export function ChatInput({
             rows={1}
           />
         </div>
+
+        {/* Brain AI Model Selector */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="outline" 
+              size="sm"
+              disabled={disabled}
+              className={cn(
+                "h-11 px-3",
+                "bg-background dark:bg-background text-foreground dark:text-foreground",
+                "border-border dark:border-border",
+                "hover:bg-muted dark:hover:bg-muted",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
+            >
+              <Brain className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="top" className="w-48">
+            {AI_MODELS.map((model) => (
+              <DropdownMenuItem
+                key={model}
+                onClick={() => setSelectedModel(model)}
+                className={selectedModel === model ? "bg-accent" : ""}
+              >
+                {model}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* File Attachment Button */}
         <Button
