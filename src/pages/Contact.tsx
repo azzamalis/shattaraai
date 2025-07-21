@@ -185,7 +185,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium mb-1 text-[#FAFAFA] text-2xl">Call Us</h3>
-                    <p className="text-[#9A9A9A]">+966 53 481 4860<br />+966 55 895 71721</p>
+                    <p className="text-[#9A9A9A]">+966 53 481 4860</p>
                   </div>
                 </div>
               </div>
