@@ -400,7 +400,7 @@ const Privacy = () => {
                 <p>[YOUR ADDRESS],</p>
                 <p>Riyadh, Kingdom of Saudi Arabia</p>
                 <p><strong className="text-[#E3E3E3]">Commercial Registration Number:</strong> [YOUR CR NUMBER]</p>
-                <p><strong className="text-[#E3E3E3]">E-mail:</strong> support@shattara.co</p>
+                <p><strong className="text-[#E3E3E3]">E-mail:</strong> hello@shattaraai.com</p>
               </div>
             </section>
 
