@@ -1,11 +1,9 @@
-
 import React from 'react';
 import SmartCTA from '@/components/SmartCTA';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import HeroActionLink from './HeroActionLink';
 import { Code, Atom, Zap } from 'lucide-react';
 import { scrollToElement } from '@/lib/scrollUtils';
-
 const transitionVariants = {
   item: {
     hidden: {
@@ -25,13 +23,11 @@ const transitionVariants = {
     }
   }
 };
-
 const HeroContent = () => {
   const handleFeatureClick = (e: React.MouseEvent) => {
     e.preventDefault();
     scrollToElement('features');
   };
-
   return <section>
       <div className="relative pt-24 md:pt-36">
         <AnimatedGroup variants={{
@@ -76,7 +72,7 @@ const HeroContent = () => {
             <AnimatedGroup variants={transitionVariants}>
               <HeroActionLink to="/signup" text="AI-Powered Learning Platform" />
   
-              <h1 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] bg-gradient-to-br from-[#FAFAFA] to-[#FAFAFA]/50 bg-clip-text text-transparent my-[66px]">
+              <h1 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] bg-gradient-to-br from-[#FAFAFA] to-[#FAFAFA]/50 bg-clip-text text-primary my-[66px]">
                 Smarter Learning Powered by AI
               </h1>
               <p className="mx-auto mt-8 max-w-2xl text-balance text-lg text-[#9A9A9A]">
@@ -158,16 +154,11 @@ const HeroContent = () => {
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-[#E3E3E3] to-transparent"></div>
               
               {/* Replace EducationAnimation with the uploaded image */}
-              <img
-                src="/lovable-uploads/2bc5288d-2915-45fe-ab54-f4b2b3741065.png"
-                alt="Shattara AI Dashboard Interface"
-                className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover"
-              />
+              <img src="/lovable-uploads/2bc5288d-2915-45fe-ab54-f4b2b3741065.png" alt="Shattara AI Dashboard Interface" className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover" />
             </div>
           </div>
         </AnimatedGroup>
       </div>
     </section>;
 };
-
 export default HeroContent;
