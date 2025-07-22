@@ -1,10 +1,13 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Shield, Lock, FileText, Mail } from 'lucide-react';
 import SharedHeroHeader from '../shared/SharedHeroHeader';
+
 const PrivacyHero = () => {
   const navigate = useNavigate();
+
   const scrollToPolicy = () => {
     const policyElement = document.querySelector('[data-section="policy"]');
     if (policyElement) {
@@ -13,16 +16,17 @@ const PrivacyHero = () => {
       });
     }
   };
+
   const handleContactClick = () => {
     navigate('/contact');
   };
-  return <div className="bg-background text-foreground">
+
+  return (
+    <div className="bg-background text-foreground">
       <SharedHeroHeader />
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
-            
-            
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
               Your Privacy,{' '}
               <span className="text-primary">Our Commitment</span>
@@ -71,6 +75,8 @@ const PrivacyHero = () => {
           </div>
         </div>
       </section>
-    </div>;
+    </div>
+  );
 };
+
 export default PrivacyHero;

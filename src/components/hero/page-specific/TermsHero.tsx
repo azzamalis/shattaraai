@@ -1,10 +1,13 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FileText, Scale, MessageCircle, Calendar } from 'lucide-react';
 import SharedHeroHeader from '../shared/SharedHeroHeader';
+
 const TermsHero = () => {
   const navigate = useNavigate();
+
   const scrollToTerms = () => {
     const termsElement = document.querySelector('[data-section="terms"]');
     if (termsElement) {
@@ -13,16 +16,17 @@ const TermsHero = () => {
       });
     }
   };
+
   const handleContactClick = () => {
     navigate('/contact');
   };
-  return <div className="bg-background text-foreground">
+
+  return (
+    <div className="bg-background text-foreground">
       <SharedHeroHeader />
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
-            
-            
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
               Clear Terms,{' '}
               <span className="text-primary">Fair Service</span>
@@ -71,6 +75,8 @@ const TermsHero = () => {
           </div>
         </div>
       </section>
-    </div>;
+    </div>
+  );
 };
+
 export default TermsHero;
