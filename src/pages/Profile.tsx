@@ -21,6 +21,50 @@ interface NotificationSettings {
   quizReady: boolean;
 }
 
+// Reverse mapping functions to convert database enum values back to form values
+const getFormPurposeFromDb = (dbPurpose: Database['public']['Enums']['user_purpose'] | null): string => {
+  const reverseMap: Record<Database['public']['Enums']['user_purpose'], string> = {
+    'student': 'student',
+    'teacher': 'teacher',
+    'professional': 'work',
+    'researcher': 'research'
+  };
+  return dbPurpose ? reverseMap[dbPurpose] : '';
+};
+
+const getFormGoalFromDb = (dbGoal: Database['public']['Enums']['user_goal'] | null): string => {
+  const reverseMap: Record<Database['public']['Enums']['user_goal'], string> = {
+    'exam_prep': 'exam-prep',
+    'data_analysis': 'research',
+    'homework_help': 'coursework',
+    'lesson_planning': 'lesson-planning',
+    'student_assessment': 'grading',
+    'content_creation': 'personalization',
+    'career_advancement': 'productivity',
+    'skill_building': 'learning',
+    'collaboration': 'innovation',
+    'concept_learning': 'learning',
+    'certification_prep': 'productivity',
+    'networking': 'productivity',
+    'leadership_development': 'productivity',
+    'publication_support': 'research',
+    'grant_writing': 'research',
+    'curriculum_design': 'lesson-planning'
+  };
+  return dbGoal ? reverseMap[dbGoal] : '';
+};
+
+const getFormSourceFromDb = (dbSource: Database['public']['Enums']['user_source'] | null): string => {
+  const reverseMap: Record<Database['public']['Enums']['user_source'], string> = {
+    'search_engine': 'search',
+    'social_media': 'instagram', // Default to instagram for social media
+    'referral': 'friends-family',
+    'advertisement': 'online-ad',
+    'other': 'search'
+  };
+  return dbSource ? reverseMap[dbSource] : '';
+};
+
 export default function Profile() {
   const {
     user,
@@ -54,17 +98,18 @@ export default function Profile() {
     progressPercent: 75
   };
 
-  // Initialize form data when profile loads
+  // Initialize form data when profile loads with proper reverse mapping
   useEffect(() => {
     if (profile) {
       setFormData({
         language: profile.language || 'en',
-        purpose: profile.purpose || '',
-        goal: profile.goal || '',
-        source: profile.source || ''
+        purpose: getFormPurposeFromDb(profile.purpose),
+        goal: getFormGoalFromDb(profile.goal),
+        source: getFormSourceFromDb(profile.source)
       });
     }
   }, [profile]);
+
   const handleSaveChanges = async () => {
     if (!user || !profile) {
       toast.error("Authentication required", {
@@ -127,11 +172,13 @@ export default function Profile() {
       setIsSaving(false);
     }
   };
+
   const handleDeleteAccount = () => {
     toast.error("Are you sure?", {
       description: "This action cannot be undone. This will permanently delete your account."
     });
   };
+
   if (loading) {
     return <DashboardLayout>
         <div className="h-full bg-background text-foreground flex items-center justify-center">
@@ -139,6 +186,7 @@ export default function Profile() {
         </div>
       </DashboardLayout>;
   }
+
   if (!user || !profile) {
     return <DashboardLayout>
         <div className="h-full bg-background text-foreground flex items-center justify-center">
@@ -149,6 +197,7 @@ export default function Profile() {
         </div>
       </DashboardLayout>;
   }
+
   return <DashboardLayout>
       <div className="h-full bg-background text-foreground">
         <div className="max-w-7xl mx-auto p-6 space-y-6">
