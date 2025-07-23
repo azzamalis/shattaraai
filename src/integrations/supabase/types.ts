@@ -197,6 +197,7 @@ export type Database = {
           onboarding_completed: boolean | null
           purpose: Database["public"]["Enums"]["user_purpose"] | null
           source: Database["public"]["Enums"]["user_source"] | null
+          theme_preference: string | null
           updated_at: string | null
         }
         Insert: {
@@ -209,6 +210,7 @@ export type Database = {
           onboarding_completed?: boolean | null
           purpose?: Database["public"]["Enums"]["user_purpose"] | null
           source?: Database["public"]["Enums"]["user_source"] | null
+          theme_preference?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -221,6 +223,7 @@ export type Database = {
           onboarding_completed?: boolean | null
           purpose?: Database["public"]["Enums"]["user_purpose"] | null
           source?: Database["public"]["Enums"]["user_source"] | null
+          theme_preference?: string | null
           updated_at?: string | null
         }
         Relationships: []
