@@ -4,6 +4,8 @@ import { AnimatedGroup } from '@/components/ui/animated-group';
 import HeroActionLink from './HeroActionLink';
 import { Code, Atom, Zap } from 'lucide-react';
 import { scrollToElement } from '@/lib/scrollUtils';
+import { useTheme } from '@/hooks/useTheme';
+
 const transitionVariants = {
   item: {
     hidden: {
@@ -23,11 +25,15 @@ const transitionVariants = {
     }
   }
 };
+
 const HeroContent = () => {
+  const { isDark } = useTheme();
+  
   const handleFeatureClick = (e: React.MouseEvent) => {
     e.preventDefault();
     scrollToElement('features');
   };
+
   return <section>
       <div className="relative pt-24 md:pt-36">
         <AnimatedGroup variants={{
@@ -153,12 +159,17 @@ const HeroContent = () => {
             <div className="bg-[#141414]/20 backdrop-blur-xl relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#E3E3E3]/10 p-4 shadow-lg shadow-black/15">
               <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-transparent via-[#E3E3E3] to-transparent"></div>
               
-              {/* Replace EducationAnimation with the uploaded image */}
-              <img src="/lovable-uploads/1e757815-04af-4b95-9f57-c03d74558704.png" alt="Shattara AI Dashboard Interface" className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover" />
+              {/* Theme-based image switching */}
+              <img 
+                src={isDark ? "/lovable-uploads/1e757815-04af-4b95-9f57-c03d74558704.png" : "/lovable-uploads/31c3ad48-c836-4e3e-a7d0-c4588060b235.png"} 
+                alt="Shattara AI Dashboard Interface" 
+                className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover" 
+              />
             </div>
           </div>
         </AnimatedGroup>
       </div>
     </section>;
 };
+
 export default HeroContent;
