@@ -11,7 +11,7 @@ export default function ChatPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('query');
   
-  console.log('ChatPage - Received query:', query);
+  console.log('ChatPage - Received query:', query, 'Content ID:', id);
   
   const [contentData, setContentData] = useState({
     id: id || 'new-chat',
@@ -39,6 +39,7 @@ export default function ChatPage() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           initialQuery={query}
+          contentId={id}
         />
       </div>
     </DashboardLayout>

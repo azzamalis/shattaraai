@@ -15,12 +15,14 @@ interface ChatInterfaceProps {
   activeTab: UnifiedTabType;
   onTabChange: (tab: UnifiedTabType) => void;
   initialQuery?: string | null;
+  contentId?: string;
 }
 
 export function ChatInterface({
   activeTab,
   onTabChange,
-  initialQuery
+  initialQuery,
+  contentId
 }: ChatInterfaceProps) {
   const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
   
@@ -32,6 +34,8 @@ export function ChatInterface({
     addAIResponse
   } = useChatConversation({
     conversationType: 'general',
+    contextId: contentId,
+    contextType: 'content',
     autoCreate: true
   });
 

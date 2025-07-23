@@ -122,9 +122,7 @@ export function useChatConversation({
           .from('chat_conversations')
           .select('*')
           .eq('type', conversationType)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(1);
+          .eq('user_id', user.id);
 
         if (contextId) {
           query = query.eq('context_id', contextId);
@@ -134,6 +132,14 @@ export function useChatConversation({
           query = query.eq('context_type', contextType);
         }
 
+        // If we have a contextId (like contentId), look for that specific conversation
+        // Otherwise, get the most recent one
+        if (contextId) {
+          query = query.order('created_at', { ascending: false }).limit(1);
+        } else {
+          query = query.order('created_at', { ascending: false }).limit(1);
+        }
+
         const { data: existingConversation, error } = await query.maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
@@ -141,11 +147,9 @@ export function useChatConversation({
           return;
         }
 
-        if (existingConversation) {
-          setConversationId(existingConversation.id);
-          setConversation(existingConversation);
-          await fetchMessages(existingConversation.id);
-        } else if (autoCreate) {
+        // If we have a contextId but no existing conversation, always create a new one
+        if (contextId && !existingConversation && autoCreate) {
+          console.log('Creating new conversation for contextId:', contextId);
           const newConversationId = await createConversation();
           if (newConversationId) {
             setConversationId(newConversationId);
@@ -158,6 +162,28 @@ export function useChatConversation({
               created_at: new Date().toISOString()
             };
             setConversation(newConversation);
+            setMessages([]); // Start with empty messages for new conversation
+          }
+        } else if (existingConversation) {
+          console.log('Loading existing conversation:', existingConversation.id);
+          setConversationId(existingConversation.id);
+          setConversation(existingConversation);
+          await fetchMessages(existingConversation.id);
+        } else if (autoCreate && !contextId) {
+          // Only create a new conversation without contextId if explicitly needed
+          const newConversationId = await createConversation();
+          if (newConversationId) {
+            setConversationId(newConversationId);
+            const newConversation = {
+              id: newConversationId,
+              type: conversationType,
+              context_id: contextId,
+              context_type: contextType,
+              user_id: user.id,
+              created_at: new Date().toISOString()
+            };
+            setConversation(newConversation);
+            setMessages([]); // Start with empty messages for new conversation
           }
         }
       } finally {
