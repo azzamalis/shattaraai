@@ -161,7 +161,7 @@ const HeroContent = () => {
               
               {/* Theme-based image switching */}
               <img 
-                src={isDark ? "/lovable-uploads/1e757815-04af-4b95-9f57-c03d74558704.png" : "/lovable-uploads/31c3ad48-c836-4e3e-a7d0-c4588060b235.png"} 
+                src={isDark ? "/lovable-uploads/31c3ad48-c836-4e3e-a7d0-c4588060b235.png" : "/lovable-uploads/1e757815-04af-4b95-9f57-c03d74558704.png"} 
                 alt="Shattara AI Dashboard Interface" 
                 className="aspect-15/8 relative rounded-2xl w-full h-full min-h-[360px] object-cover" 
               />
