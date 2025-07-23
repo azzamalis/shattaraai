@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ChatInterface } from '@/components/chat/ChatInterface';
-import { ChatTabType, ContentType } from '@/lib/types';
+import { UnifiedTabType } from '@/components/shared/UnifiedTabNavigation';
+import { ContentType } from '@/lib/types';
 
 export default function ChatPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +22,7 @@ export default function ChatPage() {
     hasError: false,
   });
 
-  const [activeTab, setActiveTab] = useState<ChatTabType>('chat');
+  const [activeTab, setActiveTab] = useState<UnifiedTabType>('chat');
 
   const updateContentData = (updates: any) => {
     setContentData(prev => ({ ...prev, ...updates }));

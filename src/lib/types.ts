@@ -27,7 +27,7 @@ export interface ContentHandlers {
 }
 
 // Chat types
-export type ChatTabType = 'chat' | 'flashcards' | 'quizzes' | 'notes';
+export type ChatTabType = 'chat' | 'flashcards' | 'quizzes' | 'summary' | 'notes';
 
 export interface Message {
   id: string;

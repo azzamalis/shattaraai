@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ChatTabType } from '@/lib/types';
-import { MessageSquare, FileStack, BookCheck, FileText } from 'lucide-react';
+import { MessageSquare, FileStack, BookCheck, FileText, FileBarChart } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +22,10 @@ const tabs = [{
   id: 'quizzes' as ChatTabType,
   label: 'Quizzes',
   icon: BookCheck
+}, {
+  id: 'summary' as ChatTabType,
+  label: 'Summary',
+  icon: FileBarChart
 }, {
   id: 'notes' as ChatTabType,
   label: 'Notes',

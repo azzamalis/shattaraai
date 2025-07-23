@@ -1,15 +1,19 @@
 
 import React, { useEffect, useState } from 'react';
 import { ChatTabType } from '@/lib/types';
-import { ChatTabNavigation } from './ChatTabNavigation';
+import { UnifiedTabNavigation, UnifiedTabType } from '@/components/shared/UnifiedTabNavigation';
+import { UnifiedTabContent, UnifiedTabContainer } from '@/components/shared/UnifiedTabContent';
+import { Tabs } from '@/components/ui/tabs';
 import { ChatContainer } from './shared/ChatContainer';
 import { NotesEditor } from './NotesEditor/NotesEditor';
+import { ChatSummaryDisplay } from './ChatSummaryDisplay';
+import { ChatFlashcardContainer } from './ChatFlashcardContainer';
 import { Brain } from 'lucide-react';
 import { useChatConversation } from '@/hooks/useChatConversation';
 
 interface ChatInterfaceProps {
-  activeTab: ChatTabType;
-  onTabChange: (tab: ChatTabType) => void;
+  activeTab: UnifiedTabType;
+  onTabChange: (tab: UnifiedTabType) => void;
   initialQuery?: string | null;
 }
 
@@ -56,64 +60,59 @@ export function ChatInterface({
     }
   };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'chat':
-        return (
-          <div className="flex-1 overflow-hidden mx-4 mb-4">
-            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <ChatContainer 
-                messages={messages} 
-                onSendMessage={handleSendMessage} 
-                isLoading={isLoading} 
-                isSending={isSending} 
-                inputPlaceholder="Ask me anything..." 
-                emptyStateContent={
-                  <div className="text-center">
-                    <h3 className="text-dashboard-text dark:text-dashboard-text mb-2 font-medium text-lg">
-                      Learn with the Shattara AI Tutor
-                    </h3>
-                    <p className="text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 text-center max-w-md text-sm">
-                      Start a conversation to get help with any topic, generate quizzes, create flashcards, and more.
-                    </p>
-                  </div>
-                } 
-              />
-            </div>
-          </div>
-        );
-      case 'notes':
-        return (
-          <div className="flex-1 overflow-hidden mx-4 mb-4">
-            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <NotesEditor />
-            </div>
-          </div>
-        );
-      case 'flashcards':
-      case 'quizzes':
-        return (
-          <div className="flex-1 overflow-hidden mx-4 mb-4">
-            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <EmptyStates type={activeTab} />
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="flex flex-col h-full bg-dashboard-card dark:bg-dashboard-card">
-      <ChatTabNavigation activeTab={activeTab} onTabChange={onTabChange} />
-      {renderTabContent()}
+      <UnifiedTabNavigation 
+        activeTab={activeTab} 
+        onTabChange={onTabChange} 
+        variant="chat"
+      />
+      
+      <Tabs value={activeTab} onValueChange={onTabChange} className="flex-1 flex flex-col">
+        <div className="flex-1 overflow-hidden">
+        <UnifiedTabContent activeTab="chat" variant="chat">
+          <ChatContainer 
+            messages={messages} 
+            onSendMessage={handleSendMessage} 
+            isLoading={isLoading} 
+            isSending={isSending} 
+            inputPlaceholder="Ask me anything..." 
+            emptyStateContent={
+              <div className="text-center">
+                <h3 className="text-dashboard-text dark:text-dashboard-text mb-2 font-medium text-lg">
+                  Learn with the Shattara AI Tutor
+                </h3>
+                <p className="text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 text-center max-w-md text-sm">
+                  Start a conversation to get help with any topic, generate quizzes, create flashcards, and more.
+                </p>
+              </div>
+            } 
+          />
+        </UnifiedTabContent>
+
+        <UnifiedTabContent activeTab="flashcards" variant="chat">
+          <ChatFlashcardContainer messages={messages} />
+        </UnifiedTabContent>
+
+        <UnifiedTabContent activeTab="quizzes" variant="chat">
+          <EmptyStates type={activeTab} />
+        </UnifiedTabContent>
+
+        <UnifiedTabContent activeTab="summary" variant="chat">
+          <ChatSummaryDisplay messages={messages} />
+        </UnifiedTabContent>
+
+        <UnifiedTabContent activeTab="notes" variant="chat">
+          <NotesEditor />
+        </UnifiedTabContent>
+        </div>
+      </Tabs>
     </div>
   );
 }
 
 interface EmptyStatesProps {
-  type: ChatTabType;
+  type: UnifiedTabType;
 }
 
 export function EmptyStates({ type }: EmptyStatesProps) {
@@ -126,6 +125,10 @@ export function EmptyStates({ type }: EmptyStatesProps) {
       case 'quizzes':
         return {
           description: 'Learn with the Shattara AI Tutor through adaptive quizzes.'
+        };
+      case 'summary':
+        return {
+          description: 'Your conversation summaries will appear here as you chat.'
         };
       default:
         return null;
