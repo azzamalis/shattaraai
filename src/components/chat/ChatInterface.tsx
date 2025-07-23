@@ -41,12 +41,12 @@ export function ChatInterface({
 
   useEffect(() => {
     // Process initial query once the conversation is ready and we haven't processed it yet
-    if (initialQuery && !hasProcessedInitialQuery && !isLoading && sendMessage) {
+    if (initialQuery && !hasProcessedInitialQuery && !isLoading && sendMessage && messages.length === 0) {
       console.log('ChatInterface - Processing initial query:', initialQuery);
       handleSendMessage(initialQuery);
       setHasProcessedInitialQuery(true);
     }
-  }, [initialQuery, hasProcessedInitialQuery, isLoading, sendMessage]);
+  }, [initialQuery, hasProcessedInitialQuery, isLoading, sendMessage, messages.length]);
 
   const handleSendMessage = async (content: string, attachments?: File[]) => {
     console.log('ChatInterface - handleSendMessage called with content:', content, 'attachments:', attachments);

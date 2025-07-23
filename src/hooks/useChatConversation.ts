@@ -147,8 +147,14 @@ export function useChatConversation({
           return;
         }
 
-        // If we have a contextId but no existing conversation, always create a new one
-        if (contextId && !existingConversation && autoCreate) {
+        // Always look for existing conversation with contextId first
+        if (existingConversation) {
+          console.log('Loading existing conversation:', existingConversation.id);
+          setConversationId(existingConversation.id);
+          setConversation(existingConversation);
+          await fetchMessages(existingConversation.id);
+        } else if (contextId && autoCreate) {
+          // If we have a contextId but no existing conversation, create a new one
           console.log('Creating new conversation for contextId:', contextId);
           const newConversationId = await createConversation();
           if (newConversationId) {
@@ -164,11 +170,6 @@ export function useChatConversation({
             setConversation(newConversation);
             setMessages([]); // Start with empty messages for new conversation
           }
-        } else if (existingConversation) {
-          console.log('Loading existing conversation:', existingConversation.id);
-          setConversationId(existingConversation.id);
-          setConversation(existingConversation);
-          await fetchMessages(existingConversation.id);
         } else if (autoCreate && !contextId) {
           // Only create a new conversation without contextId if explicitly needed
           const newConversationId = await createConversation();
