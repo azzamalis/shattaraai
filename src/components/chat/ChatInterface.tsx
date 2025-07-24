@@ -41,10 +41,15 @@ export function ChatInterface({
 
   useEffect(() => {
     // Process initial query once the conversation is ready and we haven't processed it yet
+    // Only process if we have no existing messages (empty conversation)
     if (initialQuery && !hasProcessedInitialQuery && !isLoading && sendMessage && messages.length === 0) {
-      console.log('ChatInterface - Processing initial query:', initialQuery);
-      handleSendMessage(initialQuery);
-      setHasProcessedInitialQuery(true);
+      console.log('ChatInterface - Processing initial query:', initialQuery, 'Messages count:', messages.length);
+      
+      // Delay the initial message to ensure conversation is fully set up
+      setTimeout(() => {
+        handleSendMessage(initialQuery);
+        setHasProcessedInitialQuery(true);
+      }, 100);
     }
   }, [initialQuery, hasProcessedInitialQuery, isLoading, sendMessage, messages.length]);
 

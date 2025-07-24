@@ -118,73 +118,88 @@ export function useChatConversation({
 
       setIsLoading(true);
       try {
-        let query = supabase
-          .from('chat_conversations')
-          .select('*')
-          .eq('type', conversationType)
-          .eq('user_id', user.id);
-
+        // If we have a contextId, always look for that specific conversation first
         if (contextId) {
-          query = query.eq('context_id', contextId);
-        }
+          console.log('Looking for conversation with contextId:', contextId);
+          
+          const { data: existingConversation, error } = await supabase
+            .from('chat_conversations')
+            .select('*')
+            .eq('type', conversationType)
+            .eq('user_id', user.id)
+            .eq('context_id', contextId)
+            .eq('context_type', contextType || 'content')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-        if (contextType) {
-          query = query.eq('context_type', contextType);
-        }
-
-        // If we have a contextId (like contentId), look for that specific conversation
-        // Otherwise, get the most recent one
-        if (contextId) {
-          query = query.order('created_at', { ascending: false }).limit(1);
-        } else {
-          query = query.order('created_at', { ascending: false }).limit(1);
-        }
-
-        const { data: existingConversation, error } = await query.maybeSingle();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching conversation:', error);
-          return;
-        }
-
-        // Always look for existing conversation with contextId first
-        if (existingConversation) {
-          console.log('Loading existing conversation:', existingConversation.id);
-          setConversationId(existingConversation.id);
-          setConversation(existingConversation);
-          await fetchMessages(existingConversation.id);
-        } else if (contextId && autoCreate) {
-          // If we have a contextId but no existing conversation, create a new one
-          console.log('Creating new conversation for contextId:', contextId);
-          const newConversationId = await createConversation();
-          if (newConversationId) {
-            setConversationId(newConversationId);
-            const newConversation = {
-              id: newConversationId,
-              type: conversationType,
-              context_id: contextId,
-              context_type: contextType,
-              user_id: user.id,
-              created_at: new Date().toISOString()
-            };
-            setConversation(newConversation);
-            setMessages([]); // Start with empty messages for new conversation
+          if (error && error.code !== 'PGRST116') {
+            console.error('Error fetching conversation:', error);
+            return;
           }
-        } else if (autoCreate && !contextId) {
-          // Only create a new conversation without contextId if explicitly needed
-          const newConversationId = await createConversation();
-          if (newConversationId) {
-            setConversationId(newConversationId);
-            const newConversation = {
-              id: newConversationId,
-              type: conversationType,
-              context_id: contextId,
-              context_type: contextType,
-              user_id: user.id,
-              created_at: new Date().toISOString()
-            };
-            setConversation(newConversation);
-            setMessages([]); // Start with empty messages for new conversation
+
+          if (existingConversation) {
+            console.log('Loading existing conversation for contextId:', existingConversation.id);
+            setConversationId(existingConversation.id);
+            setConversation(existingConversation);
+            await fetchMessages(existingConversation.id);
+          } else if (autoCreate) {
+            // Create new conversation for this specific contextId
+            console.log('Creating new conversation for contextId:', contextId);
+            const newConversationId = await createConversation();
+            if (newConversationId) {
+              setConversationId(newConversationId);
+              const newConversation = {
+                id: newConversationId,
+                type: conversationType,
+                context_id: contextId,
+                context_type: contextType || 'content',
+                user_id: user.id,
+                created_at: new Date().toISOString()
+              };
+              setConversation(newConversation);
+              setMessages([]); // Start with empty messages for new conversation
+            }
+          }
+        } else if (autoCreate) {
+          // For general chat without contextId, look for existing general conversation
+          const { data: existingConversation, error } = await supabase
+            .from('chat_conversations')
+            .select('*')
+            .eq('type', conversationType)
+            .eq('user_id', user.id)
+            .is('context_id', null)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (error && error.code !== 'PGRST116') {
+            console.error('Error fetching general conversation:', error);
+            return;
+          }
+
+          if (existingConversation) {
+            console.log('Loading existing general conversation:', existingConversation.id);
+            setConversationId(existingConversation.id);
+            setConversation(existingConversation);
+            await fetchMessages(existingConversation.id);
+          } else {
+            // Create new general conversation
+            console.log('Creating new general conversation');
+            const newConversationId = await createConversation();
+            if (newConversationId) {
+              setConversationId(newConversationId);
+              const newConversation = {
+                id: newConversationId,
+                type: conversationType,
+                context_id: null,
+                context_type: null,
+                user_id: user.id,
+                created_at: new Date().toISOString()
+              };
+              setConversation(newConversation);
+              setMessages([]); // Start with empty messages for new conversation
+            }
           }
         }
       } finally {
