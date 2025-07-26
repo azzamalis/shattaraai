@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 interface LogoProps {
   className?: string;
@@ -9,9 +8,8 @@ const Logo: React.FC<LogoProps> = ({
   className,
   textColor = 'text-foreground'
 }) => {
-  const navigate = useNavigate();
   const handleLogoClick = () => {
-    navigate('/dashboard');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   return <div className={cn('flex items-center font-bold text-2xl text-foreground transition-colors duration-200 cursor-pointer hover:opacity-80', className)} onClick={handleLogoClick}>
       <span>SHATTARA </span>
