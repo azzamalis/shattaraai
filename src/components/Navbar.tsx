@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Logo from './Logo';
 import SmartCTA from './SmartCTA';
 import { Menu, X } from 'lucide-react';
@@ -26,14 +27,14 @@ const Navbar = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="/" className="flex-shrink-0">
+          <Link to="/" className="flex-shrink-0">
             <Logo />
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#team" className="text-foreground hover:text-primary transition-colors">The Team</a>
-            <a href="#teachers" className="text-foreground hover:text-primary transition-colors">For Teachers</a>
+            <Link to="/team" className="text-foreground hover:text-primary transition-colors">The Team</Link>
+            <Link to="/teachers" className="text-foreground hover:text-primary transition-colors">For Teachers</Link>
             <a href="#newsletter" className="text-foreground hover:text-primary transition-colors">The Newsletter</a>
           </nav>
 
@@ -76,20 +77,20 @@ const Navbar = () => {
             </button>
           </div>
           <nav className="flex flex-col space-y-6 px-8 py-8">
-            <a 
-              href="#team" 
+            <Link 
+              to="/team" 
               className="text-xl font-medium text-foreground hover:text-primary transition-colors"
               onClick={() => setIsOpen(false)}
             >
               The Team
-            </a>
-            <a 
-              href="#teachers" 
+            </Link>
+            <Link 
+              to="/teachers" 
               className="text-xl font-medium text-foreground hover:text-primary transition-colors"
               onClick={() => setIsOpen(false)}
             >
               For Teachers
-            </a>
+            </Link>
             <a 
               href="#newsletter" 
               className="text-xl font-medium text-foreground hover:text-primary transition-colors"
