@@ -12,7 +12,7 @@ export const chatMessageStyles = {
   ),
   content: "text-sm",
   timestamp: cn(
-    "text-xs text-muted-foreground mt-1",
+    "text-xs text-foreground/60 dark:text-foreground/50 mt-1",
     "flex items-center gap-1"
   ),
   status: {
