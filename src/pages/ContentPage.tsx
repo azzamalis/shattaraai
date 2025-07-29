@@ -231,7 +231,7 @@ export default function ContentPage() {
               <ContentLeftSidebar contentData={contentData} onUpdateContent={updateContentData} isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={formatTime(recordingTime)} selectedMicrophone={selectedMicrophone} onMicrophoneSelect={handleMicrophoneSelect} onMicrophoneClear={handleMicrophoneClear} recordingStateInfo={recordingStateInfo} recordingMetadata={recordingMetadata} isRecordingLoading={false} onTextAction={handleTextAction} onChapterClick={handleChapterClick} currentTimestamp={currentTimestamp} />
             </ResizablePanel>
             
-            <ResizableHandle withHandle className="w-0.5 ">
+            <ResizableHandle withHandle className="w-0.5 opacity-0 hover:opacity-100 transition-opacity duration-200">
               <div className="w-1 h-10 bg-border rounded-full transition-colors duration-200" />
             </ResizableHandle>
             
