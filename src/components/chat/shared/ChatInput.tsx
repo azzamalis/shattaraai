@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
+import React, { useState, useRef, ChangeEvent } from 'react';
 import { Send, Loader2, Paperclip, X, Brain, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,7 +32,6 @@ export function ChatInput({
   const [attachments, setAttachments] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState("Claude 4 Sonnet");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,11 +39,6 @@ export function ChatInput({
       onSendMessage(inputValue.trim(), attachments);
       setInputValue('');
       setAttachments([]);
-      
-      // Refocus the textarea after sending the message
-      setTimeout(() => {
-        textareaRef.current?.focus();
-      }, 0);
     }
   };
 
@@ -99,7 +93,6 @@ export function ChatInput({
       <div className="flex gap-2 items-end">
         <div className="flex-1">
           <Textarea
-            ref={textareaRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
