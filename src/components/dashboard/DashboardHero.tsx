@@ -22,62 +22,19 @@ export function DashboardHero({
   } = useContent();
 
   const handleAISubmit = async (value: string, files?: File[]) => {
-    let contentId: string | null = null;
-
     try {
-      // If files are attached, handle them first
-      if (files && files.length > 0) {
-        for (const file of files) {
-          const contentType = file.type === 'application/pdf' ? 'pdf' : 'upload';
-          
-          const fileContentId = await addContentWithFile({
-            title: file.name,
-            type: contentType,
-            room_id: null,
-            metadata: {
-              originalName: file.name,
-              fileSize: file.size,
-              fileType: file.type
-            }
-          }, file);
-
-          if (!contentId) {
-            contentId = fileContentId;
-          }
-        }
-      }
-
-      // Create chat content with the query
+      // For new chats, navigate directly to new chat route without creating content
+      const searchParams = new URLSearchParams();
       if (value.trim()) {
-        const chatContentId = await onAddContent({
-          title: 'Chat with Shattara AI',
-          type: 'chat',
-          room_id: null,
-          metadata: {
-            hasAttachments: files && files.length > 0,
-            attachmentCount: files ? files.length : 0
-          },
-          text_content: value
-        });
-
-        if (!contentId) {
-          contentId = chatContentId;
-        }
+        searchParams.set('query', value);
       }
-
-      // Navigate to chat page
-      if (contentId) {
-        const searchParams = new URLSearchParams();
-        if (value.trim()) {
-          searchParams.set('query', value);
-        }
-        if (files && files.length > 0) {
-          searchParams.set('hasFiles', 'true');
-        }
-        
-        navigate(`/chat/${contentId}?${searchParams.toString()}`);
-        toast.success(`Starting conversation with Shattara AI${files && files.length > 0 ? ` with ${files.length} file(s)` : ''}`);
+      if (files && files.length > 0) {
+        searchParams.set('hasFiles', 'true');
       }
+      
+      // Navigate to new chat route - this will create a fresh conversation
+      navigate(`/chat/new?${searchParams.toString()}`);
+      toast.success(`Starting conversation with Shattara AI${files && files.length > 0 ? ` with ${files.length} file(s)` : ''}`);
     } catch (error) {
       console.error('Error handling AI submit:', error);
       toast.error('Failed to start conversation');

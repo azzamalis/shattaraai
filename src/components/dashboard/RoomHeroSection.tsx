@@ -87,20 +87,16 @@ export function RoomHeroSection({
     setIsPasteModalOpen(false);
   };
   const handleAISubmit = async (value: string) => {
-    // Create chat content WITHOUT automatic room assignment
-    const contentId = await onAddContent({
-      title: 'Chat with Shattara AI',
-      type: 'chat',
-      room_id: null,
-      metadata: {},
-      text_content: value
-    });
-    if (contentId) {
+    try {
+      // Navigate directly to new chat route without creating content first
       const searchParams = new URLSearchParams({
         query: value
       });
-      navigate(`/chat/${contentId}?${searchParams.toString()}`);
+      navigate(`/chat/new?${searchParams.toString()}`);
       toast.success("Starting conversation with Shattara AI");
+    } catch (error) {
+      console.error('Error starting chat:', error);
+      toast.error('Failed to start conversation');
     }
   };
 
