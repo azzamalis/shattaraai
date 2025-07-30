@@ -13,6 +13,10 @@ export default function ChatPage() {
   
   console.log('ChatPage - Received query:', query, 'Content ID:', id);
   
+  // Determine if this is a new chat or existing chat
+  const isNewChat = !id || id === 'new' || id === 'new-chat';
+  const contentId = isNewChat ? undefined : id;
+  
   const [contentData, setContentData] = useState({
     id: id || 'new-chat',
     type: 'chat' as ContentType,
@@ -39,7 +43,7 @@ export default function ChatPage() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           initialQuery={query}
-          contentId={id}
+          contentId={contentId}
         />
       </div>
     </DashboardLayout>

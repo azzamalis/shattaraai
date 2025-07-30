@@ -162,44 +162,21 @@ export function useChatConversation({
             }
           }
         } else if (autoCreate) {
-          // For general chat without contextId, look for existing general conversation
-          const { data: existingConversation, error } = await supabase
-            .from('chat_conversations')
-            .select('*')
-            .eq('type', conversationType)
-            .eq('user_id', user.id)
-            .is('context_id', null)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          if (error && error.code !== 'PGRST116') {
-            console.error('Error fetching general conversation:', error);
-            return;
-          }
-
-          if (existingConversation) {
-            console.log('Loading existing general conversation:', existingConversation.id);
-            setConversationId(existingConversation.id);
-            setConversation(existingConversation);
-            await fetchMessages(existingConversation.id);
-          } else {
-            // Create new general conversation
-            console.log('Creating new general conversation');
-            const newConversationId = await createConversation();
-            if (newConversationId) {
-              setConversationId(newConversationId);
-              const newConversation = {
-                id: newConversationId,
-                type: conversationType,
-                context_id: null,
-                context_type: null,
-                user_id: user.id,
-                created_at: new Date().toISOString()
-              };
-              setConversation(newConversation);
-              setMessages([]); // Start with empty messages for new conversation
-            }
+          // For general chat without contextId, always create a new conversation
+          console.log('Creating new general conversation');
+          const newConversationId = await createConversation();
+          if (newConversationId) {
+            setConversationId(newConversationId);
+            const newConversation = {
+              id: newConversationId,
+              type: conversationType,
+              context_id: null,
+              context_type: null,
+              user_id: user.id,
+              created_at: new Date().toISOString()
+            };
+            setConversation(newConversation);
+            setMessages([]); // Start with empty messages for new conversation
           }
         }
       } finally {
