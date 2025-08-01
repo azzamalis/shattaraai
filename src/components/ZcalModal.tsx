@@ -80,27 +80,27 @@ const ZcalModal = ({
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] md:max-w-[700px] lg:max-w-[1100px] bg-[#111] text-white">
+      <DialogContent className="w-[95vw] max-w-[600px] sm:max-w-[700px] lg:max-w-[1100px] max-h-[90vh] bg-card border-border text-card-foreground">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-white">{title}</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-foreground">{title}</DialogTitle>
         </DialogHeader>
         
-        <div className="relative w-full mt-4 flex justify-center">
+        <div className="relative w-full mt-4 flex justify-center overflow-hidden">
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#111] z-10">
-              <Loader2 className="h-8 w-8 animate-spin text-[#2323FF]" />
+            <div className="absolute inset-0 flex items-center justify-center bg-card z-10">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           )}
           
           {hasError ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#111] p-4 text-center">
-              <p className="text-red-500 mb-4">Unable to load the booking calendar</p>
-              <p className="mb-6">Please try again later or contact us directly</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-card p-4 text-center">
+              <p className="text-destructive mb-4">Unable to load the booking calendar</p>
+              <p className="text-muted-foreground mb-6">Please try again later or contact us directly</p>
               <Button 
                 onClick={() => {
                   window.open('mailto:contact@shattara.com', '_blank');
                 }}
-                className="bg-[#2323FF] hover:bg-[#2323FF]/80"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Contact Us
               </Button>
@@ -109,9 +109,8 @@ const ZcalModal = ({
             <iframe
               src={bookingUrl}
               loading="lazy"
-              style={{ border: 'none', minWidth: '320px', minHeight: '544px', height: embedHeight, width: embedWidth }}
+              className="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-background rounded-md border border-border"
               id="zcal-invite"
-              className="w-full bg-white rounded-md"
               scrolling="no"
               onLoad={handleIframeLoad}
               onError={handleIframeError}
