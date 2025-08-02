@@ -52,10 +52,10 @@ export function InviteEarnModal({
       open={open} 
       onOpenChange={onOpenChange} 
       title="" 
-      className="w-[95vw] max-w-[450px] sm:w-auto bg-card border-border p-0 rounded-xl shadow-lg" 
+      className="w-[450px] bg-card border-border p-0 rounded-xl shadow-lg" 
       showCloseButton={false}
     >
-      <div className="p-4 sm:p-5">
+      <div className="p-5">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-medium text-foreground">Spread the love</h2>
@@ -115,10 +115,20 @@ export function InviteEarnModal({
           <div className="flex items-center gap-2 p-3 bg-muted border-none rounded-lg">
             <Link className="h-4 w-4 text-muted-foreground shrink-0" />
             <span className="text-sm font-mono text-foreground truncate flex-1">{inviteLink}</span>
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <Button 
+              variant="ghost" 
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+
             <Button 
               onClick={handleCopyLink} 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground shrink-0"
-              size="sm"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               <Copy className="h-4 w-4 mr-2" />
               Copy link
