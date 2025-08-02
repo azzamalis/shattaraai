@@ -52,10 +52,10 @@ export function InviteEarnModal({
       open={open} 
       onOpenChange={onOpenChange} 
       title="" 
-      className="w-[450px] bg-card border-border p-0 rounded-xl shadow-lg" 
+      className="w-[95vw] max-w-[450px] sm:w-auto bg-card border-border p-0 rounded-xl shadow-lg" 
       showCloseButton={false}
     >
-      <div className="p-5">
+      <div className="p-4 sm:p-5">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-medium text-foreground">Spread the love</h2>
