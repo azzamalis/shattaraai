@@ -49,7 +49,7 @@ const TeamHero = () => {
               <div className="size-12 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center">
                 <Globe className="size-6 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold text-foreground mb-1">5K+</div>
+              <div className="text-2xl font-bold text-foreground mb-1">500+</div>
               <div className="text-sm text-muted-foreground">Students Helped</div>
             </div>
             
