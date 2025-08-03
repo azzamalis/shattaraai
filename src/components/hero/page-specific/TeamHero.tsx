@@ -41,7 +41,7 @@ const TeamHero = () => {
               <div className="size-12 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center">
                 <Award className="size-6 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold text-foreground mb-1">15+</div>
+              <div className="text-2xl font-bold text-foreground mb-1">25+</div>
               <div className="text-sm text-muted-foreground">Years Combined Experience</div>
             </div>
             
