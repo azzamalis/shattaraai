@@ -11,11 +11,7 @@ const Team = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {/* Team Member 1 */}
           <div className="bg-card p-6 rounded-xl border border-border">
-            <div className="size-20 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
-              <svg className="text-muted-foreground size-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
+            
             <h3 className="text-xl font-semibold text-center mb-2 text-card-foreground">Azzam AlSahili</h3>
             <p className="text-muted-foreground text-center mb-4">Co-founder &amp; CEO</p>
             <p className="text-muted-foreground text-center">Former senior leader with a passion for accessible education. Founded Shattara AI to transform e-learning in the MENA region.</p>
@@ -23,11 +19,7 @@ const Team = () => {
           
           {/* Team Member 2 */}
           <div className="bg-card p-6 rounded-xl border border-border">
-            <div className="size-20 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
-              <svg className="text-muted-foreground size-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
+            
             <h3 className="text-xl font-semibold text-center mb-2 text-card-foreground">Mohammad AlKabbani</h3>
             <p className="text-muted-foreground text-center mb-4">Co-founder &amp; CTO</p>
             <p className="text-muted-foreground text-center">CS Professional with 8+ years of experience in product, growth and AI systems learning.</p>
@@ -35,11 +27,7 @@ const Team = () => {
           
           {/* Team Member 3 */}
           <div className="bg-card p-6 rounded-xl border border-border">
-            <div className="size-20 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
-              <svg className="text-muted-foreground size-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
+            
             <h3 className="text-xl font-semibold text-center mb-2 text-card-foreground">Noor Dally</h3>
             <p className="text-muted-foreground text-center mb-4">Chief Education Officer</p>
             <p className="text-muted-foreground text-center">10+ years in curriculum development and educational psychology. Ensures our platform meets real learning needs.</p>
