@@ -111,13 +111,7 @@ const Contact = () => {
       <ContactHero />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Get in Touch</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Have questions about our platform? Looking to partner with us? 
-            Our team is ready to help you transform education with AI.
-          </p>
-        </div>
+        
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div id="contact-form" className="bg-card p-8 rounded-xl border border-border">
