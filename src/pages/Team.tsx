@@ -1,10 +1,8 @@
 import React from 'react';
 import TeamHero from '@/components/hero/page-specific/TeamHero';
 import Footer from '@/components/Footer';
-
 const Team = () => {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
+  return <div className="min-h-screen bg-background text-foreground">
       <TeamHero />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
@@ -18,9 +16,9 @@ const Team = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-center mb-2 text-card-foreground">Azzam Sahili</h3>
-            <p className="text-muted-foreground text-center mb-4">Founder &amp; CEO</p>
-            <p className="text-muted-foreground text-center">Former senior leader with a passion for accessible education. Founded Shattara to transform learning in the Gulf region.</p>
+            <h3 className="text-xl font-semibold text-center mb-2 text-card-foreground">Azzam AlSahili</h3>
+            <p className="text-muted-foreground text-center mb-4">Co-founder &amp; CEO</p>
+            <p className="text-muted-foreground text-center">Former senior leader with a passion for accessible education. Founded Shattara AI to transform e-learning in the MENA region.</p>
           </div>
           
           {/* Team Member 2 */}
@@ -30,9 +28,9 @@ const Team = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-center mb-2 text-card-foreground">Xhiang Habib</h3>
-            <p className="text-muted-foreground text-center mb-4">Chief AI Lead</p>
-            <p className="text-muted-foreground text-center">PhD in Machine Learning from MIT with 10+ years of experience in educational AI systems and adaptive learning.</p>
+            <h3 className="text-xl font-semibold text-center mb-2 text-card-foreground">Mohammad AlKabbani</h3>
+            <p className="text-muted-foreground text-center mb-4">Co-founder &amp; CTO</p>
+            <p className="text-muted-foreground text-center">CS Professional with 8+ years of experience in product, growth and AI systems learning.</p>
           </div>
           
           {/* Team Member 3 */}
@@ -42,16 +40,14 @@ const Team = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-center mb-2 text-card-foreground">Noor Ali</h3>
-            <p className="text-muted-foreground text-center mb-4">Head of Education</p>
-            <p className="text-muted-foreground text-center">15+ years in curriculum development and educational psychology. Ensures our platform meets real learning needs.</p>
+            <h3 className="text-xl font-semibold text-center mb-2 text-card-foreground">Noor Dally</h3>
+            <p className="text-muted-foreground text-center mb-4">Chief Education Officer</p>
+            <p className="text-muted-foreground text-center">10+ years in curriculum development and educational psychology. Ensures our platform meets real learning needs.</p>
           </div>
         </div>
       </section>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Team;
