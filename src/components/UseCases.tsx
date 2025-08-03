@@ -118,7 +118,7 @@ const UseCases = () => {
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-foreground">
             Designed for every learning journey
           </h2>
-          <p className="text-lg text-muted-foreground">Our platform adapts to your needs, whether you're a student, a teacher, or a work professional.</p>
+          <p className="text-center mt-5 text-muted-foreground">Our platform adapts to your needs, whether you're a student, a teacher, or a work professional.</p>
         </div>
         
         <div role="region" aria-label="Use Cases Carousel" className="relative">
