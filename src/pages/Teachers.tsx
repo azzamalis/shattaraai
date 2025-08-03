@@ -9,13 +9,7 @@ const Teachers = () => {
       <TeachersHero />
       
       <section className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="text-center mb-20">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Empower Your Teaching</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Transform your classroom with AI-powered tools designed specifically for educators.
-            Save time, personalize learning, and engage your students like never before.
-          </p>
-        </div>
+        
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20">
           {/* Feature 1 */}
