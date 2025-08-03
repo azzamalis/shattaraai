@@ -41,13 +41,7 @@ const Careers = () => {
       
       {/* Hero Section */}
       <section className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="text-center mb-20">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Join Our Mission</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Help us transform education through AI. We're looking for passionate individuals 
-            who believe in making quality education accessible to all.
-          </p>
-        </div>
+        
         
         {/* Company Values */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-24">
