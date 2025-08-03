@@ -59,7 +59,7 @@ const ContactHero = () => {
               <div className="size-12 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center">
                 <Mail className="size-6 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold text-foreground mb-1">99%</div>
+              <div className="text-2xl font-bold text-foreground mb-1">89%</div>
               <div className="text-sm text-muted-foreground">Satisfaction Rate</div>
             </div>
           </div>
