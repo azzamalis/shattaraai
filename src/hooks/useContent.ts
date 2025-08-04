@@ -263,32 +263,9 @@ export const useContent = () => {
       console.log('DEBUG: useContent - Calling addContent with final data');
       const contentId = await addContent(finalContentData);
       
-      // If PDF content was successfully added, extract text on client side
-      if (contentId && contentData.type === 'pdf' && file) {
-        try {
-          console.log('DEBUG: useContent - Starting client-side PDF text extraction for:', contentId);
-          
-          // Extract PDF text on client side
-          const extractedText = await extractPdfText(file);
-          console.log('DEBUG: useContent - Extracted text length:', extractedText.length);
-          console.log('DEBUG: useContent - Extracted text preview (first 200 chars):', extractedText.substring(0, 200));
-          
-          // Update the content with extracted text
-          const { error: updateError } = await supabase.from('content').update({ text_content: extractedText }).eq('id', contentId);
-          
-          if (updateError) {
-            console.error('DEBUG: useContent - Failed to update content with extracted text:', updateError);
-            throw new Error(`Failed to save extracted text: ${updateError.message}`);
-          }
-          
-          console.log('DEBUG: useContent - Successfully updated content with text_content for contentId:', contentId);
-          
-          console.log('DEBUG: useContent - PDF text extraction completed successfully');
-          toast.success('PDF uploaded and text extracted successfully!');
-        } catch (extractionError) {
-          console.error('DEBUG: useContent - PDF text extraction failed:', extractionError);
-          toast.error('PDF uploaded but text extraction failed');
-        }
+      // Auto-trigger content processing based on content type
+      if (contentId) {
+        await processContentAutomatically(contentId, contentData, file);
       }
       
       console.log('DEBUG: useContent - addContentWithFile completed, content ID:', contentId);
@@ -342,21 +319,9 @@ export const useContent = () => {
 
       const contentId = await addContent(finalContentData);
       
-      // For YouTube content, trigger extraction of video data
-      if (contentId && contentData.type === 'youtube' && contentData.url) {
-        try {
-          console.log('Triggering YouTube data extraction for:', contentData.url);
-          await supabase.functions.invoke('youtube-extractor', {
-            body: {
-              url: contentData.url,
-              contentId: contentId
-            }
-          });
-          toast.success('YouTube video data is being extracted...');
-        } catch (extractionError) {
-          console.error('Failed to extract YouTube data:', extractionError);
-          toast.error('YouTube data extraction failed, but content was saved');
-        }
+      // Auto-trigger content processing based on content type
+      if (contentId) {
+        await processContentAutomatically(contentId, contentData);
       }
       
       return contentId;
@@ -447,6 +412,152 @@ export const useContent = () => {
     } catch (error) {
       console.error('Error deleting content:', error);
       toast.error('Failed to delete content');
+    }
+  };
+
+  // Unified content processing function
+  const processContentAutomatically = async (
+    contentId: string, 
+    contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
+    file?: File
+  ) => {
+    console.log('DEBUG: useContent - Starting automatic content processing for:', contentId, contentData.type);
+    
+    try {
+      switch (contentData.type) {
+        case 'pdf':
+          if (file) {
+            console.log('DEBUG: useContent - Processing PDF with client-side extraction');
+            try {
+              const extractedText = await extractPdfText(file);
+              console.log('DEBUG: useContent - Extracted text length:', extractedText.length);
+              
+              const { error: updateError } = await supabase
+                .from('content')
+                .update({ text_content: extractedText })
+                .eq('id', contentId);
+              
+              if (updateError) {
+                throw new Error(`Failed to save extracted text: ${updateError.message}`);
+              }
+              
+              toast.success('PDF uploaded and text extracted successfully!');
+            } catch (extractionError) {
+              console.error('DEBUG: useContent - PDF text extraction failed:', extractionError);
+              // Fallback to server-side extraction
+              console.log('DEBUG: useContent - Attempting server-side PDF extraction');
+              try {
+                await supabase.functions.invoke('extract-pdf-text', {
+                  body: {
+                    contentId: contentId,
+                    storagePath: contentData.storage_path || contentData.url
+                  }
+                });
+                toast.success('PDF uploaded! Text extraction in progress...');
+              } catch (serverError) {
+                console.error('DEBUG: useContent - Server-side PDF extraction also failed:', serverError);
+                toast.error('PDF uploaded but text extraction failed');
+              }
+            }
+          }
+          break;
+
+        case 'youtube':
+          if (contentData.url) {
+            console.log('DEBUG: useContent - Processing YouTube content');
+            try {
+              await supabase.functions.invoke('youtube-extractor', {
+                body: {
+                  url: contentData.url,
+                  contentId: contentId
+                }
+              });
+              toast.success('YouTube video data is being extracted...');
+            } catch (extractionError) {
+              console.error('DEBUG: useContent - YouTube extraction failed:', extractionError);
+              toast.error('YouTube data extraction failed, but content was saved');
+            }
+          }
+          break;
+
+        case 'website':
+          if (contentData.url) {
+            console.log('DEBUG: useContent - Processing website content');
+            try {
+              await supabase.functions.invoke('extract-website-content', {
+                body: {
+                  url: contentData.url,
+                  contentId: contentId
+                }
+              });
+              toast.success('Website content is being extracted...');
+            } catch (extractionError) {
+              console.error('DEBUG: useContent - Website extraction failed:', extractionError);
+              console.log('DEBUG: useContent - Website extraction not available, content saved without processing');
+            }
+          }
+          break;
+
+        case 'audio_file':
+          if (file) {
+            console.log('DEBUG: useContent - Processing audio file');
+            try {
+              await supabase.functions.invoke('extract-audio-transcript', {
+                body: {
+                  contentId: contentId,
+                  storagePath: contentData.storage_path || contentData.url
+                }
+              });
+              toast.success('Audio uploaded! Transcript extraction in progress...');
+            } catch (extractionError) {
+              console.error('DEBUG: useContent - Audio transcription failed:', extractionError);
+              console.log('DEBUG: useContent - Audio transcription not available, content saved without processing');
+            }
+          }
+          break;
+
+        case 'video':
+          if (file) {
+            console.log('DEBUG: useContent - Processing video file');
+            try {
+              await supabase.functions.invoke('extract-video-content', {
+                body: {
+                  contentId: contentId,
+                  storagePath: contentData.storage_path || contentData.url
+                }
+              });
+              toast.success('Video uploaded! Content extraction in progress...');
+            } catch (extractionError) {
+              console.error('DEBUG: useContent - Video content extraction failed:', extractionError);
+              console.log('DEBUG: useContent - Video content extraction not available, content saved without processing');
+            }
+          }
+          break;
+
+        case 'file':
+          if (file) {
+            console.log('DEBUG: useContent - Processing document file');
+            try {
+              await supabase.functions.invoke('extract-document-text', {
+                body: {
+                  contentId: contentId,
+                  storagePath: contentData.storage_path || contentData.url,
+                  fileType: file.type
+                }
+              });
+              toast.success('Document uploaded! Text extraction in progress...');
+            } catch (extractionError) {
+              console.error('DEBUG: useContent - Document text extraction failed:', extractionError);
+              console.log('DEBUG: useContent - Document text extraction not available, content saved without processing');
+            }
+          }
+          break;
+
+        default:
+          console.log('DEBUG: useContent - No automatic processing available for content type:', contentData.type);
+      }
+    } catch (error) {
+      console.error('DEBUG: useContent - Error in automatic content processing:', error);
     }
   };
 

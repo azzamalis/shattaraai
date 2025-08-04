@@ -63,40 +63,139 @@ serve(async (req) => {
       throw new Error('Invalid authorization token');
     }
 
-    // Build context from room content
+    // Enhanced content context building with chunking for large content
     const roomContext = roomContent.map(content => {
-      let contextText = `${content.title} (${content.type}):`;
+      let contextText = `📄 ${content.title} (${content.type}):`;
       
-      // Include transcript for YouTube videos
-      if (content.type === 'youtube' && content.text_content) {
-        contextText += `\nTranscript: ${content.text_content}`;
+      // Handle different content types with specialized processing
+      switch (content.type) {
+        case 'youtube':
+          if (content.text_content) {
+            // Chunk large YouTube transcripts
+            const transcript = content.text_content.length > 3000 
+              ? content.text_content.substring(0, 3000) + '... [transcript continues]'
+              : content.text_content;
+            contextText += `\n📝 Transcript: ${transcript}`;
+          }
+          
+          // Include chapters for YouTube videos  
+          if (content.metadata?.chapters && Array.isArray(content.metadata.chapters)) {
+            const chapters = content.metadata.chapters.slice(0, 10).map((chapter: any) => 
+              `${Math.floor(chapter.startTime / 60)}:${(chapter.startTime % 60).toString().padStart(2, '0')} - ${chapter.title}`
+            ).join('\n');
+            contextText += `\n📋 Chapters:\n${chapters}`;
+            if (content.metadata.chapters.length > 10) {
+              contextText += `\n... and ${content.metadata.chapters.length - 10} more chapters`;
+            }
+          }
+          
+          // Include video metadata
+          if (content.metadata?.channelTitle) {
+            contextText += `\n👤 Channel: ${content.metadata.channelTitle}`;
+            if (content.metadata.publishedAt) {
+              contextText += `\n📅 Published: ${new Date(content.metadata.publishedAt).toLocaleDateString()}`;
+            }
+            if (content.metadata.duration) {
+              const minutes = Math.floor(content.metadata.duration / 60);
+              const seconds = content.metadata.duration % 60;
+              contextText += `\n⏱️ Duration: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+          }
+          break;
+
+        case 'pdf':
+          if (content.text_content) {
+            // Chunk large PDF content and provide summary
+            const pdfText = content.text_content.length > 4000 
+              ? content.text_content.substring(0, 4000) + '... [document continues]'
+              : content.text_content;
+            contextText += `\n📖 Content: ${pdfText}`;
+            
+            if (content.text_content.length > 4000) {
+              const wordCount = content.text_content.split(' ').length;
+              contextText += `\n📊 Document stats: ~${wordCount} words, ${Math.ceil(wordCount / 250)} pages estimated`;
+            }
+          } else {
+            contextText += '\n⚠️ PDF text not yet extracted';
+          }
+          break;
+
+        case 'audio_file':
+          if (content.text_content) {
+            const transcript = content.text_content.length > 3000 
+              ? content.text_content.substring(0, 3000) + '... [transcript continues]'
+              : content.text_content;
+            contextText += `\n🎵 Transcript: ${transcript}`;
+          } else {
+            contextText += '\n⚠️ Audio transcript not yet available';
+          }
+          break;
+
+        case 'video':
+          if (content.text_content) {
+            const transcript = content.text_content.length > 3000 
+              ? content.text_content.substring(0, 3000) + '... [transcript continues]'
+              : content.text_content;
+            contextText += `\n🎬 Transcript: ${transcript}`;
+          } else {
+            contextText += '\n⚠️ Video transcript not yet available';
+          }
+          break;
+
+        case 'website':
+          if (content.text_content) {
+            const webContent = content.text_content.length > 2000 
+              ? content.text_content.substring(0, 2000) + '... [content continues]'
+              : content.text_content;
+            contextText += `\n🌐 Content: ${webContent}`;
+          } else {
+            contextText += '\n⚠️ Website content not yet extracted';
+          }
+          if (content.url) {
+            contextText += `\n🔗 URL: ${content.url}`;
+          }
+          break;
+
+        case 'text':
+        case 'chat':
+          if (content.text_content) {
+            const textContent = content.text_content.length > 2000 
+              ? content.text_content.substring(0, 2000) + '... [content continues]'
+              : content.text_content;
+            contextText += `\n📝 Content: ${textContent}`;
+          }
+          break;
+
+        case 'file':
+          if (content.text_content) {
+            const fileContent = content.text_content.length > 3000 
+              ? content.text_content.substring(0, 3000) + '... [document continues]'
+              : content.text_content;
+            contextText += `\n📁 Content: ${fileContent}`;
+          } else {
+            contextText += '\n⚠️ Document text not yet extracted';
+          }
+          if (content.filename) {
+            contextText += `\n📎 Filename: ${content.filename}`;
+          }
+          break;
+
+        default:
+          if (content.text_content) {
+            contextText += `\n📄 Content: ${content.text_content}`;
+          } else {
+            contextText += '\n⚠️ No text content available yet';
+          }
       }
       
-      // Include chapters for YouTube videos  
-      if (content.type === 'youtube' && content.metadata?.chapters && Array.isArray(content.metadata.chapters)) {
-        const chapters = content.metadata.chapters.map((chapter: any) => 
-          `${Math.floor(chapter.startTime / 60)}:${(chapter.startTime % 60).toString().padStart(2, '0')} - ${chapter.title}`
-        ).join('\n');
-        contextText += `\n\nChapters:\n${chapters}`;
-      }
-      
-      // Include video metadata
-      if (content.type === 'youtube' && content.metadata?.channelTitle) {
-        contextText += `\nChannel: ${content.metadata.channelTitle}`;
-        if (content.metadata.publishedAt) {
-          contextText += `\nPublished: ${new Date(content.metadata.publishedAt).toLocaleDateString()}`;
-        }
-      }
-      
-      // Fallback to text content for other types
-      if (content.type !== 'youtube' && content.text_content) {
-        contextText += ` ${content.text_content}`;
-      } else if (!content.text_content) {
-        contextText += ' No text content available';
+      // Add metadata info if available
+      if (content.metadata?.fileSize) {
+        const sizeInMB = (content.metadata.fileSize / (1024 * 1024)).toFixed(2);
+        contextText += `\n💾 Size: ${sizeInMB} MB`;
       }
       
       return contextText;
-    }).join('\n\n');
+    }).join('\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n');
 
     // Build conversation context
     const conversationContext = conversationHistory
@@ -104,23 +203,37 @@ serve(async (req) => {
       .map(msg => `${msg.sender_type === 'user' ? 'User' : 'AI Tutor'}: ${msg.content}`)
       .join('\n');
 
-    // Construct the system prompt
+    // Construct the enhanced system prompt
     const systemPrompt = `You are Shattara AI Tutor, an intelligent educational assistant helping students learn from their study materials. You are currently in a study room where the student has organized their learning content.
 
-Room Content Available:
-${roomContext || 'No content available in this room yet.'}
+📚 ROOM CONTENT AVAILABLE:
+${roomContext || 'No content available in this room yet. Encourage the student to add their study materials (PDFs, videos, notes, etc.) to get started.'}
 
-Recent Conversation:
+💬 RECENT CONVERSATION:
 ${conversationContext || 'This is the start of the conversation.'}
 
-Instructions:
-- Be helpful, encouraging, and educational
-- Reference the room content when relevant to answer questions
-- Provide explanations at an appropriate academic level
-- Help students understand concepts rather than just giving answers
-- If the room has no content, encourage the student to add study materials
-- Keep responses concise but informative
-- Use a friendly, supportive tone`;
+🎯 INSTRUCTIONS:
+- Be helpful, encouraging, and educational with a friendly, approachable tone
+- ALWAYS reference specific content from the room when answering questions
+- When content is not yet processed (shows "not yet extracted/available"), let the student know it's being processed
+- Provide explanations at an appropriate academic level for the student
+- Help students understand concepts rather than just giving direct answers
+- Encourage critical thinking and ask follow-up questions
+- If asked about content that's chunked (shows "continues"), offer to dive deeper into specific sections
+- Use the emojis and formatting in your responses to make them more engaging
+- When referencing content, use the title and type (e.g., "Based on your PDF 'Chapter 5 Notes'...")
+- Suggest practical study strategies and techniques based on the available content
+- If no content is available, guide the student on how to add materials to the room
+
+🔍 CONTENT ANALYSIS CAPABILITIES:
+- PDF documents: Can analyze text, summarize key points, create study guides
+- YouTube videos: Can reference transcripts, chapters, and timestamps
+- Audio files: Can work with transcripts for lectures and recordings  
+- Websites: Can analyze articles and web content
+- Notes and text: Can help organize and expand on written materials
+- Documents: Can process various file formats for text analysis
+
+Remember: Your goal is to be an intelligent study companion that helps students learn effectively from their materials.`;
 
     // Prepare the Gemini API request
     const geminiRequest = {
