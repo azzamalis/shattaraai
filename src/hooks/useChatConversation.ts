@@ -87,16 +87,26 @@ export function useChatConversation({
     }
 
     try {
-      const { data, error } = await supabase
-        .from('chat_conversations')
-        .insert([
-          {
+      // For room collaboration, don't set context_id as it references content table
+      // Instead, store room info in metadata
+      const insertData = conversationType === 'room_collaboration' 
+        ? {
+            type: conversationType,
+            context_id: null, // Don't reference content table for rooms
+            context_type: contextType,
+            user_id: user.id,
+            metadata: { room_id: contextId } // Store room ID in metadata instead
+          }
+        : {
             type: conversationType,
             context_id: contextId,
             context_type: contextType,
             user_id: user.id
-          }
-        ])
+          };
+
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .insert([insertData])
         .select()
         .single();
 
@@ -122,16 +132,23 @@ export function useChatConversation({
         if (contextId) {
           console.log('Looking for conversation with contextId:', contextId);
           
-          const { data: existingConversation, error } = await supabase
+          let query = supabase
             .from('chat_conversations')
             .select('*')
             .eq('type', conversationType)
             .eq('user_id', user.id)
-            .eq('context_id', contextId)
             .eq('context_type', contextType || 'content')
             .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
+            .limit(1);
+
+          // For room collaboration, check metadata instead of context_id
+          if (conversationType === 'room_collaboration') {
+            query = query.contains('metadata', { room_id: contextId });
+          } else {
+            query = query.eq('context_id', contextId);
+          }
+
+          const { data: existingConversation, error } = await query.maybeSingle();
 
           if (error && error.code !== 'PGRST116') {
             console.error('Error fetching conversation:', error);
@@ -152,10 +169,11 @@ export function useChatConversation({
               const newConversation = {
                 id: newConversationId,
                 type: conversationType,
-                context_id: contextId,
+                context_id: conversationType === 'room_collaboration' ? null : contextId,
                 context_type: contextType || 'content',
                 user_id: user.id,
-                created_at: new Date().toISOString()
+                created_at: new Date().toISOString(),
+                metadata: conversationType === 'room_collaboration' ? { room_id: contextId } : null
               };
               setConversation(newConversation);
               setMessages([]); // Start with empty messages for new conversation
