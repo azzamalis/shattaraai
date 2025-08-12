@@ -374,74 +374,81 @@ Current student question: ${message}`;
       }
     ];
 
-    console.log('Calling OpenAI with model: o4-mini-2025-04-16');
+    console.log('Calling OpenAI with primary model: o4-mini-2025-04-16');
 
-    // Call OpenAI API with primary model
-    let response;
-    try {
-      response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'o4-mini-2025-04-16',
-          messages,
-          max_completion_tokens: 1000,
-        }),
-      });
-    } catch (error) {
-      console.error('Primary model failed, trying fallback:', error);
-      
-      // Fallback to o3-mini for complex reasoning
-      response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'o3-2025-04-16',
-          messages,
-          max_completion_tokens: 1000,
-        }),
-      });
-    }
+    let aiResponse: string | null = null;
+    let modelUsed = 'o4-mini-2025-04-16';
+    let aiData: any = null;
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('OpenAI API error:', response.status, errorData);
-      
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'OpenAI API error',
-          response: "I'm having trouble processing your request right now. Please try again in a moment."
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    // Primary model attempt with robust fallback system
+    const models = [
+      { name: 'o4-mini-2025-04-16', maxTokens: 2000 },
+      { name: 'gpt-4.1-2025-04-14', maxTokens: 4000 },
+      { name: 'gpt-4o-mini', maxTokens: 4000 }
+    ];
+
+    for (const model of models) {
+      try {
+        console.log(`Trying model: ${model.name}`);
+        
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openaiApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: model.name,
+            messages,
+            max_completion_tokens: model.maxTokens,
+            temperature: 0.7,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error(`Model ${model.name} failed with status ${response.status}:`, errorData);
+          continue; // Try next model
         }
-      );
+
+        aiData = await response.json();
+        const responseContent = aiData.choices?.[0]?.message?.content;
+
+        // Check if response has actual content
+        if (responseContent && responseContent.trim().length > 0) {
+          aiResponse = responseContent.trim();
+          modelUsed = model.name;
+          console.log(`Successfully got response from model: ${model.name}`);
+          break; // Success, exit loop
+        } else {
+          console.error(`Model ${model.name} returned empty content:`, aiData);
+          continue; // Try next model
+        }
+
+      } catch (error) {
+        console.error(`Error with model ${model.name}:`, error);
+        continue; // Try next model
+      }
     }
 
-    const aiData = await response.json();
-    const aiResponse = aiData.choices?.[0]?.message?.content;
-
+    // If all models failed, provide fallback response
     if (!aiResponse) {
-      console.error('No response from OpenAI:', aiData);
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'No response from AI',
-          response: "I'm sorry, I didn't receive a proper response. Please try asking your question again."
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      console.error('All models failed to provide a response');
+      aiResponse = `I apologize, but I'm having technical difficulties right now. Here's what I can help you with:
+
+**For your study materials in this room:**
+${roomContent.length > 0 ? roomContent.map(c => `• ${c.title} (${c.type})`).join('\n') : '• No study materials uploaded yet'}
+
+**You can ask me to:**
+• Explain concepts from your materials
+• Create practice questions
+• Summarize key points
+• Help with specific topics
+
+Please try asking your question again, or feel free to ask about any of the topics above!`;
+      
+      modelUsed = 'fallback';
+      aiData = { model: 'fallback', usage: { total_tokens: 0 } };
     }
 
     // Store AI response in database
@@ -450,22 +457,28 @@ Current student question: ${message}`;
         .from('chat_messages')
         .insert({
           conversation_id: conversationId,
+          user_id: user.id, // Fix: Add user_id to prevent constraint violation
           content: aiResponse,
           sender_type: 'ai',
           metadata: {
-            model: aiData.model || 'o4-mini-2025-04-16',
+            model: modelUsed,
             room_id: roomId,
             generated_at: new Date().toISOString(),
-            tokens_used: aiData.usage?.total_tokens || 0,
-            cached: false
+            tokens_used: aiData?.usage?.total_tokens || 0,
+            cached: false,
+            fallback_used: modelUsed === 'fallback'
           }
         });
 
       if (insertError) {
         console.error('Error storing AI response:', insertError);
+        // Don't fail the request if database storage fails
+      } else {
+        console.log('Successfully stored AI response in database');
       }
     } catch (dbError) {
       console.error('Database storage error:', dbError);
+      // Don't fail the request if database storage fails
     }
 
     // Cache the response for future requests
