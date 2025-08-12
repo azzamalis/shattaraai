@@ -207,6 +207,74 @@ serve(async (req) => {
       );
     }
 
+    console.log('Processing chat request for user:', user.id);
+
+    // Check rate limits before processing
+    const { data: rateLimitData, error: rateLimitError } = await supabase
+      .rpc('check_rate_limit', {
+        user_uuid: user.id,
+        request_type: 'chat',
+        estimated_tokens: 1500
+      });
+
+    if (rateLimitError) {
+      console.error('Rate limit check error:', rateLimitError);
+    } else if (rateLimitData && rateLimitData.length > 0) {
+      const rateLimit = rateLimitData[0];
+      if (!rateLimit.allowed) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: `Daily chat limit reached. Plan: ${rateLimit.plan_type}. Resets at: ${rateLimit.reset_time}`,
+            rateLimitInfo: {
+              remaining: rateLimit.remaining_requests,
+              resetTime: rateLimit.reset_time,
+              planType: rateLimit.plan_type
+            }
+          }),
+          { 
+            status: 429, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+    }
+
+    // Create cache key for this request
+    const cacheKey = `chat_${user.id}_${roomId}`;
+    const contentHash = JSON.stringify({ roomContent, conversationHistory, message }).substring(0, 100);
+    
+    // Check cache first
+    const { data: cachedResponse, error: cacheError } = await supabase
+      .from('ai_cache')
+      .select('response_data, hit_count, id')
+      .eq('user_id', user.id)
+      .eq('cache_key', cacheKey)
+      .eq('content_hash', contentHash)
+      .gt('expires_at', new Date().toISOString())
+      .limit(1);
+
+    if (!cacheError && cachedResponse && cachedResponse.length > 0) {
+      console.log('Cache hit for chat request');
+      
+      // Update hit count
+      await supabase
+        .from('ai_cache')
+        .update({ hit_count: cachedResponse[0].hit_count + 1 })
+        .eq('id', cachedResponse[0].id);
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          response: cachedResponse[0].response_data.response,
+          cached: true
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
     // Build enhanced room context with smart chunking
     let roomContext = '';
     let allChunks: any[] = [];
@@ -388,17 +456,61 @@ Current student question: ${message}`;
           metadata: {
             model: aiData.model || 'o4-mini-2025-04-16',
             room_id: roomId,
-            generated_at: new Date().toISOString()
+            generated_at: new Date().toISOString(),
+            tokens_used: aiData.usage?.total_tokens || 0,
+            cached: false
           }
         });
 
       if (insertError) {
         console.error('Error storing AI response:', insertError);
-        // Don't fail the request, just log the error
       }
     } catch (dbError) {
       console.error('Database storage error:', dbError);
-      // Continue with response even if storage fails
+    }
+
+    // Cache the response for future requests
+    try {
+      const { data: planData } = await supabase
+        .rpc('get_user_plan_quotas', { user_uuid: user.id });
+      
+      const cacheHours = planData?.[0]?.cache_duration_hours || 24;
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + cacheHours);
+
+      await supabase
+        .from('ai_cache')
+        .insert({
+          user_id: user.id,
+          cache_key: cacheKey,
+          response_data: { response: aiResponse, model: aiData.model },
+          content_hash: contentHash,
+          model_name: aiData.model || 'o4-mini-2025-04-16',
+          expires_at: expiresAt.toISOString()
+        });
+    } catch (cacheInsertError) {
+      console.error('Cache insertion error:', cacheInsertError);
+    }
+
+    // Update usage tracking
+    try {
+      const tokensUsed = aiData.usage?.total_tokens || 1000;
+      const estimatedCost = (tokensUsed / 1000000) * 0.15; // Rough estimate for o4-mini
+
+      await supabase
+        .from('ai_usage_counters')
+        .upsert({
+          user_id: user.id,
+          date: new Date().toISOString().split('T')[0],
+          chat_requests: 1,
+          total_tokens_used: tokensUsed,
+          total_cost_usd: estimatedCost
+        }, {
+          onConflict: 'user_id,date',
+          ignoreDuplicates: false
+        });
+    } catch (usageError) {
+      console.error('Usage tracking error:', usageError);
     }
 
     return new Response(

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ExamLoadingScreen } from '@/components/dashboard/ExamLoadingScreen';
+import { EnhancedLoadingIndicator } from '@/components/dashboard/AIUsageDisplay';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -102,5 +103,15 @@ export default function ExamLoadingPage() {
     }
   };
 
-  return <ExamLoadingScreen onComplete={handleLoadingComplete} />;
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="max-w-md w-full mx-auto p-6">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Generating Your Exam</h1>
+          <p className="text-muted-foreground">Our AI is analyzing your content and creating personalized questions...</p>
+        </div>
+        <EnhancedLoadingIndicator message="Analyzing content and generating questions" />
+      </div>
+    </div>
+  );
 }

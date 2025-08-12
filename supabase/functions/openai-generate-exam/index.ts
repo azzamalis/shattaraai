@@ -250,6 +250,74 @@ serve(async (req) => {
       );
     }
 
+    console.log('Processing exam generation for user:', user.id);
+
+    // Check rate limits for exam generation
+    const { data: rateLimitData, error: rateLimitError } = await supabase
+      .rpc('check_rate_limit', {
+        user_uuid: user.id,
+        request_type: 'exam',
+        estimated_tokens: 4000
+      });
+
+    if (rateLimitError) {
+      console.error('Rate limit check error:', rateLimitError);
+    } else if (rateLimitData && rateLimitData.length > 0) {
+      const rateLimit = rateLimitData[0];
+      if (!rateLimit.allowed) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: `Daily exam generation limit reached. Plan: ${rateLimit.plan_type}. Resets at: ${rateLimit.reset_time}`,
+            rateLimitInfo: {
+              remaining: rateLimit.remaining_requests,
+              resetTime: rateLimit.reset_time,
+              planType: rateLimit.plan_type
+            }
+          }),
+          { 
+            status: 429, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+    }
+
+    // Create cache key for exam generation
+    const examCacheKey = `exam_${user.id}_${roomId}`;
+    const examContentHash = JSON.stringify({ roomContent, additionalResources, examConfig }).substring(0, 100);
+    
+    // Check cache for exam generation
+    const { data: cachedExam, error: examCacheError } = await supabase
+      .from('ai_cache')
+      .select('response_data, hit_count, id')
+      .eq('user_id', user.id)
+      .eq('cache_key', examCacheKey)
+      .eq('content_hash', examContentHash)
+      .gt('expires_at', new Date().toISOString())
+      .limit(1);
+
+    if (!examCacheError && cachedExam && cachedExam.length > 0) {
+      console.log('Cache hit for exam generation');
+      
+      // Update hit count
+      await supabase
+        .from('ai_cache')
+        .update({ hit_count: cachedExam[0].hit_count + 1 })
+        .eq('id', cachedExam[0].id);
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          exam: cachedExam[0].response_data.exam,
+          cached: true
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
     // Build enhanced content context with smart processing
     let contentContext = '';
     let allProcessedChunks: any[] = [];
@@ -484,10 +552,56 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
       model: aiData.model || 'o4-mini-2025-04-16',
       roomId: roomId,
       userId: user.id,
-      config: examConfig
+      config: examConfig,
+      tokensUsed: aiData.usage?.total_tokens || 0,
+      cached: false
     };
 
     console.log(`Successfully generated exam with ${examData.questions?.length || 0} questions`);
+
+    // Cache the exam for future requests
+    try {
+      const { data: planData } = await supabase
+        .rpc('get_user_plan_quotas', { user_uuid: user.id });
+      
+      const cacheHours = planData?.[0]?.cache_duration_hours || 24;
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + cacheHours);
+
+      await supabase
+        .from('ai_cache')
+        .insert({
+          user_id: user.id,
+          cache_key: examCacheKey,
+          response_data: { exam: examData },
+          content_hash: examContentHash,
+          model_name: aiData.model || 'o4-mini-2025-04-16',
+          expires_at: expiresAt.toISOString()
+        });
+    } catch (cacheInsertError) {
+      console.error('Cache insertion error:', cacheInsertError);
+    }
+
+    // Update usage tracking for exam generation
+    try {
+      const tokensUsed = aiData.usage?.total_tokens || 3000;
+      const estimatedCost = (tokensUsed / 1000000) * 0.15;
+
+      await supabase
+        .from('ai_usage_counters')
+        .upsert({
+          user_id: user.id,
+          date: new Date().toISOString().split('T')[0],
+          exam_generations: 1,
+          total_tokens_used: tokensUsed,
+          total_cost_usd: estimatedCost
+        }, {
+          onConflict: 'user_id,date',
+          ignoreDuplicates: false
+        });
+    } catch (usageError) {
+      console.error('Usage tracking error:', usageError);
+    }
 
     return new Response(
       JSON.stringify({ 

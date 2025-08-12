@@ -1,12 +1,15 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2 } from 'lucide-react';
+import { X, Send, Loader2, AlertCircle, Clock } from 'lucide-react';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { chatMessageStyles } from '@/lib/chatStyles';
 import { useChatConversation } from '@/hooks/useChatConversation';
 import { useOpenAIChat } from '@/hooks/useOpenAIChat';
+import { useAIUsageTracking } from '@/hooks/useAIUsageTracking';
 
 interface AITutorChatDrawerProps {
   open: boolean;
@@ -29,7 +32,11 @@ export function AITutorChatDrawer({
   const [input, setInput] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
   const [welcomeMessageSent, setWelcomeMessageSent] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const [isNearLimit, setIsNearLimit] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { checkRateLimit, usageStats, planLimits } = useAIUsageTracking();
 
   // Initialize chat conversation for room collaboration
   const {
@@ -68,6 +75,13 @@ export function AITutorChatDrawer({
     if (open && conversation) {
       setMessages([]); // Clear UI messages
       setWelcomeMessageSent(false); // Reset welcome flag
+      setRateLimitError(null); // Clear any rate limit errors
+      
+      // Check usage when opening chat
+      if (usageStats && planLimits) {
+        const usagePercent = (usageStats.chatRequests / planLimits.dailyChatLimit) * 100;
+        setIsNearLimit(usagePercent > 80);
+      }
       
       // Add fresh welcome message to UI only
       const welcomeMessage = roomContent.length > 0
@@ -85,7 +99,7 @@ export function AITutorChatDrawer({
       setMessages([welcomeMsg]);
       setWelcomeMessageSent(true);
     }
-  }, [open, conversation, roomContent.length]);
+  }, [open, conversation, roomContent.length, usageStats, planLimits]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -96,8 +110,18 @@ export function AITutorChatDrawer({
   const handleSendMessage = async () => {
     if (!input.trim() || !conversation) return;
 
+    // Check rate limits before sending
+    const rateLimitInfo = await checkRateLimit('chat');
+    if (rateLimitInfo && !rateLimitInfo.allowed) {
+      setRateLimitError(
+        `Daily chat limit reached (${rateLimitInfo.planType} plan). Resets at ${new Date(rateLimitInfo.resetTime).toLocaleTimeString()}`
+      );
+      return;
+    }
+
     const userMessage = input.trim();
     setInput('');
+    setRateLimitError(null);
 
     try {
       // Add user message to UI immediately
@@ -192,6 +216,29 @@ export function AITutorChatDrawer({
             </SheetClose>
           </div>
           
+          {/* Usage Warning */}
+          {isNearLimit && (
+            <Alert className="mx-6 mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                You're approaching your daily chat limit. 
+                {usageStats && planLimits && (
+                  <span className="ml-1">
+                    {usageStats.chatRequests}/{planLimits.dailyChatLimit} requests used
+                  </span>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Rate Limit Error */}
+          {rateLimitError && (
+            <Alert variant="destructive" className="mx-6 mb-4">
+              <Clock className="h-4 w-4" />
+              <AlertDescription>{rateLimitError}</AlertDescription>
+            </Alert>
+          )}
+          
           <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-background">
             {messages.map(message => (
               <div 
@@ -200,16 +247,25 @@ export function AITutorChatDrawer({
               >
                 <div className={chatMessageStyles.bubble(message.sender_type === 'user')}>
                   <p className={chatMessageStyles.content}>{message.content}</p>
-                  <div className={`text-xs mt-1 ${
-                    message.sender_type === 'user' 
-                      ? 'text-white/80' 
-                      : 'text-foreground/60 dark:text-foreground/50'
-                  }`}>
-                    {new Date(message.created_at).toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    })}
-                  </div>
+                   
+                   {/* Show cache indicator */}
+                   <div className={`text-xs mt-1 flex items-center gap-1 ${
+                     message.sender_type === 'user' 
+                       ? 'text-white/80' 
+                       : 'text-foreground/60 dark:text-foreground/50'
+                   }`}>
+                     <span>
+                       {new Date(message.created_at).toLocaleTimeString([], { 
+                         hour: '2-digit', 
+                         minute: '2-digit' 
+                       })}
+                     </span>
+                      {message.sender_type === 'ai' && (message as any).metadata?.cached && (
+                        <Badge variant="outline" className="text-xs py-0 px-1">
+                          Cached
+                        </Badge>
+                      )}
+                   </div>
                 </div>
               </div>
             ))}
@@ -241,7 +297,7 @@ export function AITutorChatDrawer({
               />
               <Button 
                 onClick={handleSendMessage} 
-                disabled={!input.trim() || isSending || isAITyping || !conversation} 
+                disabled={!input.trim() || isSending || isAITyping || !conversation || !!rateLimitError} 
                 className="
                   bg-primary text-primary-foreground hover:bg-primary/90 
                   disabled:opacity-50 disabled:cursor-not-allowed
