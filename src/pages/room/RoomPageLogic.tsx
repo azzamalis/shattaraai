@@ -4,6 +4,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useRooms } from '@/hooks/useRooms';
 import { useContent } from '@/hooks/useContent';
+import { ContentItem } from '@/components/dashboard/exam-prep/ExamPrepStepTwo';
 
 export const useRoomPageLogic = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -16,6 +17,7 @@ export const useRoomPageLogic = () => {
   const [isExamMode, setIsExamMode] = useState(false);
   const [examStep, setExamStep] = useState(1);
   const [selectedContentIds, setSelectedContentIds] = useState<string[]>([]);
+  const [additionalResources, setAdditionalResources] = useState<ContentItem[]>([]);
   
   // Exam step 3 state
   const [numQuestions, setNumQuestions] = useState('25');
@@ -117,7 +119,13 @@ export const useRoomPageLogic = () => {
       questionType,
       examLength,
       roomId,
-      selectedContentIds
+      selectedContentIds,
+      additionalResources: additionalResources.map(resource => ({
+        id: resource.id,
+        title: resource.title,
+        type: resource.type,
+        content: resource.text || resource.url || resource.file?.name || ''
+      }))
     };
     localStorage.setItem('examConfig', JSON.stringify(examConfig));
     
@@ -142,6 +150,8 @@ export const useRoomPageLogic = () => {
     setIsExamMode,
     examStep,
     selectedContentIds,
+    additionalResources,
+    setAdditionalResources,
     numQuestions,
     setNumQuestions,
     examLength,

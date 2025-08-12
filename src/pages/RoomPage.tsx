@@ -19,6 +19,8 @@ export default function RoomPage() {
     setIsExamMode,
     examStep,
     selectedContentIds,
+    additionalResources,
+    setAdditionalResources,
     numQuestions,
     setNumQuestions,
     examLength,
@@ -66,25 +68,27 @@ export default function RoomPage() {
       <div className="flex flex-col h-full bg-background">
         {/* Hero Section - Default or Exam Mode */}
         <div className="py-12">
-          <RoomPageExamSteps
-            examStep={examStep}
-            currentRoom={currentRoom}
-            isExamMode={isExamMode}
-            selectedContentIds={selectedContentIds}
-            roomContent={roomContent}
-            numQuestions={numQuestions}
-            setNumQuestions={setNumQuestions}
-            questionType={questionType}
-            setQuestionType={setQuestionType}
-            examLength={examLength}
-            setExamLength={setExamLength}
-            handleToggleSelectAll={handleToggleSelectAll}
-            handleExamNext={handleExamNext}
-            handleExamBack={handleExamBack}
-            handleExamSkip={handleExamSkip}
-            handleStartExam={handleStartExam}
-            handleExamCancel={handleExamCancel}
-          />
+        <RoomPageExamSteps 
+          examStep={examStep}
+          currentRoom={currentRoom}
+          isExamMode={isExamMode}
+          selectedContentIds={selectedContentIds}
+          roomContent={roomContent}
+          numQuestions={numQuestions}
+          setNumQuestions={setNumQuestions}
+          questionType={questionType}
+          setQuestionType={setQuestionType}
+          examLength={examLength}
+          setExamLength={setExamLength}
+          additionalResources={additionalResources}
+          setAdditionalResources={setAdditionalResources}
+          handleToggleSelectAll={handleToggleSelectAll}
+          handleExamNext={handleExamNext}
+          handleExamBack={handleExamBack}
+          handleExamSkip={handleExamSkip}
+          handleStartExam={handleStartExam}
+          handleExamCancel={handleExamCancel}
+        />
         </div>
         
         <RoomPageContent

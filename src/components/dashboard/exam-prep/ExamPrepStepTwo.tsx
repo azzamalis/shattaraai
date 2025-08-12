@@ -8,9 +8,10 @@ interface ExamPrepStepTwoProps {
   onBack: () => void;
   onNext: () => void;
   onSkip: () => void;
+  onAdditionalResourcesChange?: (resources: ContentItem[]) => void;
 }
 
-interface ContentItem {
+export interface ContentItem {
   id: string;
   title: string;
   type: 'file' | 'url' | 'text';
@@ -19,10 +20,15 @@ interface ContentItem {
   text?: string;
 }
 
-export function ExamPrepStepTwo({ onBack, onNext, onSkip }: ExamPrepStepTwoProps) {
+export function ExamPrepStepTwo({ onBack, onNext, onSkip, onAdditionalResourcesChange }: ExamPrepStepTwoProps) {
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Notify parent component when content items change
+  React.useEffect(() => {
+    onAdditionalResourcesChange?.(contentItems);
+  }, [contentItems, onAdditionalResourcesChange]);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();

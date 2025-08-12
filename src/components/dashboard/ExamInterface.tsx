@@ -8,10 +8,11 @@ import { debounce, generateQuestions, Question, ExamConfig } from './exam/examUt
 
 interface ExamInterfaceProps {
   examConfig: ExamConfig;
+  generatedExam?: any;
   onSubmitExam: (questions: Question[], answers: {[key: number]: any}, skippedQuestions: Set<number>) => void;
 }
 
-const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam }) => {
+const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam, onSubmitExam }) => {
   const [answers, setAnswers] = useState<{[key: number]: any}>({});
   const [skippedQuestions, setSkippedQuestions] = useState(new Set<number>());
   const [timeRemaining, setTimeRemaining] = useState(examConfig.duration * 60);
@@ -20,7 +21,13 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, onSubmitExam 
   const navigate = useNavigate();
   const { contentId } = useParams();
 
-  const questions = useMemo(() => generateQuestions(examConfig), [examConfig]);
+  // Use generated questions if available, otherwise fall back to generated ones
+  const questions = useMemo(() => {
+    if (generatedExam?.questions) {
+      return generatedExam.questions;
+    }
+    return generateQuestions(examConfig);
+  }, [examConfig, generatedExam]);
 
   const totalCompletedQuestions = Object.keys(answers).length + skippedQuestions.size;
   const progressPercentage = Math.min((totalCompletedQuestions / questions.length) * 100, 100);

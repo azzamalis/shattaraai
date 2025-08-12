@@ -72,3 +72,6 @@ verify_jwt = false
 
 [functions.openai-room-chat]
 verify_jwt = true
+
+[functions.openai-generate-exam]
+verify_jwt = true

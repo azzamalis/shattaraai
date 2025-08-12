@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { RoomHeroSection } from '@/components/dashboard/RoomHeroSection';
-import { ExamPrepStepTwo } from '@/components/dashboard/exam-prep/ExamPrepStepTwo';
+import { ExamPrepStepTwo, ContentItem } from '@/components/dashboard/exam-prep/ExamPrepStepTwo';
 import { ExamPrepStepThree } from '@/components/dashboard/exam-prep/ExamPrepStepThree';
 
 interface RoomPageExamStepsProps {
@@ -16,6 +16,8 @@ interface RoomPageExamStepsProps {
   setQuestionType: (value: string) => void;
   examLength: string;
   setExamLength: (value: string) => void;
+  additionalResources: ContentItem[];
+  setAdditionalResources: (resources: ContentItem[]) => void;
   handleToggleSelectAll: () => void;
   handleExamNext: () => void;
   handleExamBack: () => void;
@@ -36,6 +38,8 @@ export function RoomPageExamSteps({
   setQuestionType,
   examLength,
   setExamLength,
+  additionalResources,
+  setAdditionalResources,
   handleToggleSelectAll,
   handleExamNext,
   handleExamBack,
@@ -73,6 +77,7 @@ export function RoomPageExamSteps({
           onBack={handleExamBack}
           onNext={handleExamNext}
           onSkip={handleExamSkip}
+          onAdditionalResourcesChange={setAdditionalResources}
         />
       </div>
     );

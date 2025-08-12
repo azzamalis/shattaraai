@@ -5,7 +5,20 @@ import ExamInterface from '@/components/dashboard/ExamInterface';
 export default function ExamPage() {
   const navigate = useNavigate();
 
-  // Get exam config from localStorage or navigation state
+  // Get generated exam from localStorage or fall back to config
+  const getExamData = () => {
+    const generatedExamStr = localStorage.getItem('generatedExam');
+    if (generatedExamStr) {
+      try {
+        return JSON.parse(generatedExamStr);
+      } catch (error) {
+        console.error('Error parsing generated exam:', error);
+      }
+    }
+    return null;
+  };
+
+  // Get exam config from localStorage as fallback
   const getExamConfig = () => {
     const savedConfig = localStorage.getItem('examConfig');
     if (savedConfig) {
@@ -29,6 +42,7 @@ export default function ExamPage() {
     };
   };
 
+  const generatedExam = getExamData();
   const examConfig = getExamConfig();
 
   const handleSubmitExam = (questions: any[], answers: {[key: number]: any}, skippedQuestions: Set<number>) => {
@@ -44,8 +58,9 @@ export default function ExamPage() {
     };
     localStorage.setItem('examResults', JSON.stringify(examResults));
     
-    // Clear exam config after submission
+    // Clear exam data after submission
     localStorage.removeItem('examConfig');
+    localStorage.removeItem('generatedExam');
     
     // Navigate to results page
     navigate('/exam-results');
@@ -54,6 +69,7 @@ export default function ExamPage() {
   return (
     <ExamInterface 
       examConfig={examConfig}
+      generatedExam={generatedExam}
       onSubmitExam={handleSubmitExam}
     />
   );
