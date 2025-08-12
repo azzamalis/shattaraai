@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { chatMessageStyles } from '@/lib/chatStyles';
 import { useChatConversation } from '@/hooks/useChatConversation';
-import { useGeminiChat } from '@/hooks/useGeminiChat';
+import { useOpenAIChat } from '@/hooks/useOpenAIChat';
 
 interface AITutorChatDrawerProps {
   open: boolean;
@@ -55,8 +55,8 @@ export function AITutorChatDrawer({
     sender_type: msg.sender_type as 'user' | 'ai'
   }));
 
-  // Initialize Gemini chat hook
-  const { sendMessageToAI } = useGeminiChat({
+  // Initialize OpenAI chat hook
+  const { sendMessageToAI } = useOpenAIChat({
     conversationId: conversation?.id || '',
     roomId: roomId || '',
     roomContent,
@@ -121,7 +121,7 @@ export function AITutorChatDrawer({
       
       // Add AI response to database
       await addAIResponse(aiResponse, 'ai_response', {
-        model: 'gemini-1.5-flash-latest',
+        model: 'o4-mini-2025-04-16',
         room_id: roomId,
         responded_to: userMessage
       });
