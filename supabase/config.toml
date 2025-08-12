@@ -69,3 +69,6 @@ verify_jwt = false
 
 [functions.extract-word-text]
 verify_jwt = false
+
+[functions.openai-room-chat]
+verify_jwt = true
