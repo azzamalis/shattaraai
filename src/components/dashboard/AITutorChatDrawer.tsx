@@ -70,11 +70,9 @@ export function AITutorChatDrawer({
     conversationHistory
   });
 
-  // Clear UI messages and show fresh welcome when drawer opens
+  // Load persisted messages and show welcome when drawer opens
   useEffect(() => {
     if (open && conversation) {
-      setMessages([]); // Clear UI messages
-      setWelcomeMessageSent(false); // Reset welcome flag
       setRateLimitError(null); // Clear any rate limit errors
       
       // Check usage when opening chat
@@ -83,23 +81,29 @@ export function AITutorChatDrawer({
         setIsNearLimit(usagePercent > 80);
       }
       
-      // Add fresh welcome message to UI only
-      const welcomeMessage = roomContent.length > 0
-        ? `Hello! I'm Shattara AI Tutor. I can see you have ${roomContent.length} item(s) in this room. How can I help you learn today?`
-        : "Hello! I'm Shattara AI Tutor. This room doesn't have any content yet. Feel free to add some study materials, and I'll help you learn from them!";
-      
-      const welcomeMsg = {
-        id: `welcome-${Date.now()}`,
-        content: welcomeMessage,
-        sender_type: 'ai' as const,
-        created_at: new Date().toISOString(),
-        attachments: []
-      };
-      
-      setMessages([welcomeMsg]);
-      setWelcomeMessageSent(true);
+      // Load persisted messages from database
+      if (persistedMessages.length > 0) {
+        setMessages(persistedMessages);
+        setWelcomeMessageSent(true);
+      } else {
+        // Add fresh welcome message only if no persisted messages
+        const welcomeMessage = roomContent.length > 0
+          ? `Hello! I'm Shattara AI Tutor. I can see you have ${roomContent.length} item(s) in this room. How can I help you learn today?`
+          : "Hello! I'm Shattara AI Tutor. This room doesn't have any content yet. Feel free to add some study materials, and I'll help you learn from them!";
+        
+        const welcomeMsg = {
+          id: `welcome-${Date.now()}`,
+          content: welcomeMessage,
+          sender_type: 'ai' as const,
+          created_at: new Date().toISOString(),
+          attachments: []
+        };
+        
+        setMessages([welcomeMsg]);
+        setWelcomeMessageSent(true);
+      }
     }
-  }, [open, conversation, roomContent.length, usageStats, planLimits]);
+  }, [open, conversation, persistedMessages, roomContent.length, usageStats, planLimits]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
