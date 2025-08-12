@@ -10,6 +10,7 @@ import { chatMessageStyles } from '@/lib/chatStyles';
 import { useChatConversation } from '@/hooks/useChatConversation';
 import { useOpenAIChat } from '@/hooks/useOpenAIChat';
 import { useAIUsageTracking } from '@/hooks/useAIUsageTracking';
+import RichMessage from '@/components/chat/RichMessage';
 
 interface AITutorChatDrawerProps {
   open: boolean;
@@ -250,8 +251,7 @@ export function AITutorChatDrawer({
                 className={chatMessageStyles.wrapper(message.sender_type === 'user')}
               >
                 <div className={chatMessageStyles.bubble(message.sender_type === 'user')}>
-                  <p className={chatMessageStyles.content}>{message.content}</p>
-                   
+                  <RichMessage content={message.content} className={chatMessageStyles.content} />
                    {/* Show cache indicator */}
                    <div className={`text-xs mt-1 flex items-center gap-1 ${
                      message.sender_type === 'user' 
