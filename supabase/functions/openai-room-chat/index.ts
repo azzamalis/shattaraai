@@ -241,9 +241,9 @@ serve(async (req) => {
     }
 
     // Create more specific cache key for this request
-    const messageHash = btoa(message).substring(0, 20); // Encode message for uniqueness
+    const messageHash = message.substring(0, 20).replace(/[^a-zA-Z0-9]/g, ''); // Clean message for uniqueness
     const cacheKey = `chat_${user.id}_${roomId}_${messageHash}`;
-    const contentHash = btoa(JSON.stringify({ roomContent, conversationHistory, message }));
+    const contentHash = JSON.stringify({ roomContent, conversationHistory, message });
     
     // Check cache first
     const { data: cachedResponse, error: cacheError } = await supabase
