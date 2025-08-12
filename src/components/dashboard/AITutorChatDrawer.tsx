@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, AlertCircle, Clock, User, Bot, GripVertical } from 'lucide-react';
+import { X, Send, Loader2, AlertCircle, Clock, User, Bot, GripVertical, SquarePen } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { chatMessageStyles, formatTimestamp } from '@/lib/chatStyles';
 import { useChatConversation } from '@/hooks/useChatConversation';
 import { useOpenAIChat } from '@/hooks/useOpenAIChat';
@@ -223,6 +224,30 @@ export function AITutorChatDrawer({
     }
   };
 
+  const handleNewChat = () => {
+    // Clear local messages and reset welcome message state
+    setMessages([]);
+    setWelcomeMessageSent(false);
+    setInput('');
+    setRateLimitError(null);
+    
+    // Add fresh welcome message
+    const welcomeMessage = roomContent.length > 0
+      ? `Hello! I'm Shattara AI Tutor. I can see you have ${roomContent.length} item(s) in this room. How can I help you learn today?`
+      : "Hello! I'm Shattara AI Tutor. This room doesn't have any content yet. Feel free to add some study materials, and I'll help you learn from them!";
+    
+    const welcomeMsg = {
+      id: `welcome-${Date.now()}`,
+      content: welcomeMessage,
+      sender_type: 'ai' as const,
+      created_at: new Date().toISOString(),
+      attachments: []
+    };
+    
+    setMessages([welcomeMsg]);
+    setWelcomeMessageSent(true);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -317,15 +342,35 @@ export function AITutorChatDrawer({
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background shrink-0">
             <h3 className="text-lg font-semibold text-foreground truncate">Learn with Shattara AI Tutor</h3>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => onOpenChange(false)}
-              className="text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200 shrink-0 ml-2"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </Button>
+            <TooltipProvider>
+              <div className="flex items-center gap-2 shrink-0">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={handleNewChat}
+                      className="text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200"
+                    >
+                      <SquarePen className="h-4 w-4" />
+                      <span className="sr-only">New Chat</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>New Chat</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => onOpenChange(false)}
+                  className="text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </Button>
+              </div>
+            </TooltipProvider>
           </div>
           
           {/* Usage Warning */}
