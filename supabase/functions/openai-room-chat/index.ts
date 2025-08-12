@@ -388,7 +388,6 @@ Current student question: ${message}`;
           model: 'o4-mini-2025-04-16',
           messages,
           max_completion_tokens: 1000,
-          temperature: 0.3,
         }),
       });
     } catch (error) {
@@ -405,7 +404,6 @@ Current student question: ${message}`;
           model: 'o3-2025-04-16',
           messages,
           max_completion_tokens: 1000,
-          temperature: 0.3,
         }),
       });
     }
