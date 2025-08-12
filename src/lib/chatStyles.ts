@@ -2,18 +2,29 @@
 import { cn } from '@/lib/utils';
 
 export const chatMessageStyles = {
-  container: "space-y-4 p-4",
-  wrapper: (isUser: boolean) => `flex ${isUser ? 'justify-end' : 'justify-start'}`,
-  bubble: (isUser: boolean) => cn(
-    "group relative max-w-[80%] rounded-lg px-4 py-3",
-    isUser 
-      ? "bg-primary text-primary-foreground" 
-      : "bg-card dark:bg-card text-foreground dark:text-foreground"
+  container: "space-y-6 p-6",
+  wrapper: (isUser: boolean) => cn(
+    "w-full",
+    isUser ? "border-l-2 border-primary/20 pl-4" : ""
   ),
-  content: "text-sm",
+  content: cn(
+    "prose prose-sm max-w-none",
+    "prose-headings:text-foreground prose-headings:font-semibold",
+    "prose-p:text-foreground prose-p:leading-relaxed",
+    "prose-strong:text-foreground prose-strong:font-semibold",
+    "prose-ul:text-foreground prose-ol:text-foreground",
+    "prose-li:text-foreground prose-li:leading-relaxed",
+    "prose-code:text-foreground prose-code:bg-muted",
+    "prose-pre:bg-muted prose-pre:text-foreground",
+    "prose-blockquote:text-muted-foreground prose-blockquote:border-border",
+    "prose-a:text-primary prose-a:no-underline hover:prose-a:underline",
+    "break-words hyphens-auto"
+  ),
+  userLabel: "text-xs font-medium text-primary mb-2 flex items-center gap-2",
+  aiLabel: "text-xs font-medium text-muted-foreground mb-2 flex items-center gap-2",
   timestamp: cn(
-    "text-xs text-foreground/60 dark:text-foreground/50 mt-1",
-    "flex items-center gap-1"
+    "text-xs text-muted-foreground mt-3 pt-2 border-t border-border/50",
+    "flex items-center gap-2"
   ),
   status: {
     container: "flex items-center gap-1",

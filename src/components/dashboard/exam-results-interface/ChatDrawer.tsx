@@ -160,13 +160,9 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId }: ChatDrawerPro
               key={message.id} 
               className={chatMessageStyles.wrapper(message.isUser)}
             >
-              <div className={chatMessageStyles.bubble(message.isUser)}>
+              <div className="w-full">
                 <p className={chatMessageStyles.content}>{message.content}</p>
-                <div className={`text-xs mt-1 ${
-                  message.isUser 
-                    ? 'text-white/80' 
-                    : 'text-foreground/60 dark:text-foreground/50'
-                }`}>
+                <div className={chatMessageStyles.timestamp}>
                   {formatTimestamp(message.timestamp)}
                   {message.isUser && (
                     <span className="flex items-center ml-2">

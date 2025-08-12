@@ -8,6 +8,32 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* Responsive text and overflow prevention */
+  .responsive-text {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    word-break: break-word;
+  }
+
+  /* Prevent horizontal overflow in chat containers */
+  .chat-container {
+    max-width: 100%;
+    overflow-x: hidden;
+    word-wrap: break-word;
+  }
+
+  /* Smooth resize transitions */
+  .resize-transition {
+    transition: width 0.1s ease-out;
+  }
+
+  /* Focus styles for resize handles */
+  .resize-handle:focus {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
 }
 
 /* Improved scrollbar for dark theme */

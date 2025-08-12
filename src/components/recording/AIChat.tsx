@@ -62,7 +62,7 @@ const AIChat = () => {
                 </p>
               </div> : <div className="space-y-4">
                 {messages.map(msg => <div key={msg.id} className={chatMessageStyles.wrapper(msg.sender === "user")}>
-                    <div className={chatMessageStyles.bubble(msg.sender === "user")}>
+                    <div className="w-full">
                       <p className={chatMessageStyles.content}>{msg.content}</p>
                       <div className={chatMessageStyles.timestamp}>
                         {msg.timestamp?.toLocaleTimeString([], {
