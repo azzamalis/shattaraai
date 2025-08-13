@@ -446,72 +446,172 @@ ${contentContext}
 
 Generate an intelligent, comprehensive exam that thoroughly assesses student understanding of the above materials.`;
 
-    console.log('Generating exam with OpenAI o4-mini-2025-04-16');
+    // Define model configurations with proper parameter support
+    const modelConfigs = [
+      {
+        name: 'gpt-4.1-2025-04-14',
+        supportsTemperature: true,
+        maxTokens: 4000,
+        description: 'Primary GPT-4.1 model'
+      },
+      {
+        name: 'gpt-4.1-mini-2025-04-14',
+        supportsTemperature: true,
+        maxTokens: 4000,
+        description: 'Fallback GPT-4.1 mini model'
+      },
+      {
+        name: 'gpt-4o-mini',
+        supportsTemperature: true,
+        maxTokens: 4000,
+        description: 'Legacy fallback model'
+      }
+    ];
 
-    // Call OpenAI API
     let response;
-    try {
-      response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'o4-mini-2025-04-16',
+    let modelUsed = '';
+    let aiData;
+
+    // Try each model in sequence with proper error handling
+    for (const config of modelConfigs) {
+      try {
+        console.log(`Attempting exam generation with ${config.name}`);
+        
+        const requestBody: any = {
+          model: config.name,
           messages: [
             {
               role: 'system',
               content: systemPrompt
             }
           ],
-          max_completion_tokens: 4000,
-          temperature: 0.4,
+          max_completion_tokens: config.maxTokens,
           response_format: { type: "json_object" }
-        }),
-      });
-    } catch (error) {
-      console.error('Primary model failed, trying fallback:', error);
-      
-      // Fallback to o3-mini for complex reasoning
-      response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'o3-2025-04-16',
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt
+        };
+
+        // Only add temperature for models that support it
+        if (config.supportsTemperature) {
+          requestBody.temperature = 0.4;
+        }
+
+        response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openaiApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (response.ok) {
+          aiData = await response.json();
+          modelUsed = config.name;
+          console.log(`Successfully generated exam with ${config.name}`);
+          break;
+        } else {
+          const errorData = await response.text();
+          console.error(`${config.name} failed:`, response.status, errorData);
+          
+          // If this is a temperature error, try without temperature
+          if (errorData.includes('temperature') && config.supportsTemperature) {
+            console.log(`Retrying ${config.name} without temperature parameter`);
+            delete requestBody.temperature;
+            
+            const retryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${openaiApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestBody),
+            });
+
+            if (retryResponse.ok) {
+              aiData = await retryResponse.json();
+              modelUsed = config.name;
+              console.log(`Successfully generated exam with ${config.name} (no temperature)`);
+              response = retryResponse;
+              break;
             }
-          ],
-          max_completion_tokens: 4000,
-          temperature: 0.4,
-          response_format: { type: "json_object" }
-        }),
-      });
+          }
+        }
+      } catch (error) {
+        console.error(`Error with ${config.name}:`, error);
+        continue;
+      }
     }
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('OpenAI API error:', response.status, errorData);
+    // If all models failed, provide a structured fallback response
+    if (!response || !response.ok || !aiData) {
+      console.error('All OpenAI models failed, generating fallback exam');
       
+      // Create a basic fallback exam structure
+      const fallbackExam = {
+        examTitle: `Study Review - ${examConfig.selectedTopics.join(', ')}`,
+        instructions: `This is a ${examConfig.examLength}-minute exam covering your study materials. Answer all questions to the best of your ability.`,
+        questions: []
+      };
+
+      // Generate basic questions based on content
+      const questionCount = Math.min(examConfig.numQuestions, 10); // Limit fallback questions
+      for (let i = 1; i <= questionCount; i++) {
+        if (examConfig.questionType === 'MCQ' || (examConfig.questionType === 'Both' && i <= Math.ceil(questionCount * 0.7))) {
+          fallbackExam.questions.push({
+            id: `q${i}`,
+            type: 'mcq',
+            question: `Which of the following best describes a key concept from your study materials?`,
+            points: 5,
+            timeEstimate: 3,
+            difficulty: 'medium',
+            topic: examConfig.selectedTopics[0] || 'General',
+            sourceContent: 'Study materials',
+            options: [
+              { label: 'A', text: 'Option A', isCorrect: false },
+              { label: 'B', text: 'Option B', isCorrect: true },
+              { label: 'C', text: 'Option C', isCorrect: false },
+              { label: 'D', text: 'Option D', isCorrect: false }
+            ]
+          });
+        } else {
+          fallbackExam.questions.push({
+            id: `q${i}`,
+            type: 'open',
+            question: `Explain a key concept from your study materials and provide examples.`,
+            points: 10,
+            timeEstimate: 8,
+            difficulty: 'medium',
+            topic: examConfig.selectedTopics[0] || 'General',
+            sourceContent: 'Study materials',
+            sampleAnswer: 'A comprehensive answer should include key concepts and relevant examples.',
+            rubric: ['Clear explanation', 'Relevant examples', 'Proper understanding']
+          });
+        }
+      }
+
+      // Add metadata for fallback
+      fallbackExam.metadata = {
+        generatedAt: new Date().toISOString(),
+        model: 'fallback',
+        roomId: roomId,
+        userId: user.id,
+        config: examConfig,
+        tokensUsed: 0,
+        cached: false,
+        fallback: true
+      };
+
       return new Response(
         JSON.stringify({ 
-          success: false, 
-          error: 'Failed to generate exam'
+          success: true, 
+          exam: fallbackExam,
+          warning: 'Generated using fallback system due to AI service unavailability'
         }),
         { 
-          status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       );
     }
 
-    const aiData = await response.json();
     const aiResponse = aiData.choices?.[0]?.message?.content;
 
     if (!aiResponse) {
@@ -549,7 +649,7 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
     // Add metadata to the exam
     examData.metadata = {
       generatedAt: new Date().toISOString(),
-      model: aiData.model || 'o4-mini-2025-04-16',
+      model: modelUsed || aiData.model || 'unknown',
       roomId: roomId,
       userId: user.id,
       config: examConfig,
@@ -575,7 +675,7 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
           cache_key: examCacheKey,
           response_data: { exam: examData },
           content_hash: examContentHash,
-          model_name: aiData.model || 'o4-mini-2025-04-16',
+          model_name: modelUsed || aiData.model || 'unknown',
           expires_at: expiresAt.toISOString()
         });
     } catch (cacheInsertError) {
