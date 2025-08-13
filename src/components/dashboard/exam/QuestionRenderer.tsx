@@ -7,6 +7,10 @@ interface Question {
   question: string;
   options?: string[];
   correctAnswer?: number;
+  points?: number;
+  timeEstimate?: number;
+  difficulty?: string;
+  topic?: string;
 }
 interface QuestionRendererProps {
   question: Question;

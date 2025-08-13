@@ -24,7 +24,18 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
   // Use generated questions if available, otherwise fall back to generated ones
   const questions = useMemo(() => {
     if (generatedExam?.questions) {
-      return generatedExam.questions;
+      // Transform AI-generated questions to match the expected format
+      return generatedExam.questions.map((q: any, index: number) => ({
+        id: index + 1,
+        type: q.type === 'mcq' ? 'multiple-choice' : 'free-text',
+        question: q.question,
+        options: q.type === 'mcq' ? q.options?.map((opt: any) => opt.text) : undefined,
+        correctAnswer: q.type === 'mcq' ? q.options?.findIndex((opt: any) => opt.isCorrect) : undefined,
+        points: q.points || 5,
+        timeEstimate: q.timeEstimate || 3,
+        difficulty: q.difficulty || 'medium',
+        topic: q.topic || 'General'
+      }));
     }
     return generateQuestions(examConfig);
   }, [examConfig, generatedExam]);
