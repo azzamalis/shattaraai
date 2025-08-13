@@ -29,11 +29,13 @@ export default function ExamLoadingPage() {
 
       const examConfig = JSON.parse(examConfigStr);
 
-      // Get room content for the selected content IDs
+      // Get ONLY the content selected by user in Step 1
       const { data: roomContent, error: contentError } = await supabase
         .from('content')
         .select('id, title, type, text_content')
         .in('id', examConfig.selectedContentIds || []);
+      
+      console.log(`Loading exam with ${examConfig.selectedContentIds?.length || 0} selected content items`);
 
       if (contentError) {
         console.error('Error fetching room content:', contentError);

@@ -318,12 +318,15 @@ serve(async (req) => {
       );
     }
 
-    // Build enhanced content context with smart processing
+    // Build content context ONLY from user-selected materials
     let contentContext = '';
     let allProcessedChunks: any[] = [];
     
+    // Process ONLY user-selected content from Step 1
     if (roomContent.length > 0) {
-      contentContext += '\n\n## Room Study Materials (Processed for Exam Generation):\n';
+      contentContext += '\n\n## User-Selected Study Materials:\n';
+      console.log(`Processing ${roomContent.length} user-selected content items`);
+      
       for (const content of roomContent) {
         contentContext += `\n### ${content.title} (${content.type})\n`;
         
@@ -347,8 +350,11 @@ serve(async (req) => {
       }
     }
 
+    // Process additional resources ONLY if user added them in Step 2
     if (additionalResources.length > 0) {
-      contentContext += '\n\n## Additional Reference Materials:\n';
+      contentContext += '\n\n## User-Added Additional Resources (Step 2):\n';
+      console.log(`Processing ${additionalResources.length} user-added additional resources`);
+      
       for (const resource of additionalResources) {
         contentContext += `\n### ${resource.title} (${resource.type})\n`;
         if (resource.content) {
@@ -358,21 +364,27 @@ serve(async (req) => {
           contentContext += `${prioritizedContent}\n`;
         }
       }
+    } else {
+      console.log('No additional resources added by user in Step 2');
     }
 
-    // Determine question distribution
+    // Determine question distribution based on user preferences
     const { numQuestions, questionType } = examConfig;
     let mcqCount = 0;
     let openCount = 0;
 
-    if (questionType === 'MCQ') {
+    if (questionType === 'Multiple Choice') {
       mcqCount = numQuestions;
-    } else if (questionType === 'Open Source') {
+      openCount = 0;
+    } else if (questionType === 'Free Writing') {
+      mcqCount = 0;
       openCount = numQuestions;
     } else { // Both
-      mcqCount = Math.ceil(numQuestions * 0.7); // 70% MCQ
-      openCount = numQuestions - mcqCount; // 30% Open-ended
+      mcqCount = Math.ceil(numQuestions / 2); // 50% MCQ
+      openCount = Math.floor(numQuestions / 2); // 50% Open-ended
     }
+    
+    console.log(`User preferences: ${numQuestions} total questions, ${questionType} type, ${mcqCount} MCQ, ${openCount} open-ended`);
 
     // Create enhanced system prompt for intelligent exam generation
     const systemPrompt = `You are an expert educational assessment creator with advanced content processing capabilities. Generate a comprehensive exam based on the intelligently processed study materials.
