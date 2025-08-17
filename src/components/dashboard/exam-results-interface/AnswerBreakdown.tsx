@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { Check, X, HelpCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface Question {
   id: number;
@@ -20,7 +22,47 @@ interface AnswerBreakdownProps {
 }
 
 export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
+  const getStatusConfig = () => {
+    if (question.isSkipped) {
+      return {
+        icon: HelpCircle,
+        bgColor: 'bg-muted/50',
+        borderColor: 'border-muted-foreground/30',
+        textColor: 'text-muted-foreground',
+        badgeVariant: 'secondary' as const,
+        status: 'Skipped'
+      };
+    }
+    
+    const isCorrect = question.type === 'multiple-choice' 
+      ? question.userAnswer === question.correctAnswer
+      : true; // Free-text questions don't have a simple correct/incorrect
+    
+    if (isCorrect && question.type === 'multiple-choice') {
+      return {
+        icon: Check,
+        bgColor: 'bg-green-500/10',
+        borderColor: 'border-green-500/30',
+        textColor: 'text-green-600',
+        badgeVariant: 'default' as const,
+        status: 'Correct'
+      };
+    }
+    
+    return {
+      icon: X,
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500/30',
+      textColor: 'text-red-600',
+      badgeVariant: 'destructive' as const,
+      status: 'Incorrect'
+    };
+  };
+
   const renderMultipleChoiceAnswer = () => {
+    const statusConfig = getStatusConfig();
+    const StatusIcon = statusConfig.icon;
+
     return (
       <div className="space-y-3">
         {question.options?.map((option, index) => {
@@ -28,10 +70,10 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
           let bgColor = 'bg-card';
           
           if (index === question.correctAnswer) {
-            borderColor = 'border-green-500';
+            borderColor = 'border-green-500/30';
             bgColor = 'bg-green-500/10';
           } else if (index === question.userAnswer && index !== question.correctAnswer) {
-            borderColor = 'border-red-500';
+            borderColor = 'border-red-500/30';
             bgColor = 'bg-red-500/10';
           }
 
@@ -46,23 +88,18 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
           );
         })}
         
-        <div className={`mt-4 rounded-lg border p-4 ${
-          question.userAnswer === question.correctAnswer 
-            ? 'border-green-500 bg-green-500/10' 
-            : 'border-red-500 bg-red-500/10'
-        }`}>
-          <div className={`mb-2 font-medium ${
-            question.userAnswer === question.correctAnswer ? 'text-green-400' : 'text-red-400'
-          }`}>
-            {question.userAnswer === question.correctAnswer ? 'Correct' : 'Incorrect'}
+        <div className={`mt-4 rounded-lg border p-4 ${statusConfig.borderColor} ${statusConfig.bgColor}`}>
+          <div className={`mb-3 flex items-center gap-2 font-medium ${statusConfig.textColor}`}>
+            <StatusIcon className="h-4 w-4" />
+            {statusConfig.status}
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
             {question.explanation || 'Explanation not available for this question.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <div className="mt-2 text-xs text-muted-foreground">
-              Reference: {question.referenceTime} {question.referenceSource}
-            </div>
+            <Badge variant={statusConfig.badgeVariant} className="text-xs">
+              {question.referenceSource} - {question.referenceTime}
+            </Badge>
           )}
         </div>
       </div>
@@ -70,21 +107,27 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
   };
 
   const renderFreeTextAnswer = () => {
+    const statusConfig = getStatusConfig();
+    const StatusIcon = statusConfig.icon;
+
     if (question.isSkipped) {
       return (
         <div>
           <div className="mb-4 rounded-lg border border-border bg-card p-4">
             <div className="text-muted-foreground italic">Question was skipped</div>
           </div>
-          <div className="rounded-lg border border-border bg-card p-4">
-            <div className="mb-2 font-medium text-muted-foreground">Suggested Answer</div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+          <div className={`rounded-lg border p-4 ${statusConfig.borderColor} ${statusConfig.bgColor}`}>
+            <div className={`mb-3 flex items-center gap-2 font-medium ${statusConfig.textColor}`}>
+              <StatusIcon className="h-4 w-4" />
+              {statusConfig.status}
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-3">
               {question.feedback || 'Sample answer not available for this question.'}
             </p>
             {question.referenceTime && question.referenceSource && (
-              <div className="mt-2 text-xs text-muted-foreground">
-                Reference: {question.referenceTime} {question.referenceSource}
-              </div>
+              <Badge variant={statusConfig.badgeVariant} className="text-xs">
+                {question.referenceSource} - {question.referenceTime}
+              </Badge>
             )}
           </div>
         </div>
@@ -97,15 +140,18 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
           <div className="mb-2 text-sm text-muted-foreground">Your Answer:</div>
           <div className="text-foreground">{question.userAnswer || 'No answer provided'}</div>
         </div>
-        <div className="rounded-lg border border-green-500 bg-green-500/10 p-4">
-          <div className="mb-2 font-medium text-green-400">AI Feedback</div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+        <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4">
+          <div className="mb-3 flex items-center gap-2 font-medium text-green-600">
+            <Check className="h-4 w-4" />
+            AI Feedback
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
             {question.feedback || 'Good effort! This type of question requires detailed explanation of the concepts involved.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <div className="mt-2 text-xs text-muted-foreground">
-              Reference: {question.referenceTime} {question.referenceSource}
-            </div>
+            <Badge variant="default" className="text-xs">
+              {question.referenceSource} - {question.referenceTime}
+            </Badge>
           )}
         </div>
       </div>
