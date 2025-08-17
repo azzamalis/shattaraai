@@ -101,6 +101,28 @@ const ExamResultsInterface: React.FC = () => {
   const navigate = useNavigate();
   const { contentId } = useParams<{ contentId: string }>();
 
+  // Get exam data from localStorage to get correct examId and roomId
+  const examMetadata = (() => {
+    const generatedExam = localStorage.getItem('generatedExam');
+    if (generatedExam) {
+      try {
+        const parsed = JSON.parse(generatedExam);
+        return {
+          examId: parsed.examId,
+          roomId: parsed.roomId,
+          contentId: parsed.contentId || contentId
+        };
+      } catch (error) {
+        console.warn('Failed to parse generatedExam from localStorage:', error);
+      }
+    }
+    return {
+      examId: contentId, // fallback to contentId if no generatedExam
+      roomId: null,
+      contentId: contentId
+    };
+  })();
+
   // Add dummy data when component mounts if no exam results exist
   useEffect(() => {
     if (!localStorage.getItem('examResults')) {
@@ -247,8 +269,9 @@ const ExamResultsInterface: React.FC = () => {
         isOpen={isChatOpen} 
         onClose={() => setIsChatOpen(false)} 
         currentQuestionId={currentChatQuestion}
-        examId={contentId} // contentId in URL represents the examId
-        contentId={contentId}
+        examId={examMetadata.examId}
+        contentId={examMetadata.contentId}
+        roomId={examMetadata.roomId}
       />
     </div>;
 };

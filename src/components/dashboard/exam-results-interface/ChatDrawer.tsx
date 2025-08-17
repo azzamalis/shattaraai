@@ -19,9 +19,10 @@ interface ChatDrawerProps {
   currentQuestionId: number | null;
   examId?: string;
   contentId?: string;
+  roomId?: string | null;
 }
 
-export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, contentId }: ChatDrawerProps) {
+export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, contentId, roomId }: ChatDrawerProps) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -113,6 +114,7 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
           examId,
           questionId: currentQuestionId,
           contentId,
+          roomId,
           conversationHistory
         },
         headers: {

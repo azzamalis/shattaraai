@@ -9,9 +9,10 @@ const corsHeaders = {
 
 interface ExamChatRequest {
   message: string;
-  examId: string;
+  examId?: string;
   questionId?: number;
   contentId?: string;
+  roomId?: string;
   conversationHistory?: Array<{
     content: string;
     sender_type: 'user' | 'ai';
@@ -30,15 +31,16 @@ serve(async (req) => {
       examId,
       questionId,
       contentId,
+      roomId,
       conversationHistory = []
     }: ExamChatRequest = await req.json();
 
     // Validate required fields
-    if (!message || !examId) {
+    if (!message) {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Missing required fields: message or examId' 
+          error: 'Missing required field: message' 
         }),
         { 
           status: 400, 
@@ -104,6 +106,7 @@ serve(async (req) => {
     }
 
     console.log('Processing exam chat request for user:', user.id);
+    console.log('Request context:', { examId, contentId, roomId, questionId });
 
     // Check rate limits before processing
     const { data: rateLimitData, error: rateLimitError } = await supabase
@@ -136,18 +139,94 @@ serve(async (req) => {
       }
     }
 
-    // Get exam data with questions
-    console.log('Looking for exam with ID:', examId);
-    console.log('User ID:', user.id);
-    
-    const { data: examData, error: examError } = await supabase
-      .from('exams')
-      .select(`
-        id,
-        title,
-        room_id,
-        content_metadata,
-        rooms:room_id (
+    // Try to get context from multiple sources - exam, content, or room
+    let examData = null;
+    let questionsData = null;
+    let contentData = null;
+    let roomData = null;
+    let contextSource = 'none';
+
+    // 1. Try to get exam data if examId is provided
+    if (examId) {
+      console.log('Looking for exam with ID:', examId);
+      
+      const { data: examResult, error: examError } = await supabase
+        .from('exams')
+        .select(`
+          id,
+          title,
+          room_id,
+          content_metadata,
+          rooms:room_id (
+            id,
+            name,
+            content (
+              id,
+              title,
+              type,
+              text_content
+            )
+          )
+        `)
+        .eq('id', examId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!examError && examResult) {
+        examData = examResult;
+        contextSource = 'exam';
+        console.log('Found exam data:', examData.title);
+
+        // Get exam questions
+        const { data: questionsResult, error: questionsError } = await supabase
+          .from('exam_questions')
+          .select('*')
+          .eq('exam_id', examId)
+          .order('order_index');
+
+        if (!questionsError && questionsResult) {
+          questionsData = questionsResult;
+        }
+      } else {
+        console.log('Exam not found, trying fallback methods');
+      }
+    }
+
+    // 2. If no exam data, try to get content data
+    if (!examData && contentId) {
+      console.log('Looking for content with ID:', contentId);
+      
+      const { data: contentResult, error: contentError } = await supabase
+        .from('content')
+        .select(`
+          id,
+          title,
+          type,
+          text_content,
+          room_id,
+          rooms:room_id (
+            id,
+            name
+          )
+        `)
+        .eq('id', contentId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!contentError && contentResult) {
+        contentData = contentResult;
+        contextSource = 'content';
+        console.log('Found content data:', contentData.title);
+      }
+    }
+
+    // 3. If no exam or content data, try to get room data
+    if (!examData && !contentData && roomId) {
+      console.log('Looking for room with ID:', roomId);
+      
+      const { data: roomResult, error: roomError } = await supabase
+        .from('rooms')
+        .select(`
           id,
           name,
           content (
@@ -156,25 +235,32 @@ serve(async (req) => {
             type,
             text_content
           )
-        )
-      `)
-      .eq('id', examId)
-      .eq('user_id', user.id)
-      .maybeSingle();
+        `)
+        .eq('id', roomId)
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-    console.log('Exam query result:', { examData, examError });
+      if (!roomError && roomResult) {
+        roomData = roomResult;
+        contextSource = 'room';
+        console.log('Found room data:', roomData.name);
+      }
+    }
 
-    if (examError || !examData) {
-      console.error('Error fetching exam data:', examError);
+    console.log('Context source determined:', contextSource);
+
+    // If we still have no context, return an error
+    if (contextSource === 'none') {
+      console.error('No context found for chat');
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Exam not found or access denied',
+          error: 'No accessible context found',
           debug: {
             examId,
-            userId: user.id,
-            examError: examError?.message,
-            foundData: !!examData
+            contentId,
+            roomId,
+            userId: user.id
           }
         }),
         { 
@@ -184,67 +270,60 @@ serve(async (req) => {
       );
     }
 
-    // Get exam questions
-    const { data: questionsData, error: questionsError } = await supabase
-      .from('exam_questions')
-      .select('*')
-      .eq('exam_id', examId)
-      .order('order_index');
+    // Build context based on what we found
 
-    if (questionsError) {
-      console.error('Error fetching questions:', questionsError);
-    }
-
-    // Get content data if contentId is provided
-    let contentData = null;
-    if (contentId) {
-      const { data, error } = await supabase
-        .from('content')
-        .select('id, title, type, text_content')
-        .eq('id', contentId)
-        .single();
-      
-      if (!error && data) {
-        contentData = data;
-      }
-    }
-
-    // Build context from exam and content
-    let examContext = `## Exam Information:
+    // Build context based on available data
+    let contextInfo = '';
+    
+    if (contextSource === 'exam' && examData) {
+      contextInfo = `## Exam Information:
 **Exam Title:** ${examData.title}
 **Room:** ${examData.rooms?.name || 'Unknown Room'}
 **Total Questions:** ${questionsData?.length || 0}
 `;
+    } else if (contextSource === 'content' && contentData) {
+      contextInfo = `## Content Information:
+**Content Title:** ${contentData.title}
+**Content Type:** ${contentData.type}
+**Room:** ${contentData.rooms?.name || 'Unknown Room'}
+`;
+    } else if (contextSource === 'room' && roomData) {
+      contextInfo = `## Room Information:
+**Room Name:** ${roomData.name}
+**Available Content Items:** ${roomData.content?.length || 0}
+`;
+    }
 
-    // Add specific question context if questionId is provided
-    if (questionId && questionsData) {
+    // Add specific question context if questionId is provided and we have questions
+    if (questionId && questionsData && questionsData.length > 0) {
       const specificQuestion = questionsData.find(q => q.order_index === questionId - 1); // Convert 1-based to 0-based index
       if (specificQuestion) {
-        examContext += `
+        contextInfo += `
 
 ## Current Question Context:
 **Question ${questionId}:** ${specificQuestion.question_text}
 `;
         if (specificQuestion.question_type === 'multiple_choice' && specificQuestion.options) {
-          examContext += `**Options:**
+          contextInfo += `**Options:**
 ${specificQuestion.options.map((opt: string, idx: number) => `${String.fromCharCode(65 + idx)}. ${opt}`).join('\n')}
 `;
         }
         if (specificQuestion.correct_answer !== null) {
-          examContext += `**Correct Answer:** ${specificQuestion.correct_answer}
+          contextInfo += `**Correct Answer:** ${specificQuestion.correct_answer}
 `;
         }
         if (specificQuestion.explanation) {
-          examContext += `**Explanation:** ${specificQuestion.explanation}
+          contextInfo += `**Explanation:** ${specificQuestion.explanation}
 `;
         }
       }
     }
 
-    // Add content context from the source material
-    let contentContext = '';
-    if (contentData && contentData.text_content) {
-      contentContext = `
+    // Add source material context
+    let sourceContext = '';
+    
+    if (contextSource === 'content' && contentData?.text_content) {
+      sourceContext = `
 
 ## Source Material:
 **Content Title:** ${contentData.title} (${contentData.type})
@@ -253,16 +332,32 @@ ${contentData.text_content.length > 3000
   ? contentData.text_content.substring(0, 3000) + '...' 
   : contentData.text_content}
 `;
-    } else if (examData.rooms?.content && examData.rooms.content.length > 0) {
-      contentContext = `
+    } else if (contextSource === 'exam' && examData?.rooms?.content && examData.rooms.content.length > 0) {
+      sourceContext = `
 
 ## Available Study Materials:
 `;
       for (const content of examData.rooms.content) {
-        contentContext += `**${content.title}** (${content.type})
+        sourceContext += `**${content.title}** (${content.type})
 `;
         if (content.text_content) {
-          contentContext += `${content.text_content.length > 1500 
+          sourceContext += `${content.text_content.length > 1500 
+            ? content.text_content.substring(0, 1500) + '...' 
+            : content.text_content}
+
+`;
+        }
+      }
+    } else if (contextSource === 'room' && roomData?.content && roomData.content.length > 0) {
+      sourceContext = `
+
+## Available Study Materials:
+`;
+      for (const content of roomData.content) {
+        sourceContext += `**${content.title}** (${content.type})
+`;
+        if (content.text_content) {
+          sourceContext += `${content.text_content.length > 1500 
             ? content.text_content.substring(0, 1500) + '...' 
             : content.text_content}
 
@@ -288,25 +383,24 @@ ${contentData.text_content.length > 3000
       }
     }
 
-    // Create system prompt for exam-specific tutoring
-    const systemPrompt = `You are an AI tutor specialized in helping students understand exam questions and the source material they were based on. You have access to the exam questions, correct answers, explanations, and the original study materials.
+    // Create system prompt based on available context
+    const systemPrompt = `You are an AI tutor helping students learn and understand their study materials. You have access to ${contextSource === 'exam' ? 'exam questions, answers, and' : ''} study materials.
 
 ## Your Role:
-- Help students understand exam questions and their correct answers
-- Explain concepts from the source material that relate to the questions
-- Provide additional context and examples to reinforce learning
+- Help students understand ${contextSource === 'exam' ? 'exam questions and their correct answers' : 'concepts from their study materials'}
+- Explain concepts clearly and provide additional context
 - Answer follow-up questions about the material
 - Be encouraging and supportive while being educational
+- Provide examples and analogies when helpful
 
 ## Instructions:
-- Reference the source material when explaining concepts
-- If discussing a specific question, explain why the correct answer is right and why wrong answers are incorrect
-- Provide additional examples or analogies when helpful
+- Reference the available material when explaining concepts
+${contextSource === 'exam' ? '- If discussing a specific question, explain why the correct answer is right and why wrong answers are incorrect' : ''}
 - Ask clarifying questions if you need to understand what the student wants to learn
 - Keep explanations clear and at an appropriate educational level
 - When referencing content, mention the source material by title
 
-${examContext}${contentContext}${conversationContext}
+${contextInfo}${sourceContext}${conversationContext}
 
 Current student question: ${message}`;
 
@@ -322,17 +416,17 @@ Current student question: ${message}`;
       }
     ];
 
-    console.log('Calling OpenAI for exam chat with model: o4-mini-2025-04-16');
+    console.log(`Calling OpenAI for ${contextSource} chat with model: o4-mini-2025-04-16`);
 
     let aiResponse: string | null = null;
     let modelUsed = 'o4-mini-2025-04-16';
 
-    // Try multiple models with fallback - Using o4-mini and o3-mini as requested
+    // Try multiple models with fallback - Updated for correct parameter handling
     const models = [
-      { name: 'o4-mini-2025-04-16', maxTokens: 2000, useTemperature: false },
-      { name: 'o3-2025-04-16', maxTokens: 3000, useTemperature: false },
-      { name: 'gpt-4.1-2025-04-14', maxTokens: 3000, useTemperature: false },
-      { name: 'gpt-4o-mini', maxTokens: 3000, useTemperature: true }
+      { name: 'o4-mini-2025-04-16', useMaxCompletionTokens: true, maxTokens: 2000, useTemperature: false },
+      { name: 'o3-2025-04-16', useMaxCompletionTokens: true, maxTokens: 3000, useTemperature: false },
+      { name: 'gpt-4.1-2025-04-14', useMaxCompletionTokens: true, maxTokens: 3000, useTemperature: false },
+      { name: 'gpt-4o-mini', useMaxCompletionTokens: false, maxTokens: 3000, useTemperature: true }
     ];
 
     for (const model of models) {
@@ -342,8 +436,14 @@ Current student question: ${message}`;
         const requestBody: any = {
           model: model.name,
           messages,
-          max_completion_tokens: model.maxTokens,
         };
+
+        // Use correct token parameter based on model
+        if (model.useMaxCompletionTokens) {
+          requestBody.max_completion_tokens = model.maxTokens;
+        } else {
+          requestBody.max_tokens = model.maxTokens;
+        }
 
         // Only add temperature for models that support it
         if (model.useTemperature) {
@@ -387,18 +487,27 @@ Current student question: ${message}`;
     // Fallback response if all models fail
     if (!aiResponse) {
       console.error('All models failed to provide a response');
-      aiResponse = `I apologize, but I'm having technical difficulties right now. Here's what I can help you with regarding your exam:
+      
+      let fallbackTitle = 'your study materials';
+      if (contextSource === 'exam' && examData) {
+        fallbackTitle = `your exam: ${examData.title}`;
+      } else if (contextSource === 'content' && contentData) {
+        fallbackTitle = `the content: ${contentData.title}`;
+      } else if (contextSource === 'room' && roomData) {
+        fallbackTitle = `the room: ${roomData.name}`;
+      }
+      
+      aiResponse = `I apologize, but I'm having technical difficulties right now. Here's what I can help you with regarding ${fallbackTitle}:
 
-**Exam:** ${examData.title}
 ${questionsData && questionId ? `**Current Question:** Question ${questionId}` : ''}
 
 **I can help you:**
-• Understand exam questions and their correct answers
+${contextSource === 'exam' ? '• Understand exam questions and their correct answers' : ''}
 • Explain concepts from your study materials
 • Provide additional context and examples
 • Answer follow-up questions about the material
 
-Please try asking your question again, or feel free to ask about any specific question from your exam!`;
+Please try asking your question again!`;
       modelUsed = 'fallback';
     }
 
