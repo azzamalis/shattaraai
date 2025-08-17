@@ -37,7 +37,7 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
     
     const isCorrect = question.type === 'multiple-choice' 
       ? question.userAnswer === question.correctAnswer
-      : true; // Free-text questions don't have a simple correct/incorrect
+      : !question.feedback?.toLowerCase().startsWith('incorrect'); // Free-text: check if feedback starts with "incorrect"
     
     if (isCorrect && question.type === 'multiple-choice') {
       return {
@@ -100,7 +100,7 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
             {question.explanation || 'Explanation not available for this question.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <Badge className={`text-xs ${statusConfig.badgeClassName}`}>
+            <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent`}>
               {question.referenceSource} - {question.referenceTime}
             </Badge>
           )}
@@ -112,6 +112,13 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
   const renderFreeTextAnswer = () => {
     const statusConfig = getStatusConfig();
     const StatusIcon = statusConfig.icon;
+    
+    // Determine if the answer is incorrect based on feedback
+    const isIncorrectAnswer = question.feedback?.toLowerCase().startsWith('incorrect');
+    const feedbackColor = isIncorrectAnswer ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950' : 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950';
+    const feedbackTextColor = isIncorrectAnswer ? 'text-red-700 dark:text-red-400' : 'text-green-700 dark:text-green-400';
+    const feedbackBadgeClass = isIncorrectAnswer ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 shadow-sm border-0 hover:bg-transparent' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 shadow-sm border-0 hover:bg-transparent';
+    const FeedbackIcon = isIncorrectAnswer ? X : Check;
 
     if (question.isSkipped) {
       return (
@@ -128,7 +135,7 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
               {question.feedback || 'Sample answer not available for this question.'}
             </p>
             {question.referenceTime && question.referenceSource && (
-              <Badge className={`text-xs ${statusConfig.badgeClassName}`}>
+              <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent`}>
                 {question.referenceSource} - {question.referenceTime}
               </Badge>
             )}
@@ -143,16 +150,16 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
           <div className="mb-2 text-sm text-muted-foreground">Your Answer:</div>
           <div className="text-foreground">{question.userAnswer || 'No answer provided'}</div>
         </div>
-        <div className="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-4">
-          <div className="mb-3 flex items-center gap-2 font-medium text-green-700 dark:text-green-400">
-            <Check className="h-4 w-4" />
+        <div className={`rounded-lg border p-4 ${feedbackColor}`}>
+          <div className={`mb-3 flex items-center gap-2 font-medium ${feedbackTextColor}`}>
+            <FeedbackIcon className="h-4 w-4" />
             AI Feedback
           </div>
           <p className="text-sm text-foreground leading-relaxed mb-3">
             {question.feedback || 'Good effort! This type of question requires detailed explanation of the concepts involved.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <Badge className="text-xs bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+            <Badge className={`text-xs ${feedbackBadgeClass}`}>
               {question.referenceSource} - {question.referenceTime}
             </Badge>
           )}

@@ -106,7 +106,7 @@ Provide a concise sample answer (2-3 sentences) that demonstrates what a good re
           
         } else {
           const evaluationPrompt = `
-Based on the following study material, evaluate the student's answer:
+Based on the following study material, evaluate the student's answer and determine if it's correct or incorrect:
 
 Study Material Context:
 ${originalContent || 'General knowledge'}
@@ -114,7 +114,11 @@ ${originalContent || 'General knowledge'}
 Question: ${question.question}
 Student's Answer: ${userAnswer || 'No answer provided'}
 
-Provide constructive feedback (2-3 sentences) that acknowledges what the student got right and suggests improvements. Include a realistic page reference from the study material.
+First, assess if the student's answer is CORRECT or INCORRECT based on the study material.
+If INCORRECT or not related to the question, clearly label it as "INCORRECT" and provide the proper explanation.
+If CORRECT, provide positive feedback.
+
+Provide feedback (2-3 sentences) and include a realistic page reference from the study material.
 `;
 
           const feedbackResponse = await generateStructuredExplanation(evaluationPrompt);
@@ -164,6 +168,10 @@ async function generateStructuredExplanation(prompt: string): Promise<{explanati
           {
             role: 'system',
             content: `You are an expert educational evaluator. Provide clear, constructive, and educational explanations and feedback. 
+
+For multiple choice questions: Ensure each question has unique answer options with no duplicate or nearly identical answers. Generate 4 distinct options with only 1 correct answer.
+
+For free text evaluation: If the student's answer is incorrect or unrelated, start your feedback with "INCORRECT:" followed by the proper explanation.
 
 IMPORTANT: You must respond with a JSON object in this exact format:
 {
