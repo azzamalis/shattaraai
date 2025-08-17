@@ -102,7 +102,7 @@ export function AnswerBreakdown({ question, contentId }: AnswerBreakdownProps) {
             {question.explanation || 'Explanation not available for this question.'}
           </p>
           {question.referenceTime && question.referenceSource && contentId && (
-            <Link to={`/content/${contentId}`}>
+            <Link to={`/content/${contentId}`} className="inline-block">
               <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent cursor-pointer transition-opacity hover:opacity-80`}>
                 {question.referenceSource} - {question.referenceTime}
               </Badge>
@@ -139,7 +139,7 @@ export function AnswerBreakdown({ question, contentId }: AnswerBreakdownProps) {
               {question.feedback || 'Sample answer not available for this question.'}
             </p>
             {question.referenceTime && question.referenceSource && contentId && (
-              <Link to={`/content/${contentId}`}>
+              <Link to={`/content/${contentId}`} className="inline-block">
                 <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent cursor-pointer transition-opacity hover:opacity-80`}>
                   {question.referenceSource} - {question.referenceTime}
                 </Badge>
@@ -165,7 +165,7 @@ export function AnswerBreakdown({ question, contentId }: AnswerBreakdownProps) {
             {question.feedback || 'Good effort! This type of question requires detailed explanation of the concepts involved.'}
           </p>
           {question.referenceTime && question.referenceSource && contentId && (
-            <Link to={`/content/${contentId}`}>
+            <Link to={`/content/${contentId}`} className="inline-block">
               <Badge className={`text-xs ${feedbackBadgeClass} cursor-pointer transition-opacity hover:opacity-80`}>
                 {question.referenceSource} - {question.referenceTime}
               </Badge>
