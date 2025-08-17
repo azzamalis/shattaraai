@@ -7,13 +7,121 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      ai_cache: {
+        Row: {
+          cache_key: string
+          content_hash: string
+          created_at: string
+          expires_at: string
+          hit_count: number
+          id: string
+          model_name: string
+          response_data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cache_key: string
+          content_hash: string
+          created_at?: string
+          expires_at: string
+          hit_count?: number
+          id?: string
+          model_name: string
+          response_data: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cache_key?: string
+          content_hash?: string
+          created_at?: string
+          expires_at?: string
+          hit_count?: number
+          id?: string
+          model_name?: string
+          response_data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_rate_limits: {
+        Row: {
+          chat_tokens: number
+          created_at: string
+          exam_tokens: number
+          id: string
+          last_reset_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chat_tokens?: number
+          created_at?: string
+          exam_tokens?: number
+          id?: string
+          last_reset_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chat_tokens?: number
+          created_at?: string
+          exam_tokens?: number
+          id?: string
+          last_reset_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_usage_counters: {
+        Row: {
+          chat_requests: number
+          created_at: string
+          date: string
+          exam_generations: number
+          id: string
+          plan_type: Database["public"]["Enums"]["user_plan"]
+          total_cost_usd: number
+          total_tokens_used: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chat_requests?: number
+          created_at?: string
+          date?: string
+          exam_generations?: number
+          id?: string
+          plan_type?: Database["public"]["Enums"]["user_plan"]
+          total_cost_usd?: number
+          total_tokens_used?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chat_requests?: number
+          created_at?: string
+          date?: string
+          exam_generations?: number
+          id?: string
+          plan_type?: Database["public"]["Enums"]["user_plan"]
+          total_cost_usd?: number
+          total_tokens_used?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       chat_conversations: {
         Row: {
           context_id: string | null
@@ -164,6 +272,198 @@ export type Database = {
           },
         ]
       }
+      exam_answers: {
+        Row: {
+          created_at: string
+          exam_attempt_id: string
+          id: string
+          is_correct: boolean
+          points_earned: number
+          question_id: string
+          updated_at: string
+          user_answer: string | null
+        }
+        Insert: {
+          created_at?: string
+          exam_attempt_id: string
+          id?: string
+          is_correct?: boolean
+          points_earned?: number
+          question_id: string
+          updated_at?: string
+          user_answer?: string | null
+        }
+        Update: {
+          created_at?: string
+          exam_attempt_id?: string
+          id?: string
+          is_correct?: boolean
+          points_earned?: number
+          question_id?: string
+          updated_at?: string
+          user_answer?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_exam_answers_attempt"
+            columns: ["exam_attempt_id"]
+            isOneToOne: false
+            referencedRelation: "exam_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_exam_answers_question"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "exam_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_attempts: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          exam_id: string
+          id: string
+          max_score: number
+          started_at: string
+          status: Database["public"]["Enums"]["exam_attempt_status"]
+          total_score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          exam_id: string
+          id?: string
+          max_score?: number
+          started_at?: string
+          status?: Database["public"]["Enums"]["exam_attempt_status"]
+          total_score?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          exam_id?: string
+          id?: string
+          max_score?: number
+          started_at?: string
+          status?: Database["public"]["Enums"]["exam_attempt_status"]
+          total_score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_exam_attempts_exam"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_questions: {
+        Row: {
+          correct_answer: string
+          created_at: string
+          exam_id: string
+          id: string
+          options: Json | null
+          order_index: number
+          points: number
+          question_text: string
+          question_type: Database["public"]["Enums"]["question_type"]
+          reference_source: string | null
+          reference_time: string | null
+          updated_at: string
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string
+          exam_id: string
+          id?: string
+          options?: Json | null
+          order_index: number
+          points?: number
+          question_text: string
+          question_type?: Database["public"]["Enums"]["question_type"]
+          reference_source?: string | null
+          reference_time?: string | null
+          updated_at?: string
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string
+          exam_id?: string
+          id?: string
+          options?: Json | null
+          order_index?: number
+          points?: number
+          question_text?: string
+          question_type?: Database["public"]["Enums"]["question_type"]
+          reference_source?: string | null
+          reference_time?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_exam_questions_exam"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exams: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          room_id: string
+          time_limit_minutes: number | null
+          title: string
+          total_questions: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          room_id: string
+          time_limit_minutes?: number | null
+          title: string
+          total_questions?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          room_id?: string
+          time_limit_minutes?: number | null
+          title?: string
+          total_questions?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_exams_room"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_subscribers: {
         Row: {
           confirmation_token: string | null
@@ -203,6 +503,7 @@ export type Database = {
           id: string
           language: string
           onboarding_completed: boolean | null
+          plan_type: Database["public"]["Enums"]["user_plan"]
           purpose: Database["public"]["Enums"]["user_purpose"] | null
           source: Database["public"]["Enums"]["user_source"] | null
           theme_preference: string | null
@@ -216,6 +517,7 @@ export type Database = {
           id: string
           language?: string
           onboarding_completed?: boolean | null
+          plan_type?: Database["public"]["Enums"]["user_plan"]
           purpose?: Database["public"]["Enums"]["user_purpose"] | null
           source?: Database["public"]["Enums"]["user_source"] | null
           theme_preference?: string | null
@@ -229,6 +531,7 @@ export type Database = {
           id?: string
           language?: string
           onboarding_completed?: boolean | null
+          plan_type?: Database["public"]["Enums"]["user_plan"]
           purpose?: Database["public"]["Enums"]["user_purpose"] | null
           source?: Database["public"]["Enums"]["user_source"] | null
           theme_preference?: string | null
@@ -431,9 +734,51 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_rate_limit: {
+        Args: {
+          estimated_tokens?: number
+          request_type: string
+          user_uuid: string
+        }
+        Returns: {
+          allowed: boolean
+          plan_type: Database["public"]["Enums"]["user_plan"]
+          remaining_requests: number
+          reset_time: string
+        }[]
+      }
+      cleanup_expired_cache: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_invite_code: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_user_plan_quotas: {
+        Args: { user_uuid: string }
+        Returns: {
+          cache_duration_hours: number
+          daily_chat_limit: number
+          daily_exam_limit: number
+          plan_type: Database["public"]["Enums"]["user_plan"]
+        }[]
+      }
+      user_owns_exam: {
+        Args: { exam_uuid: string }
+        Returns: boolean
+      }
+      user_owns_exam_attempt: {
+        Args: { attempt_uuid: string }
+        Returns: boolean
+      }
+      user_owns_exam_via_question: {
+        Args: { question_uuid: string }
+        Returns: boolean
+      }
+      user_owns_room_for_exam: {
+        Args: { exam_uuid: string }
+        Returns: boolean
       }
     }
     Enums: {
@@ -442,7 +787,9 @@ export type Database = {
         | "content_discussion"
         | "room_collaboration"
         | "exam_support"
+      exam_attempt_status: "in_progress" | "completed" | "abandoned"
       message_type: "text" | "system" | "ai_response" | "user_query"
+      question_type: "multiple_choice" | "free_text"
       user_goal:
         | "exam_prep"
         | "homework_help"
@@ -460,6 +807,7 @@ export type Database = {
         | "publication_support"
         | "grant_writing"
         | "collaboration"
+      user_plan: "free" | "pro" | "enterprise"
       user_purpose: "student" | "teacher" | "professional" | "researcher"
       user_source:
         | "search_engine"
@@ -600,7 +948,9 @@ export const Constants = {
         "room_collaboration",
         "exam_support",
       ],
+      exam_attempt_status: ["in_progress", "completed", "abandoned"],
       message_type: ["text", "system", "ai_response", "user_query"],
+      question_type: ["multiple_choice", "free_text"],
       user_goal: [
         "exam_prep",
         "homework_help",
@@ -619,6 +969,7 @@ export const Constants = {
         "grant_writing",
         "collaboration",
       ],
+      user_plan: ["free", "pro", "enterprise"],
       user_purpose: ["student", "teacher", "professional", "researcher"],
       user_source: [
         "search_engine",
