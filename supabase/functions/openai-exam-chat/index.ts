@@ -326,9 +326,10 @@ Current student question: ${message}`;
     let aiResponse: string | null = null;
     let modelUsed = 'o4-mini-2025-04-16';
 
-    // Try multiple models with fallback
+    // Try multiple models with fallback - Using o4-mini and o3-mini as requested
     const models = [
       { name: 'o4-mini-2025-04-16', maxTokens: 2000, useTemperature: false },
+      { name: 'o3-2025-04-16', maxTokens: 3000, useTemperature: false },
       { name: 'gpt-4.1-2025-04-14', maxTokens: 3000, useTemperature: false },
       { name: 'gpt-4o-mini', maxTokens: 3000, useTemperature: true }
     ];

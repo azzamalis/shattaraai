@@ -458,19 +458,25 @@ ${contentContext}
 
 Generate an intelligent, comprehensive exam that thoroughly assesses student understanding of the above materials.`;
 
-    // Define model configurations with proper parameter support
+    // Define model configurations with proper parameter support - Using o4-mini and o3-mini
     const modelConfigs = [
       {
-        name: 'gpt-4.1-2025-04-14',
-        supportsTemperature: true,
+        name: 'o4-mini-2025-04-16',
+        supportsTemperature: false,
         maxTokens: 4000,
-        description: 'Primary GPT-4.1 model'
+        description: 'Primary O4 mini model for fast generation'
       },
       {
-        name: 'gpt-4.1-mini-2025-04-14',
-        supportsTemperature: true,
+        name: 'o3-2025-04-16', 
+        supportsTemperature: false,
         maxTokens: 4000,
-        description: 'Fallback GPT-4.1 mini model'
+        description: 'O3 reasoning model for complex exams'
+      },
+      {
+        name: 'gpt-4.1-2025-04-14',
+        supportsTemperature: false,
+        maxTokens: 4000,
+        description: 'Fallback GPT-4.1 model'
       },
       {
         name: 'gpt-4o-mini',
@@ -672,7 +678,69 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
     // Include original content for AI evaluation
     examData.originalContent = contentContext;
 
+    
     console.log(`Successfully generated exam with ${examData.questions?.length || 0} questions`);
+
+    // Store exam in database
+    try {
+      console.log('Storing exam in database...');
+      
+      // Create the exam record
+      const { data: examRecord, error: examError } = await supabase
+        .from('exams')
+        .insert({
+          title: examData.examTitle || 'Generated Exam',
+          description: examData.instructions || 'AI-generated exam',
+          user_id: user.id,
+          room_id: roomId,
+          total_questions: examData.questions?.length || 0,
+          time_limit_minutes: examConfig.timeLimit || null
+        })
+        .select()
+        .single();
+
+      if (examError) {
+        console.error('Error creating exam record:', examError);
+        throw examError;
+      }
+
+      console.log('Created exam record:', examRecord.id);
+
+      // Store exam questions
+      const questionsToInsert = examData.questions?.map((question: any, index: number) => ({
+        exam_id: examRecord.id,
+        question_text: question.question,
+        question_type: question.type === 'mcq' ? 'multiple_choice' : 'open_ended',
+        options: question.type === 'mcq' ? question.options?.map((opt: any) => opt.text) : null,
+        correct_answer: question.type === 'mcq' 
+          ? question.options?.find((opt: any) => opt.isCorrect)?.text 
+          : question.sampleAnswer,
+        points: question.points || 1,
+        order_index: index,
+        reference_source: question.sourceContent || null,
+        reference_time: question.timeEstimate ? `${question.timeEstimate} min` : null
+      })) || [];
+
+      if (questionsToInsert.length > 0) {
+        const { error: questionsError } = await supabase
+          .from('exam_questions')
+          .insert(questionsToInsert);
+
+        if (questionsError) {
+          console.error('Error creating exam questions:', questionsError);
+          throw questionsError;
+        }
+
+        console.log(`Created ${questionsToInsert.length} exam questions`);
+      }
+
+      // Add exam ID to the response
+      examData.examId = examRecord.id;
+      
+    } catch (dbError) {
+      console.error('Database storage error:', dbError);
+      // Don't fail the request if database storage fails, but log it
+    }
 
     // Cache the exam for future requests
     try {
