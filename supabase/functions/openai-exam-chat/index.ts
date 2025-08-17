@@ -146,10 +146,9 @@ serve(async (req) => {
         id,
         title,
         room_id,
-        content_metadata,
         rooms:room_id (
           id,
-          title,
+          name,
           content (
             id,
             title,
@@ -160,7 +159,7 @@ serve(async (req) => {
       `)
       .eq('id', examId)
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     console.log('Exam query result:', { examData, examError });
 
@@ -189,7 +188,7 @@ serve(async (req) => {
       .from('exam_questions')
       .select('*')
       .eq('exam_id', examId)
-      .order('question_number');
+      .order('order_index');
 
     if (questionsError) {
       console.error('Error fetching questions:', questionsError);
@@ -212,13 +211,13 @@ serve(async (req) => {
     // Build context from exam and content
     let examContext = `## Exam Information:
 **Exam Title:** ${examData.title}
-**Room:** ${examData.rooms?.title || 'Unknown Room'}
+**Room:** ${examData.rooms?.name || 'Unknown Room'}
 **Total Questions:** ${questionsData?.length || 0}
 `;
 
     // Add specific question context if questionId is provided
     if (questionId && questionsData) {
-      const specificQuestion = questionsData.find(q => q.question_number === questionId);
+      const specificQuestion = questionsData.find(q => q.order_index === questionId - 1); // Convert 1-based to 0-based index
       if (specificQuestion) {
         examContext += `
 
