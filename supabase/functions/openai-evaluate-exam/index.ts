@@ -32,12 +32,17 @@ serve(async (req) => {
       const userAnswer = answers[question.id];
       let evaluatedQuestion = { ...question };
       
+      // Add user answer to the question
+      evaluatedQuestion.userAnswer = userAnswer;
+      
       if (question.type === 'multiple-choice') {
         // For MCQ, determine correctness and generate explanation
         const isCorrect = userAnswer === question.correctAnswer;
         
-        const explanationPrompt = `
-Based on the following study material and question, provide a detailed explanation for ${isCorrect ? 'why this answer is correct' : 'why the user\'s answer is incorrect and what the correct answer should be'}:
+        let explanationPrompt;
+        if (question.isSkipped) {
+          explanationPrompt = `
+Based on the following study material, explain the correct answer to this multiple choice question:
 
 Study Material Context:
 ${originalContent || 'General knowledge'}
@@ -45,32 +50,63 @@ ${originalContent || 'General knowledge'}
 Question: ${question.question}
 Options: ${question.options?.map((opt, idx) => `${String.fromCharCode(65 + idx)}. ${opt}`).join('\n') || ''}
 Correct Answer: ${String.fromCharCode(65 + (question.correctAnswer || 0))}. ${question.options?.[question.correctAnswer || 0] || ''}
-User's Answer: ${userAnswer !== undefined ? `${String.fromCharCode(65 + userAnswer)}. ${question.options?.[userAnswer] || ''}` : 'No answer provided'}
 
-Provide a clear, educational explanation that helps the student understand the concept. Reference the study material when relevant.
+Status: Question was skipped by student
+
+Provide a concise explanation (2-3 sentences) explaining why the correct answer is right and what concept it demonstrates. Include a realistic page reference from the study material.
 `;
+        } else {
+          explanationPrompt = `
+Based on the following study material and question, provide a concise evaluation:
 
-        evaluatedQuestion.explanation = await generateExplanation(explanationPrompt);
+Study Material Context:
+${originalContent || 'General knowledge'}
+
+Question: ${question.question}
+Options: ${question.options?.map((opt, idx) => `${String.fromCharCode(65 + idx)}. ${opt}`).join('\n') || ''}
+Correct Answer: ${String.fromCharCode(65 + (question.correctAnswer || 0))}. ${question.options?.[question.correctAnswer || 0] || ''}
+User's Answer: ${String.fromCharCode(65 + userAnswer)}. ${question.options?.[userAnswer] || ''}
+
+Status: ${isCorrect ? 'CORRECT' : 'INCORRECT'}
+
+${isCorrect ? 
+  'Provide a brief explanation (2-3 sentences) confirming why this answer is correct and what concept it demonstrates.' : 
+  'Provide a brief explanation (2-3 sentences) explaining why the user\'s answer is wrong and why the correct answer is right.'
+}
+
+Include a realistic page reference from the study material.
+`;
+        }
+
+        const explanationResponse = await generateStructuredExplanation(explanationPrompt);
+        evaluatedQuestion.explanation = explanationResponse.explanation;
+        evaluatedQuestion.referenceSource = explanationResponse.referenceSource;
+        evaluatedQuestion.referenceTime = explanationResponse.referenceTime;
         
       } else if (question.type === 'free-text') {
         // For free-text, evaluate the answer quality and provide feedback
         if (question.isSkipped) {
           const sampleAnswerPrompt = `
-Based on the following study material, provide a comprehensive sample answer for this question:
+Based on the following study material, provide a sample answer for this free-text question:
 
 Study Material Context:
 ${originalContent || 'General knowledge'}
 
 Question: ${question.question}
 
-Provide a detailed, well-structured answer that demonstrates mastery of the topic. This will help the student understand what a complete answer should include.
+Status: Question was skipped by student
+
+Provide a concise sample answer (2-3 sentences) that demonstrates what a good response should include. Include a realistic page reference from the study material.
 `;
           
-          evaluatedQuestion.feedback = await generateExplanation(sampleAnswerPrompt);
+          const feedbackResponse = await generateStructuredExplanation(sampleAnswerPrompt);
+          evaluatedQuestion.feedback = feedbackResponse.explanation;
+          evaluatedQuestion.referenceSource = feedbackResponse.referenceSource;
+          evaluatedQuestion.referenceTime = feedbackResponse.referenceTime;
           
         } else {
           const evaluationPrompt = `
-Based on the following study material, evaluate the student's answer to this question:
+Based on the following study material, evaluate the student's answer:
 
 Study Material Context:
 ${originalContent || 'General knowledge'}
@@ -78,16 +114,13 @@ ${originalContent || 'General knowledge'}
 Question: ${question.question}
 Student's Answer: ${userAnswer || 'No answer provided'}
 
-Provide constructive feedback that:
-1. Acknowledges what the student got right (if anything)
-2. Points out key concepts that were missed or incorrectly explained
-3. Provides the correct or more complete information
-4. References specific parts of the study material when relevant
-
-Be encouraging but honest about the quality of the answer.
+Provide constructive feedback (2-3 sentences) that acknowledges what the student got right and suggests improvements. Include a realistic page reference from the study material.
 `;
 
-          evaluatedQuestion.feedback = await generateExplanation(evaluationPrompt);
+          const feedbackResponse = await generateStructuredExplanation(evaluationPrompt);
+          evaluatedQuestion.feedback = feedbackResponse.explanation;
+          evaluatedQuestion.referenceSource = feedbackResponse.referenceSource;
+          evaluatedQuestion.referenceTime = feedbackResponse.referenceTime;
         }
       }
       
@@ -117,7 +150,7 @@ Be encouraging but honest about the quality of the answer.
   }
 });
 
-async function generateExplanation(prompt: string): Promise<string> {
+async function generateStructuredExplanation(prompt: string): Promise<{explanation: string, referenceSource: string, referenceTime: string}> {
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -126,19 +159,27 @@ async function generateExplanation(prompt: string): Promise<string> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14', // Using same model as exam generation
+        model: 'gpt-4.1-2025-04-14',
         messages: [
           {
             role: 'system',
-            content: 'You are an expert educational evaluator. Provide clear, constructive, and educational explanations and feedback. Keep responses focused and helpful for student learning.'
+            content: `You are an expert educational evaluator. Provide clear, constructive, and educational explanations and feedback. 
+
+IMPORTANT: You must respond with a JSON object in this exact format:
+{
+  "explanation": "Your 2-3 sentence explanation here",
+  "referenceSource": "Document",
+  "referenceTime": "Page X"
+}
+
+Replace "Page X" with a realistic page number (e.g., "Page 12", "Page 5", etc.) based on the content complexity. Keep explanations concise and educational.`
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        max_completion_tokens: 500,
-        // Note: temperature not supported for this model
+        max_completion_tokens: 300,
       }),
     });
 
@@ -149,10 +190,30 @@ async function generateExplanation(prompt: string): Promise<string> {
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    const content = data.choices[0].message.content;
+    
+    try {
+      const parsed = JSON.parse(content);
+      return {
+        explanation: parsed.explanation || 'Unable to generate explanation.',
+        referenceSource: parsed.referenceSource || 'Document',
+        referenceTime: parsed.referenceTime || 'Page 1'
+      };
+    } catch (parseError) {
+      console.error('Error parsing JSON response:', parseError);
+      return {
+        explanation: content || 'Unable to generate explanation at this time.',
+        referenceSource: 'Document',
+        referenceTime: 'Page 1'
+      };
+    }
     
   } catch (error) {
     console.error('Error generating explanation:', error);
-    return 'Unable to generate explanation at this time. Please review the study material for more information.';
+    return {
+      explanation: 'Unable to generate explanation at this time. Please review the study material for more information.',
+      referenceSource: 'Document',
+      referenceTime: 'Page 1'
+    };
   }
 }

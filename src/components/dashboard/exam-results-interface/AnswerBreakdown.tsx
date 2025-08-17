@@ -26,10 +26,11 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
     if (question.isSkipped) {
       return {
         icon: HelpCircle,
-        bgColor: 'bg-muted/50',
+        bgColor: 'bg-muted',
         borderColor: 'border-muted-foreground/30',
         textColor: 'text-muted-foreground',
         badgeVariant: 'secondary' as const,
+        badgeClassName: 'bg-muted text-muted-foreground',
         status: 'Skipped'
       };
     }
@@ -41,20 +42,22 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
     if (isCorrect && question.type === 'multiple-choice') {
       return {
         icon: Check,
-        bgColor: 'bg-green-500/10',
-        borderColor: 'border-green-500/30',
-        textColor: 'text-green-600',
+        bgColor: 'bg-green-50 dark:bg-green-950',
+        borderColor: 'border-green-200 dark:border-green-800',
+        textColor: 'text-green-700 dark:text-green-400',
         badgeVariant: 'default' as const,
+        badgeClassName: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
         status: 'Correct'
       };
     }
     
     return {
       icon: X,
-      bgColor: 'bg-red-500/10',
-      borderColor: 'border-red-500/30',
-      textColor: 'text-red-600',
+      bgColor: 'bg-red-50 dark:bg-red-950',
+      borderColor: 'border-red-200 dark:border-red-800',
+      textColor: 'text-red-700 dark:text-red-400',
       badgeVariant: 'destructive' as const,
+      badgeClassName: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
       status: 'Incorrect'
     };
   };
@@ -93,11 +96,11 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
             <StatusIcon className="h-4 w-4" />
             {statusConfig.status}
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+          <p className="text-sm text-foreground leading-relaxed mb-3">
             {question.explanation || 'Explanation not available for this question.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <Badge variant={statusConfig.badgeVariant} className="text-xs">
+            <Badge className={`text-xs ${statusConfig.badgeClassName}`}>
               {question.referenceSource} - {question.referenceTime}
             </Badge>
           )}
@@ -121,11 +124,11 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
               <StatusIcon className="h-4 w-4" />
               {statusConfig.status}
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+            <p className="text-sm text-foreground leading-relaxed mb-3">
               {question.feedback || 'Sample answer not available for this question.'}
             </p>
             {question.referenceTime && question.referenceSource && (
-              <Badge variant={statusConfig.badgeVariant} className="text-xs">
+              <Badge className={`text-xs ${statusConfig.badgeClassName}`}>
                 {question.referenceSource} - {question.referenceTime}
               </Badge>
             )}
@@ -140,16 +143,16 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
           <div className="mb-2 text-sm text-muted-foreground">Your Answer:</div>
           <div className="text-foreground">{question.userAnswer || 'No answer provided'}</div>
         </div>
-        <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4">
-          <div className="mb-3 flex items-center gap-2 font-medium text-green-600">
+        <div className="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-4">
+          <div className="mb-3 flex items-center gap-2 font-medium text-green-700 dark:text-green-400">
             <Check className="h-4 w-4" />
             AI Feedback
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+          <p className="text-sm text-foreground leading-relaxed mb-3">
             {question.feedback || 'Good effort! This type of question requires detailed explanation of the concepts involved.'}
           </p>
           {question.referenceTime && question.referenceSource && (
-            <Badge variant="default" className="text-xs">
+            <Badge className="text-xs bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
               {question.referenceSource} - {question.referenceTime}
             </Badge>
           )}
