@@ -256,7 +256,7 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
             />
             <button 
               onClick={sendMessage}
-              disabled={!chatInput.trim()}
+              disabled={!chatInput.trim() || !examId}
               className="rounded-lg bg-primary px-3 py-2 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
             >
               <Send className="h-4 w-4" />
