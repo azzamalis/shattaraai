@@ -93,25 +93,46 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
     return () => clearInterval(timer);
   }, [timeRemaining]);
 
-  const handleSubmitExam = () => {
-    const examResults = {
-      questions,
-      answers,
-      skippedQuestions: Array.from(skippedQuestions),
-      score: {
-        correct: questions.filter((q, index) => 
-          answers[index] === q.correctAnswer
-        ).length,
-        incorrect: questions.filter((q, index) => 
-          answers[index] !== undefined && answers[index] !== q.correctAnswer
-        ).length,
-        skipped: skippedQuestions.size,
-        total: questions.length
-      }
-    };
-    
-    localStorage.setItem('examResults', JSON.stringify(examResults));
-    navigate(`/exam-results/${contentId || 'default'}`);
+  const handleSubmitExam = async () => {
+    try {
+      // Store basic exam results first (in case AI evaluation fails)
+      const basicExamResults = {
+        questions,
+        answers,
+        skippedQuestions: Array.from(skippedQuestions),
+        score: {
+          correct: questions.filter((q) => 
+            q.type === 'multiple-choice' && answers[q.id] === q.correctAnswer
+          ).length,
+          incorrect: questions.filter((q) => 
+            q.type === 'multiple-choice' && answers[q.id] !== undefined && answers[q.id] !== q.correctAnswer
+          ).length,
+          skipped: skippedQuestions.size,
+          total: questions.length
+        },
+        originalContent: generatedExam?.originalContent || null // Store original content for AI evaluation
+      };
+      
+      localStorage.setItem('examResults', JSON.stringify(basicExamResults));
+      navigate(`/exam-results/${contentId || 'default'}`);
+      
+    } catch (error) {
+      console.error('Error submitting exam:', error);
+      // Fallback to basic results if anything fails
+      const fallbackResults = {
+        questions,
+        answers,
+        skippedQuestions: Array.from(skippedQuestions),
+        score: {
+          correct: 0,
+          incorrect: 0,
+          skipped: skippedQuestions.size,
+          total: questions.length
+        }
+      };
+      localStorage.setItem('examResults', JSON.stringify(fallbackResults));
+      navigate(`/exam-results/${contentId || 'default'}`);
+    }
   };
 
   return (

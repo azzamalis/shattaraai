@@ -668,6 +668,9 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
       tokensUsed: aiData.usage?.total_tokens || 0,
       cached: false
     };
+    
+    // Include original content for AI evaluation
+    examData.originalContent = contentContext;
 
     console.log(`Successfully generated exam with ${examData.questions?.length || 0} questions`);
 
