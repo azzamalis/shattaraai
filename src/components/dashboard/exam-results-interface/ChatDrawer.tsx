@@ -38,13 +38,8 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
           timestamp: new Date(msg.timestamp)
         })));
       } else {
-        setChatMessages([{
-          id: Date.now().toString(),
-          isUser: false,
-          content: `I'm here to help you understand question ${currentQuestionId}. What would you like to know?`,
-          timestamp: new Date(),
-          status: 'delivered'
-        }]);
+        // Start with empty chat - no static messages
+        setChatMessages([]);
       }
     }
   }, [isOpen, currentQuestionId]);
@@ -151,7 +146,7 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         isUser: false,
-        content: "I'm sorry, I'm having trouble responding right now. Please try again later.",
+        content: `I'm having trouble accessing the AI service right now. Error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
         timestamp: new Date(),
         status: 'delivered'
       };
