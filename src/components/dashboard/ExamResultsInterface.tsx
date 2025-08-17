@@ -99,7 +99,7 @@ const ExamResultsInterface: React.FC = () => {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationError, setEvaluationError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { examId } = useParams<{ examId: string }>();
+  const { contentId } = useParams<{ contentId: string }>();
 
   // Add dummy data when component mounts if no exam results exist
   useEffect(() => {
@@ -239,16 +239,16 @@ const ExamResultsInterface: React.FC = () => {
       </main>
 
       <ExamResultsFooter 
-        onTryAgain={() => navigate(`/exam/${examId}`)} 
-        onViewResults={() => navigate(`/exam-summary/${examId}`)} 
+        onTryAgain={() => navigate(`/exam/${contentId}`)} 
+        onViewResults={() => navigate(`/exam-summary/${contentId}`)} 
       />
 
       <ChatDrawer 
         isOpen={isChatOpen} 
         onClose={() => setIsChatOpen(false)} 
         currentQuestionId={currentChatQuestion}
-        examId={examId}
-        contentId={examId} // Using examId as contentId for now - will need to get actual contentId from exam data
+        examId={contentId} // contentId in URL represents the examId
+        contentId={contentId}
       />
     </div>;
 };
