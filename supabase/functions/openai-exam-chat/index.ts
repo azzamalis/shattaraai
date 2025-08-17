@@ -146,6 +146,7 @@ serve(async (req) => {
         id,
         title,
         room_id,
+        content_metadata,
         rooms:room_id (
           id,
           name,

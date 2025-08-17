@@ -372,6 +372,8 @@ export type Database = {
           correct_answer: string
           created_at: string
           exam_id: string
+          explanation: string | null
+          feedback: string | null
           id: string
           options: Json | null
           order_index: number
@@ -386,6 +388,8 @@ export type Database = {
           correct_answer: string
           created_at?: string
           exam_id: string
+          explanation?: string | null
+          feedback?: string | null
           id?: string
           options?: Json | null
           order_index: number
@@ -400,6 +404,8 @@ export type Database = {
           correct_answer?: string
           created_at?: string
           exam_id?: string
+          explanation?: string | null
+          feedback?: string | null
           id?: string
           options?: Json | null
           order_index?: number
@@ -422,6 +428,7 @@ export type Database = {
       }
       exams: {
         Row: {
+          content_metadata: Json | null
           created_at: string
           description: string | null
           id: string
@@ -433,6 +440,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          content_metadata?: Json | null
           created_at?: string
           description?: string | null
           id?: string
@@ -444,6 +452,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          content_metadata?: Json | null
           created_at?: string
           description?: string | null
           id?: string

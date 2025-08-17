@@ -694,7 +694,13 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
           user_id: user.id,
           room_id: roomId,
           total_questions: examData.questions?.length || 0,
-          time_limit_minutes: examConfig.timeLimit || null
+          time_limit_minutes: examConfig.timeLimit || null,
+          content_metadata: {
+            contentIds: roomContent.map(c => c.id),
+            generatedAt: new Date().toISOString(),
+            model: modelUsed,
+            config: examConfig
+          }
         })
         .select()
         .single();
