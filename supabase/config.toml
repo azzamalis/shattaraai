@@ -75,3 +75,9 @@ verify_jwt = true
 
 [functions.openai-generate-exam]
 verify_jwt = true
+
+[functions.openai-evaluate-exam]
+verify_jwt = true
+
+[functions.openai-exam-chat]
+verify_jwt = true

@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Copy, Trash2, Check, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { chatMessageStyles } from '@/lib/chatStyles';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChatMessage {
   id: string;
@@ -16,9 +17,11 @@ interface ChatDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   currentQuestionId: number | null;
+  examId?: string;
+  contentId?: string;
 }
 
-export function ChatDrawer({ isOpen, onClose, currentQuestionId }: ChatDrawerProps) {
+export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, contentId }: ChatDrawerProps) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -69,7 +72,7 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId }: ChatDrawerPro
   }, [isOpen]);
 
   const sendMessage = async () => {
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() || !examId) return;
     
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -80,9 +83,10 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId }: ChatDrawerPro
     };
     
     setChatMessages(prev => [...prev, userMessage]);
+    const currentMessage = chatInput;
     setChatInput('');
     
-    // Simulate message delivery
+    // Update message status to delivered
     setTimeout(() => {
       setChatMessages(prev => prev.map(msg => 
         msg.id === userMessage.id 
@@ -94,18 +98,67 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId }: ChatDrawerPro
     // Show typing indicator
     setIsTyping(true);
     
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+
+      // Prepare conversation history
+      const conversationHistory = chatMessages.map(msg => ({
+        content: msg.content,
+        sender_type: msg.isUser ? 'user' : 'ai'
+      }));
+
+      // Call the exam chat AI function
+      const { data, error } = await supabase.functions.invoke('openai-exam-chat', {
+        body: {
+          message: currentMessage,
+          examId,
+          questionId: currentQuestionId,
+          contentId,
+          conversationHistory
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error calling exam chat function:', error);
+        throw new Error('Failed to get AI response');
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'AI service error');
+      }
+
       setIsTyping(false);
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         isUser: false,
-        content: 'This is a simulated AI tutor response. In a real implementation, this would connect to your AI service.',
+        content: data.response,
         timestamp: new Date(),
         status: 'delivered'
       };
       setChatMessages(prev => [...prev, aiMessage]);
-    }, 2000);
+
+    } catch (error) {
+      console.error('Error in sendMessage:', error);
+      setIsTyping(false);
+      
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        isUser: false,
+        content: "I'm sorry, I'm having trouble responding right now. Please try again later.",
+        timestamp: new Date(),
+        status: 'delivered'
+      };
+      setChatMessages(prev => [...prev, errorMessage]);
+      
+      toast.error('Failed to get AI response. Please try again.');
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
