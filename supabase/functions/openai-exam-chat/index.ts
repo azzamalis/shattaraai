@@ -137,6 +137,9 @@ serve(async (req) => {
     }
 
     // Get exam data with questions
+    console.log('Looking for exam with ID:', examId);
+    console.log('User ID:', user.id);
+    
     const { data: examData, error: examError } = await supabase
       .from('exams')
       .select(`
@@ -159,12 +162,20 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .single();
 
+    console.log('Exam query result:', { examData, examError });
+
     if (examError || !examData) {
       console.error('Error fetching exam data:', examError);
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Exam not found or access denied' 
+          error: 'Exam not found or access denied',
+          debug: {
+            examId,
+            userId: user.id,
+            examError: examError?.message,
+            foundData: !!examData
+          }
         }),
         { 
           status: 404, 
@@ -318,14 +329,25 @@ Current student question: ${message}`;
 
     // Try multiple models with fallback
     const models = [
-      { name: 'o4-mini-2025-04-16', maxTokens: 2000 },
-      { name: 'gpt-4.1-2025-04-14', maxTokens: 3000 },
-      { name: 'gpt-4o-mini', maxTokens: 3000 }
+      { name: 'o4-mini-2025-04-16', maxTokens: 2000, useTemperature: false },
+      { name: 'gpt-4.1-2025-04-14', maxTokens: 3000, useTemperature: false },
+      { name: 'gpt-4o-mini', maxTokens: 3000, useTemperature: true }
     ];
 
     for (const model of models) {
       try {
         console.log(`Trying model: ${model.name}`);
+        
+        const requestBody: any = {
+          model: model.name,
+          messages,
+          max_completion_tokens: model.maxTokens,
+        };
+
+        // Only add temperature for models that support it
+        if (model.useTemperature) {
+          requestBody.temperature = 0.7;
+        }
         
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -333,12 +355,7 @@ Current student question: ${message}`;
             'Authorization': `Bearer ${openaiApiKey}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            model: model.name,
-            messages,
-            max_completion_tokens: model.maxTokens,
-            temperature: 0.7,
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {
