@@ -2,6 +2,7 @@
 import React from 'react';
 import { Check, X, HelpCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
 
 interface Question {
   id: number;
@@ -19,9 +20,10 @@ interface Question {
 
 interface AnswerBreakdownProps {
   question: Question;
+  contentId?: string;
 }
 
-export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
+export function AnswerBreakdown({ question, contentId }: AnswerBreakdownProps) {
   const getStatusConfig = () => {
     if (question.isSkipped) {
       return {
@@ -99,10 +101,12 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
           <p className="text-sm text-foreground leading-relaxed mb-3">
             {question.explanation || 'Explanation not available for this question.'}
           </p>
-          {question.referenceTime && question.referenceSource && (
-            <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent`}>
-              {question.referenceSource} - {question.referenceTime}
-            </Badge>
+          {question.referenceTime && question.referenceSource && contentId && (
+            <Link to={`/content/${contentId}`}>
+              <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent cursor-pointer transition-opacity hover:opacity-80`}>
+                {question.referenceSource} - {question.referenceTime}
+              </Badge>
+            </Link>
           )}
         </div>
       </div>
@@ -134,10 +138,12 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
             <p className="text-sm text-foreground leading-relaxed mb-3">
               {question.feedback || 'Sample answer not available for this question.'}
             </p>
-            {question.referenceTime && question.referenceSource && (
-              <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent`}>
-                {question.referenceSource} - {question.referenceTime}
-              </Badge>
+            {question.referenceTime && question.referenceSource && contentId && (
+              <Link to={`/content/${contentId}`}>
+                <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent cursor-pointer transition-opacity hover:opacity-80`}>
+                  {question.referenceSource} - {question.referenceTime}
+                </Badge>
+              </Link>
             )}
           </div>
         </div>
@@ -158,10 +164,12 @@ export function AnswerBreakdown({ question }: AnswerBreakdownProps) {
           <p className="text-sm text-foreground leading-relaxed mb-3">
             {question.feedback || 'Good effort! This type of question requires detailed explanation of the concepts involved.'}
           </p>
-          {question.referenceTime && question.referenceSource && (
-            <Badge className={`text-xs ${feedbackBadgeClass}`}>
-              {question.referenceSource} - {question.referenceTime}
-            </Badge>
+          {question.referenceTime && question.referenceSource && contentId && (
+            <Link to={`/content/${contentId}`}>
+              <Badge className={`text-xs ${feedbackBadgeClass} cursor-pointer transition-opacity hover:opacity-80`}>
+                {question.referenceSource} - {question.referenceTime}
+              </Badge>
+            </Link>
           )}
         </div>
       </div>
