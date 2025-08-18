@@ -139,8 +139,23 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
         originalContent: generatedExam?.originalContent || null
       };
 
-      // Start AI evaluation
-      setSubmissionProgress('AI is evaluating your answers...');
+      // Start AI evaluation with progress tracking
+      setSubmissionProgress(`Processing question 1 of ${questions.length}...`);
+      
+      // Simulate progress updates while AI processes questions
+      const progressInterval = setInterval(() => {
+        setSubmissionProgress(prev => {
+          const match = prev.match(/Processing question (\d+) of (\d+)/);
+          if (match) {
+            const current = parseInt(match[1]);
+            const total = parseInt(match[2]);
+            if (current < total) {
+              return `Processing question ${current + 1} of ${total}...`;
+            }
+          }
+          return prev;
+        });
+      }, 1500); // Update progress every 1.5 seconds
       
       try {
         const { supabase } = await import('@/integrations/supabase/client');
@@ -152,6 +167,8 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
             originalContent: examData.originalContent
           }
         });
+
+        clearInterval(progressInterval);
 
         if (error) {
           console.error('AI evaluation error:', error);
@@ -172,6 +189,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
         }
 
       } catch (aiError) {
+        clearInterval(progressInterval);
         console.error('AI evaluation failed:', aiError);
         // Fall back to basic results if AI evaluation fails
         localStorage.setItem('examResults', JSON.stringify(examData));
