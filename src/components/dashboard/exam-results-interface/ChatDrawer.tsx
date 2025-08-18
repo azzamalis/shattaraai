@@ -31,8 +31,8 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
 
   // Load chat history from localStorage when opening chat
   useEffect(() => {
-    if (isOpen && currentQuestionId) {
-      const savedMessages = localStorage.getItem(`chat-history-${currentQuestionId}`);
+    if (isOpen && currentQuestionId && examId) {
+      const savedMessages = localStorage.getItem(`chat-history-${examId}-${currentQuestionId}`);
       if (savedMessages) {
         setChatMessages(JSON.parse(savedMessages).map((msg: any) => ({
           ...msg,
@@ -43,17 +43,17 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
         setChatMessages([]);
       }
     }
-  }, [isOpen, currentQuestionId]);
+  }, [isOpen, currentQuestionId, examId]);
 
   // Save chat history to localStorage
   useEffect(() => {
-    if (currentQuestionId) {
+    if (currentQuestionId && examId) {
       localStorage.setItem(
-        `chat-history-${currentQuestionId}`,
+        `chat-history-${examId}-${currentQuestionId}`,
         JSON.stringify(chatMessages)
       );
     }
-  }, [chatMessages, currentQuestionId]);
+  }, [chatMessages, currentQuestionId, examId]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
