@@ -15,13 +15,34 @@ interface ExamInterfaceProps {
 const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam, onSubmitExam }) => {
   const [answers, setAnswers] = useState<{[key: number]: any}>({});
   const [skippedQuestions, setSkippedQuestions] = useState(new Set<number>());
-  const [timeRemaining, setTimeRemaining] = useState(examConfig.duration * 60);
   const [isSaving, setIsSaving] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionProgress, setSubmissionProgress] = useState('');
   const navigate = useNavigate();
   const { contentId } = useParams();
+
+  // Initialize exam start time and calculate remaining time
+  const [timeRemaining, setTimeRemaining] = useState(() => {
+    const examStartTimeKey = `examStartTime_${contentId}`;
+    const savedStartTime = localStorage.getItem(examStartTimeKey);
+    
+    if (savedStartTime) {
+      // Calculate elapsed time since exam started
+      const startTime = parseInt(savedStartTime);
+      const currentTime = Date.now();
+      const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+      const totalDurationSeconds = examConfig.duration * 60;
+      const remaining = Math.max(0, totalDurationSeconds - elapsedSeconds);
+      
+      return remaining;
+    } else {
+      // First time starting exam - save start time
+      const startTime = Date.now();
+      localStorage.setItem(examStartTimeKey, startTime.toString());
+      return examConfig.duration * 60;
+    }
+  });
 
   // Use generated questions if available, otherwise fall back to generated ones
   const questions = useMemo(() => {
@@ -157,7 +178,8 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
         setSubmissionProgress('Preparing results...');
       }
 
-      // Navigate to results page
+      // Navigate to results page and clean up exam start time
+      localStorage.removeItem(`examStartTime_${contentId}`);
       navigate(`/exam-results/${contentId || 'default'}`);
       
     } catch (error) {
@@ -175,6 +197,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
         }
       };
       localStorage.setItem('examResults', JSON.stringify(fallbackResults));
+      localStorage.removeItem(`examStartTime_${contentId}`);
       navigate(`/exam-results/${contentId || 'default'}`);
     } finally {
       setIsSubmitting(false);
