@@ -54,12 +54,19 @@ export function ExamResultsSummary() {
         
         // First try to get the exam attempt ID from localStorage
         const storedAttemptId = localStorage.getItem('currentExamAttemptId');
+        console.log('DEBUG: Stored attempt ID:', storedAttemptId);
+        console.log('DEBUG: Content ID from URL:', contentId);
+        
         if (!storedAttemptId && !contentId) {
           console.error('No exam attempt ID found');
           return;
         }
 
+        const attemptId = storedAttemptId || contentId;
+        console.log('DEBUG: Using attempt ID:', attemptId);
+
         // Fetch exam attempt data with exam details
+        console.log('DEBUG: Querying exam_attempts table...');
         const { data: attemptData, error } = await supabase
           .from('exam_attempts')
           .select(`
@@ -69,13 +76,35 @@ export function ExamResultsSummary() {
               total_questions
             )
           `)
-          .eq('id', storedAttemptId || contentId)
+          .eq('id', attemptId)
           .maybeSingle();
+
+        console.log('DEBUG: Query result:', { attemptData, error });
 
         if (error) {
           console.error('Error fetching exam attempt:', error);
+          // Let's also try to fetch by exam_id if the attempt ID doesn't work
+          console.log('DEBUG: Trying to fetch by exam_id...');
+          const { data: examData } = await supabase
+            .from('exams')
+            .select('id')
+            .eq('id', attemptId)
+            .maybeSingle();
+          
+          if (examData) {
+            console.log('DEBUG: Found exam, now looking for attempts...');
+            const { data: attempts } = await supabase
+              .from('exam_attempts')
+              .select('*')
+              .eq('exam_id', examData.id)
+              .order('created_at', { ascending: false })
+              .limit(1);
+            console.log('DEBUG: Found attempts:', attempts);
+          }
           return;
         }
+
+        console.log('DEBUG: Attempt data found:', attemptData);
 
         if (attemptData) {
           setExamAttempt(attemptData);

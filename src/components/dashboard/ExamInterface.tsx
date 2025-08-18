@@ -121,19 +121,41 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
       setIsSubmitting(true);
       setSubmissionProgress('Preparing your exam results...');
       
+      // Get exam start time to calculate duration
+      const examStartTimeKey = `examStartTime_${contentId}`;
+      const savedStartTime = localStorage.getItem(examStartTimeKey);
+      const startTime = savedStartTime ? parseInt(savedStartTime) : Date.now();
+      const endTime = Date.now();
+      const timeTakenMinutes = Math.round((endTime - startTime) / (1000 * 60)); // Convert to minutes
+      
+      // Calculate scores
+      const correctAnswers = questions.filter((q) => 
+        q.type === 'multiple-choice' && answers[q.id] === q.correctAnswer
+      ).length;
+      
+      const totalScore = correctAnswers;
+      const maxScore = questions.length;
+      const skippedCount = skippedQuestions.size;
+      
+      console.log('DEBUG: Exam submission data:', {
+        totalScore,
+        maxScore,
+        skippedCount,
+        timeTakenMinutes,
+        contentId
+      });
+      
       // Prepare basic exam data
       const examData = {
         questions,
         answers,
         skippedQuestions: Array.from(skippedQuestions),
         score: {
-          correct: questions.filter((q) => 
-            q.type === 'multiple-choice' && answers[q.id] === q.correctAnswer
-          ).length,
+          correct: correctAnswers,
           incorrect: questions.filter((q) => 
             q.type === 'multiple-choice' && answers[q.id] !== undefined && answers[q.id] !== q.correctAnswer
           ).length,
-          skipped: skippedQuestions.size,
+          skipped: skippedCount,
           total: questions.length
         },
         originalContent: generatedExam?.originalContent || null
@@ -159,6 +181,58 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
       
       try {
         const { supabase } = await import('@/integrations/supabase/client');
+        
+        // First, create or update exam attempt in database
+        setSubmissionProgress('Saving exam attempt...');
+        
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+        
+        // Get the current exam ID from localStorage
+        const examConfigStr = localStorage.getItem('examConfig');
+        let examId = null;
+        
+        if (examConfigStr) {
+          const config = JSON.parse(examConfigStr);
+          examId = config.examId;
+        }
+        
+        // If no exam ID, try to find/create one based on content
+        if (!examId) {
+          console.log('DEBUG: No exam ID found, looking for existing exam...');
+          // For now, we'll create the exam attempt without linking to a specific exam
+          // This is a temporary solution - ideally should be linked to the actual exam
+        }
+        
+        // Create exam attempt record
+        const { data: attemptData, error: attemptError } = await supabase
+          .from('exam_attempts')
+        .insert({
+          user_id: user.id,
+          exam_id: examId || null, // Allow null for now
+          total_score: totalScore,
+          max_score: maxScore,
+          skipped_questions: skippedCount,
+          time_taken_minutes: timeTakenMinutes,
+          status: 'completed' as const,
+          completed_at: new Date().toISOString(),
+          started_at: new Date(startTime).toISOString()
+        })
+        .select()
+        .single();
+          
+        if (attemptError) {
+          console.error('Error creating exam attempt:', attemptError);
+        } else {
+          console.log('DEBUG: Exam attempt created:', attemptData);
+          // Store attempt ID for the summary page
+          localStorage.setItem('currentExamAttemptId', attemptData.id);
+        }
+        
+        setSubmissionProgress('Evaluating answers with AI...');
         
         const { data, error } = await supabase.functions.invoke('openai-evaluate-exam', {
           body: {
@@ -196,9 +270,12 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
         setSubmissionProgress('Preparing results...');
       }
 
-      // Navigate to results page and clean up exam start time
+      // Navigate to exam summary page instead of exam results
       localStorage.removeItem(`examStartTime_${contentId}`);
-      navigate(`/exam-results/${contentId || 'default'}`);
+      
+      // Navigate to summary page with the content ID or attempt ID
+      const attemptId = localStorage.getItem('currentExamAttemptId');
+      navigate(`/exam-summary/${attemptId || contentId || 'default'}`);
       
     } catch (error) {
       console.error('Error submitting exam:', error);
@@ -216,7 +293,10 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
       };
       localStorage.setItem('examResults', JSON.stringify(fallbackResults));
       localStorage.removeItem(`examStartTime_${contentId}`);
-      navigate(`/exam-results/${contentId || 'default'}`);
+      
+      // Navigate to summary page even on error
+      const attemptId = localStorage.getItem('currentExamAttemptId');
+      navigate(`/exam-summary/${attemptId || contentId || 'default'}`);
     } finally {
       setIsSubmitting(false);
       setSubmissionProgress('');
