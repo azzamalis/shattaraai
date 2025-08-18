@@ -162,7 +162,10 @@ const ExamResultsInterface: React.FC = () => {
     return null;
   }
   return <div className="h-full bg-background text-foreground">
-      <ExamResultsHeader totalQuestions={examResults.score.total} onOpenChat={() => setIsChatOpen(true)} />
+      <ExamResultsHeader totalQuestions={examResults.score.total} onOpenChat={() => {
+        setCurrentChatQuestion(null); // Clear question context for space chat
+        setIsChatOpen(true);
+      }} />
 
       {/* Main Content Area */}
       <main className="pb-24 pt-8">
@@ -198,6 +201,7 @@ const ExamResultsInterface: React.FC = () => {
         examId={examMetadata.examId}
         contentId={examMetadata.contentId}
         roomId={examMetadata.roomId}
+        chatType={currentChatQuestion ? 'question' : 'space'}
       />
     </div>;
 };

@@ -20,47 +20,78 @@ interface ChatDrawerProps {
   examId?: string;
   contentId?: string;
   roomId?: string | null;
+  chatType?: 'question' | 'space';
 }
 
-export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, contentId, roomId }: ChatDrawerProps) {
+export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, contentId, roomId, chatType = 'question' }: ChatDrawerProps) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [userName, setUserName] = useState<string>('');
   const chatMessagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Get user name from Supabase
+  useEffect(() => {
+    const getUserName = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.user_metadata?.full_name) {
+        setUserName(session.user.user_metadata.full_name);
+      } else if (session?.user?.email) {
+        // Extract first name from email if no full name
+        const firstName = session.user.email.split('@')[0];
+        setUserName(firstName);
+      } else {
+        setUserName('Student');
+      }
+    };
+    getUserName();
+  }, []);
+
   // Load chat history from localStorage when opening chat
   useEffect(() => {
-    if (isOpen && currentQuestionId && examId) {
-      const savedMessages = localStorage.getItem(`chat-history-${examId}-${currentQuestionId}`);
+    if (isOpen) {
+      const chatKey = chatType === 'question' && currentQuestionId && examId 
+        ? `chat-history-${examId}-${currentQuestionId}`
+        : `space-chat-history-${examId || roomId || 'default'}`;
+      
+      const savedMessages = localStorage.getItem(chatKey);
       if (savedMessages) {
         setChatMessages(JSON.parse(savedMessages).map((msg: any) => ({
           ...msg,
           timestamp: new Date(msg.timestamp)
         })));
       } else {
-        // Add welcome AI message for new question chat
+        // Add appropriate welcome AI message
+        let welcomeContent: string;
+        if (chatType === 'question' && currentQuestionId) {
+          welcomeContent = `You are asking me about Question ${currentQuestionId}, how can I help?`;
+        } else {
+          welcomeContent = `Hi ${userName}, I am Shattara AI tutor and I'm here to help you study!`;
+        }
+        
         const welcomeMessage: ChatMessage = {
-          id: `welcome-${examId}-${currentQuestionId}`,
+          id: `welcome-${chatType}-${Date.now()}`,
           isUser: false,
-          content: `You are asking me about Question ${currentQuestionId}, how can I help?`,
+          content: welcomeContent,
           timestamp: new Date(),
           status: 'delivered'
         };
         setChatMessages([welcomeMessage]);
       }
     }
-  }, [isOpen, currentQuestionId, examId]);
+  }, [isOpen, currentQuestionId, examId, chatType, roomId, userName]);
 
   // Save chat history to localStorage
   useEffect(() => {
-    if (currentQuestionId && examId) {
-      localStorage.setItem(
-        `chat-history-${examId}-${currentQuestionId}`,
-        JSON.stringify(chatMessages)
-      );
+    if (chatMessages.length > 0) {
+      const chatKey = chatType === 'question' && currentQuestionId && examId 
+        ? `chat-history-${examId}-${currentQuestionId}`
+        : `space-chat-history-${examId || roomId || 'default'}`;
+      
+      localStorage.setItem(chatKey, JSON.stringify(chatMessages));
     }
-  }, [chatMessages, currentQuestionId, examId]);
+  }, [chatMessages, currentQuestionId, examId, chatType, roomId]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
