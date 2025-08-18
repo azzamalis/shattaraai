@@ -39,8 +39,15 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
           timestamp: new Date(msg.timestamp)
         })));
       } else {
-        // Start with empty chat - no static messages
-        setChatMessages([]);
+        // Add welcome AI message for new question chat
+        const welcomeMessage: ChatMessage = {
+          id: `welcome-${examId}-${currentQuestionId}`,
+          isUser: false,
+          content: `You are asking me about Question ${currentQuestionId}, how can I help?`,
+          timestamp: new Date(),
+          status: 'delivered'
+        };
+        setChatMessages([welcomeMessage]);
       }
     }
   }, [isOpen, currentQuestionId, examId]);
