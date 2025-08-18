@@ -324,7 +324,7 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string
-          exam_id: string
+          exam_id: string | null
           id: string
           max_score: number
           skipped_questions: number | null
@@ -338,7 +338,7 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           created_at?: string
-          exam_id: string
+          exam_id?: string | null
           id?: string
           max_score?: number
           skipped_questions?: number | null
@@ -352,7 +352,7 @@ export type Database = {
         Update: {
           completed_at?: string | null
           created_at?: string
-          exam_id?: string
+          exam_id?: string | null
           id?: string
           max_score?: number
           skipped_questions?: number | null

@@ -130,7 +130,7 @@ export function ExamResultsSummary() {
             score: Math.round(percentage * 10) / 10, // Round to 1 decimal place
             skipped: attemptData.skipped_questions || 0,
             timeTaken: formatTime(attemptData.time_taken_minutes || 0),
-            totalQuestions: attemptData.exams?.total_questions || 0,
+            totalQuestions: attemptData.exams?.total_questions || attemptData.max_score || 0,
             correctAnswers: attemptData.total_score || 0
           };
 
@@ -189,7 +189,7 @@ export function ExamResultsSummary() {
           <Logo className="h-8 w-auto" textColor="text-foreground" />
         </div>
         <div className="flex items-center gap-2 text-foreground">
-          <span>{examAttempt?.exams?.title || 'Exam'}</span>
+          <span>{examAttempt?.exams?.title || 'Exam Results'}</span>
           <ChevronRight className="h-4 w-4" />
         </div>
         <div className="flex items-center gap-4">
