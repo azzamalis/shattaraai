@@ -96,8 +96,6 @@ const DUMMY_EXAM_DATA = {
 const ExamResultsInterface: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentChatQuestion, setCurrentChatQuestion] = useState<number | null>(null);
-  const [isEvaluating, setIsEvaluating] = useState(false);
-  const [evaluationError, setEvaluationError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { contentId } = useParams<{ contentId: string }>();
 
@@ -128,60 +126,6 @@ const ExamResultsInterface: React.FC = () => {
     if (!localStorage.getItem('examResults')) {
       localStorage.setItem('examResults', JSON.stringify(DUMMY_EXAM_DATA));
     }
-  }, []);
-
-  // Run AI evaluation on the actual exam results
-  useEffect(() => {
-    const evaluateExamResults = async () => {
-      const savedResults = localStorage.getItem('examResults');
-      if (!savedResults) return;
-
-      const examData = JSON.parse(savedResults);
-      
-      // Skip if already evaluated or if it's dummy data
-      if (examData.evaluated || examData === DUMMY_EXAM_DATA) return;
-
-      setIsEvaluating(true);
-      setEvaluationError(null);
-
-      try {
-        const { supabase } = await import('@/integrations/supabase/client');
-        
-        const { data, error } = await supabase.functions.invoke('openai-evaluate-exam', {
-          body: {
-            questions: examData.questions,
-            answers: examData.answers,
-            originalContent: examData.originalContent
-          }
-        });
-
-        if (error) {
-          console.error('Error evaluating exam:', error);
-          setEvaluationError('Failed to get AI evaluation');
-          return;
-        }
-
-        if (data?.success && data?.evaluatedQuestions) {
-          // Update localStorage with AI-evaluated questions
-          const updatedResults = {
-            ...examData,
-            questions: data.evaluatedQuestions,
-            evaluated: true
-          };
-          localStorage.setItem('examResults', JSON.stringify(updatedResults));
-          // Force re-render to show updated results
-          window.location.reload();
-        }
-
-      } catch (error) {
-        console.error('Error in AI evaluation:', error);
-        setEvaluationError('Failed to connect to AI evaluation service');
-      } finally {
-        setIsEvaluating(false);
-      }
-    };
-
-    evaluateExamResults();
   }, []);
 
   // Get exam results from localStorage
@@ -224,24 +168,6 @@ const ExamResultsInterface: React.FC = () => {
       <main className="pb-24 pt-8">
         <div className="mx-auto max-w-4xl px-6">
           <h1 className="mb-8 text-center text-2xl font-semibold">Answer Breakdown</h1>
-          
-          {isEvaluating && (
-            <div className="mb-6 rounded-lg border border-blue-500 bg-blue-500/10 p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
-                <span className="text-blue-400 font-medium">AI is evaluating your answers...</span>
-              </div>
-            </div>
-          )}
-          
-          {evaluationError && (
-            <div className="mb-6 rounded-lg border border-yellow-500 bg-yellow-500/10 p-4">
-              <div className="text-yellow-400 font-medium">⚠️ {evaluationError}</div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Basic results are shown. Refresh the page to retry AI evaluation.
-              </div>
-            </div>
-          )}
           
           {examResults.questions.map(question => <div key={question.id} className="mb-8 rounded-lg bg-card p-6">
               <div className="mb-4 flex items-start justify-between">

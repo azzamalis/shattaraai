@@ -18,6 +18,8 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
   const [timeRemaining, setTimeRemaining] = useState(examConfig.duration * 60);
   const [isSaving, setIsSaving] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionProgress, setSubmissionProgress] = useState('');
   const navigate = useNavigate();
   const { contentId } = useParams();
 
@@ -95,8 +97,11 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
 
   const handleSubmitExam = async () => {
     try {
-      // Store basic exam results first (in case AI evaluation fails)
-      const basicExamResults = {
+      setIsSubmitting(true);
+      setSubmissionProgress('Preparing your exam results...');
+      
+      // Prepare basic exam data
+      const examData = {
         questions,
         answers,
         skippedQuestions: Array.from(skippedQuestions),
@@ -110,10 +115,49 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
           skipped: skippedQuestions.size,
           total: questions.length
         },
-        originalContent: generatedExam?.originalContent || null // Store original content for AI evaluation
+        originalContent: generatedExam?.originalContent || null
       };
+
+      // Start AI evaluation
+      setSubmissionProgress('AI is evaluating your answers...');
       
-      localStorage.setItem('examResults', JSON.stringify(basicExamResults));
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        
+        const { data, error } = await supabase.functions.invoke('openai-evaluate-exam', {
+          body: {
+            questions: examData.questions,
+            answers: examData.answers,
+            originalContent: examData.originalContent
+          }
+        });
+
+        if (error) {
+          console.error('AI evaluation error:', error);
+          throw new Error('AI evaluation failed');
+        }
+
+        if (data?.success && data?.evaluatedQuestions) {
+          // Save evaluated results
+          const evaluatedResults = {
+            ...examData,
+            questions: data.evaluatedQuestions,
+            evaluated: true
+          };
+          localStorage.setItem('examResults', JSON.stringify(evaluatedResults));
+          setSubmissionProgress('Evaluation complete! Redirecting...');
+        } else {
+          throw new Error('AI evaluation returned invalid data');
+        }
+
+      } catch (aiError) {
+        console.error('AI evaluation failed:', aiError);
+        // Fall back to basic results if AI evaluation fails
+        localStorage.setItem('examResults', JSON.stringify(examData));
+        setSubmissionProgress('Preparing results...');
+      }
+
+      // Navigate to results page
       navigate(`/exam-results/${contentId || 'default'}`);
       
     } catch (error) {
@@ -132,6 +176,9 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
       };
       localStorage.setItem('examResults', JSON.stringify(fallbackResults));
       navigate(`/exam-results/${contentId || 'default'}`);
+    } finally {
+      setIsSubmitting(false);
+      setSubmissionProgress('');
     }
   };
 
@@ -168,15 +215,24 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
                 <div className="absolute inset-0 -bottom-8 bg-background" />
                 <button 
                   onClick={handleSubmitExam}
+                  disabled={isSubmitting}
                   className={cn(
                     "relative z-10",
                     "w-full rounded-lg py-4 px-8 text-lg font-medium",
                     "bg-primary text-primary-foreground",
                     "hover:bg-primary/90 transition-colors",
-                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    "flex items-center justify-center gap-3"
                   )}
                 >
-                  Submit Exam
+                  {isSubmitting ? (
+                    <>
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      <span>{submissionProgress || 'Submitting...'}</span>
+                    </>
+                  ) : (
+                    'Submit Exam'
+                  )}
                 </button>
               </div>
             </div>
