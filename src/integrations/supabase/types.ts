@@ -327,8 +327,10 @@ export type Database = {
           exam_id: string
           id: string
           max_score: number
+          skipped_questions: number | null
           started_at: string
           status: Database["public"]["Enums"]["exam_attempt_status"]
+          time_taken_minutes: number | null
           total_score: number
           updated_at: string
           user_id: string
@@ -339,8 +341,10 @@ export type Database = {
           exam_id: string
           id?: string
           max_score?: number
+          skipped_questions?: number | null
           started_at?: string
           status?: Database["public"]["Enums"]["exam_attempt_status"]
+          time_taken_minutes?: number | null
           total_score?: number
           updated_at?: string
           user_id: string
@@ -351,8 +355,10 @@ export type Database = {
           exam_id?: string
           id?: string
           max_score?: number
+          skipped_questions?: number | null
           started_at?: string
           status?: Database["public"]["Enums"]["exam_attempt_status"]
+          time_taken_minutes?: number | null
           total_score?: number
           updated_at?: string
           user_id?: string
