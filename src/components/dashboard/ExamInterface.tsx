@@ -270,12 +270,9 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
         setSubmissionProgress('Preparing results...');
       }
 
-      // Navigate to exam summary page instead of exam results
-      localStorage.removeItem(`examStartTime_${contentId}`);
-      
-      // Navigate to summary page with the content ID or attempt ID
-      const attemptId = localStorage.getItem('currentExamAttemptId');
-      navigate(`/exam-summary/${attemptId || contentId || 'default'}`);
+        // Navigate to exam results page for AI evaluation display
+        localStorage.removeItem(`examStartTime_${contentId}`);
+        navigate(`/exam-results/${contentId}`);
       
     } catch (error) {
       console.error('Error submitting exam:', error);
@@ -294,9 +291,8 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
       localStorage.setItem('examResults', JSON.stringify(fallbackResults));
       localStorage.removeItem(`examStartTime_${contentId}`);
       
-      // Navigate to summary page even on error
-      const attemptId = localStorage.getItem('currentExamAttemptId');
-      navigate(`/exam-summary/${attemptId || contentId || 'default'}`);
+      // Navigate to exam results page even on error
+      navigate(`/exam-results/${contentId}`);
     } finally {
       setIsSubmitting(false);
       setSubmissionProgress('');
