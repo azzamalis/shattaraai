@@ -556,6 +556,7 @@ export type Database = {
       }
       recordings: {
         Row: {
+          audio_chunks_processed: number | null
           audio_file_path: string | null
           chapters: Json | null
           content_id: string | null
@@ -563,11 +564,16 @@ export type Database = {
           duration: number | null
           id: string
           processing_status: string | null
+          real_time_transcript: Json | null
           transcript: string | null
+          transcription_confidence: number | null
+          transcription_progress: number | null
+          transcription_status: string | null
           updated_at: string
           waveform_data: Json | null
         }
         Insert: {
+          audio_chunks_processed?: number | null
           audio_file_path?: string | null
           chapters?: Json | null
           content_id?: string | null
@@ -575,11 +581,16 @@ export type Database = {
           duration?: number | null
           id?: string
           processing_status?: string | null
+          real_time_transcript?: Json | null
           transcript?: string | null
+          transcription_confidence?: number | null
+          transcription_progress?: number | null
+          transcription_status?: string | null
           updated_at?: string
           waveform_data?: Json | null
         }
         Update: {
+          audio_chunks_processed?: number | null
           audio_file_path?: string | null
           chapters?: Json | null
           content_id?: string | null
@@ -587,7 +598,11 @@ export type Database = {
           duration?: number | null
           id?: string
           processing_status?: string | null
+          real_time_transcript?: Json | null
           transcript?: string | null
+          transcription_confidence?: number | null
+          transcription_progress?: number | null
+          transcription_status?: string | null
           updated_at?: string
           waveform_data?: Json | null
         }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -12,6 +12,10 @@ import { AudioPlayer } from '@/components/content/AudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { useRealtimeTranscription } from '@/hooks/useRealtimeTranscription';
+import RealtimeTranscriptionDisplay from './RealtimeTranscriptionDisplay';
+import RealtimeChaptersDisplay from './RealtimeChaptersDisplay';
+import { AudioChunker, getOptimalAudioStream } from '@/utils/audioChunking';
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -47,6 +51,76 @@ export function ContentLeftSidebar({
   const [activeTab, setActiveTab] = useState("chapters");
   const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
   const [isTextExpanded, setIsTextExpanded] = useState(false);
+
+  // Real-time transcription integration for live recording
+  const {
+    isConnected,
+    transcriptionChunks,
+    fullTranscript,
+    chapters: liveChapters,
+    transcriptionProgress,
+    transcriptionStatus,
+    averageConfidence,
+    isProcessingAudio,
+    queueAudioChunk,
+    finalizeTranscription,
+    requestChapters,
+    disconnect
+  } = useRealtimeTranscription(contentData.type === 'live_recording' ? contentData.id : undefined);
+
+  // Audio chunker for real-time transcription
+  const audioChunkerRef = useRef<AudioChunker | null>(null);
+  const audioStreamRef = useRef<MediaStream | null>(null);
+
+  // Initialize audio chunking when recording starts
+  useEffect(() => {
+    if (contentData.type === 'live_recording' && isRecording && !audioChunkerRef.current) {
+      const initializeAudioChunking = async () => {
+        try {
+          const stream = await getOptimalAudioStream();
+          audioStreamRef.current = stream;
+
+          const chunker = new AudioChunker(queueAudioChunk, 4000); // 4 second chunks
+          audioChunkerRef.current = chunker;
+          
+          await chunker.startChunking(stream);
+          console.log('Real-time audio chunking started');
+        } catch (error) {
+          console.error('Failed to initialize audio chunking:', error);
+        }
+      };
+
+      initializeAudioChunking();
+    } else if (!isRecording && audioChunkerRef.current) {
+      // Stop chunking when recording stops
+      audioChunkerRef.current.stopChunking();
+      
+      // Finalize transcription with remaining audio
+      if (audioStreamRef.current) {
+        audioChunkerRef.current.getFinalAudio(audioStreamRef.current).then(finalAudio => {
+          finalizeTranscription(finalAudio);
+        }).catch(console.error);
+      }
+
+      // Cleanup
+      audioStreamRef.current?.getTracks().forEach(track => track.stop());
+      audioStreamRef.current = null;
+      audioChunkerRef.current = null;
+    }
+  }, [isRecording, contentData.type, queueAudioChunk, finalizeTranscription]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioChunkerRef.current) {
+        audioChunkerRef.current.stopChunking();
+      }
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+      disconnect();
+    };
+  }, [disconnect]);
   const handleChapterClick = (timestamp: number) => {
     if (onChapterClick) {
       onChapterClick(timestamp);
@@ -127,7 +201,18 @@ export function ContentLeftSidebar({
         <TabsContent value="chapters" className="absolute inset-0">
           <ScrollArea className="h-full">
             {hasContent ? <div className="p-4 space-y-4">
-                {(contentData.type === 'live_recording' || recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {/* Real-time chapters for live recording */}
+                {contentData.type === 'live_recording' && (
+                  <RealtimeChaptersDisplay
+                    chapters={liveChapters}
+                    transcriptionStatus={transcriptionStatus}
+                    isRecording={isRecording}
+                    onRequestChapters={requestChapters}
+                    onChapterClick={handleChapterClick}
+                  />
+                )}
+                
+                {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Recording in progress...
                   </div>}
                 {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="grid grid-cols-2 gap-3">
@@ -192,7 +277,20 @@ export function ContentLeftSidebar({
         <TabsContent value="transcripts" className="absolute inset-0">
           <ScrollArea className="h-full">
             {hasContent ? <div className="p-4 space-y-4">
-                {(contentData.type === 'live_recording' || recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {/* Real-time transcription for live recording */}
+                {contentData.type === 'live_recording' && (
+                  <RealtimeTranscriptionDisplay
+                    transcriptionChunks={transcriptionChunks}
+                    fullTranscript={fullTranscript}
+                    transcriptionProgress={transcriptionProgress}
+                    transcriptionStatus={transcriptionStatus}
+                    averageConfidence={averageConfidence}
+                    isProcessingAudio={isProcessingAudio}
+                    isRecording={isRecording}
+                  />
+                )}
+                
+                {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Transcribing in progress...
                   </div>}
                 {recordingStateInfo?.isExistingRecording && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">

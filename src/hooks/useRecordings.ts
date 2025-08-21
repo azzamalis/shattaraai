@@ -5,8 +5,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { DbRecording } from '@/lib/types';
 
-export interface Recording extends DbRecording {
-  // Additional computed properties can be added here
+export interface Recording extends Omit<DbRecording, 'real_time_transcript'> {
+  // Override specific fields for better typing
+  real_time_transcript?: Array<{
+    chunkIndex: number;
+    timestamp: number;
+    text: string;
+    confidence: number;
+    segments: any[];
+    duration: number;
+  }> | null;
 }
 
 export const useRecordings = (contentId?: string) => {
@@ -37,7 +45,7 @@ export const useRecordings = (contentId?: string) => {
         console.error('Error fetching recordings:', error);
         toast.error('Failed to load recordings');
       } else {
-        setRecordings(data || []);
+        setRecordings(data as Recording[] || []);
       }
     } catch (error) {
       console.error('Error fetching recordings:', error);
@@ -63,7 +71,7 @@ export const useRecordings = (contentId?: string) => {
         return null;
       }
 
-      setRecordings(prev => [data, ...prev]);
+      setRecordings(prev => [data as Recording, ...prev]);
       toast.success('Recording created successfully');
       return data.id;
     } catch (error) {
