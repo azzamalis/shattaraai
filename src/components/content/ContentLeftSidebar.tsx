@@ -212,9 +212,21 @@ export function ContentLeftSidebar({
                   />
                 )}
                 
-                {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                    Recording in progress...
-                  </div>}
+                {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <div className="animate-pulse mb-2">
+                        <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
+                      </div>
+                      <p className="text-sm font-medium text-dashboard-text dark:text-dashboard-text mb-1">
+                        Recording in progress
+                      </p>
+                      <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                        Chapters will be generated automatically
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="grid grid-cols-2 gap-3">
                     {recordingMetadata.chaptersData.map((chapter, index) => <Button key={chapter.id} variant="ghost" className="p-3 h-auto rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
                         <div className="flex items-start justify-between gap-2 w-full">
@@ -290,9 +302,21 @@ export function ContentLeftSidebar({
                   />
                 )}
                 
-                {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-                    Transcribing in progress...
-                  </div>}
+                {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <div className="animate-pulse mb-2">
+                        <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
+                      </div>
+                      <p className="text-sm font-medium text-dashboard-text dark:text-dashboard-text mb-1">
+                        Recording in progress
+                      </p>
+                      <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                        Transcription will be generated automatically
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {recordingStateInfo?.isExistingRecording && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
                     <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-4">
                       Full transcript available

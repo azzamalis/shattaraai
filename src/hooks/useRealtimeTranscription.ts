@@ -151,6 +151,37 @@ export const useRealtimeTranscription = (recordingId?: string) => {
     try {
       console.log(`Processing audio chunk ${chunkIndex} for recording ${recordingId}`);
 
+      // Ensure recording exists before processing audio
+      const { data: recordingCheck, error: checkError } = await supabase
+        .from('recordings')
+        .select('id')
+        .eq('id', recordingId)
+        .single();
+
+      if (checkError || !recordingCheck) {
+        console.log('Recording not found, creating it...');
+        // Create the recording if it doesn't exist
+        const { data: newRecording, error: createError } = await supabase
+          .from('recordings')
+          .insert([{
+            content_id: recordingId, // Using recordingId as content_id for live recordings
+            transcription_status: 'processing',
+            real_time_transcript: [],
+            audio_chunks_processed: 0,
+            transcription_confidence: 0,
+            transcription_progress: 0
+          }])
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Failed to create recording:', createError);
+          toast.error('Failed to initialize recording');
+          return;
+        }
+        console.log('Recording created successfully:', newRecording.id);
+      }
+
       const { data, error } = await supabase.functions.invoke('audio-transcription', {
         body: {
           audioData,
