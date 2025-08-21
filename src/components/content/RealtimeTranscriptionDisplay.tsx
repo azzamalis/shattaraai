@@ -21,17 +21,19 @@ interface RealtimeTranscriptionDisplayProps {
   averageConfidence: number;
   isProcessingAudio: boolean;
   isRecording?: boolean;
+  isLoadingData?: boolean;
 }
 
-const RealtimeTranscriptionDisplay: React.FC<RealtimeTranscriptionDisplayProps> = ({
+export const RealtimeTranscriptionDisplay = ({
   transcriptionChunks,
   fullTranscript,
   transcriptionProgress,
   transcriptionStatus,
   averageConfidence,
   isProcessingAudio,
-  isRecording = false
-}) => {
+  isRecording = false,
+  isLoadingData = false
+}: RealtimeTranscriptionDisplayProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const lastChunkRef = useRef<HTMLDivElement>(null);
 
@@ -85,11 +87,36 @@ const RealtimeTranscriptionDisplay: React.FC<RealtimeTranscriptionDisplayProps> 
     return date.toLocaleTimeString([], { hour12: false, minute: '2-digit', second: '2-digit' });
   };
 
-  if (!isRecording && transcriptionChunks.length === 0 && !fullTranscript) {
+  // Show loading state when fetching persisted data
+  if (isLoadingData) {
     return (
-      <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
-        <Mic className="h-8 w-8 mb-2 opacity-50" />
-        <p className="text-sm text-center">Start recording to see live transcription</p>
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+        <div className="text-center mb-4">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-dashboard-accent/10 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 text-dashboard-accent animate-spin" />
+          </div>
+          <h3 className="text-lg font-medium text-dashboard-text mb-2">Loading Transcription</h3>
+          <p className="text-dashboard-text-secondary text-sm">
+            Retrieving saved transcription data...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Initial state - waiting to start recording (only if no existing data)
+  if (!isRecording && (!transcriptionChunks || transcriptionChunks.length === 0) && !fullTranscript) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+        <div className="text-center mb-4">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-dashboard-accent/10 flex items-center justify-center">
+            <Mic className="h-8 w-8 text-dashboard-accent" />
+          </div>
+          <h3 className="text-lg font-medium text-dashboard-text mb-2">Ready to Record</h3>
+          <p className="text-dashboard-text-secondary text-sm">
+            Click "Start Recording" to begin live transcription
+          </p>
+        </div>
       </div>
     );
   }

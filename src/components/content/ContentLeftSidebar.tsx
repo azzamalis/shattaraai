@@ -62,6 +62,7 @@ export function ContentLeftSidebar({
     transcriptionStatus,
     averageConfidence,
     isProcessingAudio,
+    isLoadingData,
     queueAudioChunk,
     finalizeTranscription,
     requestChapters,
@@ -209,6 +210,7 @@ export function ContentLeftSidebar({
                     isRecording={isRecording}
                     onRequestChapters={requestChapters}
                     onChapterClick={handleChapterClick}
+                    isLoadingData={isLoadingData || false}
                   />
                 )}
                 
@@ -299,6 +301,7 @@ export function ContentLeftSidebar({
                     averageConfidence={averageConfidence}
                     isProcessingAudio={isProcessingAudio}
                     isRecording={isRecording}
+                    isLoadingData={isLoadingData || false}
                   />
                 )}
                 

@@ -17,15 +17,17 @@ interface RealtimeChaptersDisplayProps {
   isRecording?: boolean;
   onRequestChapters?: () => void;
   onChapterClick?: (startTime: number) => void;
+  isLoadingData?: boolean;
 }
 
-const RealtimeChaptersDisplay: React.FC<RealtimeChaptersDisplayProps> = ({
+export const RealtimeChaptersDisplay = ({
   chapters,
   transcriptionStatus,
   isRecording = false,
   onRequestChapters,
-  onChapterClick
-}) => {
+  onChapterClick,
+  isLoadingData = false
+}: RealtimeChaptersDisplayProps) => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -35,7 +37,25 @@ const RealtimeChaptersDisplay: React.FC<RealtimeChaptersDisplayProps> = ({
   const canGenerateChapters = transcriptionStatus === 'completed' || 
     (transcriptionStatus === 'processing' && !isRecording);
 
-  if (isRecording && transcriptionStatus === 'processing') {
+  // Show loading state when fetching data
+  if (isLoadingData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+        <div className="text-center mb-4">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-dashboard-accent/10 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 text-dashboard-accent animate-spin" />
+          </div>
+          <h3 className="text-lg font-medium text-dashboard-text mb-2">Loading Chapters</h3>
+          <p className="text-dashboard-text-secondary text-sm">
+            Retrieving saved chapter data...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show recording in progress message
+  if (isRecording) {
     return (
       <div className="space-y-4">
         {/* Recording Status */}

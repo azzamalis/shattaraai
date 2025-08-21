@@ -51,9 +51,11 @@ serve(async (req) => {
             // Send initial transcription data
             const { data: recording, error } = await supabase
               .from('recordings')
-              .select('real_time_transcript, transcription_progress, transcription_status, transcription_confidence')
-              .eq('id', recordingId)
-              .single();
+              .select('real_time_transcript, transcription_progress, transcription_status, transcription_confidence, chapters')
+              .eq('content_id', recordingId)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
 
             if (!error && recording) {
               socket.send(JSON.stringify({
@@ -115,8 +117,10 @@ async function generateChapters(recordingId: string, socket: WebSocket) {
     const { data: recording, error } = await supabase
       .from('recordings')
       .select('real_time_transcript, transcript')
-      .eq('id', recordingId)
-      .single();
+      .eq('content_id', recordingId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     if (error || !recording) {
       console.error('Error fetching recording for chapter generation:', error);
@@ -204,7 +208,7 @@ Estimate start and end times based on the natural flow of the content.`;
           chapters: chapters,
           updated_at: new Date().toISOString()
         })
-        .eq('id', recordingId);
+        .eq('content_id', recordingId);
 
       if (updateError) {
         console.error('Error updating chapters:', updateError);

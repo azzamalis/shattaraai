@@ -29,6 +29,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
   const [transcriptionStatus, setTranscriptionStatus] = useState<'pending' | 'processing' | 'completed' | 'failed'>('pending');
   const [averageConfidence, setAverageConfidence] = useState(0);
   const [isProcessingAudio, setIsProcessingAudio] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const audioQueueRef = useRef<string[]>([]);
@@ -264,6 +265,45 @@ export const useRealtimeTranscription = (recordingId?: string) => {
     }
   }, [recordingId, user, requestChapters]);
 
+  const fetchPersistedData = useCallback(async () => {
+    if (!recordingId || !user) return;
+    
+    setIsLoadingData(true);
+    try {
+      const { data: recording, error } = await supabase
+        .from('recordings')
+        .select('real_time_transcript, chapters, transcription_progress, transcription_status, transcription_confidence, transcript')
+        .eq('content_id', recordingId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && recording) {
+        console.log('Loaded persisted transcription data:', recording);
+        
+        // Set the transcription data from database
+        const chunks = (recording.real_time_transcript as unknown as TranscriptionChunk[]) || [];
+        setTranscriptionChunks(chunks);
+        setChapters((recording.chapters as unknown as ChapterData[]) || []);
+        setTranscriptionProgress(recording.transcription_progress || 0);
+        setTranscriptionStatus((recording.transcription_status as 'pending' | 'processing' | 'completed' | 'failed') || 'pending');
+        setAverageConfidence(recording.transcription_confidence || 0);
+        
+        // Update full transcript
+        updateFullTranscript(chunks);
+        
+        // Use final transcript if available
+        if (recording.transcript && recording.transcript.trim()) {
+          setFullTranscript(recording.transcript);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching persisted transcription data:', error);
+    } finally {
+      setIsLoadingData(false);
+    }
+  }, [recordingId, user]);
+
   const disconnect = useCallback(() => {
     if (wsRef.current) {
       // Only send unsubscribe if connection is open
@@ -287,9 +327,19 @@ export const useRealtimeTranscription = (recordingId?: string) => {
       wsRef.current = null;
     }
     setIsConnected(false);
-  }, [recordingId, user]);
+    
+    // After disconnecting, fetch persisted data
+    fetchPersistedData();
+  }, [recordingId, user, fetchPersistedData]);
 
-  // Connect WebSocket when component mounts or recordingId changes
+  // Load persisted data when component mounts
+  useEffect(() => {
+    if (recordingId && user) {
+      fetchPersistedData();
+    }
+  }, [recordingId, user, fetchPersistedData]);
+
+  // Connect WebSocket when component mounts or recordingId changes  
   useEffect(() => {
     if (recordingId && user) {
       connectWebSocket();
@@ -316,9 +366,11 @@ export const useRealtimeTranscription = (recordingId?: string) => {
     transcriptionStatus,
     averageConfidence,
     isProcessingAudio,
+    isLoadingData,
     queueAudioChunk,
     finalizeTranscription,
     requestChapters,
-    disconnect
+    disconnect,
+    fetchPersistedData
   };
 };
