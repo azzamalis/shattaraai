@@ -155,7 +155,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
       const { data: recordingCheck, error: checkError } = await supabase
         .from('recordings')
         .select('id')
-        .eq('id', recordingId)
+        .eq('content_id', recordingId)
         .single();
 
       if (checkError || !recordingCheck) {

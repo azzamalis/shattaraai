@@ -113,7 +113,7 @@ serve(async (req) => {
       const { data: currentRecording, error: fetchError } = await supabase
         .from('recordings')
         .select('real_time_transcript, audio_chunks_processed, transcription_confidence')
-        .eq('id', recordingId)
+        .eq('content_id', recordingId)
         .single();
 
       if (fetchError) {
@@ -137,7 +137,7 @@ serve(async (req) => {
           transcription_status: 'processing',
           updated_at: new Date().toISOString()
         })
-        .eq('id', recordingId);
+        .eq('content_id', recordingId);
 
       if (updateError) {
         console.error('Error updating recording:', updateError);
@@ -158,7 +158,7 @@ serve(async (req) => {
           transcription_status: 'completed',
           updated_at: new Date().toISOString()
         })
-        .eq('id', recordingId);
+        .eq('content_id', recordingId);
 
       if (updateError) {
         console.error('Error updating final transcript:', updateError);
