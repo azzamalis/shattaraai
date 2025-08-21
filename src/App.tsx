@@ -15,7 +15,7 @@ import PasswordReset from "./pages/PasswordReset";
 import NewPassword from "./pages/NewPassword";
 import DashboardPage from "./pages/DashboardPage";
 import RoomPage from "./pages/RoomPage";
-import RecordingRoom from "./pages/RecordingRoom";
+
 import ContentPage from "./pages/ContentPage";
 import ChatPage from "./pages/ChatPage";
 import PricingPage from "./pages/PricingPage";
@@ -57,7 +57,7 @@ function App() {
                    <Route path="/new-password" element={<NewPassword />} />
                    <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/rooms/:roomId" element={<RoomPage />} />
-                  <Route path="/recording/:roomId" element={<RecordingRoom />} />
+                  
                   <Route path="/content/:contentId" element={<ContentPage />} />
                   <Route path="/chat/:contentId" element={<ChatPage />} />
                   <Route path="/pricing" element={<PricingPage />} />
