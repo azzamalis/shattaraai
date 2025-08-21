@@ -75,7 +75,7 @@ serve(async (req) => {
     const blob = new Blob([binaryAudio], { type: 'audio/webm' });
     formData.append('file', blob, `audio_chunk_${chunkIndex}.webm`);
     formData.append('model', 'whisper-1');
-    formData.append('language', 'auto');
+    // No language parameter - let Whisper auto-detect the language
     formData.append('response_format', 'verbose_json');
 
     // Send to OpenAI Whisper API
