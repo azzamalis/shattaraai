@@ -35,7 +35,12 @@ export const useRealtimeTranscription = (recordingId?: string) => {
   const processingRef = useRef(false);
 
   const connectWebSocket = useCallback(() => {
-    if (!recordingId || !user || wsRef.current?.readyState === WebSocket.OPEN) {
+    if (!recordingId || !user) {
+      return;
+    }
+
+    // Don't create new connection if already connecting or connected
+    if (wsRef.current && (wsRef.current.readyState === WebSocket.CONNECTING || wsRef.current.readyState === WebSocket.OPEN)) {
       return;
     }
 
@@ -49,12 +54,14 @@ export const useRealtimeTranscription = (recordingId?: string) => {
         console.log('WebSocket connected for real-time transcription');
         setIsConnected(true);
         
-        // Subscribe to recording updates
-        wsRef.current?.send(JSON.stringify({
-          type: 'subscribe',
-          recordingId,
-          userId: user.id
-        }));
+        // Subscribe to recording updates - safely check connection state
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({
+            type: 'subscribe',
+            recordingId,
+            userId: user.id
+          }));
+        }
       };
 
       wsRef.current.onmessage = (event) => {
@@ -98,16 +105,19 @@ export const useRealtimeTranscription = (recordingId?: string) => {
         }
       };
 
-      wsRef.current.onclose = () => {
-        console.log('WebSocket connection closed');
+      wsRef.current.onclose = (event) => {
+        console.log('WebSocket connection closed', event.code, event.reason);
         setIsConnected(false);
         
-        // Attempt to reconnect after a delay
-        setTimeout(() => {
-          if (recordingId && user) {
-            connectWebSocket();
-          }
-        }, 3000);
+        // Only attempt to reconnect if it wasn't a manual close (code 1000) and we still have valid params
+        if (event.code !== 1000 && recordingId && user && !event.wasClean) {
+          console.log('Attempting to reconnect in 3 seconds...');
+          setTimeout(() => {
+            if (recordingId && user) {
+              connectWebSocket();
+            }
+          }, 3000);
+        }
       };
 
       wsRef.current.onerror = (error) => {
@@ -187,6 +197,8 @@ export const useRealtimeTranscription = (recordingId?: string) => {
         type: 'request_chapters',
         recordingId
       }));
+    } else {
+      console.warn('WebSocket not ready for chapter request');
     }
   }, [recordingId]);
 
@@ -223,12 +235,24 @@ export const useRealtimeTranscription = (recordingId?: string) => {
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
-      wsRef.current.send(JSON.stringify({
-        type: 'unsubscribe',
-        recordingId,
-        userId: user?.id
-      }));
-      wsRef.current.close();
+      // Only send unsubscribe if connection is open
+      if (wsRef.current.readyState === WebSocket.OPEN) {
+        try {
+          wsRef.current.send(JSON.stringify({
+            type: 'unsubscribe',
+            recordingId,
+            userId: user?.id
+          }));
+        } catch (error) {
+          console.warn('Failed to send unsubscribe message:', error);
+        }
+      }
+      
+      // Close connection if it's open or connecting
+      if (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING) {
+        wsRef.current.close();
+      }
+      
       wsRef.current = null;
     }
     setIsConnected(false);
