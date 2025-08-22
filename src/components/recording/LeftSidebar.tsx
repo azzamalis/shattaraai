@@ -21,6 +21,28 @@ export function LeftSidebar({
   onMicrophoneClear
 }: LeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
+  const [isPaused, setIsPaused] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handlePause = () => setIsPaused(!isPaused);
+  const handleStop = async () => {
+    setIsPaused(false);
+    setIsProcessing(true);
+    
+    try {
+      // Stop the recording and wait for processing
+      toggleRecording();
+      
+      // Simulate processing time (you can integrate with actual processing logic)
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 3000); // Adjust timing based on your actual processing needs
+    } catch (error) {
+      console.error('Error processing recording:', error);
+      setIsProcessing(false);
+    }
+  };
+
   return <div className="h-full flex flex-col min-h-0 bg-black">
       {/* Microphone Selector row */}
       <div className="p-4 pb-2 shrink-0 bg-[#222222]">
@@ -28,7 +50,15 @@ export function LeftSidebar({
       </div>
       {/* Recording Controls row */}
       <div className="px-4 pb-4 shrink-0 bg-[#222222]">
-        <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
+        <RecordingControls 
+          isRecording={isRecording} 
+          isPaused={isPaused}
+          isProcessing={isProcessing}
+          toggleRecording={toggleRecording} 
+          onPause={handlePause}
+          onStop={handleStop}
+          recordingTime={recordingTime} 
+        />
       </div>
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-[#222222]">

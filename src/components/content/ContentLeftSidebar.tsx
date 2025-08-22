@@ -155,9 +155,22 @@ export function ContentLeftSidebar({
     // Live recording interface - show recording controls with microphone selector below
     if (contentData.type === 'live_recording') {
       const handlePause = () => setIsPaused(!isPaused);
-      const handleStop = () => {
+      const handleStop = async () => {
         setIsPaused(false);
-        toggleRecording();
+        setIsProcessing(true);
+        
+        try {
+          // Stop the recording and wait for processing
+          toggleRecording();
+          
+          // Simulate processing time (you can integrate with actual processing logic)
+          setTimeout(() => {
+            setIsProcessing(false);
+          }, 3000); // Adjust timing based on your actual processing needs
+        } catch (error) {
+          console.error('Error processing recording:', error);
+          setIsProcessing(false);
+        }
       };
       
       return <>
@@ -182,9 +195,36 @@ export function ContentLeftSidebar({
 
     // New recording interface
     if (contentData.type === 'recording' && recordingStateInfo?.isNewRecording) {
+      const handlePause = () => setIsPaused(!isPaused);
+      const handleStop = async () => {
+        setIsPaused(false);
+        setIsProcessing(true);
+        
+        try {
+          // Stop the recording and wait for processing
+          toggleRecording();
+          
+          // Simulate processing time (you can integrate with actual processing logic)
+          setTimeout(() => {
+            setIsProcessing(false);
+          }, 3000); // Adjust timing based on your actual processing needs
+        } catch (error) {
+          console.error('Error processing recording:', error);
+          setIsProcessing(false);
+        }
+      };
+      
       return <>
           <div className="p-4 pb-2 shrink-0 bg-dashboard-card dark:bg-dashboard-card">
-            <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
+            <RecordingControls 
+              isRecording={isRecording} 
+              isPaused={isPaused}
+              isProcessing={isProcessing}
+              toggleRecording={toggleRecording} 
+              onPause={handlePause}
+              onStop={handleStop}
+              recordingTime={recordingTime} 
+            />
           </div>
           <div className="px-4 pb-4 shrink-0 bg-dashboard-card dark:bg-dashboard-card">
             <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
