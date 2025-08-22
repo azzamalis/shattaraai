@@ -25,10 +25,11 @@ serve(async (req) => {
     });
   }
 
-  const { socket, response } = Deno.upgradeWebSocket(req);
-  
-  let recordingId: string | null = null;
-  let userId: string | null = null;
+  try {
+    const { socket, response } = Deno.upgradeWebSocket(req);
+    
+    let recordingId: string | null = null;
+    let userId: string | null = null;
 
   socket.onopen = () => {
     console.log("WebSocket connection opened for real-time transcription");
@@ -106,7 +107,14 @@ serve(async (req) => {
     console.error("WebSocket error:", error);
   };
 
-  return response;
+    return response;
+  } catch (error) {
+    console.error('WebSocket upgrade failed:', error);
+    return new Response("WebSocket upgrade failed", { 
+      status: 500,
+      headers: corsHeaders 
+    });
+  }
 });
 
 // Function to generate chapters from transcription using AI

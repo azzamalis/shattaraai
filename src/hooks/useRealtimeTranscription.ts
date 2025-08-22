@@ -35,6 +35,54 @@ export const useRealtimeTranscription = (recordingId?: string) => {
   const audioQueueRef = useRef<string[]>([]);
   const processingRef = useRef(false);
 
+  const updateFullTranscript = (chunks: TranscriptionChunk[]) => {
+    const transcript = chunks
+      .sort((a, b) => a.chunkIndex - b.chunkIndex)
+      .map(chunk => chunk.text)
+      .join(' ')
+      .trim();
+    setFullTranscript(transcript);
+  };
+
+  const fetchPersistedData = useCallback(async () => {
+    if (!recordingId || !user) return;
+    
+    setIsLoadingData(true);
+    try {
+      const { data: recording, error } = await supabase
+        .from('recordings')
+        .select('real_time_transcript, chapters, transcription_progress, transcription_status, transcription_confidence, transcript')
+        .eq('content_id', recordingId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && recording) {
+        console.log('Loaded persisted transcription data:', recording);
+        
+        // Set the transcription data from database
+        const chunks = (recording.real_time_transcript as unknown as TranscriptionChunk[]) || [];
+        setTranscriptionChunks(chunks);
+        setChapters((recording.chapters as unknown as ChapterData[]) || []);
+        setTranscriptionProgress(recording.transcription_progress || 0);
+        setTranscriptionStatus((recording.transcription_status as 'pending' | 'processing' | 'completed' | 'failed') || 'pending');
+        setAverageConfidence(recording.transcription_confidence || 0);
+        
+        // Update full transcript
+        updateFullTranscript(chunks);
+        
+        // Use final transcript if available
+        if (recording.transcript && recording.transcript.trim()) {
+          setFullTranscript(recording.transcript);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching persisted transcription data:', error);
+    } finally {
+      setIsLoadingData(false);
+    }
+  }, [recordingId, user]);
+
   const connectWebSocket = useCallback(() => {
     if (!recordingId || !user) {
       return;
@@ -48,7 +96,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
     console.log('Connecting to real-time transcription WebSocket...');
 
     try {
-      const wsUrl = `wss://trvuidenkjqqlwadlosh.functions.supabase.co/functions/v1/real-time-transcription`;
+      const wsUrl = `wss://trvuidenkjqqlwadlosh.supabase.co/functions/v1/real-time-transcription`;
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
@@ -132,15 +180,6 @@ export const useRealtimeTranscription = (recordingId?: string) => {
     }
   }, [recordingId, user]);
 
-  const updateFullTranscript = (chunks: TranscriptionChunk[]) => {
-    const transcript = chunks
-      .sort((a, b) => a.chunkIndex - b.chunkIndex)
-      .map(chunk => chunk.text)
-      .join(' ')
-      .trim();
-    setFullTranscript(transcript);
-  };
-
   const processAudioChunk = useCallback(async (audioData: string, chunkIndex: number) => {
     if (!recordingId || !user || processingRef.current) {
       return;
@@ -157,7 +196,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
         .from('recordings')
         .select('id')
         .eq('content_id', recordingId)
-        .single();
+        .maybeSingle();
 
       if (checkError || !recordingCheck) {
         console.log('Recording not found, creating it...');
@@ -170,7 +209,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
           .from('content')
           .select('id')
           .eq('id', recordingId)
-          .single();
+          .maybeSingle();
           
         if (contentCheckError && contentCheckError.code === 'PGRST116') {
           // Content doesn't exist, create it first
@@ -286,11 +325,32 @@ export const useRealtimeTranscription = (recordingId?: string) => {
         });
       }
 
+      // Save current state to database if we have local data
+      if (transcriptionChunks.length > 0) {
+        const { error: saveError } = await supabase
+          .from('recordings')
+          .update({
+            real_time_transcript: transcriptionChunks as any,
+            transcript: fullTranscript,
+            transcription_status: 'completed',
+            transcription_progress: 100,
+            transcription_confidence: averageConfidence,
+            updated_at: new Date().toISOString()
+          })
+          .eq('content_id', recordingId);
+
+        if (saveError) {
+          console.error('Error saving final transcription state:', saveError);
+        } else {
+          console.log('Final transcription state saved successfully');
+        }
+      }
+
       // Request chapter generation
       requestChapters();
       
       setTranscriptionStatus('completed');
-      toast.success('Transcription completed');
+      toast.success('Transcription completed and saved');
       
       console.log('Transcription finalized for recording:', recordingId);
     } catch (error) {
@@ -298,46 +358,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
       setTranscriptionStatus('failed');
       toast.error('Failed to finalize transcription');
     }
-  }, [recordingId, user, requestChapters]);
-
-  const fetchPersistedData = useCallback(async () => {
-    if (!recordingId || !user) return;
-    
-    setIsLoadingData(true);
-    try {
-      const { data: recording, error } = await supabase
-        .from('recordings')
-        .select('real_time_transcript, chapters, transcription_progress, transcription_status, transcription_confidence, transcript')
-        .eq('content_id', recordingId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (!error && recording) {
-        console.log('Loaded persisted transcription data:', recording);
-        
-        // Set the transcription data from database
-        const chunks = (recording.real_time_transcript as unknown as TranscriptionChunk[]) || [];
-        setTranscriptionChunks(chunks);
-        setChapters((recording.chapters as unknown as ChapterData[]) || []);
-        setTranscriptionProgress(recording.transcription_progress || 0);
-        setTranscriptionStatus((recording.transcription_status as 'pending' | 'processing' | 'completed' | 'failed') || 'pending');
-        setAverageConfidence(recording.transcription_confidence || 0);
-        
-        // Update full transcript
-        updateFullTranscript(chunks);
-        
-        // Use final transcript if available
-        if (recording.transcript && recording.transcript.trim()) {
-          setFullTranscript(recording.transcript);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching persisted transcription data:', error);
-    } finally {
-      setIsLoadingData(false);
-    }
-  }, [recordingId, user]);
+  }, [recordingId, user, transcriptionChunks, fullTranscript, averageConfidence, requestChapters]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
@@ -362,17 +383,23 @@ export const useRealtimeTranscription = (recordingId?: string) => {
       wsRef.current = null;
     }
     setIsConnected(false);
-    
-    // After disconnecting, fetch persisted data
-    fetchPersistedData();
-  }, [recordingId, user, fetchPersistedData]);
+  }, [recordingId, user]);
 
-  // Load persisted data when component mounts
+  // Load persisted data when component mounts and periodically if WebSocket is not connected
   useEffect(() => {
     if (recordingId && user) {
       fetchPersistedData();
+      
+      // Set up periodic data fetching when WebSocket is not connected
+      const interval = setInterval(() => {
+        if (!isConnected && recordingId && user) {
+          fetchPersistedData();
+        }
+      }, 5000); // Poll every 5 seconds when not connected
+      
+      return () => clearInterval(interval);
     }
-  }, [recordingId, user, fetchPersistedData]);
+  }, [recordingId, user, isConnected, fetchPersistedData]);
 
   // Connect WebSocket when component mounts or recordingId changes  
   useEffect(() => {
