@@ -12,7 +12,7 @@ export function ShimmerText({ children, className }: ShimmerTextProps) {
       "relative overflow-hidden text-card-foreground",
       className
     )}>
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 text-muted-foreground">{children}</span>
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[shimmer_2s_infinite] -translate-x-full" />
     </div>
   );
