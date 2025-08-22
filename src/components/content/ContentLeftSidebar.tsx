@@ -54,7 +54,10 @@ export function ContentLeftSidebar({
   const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Real-time transcription integration for live recording
+  // Real-time transcription integration for live recording and recordings with transcription data
+  const shouldUseTranscription = contentData.type === 'live_recording' || 
+    (contentData.type === 'recording' && (recordingStateInfo?.hasTranscript || recordingStateInfo?.hasChapters));
+  
   const {
     isConnected,
     transcriptionChunks,
@@ -69,7 +72,7 @@ export function ContentLeftSidebar({
     finalizeTranscription,
     requestChapters,
     disconnect
-  } = useRealtimeTranscription(contentData.type === 'live_recording' ? contentData.id : undefined);
+  } = useRealtimeTranscription(shouldUseTranscription ? contentData.id : undefined);
 
   // Audio chunker for real-time transcription
   const audioChunkerRef = useRef<AudioChunker | null>(null);
@@ -263,12 +266,12 @@ export function ContentLeftSidebar({
         <TabsContent value="chapters" className="absolute inset-0">
           <ScrollArea className="h-full">
             {hasContent ? <div className="p-4 space-y-4">
-                {/* Real-time chapters for live recording */}
-                {contentData.type === 'live_recording' && (
+                {/* Real-time chapters for live recording and recordings with transcription */}
+                {(contentData.type === 'live_recording' || (contentData.type === 'recording' && shouldUseTranscription)) && (
                   <RealtimeChaptersDisplay
                     chapters={liveChapters}
                     transcriptionStatus={transcriptionStatus}
-                    isRecording={isRecording}
+                    isRecording={isRecording && contentData.type === 'live_recording'}
                     onRequestChapters={requestChapters}
                     onChapterClick={handleChapterClick}
                     isLoadingData={isLoadingData || false}
@@ -352,8 +355,8 @@ export function ContentLeftSidebar({
         <TabsContent value="transcripts" className="absolute inset-0">
           <ScrollArea className="h-full">
             {hasContent ? <div className="p-4 space-y-4">
-                {/* Real-time transcription for live recording */}
-                {contentData.type === 'live_recording' && (
+                {/* Real-time transcription for live recording and recordings with transcription */}
+                {(contentData.type === 'live_recording' || (contentData.type === 'recording' && shouldUseTranscription)) && (
                   <RealtimeTranscriptionDisplay
                     transcriptionChunks={transcriptionChunks}
                     fullTranscript={fullTranscript}
@@ -361,8 +364,8 @@ export function ContentLeftSidebar({
                     transcriptionStatus={transcriptionStatus}
                     averageConfidence={averageConfidence}
                     isProcessingAudio={isProcessingAudio}
-                     isRecording={isRecording && !isPaused}
-                     isLoadingData={isLoadingData || false}
+                    isRecording={isRecording && !isPaused && contentData.type === 'live_recording'}
+                    isLoadingData={isLoadingData || false}
                    />
                 )}
                 
