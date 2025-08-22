@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BookOpen, Clock, Loader2, RefreshCw } from 'lucide-react';
-import { ShimmerText } from '@/components/ui/shimmer-text';
+import { TextShimmer } from '@/components/ui/text-shimmer';
 
 interface ChapterData {
   title: string;
@@ -60,9 +60,9 @@ export const RealtimeChaptersDisplay = ({
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">
-          <ShimmerText className="text-lg font-semibold">
+          <TextShimmer className="text-lg font-semibold" duration={1.5}>
             Generating content...
-          </ShimmerText>
+          </TextShimmer>
         </div>
       </ScrollArea>
     );
