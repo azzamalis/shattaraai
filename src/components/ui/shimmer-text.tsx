@@ -9,11 +9,11 @@ interface ShimmerTextProps {
 export function ShimmerText({ children, className }: ShimmerTextProps) {
   return (
     <div className={cn(
-      "relative overflow-hidden bg-gradient-to-r from-muted-foreground/60 via-primary/80 to-muted-foreground/60 bg-clip-text text-transparent animate-pulse",
-      "before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent",
+      "relative overflow-hidden text-card-foreground",
       className
     )}>
-      <span className="relative">{children}</span>
+      <span className="relative z-10">{children}</span>
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[shimmer_2s_infinite] -translate-x-full" />
     </div>
   );
 }
