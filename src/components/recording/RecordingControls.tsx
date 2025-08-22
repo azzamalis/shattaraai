@@ -47,7 +47,7 @@ export function RecordingControls({
               onClick={onPause} 
               size="icon"
               variant="outline"
-              className="h-10 w-10 border-border hover:bg-muted"
+              className="h-10 w-10 rounded-full border-border hover:bg-muted"
               style={{ boxShadow: 'none' }}
             >
               <Pause className="h-4 w-4" />
@@ -56,7 +56,7 @@ export function RecordingControls({
               onClick={onStop} 
               size="icon"
               variant="outline"
-              className="h-10 w-10 border-border hover:bg-muted"
+              className="h-10 w-10 rounded-full border-border hover:bg-muted"
               style={{ boxShadow: 'none' }}
             >
               <Square className="h-4 w-4" />
@@ -64,11 +64,11 @@ export function RecordingControls({
           </div>
         )}
         
-        <div className="flex-1 flex items-center justify-center h-10 bg-transparent px-2 min-w-0">
+        <div className="flex-[2] flex items-center justify-center h-10 bg-transparent px-4 min-w-0">
           <AudioWaveform isActive={isRecording && !isPaused} />
         </div>
         
-        <div className="text-card-foreground text-sm font-mono shrink-0 min-w-[48px] text-right">
+        <div className="text-card-foreground text-lg font-medium shrink-0 min-w-[60px] text-right">
           {recordingTime}
         </div>
       </div>

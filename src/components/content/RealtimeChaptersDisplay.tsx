@@ -55,62 +55,16 @@ export const RealtimeChaptersDisplay = ({
     );
   }
 
-  // Show recording in progress message
+  // Show recording state with shimmer text only
   if (isRecording) {
     return (
-      <div className="space-y-4">
-        {/* Recording Status */}
-        <div className="flex items-center justify-center p-6 bg-card/50 rounded-lg border">
-          <div className="text-center space-y-3">
-            <ShimmerText className="text-sm font-medium">
-              Generating content...
-            </ShimmerText>
-            <p className="text-xs text-muted-foreground max-w-xs">
-              Chapters will be generated automatically as you speak. 
-              Continue recording to build your content structure.
-            </p>
-          </div>
+      <ScrollArea className="flex-1">
+        <div className="flex items-center justify-center h-full py-16">
+          <ShimmerText className="text-lg font-semibold">
+            Generating content...
+          </ShimmerText>
         </div>
-
-        {/* Existing chapters if any */}
-        {chapters.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                Auto-Generated Chapters ({chapters.length})
-              </h4>
-              <Badge variant="secondary" className="text-xs">
-                Live
-              </Badge>
-            </div>
-            
-            <ScrollArea className="h-48">
-              <div className="space-y-2">
-                {chapters.map((chapter, index) => (
-                  <div 
-                    key={index}
-                    className="p-3 bg-card/30 rounded-lg border border-border/50 hover:bg-card/50 transition-colors cursor-pointer"
-                    onClick={() => onChapterClick?.(chapter.startTime)}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h5 className="text-sm font-medium leading-tight">
-                        {chapter.title}
-                      </h5>
-                      <Badge variant="outline" className="text-xs">
-                        {formatTime(chapter.startTime)}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {chapter.summary}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-        )}
-      </div>
+      </ScrollArea>
     );
   }
 

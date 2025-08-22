@@ -122,6 +122,19 @@ export const RealtimeTranscriptionDisplay = ({
     );
   }
 
+  // Show only shimmer text when recording
+  if (isRecording) {
+    return (
+      <ScrollArea className="flex-1">
+        <div className="flex items-center justify-center h-full py-16">
+          <ShimmerText className="text-lg font-semibold">
+            Generating content...
+          </ShimmerText>
+        </div>
+      </ScrollArea>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Status Header */}
