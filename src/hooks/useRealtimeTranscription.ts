@@ -161,11 +161,46 @@ export const useRealtimeTranscription = (recordingId?: string) => {
 
       if (checkError || !recordingCheck) {
         console.log('Recording not found, creating it...');
+        
+        // For live recordings, ensure the content record exists first
+        let contentId = recordingId;
+        
+        // Check if content record exists for this recordingId
+        const { data: contentCheck, error: contentCheckError } = await supabase
+          .from('content')
+          .select('id')
+          .eq('id', recordingId)
+          .single();
+          
+        if (contentCheckError && contentCheckError.code === 'PGRST116') {
+          // Content doesn't exist, create it first
+          console.log('Creating content record for live recording...');
+          const { data: newContent, error: contentCreateError } = await supabase
+            .from('content')
+            .insert([{
+              id: recordingId,
+              title: `Live Recording ${new Date().toLocaleDateString()}`,
+              type: 'live_recording',
+              user_id: user.id,
+              metadata: { startedAt: new Date().toISOString() }
+            }])
+            .select()
+            .single();
+            
+          if (contentCreateError) {
+            console.error('Failed to create content record:', contentCreateError);
+            toast.error('Failed to initialize recording content');
+            return;
+          }
+          contentId = newContent.id;
+          console.log('Content record created successfully:', contentId);
+        }
+        
         // Create the recording if it doesn't exist
         const { data: newRecording, error: createError } = await supabase
           .from('recordings')
           .insert([{
-            content_id: recordingId, // Using recordingId as content_id for live recordings
+            content_id: contentId,
             transcription_status: 'processing',
             real_time_transcript: [],
             audio_chunks_processed: 0,
