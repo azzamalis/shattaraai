@@ -51,6 +51,8 @@ export function ContentLeftSidebar({
   const [activeTab, setActiveTab] = useState("chapters");
   const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
   const [isTextExpanded, setIsTextExpanded] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Real-time transcription integration for live recording
   const {
@@ -75,7 +77,7 @@ export function ContentLeftSidebar({
 
   // Initialize audio chunking when recording starts
   useEffect(() => {
-    if (contentData.type === 'live_recording' && isRecording && !audioChunkerRef.current) {
+    if (contentData.type === 'live_recording' && isRecording && !isPaused && !audioChunkerRef.current) {
       const initializeAudioChunking = async () => {
         try {
           const stream = await getOptimalAudioStream();
@@ -94,13 +96,18 @@ export function ContentLeftSidebar({
       initializeAudioChunking();
     } else if (!isRecording && audioChunkerRef.current) {
       // Stop chunking when recording stops
+      setIsProcessing(true);
       audioChunkerRef.current.stopChunking();
       
       // Finalize transcription with remaining audio
       if (audioStreamRef.current) {
         audioChunkerRef.current.getFinalAudio(audioStreamRef.current).then(finalAudio => {
           finalizeTranscription(finalAudio);
-        }).catch(console.error);
+          setIsProcessing(false);
+        }).catch(error => {
+          console.error('Error finalizing transcription:', error);
+          setIsProcessing(false);
+        });
       }
 
       // Cleanup
@@ -147,9 +154,23 @@ export function ContentLeftSidebar({
 
     // Live recording interface - show recording controls with microphone selector below
     if (contentData.type === 'live_recording') {
+      const handlePause = () => setIsPaused(!isPaused);
+      const handleStop = () => {
+        setIsPaused(false);
+        toggleRecording();
+      };
+      
       return <>
           <div className="p-4 pb-2 shrink-0 bg-background px-0 py-[14px]">
-            <RecordingControls isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={recordingTime} />
+            <RecordingControls 
+              isRecording={isRecording} 
+              isPaused={isPaused}
+              isProcessing={isProcessing}
+              toggleRecording={toggleRecording} 
+              onPause={handlePause}
+              onStop={handleStop}
+              recordingTime={recordingTime} 
+            />
           </div>
           <div className="pb-4 shrink-0 bg-background px-[5px] py-[6px]">
             <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
@@ -300,9 +321,9 @@ export function ContentLeftSidebar({
                     transcriptionStatus={transcriptionStatus}
                     averageConfidence={averageConfidence}
                     isProcessingAudio={isProcessingAudio}
-                    isRecording={isRecording}
-                    isLoadingData={isLoadingData || false}
-                  />
+                     isRecording={isRecording && !isPaused}
+                     isLoadingData={isLoadingData || false}
+                   />
                 )}
                 
                 {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (

@@ -34,6 +34,16 @@
     outline: 2px solid hsl(var(--primary));
     outline-offset: 2px;
   }
+
+  /* Animation keyframes */
+  @keyframes shimmer {
+    0% { 
+      transform: translateX(-100%);
+    }
+    100% { 
+      transform: translateX(100%);
+    }
+  }
 }
 
 /* Improved scrollbar for dark theme */

@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Mic, CheckCircle, AlertCircle } from 'lucide-react';
+import { ShimmerText } from '@/components/ui/shimmer-text';
 
 interface TranscriptionChunk {
   chunkIndex: number;
@@ -198,7 +199,7 @@ export const RealtimeTranscriptionDisplay = ({
             )
           )}
 
-          {/* Live typing indicator */}
+          {/* Live shimmer indicator for recording */}
           {isRecording && transcriptionStatus === 'processing' && (
             <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
               <div className="flex gap-1">
@@ -206,7 +207,9 @@ export const RealtimeTranscriptionDisplay = ({
                 <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
                 <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
               </div>
-              <span className="text-xs text-muted-foreground">Listening...</span>
+              <ShimmerText className="text-xs">
+                Generating content...
+              </ShimmerText>
             </div>
           )}
         </div>

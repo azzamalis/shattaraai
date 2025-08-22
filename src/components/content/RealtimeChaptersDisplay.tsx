@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BookOpen, Clock, Loader2, RefreshCw } from 'lucide-react';
+import { ShimmerText } from '@/components/ui/shimmer-text';
 
 interface ChapterData {
   title: string;
@@ -61,13 +62,9 @@ export const RealtimeChaptersDisplay = ({
         {/* Recording Status */}
         <div className="flex items-center justify-center p-6 bg-card/50 rounded-lg border">
           <div className="text-center space-y-3">
-            <div className="flex items-center justify-center gap-2">
-              <div className="relative">
-                <div className="w-4 h-4 bg-red-500 rounded-full animate-pulse" />
-                <div className="absolute inset-0 w-4 h-4 bg-red-500 rounded-full animate-ping opacity-75" />
-              </div>
-              <span className="text-sm font-medium">Recording in progress...</span>
-            </div>
+            <ShimmerText className="text-sm font-medium">
+              Generating content...
+            </ShimmerText>
             <p className="text-xs text-muted-foreground max-w-xs">
               Chapters will be generated automatically as you speak. 
               Continue recording to build your content structure.
