@@ -68,7 +68,7 @@ export function RecordingControls({
           <AudioWaveform isActive={isRecording && !isPaused} />
         </div>
         
-        <div className="text-card-foreground text-lg font-medium shrink-0 min-w-[60px] text-right">
+        <div className="text-card-foreground text-base font-medium shrink-0 min-w-[60px] text-right">
           {recordingTime}
         </div>
       </div>
