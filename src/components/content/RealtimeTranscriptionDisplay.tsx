@@ -90,20 +90,16 @@ export const RealtimeTranscriptionDisplay = ({
     return date.toLocaleTimeString([], { hour12: false, minute: '2-digit', second: '2-digit' });
   };
 
-  // Show loading state when fetching persisted data
-  if (isLoadingData) {
+  // Show shimmer text when recording or processing final content
+  if (isRecording || isProcessingFinal) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-        <div className="text-center mb-4">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-dashboard-accent/10 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 text-dashboard-accent animate-spin" />
-          </div>
-          <h3 className="text-lg font-medium text-dashboard-text mb-2">Loading Transcription</h3>
-          <p className="text-dashboard-text-secondary text-sm">
-            Retrieving saved transcription data...
-          </p>
+      <ScrollArea className="flex-1">
+        <div className="flex items-center justify-center h-full py-16">
+          <TextShimmer className="text-lg font-semibold" duration={1.5}>
+            {isRecording ? 'Processing audio...' : 'Generating final transcript...'}
+          </TextShimmer>
         </div>
-      </div>
+      </ScrollArea>
     );
   }
 
@@ -121,19 +117,6 @@ export const RealtimeTranscriptionDisplay = ({
           </p>
         </div>
       </div>
-    );
-  }
-
-  // Show shimmer text when processing final content (after recording stops)
-  if (isProcessingFinal) {
-    return (
-      <ScrollArea className="flex-1">
-        <div className="flex items-center justify-center h-full py-16">
-          <TextShimmer className="text-lg font-semibold">
-            Generating content...
-          </TextShimmer>
-        </div>
-      </ScrollArea>
     );
   }
 

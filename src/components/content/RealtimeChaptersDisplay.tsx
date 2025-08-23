@@ -40,30 +40,13 @@ export const RealtimeChaptersDisplay = ({
   const canGenerateChapters = transcriptionStatus === 'completed' || 
     (transcriptionStatus === 'processing' && !isRecording);
 
-  // Show loading state when fetching data
-  if (isLoadingData) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-        <div className="text-center mb-4">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-dashboard-accent/10 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 text-dashboard-accent animate-spin" />
-          </div>
-          <h3 className="text-lg font-medium text-dashboard-text mb-2">Loading Chapters</h3>
-          <p className="text-dashboard-text-secondary text-sm">
-            Retrieving saved chapter data...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show shimmer text when processing final content (after recording stops)
-  if (isProcessingFinal) {
+  // Show shimmer text when recording or processing final content
+  if (isRecording || isProcessingFinal) {
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">
           <TextShimmer className="text-lg font-semibold" duration={1.5}>
-            Generating content...
+            {isRecording ? 'Processing audio for chapter generation...' : 'Generating content...'}
           </TextShimmer>
         </div>
       </ScrollArea>
