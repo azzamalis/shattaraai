@@ -166,10 +166,10 @@ export function ContentLeftSidebar({
           // Stop the recording and wait for processing
           toggleRecording();
           
-          // Simulate processing time (you can integrate with actual processing logic)
+          // Enhanced processing time with better UX messaging
           setTimeout(() => {
             setIsProcessing(false);
-          }, 3000); // Adjust timing based on your actual processing needs
+          }, 4000); // Extended to allow for AI processing visualization
         } catch (error) {
           console.error('Error processing recording:', error);
           setIsProcessing(false);
