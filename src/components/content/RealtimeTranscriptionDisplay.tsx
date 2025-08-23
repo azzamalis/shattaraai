@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Mic, CheckCircle, AlertCircle } from 'lucide-react';
-import { ShimmerText } from '@/components/ui/shimmer-text';
+import { TextShimmer } from '@/components/ui/text-shimmer';
 
 interface TranscriptionChunk {
   chunkIndex: number;
@@ -122,14 +122,14 @@ export const RealtimeTranscriptionDisplay = ({
     );
   }
 
-  // Show only shimmer text when recording
-  if (isRecording) {
+  // Show shimmer text when recording or processing
+  if (isRecording || isProcessingAudio) {
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">
-          <ShimmerText className="text-lg font-semibold">
+          <TextShimmer className="text-lg font-semibold">
             Generating content...
-          </ShimmerText>
+          </TextShimmer>
         </div>
       </ScrollArea>
     );
@@ -220,9 +220,9 @@ export const RealtimeTranscriptionDisplay = ({
                 <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
                 <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
               </div>
-              <ShimmerText className="text-xs">
+              <TextShimmer className="text-xs">
                 Generating content...
-              </ShimmerText>
+              </TextShimmer>
             </div>
           )}
         </div>

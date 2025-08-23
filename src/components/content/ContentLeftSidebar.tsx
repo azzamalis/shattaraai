@@ -99,17 +99,15 @@ export function ContentLeftSidebar({
       initializeAudioChunking();
     } else if (!isRecording && audioChunkerRef.current) {
       // Stop chunking when recording stops
-      setIsProcessing(true);
+      setIsProcessing(false); // Reset UI processing state since transcription hook will handle it
       audioChunkerRef.current.stopChunking();
       
       // Finalize transcription with remaining audio
       if (audioStreamRef.current) {
         audioChunkerRef.current.getFinalAudio(audioStreamRef.current).then(finalAudio => {
           finalizeTranscription(finalAudio);
-          setIsProcessing(false);
         }).catch(error => {
           console.error('Error finalizing transcription:', error);
-          setIsProcessing(false);
         });
       }
 
@@ -163,13 +161,11 @@ export function ContentLeftSidebar({
         setIsProcessing(true);
         
         try {
-          // Stop the recording and wait for processing
+          // Stop the recording
           toggleRecording();
           
-          // Enhanced processing time with better UX messaging
-          setTimeout(() => {
-            setIsProcessing(false);
-          }, 4000); // Extended to allow for AI processing visualization
+          // The processing state will be managed by the transcription hook
+          // We don't need to manage it manually here anymore
         } catch (error) {
           console.error('Error processing recording:', error);
           setIsProcessing(false);
@@ -181,8 +177,8 @@ export function ContentLeftSidebar({
             <RecordingControls 
               isRecording={isRecording} 
               isPaused={isPaused}
-              isProcessing={isProcessing}
-              toggleRecording={toggleRecording} 
+              isProcessing={isProcessing || isProcessingAudio}
+              toggleRecording={toggleRecording}
               onPause={handlePause}
               onStop={handleStop}
               recordingTime={recordingTime} 
