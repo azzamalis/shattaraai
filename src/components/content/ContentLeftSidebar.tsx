@@ -159,18 +159,10 @@ export function ContentLeftSidebar({
       const handlePause = () => setIsPaused(!isPaused);
       const handleStop = async () => {
         setIsPaused(false);
-        setIsProcessing(true);
+        toggleRecording();
         
-        try {
-          // Stop the recording
-          toggleRecording();
-          
-          // The processing state will be managed by the transcription hook
-          // We don't need to manage it manually here anymore
-        } catch (error) {
-          console.error('Error processing recording:', error);
-          setIsProcessing(false);
-        }
+        // The processing state is now fully managed by the transcription hook
+        // isProcessingFinal state will show the pulsating loader automatically
       };
       
       return <>

@@ -1,3 +1,4 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 
@@ -12,169 +13,68 @@ const supabase = createClient(
 );
 
 // Store active WebSocket connections
-const activeConnections = new Map<string, WebSocket>();
+const activeConnections = new Map<string, { socket: WebSocket; userId: string; recordingId: string }>();
 
-serve(async (req) => {
-  const { headers } = req;
-  const upgradeHeader = headers.get("upgrade") || "";
-
-  if (upgradeHeader.toLowerCase() !== "websocket") {
-    return new Response("Expected WebSocket connection", { 
-      status: 400,
-      headers: corsHeaders 
-    });
-  }
-
-  try {
-    const { socket, response } = Deno.upgradeWebSocket(req);
-    
-    let recordingId: string | null = null;
-    let userId: string | null = null;
-
-  socket.onopen = () => {
-    console.log("WebSocket connection opened for real-time transcription");
-  };
-
-  socket.onmessage = async (event) => {
-    try {
-      const data = JSON.parse(event.data);
-      console.log("Received WebSocket message:", data.type);
-
-      switch (data.type) {
-        case 'subscribe':
-          recordingId = data.recordingId;
-          userId = data.userId;
-          
-          if (recordingId && userId) {
-            activeConnections.set(`${userId}-${recordingId}`, socket);
-            console.log(`Client subscribed to recording ${recordingId} for user ${userId}`);
-            
-            // Send initial transcription data
-            const { data: recording, error } = await supabase
-              .from('recordings')
-              .select('real_time_transcript, transcription_progress, transcription_status, transcription_confidence, chapters')
-              .eq('content_id', recordingId)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .maybeSingle();
-
-            if (!error && recording) {
-              socket.send(JSON.stringify({
-                type: 'initial_transcript',
-                recordingId,
-                transcript: recording.real_time_transcript || [],
-                progress: recording.transcription_progress || 0,
-                status: recording.transcription_status || 'pending',
-                confidence: recording.transcription_confidence || 0
-              }));
-            }
-          }
-          break;
-
-        case 'request_chapters':
-          if (recordingId) {
-            await generateChapters(recordingId, socket);
-          }
-          break;
-
-        case 'unsubscribe':
-          if (recordingId && userId) {
-            activeConnections.delete(`${userId}-${recordingId}`);
-            console.log(`Client unsubscribed from recording ${recordingId}`);
-          }
-          break;
-
-        default:
-          console.log('Unknown message type:', data.type);
+// Broadcast transcription update to specific client
+function broadcastTranscriptionUpdate(recordingId: string, userId: string, update: any) {
+  for (const [connectionId, connection] of activeConnections) {
+    if (connection.recordingId === recordingId && connection.userId === userId) {
+      try {
+        connection.socket.send(JSON.stringify({
+          type: 'transcription_update',
+          data: update
+        }));
+      } catch (error) {
+        console.error(`Failed to send update to connection ${connectionId}:`, error);
+        activeConnections.delete(connectionId);
       }
-    } catch (error) {
-      console.error('Error processing WebSocket message:', error);
-      socket.send(JSON.stringify({
-        type: 'error',
-        message: 'Failed to process message'
-      }));
     }
-  };
-
-  socket.onclose = () => {
-    if (recordingId && userId) {
-      activeConnections.delete(`${userId}-${recordingId}`);
-      console.log(`WebSocket connection closed for recording ${recordingId}`);
-    }
-  };
-
-  socket.onerror = (error) => {
-    console.error("WebSocket error:", error);
-  };
-
-    return response;
-  } catch (error) {
-    console.error('WebSocket upgrade failed:', error);
-    return new Response("WebSocket upgrade failed", { 
-      status: 500,
-      headers: corsHeaders 
-    });
   }
-});
+}
 
-// Function to generate chapters from transcription using AI
+// Generate chapters using OpenAI
 async function generateChapters(recordingId: string, socket: WebSocket) {
   try {
     console.log(`Generating chapters for recording ${recordingId}`);
-
-    const { data: recording, error } = await supabase
+    
+    // Fetch transcript data
+    const { data: recording, error: fetchError } = await supabase
       .from('recordings')
-      .select('real_time_transcript, transcript')
+      .select('transcript, real_time_transcript')
       .eq('content_id', recordingId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .single();
 
-    if (error || !recording) {
-      console.error('Error fetching recording for chapter generation:', error);
-      return;
-    }
-
-    // Combine real-time transcript chunks into full text
-    const realTimeTranscript = recording.real_time_transcript || [];
-    const fullText = realTimeTranscript.length > 0 
-      ? realTimeTranscript.map((chunk: any) => chunk.text).join(' ')
-      : recording.transcript || '';
-
-    if (!fullText.trim()) {
+    if (fetchError) {
+      console.error('Error fetching recording for chapters:', fetchError);
       socket.send(JSON.stringify({
-        type: 'chapters_update',
-        recordingId,
-        chapters: [],
-        message: 'No transcript available for chapter generation'
+        type: 'chapters_error',
+        error: 'Failed to fetch recording data'
       }));
       return;
     }
 
-    // Use OpenAI to generate chapters
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      console.error('OpenAI API key not configured for chapter generation');
+    const transcript = recording.transcript || 
+      (recording.real_time_transcript?.map((chunk: any) => chunk.text).join(' ')) || '';
+
+    if (!transcript.trim()) {
+      socket.send(JSON.stringify({
+        type: 'chapters_error',
+        error: 'No transcript available for chapter generation'
+      }));
       return;
     }
 
-    const prompt = `Analyze the following transcript and identify natural chapter breaks. Create 3-7 chapters with meaningful titles and brief summaries. Each chapter should represent a distinct topic or section.
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAIApiKey) {
+      console.error('OpenAI API key not configured');
+      socket.send(JSON.stringify({
+        type: 'chapters_error',
+        error: 'OpenAI API not configured'
+      }));
+      return;
+    }
 
-Transcript:
-${fullText}
-
-Please respond with a JSON array of chapters in this format:
-[
-  {
-    "title": "Chapter Title",
-    "summary": "Brief summary of what this chapter covers",
-    "startTime": 0,
-    "endTime": 30
-  }
-]
-
-Estimate start and end times based on the natural flow of the content.`;
-
+    // Request chapters from OpenAI
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -186,81 +86,214 @@ Estimate start and end times based on the natural flow of the content.`;
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at analyzing transcripts and creating meaningful chapter divisions. Always respond with valid JSON.'
+            content: `You are an expert at analyzing transcripts and creating meaningful chapters. 
+            Create 3-7 chapters for the given transcript. Each chapter should represent a distinct topic or theme.
+            
+            Return your response as a valid JSON array with this exact structure:
+            [
+              {
+                "title": "Chapter Title",
+                "summary": "Brief summary of what this chapter covers",
+                "startTime": 0,
+                "endTime": 120
+              }
+            ]
+            
+            Rules:
+            - startTime and endTime should be in seconds
+            - Chapters should not overlap
+            - Cover the entire transcript duration
+            - Keep titles concise (3-8 words)
+            - Keep summaries brief (1-2 sentences)
+            - Return ONLY the JSON array, no other text`
           },
           {
             role: 'user',
-            content: prompt
+            content: `Please create chapters for this transcript:\n\n${transcript}`
           }
         ],
-        max_tokens: 1500,
         temperature: 0.3,
+        max_tokens: 1000,
       }),
     });
 
     if (!response.ok) {
-      console.error('OpenAI API error for chapter generation:', await response.text());
+      const errorText = await response.text();
+      console.error('OpenAI API error:', errorText);
+      socket.send(JSON.stringify({
+        type: 'chapters_error',
+        error: 'Failed to generate chapters'
+      }));
       return;
     }
 
     const result = await response.json();
     const chaptersText = result.choices[0].message.content;
     
+    let chapters;
     try {
-      const chapters = JSON.parse(chaptersText);
-      
-      // Update recording with generated chapters
-      const { error: updateError } = await supabase
-        .from('recordings')
-        .update({
-          chapters: chapters,
-          updated_at: new Date().toISOString()
-        })
-        .eq('content_id', recordingId);
-
-      if (updateError) {
-        console.error('Error updating chapters:', updateError);
-      }
-
-      // Send chapters to WebSocket client
-      socket.send(JSON.stringify({
-        type: 'chapters_update',
-        recordingId,
-        chapters: chapters
-      }));
-
-      console.log(`Generated ${chapters.length} chapters for recording ${recordingId}`);
-
+      chapters = JSON.parse(chaptersText);
     } catch (parseError) {
-      console.error('Error parsing generated chapters:', parseError);
+      console.error('Failed to parse chapters JSON:', parseError);
       socket.send(JSON.stringify({
-        type: 'chapters_update',
-        recordingId,
-        chapters: [],
+        type: 'chapters_error',
         error: 'Failed to parse generated chapters'
       }));
+      return;
     }
 
-  } catch (error) {
-    console.error('Error in generateChapters:', error);
+    // Update recording with chapters
+    const { error: updateError } = await supabase
+      .from('recordings')
+      .update({
+        chapters: chapters,
+        processing_status: 'completed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('content_id', recordingId);
+
+    if (updateError) {
+      console.error('Error updating recording with chapters:', updateError);
+    }
+
+    // Send chapters to client
     socket.send(JSON.stringify({
-      type: 'error',
-      message: 'Failed to generate chapters'
+      type: 'chapters_generated',
+      chapters: chapters
+    }));
+
+    console.log(`Generated ${chapters.length} chapters for recording ${recordingId}`);
+
+  } catch (error) {
+    console.error('Error generating chapters:', error);
+    socket.send(JSON.stringify({
+      type: 'chapters_error',
+      error: 'Unexpected error generating chapters'
     }));
   }
 }
 
-// Broadcast transcription updates to active connections
-export async function broadcastTranscriptionUpdate(recordingId: string, userId: string, update: any) {
-  const connectionKey = `${userId}-${recordingId}`;
-  const socket = activeConnections.get(connectionKey);
-  
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({
-      type: 'transcription_update',
-      recordingId,
-      ...update
-    }));
-    console.log(`Broadcasted transcription update to ${connectionKey}`);
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
   }
-}
+
+  const upgrade = req.headers.get("upgrade") || "";
+  if (upgrade.toLowerCase() !== "websocket") {
+    return new Response("Request must be a WebSocket upgrade", { status: 400 });
+  }
+
+  const { socket, response } = Deno.upgradeWebSocket(req);
+  const connectionId = crypto.randomUUID();
+  
+  console.log(`WebSocket connection established: ${connectionId}`);
+
+  socket.onopen = () => {
+    console.log(`WebSocket opened for connection ${connectionId}`);
+  };
+
+  socket.onmessage = async (event) => {
+    try {
+      const message = JSON.parse(event.data);
+      console.log(`Received message on connection ${connectionId}:`, message.type);
+
+      switch (message.type) {
+        case 'subscribe': {
+          const { recordingId, userId } = message;
+          if (!recordingId || !userId) {
+            socket.send(JSON.stringify({
+              type: 'error',
+              message: 'Missing recordingId or userId'
+            }));
+            return;
+          }
+
+          // Store connection
+          activeConnections.set(connectionId, {
+            socket,
+            userId,
+            recordingId
+          });
+
+          // Fetch initial data
+          const { data: recording, error } = await supabase
+            .from('recordings')
+            .select('real_time_transcript, chapters, transcription_status, processing_status')
+            .eq('content_id', recordingId)
+            .single();
+
+          if (error) {
+            console.error('Error fetching recording:', error);
+            socket.send(JSON.stringify({
+              type: 'error',
+              message: 'Failed to fetch recording data'
+            }));
+            return;
+          }
+
+          // Send initial data
+          socket.send(JSON.stringify({
+            type: 'initial_data',
+            data: {
+              transcriptionChunks: recording.real_time_transcript || [],
+              chapters: recording.chapters || [],
+              transcriptionStatus: recording.transcription_status || 'ready',
+              processingStatus: recording.processing_status || 'ready'
+            }
+          }));
+
+          socket.send(JSON.stringify({
+            type: 'subscribed',
+            recordingId
+          }));
+
+          break;
+        }
+
+        case 'request_chapters': {
+          const { recordingId } = message;
+          if (!recordingId) {
+            socket.send(JSON.stringify({
+              type: 'error',
+              message: 'Missing recordingId'
+            }));
+            return;
+          }
+
+          await generateChapters(recordingId, socket);
+          break;
+        }
+
+        case 'unsubscribe': {
+          activeConnections.delete(connectionId);
+          socket.send(JSON.stringify({
+            type: 'unsubscribed'
+          }));
+          break;
+        }
+
+        default:
+          console.log(`Unknown message type: ${message.type}`);
+      }
+    } catch (error) {
+      console.error(`Error handling WebSocket message on connection ${connectionId}:`, error);
+      socket.send(JSON.stringify({
+        type: 'error',
+        message: 'Failed to process message'
+      }));
+    }
+  };
+
+  socket.onclose = () => {
+    console.log(`WebSocket closed for connection ${connectionId}`);
+    activeConnections.delete(connectionId);
+  };
+
+  socket.onerror = (error) => {
+    console.error(`WebSocket error on connection ${connectionId}:`, error);
+    activeConnections.delete(connectionId);
+  };
+
+  return response;
+});

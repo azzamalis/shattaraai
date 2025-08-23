@@ -81,3 +81,9 @@ verify_jwt = true
 
 [functions.openai-exam-chat]
 verify_jwt = true
+
+[functions.audio-transcription]
+verify_jwt = false
+
+[functions.real-time-transcription]
+verify_jwt = false

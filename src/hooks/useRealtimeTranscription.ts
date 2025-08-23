@@ -120,12 +120,12 @@ export const useRealtimeTranscription = (recordingId?: string) => {
           console.log('WebSocket message received:', data.type);
 
           switch (data.type) {
-            case 'initial_transcript':
-              setTranscriptionChunks(data.transcript || []);
-              setTranscriptionProgress(data.progress || 0);
-              setTranscriptionStatus(data.status || 'pending');
-              setAverageConfidence(data.confidence || 0);
-              updateFullTranscript(data.transcript || []);
+            case 'initial_data':
+              setTranscriptionChunks(data.data.transcriptionChunks || []);
+              setChapters(data.data.chapters || []);
+              setTranscriptionStatus(data.data.transcriptionStatus || 'pending');
+              setTranscriptionProgress(data.data.processingStatus === 'completed' ? 100 : 0);
+              updateFullTranscript(data.data.transcriptionChunks || []);
               break;
 
             case 'transcription_update':
@@ -141,8 +141,19 @@ export const useRealtimeTranscription = (recordingId?: string) => {
               if (data.confidence !== undefined) setAverageConfidence(data.confidence);
               break;
 
-            case 'chapters_update':
+            case 'chapters_generated':
               setChapters(data.chapters || []);
+              setTranscriptionStatus('completed');
+              setTranscriptionProgress(100);
+              break;
+
+            case 'chapters_error':
+              console.error('Chapter generation error:', data.error);
+              setTranscriptionStatus('completed'); // Still mark as completed
+              break;
+
+            case 'subscribed':
+              console.log('Successfully subscribed to recording:', data.recordingId);
               break;
 
             case 'error':
@@ -353,17 +364,29 @@ export const useRealtimeTranscription = (recordingId?: string) => {
         }
       }
 
-      // Request chapter generation
+      // Request chapter generation via WebSocket with fallback
       console.log('Requesting chapter generation...');
-      requestChapters();
-      
-      // Wait a bit for chapter generation to complete
-      setTimeout(() => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'request_chapters',
+          recordingId
+        }));
+        
+        // Set longer timeout for chapter generation
+        setTimeout(() => {
+          if (isProcessingFinal) {
+            setIsProcessingFinal(false);
+            setTranscriptionStatus('completed');
+            console.log('Chapter generation timeout - marking as completed');
+          }
+        }, 10000);
+      } else {
+        // Fallback: Direct database save and complete immediately
+        console.log('WebSocket unavailable, completing without chapters');
         setIsProcessingFinal(false);
         setTranscriptionStatus('completed');
-        toast.success('Transcription and chapters generated successfully');
-        console.log('Transcription finalization complete for recording:', recordingId);
-      }, 3000); // Give time for chapter generation
+        toast.success('Transcription completed');
+      }
       
     } catch (error) {
       console.error('Error finalizing transcription:', error);
@@ -371,7 +394,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
       setTranscriptionStatus('failed');
       toast.error('Failed to finalize transcription');
     }
-  }, [recordingId, user, transcriptionChunks, fullTranscript, averageConfidence, requestChapters]);
+  }, [recordingId, user, transcriptionChunks, fullTranscript, averageConfidence, isProcessingFinal]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
