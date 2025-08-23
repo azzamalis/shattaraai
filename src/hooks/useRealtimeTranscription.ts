@@ -29,6 +29,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
   const [transcriptionStatus, setTranscriptionStatus] = useState<'pending' | 'processing' | 'completed' | 'failed'>('pending');
   const [averageConfidence, setAverageConfidence] = useState(0);
   const [isProcessingAudio, setIsProcessingAudio] = useState(false);
+  const [isProcessingFinal, setIsProcessingFinal] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -311,7 +312,13 @@ export const useRealtimeTranscription = (recordingId?: string) => {
   const finalizeTranscription = useCallback(async (finalAudioData?: string) => {
     if (!recordingId || !user) return;
 
+    // Set final processing state - this will show the pulsating loader
+    setIsProcessingFinal(true);
+    setIsProcessingAudio(false); // Stop individual chunk processing
+
     try {
+      console.log('Starting final transcription processing...');
+
       if (finalAudioData) {
         // Process final audio chunk
         await supabase.functions.invoke('audio-transcription', {
@@ -347,14 +354,20 @@ export const useRealtimeTranscription = (recordingId?: string) => {
       }
 
       // Request chapter generation
+      console.log('Requesting chapter generation...');
       requestChapters();
       
-      setTranscriptionStatus('completed');
-      toast.success('Transcription completed and saved');
+      // Wait a bit for chapter generation to complete
+      setTimeout(() => {
+        setIsProcessingFinal(false);
+        setTranscriptionStatus('completed');
+        toast.success('Transcription and chapters generated successfully');
+        console.log('Transcription finalization complete for recording:', recordingId);
+      }, 3000); // Give time for chapter generation
       
-      console.log('Transcription finalized for recording:', recordingId);
     } catch (error) {
       console.error('Error finalizing transcription:', error);
+      setIsProcessingFinal(false);
       setTranscriptionStatus('failed');
       toast.error('Failed to finalize transcription');
     }
@@ -428,6 +441,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
     transcriptionStatus,
     averageConfidence,
     isProcessingAudio,
+    isProcessingFinal,
     isLoadingData,
     queueAudioChunk,
     finalizeTranscription,

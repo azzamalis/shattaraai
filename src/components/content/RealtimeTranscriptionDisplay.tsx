@@ -21,6 +21,7 @@ interface RealtimeTranscriptionDisplayProps {
   transcriptionStatus: 'pending' | 'processing' | 'completed' | 'failed';
   averageConfidence: number;
   isProcessingAudio: boolean;
+  isProcessingFinal?: boolean;
   isRecording?: boolean;
   isLoadingData?: boolean;
 }
@@ -32,6 +33,7 @@ export const RealtimeTranscriptionDisplay = ({
   transcriptionStatus,
   averageConfidence,
   isProcessingAudio,
+  isProcessingFinal = false,
   isRecording = false,
   isLoadingData = false
 }: RealtimeTranscriptionDisplayProps) => {
@@ -122,8 +124,8 @@ export const RealtimeTranscriptionDisplay = ({
     );
   }
 
-  // Show shimmer text when recording or processing
-  if (isRecording || isProcessingAudio) {
+  // Show shimmer text when processing final content (after recording stops)
+  if (isProcessingFinal) {
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">

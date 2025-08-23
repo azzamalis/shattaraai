@@ -16,6 +16,7 @@ interface RealtimeChaptersDisplayProps {
   chapters: ChapterData[];
   transcriptionStatus: 'pending' | 'processing' | 'completed' | 'failed';
   isRecording?: boolean;
+  isProcessingFinal?: boolean;
   onRequestChapters?: () => void;
   onChapterClick?: (startTime: number) => void;
   isLoadingData?: boolean;
@@ -25,6 +26,7 @@ export const RealtimeChaptersDisplay = ({
   chapters,
   transcriptionStatus,
   isRecording = false,
+  isProcessingFinal = false,
   onRequestChapters,
   onChapterClick,
   isLoadingData = false
@@ -55,8 +57,8 @@ export const RealtimeChaptersDisplay = ({
     );
   }
 
-  // Show recording state with shimmer text only
-  if (isRecording) {
+  // Show shimmer text when processing final content (after recording stops)
+  if (isProcessingFinal) {
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">

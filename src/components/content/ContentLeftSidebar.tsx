@@ -67,6 +67,7 @@ export function ContentLeftSidebar({
     transcriptionStatus,
     averageConfidence,
     isProcessingAudio,
+    isProcessingFinal,
     isLoadingData,
     queueAudioChunk,
     finalizeTranscription,
@@ -177,7 +178,7 @@ export function ContentLeftSidebar({
             <RecordingControls 
               isRecording={isRecording} 
               isPaused={isPaused}
-              isProcessing={isProcessing || isProcessingAudio}
+              isProcessing={isProcessing || isProcessingFinal}
               toggleRecording={toggleRecording}
               onPause={handlePause}
               onStop={handleStop}
@@ -263,11 +264,12 @@ export function ContentLeftSidebar({
           <ScrollArea className="h-full">
             {hasContent ? <div className="p-4 space-y-4">
                 {/* Real-time chapters for live recording and recordings with transcription */}
-                {(contentData.type === 'live_recording' || (contentData.type === 'recording' && shouldUseTranscription)) && (
+                 {(contentData.type === 'live_recording' || (contentData.type === 'recording' && shouldUseTranscription)) && (
                   <RealtimeChaptersDisplay
                     chapters={liveChapters}
                     transcriptionStatus={transcriptionStatus}
                     isRecording={isRecording && contentData.type === 'live_recording'}
+                    isProcessingFinal={isProcessingFinal}
                     onRequestChapters={requestChapters}
                     onChapterClick={handleChapterClick}
                     isLoadingData={isLoadingData || false}
@@ -352,7 +354,7 @@ export function ContentLeftSidebar({
           <ScrollArea className="h-full">
             {hasContent ? <div className="p-4 space-y-4">
                 {/* Real-time transcription for live recording and recordings with transcription */}
-                {(contentData.type === 'live_recording' || (contentData.type === 'recording' && shouldUseTranscription)) && (
+                 {(contentData.type === 'live_recording' || (contentData.type === 'recording' && shouldUseTranscription)) && (
                   <RealtimeTranscriptionDisplay
                     transcriptionChunks={transcriptionChunks}
                     fullTranscript={fullTranscript}
@@ -360,6 +362,7 @@ export function ContentLeftSidebar({
                     transcriptionStatus={transcriptionStatus}
                     averageConfidence={averageConfidence}
                     isProcessingAudio={isProcessingAudio}
+                    isProcessingFinal={isProcessingFinal}
                     isRecording={isRecording && !isPaused && contentData.type === 'live_recording'}
                     isLoadingData={isLoadingData || false}
                    />
