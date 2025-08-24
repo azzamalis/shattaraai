@@ -9,6 +9,7 @@ import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
 import { DocumentViewer } from '@/components/content/DocumentViewer/DocumentViewer';
 import { AudioPlayer } from '@/components/content/AudioPlayer';
+import { ModernAudioPlayer } from '@/components/content/ModernAudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -225,7 +226,7 @@ export function ContentLeftSidebar({
         };
         
         return <div className="p-4 shrink-0 bg-background">
-            <AudioPlayer 
+            <ModernAudioPlayer 
               metadata={audioMetadata} 
               onTimeUpdate={time => {
                 console.log('Audio playback time:', time);
