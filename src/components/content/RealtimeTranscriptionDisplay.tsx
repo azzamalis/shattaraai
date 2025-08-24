@@ -18,7 +18,7 @@ interface RealtimeTranscriptionDisplayProps {
   transcriptionChunks: TranscriptionChunk[];
   fullTranscript: string;
   transcriptionProgress: number;
-  transcriptionStatus: 'pending' | 'processing' | 'completed' | 'failed';
+  transcriptionStatus: 'ready' | 'pending' | 'processing' | 'completed' | 'failed';
   averageConfidence: number;
   isProcessingAudio: boolean;
   isProcessingFinal?: boolean;

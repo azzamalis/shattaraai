@@ -14,7 +14,7 @@ interface ChapterData {
 
 interface RealtimeChaptersDisplayProps {
   chapters: ChapterData[];
-  transcriptionStatus: 'pending' | 'processing' | 'completed' | 'failed';
+  transcriptionStatus: 'ready' | 'pending' | 'processing' | 'completed' | 'failed';
   isRecording?: boolean;
   isProcessingFinal?: boolean;
   onRequestChapters?: () => void;

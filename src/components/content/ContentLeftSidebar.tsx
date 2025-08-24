@@ -158,7 +158,7 @@ export function ContentLeftSidebar({
     // Live recording interface - show recording controls with conditional microphone selector
     if (contentData.type === 'live_recording') {
       // State 1: Before recording or ready to record
-      if (!isRecording && transcriptionStatus === 'pending') {
+      if (!isRecording && (transcriptionStatus === 'pending' || transcriptionStatus === 'ready')) {
         const handlePause = () => setIsPaused(!isPaused);
         const handleStop = async () => {
           setIsPaused(false);

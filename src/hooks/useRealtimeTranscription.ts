@@ -26,7 +26,7 @@ export const useRealtimeTranscription = (recordingId?: string) => {
   const [fullTranscript, setFullTranscript] = useState('');
   const [chapters, setChapters] = useState<ChapterData[]>([]);
   const [transcriptionProgress, setTranscriptionProgress] = useState(0);
-  const [transcriptionStatus, setTranscriptionStatus] = useState<'pending' | 'processing' | 'completed' | 'failed'>('pending');
+  const [transcriptionStatus, setTranscriptionStatus] = useState<'ready' | 'pending' | 'processing' | 'completed' | 'failed'>('pending');
   const [averageConfidence, setAverageConfidence] = useState(0);
   const [isProcessingAudio, setIsProcessingAudio] = useState(false);
   const [isProcessingFinal, setIsProcessingFinal] = useState(false);
