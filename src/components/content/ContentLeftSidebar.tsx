@@ -207,30 +207,31 @@ export function ContentLeftSidebar({
           </>;
       }
       
-      // State 3: Recording completed - Show Audio Player
-      if (!isRecording && transcriptionStatus === 'completed' && contentData.url) {
-        // Create audio URL from recording data or content data
-        const audioUrl = contentData.url;
+      // State 3: Recording completed - Show Audio Player (when completed OR has substantial data)
+      if (!isRecording && (transcriptionStatus === 'completed' || 
+           (transcriptionChunks.length > 0 && liveChapters.length > 0 && fullTranscript.length > 100))) {
+        // Create audio URL from recording data or content data  
+        const audioUrl = contentData.url || '/placeholder-audio.mp3'; // Fallback for testing
         const recordingDuration = transcriptionChunks.length > 0 ? 
-          Math.max(...transcriptionChunks.map(chunk => chunk.timestamp + (chunk.duration || 1))) : 60;
+          Math.max(...transcriptionChunks.map(chunk => chunk.timestamp + (chunk.duration || 1))) : 120;
         
-        if (audioUrl) {
-          const audioMetadata = {
-            audioUrl,
-            duration: recordingDuration,
-            title: contentData.title || 'Live Recording',
-            transcript: fullTranscript
-          };
-          
-          return <div className="p-4 shrink-0 bg-background">
-              <AudioPlayer 
-                metadata={audioMetadata} 
-                onTimeUpdate={time => {
-                  console.log('Audio playback time:', time);
-                }} 
-              />
-            </div>;
-        }
+        console.log('Showing audio player for completed recording:', { audioUrl, recordingDuration, transcriptionStatus, chunksCount: transcriptionChunks.length, chaptersCount: liveChapters.length });
+        
+        const audioMetadata = {
+          audioUrl,
+          duration: recordingDuration,
+          title: contentData.title || 'Live Recording',
+          transcript: fullTranscript
+        };
+        
+        return <div className="p-4 shrink-0 bg-background">
+            <AudioPlayer 
+              metadata={audioMetadata} 
+              onTimeUpdate={time => {
+                console.log('Audio playback time:', time);
+              }} 
+            />
+          </div>;
       }
       
       // Fallback to recording controls if no audio available yet
