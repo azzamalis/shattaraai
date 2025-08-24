@@ -8,7 +8,7 @@ import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
 import { DocumentViewer } from '@/components/content/DocumentViewer/DocumentViewer';
-import { AudioPlayer } from '@/components/content/AudioPlayer';
+
 import { ModernAudioPlayer } from '@/components/content/ModernAudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
@@ -287,9 +287,14 @@ export function ContentLeftSidebar({
     }
 
     // Existing recording interface
-    if (contentData.type === 'recording' && recordingStateInfo?.isExistingRecording && recordingMetadata) {
+    if (contentData.type === 'recording' && recordingStateInfo?.isExistingRecording && recordingMetadata && recordingMetadata.audioUrl) {
       return <div className="p-4 shrink-0 bg-dashboard-card dark:bg-dashboard-card">
-          <AudioPlayer metadata={recordingMetadata} onTimeUpdate={time => {
+          <ModernAudioPlayer metadata={{
+            audioUrl: recordingMetadata.audioUrl,
+            duration: recordingMetadata.duration,
+            title: contentData.title,
+            transcript: recordingMetadata.transcript
+          }} onTimeUpdate={time => {
           // Update current playback time for chapter navigation
           console.log('Current time:', time);
         }} />

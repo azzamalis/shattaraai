@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste, Expand, Minimize2 } from 'lucide-react';
 import { NewPDFViewer } from './NewPDFViewer';
+import { ModernAudioPlayer } from './ModernAudioPlayer';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -67,22 +68,9 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
   const renderAudioPlayer = (url: string) => {
     console.log('DEBUG: ContentViewer - Rendering audio player with URL:', url);
     return (
-      <div className="w-full sticky top-0 z-10 flex flex-col bg-background border-b border-border min-w-0 flex-shrink-0">
-        <div className="w-full p-4">
-          <div className="flex items-center justify-center">
-            <audio 
-              controls 
-              className="w-full"
-              onError={(e) => {
-                console.error('DEBUG: ContentViewer - Audio loading error:', e);
-              }}
-            >
-              <source src={url} type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
-          </div>
-        </div>
-      </div>
+      <ModernAudioPlayer 
+        metadata={{ audioUrl: url }}
+      />
     );
   };
 
