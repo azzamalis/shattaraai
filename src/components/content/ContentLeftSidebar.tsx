@@ -253,7 +253,32 @@ export function ContentLeftSidebar({
       </div>;
   };
   const renderTabContent = () => {
-    const hasContent = contentData.type === 'live_recording' ? isRecording : recordingStateInfo?.isNewRecording ? isRecording : recordingStateInfo?.isExistingRecording ? true : !!contentData.url || !!contentData.text;
+    // Check if we have real-time transcription data available
+    const hasRealtimeData = shouldUseTranscription && (
+      transcriptionChunks.length > 0 || 
+      fullTranscript.length > 0 || 
+      liveChapters.length > 0 || 
+      isLoadingData ||
+      transcriptionStatus === 'processing' ||
+      transcriptionStatus === 'completed'
+    );
+    
+    const hasContent = contentData.type === 'live_recording' ? (isRecording || hasRealtimeData) : 
+                      recordingStateInfo?.isNewRecording ? isRecording : 
+                      recordingStateInfo?.isExistingRecording ? true : 
+                      hasRealtimeData || !!contentData.url || !!contentData.text;
+
+    console.log('ContentLeftSidebar - hasContent check:', {
+      contentType: contentData.type,
+      isRecording,
+      hasRealtimeData,
+      transcriptionChunks: transcriptionChunks.length,
+      fullTranscript: fullTranscript.length,
+      liveChapters: liveChapters.length,
+      transcriptionStatus,
+      shouldUseTranscription,
+      hasContent
+    });
     return <>
         <TabsContent value="chapters" className="absolute inset-0">
           <ScrollArea className="h-full">
