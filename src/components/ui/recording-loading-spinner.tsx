@@ -13,7 +13,7 @@ export function RecordingLoadingSpinner({
 }: RecordingLoadingSpinnerProps) {
   return (
     <div className={cn("w-full", className)}>
-      <div className="flex flex-col items-center justify-center w-full bg-card rounded-xl min-h-[48px] gap-3 py-[20px] px-[12px]">
+      <div className="flex items-center justify-center w-full bg-card rounded-xl min-h-[48px] gap-3 py-[10px] px-[12px]">
         <PulsatingDots />
         <span className="text-card-foreground text-base font-medium">
           {message}

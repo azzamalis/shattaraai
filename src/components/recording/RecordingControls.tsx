@@ -24,7 +24,7 @@ export function RecordingControls({
 }: RecordingControlsProps) {
   // Show loading spinner when processing after recording stops
   if (isProcessing) {
-    return <RecordingLoadingSpinner />;
+    return <RecordingLoadingSpinner message="Processing" />;
   }
 
   return (

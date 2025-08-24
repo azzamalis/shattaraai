@@ -154,7 +154,7 @@ export function ContentLeftSidebar({
         </div>;
     }
 
-    // Live recording interface - show recording controls with microphone selector below
+    // Live recording interface - show recording controls with conditional microphone selector
     if (contentData.type === 'live_recording') {
       const handlePause = () => setIsPaused(!isPaused);
       const handleStop = async () => {
@@ -177,11 +177,14 @@ export function ContentLeftSidebar({
               recordingTime={recordingTime} 
             />
           </div>
-          <div className="pb-4 shrink-0 bg-background px-[5px] py-[6px]">
-            <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
-              <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
+          {/* Only show microphone selector before recording starts and during recording */}
+          {(!isProcessingFinal) && (
+            <div className="pb-4 shrink-0 bg-background px-[5px] py-[6px]">
+              <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
+                <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
+              </div>
             </div>
-          </div>
+          )}
         </>;
     }
 
@@ -333,12 +336,27 @@ export function ContentLeftSidebar({
                 {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Processing content...
                   </div>}
-              </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                
-                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
-                  {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view chapters' : 'Add content to view chapters'}
-                </p>
-              </div>}
+              </div> : (
+                // Show shimmer loading for live recording in processing state
+                (contentData.type === 'live_recording' && isProcessingFinal) ? (
+                  <div className="p-4 space-y-4">
+                    <div className="space-y-3">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="animate-pulse">
+                          <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                          <div className="h-3 bg-muted rounded w-1/2"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+                    <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
+                      {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view chapters' : 'Add content to view chapters'}
+                    </p>
+                  </div>
+                )
+              )}
           </ScrollArea>
         </TabsContent>
         
@@ -423,12 +441,28 @@ export function ContentLeftSidebar({
                 {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
                     Extracting text...
                   </div>}
-              </div> : <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                
-                <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
-                  {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
-                </p>
-              </div>}
+              </div> : (
+                // Show shimmer loading for live recording in processing state
+                (contentData.type === 'live_recording' && isProcessingFinal) ? (
+                  <div className="p-4 space-y-4">
+                    <div className="space-y-3">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="animate-pulse">
+                          <div className="h-3 bg-muted rounded w-full mb-1"></div>
+                          <div className="h-3 bg-muted rounded w-4/5 mb-1"></div>
+                          <div className="h-3 bg-muted rounded w-3/4"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+                    <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
+                      {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
+                    </p>
+                  </div>
+                )
+              )}
           </ScrollArea>
         </TabsContent>
       </>;
