@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { ContentData } from '@/pages/ContentPage';
 import { FileText, Video, Youtube, Globe, FileUp, ClipboardPaste, Expand, Minimize2 } from 'lucide-react';
 import { NewPDFViewer } from './NewPDFViewer';
-import { ModernAudioPlayer } from './ModernAudioPlayer';
+import { WaveformAudioPlayer } from './WaveformAudioPlayer';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -68,7 +68,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
   const renderAudioPlayer = (url: string) => {
     console.log('DEBUG: ContentViewer - Rendering audio player with URL:', url);
     return (
-      <ModernAudioPlayer 
+      <WaveformAudioPlayer 
         metadata={{ audioUrl: url }}
       />
     );

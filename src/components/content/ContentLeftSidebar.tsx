@@ -9,7 +9,7 @@ import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
 import { DocumentViewer } from '@/components/content/DocumentViewer/DocumentViewer';
 
-import { ModernAudioPlayer } from '@/components/content/ModernAudioPlayer';
+import { WaveformAudioPlayer } from '@/components/content/WaveformAudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -226,7 +226,7 @@ export function ContentLeftSidebar({
         };
         
         return <div className="p-4 shrink-0 bg-background">
-            <ModernAudioPlayer 
+            <WaveformAudioPlayer 
               metadata={audioMetadata} 
               onTimeUpdate={time => {
                 console.log('Audio playback time:', time);
@@ -289,7 +289,7 @@ export function ContentLeftSidebar({
     // Existing recording interface
     if (contentData.type === 'recording' && recordingStateInfo?.isExistingRecording && recordingMetadata && recordingMetadata.audioUrl) {
       return <div className="p-4 shrink-0 bg-dashboard-card dark:bg-dashboard-card">
-          <ModernAudioPlayer metadata={{
+          <WaveformAudioPlayer metadata={{
             audioUrl: recordingMetadata.audioUrl,
             duration: recordingMetadata.duration,
             title: contentData.title,
