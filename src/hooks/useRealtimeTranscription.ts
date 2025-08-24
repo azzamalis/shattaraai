@@ -149,6 +149,10 @@ export const useRealtimeTranscription = (recordingId?: string) => {
 
             case 'chapters_error':
               console.error('Chapter generation error:', data.error);
+              // Only show toast for unexpected errors, not for new recordings without transcript
+              if (!data.error.includes('No transcript available yet for new recording')) {
+                toast.error('Chapter generation error: ' + data.error);
+              }
               setTranscriptionStatus('completed'); // Still mark as completed
               break;
 
@@ -158,7 +162,10 @@ export const useRealtimeTranscription = (recordingId?: string) => {
 
             case 'error':
               console.error('WebSocket error:', data.message);
-              toast.error('Transcription error: ' + data.message);
+              // Only show toast for unexpected errors, not for new recordings
+              if (!data.message.includes('Failed to fetch recording data') || data.message.includes('Unexpected')) {
+                toast.error('Transcription error: ' + data.message);
+              }
               break;
           }
         } catch (error) {

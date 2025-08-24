@@ -45,11 +45,20 @@ async function generateChapters(recordingId: string, socket: WebSocket) {
       .single();
 
     if (fetchError) {
-      console.error('Error fetching recording for chapters:', fetchError);
-      socket.send(JSON.stringify({
-        type: 'chapters_error',
-        error: 'Failed to fetch recording data'
-      }));
+      if (fetchError.code === 'PGRST116') {
+        // No recording found - this is expected for new live recordings without transcript yet
+        console.log(`No recording found for content_id ${recordingId} - skipping chapter generation for new live recording`);
+        socket.send(JSON.stringify({
+          type: 'chapters_error',
+          error: 'No transcript available yet for new recording'
+        }));
+      } else {
+        console.error('Error fetching recording for chapters:', fetchError);
+        socket.send(JSON.stringify({
+          type: 'chapters_error',
+          error: 'Failed to fetch recording data'
+        }));
+      }
       return;
     }
 
@@ -216,31 +225,47 @@ serve(async (req) => {
             recordingId
           });
 
-          // Fetch initial data
+          // Fetch initial data - handle case where recording doesn't exist yet (new live recording)
           const { data: recording, error } = await supabase
             .from('recordings')
             .select('real_time_transcript, chapters, transcription_status, processing_status')
             .eq('content_id', recordingId)
             .single();
 
-          if (error) {
-            console.error('Error fetching recording:', error);
+          // For new live recordings, the recording might not exist in the database yet
+          // This is normal behavior, so we'll send empty initial data instead of an error
+          let initialData = {
+            transcriptionChunks: [],
+            chapters: [],
+            transcriptionStatus: 'ready',
+            processingStatus: 'ready'
+          };
+
+          if (error && error.code === 'PGRST116') {
+            // No rows returned - this is expected for new live recordings
+            console.log(`No recording found for content_id ${recordingId} - initializing empty state for new live recording`);
+          } else if (error) {
+            // Unexpected error
+            console.error('Unexpected error fetching recording:', error);
             socket.send(JSON.stringify({
               type: 'error',
               message: 'Failed to fetch recording data'
             }));
             return;
+          } else if (recording) {
+            // Recording exists, use its data
+            initialData = {
+              transcriptionChunks: recording.real_time_transcript || [],
+              chapters: recording.chapters || [],
+              transcriptionStatus: recording.transcription_status || 'ready',
+              processingStatus: recording.processing_status || 'ready'
+            };
           }
 
           // Send initial data
           socket.send(JSON.stringify({
             type: 'initial_data',
-            data: {
-              transcriptionChunks: recording.real_time_transcript || [],
-              chapters: recording.chapters || [],
-              transcriptionStatus: recording.transcription_status || 'ready',
-              processingStatus: recording.processing_status || 'ready'
-            }
+            data: initialData
           }));
 
           socket.send(JSON.stringify({
