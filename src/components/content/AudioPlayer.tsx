@@ -6,7 +6,12 @@ import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
 import { RecordingMetadata } from '@/lib/types';
 
 interface AudioPlayerProps {
-  metadata: RecordingMetadata;
+  metadata: RecordingMetadata | {
+    audioUrl: string;
+    duration?: number;
+    title?: string;
+    transcript?: string;
+  };
   onTimeUpdate?: (currentTime: number) => void;
 }
 

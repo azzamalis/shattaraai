@@ -156,35 +156,90 @@ export function ContentLeftSidebar({
 
     // Live recording interface - show recording controls with conditional microphone selector
     if (contentData.type === 'live_recording') {
-      const handlePause = () => setIsPaused(!isPaused);
-      const handleStop = async () => {
-        setIsPaused(false);
-        toggleRecording();
+      // State 1: Before recording or ready to record
+      if (!isRecording && transcriptionStatus === 'pending') {
+        const handlePause = () => setIsPaused(!isPaused);
+        const handleStop = async () => {
+          setIsPaused(false);
+          toggleRecording();
+        };
         
-        // The processing state is now fully managed by the transcription hook
-        // isProcessingFinal state will show the pulsating loader automatically
-      };
-      
-      return <>
-          <div className="p-4 pb-2 shrink-0 bg-background px-0 py-[14px]">
-            <RecordingControls 
-              isRecording={isRecording} 
-              isPaused={isPaused}
-              isProcessing={isProcessing || isProcessingFinal}
-              toggleRecording={toggleRecording}
-              onPause={handlePause}
-              onStop={handleStop}
-              recordingTime={recordingTime} 
-            />
-          </div>
-          {/* Only show microphone selector before recording starts and during recording */}
-          {(!isProcessingFinal) && (
+        return <>
+            <div className="p-4 pb-2 shrink-0 bg-background px-0 py-[14px]">
+              <RecordingControls 
+                isRecording={isRecording} 
+                isPaused={isPaused}
+                isProcessing={isProcessing}
+                toggleRecording={toggleRecording}
+                onPause={handlePause}
+                onStop={handleStop}
+                recordingTime={recordingTime} 
+              />
+            </div>
             <div className="pb-4 shrink-0 bg-background px-[5px] py-[6px]">
               <div className="text-xs text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70">
                 <MicrophoneSelector selected={selectedMicrophone} onSelect={onMicrophoneSelect} onClear={onMicrophoneClear} />
               </div>
             </div>
-          )}
+          </>;
+      }
+      
+      // State 2: Currently recording or processing
+      if (isRecording || isProcessingFinal || transcriptionStatus === 'processing') {
+        const handlePause = () => setIsPaused(!isPaused);
+        const handleStop = async () => {
+          setIsPaused(false);
+          toggleRecording();
+        };
+        
+        return <>
+            <div className="p-4 pb-2 shrink-0 bg-background px-0 py-[14px]">
+              <RecordingControls 
+                isRecording={isRecording} 
+                isPaused={isPaused}
+                isProcessing={isProcessing || isProcessingFinal}
+                toggleRecording={toggleRecording}
+                onPause={handlePause}
+                onStop={handleStop}
+                recordingTime={recordingTime} 
+              />
+            </div>
+          </>;
+      }
+      
+      // State 3: Recording completed - Show Audio Player
+      if (!isRecording && transcriptionStatus === 'completed' && contentData.url) {
+        // Create audio URL from recording data or content data
+        const audioUrl = contentData.url;
+        const recordingDuration = transcriptionChunks.length > 0 ? 
+          Math.max(...transcriptionChunks.map(chunk => chunk.timestamp + (chunk.duration || 1))) : 60;
+        
+        if (audioUrl) {
+          const audioMetadata = {
+            audioUrl,
+            duration: recordingDuration,
+            title: contentData.title || 'Live Recording',
+            transcript: fullTranscript
+          };
+          
+          return <div className="p-4 shrink-0 bg-background">
+              <AudioPlayer 
+                metadata={audioMetadata} 
+                onTimeUpdate={time => {
+                  console.log('Audio playback time:', time);
+                }} 
+              />
+            </div>;
+        }
+      }
+      
+      // Fallback to recording controls if no audio available yet
+      return <>
+          <div className="p-4 pb-2 shrink-0 bg-background px-0 py-[14px]">
+            <div className="text-center text-muted-foreground">
+              Recording completed but audio not yet available
+            </div>
+          </div>
         </>;
     }
 
