@@ -94,7 +94,7 @@ export const RealtimeChaptersDisplay = ({
             onClick={() => onChapterClick?.(chapter.startTime)}
           >
             {/* Timestamp */}
-            <div className="text-xs text-muted-foreground mb-2 font-mono">
+            <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
               {formatTime(chapter.startTime)}
               {chapter.endTime && chapter.endTime > chapter.startTime && (
                 <span> - {formatTime(chapter.endTime)}</span>

@@ -85,11 +85,11 @@ export const RealtimeTranscriptionDisplay = ({
     return 'text-red-600';
   };
 
-  const formatTime = (timestamp: number) => {
-    const totalSeconds = Math.floor(timestamp / 1000);
+  const formatTime = (seconds: number) => {
+    const totalSeconds = Math.floor(seconds / 1000);
     const mins = Math.floor(totalSeconds / 60);
     const secs = Math.floor(totalSeconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   // Show shimmer text when recording or processing final content
@@ -135,7 +135,7 @@ export const RealtimeTranscriptionDisplay = ({
               ref={index === transcriptionChunks.length - 1 ? lastChunkRef : undefined}
             >
               {/* Timestamp */}
-              <div className="text-xs text-muted-foreground mb-2 font-mono">
+              <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
                 {formatTime(chunk.timestamp)}
               </div>
               
@@ -149,7 +149,7 @@ export const RealtimeTranscriptionDisplay = ({
           /* Show full transcript if no chunks available */
           fullTranscript && (
             <div className="space-y-6">
-              <div className="text-xs text-muted-foreground mb-2 font-mono">
+              <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
                 00:00
               </div>
               <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
@@ -162,7 +162,7 @@ export const RealtimeTranscriptionDisplay = ({
         {/* Live indicator for recording */}
         {isRecording && transcriptionStatus === 'processing' && (
           <div className="group">
-            <div className="text-xs text-muted-foreground mb-2 font-mono">
+            <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
               Live
             </div>
             <div className="flex items-center gap-2">
