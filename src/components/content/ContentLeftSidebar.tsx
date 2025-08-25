@@ -373,37 +373,55 @@ export function ContentLeftSidebar({
                     </div>
                   </div>
                 )}
-                {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="grid grid-cols-2 gap-3">
-                    {recordingMetadata.chaptersData.map((chapter, index) => <Button key={chapter.id} variant="ghost" className="p-3 h-auto rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
-                        <div className="flex items-start justify-between gap-2 w-full">
-                          <div className="flex-1 min-w-0 text-left">
-                            <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
-                              {chapter.title}
-                            </h4>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-xs text-primary dark:text-primary whitespace-nowrap font-medium">
-                              {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                            </span>
-                          </div>
+                {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="space-y-6 px-4">
+                    {recordingMetadata.chaptersData.map((chapter, index) => <div key={chapter.id} className="group cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
+                        {/* Timestamp */}
+                        <div className="text-xs text-muted-foreground mb-1">
+                          {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
                         </div>
-                      </Button>)}
+                        
+                        {/* Title */}
+                        <h5 className="text-sm font-semibold text-foreground mb-2 group-hover:text-primary transition-colors leading-tight">
+                          {chapter.title}
+                        </h5>
+                        
+                        {/* Summary if available */}
+                        {chapter.summary && (
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {chapter.summary}
+                          </p>
+                        )}
+                        
+                        {/* Separator - only show if not the last item */}
+                        {index < recordingMetadata.chaptersData.length - 1 && (
+                          <div className="mt-6 border-b border-border/30"></div>
+                        )}
+                      </div>)}
                   </div>}
-                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="grid grid-cols-2 gap-3">
-                    {contentData.metadata.chapters.map((chapter: any, index: number) => <Button key={index} variant="ghost" className="p-3 h-auto rounded-lg bg-dashboard-bg dark:bg-dashboard-bg border border-dashboard-separator/20 dark:border-white/10 hover:bg-dashboard-separator/5 dark:hover:bg-white/5 transition-colors cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
-                        <div className="flex items-start justify-between gap-2 w-full">
-                          <div className="flex-1 min-w-0 text-left">
-                            <h4 className="font-medium text-dashboard-text dark:text-dashboard-text truncate text-sm">
-                              {chapter.title}
-                            </h4>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-xs text-primary dark:text-primary whitespace-nowrap font-medium">
-                              {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                            </span>
-                          </div>
+                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="space-y-6 px-4">
+                    {contentData.metadata.chapters.map((chapter: any, index: number) => <div key={index} className="group cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
+                        {/* Timestamp */}
+                        <div className="text-xs text-muted-foreground mb-1">
+                          {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
                         </div>
-                      </Button>)}
+                        
+                        {/* Title */}
+                        <h5 className="text-sm font-semibold text-foreground mb-2 group-hover:text-primary transition-colors leading-tight">
+                          {chapter.title}
+                        </h5>
+                        
+                        {/* Summary if available */}
+                        {chapter.summary && (
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {chapter.summary}
+                          </p>
+                        )}
+                        
+                        {/* Separator - only show if not the last item */}
+                        {index < contentData.metadata.chapters.length - 1 && (
+                          <div className="mt-6 border-b border-border/30"></div>
+                        )}
+                      </div>)}
                   </div>}
                 {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
                     <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">

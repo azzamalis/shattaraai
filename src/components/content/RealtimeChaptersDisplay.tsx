@@ -84,11 +84,10 @@ export const RealtimeChaptersDisplay = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium flex items-center gap-2">
-          <BookOpen className="h-4 w-4" />
+      <div className="flex items-center justify-between px-4">
+        <h4 className="text-sm font-medium text-foreground">
           Chapters ({chapters.length})
         </h4>
         
@@ -112,55 +111,39 @@ export const RealtimeChaptersDisplay = ({
 
       {/* Chapters List */}
       <ScrollArea className="h-64">
-        <div className="space-y-3">
+        <div className="space-y-6 px-4">
           {chapters.map((chapter, index) => (
             <div 
               key={index}
-              className="group p-3 bg-card/30 rounded-lg border border-border/50 hover:bg-card/60 hover:border-border transition-all cursor-pointer"
+              className="group cursor-pointer"
               onClick={() => onChapterClick?.(chapter.startTime)}
             >
-              <div className="flex items-start justify-between mb-2">
-                <h5 className="text-sm font-medium leading-tight group-hover:text-primary transition-colors">
-                  {chapter.title}
-                </h5>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  <span>{formatTime(chapter.startTime)}</span>
-                  {chapter.endTime && chapter.endTime > chapter.startTime && (
-                    <>
-                      <span>-</span>
-                      <span>{formatTime(chapter.endTime)}</span>
-                    </>
-                  )}
-                </div>
+              {/* Timestamp */}
+              <div className="text-xs text-muted-foreground mb-1">
+                {formatTime(chapter.startTime)}
+                {chapter.endTime && chapter.endTime > chapter.startTime && (
+                  <span> - {formatTime(chapter.endTime)}</span>
+                )}
               </div>
               
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              {/* Title */}
+              <h5 className="text-sm font-semibold text-foreground mb-2 group-hover:text-primary transition-colors leading-tight">
+                {chapter.title}
+              </h5>
+              
+              {/* Summary */}
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {chapter.summary}
               </p>
               
-              {/* Duration indicator */}
-              {chapter.endTime && chapter.endTime > chapter.startTime && (
-                <div className="mt-2 pt-2 border-t border-border/30">
-                  <Badge variant="secondary" className="text-xs">
-                    {Math.round((chapter.endTime - chapter.startTime) / 60)}m duration
-                  </Badge>
-                </div>
+              {/* Separator - only show if not the last item */}
+              {index < chapters.length - 1 && (
+                <div className="mt-6 border-b border-border/30"></div>
               )}
             </div>
           ))}
         </div>
       </ScrollArea>
-
-      {/* Footer Stats */}
-      <div className="flex justify-between text-xs text-muted-foreground p-2 bg-muted/20 rounded">
-        <span>Total chapters: {chapters.length}</span>
-        {chapters.length > 0 && (
-          <span>
-            Duration: {formatTime(Math.max(...chapters.map(c => c.endTime || c.startTime)))}
-          </span>
-        )}
-      </div>
     </div>
   );
 };
