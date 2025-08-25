@@ -84,66 +84,35 @@ export const RealtimeChaptersDisplay = ({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4">
-        <h4 className="text-sm font-medium text-foreground">
-          Chapters ({chapters.length})
-        </h4>
-        
-        <div className="flex items-center gap-2">
-          {transcriptionStatus === 'processing' && (
-            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-          )}
-          
-          {canGenerateChapters && onRequestChapters && (
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={onRequestChapters}
-              className="text-xs h-auto p-1"
-            >
-              <RefreshCw className="h-3 w-3" />
-            </Button>
-          )}
-        </div>
-      </div>
-
+    <div className="space-y-8">
       {/* Chapters List */}
-      <ScrollArea className="h-64">
-        <div className="space-y-6 px-4">
-          {chapters.map((chapter, index) => (
-            <div 
-              key={index}
-              className="group cursor-pointer"
-              onClick={() => onChapterClick?.(chapter.startTime)}
-            >
-              {/* Timestamp */}
-              <div className="text-xs text-muted-foreground mb-1">
-                {formatTime(chapter.startTime)}
-                {chapter.endTime && chapter.endTime > chapter.startTime && (
-                  <span> - {formatTime(chapter.endTime)}</span>
-                )}
-              </div>
-              
-              {/* Title */}
-              <h5 className="text-sm font-semibold text-foreground mb-2 group-hover:text-primary transition-colors leading-tight">
-                {chapter.title}
-              </h5>
-              
-              {/* Summary */}
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {chapter.summary}
-              </p>
-              
-              {/* Separator - only show if not the last item */}
-              {index < chapters.length - 1 && (
-                <div className="mt-6 border-b border-border/30"></div>
+      <div className="space-y-8">
+        {chapters.map((chapter, index) => (
+          <div 
+            key={index}
+            className="group cursor-pointer"
+            onClick={() => onChapterClick?.(chapter.startTime)}
+          >
+            {/* Timestamp */}
+            <div className="text-xs text-muted-foreground mb-2 font-mono">
+              {formatTime(chapter.startTime)}
+              {chapter.endTime && chapter.endTime > chapter.startTime && (
+                <span> - {formatTime(chapter.endTime)}</span>
               )}
             </div>
-          ))}
-        </div>
-      </ScrollArea>
+            
+            {/* Title */}
+            <h3 className="text-base font-bold text-foreground mb-3 group-hover:text-primary transition-colors leading-tight">
+              {chapter.title}
+            </h3>
+            
+            {/* Summary */}
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {chapter.summary}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

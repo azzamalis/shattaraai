@@ -344,7 +344,7 @@ export function ContentLeftSidebar({
     return <>
         <TabsContent value="chapters" className="absolute inset-0">
           <ScrollArea className="h-full">
-            {hasContent ? <div className="p-4 space-y-4">
+            {hasContent ? <div className="p-6 space-y-8">
                 {/* Real-time chapters for live recording and recordings with transcription */}
                  {(contentData.type === 'live_recording' || (contentData.type === 'recording' && shouldUseTranscription)) && (
                   <RealtimeChaptersDisplay
@@ -364,26 +364,26 @@ export function ContentLeftSidebar({
                       <div className="animate-pulse mb-2">
                         <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
                       </div>
-                      <p className="text-sm font-medium text-dashboard-text dark:text-dashboard-text mb-1">
+                      <p className="text-sm font-medium text-foreground mb-1">
                         Recording in progress
                       </p>
-                      <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                      <p className="text-xs text-muted-foreground">
                         Chapters will be generated automatically
                       </p>
                     </div>
                   </div>
                 )}
-                {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="space-y-6 px-4">
+                {recordingStateInfo?.isExistingRecording && recordingMetadata?.chaptersData && <div className="space-y-8">
                     {recordingMetadata.chaptersData.map((chapter, index) => <div key={chapter.id} className="group cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
                         {/* Timestamp */}
-                        <div className="text-xs text-muted-foreground mb-1">
-                          {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                        <div className="text-xs text-muted-foreground mb-2 font-mono">
+                          {Math.floor(chapter.startTime / 60).toString().padStart(2, '0')}:{(chapter.startTime % 60).toString().padStart(2, '0')}
                         </div>
                         
                         {/* Title */}
-                        <h5 className="text-sm font-semibold text-foreground mb-2 group-hover:text-primary transition-colors leading-tight">
+                        <h3 className="text-base font-bold text-foreground mb-3 group-hover:text-primary transition-colors leading-tight">
                           {chapter.title}
-                        </h5>
+                        </h3>
                         
                         {/* Summary if available */}
                         {chapter.summary && (
@@ -391,24 +391,19 @@ export function ContentLeftSidebar({
                             {chapter.summary}
                           </p>
                         )}
-                        
-                        {/* Separator - only show if not the last item */}
-                        {index < recordingMetadata.chaptersData.length - 1 && (
-                          <div className="mt-6 border-b border-border/30"></div>
-                        )}
                       </div>)}
                   </div>}
-                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="space-y-6 px-4">
+                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="space-y-8">
                     {contentData.metadata.chapters.map((chapter: any, index: number) => <div key={index} className="group cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
                         {/* Timestamp */}
-                        <div className="text-xs text-muted-foreground mb-1">
-                          {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                        <div className="text-xs text-muted-foreground mb-2 font-mono">
+                          {Math.floor(chapter.startTime / 60).toString().padStart(2, '0')}:{(chapter.startTime % 60).toString().padStart(2, '0')}
                         </div>
                         
                         {/* Title */}
-                        <h5 className="text-sm font-semibold text-foreground mb-2 group-hover:text-primary transition-colors leading-tight">
+                        <h3 className="text-base font-bold text-foreground mb-3 group-hover:text-primary transition-colors leading-tight">
                           {chapter.title}
-                        </h5>
+                        </h3>
                         
                         {/* Summary if available */}
                         {chapter.summary && (
@@ -416,47 +411,44 @@ export function ContentLeftSidebar({
                             {chapter.summary}
                           </p>
                         )}
-                        
-                        {/* Separator - only show if not the last item */}
-                        {index < contentData.metadata.chapters.length - 1 && (
-                          <div className="mt-6 border-b border-border/30"></div>
-                        )}
                       </div>)}
                   </div>}
-                {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
-                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
-                      <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(!isTextExpanded)} className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20">
+                {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-foreground">
+                    <div className="bg-card p-4 rounded-lg border border-border relative">
+                      <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(!isTextExpanded)} className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-muted">
                         {isTextExpanded ? <Minimize2 className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
                       </Button>
                       <div>
-                        <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
+                        <p className="text-xs text-muted-foreground mb-3 pr-10">
                           Website Content Summary
                         </p>
-                        <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10 line-clamp-6">
+                        <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed pr-10 line-clamp-6">
                           {contentData.text}
                         </p>
                       </div>
                     </div>
                   </div>}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-muted-foreground">
                     Processing content...
                   </div>}
               </div> : (
                 // Show shimmer loading for live recording in processing state
                 (contentData.type === 'live_recording' && isProcessingFinal) ? (
-                  <div className="p-4 space-y-4">
-                    <div className="space-y-3">
+                  <div className="p-6 space-y-6">
+                    <div className="space-y-4">
                       {[...Array(3)].map((_, i) => (
                         <div key={i} className="animate-pulse">
-                          <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                          <div className="h-3 bg-muted rounded w-1/2"></div>
+                          <div className="h-3 bg-muted rounded w-16 mb-2"></div>
+                          <div className="h-5 bg-muted rounded w-3/4 mb-3"></div>
+                          <div className="h-4 bg-muted rounded w-full mb-1"></div>
+                          <div className="h-4 bg-muted rounded w-5/6"></div>
                         </div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                    <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
+                  <div className="flex flex-col items-center justify-center min-h-[400px] p-6">
+                    <p className="text-muted-foreground text-center text-sm">
                       {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view chapters' : 'Add content to view chapters'}
                     </p>
                   </div>
