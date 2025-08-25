@@ -459,7 +459,7 @@ export function ContentLeftSidebar({
         
         <TabsContent value="transcripts" className="absolute inset-0">
           <ScrollArea className="h-full">
-            {hasContent ? <div className="p-4 space-y-4">
+            {hasContent ? <div className="p-6 space-y-8">
                 {/* Real-time transcription for live recording and recordings with transcription */}
                  {(contentData.type === 'live_recording' || (contentData.type === 'recording' && shouldUseTranscription)) && (
                   <RealtimeTranscriptionDisplay
@@ -481,80 +481,117 @@ export function ContentLeftSidebar({
                       <div className="animate-pulse mb-2">
                         <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
                       </div>
-                      <p className="text-sm font-medium text-dashboard-text dark:text-dashboard-text mb-1">
+                      <p className="text-sm font-medium text-foreground mb-1">
                         Recording in progress
                       </p>
-                      <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                      <p className="text-xs text-muted-foreground">
                         Transcription will be generated automatically
                       </p>
                     </div>
                   </div>
                 )}
-                {recordingStateInfo?.isExistingRecording && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
-                    <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-4">
-                      Full transcript available
-                    </p>
-                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10">
-                      <p>This is where the full transcript would appear. The transcript would be searchable and time-synced with the audio playback.</p>
+                {recordingStateInfo?.isExistingRecording && <div className="space-y-8">
+                    <div className="text-xs text-muted-foreground mb-2 font-mono">
+                      00:00
+                    </div>
+                    <div className="space-y-6">
+                      <p className="text-sm text-foreground leading-relaxed">
+                        Full transcript available. The transcript would be searchable and time-synced with the audio playback for precise navigation and reference.
+                      </p>
                     </div>
                   </div>}
-                {contentData.type === 'youtube' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
-                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
-                      <Button variant="ghost" size="sm" onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)} className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20">
-                        {isTranscriptExpanded ? <Minimize2 className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
-                      </Button>
-                      {contentData.metadata?.hasRealTranscript ? <div>
-                          <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
-                            Video Transcript (Auto-generated)
-                          </p>
-                          <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
-                            {contentData.text}
-                          </p>
-                        </div> : <div>
-                          <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
-                            Video Description (No transcript available)
-                          </p>
-                          <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
-                            {contentData.text}
-                          </p>
-                        </div>}
-                    </div>
-                  </div>}
-                {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-dashboard-text dark:text-dashboard-text">
-                    <div className="bg-dashboard-bg dark:bg-dashboard-bg p-4 rounded-lg border border-dashboard-separator/20 dark:border-white/10 relative">
-                      <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(!isTextExpanded)} className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-dashboard-separator/20">
-                        {isTextExpanded ? <Minimize2 className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
-                      </Button>
-                      <div>
-                        <p className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 pr-10">
-                          Website Full Text Content
-                        </p>
-                        <p className="text-sm text-dashboard-text dark:text-dashboard-text whitespace-pre-wrap leading-relaxed pr-10">
+                {contentData.type === 'youtube' && contentData.text && <div className="space-y-8">
+                    {contentData.metadata?.hasRealTranscript ? (
+                      <div className="space-y-6">
+                        <div className="text-xs text-muted-foreground mb-2 font-mono">
+                          Video Transcript
+                        </div>
+                        <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                          {contentData.text.split('\n').map((line, index) => {
+                            // Simple timestamp detection for YouTube transcripts
+                            const timestampMatch = line.match(/^(\d{1,2}:\d{2})/);
+                            if (timestampMatch) {
+                              const [timestamp, ...textParts] = line.split(' ');
+                              const text = textParts.join(' ');
+                              return (
+                                <div key={index} className="mb-6">
+                                  <div className="text-xs text-muted-foreground mb-2 font-mono">
+                                    {timestamp}
+                                  </div>
+                                  <p className="text-sm text-foreground leading-relaxed">
+                                    {text}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return line ? (
+                              <p key={index} className="text-sm text-foreground leading-relaxed mb-4">
+                                {line}
+                              </p>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="text-xs text-muted-foreground mb-2 font-mono">
+                          Video Description
+                        </div>
+                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                           {contentData.text}
                         </p>
                       </div>
-                    </div>
+                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)} 
+                      className="mt-4 text-xs"
+                    >
+                      {isTranscriptExpanded ? <Minimize2 className="h-3 w-3 mr-1" /> : <Expand className="h-3 w-3 mr-1" />}
+                      {isTranscriptExpanded ? 'Show Less' : 'Show More'}
+                    </Button>
                   </div>}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary">
+                {contentData.type === 'website' && contentData.text && <div className="space-y-8">
+                    <div className="space-y-6">
+                      <div className="text-xs text-muted-foreground mb-2 font-mono">
+                        Website Content
+                      </div>
+                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                        {contentData.text}
+                      </p>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setIsTextExpanded(!isTextExpanded)} 
+                      className="mt-4 text-xs"
+                    >
+                      {isTextExpanded ? <Minimize2 className="h-3 w-3 mr-1" /> : <Expand className="h-3 w-3 mr-1" />}
+                      {isTextExpanded ? 'Show Less' : 'Show More'}
+                    </Button>
+                  </div>}
+                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-muted-foreground">
                     Extracting text...
                   </div>}
               </div> : (
                 // Show shimmer loading for live recording in processing state
                 (contentData.type === 'live_recording' && isProcessingFinal) ? (
-                  <div className="p-4 space-y-4">
-                    <div className="space-y-3">
+                  <div className="p-6 space-y-6">
+                    <div className="space-y-6">
                       {[...Array(4)].map((_, i) => (
                         <div key={i} className="animate-pulse">
-                          <div className="h-3 bg-muted rounded w-full mb-1"></div>
-                          <div className="h-3 bg-muted rounded w-4/5 mb-1"></div>
-                          <div className="h-3 bg-muted rounded w-3/4"></div>
+                          <div className="h-3 bg-muted rounded w-16 mb-2"></div>
+                          <div className="h-4 bg-muted rounded w-full mb-1"></div>
+                          <div className="h-4 bg-muted rounded w-4/5 mb-1"></div>
+                          <div className="h-4 bg-muted rounded w-3/4"></div>
                         </div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-                    <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-center text-sm">
+                  <div className="flex flex-col items-center justify-center min-h-[400px] p-6">
+                    <p className="text-muted-foreground text-center text-sm">
                       {contentData.type === 'recording' || contentData.type === 'live_recording' ? 'Start recording to view transcripts' : 'Add content to view transcripts'}
                     </p>
                   </div>
