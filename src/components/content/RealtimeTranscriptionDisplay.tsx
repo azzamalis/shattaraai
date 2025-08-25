@@ -98,8 +98,8 @@ export const RealtimeTranscriptionDisplay = ({
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">
-          <TextShimmer className="text-lg font-semibold" duration={1.5}>
-            {isRecording ? 'Processing audio...' : 'Generating final transcript...'}
+          <TextShimmer className="text-base font-semibold" duration={1.5}>
+            Processing audio...
           </TextShimmer>
         </div>
       </ScrollArea>
@@ -172,8 +172,8 @@ export const RealtimeTranscriptionDisplay = ({
                 <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
                 <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
               </div>
-              <TextShimmer className="text-sm">
-                Transcribing...
+              <TextShimmer className="text-base">
+                Processing audio...
               </TextShimmer>
             </div>
           </div>

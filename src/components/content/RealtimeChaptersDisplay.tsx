@@ -45,8 +45,8 @@ export const RealtimeChaptersDisplay = ({
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">
-          <TextShimmer className="text-lg font-semibold" duration={1.5}>
-            {isRecording ? 'Processing audio for chapter generation...' : 'Generating content...'}
+          <TextShimmer className="text-base font-semibold" duration={1.5}>
+            Processing audio...
           </TextShimmer>
         </div>
       </ScrollArea>
