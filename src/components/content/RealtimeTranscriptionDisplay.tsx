@@ -85,8 +85,9 @@ export const RealtimeTranscriptionDisplay = ({
     return 'text-red-600';
   };
 
-  const formatTime = (seconds: number) => {
-    const totalSeconds = Math.floor(seconds / 1000);
+  const formatTime = (timestamp: number) => {
+    // Convert timestamp to seconds (assuming timestamp is in milliseconds)
+    const totalSeconds = Math.floor(timestamp / 1000);
     const mins = Math.floor(totalSeconds / 60);
     const secs = Math.floor(totalSeconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
