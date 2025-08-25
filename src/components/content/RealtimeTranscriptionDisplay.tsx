@@ -86,8 +86,10 @@ export const RealtimeTranscriptionDisplay = ({
   };
 
   const formatTimestamp = (timestamp: number) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour12: false, minute: '2-digit', second: '2-digit' });
+    const totalSeconds = Math.floor(timestamp / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   // Show shimmer text when recording or processing final content
@@ -121,105 +123,61 @@ export const RealtimeTranscriptionDisplay = ({
   }
 
   return (
-    <div className="space-y-4">
-      {/* Status Header */}
-      <div className="flex items-center justify-between p-3 bg-card/50 rounded-lg border">
-        <div className="flex items-center gap-2">
-          {getStatusIcon()}
-          <span className="text-sm font-medium">{getStatusText()}</span>
-          {isProcessingAudio && (
-            <Badge variant="secondary" className="text-xs">
-              Processing...
-            </Badge>
-          )}
-        </div>
-        
-        {averageConfidence > 0 && (
-          <div className="flex items-center gap-2 text-xs">
-            <span>Confidence:</span>
-            <span className={`font-medium ${getConfidenceColor(averageConfidence)}`}>
-              {(averageConfidence * 100).toFixed(0)}%
-            </span>
+    <div className="space-y-8">
+      {/* Real-time Transcription Display */}
+      <div className="space-y-8">
+        {/* Show chunks for real-time display */}
+        {transcriptionChunks.length > 0 ? (
+          transcriptionChunks.map((chunk, index) => (
+            <div 
+              key={`${chunk.chunkIndex}-${chunk.timestamp}`}
+              className="group"
+              ref={index === transcriptionChunks.length - 1 ? lastChunkRef : undefined}
+            >
+              {/* Timestamp */}
+              <div className="text-xs text-muted-foreground mb-2 font-mono">
+                {formatTimestamp(chunk.timestamp)}
+              </div>
+              
+              {/* Transcript Text */}
+              <p className="text-sm text-foreground leading-relaxed">
+                {chunk.text || 'Processing...'}
+              </p>
+            </div>
+          ))
+        ) : (
+          /* Show full transcript if no chunks available */
+          fullTranscript && (
+            <div className="space-y-6">
+              <div className="text-xs text-muted-foreground mb-2 font-mono">
+                00:00
+              </div>
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                {fullTranscript}
+              </p>
+            </div>
+          )
+        )}
+
+        {/* Live indicator for recording */}
+        {isRecording && transcriptionStatus === 'processing' && (
+          <div className="group">
+            <div className="text-xs text-muted-foreground mb-2 font-mono">
+              Live
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+              </div>
+              <TextShimmer className="text-sm">
+                Transcribing...
+              </TextShimmer>
+            </div>
           </div>
         )}
       </div>
-
-      {/* Progress Bar */}
-      {transcriptionProgress > 0 && transcriptionStatus === 'processing' && (
-        <div className="space-y-2">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Transcription Progress</span>
-            <span>{transcriptionProgress.toFixed(0)}%</span>
-          </div>
-          <Progress value={transcriptionProgress} className="h-2" />
-        </div>
-      )}
-
-      {/* Real-time Transcription Display */}
-      <ScrollArea className="h-64 w-full border rounded-lg p-4" ref={scrollAreaRef}>
-        <div className="space-y-3">
-          {/* Show chunks for real-time display */}
-          {transcriptionChunks.length > 0 ? (
-            transcriptionChunks.map((chunk, index) => (
-              <div 
-                key={`${chunk.chunkIndex}-${chunk.timestamp}`}
-                className={`p-3 rounded-lg transition-all duration-300 ${
-                  index === transcriptionChunks.length - 1 
-                    ? 'bg-primary/10 border border-primary/20' 
-                    : 'bg-muted/30'
-                }`}
-                ref={index === transcriptionChunks.length - 1 ? lastChunkRef : undefined}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-muted-foreground">
-                    Chunk {chunk.chunkIndex + 1} • {formatTimestamp(chunk.timestamp)}
-                  </span>
-                  <Badge 
-                    variant="outline" 
-                    className={`text-xs ${getConfidenceColor(chunk.confidence)}`}
-                  >
-                    {(chunk.confidence * 100).toFixed(0)}%
-                  </Badge>
-                </div>
-                <p className="text-sm leading-relaxed text-foreground">
-                  {chunk.text || 'Processing...'}
-                </p>
-              </div>
-            ))
-          ) : (
-            /* Show full transcript if no chunks available */
-            fullTranscript && (
-              <div className="p-3 rounded-lg bg-muted/30">
-                <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
-                  {fullTranscript}
-                </p>
-              </div>
-            )
-          )}
-
-          {/* Live shimmer indicator for recording */}
-          {isRecording && transcriptionStatus === 'processing' && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-              </div>
-              <TextShimmer className="text-xs">
-                Generating content...
-              </TextShimmer>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
-
-      {/* Stats */}
-      {transcriptionChunks.length > 0 && (
-        <div className="flex justify-between text-xs text-muted-foreground p-2 bg-muted/20 rounded">
-          <span>Chunks processed: {transcriptionChunks.length}</span>
-          <span>Total words: {fullTranscript.split(' ').filter(word => word.length > 0).length}</span>
-        </div>
-      )}
     </div>
   );
 };
