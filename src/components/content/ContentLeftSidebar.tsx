@@ -489,34 +489,17 @@ export function ContentLeftSidebar({
                     </div>
                   </div>}
                   
-                {/* Processing state for audio/video files */}
-                {(contentData.type === 'audio_file' || contentData.type === 'video') && (!contentData.chapters || contentData.chapters.length === 0) && (
+                {/* Empty state for audio/video files without chapters */}
+                {(contentData.type === 'audio_file' || contentData.type === 'video') && 
+                 (!contentData.chapters || contentData.chapters.length === 0) && 
+                 contentData.processing_status !== 'processing' && 
+                 contentData.processing_status !== 'failed' && (
                   <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                    {contentData.processing_status === 'pending' ? (
-                      <div className="text-center space-y-4">
-                        <p className="text-sm text-muted-foreground">Ready to generate chapters</p>
-                        <Button
-                          onClick={() => contentData.id && triggerProcessing(contentData.id)}
-                          className="flex items-center gap-2"
-                        >
-                          <RefreshCw className="h-4 w-4" />
-                          Start AI Processing
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="p-6 space-y-6">
-                        <div className="space-y-4">
-                          {[...Array(3)].map((_, i) => (
-                            <div key={i} className="animate-pulse">
-                              <div className="h-3 bg-muted rounded w-16 mb-2"></div>
-                              <div className="h-5 bg-muted rounded w-3/4 mb-3"></div>
-                              <div className="h-4 bg-muted rounded w-full mb-1"></div>
-                              <div className="h-4 bg-muted rounded w-5/6"></div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Chapters will be generated automatically when processing completes
+                      </p>
+                    </div>
                   </div>
                 )}
                 
@@ -609,6 +592,12 @@ export function ContentLeftSidebar({
                     <div className="text-center py-8">
                       <p className="text-sm text-destructive mb-2">Processing failed</p>
                       <p className="text-xs text-muted-foreground">{contentData.text_content || 'Unable to process audio/video file'}</p>
+                    </div>
+                  ) : !contentData.text_content && contentData.processing_status !== 'processing' && contentData.processing_status !== 'failed' ? (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <p className="text-sm text-muted-foreground text-center">
+                        Transcript will be generated automatically when processing completes
+                      </p>
                     </div>
                   ) : null
                 )}

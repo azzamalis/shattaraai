@@ -101,12 +101,14 @@ async function processInBackground(
     
     console.log(`Processing audio file: ${fileName} with MIME type: ${mimeType}`);
     
-    // Prepare form data for gpt-4o-mini-transcribe API
+    // Prepare form data for OpenAI Whisper API
+    // Support for multiple audio formats: mp3, mp4, mpeg, mpga, m4a, wav, and webm
     const formData = new FormData();
     const blob = new Blob([binaryAudio], { type: mimeType });
     formData.append('file', blob, fileName);
     formData.append('model', 'whisper-1');
     formData.append('response_format', 'verbose_json');
+    formData.append('language', 'en'); // Can be made dynamic if needed
 
     // Send to OpenAI Whisper API
     const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
