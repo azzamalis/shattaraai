@@ -17,6 +17,8 @@ import { useRealtimeTranscription } from '@/hooks/useRealtimeTranscription';
 import RealtimeTranscriptionDisplay from './RealtimeTranscriptionDisplay';
 import RealtimeChaptersDisplay from './RealtimeChaptersDisplay';
 import { AudioChunker, getOptimalAudioStream } from '@/utils/audioChunking';
+import { useContent } from '@/hooks/useContent';
+import { RefreshCw } from 'lucide-react';
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -54,6 +56,9 @@ export function ContentLeftSidebar({
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Use content hook for triggering processing
+  const { triggerProcessing } = useContent();
 
   // Real-time transcription integration for live recording and recordings with transcription data
   const shouldUseTranscription = contentData.type === 'live_recording' || 
@@ -453,17 +458,32 @@ export function ContentLeftSidebar({
                   
                 {/* Processing state for audio/video files */}
                 {(contentData.type === 'audio_file' || contentData.type === 'video') && (!contentData.chapters || contentData.chapters.length === 0) && (
-                  <div className="p-6 space-y-6">
-                    <div className="space-y-4">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="animate-pulse">
-                          <div className="h-3 bg-muted rounded w-16 mb-2"></div>
-                          <div className="h-5 bg-muted rounded w-3/4 mb-3"></div>
-                          <div className="h-4 bg-muted rounded w-full mb-1"></div>
-                          <div className="h-4 bg-muted rounded w-5/6"></div>
+                  <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                    {contentData.processing_status === 'pending' ? (
+                      <div className="text-center space-y-4">
+                        <p className="text-sm text-muted-foreground">Ready to generate chapters</p>
+                        <Button
+                          onClick={() => contentData.id && triggerProcessing(contentData.id)}
+                          className="flex items-center gap-2"
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                          Start AI Processing
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-6 space-y-6">
+                        <div className="space-y-4">
+                          {[...Array(3)].map((_, i) => (
+                            <div key={i} className="animate-pulse">
+                              <div className="h-3 bg-muted rounded w-16 mb-2"></div>
+                              <div className="h-5 bg-muted rounded w-3/4 mb-3"></div>
+                              <div className="h-4 bg-muted rounded w-full mb-1"></div>
+                              <div className="h-4 bg-muted rounded w-5/6"></div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 
@@ -556,17 +576,32 @@ export function ContentLeftSidebar({
                 
                 {/* Processing state for audio/video files */}
                 {(contentData.type === 'audio_file' || contentData.type === 'video') && !contentData.text_content && (
-                  <div className="p-6 space-y-6">
-                    <div className="space-y-6">
-                      {[...Array(4)].map((_, i) => (
-                        <div key={i} className="animate-pulse">
-                          <div className="h-3 bg-muted rounded w-16 mb-2"></div>
-                          <div className="h-4 bg-muted rounded w-full mb-1"></div>
-                          <div className="h-4 bg-muted rounded w-4/5 mb-1"></div>
-                          <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                    {contentData.processing_status === 'pending' ? (
+                      <div className="text-center space-y-4">
+                        <p className="text-sm text-muted-foreground">Ready to generate transcript</p>
+                        <Button
+                          onClick={() => contentData.id && triggerProcessing(contentData.id)}
+                          className="flex items-center gap-2"
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                          Start AI Processing
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-6 space-y-6">
+                        <div className="space-y-6">
+                          {[...Array(4)].map((_, i) => (
+                            <div key={i} className="animate-pulse">
+                              <div className="h-3 bg-muted rounded w-16 mb-2"></div>
+                              <div className="h-4 bg-muted rounded w-full mb-1"></div>
+                              <div className="h-4 bg-muted rounded w-4/5 mb-1"></div>
+                              <div className="h-4 bg-muted rounded w-3/4"></div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div> : (

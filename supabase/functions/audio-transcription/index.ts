@@ -48,7 +48,8 @@ async function processInBackground(
   audioData: string,
   chunkIndex: number,
   isRealTime: boolean,
-  timestamp: number
+  timestamp: number,
+  originalFileName?: string
 ) {
   try {
     console.log(`Background processing started for recording ${recordingId}`);
@@ -61,10 +62,49 @@ async function processInBackground(
     // Process audio in chunks to prevent memory issues
     const binaryAudio = processBase64Chunks(audioData);
     
+    // Determine file extension and MIME type from original filename or default to MP3
+    let fileExtension = 'mp3';
+    let mimeType = 'audio/mpeg';
+    let fileName = `audio_chunk_${chunkIndex}.mp3`;
+    
+    if (originalFileName) {
+      const ext = originalFileName.split('.').pop()?.toLowerCase();
+      if (ext) {
+        fileExtension = ext;
+        fileName = `audio_chunk_${chunkIndex}.${ext}`;
+        
+        // Map common audio extensions to MIME types
+        switch (ext) {
+          case 'mp3':
+            mimeType = 'audio/mpeg';
+            break;
+          case 'wav':
+            mimeType = 'audio/wav';
+            break;
+          case 'webm':
+            mimeType = 'audio/webm';
+            break;
+          case 'ogg':
+            mimeType = 'audio/ogg';
+            break;
+          case 'm4a':
+            mimeType = 'audio/mp4';
+            break;
+          case 'aac':
+            mimeType = 'audio/aac';
+            break;
+          default:
+            mimeType = 'audio/mpeg'; // Default to MP3
+        }
+      }
+    }
+    
+    console.log(`Processing audio file: ${fileName} with MIME type: ${mimeType}`);
+    
     // Prepare form data for gpt-4o-mini-transcribe API
     const formData = new FormData();
-    const blob = new Blob([binaryAudio], { type: 'audio/webm' });
-    formData.append('file', blob, `audio_chunk_${chunkIndex}.webm`);
+    const blob = new Blob([binaryAudio], { type: mimeType });
+    formData.append('file', blob, fileName);
     formData.append('model', 'gpt-4o-mini-transcribe');
     formData.append('response_format', 'verbose_json');
 
@@ -211,14 +251,15 @@ serve(async (req) => {
       recordingId, 
       chunkIndex = 0, 
       isRealTime = false,
-      timestamp = Date.now()
+      timestamp = Date.now(),
+      originalFileName
     } = await req.json();
 
     if (!audioData || !recordingId) {
       throw new Error('Missing audio data or recording ID');
     }
 
-    console.log(`Processing audio transcription for recording ${recordingId}, chunk ${chunkIndex}`);
+    console.log(`Processing audio transcription for recording ${recordingId}, chunk ${chunkIndex}, file: ${originalFileName || 'unknown'}`);
 
     // Start background processing
     const backgroundProcessing = processInBackground(
@@ -226,7 +267,8 @@ serve(async (req) => {
       audioData,
       chunkIndex,
       isRealTime,
-      timestamp
+      timestamp,
+      originalFileName
     );
 
     // Use waitUntil to ensure background task completes

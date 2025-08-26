@@ -600,7 +600,8 @@ export const useContent = () => {
                   audioData: base64Audio,
                   recordingId: contentId,
                   isRealTime: false,
-                  timestamp: Date.now()
+                  timestamp: Date.now(),
+                  originalFileName: file.name
                 }
               });
               
@@ -647,7 +648,8 @@ export const useContent = () => {
                   audioData: base64Audio,
                   recordingId: contentId,
                   isRealTime: false,
-                  timestamp: Date.now()
+                  timestamp: Date.now(),
+                  originalFileName: file.name
                 }
               });
               
