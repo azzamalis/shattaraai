@@ -14,32 +14,31 @@ const supabase = createClient(
 
 // Process base64 in chunks to prevent memory issues
 function processBase64Chunks(base64String: string, chunkSize = 32768) {
-  const chunks: Uint8Array[] = [];
-  let position = 0;
-  
-  while (position < base64String.length) {
-    const chunk = base64String.slice(position, position + chunkSize);
-    const binaryChunk = atob(chunk);
-    const bytes = new Uint8Array(binaryChunk.length);
-    
-    for (let i = 0; i < binaryChunk.length; i++) {
-      bytes[i] = binaryChunk.charCodeAt(i);
+  try {
+    // For base64 decoding, we need to ensure the string is valid first
+    // Base64 strings should be divisible by 4, so we pad if necessary
+    let paddedBase64 = base64String;
+    while (paddedBase64.length % 4 !== 0) {
+      paddedBase64 += '=';
     }
     
-    chunks.push(bytes);
-    position += chunkSize;
+    console.log('Processing base64 string of length:', paddedBase64.length);
+    
+    // Decode the entire base64 string at once for audio files
+    // Chunking base64 can break the encoding, so we decode it all at once
+    const binaryString = atob(paddedBase64);
+    const bytes = new Uint8Array(binaryString.length);
+    
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    console.log('Successfully decoded base64 to', bytes.length, 'bytes');
+    return bytes;
+  } catch (error) {
+    console.error('Failed to decode base64:', error);
+    throw new Error('Failed to decode base64: ' + error.message);
   }
-
-  const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-  const result = new Uint8Array(totalLength);
-  let offset = 0;
-
-  for (const chunk of chunks) {
-    result.set(chunk, offset);
-    offset += chunk.length;
-  }
-
-  return result;
 }
 
 // Background task for processing after response
