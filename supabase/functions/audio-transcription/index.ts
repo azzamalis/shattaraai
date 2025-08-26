@@ -56,8 +56,11 @@ async function processInBackground(
 
     const openAIApiKey = Deno.env.get('OPENAI_TRANSCRIPTION_API_KEY');
     if (!openAIApiKey) {
+      console.error('OpenAI Transcription API key not found in environment');
       throw new Error('OpenAI Transcription API key not configured');
     }
+    
+    console.log('OpenAI API key found, proceeding with transcription');
 
     // Process audio in chunks to prevent memory issues
     const binaryAudio = processBase64Chunks(audioData);
@@ -230,12 +233,18 @@ async function processInBackground(
     console.log(`Background processing completed for recording ${recordingId}`);
   } catch (error) {
     console.error(`Background processing failed for recording ${recordingId}:`, error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     
-    // Update processing status to failed
+    // Update processing status to failed with error details
     await supabase
       .from('content')
       .update({
         processing_status: 'failed',
+        text_content: `Processing error: ${error.message || 'Unknown error'}`,
         updated_at: new Date().toISOString()
       })
       .eq('id', recordingId);

@@ -26,12 +26,15 @@ serve(async (req) => {
 
     console.log(`Generating chapters for content ${contentId}`);
 
-    const openAIApiKey = Deno.env.get('OPENAI_TRANSCRIPTION_API_KEY');
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
-      throw new Error('OpenAI Transcription API key not configured');
+      console.error('OpenAI API key not found in environment');
+      throw new Error('OpenAI API key not configured');
     }
 
-    // Generate chapters using gpt-4o-mini-transcribe
+    console.log('OpenAI API key found, generating chapters with gpt-4o-mini');
+
+    // Generate chapters using gpt-4o-mini for chat completions
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -39,7 +42,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini-transcribe',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -67,7 +70,7 @@ serve(async (req) => {
             content: `Please analyze this transcript and create chapters:\n\n${transcript}`
           }
         ],
-        max_completion_tokens: 1000
+        max_tokens: 1000
       }),
     });
 
