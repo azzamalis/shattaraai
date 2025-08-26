@@ -411,9 +411,23 @@ export function ContentLeftSidebar({
                         </div>)}
                     </div>
                   ) : contentData.processing_status === 'failed' ? (
-                    <div className="text-center py-8">
+                    <div className="text-center py-8 space-y-4">
                       <p className="text-sm text-destructive mb-2">Processing failed</p>
-                      <p className="text-xs text-muted-foreground">{contentData.text_content || 'Unable to process audio/video file'}</p>
+                      <p className="text-xs text-muted-foreground mb-4">{contentData.text_content || 'Unable to process audio/video file'}</p>
+                      <Button
+                        onClick={() => contentData.id && triggerProcessing(contentData.id)}
+                        className="flex items-center gap-2"
+                        size="sm"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                        Retry Processing
+                      </Button>
+                    </div>
+                  ) : !contentData.chapters && contentData.processing_status !== 'processing' ? (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <p className="text-sm text-muted-foreground text-center">
+                        Chapters will be generated automatically when processing completes
+                      </p>
                     </div>
                   ) : null
                 )}

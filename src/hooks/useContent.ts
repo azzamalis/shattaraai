@@ -398,6 +398,15 @@ export const useContent = () => {
       if ((contentItem.type === 'audio_file' || contentItem.type === 'video') && contentItem.url) {
         console.log('DEBUG: useContent - Downloading file from URL for processing:', contentItem.url);
         
+        // Reset failed status first if needed
+        if (contentItem.processing_status === 'failed') {
+          await updateContent(contentId, { 
+            processing_status: 'pending',
+            text_content: null 
+          });
+          console.log('DEBUG: useContent - Reset failed status to pending');
+        }
+        
         // Update status to processing
         await updateContent(contentId, { processing_status: 'processing' });
         
@@ -603,10 +612,9 @@ export const useContent = () => {
               .eq('id', contentId);
             
             try {
-              // Convert file to base64 for the transcription function
-              console.log('DEBUG: useContent - Converting file to base64...');
-              const arrayBuffer = await file.arrayBuffer();
-              const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+              // Convert file to base64 in chunks to prevent stack overflow
+              console.log('DEBUG: useContent - Converting file to base64 in chunks...');
+              const base64Audio = await convertFileToBase64Chunked(file);
               console.log('DEBUG: useContent - Base64 conversion complete, length:', base64Audio.length);
               
               console.log('DEBUG: useContent - Calling audio-transcription function...');
@@ -676,6 +684,33 @@ export const useContent = () => {
     } catch (error) {
       console.error('DEBUG: useContent - Error in automatic content processing:', error);
     }
+  };
+
+  // Helper function to convert file to base64 in chunks to prevent stack overflow
+  const convertFileToBase64Chunked = async (file: File): Promise<string> => {
+    const chunkSize = 1024 * 1024; // 1MB chunks
+    const chunks: string[] = [];
+    
+    for (let start = 0; start < file.size; start += chunkSize) {
+      const end = Math.min(start + chunkSize, file.size);
+      const chunk = file.slice(start, end);
+      const arrayBuffer = await chunk.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      
+      // Convert chunk to base64 using smaller sub-chunks to avoid call stack issues
+      let chunkBase64 = '';
+      const subChunkSize = 8192; // 8KB sub-chunks for btoa
+      
+      for (let i = 0; i < uint8Array.length; i += subChunkSize) {
+        const subChunk = uint8Array.slice(i, i + subChunkSize);
+        const binaryString = Array.from(subChunk).map(byte => String.fromCharCode(byte)).join('');
+        chunkBase64 += btoa(binaryString);
+      }
+      
+      chunks.push(chunkBase64);
+    }
+    
+    return chunks.join('');
   };
 
   // Helper function to extract PDF text using pdfjs-dist
