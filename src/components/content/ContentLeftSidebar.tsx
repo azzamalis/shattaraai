@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown, Expand, Minimize2, Globe } from 'lucide-react';
+import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown, Expand, Minimize2, Globe, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ProcessingErrorBanner } from '@/components/content/ProcessingErrorBanner';
+import { useContentProcessing } from '@/hooks/useContentProcessing';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
@@ -54,6 +56,23 @@ export function ContentLeftSidebar({
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Content processing error handling
+  const {
+    hasError,
+    error,
+    retryProcessing,
+    clearError,
+    isProcessing: isRetrying
+  } = useContentProcessing();
+
+  // Check for processing errors in content metadata
+  const hasContentError = contentData.metadata?.processingErrors && 
+    Array.isArray(contentData.metadata.processingErrors) && 
+    contentData.metadata.processingErrors.length > 0;
+  
+  const latestContentError = hasContentError ? 
+    contentData.metadata.processingErrors[contentData.metadata.processingErrors.length - 1] : null;
 
   // Real-time transcription integration for live recording and recordings with transcription data
   const shouldUseTranscription = contentData.type === 'live_recording' || 
@@ -344,6 +363,28 @@ export function ContentLeftSidebar({
     return <>
         <TabsContent value="chapters" className="absolute inset-0">
           <ScrollArea className="h-full">
+            {/* Processing Error Banner */}
+            {(hasError || hasContentError) && (
+              <div className="p-6 pt-4">
+                <ProcessingErrorBanner
+                  error={hasError ? error! : latestContentError!}
+                  onRetry={hasError ? 
+                    () => retryProcessing(contentData.id, contentData.type) :
+                    () => retryProcessing(contentData.id, contentData.type)
+                  }
+                  onDismiss={hasError ? clearError : () => {
+                    // Clear content error by updating metadata
+                    onUpdateContent({
+                      metadata: {
+                        ...contentData.metadata,
+                        processingErrors: []
+                      }
+                    });
+                  }}
+                  isRetrying={isRetrying}
+                />
+              </div>
+            )}
             {hasContent ? <div className="p-6 space-y-8">
                 {/* Real-time chapters for live recording and recordings with transcription */}
                  {(contentData.type === 'live_recording' || (contentData.type === 'recording' && shouldUseTranscription)) && (

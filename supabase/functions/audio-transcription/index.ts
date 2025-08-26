@@ -53,14 +53,52 @@ async function processYouTubeContent(youtubeUrl: string, recordingId: string) {
     });
     
     if (ytError || !ytData?.audioData) {
-      throw new Error('Failed to extract YouTube audio');
+      console.error('YouTube extractor failed:', ytError);
+      return {
+        ok: false,
+        stage: 'youtube_extraction',
+        code: 'YOUTUBE_EXTRACTION_FAILED',
+        message: 'Failed to extract audio from YouTube video',
+        details: { 
+          error: ytError?.message || 'No audio data returned',
+          url: youtubeUrl,
+          recordingId 
+        }
+      };
     }
     
     // Process the extracted audio with Whisper
-    return await transcribeAudioData(ytData.audioData, recordingId, 'youtube');
+    const result = await transcribeAudioData(ytData.audioData, recordingId, 'youtube');
+    
+    if (result.ok === false) {
+      return result; // Return error from transcription
+    }
+    
+    // Trigger chapter generation after successful transcription
+    try {
+      await triggerChapterGeneration(recordingId, 'youtube');
+    } catch (chapterError) {
+      console.warn('Chapter generation failed but transcription succeeded:', chapterError);
+      // Don't fail the entire process if chapter generation fails
+    }
+    
+    return {
+      ok: true,
+      data: result
+    };
   } catch (error) {
     console.error('YouTube processing error:', error);
-    throw error;
+    return {
+      ok: false,
+      stage: 'youtube_extraction',
+      code: 'YOUTUBE_PROCESSING_ERROR',
+      message: 'Unexpected error processing YouTube content',
+      details: { 
+        error: error.message,
+        url: youtubeUrl,
+        recordingId 
+      }
+    };
   }
 }
 
@@ -75,7 +113,18 @@ async function processAudioFile(storageUrl: string, recordingId: string) {
       .download(storageUrl.split('/').pop() || '');
     
     if (downloadError || !fileData) {
-      throw new Error('Failed to download audio file');
+      console.error('Audio file download failed:', downloadError);
+      return {
+        ok: false,
+        stage: 'audio_download',
+        code: 'AUDIO_DOWNLOAD_FAILED',
+        message: 'Failed to download audio file from storage',
+        details: { 
+          error: downloadError?.message || 'No file data returned',
+          storageUrl,
+          recordingId 
+        }
+      };
     }
     
     // Convert to base64 for Whisper API
@@ -83,10 +132,36 @@ async function processAudioFile(storageUrl: string, recordingId: string) {
     const uint8Array = new Uint8Array(buffer);
     const base64Audio = btoa(String.fromCharCode.apply(null, Array.from(uint8Array)));
     
-    return await transcribeAudioData(base64Audio, recordingId, 'audio_file');
+    const result = await transcribeAudioData(base64Audio, recordingId, 'audio_file');
+    
+    if (result.ok === false) {
+      return result; // Return error from transcription
+    }
+    
+    // Trigger chapter generation after successful transcription
+    try {
+      await triggerChapterGeneration(recordingId, 'audio_file');
+    } catch (chapterError) {
+      console.warn('Chapter generation failed but transcription succeeded:', chapterError);
+    }
+    
+    return {
+      ok: true,
+      data: result
+    };
   } catch (error) {
     console.error('Audio file processing error:', error);
-    throw error;
+    return {
+      ok: false,
+      stage: 'audio_processing',
+      code: 'AUDIO_PROCESSING_ERROR',
+      message: 'Unexpected error processing audio file',
+      details: { 
+        error: error.message,
+        storageUrl,
+        recordingId 
+      }
+    };
   }
 }
 
@@ -102,7 +177,18 @@ async function processVideoFile(storageUrl: string, recordingId: string) {
       .download(storageUrl.split('/').pop() || '');
     
     if (downloadError || !fileData) {
-      throw new Error('Failed to download video file');
+      console.error('Video file download failed:', downloadError);
+      return {
+        ok: false,
+        stage: 'video_download',
+        code: 'VIDEO_DOWNLOAD_FAILED',
+        message: 'Failed to download video file from storage',
+        details: { 
+          error: downloadError?.message || 'No file data returned',
+          storageUrl,
+          recordingId 
+        }
+      };
     }
     
     // In a real implementation, you'd extract audio track here
@@ -111,9 +197,60 @@ async function processVideoFile(storageUrl: string, recordingId: string) {
     const uint8Array = new Uint8Array(buffer);
     const base64Audio = btoa(String.fromCharCode.apply(null, Array.from(uint8Array)));
     
-    return await transcribeAudioData(base64Audio, recordingId, 'video');
+    const result = await transcribeAudioData(base64Audio, recordingId, 'video');
+    
+    if (result.ok === false) {
+      return result; // Return error from transcription
+    }
+    
+    // Trigger chapter generation after successful transcription
+    try {
+      await triggerChapterGeneration(recordingId, 'video');
+    } catch (chapterError) {
+      console.warn('Chapter generation failed but transcription succeeded:', chapterError);
+    }
+    
+    return {
+      ok: true,
+      data: result
+    };
   } catch (error) {
     console.error('Video file processing error:', error);
+    return {
+      ok: false,
+      stage: 'video_processing',
+      code: 'VIDEO_PROCESSING_ERROR',
+      message: 'Unexpected error processing video file',
+      details: { 
+        error: error.message,
+        storageUrl,
+        recordingId 
+      }
+    };
+  }
+}
+
+// Trigger chapter generation via WebSocket
+async function triggerChapterGeneration(recordingId: string, contentType: string) {
+  console.log(`Triggering chapter generation for ${contentType} recording: ${recordingId}`);
+  
+  try {
+    const { data, error } = await supabase.functions.invoke('real-time-transcription', {
+      body: {
+        type: 'request_chapters',
+        recordingId,
+        contentType
+      }
+    });
+    
+    if (error) {
+      console.error('Failed to trigger chapter generation:', error);
+      throw new Error('Failed to trigger chapter generation');
+    }
+    
+    console.log('Chapter generation triggered successfully');
+  } catch (error) {
+    console.error('Error triggering chapter generation:', error);
     throw error;
   }
 }
@@ -122,63 +259,108 @@ async function processVideoFile(storageUrl: string, recordingId: string) {
 async function transcribeAudioData(base64Audio: string, recordingId: string, contentType: string) {
   const openAIApiKey = Deno.env.get('OPENAI_WHISPER_API_KEY');
   if (!openAIApiKey) {
-    throw new Error('OpenAI Whisper API key not configured');
+    return {
+      ok: false,
+      stage: 'transcription',
+      code: 'OPENAI_API_KEY_MISSING',
+      message: 'OpenAI Whisper API key not configured',
+      details: { contentType, recordingId }
+    };
   }
 
-  // Process audio in chunks to prevent memory issues
-  const binaryAudio = processBase64Chunks(base64Audio);
-  
-  // Prepare form data for Whisper API
-  const formData = new FormData();
-  const blob = new Blob([binaryAudio], { type: 'audio/webm' });
-  formData.append('file', blob, `${contentType}_audio.webm`);
-  formData.append('model', 'whisper-1');
-  formData.append('response_format', 'verbose_json');
+  try {
+    // Process audio in chunks to prevent memory issues
+    const binaryAudio = processBase64Chunks(base64Audio);
+    
+    // Prepare form data for Whisper API
+    const formData = new FormData();
+    const blob = new Blob([binaryAudio], { type: 'audio/webm' });
+    formData.append('file', blob, `${contentType}_audio.webm`);
+    formData.append('model', 'whisper-1');
+    formData.append('response_format', 'verbose_json');
 
-  // Send to OpenAI Whisper API
-  const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${openAIApiKey}`,
-    },
-    body: formData,
-  });
+    // Send to OpenAI Whisper API
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+      },
+      body: formData,
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('OpenAI Whisper API error:', errorText);
-    throw new Error(`Whisper API error: ${response.status} - ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI Whisper API error:', errorText);
+      return {
+        ok: false,
+        stage: 'transcription',
+        code: 'WHISPER_API_ERROR',
+        message: 'OpenAI Whisper transcription failed',
+        details: { 
+          status: response.status,
+          error: errorText,
+          contentType,
+          recordingId 
+        }
+      };
+    }
+
+    const result = await response.json();
+    console.log(`Whisper API response for ${contentType}:`, { text: result.text?.substring(0, 100), segments: result.segments?.length });
+
+    // Update recording with full transcript
+    const { error: updateError } = await supabase
+      .from('recordings')
+      .update({
+        transcript: result.text || '',
+        transcription_confidence: result.segments ? 
+          result.segments.reduce((acc: number, seg: any) => acc + (seg.avg_logprob || 0), 0) / result.segments.length : 0,
+        transcription_status: 'completed',
+        processing_status: 'completed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('content_id', recordingId);
+
+    if (updateError) {
+      console.error('Error updating recording:', updateError);
+      return {
+        ok: false,
+        stage: 'database_update',
+        code: 'DATABASE_UPDATE_FAILED',
+        message: 'Failed to save transcription to database',
+        details: { 
+          error: updateError.message,
+          contentType,
+          recordingId 
+        }
+      };
+    }
+
+    console.log(`Updated recording ${recordingId} with ${contentType} transcript`);
+    
+    return {
+      ok: true,
+      data: {
+        success: true,
+        transcript: result.text,
+        contentType,
+        recordingId
+      }
+    };
+  } catch (error) {
+    console.error('Transcription error:', error);
+    return {
+      ok: false,
+      stage: 'transcription',
+      code: 'TRANSCRIPTION_ERROR',
+      message: 'Unexpected error during transcription',
+      details: { 
+        error: error.message,
+        contentType,
+        recordingId 
+      }
+    };
   }
-
-  const result = await response.json();
-  console.log(`Whisper API response for ${contentType}:`, { text: result.text?.substring(0, 100), segments: result.segments?.length });
-
-  // Update recording with full transcript
-  const { error: updateError } = await supabase
-    .from('recordings')
-    .update({
-      transcript: result.text || '',
-      transcription_confidence: result.segments ? 
-        result.segments.reduce((acc: number, seg: any) => acc + (seg.avg_logprob || 0), 0) / result.segments.length : 0,
-      transcription_status: 'completed',
-      processing_status: 'ready_for_chapters',
-      updated_at: new Date().toISOString()
-    })
-    .eq('content_id', recordingId);
-
-  if (updateError) {
-    console.error('Error updating recording:', updateError);
-    throw new Error('Failed to update recording with transcription');
-  }
-
-  console.log(`Updated recording ${recordingId} with ${contentType} transcript`);
-  
-  return {
-    success: true,
-    transcript: result.text,
-    contentType,
-    recordingId
-  };
 }
 
 serve(async (req) => {
@@ -198,17 +380,29 @@ serve(async (req) => {
       youtubeUrl = null // New: for YouTube processing
     } = await req.json();
 
-    // Handle different content types
+    // Handle different content types with structured error responses
     if (contentType === 'youtube' && youtubeUrl) {
-      return await processYouTubeContent(youtubeUrl, recordingId);
+      const result = await processYouTubeContent(youtubeUrl, recordingId);
+      return new Response(JSON.stringify(result), {
+        status: result.ok ? 200 : 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
     
     if (contentType === 'audio_file' && storageUrl) {
-      return await processAudioFile(storageUrl, recordingId);
+      const result = await processAudioFile(storageUrl, recordingId);
+      return new Response(JSON.stringify(result), {
+        status: result.ok ? 200 : 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
     
     if (contentType === 'video' && storageUrl) {
-      return await processVideoFile(storageUrl, recordingId);
+      const result = await processVideoFile(storageUrl, recordingId);
+      return new Response(JSON.stringify(result), {
+        status: result.ok ? 200 : 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
     // Original live recording logic
@@ -337,11 +531,21 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in audio-transcription function:', error);
-    return new Response(
-      JSON.stringify({ 
+    
+    // Return structured error response
+    const errorResponse = {
+      ok: false,
+      stage: 'unknown',
+      code: 'AUDIO_TRANSCRIPTION_ERROR',
+      message: 'Unexpected error in audio transcription function',
+      details: { 
         error: error.message,
-        success: false 
-      }),
+        timestamp: new Date().toISOString()
+      }
+    };
+    
+    return new Response(
+      JSON.stringify(errorResponse),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
