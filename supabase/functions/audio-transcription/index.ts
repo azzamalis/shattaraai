@@ -42,25 +42,16 @@ function processBase64Chunks(base64String: string, chunkSize = 32768) {
   return result;
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+// Background task for processing after response
+async function processInBackground(
+  recordingId: string,
+  audioData: string,
+  chunkIndex: number,
+  isRealTime: boolean,
+  timestamp: number
+) {
   try {
-    const { 
-      audioData, 
-      recordingId, 
-      chunkIndex = 0, 
-      isRealTime = false,
-      timestamp = Date.now()
-    } = await req.json();
-
-    if (!audioData || !recordingId) {
-      throw new Error('Missing audio data or recording ID');
-    }
-
-    console.log(`Processing audio transcription for recording ${recordingId}, chunk ${chunkIndex}`);
+    console.log(`Background processing started for recording ${recordingId}`);
 
     const openAIApiKey = Deno.env.get('OPENAI_TRANSCRIPTION_API_KEY');
     if (!openAIApiKey) {
@@ -75,7 +66,6 @@ serve(async (req) => {
     const blob = new Blob([binaryAudio], { type: 'audio/webm' });
     formData.append('file', blob, `audio_chunk_${chunkIndex}.webm`);
     formData.append('model', 'gpt-4o-mini-transcribe');
-    // No language parameter - let Whisper auto-detect the language
     formData.append('response_format', 'verbose_json');
 
     // Send to OpenAI Whisper API
@@ -107,7 +97,7 @@ serve(async (req) => {
       duration: result.duration || 0
     };
 
-    // Update recording with new transcription chunk
+    // Update recording/content with new transcription chunk
     if (isRealTime) {
       // For real-time transcription, append to real_time_transcript array
       const { data: currentRecording, error: fetchError } = await supabase
@@ -183,7 +173,6 @@ serve(async (req) => {
         }
       } catch (chapterError) {
         console.error('Error triggering chapter generation:', chapterError);
-        // Don't throw - transcription was successful, chapter generation is bonus
         
         // Update processing status to completed since transcription worked
         await supabase
@@ -196,11 +185,67 @@ serve(async (req) => {
       }
     }
 
+    console.log(`Background processing completed for recording ${recordingId}`);
+  } catch (error) {
+    console.error(`Background processing failed for recording ${recordingId}:`, error);
+    
+    // Update processing status to failed
+    await supabase
+      .from('content')
+      .update({
+        processing_status: 'failed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', recordingId);
+  }
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { 
+      audioData, 
+      recordingId, 
+      chunkIndex = 0, 
+      isRealTime = false,
+      timestamp = Date.now()
+    } = await req.json();
+
+    if (!audioData || !recordingId) {
+      throw new Error('Missing audio data or recording ID');
+    }
+
+    console.log(`Processing audio transcription for recording ${recordingId}, chunk ${chunkIndex}`);
+
+    // Start background processing
+    const backgroundProcessing = processInBackground(
+      recordingId,
+      audioData,
+      chunkIndex,
+      isRealTime,
+      timestamp
+    );
+
+    // Use waitUntil to ensure background task completes
+    if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime.waitUntil) {
+      EdgeRuntime.waitUntil(backgroundProcessing);
+    } else {
+      // Fallback for environments without EdgeRuntime
+      backgroundProcessing.catch(error => {
+        console.error('Background processing failed:', error);
+      });
+    }
+
+    // Return immediate response
     return new Response(
       JSON.stringify({ 
         success: true,
-        transcription: transcriptionChunk,
-        recordingId 
+        message: 'Transcription started',
+        recordingId,
+        chunkIndex
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

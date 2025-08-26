@@ -268,8 +268,11 @@ export const useContent = () => {
       
       // Auto-trigger content processing based on content type
       if (contentId) {
-        console.log('DEBUG: useContent - Content created successfully, starting processing...', { contentId, type: finalContentData.type });
-        await processContentAutomatically(contentId, finalContentData, file);
+        console.log('DEBUG: useContent - Content created successfully, starting automatic processing...', { contentId, type: finalContentData.type });
+        // Don't await - let it run in background
+        processContentAutomatically(contentId, finalContentData, file).catch(error => {
+          console.error('DEBUG: useContent - Background processing failed:', error);
+        });
       }
       
       console.log('DEBUG: useContent - addContentWithFile completed, content ID:', contentId);
@@ -325,7 +328,11 @@ export const useContent = () => {
       
       // Auto-trigger content processing based on content type
       if (contentId) {
-        await processContentAutomatically(contentId, finalContentData, undefined);
+        console.log('DEBUG: useContent - Content with metadata created, starting automatic processing...', { contentId, type: finalContentData.type });
+        // Don't await - let it run in background
+        processContentAutomatically(contentId, finalContentData, undefined).catch(error => {
+          console.error('DEBUG: useContent - Background processing failed:', error);
+        });
       }
       
       return contentId;
@@ -573,6 +580,13 @@ export const useContent = () => {
               size: file.size,
               type: file.type
             });
+            
+            // Update status to processing first
+            await supabase
+              .from('content')
+              .update({ processing_status: 'processing' })
+              .eq('id', contentId);
+            
             try {
               // Convert file to base64 for the transcription function
               console.log('DEBUG: useContent - Converting audio file to base64...');
@@ -594,6 +608,11 @@ export const useContent = () => {
               toast.success('Audio uploaded! Transcription in progress...');
             } catch (extractionError) {
               console.error('DEBUG: useContent - Audio transcription failed:', extractionError);
+              // Reset status to pending on error
+              await supabase
+                .from('content')
+                .update({ processing_status: 'pending' })
+                .eq('id', contentId);
               toast.error('Audio transcription failed');
             }
           } else {
@@ -608,6 +627,13 @@ export const useContent = () => {
               size: file.size,
               type: file.type
             });
+            
+            // Update status to processing first
+            await supabase
+              .from('content')
+              .update({ processing_status: 'processing' })
+              .eq('id', contentId);
+            
             try {
               // Convert file to base64 for the transcription function
               console.log('DEBUG: useContent - Converting video file to base64...');
@@ -629,6 +655,11 @@ export const useContent = () => {
               toast.success('Video uploaded! Audio transcription in progress...');
             } catch (extractionError) {
               console.error('DEBUG: useContent - Video transcription failed:', extractionError);
+              // Reset status to pending on error
+              await supabase
+                .from('content')
+                .update({ processing_status: 'pending' })
+                .eq('id', contentId);
               toast.error('Video transcription failed');
             }
           } else {
