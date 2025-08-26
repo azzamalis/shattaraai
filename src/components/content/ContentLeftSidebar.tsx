@@ -17,6 +17,8 @@ import { useRealtimeTranscription } from '@/hooks/useRealtimeTranscription';
 import RealtimeTranscriptionDisplay from './RealtimeTranscriptionDisplay';
 import RealtimeChaptersDisplay from './RealtimeChaptersDisplay';
 import { AudioChunker, getOptimalAudioStream } from '@/utils/audioChunking';
+import { useContent } from '@/hooks/useContent';
+import { RefreshCw } from 'lucide-react';
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -54,6 +56,9 @@ export function ContentLeftSidebar({
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Use content hook for triggering processing
+  const { triggerProcessing } = useContent();
 
   // Real-time transcription integration for live recording and recordings with transcription data
   const shouldUseTranscription = contentData.type === 'live_recording' || 
@@ -454,16 +459,31 @@ export function ContentLeftSidebar({
                 {/* Processing state for audio/video files */}
                 {(contentData.type === 'audio_file' || contentData.type === 'video') && (!contentData.chapters || contentData.chapters.length === 0) && (
                   <div className="flex items-center justify-center py-8">
-                    <div className="text-center">
-                      <div className="animate-pulse mb-2">
-                        <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
-                      </div>
-                      <p className="text-sm font-medium text-foreground mb-1">
-                        Processing {contentData.type === 'video' ? 'video' : 'audio'} content
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Chapters will be generated automatically
-                      </p>
+                    <div className="text-center space-y-4">
+                      {contentData.processing_status === 'pending' ? (
+                        <>
+                          <p className="text-sm text-muted-foreground">Ready to generate chapters</p>
+                          <Button
+                            onClick={() => contentData.id && triggerProcessing(contentData.id)}
+                            className="flex items-center gap-2"
+                          >
+                            <RefreshCw className="h-4 w-4" />
+                            Start AI Processing
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="animate-pulse mb-2">
+                            <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
+                          </div>
+                          <p className="text-sm font-medium text-foreground mb-1">
+                            Processing {contentData.type === 'video' ? 'video' : 'audio'} content
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Chapters will be generated automatically
+                          </p>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}
@@ -558,16 +578,31 @@ export function ContentLeftSidebar({
                 {/* Processing state for audio/video files */}
                 {(contentData.type === 'audio_file' || contentData.type === 'video') && !contentData.text_content && (
                   <div className="flex items-center justify-center py-8">
-                    <div className="text-center">
-                      <div className="animate-pulse mb-2">
-                        <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
-                      </div>
-                      <p className="text-sm font-medium text-foreground mb-1">
-                        Processing {contentData.type === 'video' ? 'video' : 'audio'} content
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Transcription will be generated automatically
-                      </p>
+                    <div className="text-center space-y-4">
+                      {contentData.processing_status === 'pending' ? (
+                        <>
+                          <p className="text-sm text-muted-foreground">Ready to generate transcript</p>
+                          <Button
+                            onClick={() => contentData.id && triggerProcessing(contentData.id)}
+                            className="flex items-center gap-2"
+                          >
+                            <RefreshCw className="h-4 w-4" />
+                            Start AI Processing
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="animate-pulse mb-2">
+                            <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
+                          </div>
+                          <p className="text-sm font-medium text-foreground mb-1">
+                            Processing {contentData.type === 'video' ? 'video' : 'audio'} content
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Transcription will be generated automatically
+                          </p>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}

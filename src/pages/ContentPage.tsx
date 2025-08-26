@@ -28,6 +28,8 @@ export interface ContentData {
   isProcessing?: boolean;
   hasError?: boolean;
   errorMessage?: string;
+  processing_status?: string;
+  transcription_confidence?: number;
 }
 export default function ContentPage() {
   const {
@@ -105,7 +107,11 @@ export default function ContentPage() {
             url: fetchedContent.url,
             filename: fetchedContent.filename,
             text: fetchedContent.text_content,
+            text_content: fetchedContent.text_content,
+            chapters: fetchedContent.chapters,
             metadata: fetchedContent.metadata,
+            processing_status: fetchedContent.processing_status,
+            transcription_confidence: fetchedContent.transcription_confidence,
             isProcessing: false,
             hasError: false
           });

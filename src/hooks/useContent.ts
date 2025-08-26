@@ -18,6 +18,9 @@ export interface ContentItem {
   metadata: Record<string, any>;
   created_at: string;
   updated_at: string;
+  processing_status?: string;
+  chapters?: any;
+  transcription_confidence?: number;
 }
 
 export const useContent = () => {
@@ -365,6 +368,70 @@ export const useContent = () => {
     } catch (error) {
       console.error('Error updating content:', error);
       toast.error('Failed to update content');
+    }
+  };
+
+  // Add a function to manually trigger processing for existing content
+  const triggerProcessing = async (contentId: string) => {
+    console.log('DEBUG: useContent - Manually triggering processing for:', contentId);
+    
+    try {
+      // Get the content item
+      const { data: contentItem, error } = await supabase
+        .from('content')
+        .select('*')
+        .eq('id', contentId)
+        .single();
+
+      if (error || !contentItem) {
+        throw new Error('Content not found');
+      }
+
+      // For audio/video files, download and process them
+      if ((contentItem.type === 'audio_file' || contentItem.type === 'video') && contentItem.url) {
+        console.log('DEBUG: useContent - Downloading file from URL for processing:', contentItem.url);
+        
+        // Update status to processing
+        await updateContent(contentId, { processing_status: 'processing' });
+        
+        // Download the file from the URL
+        const response = await fetch(contentItem.url);
+        if (!response.ok) {
+          throw new Error('Failed to download file');
+        }
+        
+        const blob = await response.blob();
+        const file = new File([blob], contentItem.filename || 'file', { type: blob.type });
+        
+        console.log('DEBUG: useContent - Downloaded file details:', {
+          name: file.name,
+          size: file.size,
+          type: file.type
+        });
+
+        // Call processContentAutomatically with the downloaded file
+        await processContentAutomatically(contentId, {
+          title: contentItem.title,
+          type: contentItem.type as ContentItem['type'],
+          url: contentItem.url,
+          text_content: contentItem.text_content,
+          filename: contentItem.filename,
+          storage_path: contentItem.storage_path,
+          metadata: contentItem.metadata as Record<string, any>,
+          room_id: contentItem.room_id,
+          processing_status: contentItem.processing_status,
+          chapters: contentItem.chapters,
+          transcription_confidence: contentItem.transcription_confidence
+        }, file);
+        toast.success('Processing started for uploaded content!');
+      } else {
+        toast.error('Content type not supported for processing');
+      }
+    } catch (error) {
+      console.error('DEBUG: useContent - Error triggering processing:', error);
+      toast.error('Failed to start processing');
+      // Reset status back to pending on error
+      await updateContent(contentId, { processing_status: 'pending' });
     }
   };
 
@@ -744,6 +811,7 @@ export const useContent = () => {
     deleteContent,
     refreshContent: fetchContent,
     recentContent: content.slice(0, 10),
-    fetchContentById
+    fetchContentById,
+    triggerProcessing
   };
 };
