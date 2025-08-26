@@ -169,16 +169,30 @@ serve(async (req) => {
       
       // Trigger chapter generation after successful transcription
       try {
-        await supabase.functions.invoke('generate-chapters', {
+        const chapterResponse = await supabase.functions.invoke('generate-chapters', {
           body: {
             contentId: recordingId,
             transcript: fullTranscript
           }
         });
-        console.log(`Chapter generation triggered for content ${recordingId}`);
+        
+        if (chapterResponse.error) {
+          console.error('Error in chapter generation response:', chapterResponse.error);
+        } else {
+          console.log(`Chapter generation triggered successfully for content ${recordingId}`);
+        }
       } catch (chapterError) {
         console.error('Error triggering chapter generation:', chapterError);
         // Don't throw - transcription was successful, chapter generation is bonus
+        
+        // Update processing status to completed since transcription worked
+        await supabase
+          .from('content')
+          .update({
+            processing_status: 'completed',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', recordingId);
       }
     }
 

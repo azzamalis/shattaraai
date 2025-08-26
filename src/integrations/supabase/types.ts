@@ -221,42 +221,51 @@ export type Database = {
       }
       content: {
         Row: {
+          chapters: Json | null
           created_at: string
           filename: string | null
           id: string
           metadata: Json | null
+          processing_status: string | null
           room_id: string | null
           storage_path: string | null
           text_content: string | null
           title: string
+          transcription_confidence: number | null
           type: string
           updated_at: string
           url: string | null
           user_id: string
         }
         Insert: {
+          chapters?: Json | null
           created_at?: string
           filename?: string | null
           id?: string
           metadata?: Json | null
+          processing_status?: string | null
           room_id?: string | null
           storage_path?: string | null
           text_content?: string | null
           title: string
+          transcription_confidence?: number | null
           type: string
           updated_at?: string
           url?: string | null
           user_id: string
         }
         Update: {
+          chapters?: Json | null
           created_at?: string
           filename?: string | null
           id?: string
           metadata?: Json | null
+          processing_status?: string | null
           room_id?: string | null
           storage_path?: string | null
           text_content?: string | null
           title?: string
+          transcription_confidence?: number | null
           type?: string
           updated_at?: string
           url?: string | null

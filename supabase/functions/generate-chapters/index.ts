@@ -67,8 +67,7 @@ serve(async (req) => {
             content: `Please analyze this transcript and create chapters:\n\n${transcript}`
           }
         ],
-        max_completion_tokens: 1000,
-        response_format: { type: "json_object" }
+        max_completion_tokens: 1000
       }),
     });
 
@@ -83,8 +82,23 @@ serve(async (req) => {
 
     let chapters;
     try {
-      const content = JSON.parse(result.choices[0].message.content);
-      chapters = content.chapters || content;
+      // Parse the response - it should be a JSON array of chapters
+      const responseText = result.choices[0].message.content;
+      console.log('Raw chapter generation response:', responseText);
+      
+      // Try to parse as JSON array directly first
+      try {
+        chapters = JSON.parse(responseText);
+      } catch (directParseError) {
+        // If direct parsing fails, try to extract from a JSON object
+        const parsedObject = JSON.parse(responseText);
+        chapters = parsedObject.chapters || parsedObject;
+      }
+      
+      // Ensure we have an array
+      if (!Array.isArray(chapters)) {
+        throw new Error('Generated chapters is not an array');
+      }
     } catch (parseError) {
       console.error('Error parsing chapters JSON:', parseError);
       throw new Error('Failed to parse generated chapters');

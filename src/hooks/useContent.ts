@@ -265,6 +265,7 @@ export const useContent = () => {
       
       // Auto-trigger content processing based on content type
       if (contentId) {
+        console.log('DEBUG: useContent - Content created successfully, starting processing...', { contentId, type: finalContentData.type });
         await processContentAutomatically(contentId, finalContentData, file);
       }
       
