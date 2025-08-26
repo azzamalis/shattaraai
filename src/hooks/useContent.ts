@@ -502,16 +502,22 @@ export const useContent = () => {
           if (file) {
             console.log('DEBUG: useContent - Processing audio file');
             try {
-              await supabase.functions.invoke('extract-audio-transcript', {
+              // Convert file to base64 for the transcription function
+              const arrayBuffer = await file.arrayBuffer();
+              const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+              
+              await supabase.functions.invoke('audio-transcription', {
                 body: {
-                  contentId: contentId,
-                  storagePath: contentData.storage_path || contentData.url
+                  audioData: base64Audio,
+                  recordingId: contentId,
+                  isRealTime: false,
+                  timestamp: Date.now()
                 }
               });
-              toast.success('Audio uploaded! Transcript extraction in progress...');
+              toast.success('Audio uploaded! Transcription in progress...');
             } catch (extractionError) {
               console.error('DEBUG: useContent - Audio transcription failed:', extractionError);
-              console.log('DEBUG: useContent - Audio transcription not available, content saved without processing');
+              toast.error('Audio transcription failed');
             }
           }
           break;
@@ -520,16 +526,22 @@ export const useContent = () => {
           if (file) {
             console.log('DEBUG: useContent - Processing video file');
             try {
-              await supabase.functions.invoke('extract-video-content', {
+              // Convert file to base64 for the transcription function
+              const arrayBuffer = await file.arrayBuffer();
+              const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+              
+              await supabase.functions.invoke('audio-transcription', {
                 body: {
-                  contentId: contentId,
-                  storagePath: contentData.storage_path || contentData.url
+                  audioData: base64Audio,
+                  recordingId: contentId,
+                  isRealTime: false,
+                  timestamp: Date.now()
                 }
               });
-              toast.success('Video uploaded! Content extraction in progress...');
+              toast.success('Video uploaded! Audio transcription in progress...');
             } catch (extractionError) {
-              console.error('DEBUG: useContent - Video content extraction failed:', extractionError);
-              console.log('DEBUG: useContent - Video content extraction not available, content saved without processing');
+              console.error('DEBUG: useContent - Video transcription failed:', extractionError);
+              toast.error('Video transcription failed');
             }
           }
           break;

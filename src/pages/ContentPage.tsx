@@ -16,6 +16,14 @@ export interface ContentData {
   filePath?: string;
   filename?: string;
   text?: string;
+  text_content?: string;
+  chapters?: Array<{
+    id: string;
+    title: string;
+    startTime: number;
+    endTime: number;
+    summary?: string;
+  }>;
   metadata?: Record<string, any>;
   isProcessing?: boolean;
   hasError?: boolean;

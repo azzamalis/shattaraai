@@ -358,6 +358,28 @@ export function ContentLeftSidebar({
                   />
                 )}
                 
+                {/* Audio/Video file chapters */}
+                {(contentData.type === 'audio_file' || contentData.type === 'video') && contentData.chapters && Array.isArray(contentData.chapters) && contentData.chapters.length > 0 && <div className="space-y-8">
+                    {contentData.chapters.map((chapter: any, index: number) => <div key={index} className="group cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
+                        {/* Timestamp */}
+                        <div className="text-xs text-muted-foreground mb-2 font-mono">
+                          {Math.floor(chapter.startTime / 60).toString().padStart(2, '0')}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                        </div>
+                        
+                        {/* Title */}
+                        <h3 className="text-base font-bold text-foreground mb-3 group-hover:text-primary transition-colors leading-tight">
+                          {chapter.title}
+                        </h3>
+                        
+                        {/* Summary if available */}
+                        {chapter.summary && (
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {chapter.summary}
+                          </p>
+                        )}
+                      </div>)}
+                  </div>}
+                
                 {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (
                   <div className="flex items-center justify-center py-8">
                     <div className="text-center">
@@ -428,7 +450,25 @@ export function ContentLeftSidebar({
                       </div>
                     </div>
                   </div>}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-muted-foreground">
+                  
+                {/* Processing state for audio/video files */}
+                {(contentData.type === 'audio_file' || contentData.type === 'video') && (!contentData.chapters || contentData.chapters.length === 0) && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <div className="animate-pulse mb-2">
+                        <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
+                      </div>
+                      <p className="text-sm font-medium text-foreground mb-1">
+                        Processing {contentData.type === 'video' ? 'video' : 'audio'} content
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Chapters will be generated automatically
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && contentData.type !== 'audio_file' && contentData.type !== 'video' && <div className="text-muted-foreground">
                     Processing content...
                   </div>}
               </div> : (
@@ -475,6 +515,20 @@ export function ContentLeftSidebar({
                    />
                 )}
                 
+                {/* Audio/Video file transcripts */}
+                {(contentData.type === 'audio_file' || contentData.type === 'video') && contentData.text_content && (
+                  <div className="space-y-6">
+                    <div className="text-xs text-muted-foreground mb-2 font-mono">
+                      Full Transcript
+                    </div>
+                    <div className="space-y-6">
+                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                        {contentData.text_content}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
                 {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (
                   <div className="flex items-center justify-center py-8">
                     <div className="text-center">
@@ -500,80 +554,23 @@ export function ContentLeftSidebar({
                       </p>
                     </div>
                   </div>}
-                {contentData.type === 'youtube' && contentData.text && <div className="space-y-8">
-                    {contentData.metadata?.hasRealTranscript ? (
-                      <div className="space-y-6">
-                        <div className="text-xs text-muted-foreground mb-2 font-mono">
-                          Video Transcript
-                        </div>
-                        <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                          {contentData.text.split('\n').map((line, index) => {
-                            // Simple timestamp detection for YouTube transcripts
-                            const timestampMatch = line.match(/^(\d{1,2}:\d{2})/);
-                            if (timestampMatch) {
-                              const [timestamp, ...textParts] = line.split(' ');
-                              const text = textParts.join(' ');
-                              return (
-                                <div key={index} className="mb-6">
-                                  <div className="text-xs text-muted-foreground mb-2 font-mono">
-                                    {timestamp}
-                                  </div>
-                                  <p className="text-sm text-foreground leading-relaxed">
-                                    {text}
-                                  </p>
-                                </div>
-                              );
-                            }
-                            return line ? (
-                              <p key={index} className="text-sm text-foreground leading-relaxed mb-4">
-                                {line}
-                              </p>
-                            ) : null;
-                          })}
-                        </div>
+                
+                {/* Processing state for audio/video files */}
+                {(contentData.type === 'audio_file' || contentData.type === 'video') && !contentData.text_content && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <div className="animate-pulse mb-2">
+                        <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
                       </div>
-                    ) : (
-                      <div className="space-y-6">
-                        <div className="text-xs text-muted-foreground mb-2 font-mono">
-                          Video Description
-                        </div>
-                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                          {contentData.text}
-                        </p>
-                      </div>
-                    )}
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)} 
-                      className="mt-4 text-xs"
-                    >
-                      {isTranscriptExpanded ? <Minimize2 className="h-3 w-3 mr-1" /> : <Expand className="h-3 w-3 mr-1" />}
-                      {isTranscriptExpanded ? 'Show Less' : 'Show More'}
-                    </Button>
-                  </div>}
-                {contentData.type === 'website' && contentData.text && <div className="space-y-8">
-                    <div className="space-y-6">
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">
-                        Website Content
-                      </div>
-                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                        {contentData.text}
+                      <p className="text-sm font-medium text-foreground mb-1">
+                        Processing {contentData.type === 'video' ? 'video' : 'audio'} content
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Transcription will be generated automatically
                       </p>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => setIsTextExpanded(!isTextExpanded)} 
-                      className="mt-4 text-xs"
-                    >
-                      {isTextExpanded ? <Minimize2 className="h-3 w-3 mr-1" /> : <Expand className="h-3 w-3 mr-1" />}
-                      {isTextExpanded ? 'Show Less' : 'Show More'}
-                    </Button>
-                  </div>}
-                {contentData.type !== 'recording' && contentData.type !== 'live_recording' && contentData.type !== 'youtube' && contentData.type !== 'website' && <div className="text-muted-foreground">
-                    Extracting text...
-                  </div>}
+                  </div>
+                )}
               </div> : (
                 // Show shimmer loading for live recording in processing state
                 (contentData.type === 'live_recording' && isProcessingFinal) ? (

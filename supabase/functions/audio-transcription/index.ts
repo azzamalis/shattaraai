@@ -151,21 +151,35 @@ serve(async (req) => {
       const confidence = transcriptionChunk.confidence;
 
       const { error: updateError } = await supabase
-        .from('recordings')
+        .from('content')
         .update({
-          transcript: fullTranscript,
+          text_content: fullTranscript,
           transcription_confidence: Math.max(0, Math.min(1, confidence)),
-          transcription_status: 'completed',
+          processing_status: 'processing',
           updated_at: new Date().toISOString()
         })
-        .eq('content_id', recordingId);
+        .eq('id', recordingId);
 
       if (updateError) {
         console.error('Error updating final transcript:', updateError);
         throw new Error('Failed to update final transcript');
       }
 
-      console.log(`Updated recording ${recordingId} with final transcript`);
+      console.log(`Updated content ${recordingId} with final transcript, triggering chapter generation`);
+      
+      // Trigger chapter generation after successful transcription
+      try {
+        await supabase.functions.invoke('generate-chapters', {
+          body: {
+            contentId: recordingId,
+            transcript: fullTranscript
+          }
+        });
+        console.log(`Chapter generation triggered for content ${recordingId}`);
+      } catch (chapterError) {
+        console.error('Error triggering chapter generation:', chapterError);
+        // Don't throw - transcription was successful, chapter generation is bonus
+      }
     }
 
     return new Response(
