@@ -686,31 +686,22 @@ export const useContent = () => {
     }
   };
 
-  // Helper function to convert file to base64 in chunks to prevent stack overflow
+  // Helper function to convert file to base64 properly
   const convertFileToBase64Chunked = async (file: File): Promise<string> => {
-    const chunkSize = 1024 * 1024; // 1MB chunks
-    const chunks: string[] = [];
-    
-    for (let start = 0; start < file.size; start += chunkSize) {
-      const end = Math.min(start + chunkSize, file.size);
-      const chunk = file.slice(start, end);
-      const arrayBuffer = await chunk.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
-      
-      // Convert chunk to base64 using smaller sub-chunks to avoid call stack issues
-      let chunkBase64 = '';
-      const subChunkSize = 8192; // 8KB sub-chunks for btoa
-      
-      for (let i = 0; i < uint8Array.length; i += subChunkSize) {
-        const subChunk = uint8Array.slice(i, i + subChunkSize);
-        const binaryString = Array.from(subChunk).map(byte => String.fromCharCode(byte)).join('');
-        chunkBase64 += btoa(binaryString);
-      }
-      
-      chunks.push(chunkBase64);
-    }
-    
-    return chunks.join('');
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          // Remove data URL prefix to get just the base64 data
+          const base64 = reader.result.split(',')[1];
+          resolve(base64);
+        } else {
+          reject(new Error('Failed to convert file to base64'));
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   };
 
   // Helper function to extract PDF text using pdfjs-dist
