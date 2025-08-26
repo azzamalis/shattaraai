@@ -364,26 +364,59 @@ export function ContentLeftSidebar({
                 )}
                 
                 {/* Audio/Video file chapters */}
-                {(contentData.type === 'audio_file' || contentData.type === 'video') && contentData.chapters && Array.isArray(contentData.chapters) && contentData.chapters.length > 0 && <div className="space-y-8">
-                    {contentData.chapters.map((chapter: any, index: number) => <div key={index} className="group cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
-                        {/* Timestamp */}
-                        <div className="text-xs text-muted-foreground mb-2 font-mono">
-                          {Math.floor(chapter.startTime / 60).toString().padStart(2, '0')}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                        </div>
-                        
-                        {/* Title */}
-                        <h3 className="text-base font-bold text-foreground mb-3 group-hover:text-primary transition-colors leading-tight">
-                          {chapter.title}
-                        </h3>
-                        
-                        {/* Summary if available */}
-                        {chapter.summary && (
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {chapter.summary}
+                {(contentData.type === 'audio_file' || contentData.type === 'video') && (
+                  contentData.processing_status === 'processing' ? (
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-center py-8">
+                        <div className="text-center">
+                          <div className="animate-pulse mb-2">
+                            <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
+                          </div>
+                          <p className="text-sm font-medium text-foreground mb-1">
+                            Processing audio/video
                           </p>
-                        )}
-                      </div>)}
-                  </div>}
+                          <p className="text-xs text-muted-foreground">
+                            Generating chapters automatically...
+                          </p>
+                        </div>
+                      </div>
+                      {/* Shimmer loading placeholders */}
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="space-y-3">
+                          <div className="h-3 w-16 bg-muted animate-pulse rounded font-mono"></div>
+                          <div className="h-4 w-full bg-muted animate-pulse rounded"></div>
+                          <div className="h-3 w-3/4 bg-muted animate-pulse rounded"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : contentData.chapters && Array.isArray(contentData.chapters) && contentData.chapters.length > 0 ? (
+                    <div className="space-y-8">
+                      {contentData.chapters.map((chapter: any, index: number) => <div key={index} className="group cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
+                          {/* Timestamp */}
+                          <div className="text-xs text-muted-foreground mb-2 font-mono">
+                            {Math.floor(chapter.startTime / 60).toString().padStart(2, '0')}:{(chapter.startTime % 60).toString().padStart(2, '0')}
+                          </div>
+                          
+                          {/* Title */}
+                          <h3 className="text-base font-bold text-foreground mb-3 group-hover:text-primary transition-colors leading-tight">
+                            {chapter.title}
+                          </h3>
+                          
+                          {/* Summary if available */}
+                          {chapter.summary && (
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {chapter.summary}
+                            </p>
+                          )}
+                        </div>)}
+                    </div>
+                  ) : contentData.processing_status === 'failed' ? (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-destructive mb-2">Processing failed</p>
+                      <p className="text-xs text-muted-foreground">{contentData.text_content || 'Unable to process audio/video file'}</p>
+                    </div>
+                  ) : null
+                )}
                 
                 {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (
                   <div className="flex items-center justify-center py-8">
@@ -535,17 +568,49 @@ export function ContentLeftSidebar({
                 )}
                 
                 {/* Audio/Video file transcripts */}
-                {(contentData.type === 'audio_file' || contentData.type === 'video') && contentData.text_content && (
-                  <div className="space-y-6">
-                    <div className="text-xs text-muted-foreground mb-2 font-mono">
-                      Full Transcript
-                    </div>
+                {(contentData.type === 'audio_file' || contentData.type === 'video') && (
+                  contentData.processing_status === 'processing' ? (
                     <div className="space-y-6">
-                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                        {contentData.text_content}
-                      </p>
+                      <div className="flex items-center justify-center py-8">
+                        <div className="text-center">
+                          <div className="animate-pulse mb-2">
+                            <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
+                          </div>
+                          <p className="text-sm font-medium text-foreground mb-1">
+                            Processing audio/video
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Generating transcript automatically...
+                          </p>
+                        </div>
+                      </div>
+                      {/* Shimmer loading placeholders */}
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="space-y-3">
+                          <div className="h-3 w-16 bg-muted animate-pulse rounded font-mono"></div>
+                          <div className="h-4 w-full bg-muted animate-pulse rounded"></div>
+                          <div className="h-4 w-4/5 bg-muted animate-pulse rounded"></div>
+                          <div className="h-4 w-3/4 bg-muted animate-pulse rounded"></div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
+                  ) : contentData.text_content ? (
+                    <div className="space-y-6">
+                      <div className="text-xs text-muted-foreground mb-2 font-mono">
+                        Full Transcript
+                      </div>
+                      <div className="space-y-6">
+                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                          {contentData.text_content}
+                        </p>
+                      </div>
+                    </div>
+                  ) : contentData.processing_status === 'failed' ? (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-destructive mb-2">Processing failed</p>
+                      <p className="text-xs text-muted-foreground">{contentData.text_content || 'Unable to process audio/video file'}</p>
+                    </div>
+                  ) : null
                 )}
                 
                 {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (
@@ -574,36 +639,6 @@ export function ContentLeftSidebar({
                     </div>
                   </div>}
                 
-                {/* Processing state for audio/video files */}
-                {(contentData.type === 'audio_file' || contentData.type === 'video') && !contentData.text_content && (
-                  <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                    {contentData.processing_status === 'pending' ? (
-                      <div className="text-center space-y-4">
-                        <p className="text-sm text-muted-foreground">Ready to generate transcript</p>
-                        <Button
-                          onClick={() => contentData.id && triggerProcessing(contentData.id)}
-                          className="flex items-center gap-2"
-                        >
-                          <RefreshCw className="h-4 w-4" />
-                          Start AI Processing
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="p-6 space-y-6">
-                        <div className="space-y-6">
-                          {[...Array(4)].map((_, i) => (
-                            <div key={i} className="animate-pulse">
-                              <div className="h-3 bg-muted rounded w-16 mb-2"></div>
-                              <div className="h-4 bg-muted rounded w-full mb-1"></div>
-                              <div className="h-4 bg-muted rounded w-4/5 mb-1"></div>
-                              <div className="h-4 bg-muted rounded w-3/4"></div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div> : (
                 // Show shimmer loading for live recording in processing state
                 (contentData.type === 'live_recording' && isProcessingFinal) ? (

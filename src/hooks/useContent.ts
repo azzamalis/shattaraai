@@ -574,12 +574,27 @@ export const useContent = () => {
           break;
 
         case 'audio_file':
+        case 'video':
           if (file) {
-            console.log('DEBUG: useContent - Processing audio file, file details:', {
+            console.log('DEBUG: useContent - Processing audio/video file, file details:', {
               name: file.name,
               size: file.size,
               type: file.type
             });
+            
+            // Check file size (limit to 25MB for OpenAI)
+            if (file.size > 25 * 1024 * 1024) {
+              console.error('DEBUG: useContent - File too large for transcription:', file.size);
+              await supabase
+                .from('content')
+                .update({ 
+                  processing_status: 'failed',
+                  text_content: 'File too large for transcription (max 25MB)'
+                })
+                .eq('id', contentId);
+              toast.error('File too large for transcription (max 25MB)');
+              return;
+            }
             
             // Update status to processing first
             await supabase
@@ -589,83 +604,50 @@ export const useContent = () => {
             
             try {
               // Convert file to base64 for the transcription function
-              console.log('DEBUG: useContent - Converting audio file to base64...');
+              console.log('DEBUG: useContent - Converting file to base64...');
               const arrayBuffer = await file.arrayBuffer();
               const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
               console.log('DEBUG: useContent - Base64 conversion complete, length:', base64Audio.length);
               
               console.log('DEBUG: useContent - Calling audio-transcription function...');
-              const result = await supabase.functions.invoke('audio-transcription', {
+              const { data, error } = await supabase.functions.invoke('audio-transcription', {
                 body: {
                   audioData: base64Audio,
                   recordingId: contentId,
+                  chunkIndex: 0,
                   isRealTime: false,
                   timestamp: Date.now(),
                   originalFileName: file.name
                 }
               });
               
-              console.log('DEBUG: useContent - Audio-transcription function result:', result);
-              toast.success('Audio uploaded! Transcription in progress...');
+              if (error) {
+                console.error('DEBUG: useContent - Audio transcription function error:', error);
+                await supabase
+                  .from('content')
+                  .update({ 
+                    processing_status: 'failed',
+                    text_content: `Transcription failed: ${error.message || 'Unknown error'}`
+                  })
+                  .eq('id', contentId);
+                toast.error('Audio/video transcription failed');
+              } else {
+                console.log('DEBUG: useContent - Audio-transcription function result:', data);
+                toast.success('Audio/video uploaded! Transcription in progress...');
+              }
             } catch (extractionError) {
               console.error('DEBUG: useContent - Audio transcription failed:', extractionError);
-              // Reset status to pending on error
               await supabase
                 .from('content')
-                .update({ processing_status: 'pending' })
+                .update({ 
+                  processing_status: 'failed',
+                  text_content: `Processing error: ${extractionError instanceof Error ? extractionError.message : 'Unknown error'}`
+                })
                 .eq('id', contentId);
-              toast.error('Audio transcription failed');
+              toast.error('Audio/video processing failed');
             }
           } else {
-            console.log('DEBUG: useContent - No file provided for audio processing');
-          }
-          break;
-
-        case 'video':
-          if (file) {
-            console.log('DEBUG: useContent - Processing video file, file details:', {
-              name: file.name,
-              size: file.size,
-              type: file.type
-            });
-            
-            // Update status to processing first
-            await supabase
-              .from('content')
-              .update({ processing_status: 'processing' })
-              .eq('id', contentId);
-            
-            try {
-              // Convert file to base64 for the transcription function
-              console.log('DEBUG: useContent - Converting video file to base64...');
-              const arrayBuffer = await file.arrayBuffer();
-              const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-              console.log('DEBUG: useContent - Base64 conversion complete, length:', base64Audio.length);
-              
-              console.log('DEBUG: useContent - Calling audio-transcription function for video...');
-              const result = await supabase.functions.invoke('audio-transcription', {
-                body: {
-                  audioData: base64Audio,
-                  recordingId: contentId,
-                  isRealTime: false,
-                  timestamp: Date.now(),
-                  originalFileName: file.name
-                }
-              });
-              
-              console.log('DEBUG: useContent - Audio-transcription function result for video:', result);
-              toast.success('Video uploaded! Audio transcription in progress...');
-            } catch (extractionError) {
-              console.error('DEBUG: useContent - Video transcription failed:', extractionError);
-              // Reset status to pending on error
-              await supabase
-                .from('content')
-                .update({ processing_status: 'pending' })
-                .eq('id', contentId);
-              toast.error('Video transcription failed');
-            }
-          } else {
-            console.log('DEBUG: useContent - No file provided for video processing');
+            console.log('DEBUG: useContent - No file provided for audio/video processing');
           }
           break;
 

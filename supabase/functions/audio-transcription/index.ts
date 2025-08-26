@@ -105,7 +105,7 @@ async function processInBackground(
     const formData = new FormData();
     const blob = new Blob([binaryAudio], { type: mimeType });
     formData.append('file', blob, fileName);
-    formData.append('model', 'gpt-4o-mini-transcribe');
+    formData.append('model', 'whisper-1');
     formData.append('response_format', 'verbose_json');
 
     // Send to OpenAI Whisper API
