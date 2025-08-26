@@ -464,18 +464,30 @@ export const useContent = () => {
 
         case 'youtube':
           if (contentData.url) {
-            console.log('DEBUG: useContent - Processing YouTube content');
+            console.log('DEBUG: useContent - Processing YouTube content with AI transcription');
             try {
+              // First extract YouTube data
               await supabase.functions.invoke('youtube-extractor', {
                 body: {
                   url: contentData.url,
                   contentId: contentId
                 }
               });
-              toast.success('YouTube video data is being extracted...');
+              
+              // Then trigger AI transcription and chapter generation
+              await supabase.functions.invoke('audio-transcription', {
+                body: {
+                  recordingId: contentId,
+                  contentType: 'youtube',
+                  youtubeUrl: contentData.url,
+                  isRealTime: false
+                }
+              });
+              
+              toast.success('YouTube video processing started - transcription and chapters will be generated...');
             } catch (extractionError) {
-              console.error('DEBUG: useContent - YouTube extraction failed:', extractionError);
-              toast.error('YouTube data extraction failed, but content was saved');
+              console.error('DEBUG: useContent - YouTube processing failed:', extractionError);
+              toast.error('YouTube processing failed, but content was saved');
             }
           }
           break;
@@ -499,37 +511,41 @@ export const useContent = () => {
           break;
 
         case 'audio_file':
-          if (file) {
-            console.log('DEBUG: useContent - Processing audio file');
+          if (contentData.storage_path || contentData.url) {
+            console.log('DEBUG: useContent - Processing audio file with AI transcription');
             try {
-              await supabase.functions.invoke('extract-audio-transcript', {
+              await supabase.functions.invoke('audio-transcription', {
                 body: {
-                  contentId: contentId,
-                  storagePath: contentData.storage_path || contentData.url
+                  recordingId: contentId,
+                  contentType: 'audio_file',
+                  storageUrl: contentData.storage_path || contentData.url,
+                  isRealTime: false
                 }
               });
-              toast.success('Audio uploaded! Transcript extraction in progress...');
-            } catch (extractionError) {
-              console.error('DEBUG: useContent - Audio transcription failed:', extractionError);
-              console.log('DEBUG: useContent - Audio transcription not available, content saved without processing');
+              toast.success('Audio file processing started - transcription and chapters will be generated...');
+            } catch (processingError) {
+              console.error('DEBUG: useContent - Audio file processing failed:', processingError);
+              toast.error('Audio processing failed, but file was saved');
             }
           }
           break;
 
         case 'video':
-          if (file) {
-            console.log('DEBUG: useContent - Processing video file');
+          if (contentData.storage_path || contentData.url) {
+            console.log('DEBUG: useContent - Processing video file with AI transcription');
             try {
-              await supabase.functions.invoke('extract-video-content', {
+              await supabase.functions.invoke('audio-transcription', {
                 body: {
-                  contentId: contentId,
-                  storagePath: contentData.storage_path || contentData.url
+                  recordingId: contentId,
+                  contentType: 'video',
+                  storageUrl: contentData.storage_path || contentData.url,
+                  isRealTime: false
                 }
               });
-              toast.success('Video uploaded! Content extraction in progress...');
-            } catch (extractionError) {
-              console.error('DEBUG: useContent - Video content extraction failed:', extractionError);
-              console.log('DEBUG: useContent - Video content extraction not available, content saved without processing');
+              toast.success('Video file processing started - audio transcription and chapters will be generated...');
+            } catch (processingError) {
+              console.error('DEBUG: useContent - Video file processing failed:', processingError);
+              toast.error('Video processing failed, but file was saved');
             }
           }
           break;

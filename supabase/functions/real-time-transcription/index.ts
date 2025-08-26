@@ -32,16 +32,22 @@ function broadcastTranscriptionUpdate(recordingId: string, userId: string, updat
   }
 }
 
-// Generate chapters using OpenAI
-async function generateChapters(recordingId: string, socket: WebSocket) {
+// Generate chapters using OpenAI with content-type awareness
+async function generateChapters(recordingId: string, socket: WebSocket, contentType: string = 'live_recording') {
   try {
-    console.log(`Generating chapters for recording ${recordingId}`);
+    console.log(`Generating chapters for ${contentType} recording ${recordingId}`);
     
-    // Fetch transcript data
+    // Fetch transcript data and content info
     const { data: recording, error: fetchError } = await supabase
       .from('recordings')
       .select('transcript, real_time_transcript')
       .eq('content_id', recordingId)
+      .single();
+
+    const { data: contentInfo, error: contentError } = await supabase
+      .from('content')
+      .select('type, title, metadata')
+      .eq('id', recordingId)
       .single();
 
     if (fetchError) {
@@ -95,34 +101,14 @@ async function generateChapters(recordingId: string, socket: WebSocket) {
         messages: [
           {
             role: 'system',
-            content: `You are an expert at analyzing transcripts and creating meaningful chapters. 
-            Create 3-7 chapters for the given transcript. Each chapter should represent a distinct topic or theme.
-            
-            Return your response as a valid JSON array with this exact structure:
-            [
-              {
-                "title": "Chapter Title",
-                "summary": "Brief summary of what this chapter covers",
-                "startTime": 0,
-                "endTime": 120
-              }
-            ]
-            
-            Rules:
-            - startTime and endTime should be in seconds
-            - Chapters should not overlap
-            - Cover the entire transcript duration
-            - Keep titles concise (3-8 words)
-            - Keep summaries brief (1-2 sentences)
-            - Return ONLY the JSON array, no other text`
+            content: getContentTypePrompt(contentType, contentInfo?.title, contentInfo?.metadata)
           },
           {
             role: 'user',
-            content: `Please create chapters for this transcript:\n\n${transcript}`
+            content: `Please create chapters for this ${contentType} transcript:\n\nTitle: ${contentInfo?.title || 'Untitled'}\n\nTranscript:\n${transcript}`
           }
         ],
-        temperature: 0.3,
-        max_tokens: 1000,
+        max_completion_tokens: 1000,
       }),
     });
 
@@ -179,6 +165,68 @@ async function generateChapters(recordingId: string, socket: WebSocket) {
       type: 'chapters_error',
       error: 'Unexpected error generating chapters'
     }));
+  }
+}
+
+// Generate content-type specific prompts for better chapter generation
+function getContentTypePrompt(contentType: string, title?: string, metadata?: any): string {
+  const basePrompt = `You are an expert at analyzing transcripts and creating meaningful chapters. Create 3-7 chapters for the given transcript. Each chapter should represent a distinct topic or theme.
+
+Return your response as a valid JSON array with this exact structure:
+[
+  {
+    "title": "Chapter Title",
+    "summary": "Brief summary of what this chapter covers",
+    "startTime": 0,
+    "endTime": 120
+  }
+]
+
+Rules:
+- startTime and endTime should be in seconds
+- Chapters should not overlap
+- Cover the entire transcript duration
+- Keep titles concise (3-8 words)
+- Keep summaries brief (1-2 sentences)
+- Return ONLY the JSON array, no other text`;
+
+  switch (contentType) {
+    case 'youtube':
+      return `${basePrompt}
+
+SPECIAL INSTRUCTIONS FOR YOUTUBE CONTENT:
+- This is a YouTube video transcript, so chapters should reflect video content flow
+- Consider natural video segments and topic changes
+- Use engaging, YouTube-style chapter titles
+- Focus on key topics, demonstrations, or sections that viewers would want to navigate to`;
+
+    case 'audio_file':
+      return `${basePrompt}
+
+SPECIAL INSTRUCTIONS FOR AUDIO CONTENT:
+- This is an uploaded audio file, likely a lecture, podcast, or presentation
+- Focus on main topics, speaker transitions, or subject matter changes
+- Create chapters that help listeners navigate to specific content areas
+- Consider Q&A sections, different speakers, or topic shifts`;
+
+    case 'video':
+      return `${basePrompt}
+
+SPECIAL INSTRUCTIONS FOR VIDEO CONTENT:
+- This is an uploaded video file transcript
+- Consider visual elements that might indicate chapter breaks
+- Focus on scene changes, different topics, or presentation sections
+- Create chapters that align with likely visual content breaks`;
+
+    case 'live_recording':
+    default:
+      return `${basePrompt}
+
+SPECIAL INSTRUCTIONS FOR LIVE RECORDING:
+- This is a real-time recording transcript
+- Focus on natural conversation flow and topic changes
+- Consider speaker changes or discussion topic shifts
+- Create chapters that reflect the organic flow of the conversation`;
   }
 }
 
@@ -277,7 +325,7 @@ serve(async (req) => {
         }
 
         case 'request_chapters': {
-          const { recordingId } = message;
+          const { recordingId, contentType = 'live_recording' } = message;
           if (!recordingId) {
             socket.send(JSON.stringify({
               type: 'error',
@@ -286,7 +334,7 @@ serve(async (req) => {
             return;
           }
 
-          await generateChapters(recordingId, socket);
+          await generateChapters(recordingId, socket, contentType);
           break;
         }
 
