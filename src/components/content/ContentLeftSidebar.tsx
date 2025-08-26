@@ -58,7 +58,7 @@ export function ContentLeftSidebar({
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Use content hook for triggering processing
-  const { triggerProcessing } = useContent();
+  const { triggerProcessing, retryProcessing } = useContent();
 
   // Real-time transcription integration for live recording and recordings with transcription data
   const shouldUseTranscription = contentData.type === 'live_recording' || 
@@ -365,71 +365,18 @@ export function ContentLeftSidebar({
                 
                 {/* Audio/Video file chapters */}
                 {(contentData.type === 'audio_file' || contentData.type === 'video') && (
-                  contentData.processing_status === 'processing' ? (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-center py-8">
-                        <div className="text-center">
-                          <div className="animate-pulse mb-2">
-                            <div className="h-3 w-3 bg-primary rounded-full mx-auto mb-1"></div>
-                          </div>
-                          <p className="text-sm font-medium text-foreground mb-1">
-                            Processing audio/video
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Generating chapters automatically...
-                          </p>
-                        </div>
-                      </div>
-                      {/* Shimmer loading placeholders */}
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="space-y-3">
-                          <div className="h-3 w-16 bg-muted animate-pulse rounded font-mono"></div>
-                          <div className="h-4 w-full bg-muted animate-pulse rounded"></div>
-                          <div className="h-3 w-3/4 bg-muted animate-pulse rounded"></div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : contentData.chapters && Array.isArray(contentData.chapters) && contentData.chapters.length > 0 ? (
-                    <div className="space-y-8">
-                      {contentData.chapters.map((chapter: any, index: number) => <div key={index} className="group cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
-                          {/* Timestamp */}
-                          <div className="text-xs text-muted-foreground mb-2 font-mono">
-                            {Math.floor(chapter.startTime / 60).toString().padStart(2, '0')}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                          </div>
-                          
-                          {/* Title */}
-                          <h3 className="text-base font-bold text-foreground mb-3 group-hover:text-primary transition-colors leading-tight">
-                            {chapter.title}
-                          </h3>
-                          
-                          {/* Summary if available */}
-                          {chapter.summary && (
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                              {chapter.summary}
-                            </p>
-                          )}
-                        </div>)}
-                    </div>
-                  ) : contentData.processing_status === 'failed' ? (
-                    <div className="text-center py-8 space-y-4">
-                      <p className="text-sm text-destructive mb-2">Processing failed</p>
-                      <p className="text-xs text-muted-foreground mb-4">{contentData.text_content || 'Unable to process audio/video file'}</p>
-                      <Button
-                        onClick={() => contentData.id && triggerProcessing(contentData.id)}
-                        className="flex items-center gap-2"
-                        size="sm"
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                        Retry Processing
-                      </Button>
-                    </div>
-                  ) : !contentData.chapters && contentData.processing_status !== 'processing' ? (
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <p className="text-sm text-muted-foreground text-center">
-                        Chapters will be generated automatically when processing completes
-                      </p>
-                    </div>
-                  ) : null
+                  <RealtimeChaptersDisplay
+                    chapters={contentData.chapters ? contentData.chapters.map((chapter: any) => ({
+                      title: chapter.title,
+                      summary: chapter.summary || '',
+                      startTime: chapter.startTime,
+                      endTime: chapter.endTime || chapter.startTime + 60
+                    })) : []}
+                    transcriptionStatus={contentData.text_content ? 'completed' : 'pending'}
+                    processingStatus={contentData.processing_status as 'pending' | 'processing' | 'completed' | 'failed'}
+                    onChapterClick={handleChapterClick}
+                    onRetryProcessing={() => contentData.id && retryProcessing(contentData.id)}
+                  />
                 )}
                 
                 {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (

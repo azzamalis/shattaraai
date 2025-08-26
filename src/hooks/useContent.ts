@@ -842,6 +842,32 @@ export const useContent = () => {
     };
   }, [user?.id]); // Use user.id instead of user object
 
+  const retryProcessing = async (contentId: string) => {
+    try {
+      console.log('Retrying processing for content:', contentId);
+      
+      // Call the fix-content-status function
+      const { data, error } = await supabase.functions.invoke('fix-content-status', {
+        body: { contentId }
+      });
+
+      if (error) {
+        console.error('Error retrying processing:', error);
+        toast.error('Failed to retry processing');
+        return;
+      }
+
+      console.log('Retry processing response:', data);
+      toast.success('Processing retry initiated');
+      
+      // Refresh content to get updated status
+      await fetchContent();
+    } catch (error) {
+      console.error('Error in retryProcessing:', error);
+      toast.error('Failed to retry processing');
+    }
+  };
+
   return {
     content,
     loading,
@@ -853,6 +879,7 @@ export const useContent = () => {
     refreshContent: fetchContent,
     recentContent: content.slice(0, 10),
     fetchContentById,
-    triggerProcessing
+    triggerProcessing,
+    retryProcessing
   };
 };

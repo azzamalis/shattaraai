@@ -14,6 +14,7 @@ interface ContentContextType {
   refreshContent: (roomId?: string) => Promise<void>;
   recentContent: ContentItem[];
   fetchContentById: (contentId: string) => Promise<ContentItem | null>;
+  retryProcessing: (contentId: string) => Promise<void>;
   onAddContent: (content: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<string | null>;
   onAddContentWithMetadata: (content: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>, metadata?: any) => Promise<string | null>;
   onUpdateContent: (id: string, updates: Partial<ContentItem>) => Promise<void>;

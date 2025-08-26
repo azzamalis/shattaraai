@@ -189,7 +189,7 @@ async function processInBackground(
         .update({
           text_content: fullTranscript,
           transcription_confidence: Math.max(0, Math.min(1, confidence)),
-          processing_status: 'processing',
+          processing_status: 'completed',
           updated_at: new Date().toISOString()
         })
         .eq('id', recordingId);

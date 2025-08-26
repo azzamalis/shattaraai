@@ -15,20 +15,24 @@ interface ChapterData {
 interface RealtimeChaptersDisplayProps {
   chapters: ChapterData[];
   transcriptionStatus: 'ready' | 'pending' | 'processing' | 'completed' | 'failed';
+  processingStatus?: 'pending' | 'processing' | 'completed' | 'failed';
   isRecording?: boolean;
   isProcessingFinal?: boolean;
   onRequestChapters?: () => void;
   onChapterClick?: (startTime: number) => void;
+  onRetryProcessing?: () => void;
   isLoadingData?: boolean;
 }
 
 export const RealtimeChaptersDisplay = ({
   chapters,
   transcriptionStatus,
+  processingStatus = 'pending',
   isRecording = false,
   isProcessingFinal = false,
   onRequestChapters,
   onChapterClick,
+  onRetryProcessing,
   isLoadingData = false
 }: RealtimeChaptersDisplayProps) => {
   const formatTime = (seconds: number) => {
@@ -41,7 +45,7 @@ export const RealtimeChaptersDisplay = ({
     (transcriptionStatus === 'processing' && !isRecording);
 
   // Show shimmer text when recording or processing final content
-  if (isRecording || isProcessingFinal) {
+  if (isRecording || isProcessingFinal || processingStatus === 'processing') {
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">
@@ -59,7 +63,9 @@ export const RealtimeChaptersDisplay = ({
         <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
           <BookOpen className="h-8 w-8 mb-2 opacity-50" />
           <p className="text-sm text-center mb-3">
-            {transcriptionStatus === 'pending' 
+            {processingStatus === 'failed' 
+              ? 'Processing failed. Click to retry.'
+              : transcriptionStatus === 'pending' 
               ? 'Start recording to generate chapters'
               : transcriptionStatus === 'processing'
               ? 'Processing audio for chapter generation...'
@@ -67,7 +73,19 @@ export const RealtimeChaptersDisplay = ({
             }
           </p>
           
-          {canGenerateChapters && onRequestChapters && (
+          {processingStatus === 'failed' && onRetryProcessing && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onRetryProcessing}
+              className="text-xs"
+            >
+              <RefreshCw className="h-3 w-3 mr-1" />
+              Retry Processing
+            </Button>
+          )}
+          
+          {canGenerateChapters && onRequestChapters && processingStatus !== 'failed' && (
             <Button 
               variant="outline" 
               size="sm"
