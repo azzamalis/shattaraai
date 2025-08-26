@@ -62,19 +62,19 @@ serve(async (req) => {
 
     console.log(`Processing audio transcription for recording ${recordingId}, chunk ${chunkIndex}`);
 
-    const openAIApiKey = Deno.env.get('OPENAI_WHISPER_API_KEY');
+    const openAIApiKey = Deno.env.get('OPENAI_TRANSCRIPTION_API_KEY');
     if (!openAIApiKey) {
-      throw new Error('OpenAI Whisper API key not configured');
+      throw new Error('OpenAI Transcription API key not configured');
     }
 
     // Process audio in chunks to prevent memory issues
     const binaryAudio = processBase64Chunks(audioData);
     
-    // Prepare form data for Whisper API
+    // Prepare form data for gpt-4o-mini-transcribe API
     const formData = new FormData();
     const blob = new Blob([binaryAudio], { type: 'audio/webm' });
     formData.append('file', blob, `audio_chunk_${chunkIndex}.webm`);
-    formData.append('model', 'whisper-1');
+    formData.append('model', 'gpt-4o-mini-transcribe');
     // No language parameter - let Whisper auto-detect the language
     formData.append('response_format', 'verbose_json');
 
