@@ -526,6 +526,22 @@ export const useContent = () => {
               }
               
               toast.success('PDF uploaded and text extracted successfully!');
+              
+              // Trigger AI enhancement for chapter generation
+              setTimeout(async () => {
+                try {
+                  await supabase.functions.invoke('enhance-content-ai', {
+                    body: {
+                      contentId: contentId,
+                      textContent: extractedText,
+                      contentType: 'pdf'
+                    }
+                  });
+                  console.log('DEBUG: useContent - AI enhancement triggered for PDF');
+                } catch (aiError) {
+                  console.error('DEBUG: useContent - AI enhancement failed for PDF:', aiError);
+                }
+              }, 1000);
             } catch (extractionError) {
               console.error('DEBUG: useContent - PDF text extraction failed:', extractionError);
               // Fallback to server-side extraction
@@ -538,6 +554,25 @@ export const useContent = () => {
                   }
                 });
                 toast.success('PDF uploaded! Text extraction in progress...');
+                
+                // Auto-retry with AI enhancement after successful extraction
+                setTimeout(async () => {
+                  const { data: updatedContent } = await supabase
+                    .from('content')
+                    .select('text_content')
+                    .eq('id', contentId)
+                    .single();
+                  
+                  if (updatedContent?.text_content) {
+                    await supabase.functions.invoke('enhance-content-ai', {
+                      body: {
+                        contentId: contentId,
+                        textContent: updatedContent.text_content,
+                        contentType: 'pdf'
+                      }
+                    });
+                  }
+                }, 3000);
               } catch (serverError) {
                 console.error('DEBUG: useContent - Server-side PDF extraction also failed:', serverError);
                 toast.error('PDF uploaded but text extraction failed');
@@ -557,6 +592,25 @@ export const useContent = () => {
                 }
               });
               toast.success('YouTube video data is being extracted...');
+              
+              // Auto-trigger AI enhancement after text extraction
+              setTimeout(async () => {
+                const { data: updatedContent } = await supabase
+                  .from('content')
+                  .select('text_content')
+                  .eq('id', contentId)
+                  .single();
+                
+                if (updatedContent?.text_content) {
+                  await supabase.functions.invoke('enhance-content-ai', {
+                    body: {
+                      contentId: contentId,
+                      textContent: updatedContent.text_content,
+                      contentType: 'youtube'
+                    }
+                  });
+                }
+              }, 3000);
             } catch (extractionError) {
               console.error('DEBUG: useContent - YouTube extraction failed:', extractionError);
               toast.error('YouTube data extraction failed, but content was saved');
@@ -575,6 +629,25 @@ export const useContent = () => {
                 }
               });
               toast.success('Website content is being extracted...');
+              
+              // Auto-trigger AI enhancement after text extraction
+              setTimeout(async () => {
+                const { data: updatedContent } = await supabase
+                  .from('content')
+                  .select('text_content')
+                  .eq('id', contentId)
+                  .single();
+                
+                if (updatedContent?.text_content) {
+                  await supabase.functions.invoke('enhance-content-ai', {
+                    body: {
+                      contentId: contentId,
+                      textContent: updatedContent.text_content,
+                      contentType: 'website'
+                    }
+                  });
+                }
+              }, 3000);
             } catch (extractionError) {
               console.error('DEBUG: useContent - Website extraction failed:', extractionError);
               console.log('DEBUG: useContent - Website extraction not available, content saved without processing');
@@ -582,10 +655,31 @@ export const useContent = () => {
           }
           break;
 
-        case 'audio_file':
         case 'video':
           if (file) {
-            console.log('DEBUG: useContent - Processing audio/video file, file details:', {
+            console.log('DEBUG: useContent - Processing video file for audio extraction');
+            try {
+              // Use the new video audio extraction function
+              await supabase.functions.invoke('extract-video-audio', {
+                body: {
+                  contentId: contentId
+                }
+              });
+              toast.success('Video uploaded! Audio extraction and transcription in progress...');
+            } catch (extractionError) {
+              console.error('DEBUG: useContent - Video audio extraction failed:', extractionError);
+              toast.error('Video processing failed');
+              await supabase
+                .from('content')
+                .update({ processing_status: 'failed' })
+                .eq('id', contentId);
+            }
+          }
+          break;
+
+        case 'audio_file':
+          if (file) {
+            console.log('DEBUG: useContent - Processing audio file, file details:', {
               name: file.name,
               size: file.size,
               type: file.type
@@ -601,7 +695,7 @@ export const useContent = () => {
                   text_content: 'File too large for transcription (max 25MB)'
                 })
                 .eq('id', contentId);
-              toast.error('File too large for transcription (max 25MB)');
+              toast.error('Audio file too large for transcription (max 25MB)');
               return;
             }
             
@@ -638,10 +732,10 @@ export const useContent = () => {
                     text_content: `Transcription failed: ${error.message || 'Unknown error'}`
                   })
                   .eq('id', contentId);
-                toast.error('Audio/video transcription failed');
+                toast.error('Audio transcription failed');
               } else {
                 console.log('DEBUG: useContent - Audio-transcription function result:', data);
-                toast.success('Audio/video uploaded! Transcription in progress...');
+                toast.success('Audio uploaded! Transcription in progress...');
               }
             } catch (extractionError) {
               console.error('DEBUG: useContent - Audio transcription failed:', extractionError);
@@ -652,10 +746,10 @@ export const useContent = () => {
                   text_content: `Processing error: ${extractionError instanceof Error ? extractionError.message : 'Unknown error'}`
                 })
                 .eq('id', contentId);
-              toast.error('Audio/video processing failed');
+              toast.error('Audio processing failed');
             }
           } else {
-            console.log('DEBUG: useContent - No file provided for audio/video processing');
+            console.log('DEBUG: useContent - No file provided for audio processing');
           }
           break;
 
@@ -671,9 +765,48 @@ export const useContent = () => {
                 }
               });
               toast.success('Document uploaded! Text extraction in progress...');
+              
+              // Auto-trigger AI enhancement after text extraction
+              setTimeout(async () => {
+                const { data: updatedContent } = await supabase
+                  .from('content')
+                  .select('text_content')
+                  .eq('id', contentId)
+                  .single();
+                
+                if (updatedContent?.text_content) {
+                  await supabase.functions.invoke('enhance-content-ai', {
+                    body: {
+                      contentId: contentId,
+                      textContent: updatedContent.text_content,
+                      contentType: 'file'
+                    }
+                  });
+                }
+              }, 3000);
             } catch (extractionError) {
               console.error('DEBUG: useContent - Document text extraction failed:', extractionError);
               console.log('DEBUG: useContent - Document text extraction not available, content saved without processing');
+            }
+          }
+          break;
+
+        case 'text':
+        case 'chat':
+          if (contentData.text_content) {
+            console.log('DEBUG: useContent - Processing text/chat content');
+            try {
+              // Use the new text processing function
+              await supabase.functions.invoke('process-text-content', {
+                body: {
+                  contentId: contentId,
+                  textContent: contentData.text_content
+                }
+              });
+              toast.success('Text content is being analyzed...');
+            } catch (processingError) {
+              console.error('DEBUG: useContent - Text processing failed:', processingError);
+              toast.error('Text analysis failed, but content was saved');
             }
           }
           break;
