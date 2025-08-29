@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BookOpen, Clock, Loader2, RefreshCw } from 'lucide-react';
 import { TextShimmer } from '@/components/ui/text-shimmer';
+import { ContentType } from '@/lib/types';
 
 interface ChapterData {
   title: string;
@@ -16,6 +17,7 @@ interface RealtimeChaptersDisplayProps {
   chapters: ChapterData[];
   transcriptionStatus: 'ready' | 'pending' | 'processing' | 'completed' | 'failed';
   processingStatus?: 'pending' | 'processing' | 'completed' | 'failed';
+  contentType?: ContentType;
   isRecording?: boolean;
   isProcessingFinal?: boolean;
   onRequestChapters?: () => void;
@@ -28,6 +30,7 @@ export const RealtimeChaptersDisplay = ({
   chapters,
   transcriptionStatus,
   processingStatus = 'pending',
+  contentType = 'audio_file',
   isRecording = false,
   isProcessingFinal = false,
   onRequestChapters,
@@ -44,13 +47,37 @@ export const RealtimeChaptersDisplay = ({
   const canGenerateChapters = transcriptionStatus === 'completed' || 
     (transcriptionStatus === 'processing' && !isRecording);
 
+  // Get processing message based on content type
+  const getProcessingMessage = () => {
+    switch (contentType) {
+      case 'video':
+        return 'Processing video...';
+      case 'audio_file':
+      case 'live_recording':
+        return 'Processing audio...';
+      case 'pdf':
+        return 'Processing PDF...';
+      case 'file':
+        return 'Processing document...';
+      case 'website':
+        return 'Processing website...';
+      case 'youtube':
+        return 'Processing video...';
+      case 'text':
+      case 'chat':
+        return 'Processing text...';
+      default:
+        return 'Processing content...';
+    }
+  };
+
   // Show shimmer text when recording or processing final content
   if (isRecording || isProcessingFinal || processingStatus === 'processing') {
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">
           <TextShimmer className="text-base font-semibold" duration={1.5}>
-            Processing audio...
+            {getProcessingMessage()}
           </TextShimmer>
         </div>
       </ScrollArea>

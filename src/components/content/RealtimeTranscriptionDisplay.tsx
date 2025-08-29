@@ -4,6 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Mic, CheckCircle, AlertCircle } from 'lucide-react';
 import { TextShimmer } from '@/components/ui/text-shimmer';
+import { ContentType } from '@/lib/types';
 
 interface TranscriptionChunk {
   chunkIndex: number;
@@ -24,6 +25,7 @@ interface RealtimeTranscriptionDisplayProps {
   isProcessingFinal?: boolean;
   isRecording?: boolean;
   isLoadingData?: boolean;
+  contentType?: ContentType;
 }
 
 export const RealtimeTranscriptionDisplay = ({
@@ -35,7 +37,8 @@ export const RealtimeTranscriptionDisplay = ({
   isProcessingAudio,
   isProcessingFinal = false,
   isRecording = false,
-  isLoadingData = false
+  isLoadingData = false,
+  contentType = 'audio_file'
 }: RealtimeTranscriptionDisplayProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const lastChunkRef = useRef<HTMLDivElement>(null);
@@ -93,13 +96,37 @@ export const RealtimeTranscriptionDisplay = ({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Get processing message based on content type
+  const getProcessingMessage = () => {
+    switch (contentType) {
+      case 'video':
+        return 'Processing video...';
+      case 'audio_file':
+      case 'live_recording':
+        return 'Processing audio...';
+      case 'pdf':
+        return 'Processing PDF...';
+      case 'file':
+        return 'Processing document...';
+      case 'website':
+        return 'Processing website...';
+      case 'youtube':
+        return 'Processing video...';
+      case 'text':
+      case 'chat':
+        return 'Processing text...';
+      default:
+        return 'Processing content...';
+    }
+  };
+
   // Show shimmer text when recording or processing final content
   if (isRecording || isProcessingFinal) {
     return (
       <ScrollArea className="flex-1">
         <div className="flex items-center justify-center h-full py-16">
           <TextShimmer className="text-base font-semibold" duration={1.5}>
-            Processing audio...
+            {getProcessingMessage()}
           </TextShimmer>
         </div>
       </ScrollArea>
@@ -173,7 +200,7 @@ export const RealtimeTranscriptionDisplay = ({
                 <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
               </div>
               <TextShimmer className="text-base">
-                Processing audio...
+                {getProcessingMessage()}
               </TextShimmer>
             </div>
           </div>
