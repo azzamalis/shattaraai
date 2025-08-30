@@ -16,28 +16,38 @@ interface SummaryDisplayProps {
   contentData: ContentData;
 }
 
-// Sample summary data based on content type
+// Transform AI-generated chapters to SummaryItem format
+const transformChaptersToSummaryItems = (chapters: Array<{ id: string; title: string; summary?: string; }>): SummaryItem[] => {
+  return chapters.map((chapter, index) => ({
+    id: chapter.id,
+    reference: `Section ${index + 1}`,
+    title: chapter.title,
+    summary: chapter.summary 
+      ? chapter.summary.split(/[.!?]+/).filter(s => s.trim().length > 0).map(s => s.trim())
+      : ['No summary available for this section']
+  }));
+};
+
+// Get summary data - prioritize real chapters for PDF, fallback to sample data
+const getSummaryData = (contentData: ContentData): SummaryItem[] => {
+  // For PDF content, check if we have real AI-generated chapters
+  if (contentData.type === 'pdf' && contentData.chapters && contentData.chapters.length > 0) {
+    return transformChaptersToSummaryItems(contentData.chapters);
+  }
+  
+  // Fallback to sample data for other content types or when no real chapters exist
+  return getSampleSummaryData(contentData.type);
+};
+
+// Sample summary data based on content type (used as fallback)
 const getSampleSummaryData = (contentType: string): SummaryItem[] => {
   switch (contentType) {
     case 'pdf':
       return [{
         id: '1',
-        reference: 'Page 15',
-        title: 'Introduction to Machine Learning',
-        summary: ['Machine learning is a subset of artificial intelligence that enables computers to learn without explicit programming', 'Key concepts include supervised learning, unsupervised learning, and reinforcement learning'],
-        page: 15
-      }, {
-        id: '2',
-        reference: 'Page 23',
-        title: 'Neural Networks Fundamentals',
-        summary: ['Neural networks are computing systems inspired by biological neural networks', 'They consist of layers of interconnected nodes that process information'],
-        page: 23
-      }, {
-        id: '3',
-        reference: 'Page 41',
-        title: 'Deep Learning Applications',
-        summary: ['Deep learning has revolutionized computer vision and natural language processing', 'Applications include image recognition, speech synthesis, and autonomous vehicles'],
-        page: 41
+        reference: 'Section 1',
+        title: 'Processing PDF...',
+        summary: ['Content is being processed by AI', 'Summary will be available shortly']
       }];
     case 'video':
     case 'youtube':
@@ -116,9 +126,12 @@ const formatReference = (item: SummaryItem, contentType: string) => {
 export function SummaryDisplay({
   contentData
 }: SummaryDisplayProps) {
-  const summaryData = getSampleSummaryData(contentData.type);
+  const summaryData = getSummaryData(contentData);
   const ContentIcon = getContentIcon(contentData.type);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  
+  // Show loading state if PDF is still processing
+  const isProcessing = contentData.type === 'pdf' && contentData.processing_status === 'processing';
   const handleCopyAll = () => {
     const fullSummary = summaryData.map(item => `${item.title}\n${item.summary.map(point => `• ${point}`).join('\n')}`).join('\n\n');
     navigator.clipboard.writeText(fullSummary);
@@ -132,13 +145,38 @@ export function SummaryDisplay({
   return <div className="h-full p-4">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          
           <h2 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text">Summary</h2>
         </div>
-        
+        {summaryData.length > 1 && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleCopyAll}
+            className="text-dashboard-text-secondary hover:text-dashboard-text"
+          >
+            <Copy className="h-4 w-4 mr-2" />
+            Copy All
+          </Button>
+        )}
       </div>
 
-      <div className="space-y-4">
+      {isProcessing ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="p-4 rounded-lg bg-card">
+              <div className="animate-pulse">
+                <div className="h-4 bg-muted rounded w-20 mb-2"></div>
+                <div className="h-5 bg-muted rounded w-3/4 mb-2"></div>
+                <div className="space-y-1">
+                  <div className="h-3 bg-muted rounded w-full"></div>
+                  <div className="h-3 bg-muted rounded w-5/6"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
         {summaryData.map(item => <div key={item.id} onMouseEnter={() => setHoveredCard(item.id)} onMouseLeave={() => setHoveredCard(null)} className="p-4 rounded-lg bg-card transition-colors">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex-1 min-w-0">
@@ -166,7 +204,8 @@ export function SummaryDisplay({
                   </p>
                 </div>)}
             </div>
-          </div>)}
-      </div>
+            </div>)}
+        </div>
+      )}
     </div>;
 }
