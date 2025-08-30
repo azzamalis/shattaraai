@@ -142,11 +142,9 @@ export function SummaryDisplay({
     navigator.clipboard.writeText(itemText);
     console.log('Item copied to clipboard');
   };
-  return <div className="h-full p-4">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text">Summary</h2>
-        </div>
+  return <div className="h-full p-6 overflow-y-auto">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-xl font-medium text-dashboard-text dark:text-dashboard-text">Summary</h2>
         {summaryData.length > 1 && (
           <Button 
             variant="ghost" 
@@ -161,50 +159,61 @@ export function SummaryDisplay({
       </div>
 
       {isProcessing ? (
-        <div className="space-y-4">
+        <div className="space-y-8">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="p-4 rounded-lg bg-card">
-              <div className="animate-pulse">
-                <div className="h-4 bg-muted rounded w-20 mb-2"></div>
-                <div className="h-5 bg-muted rounded w-3/4 mb-2"></div>
-                <div className="space-y-1">
-                  <div className="h-3 bg-muted rounded w-full"></div>
-                  <div className="h-3 bg-muted rounded w-5/6"></div>
-                </div>
+            <div key={i} className="animate-pulse">
+              <div className="h-3 bg-muted rounded w-16 mb-2"></div>
+              <div className="h-6 bg-muted rounded w-2/3 mb-3"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-muted rounded w-full"></div>
+                <div className="h-4 bg-muted rounded w-5/6"></div>
+                <div className="h-4 bg-muted rounded w-4/5"></div>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="space-y-4">
-        {summaryData.map(item => <div key={item.id} onMouseEnter={() => setHoveredCard(item.id)} onMouseLeave={() => setHoveredCard(null)} className="p-4 rounded-lg bg-card transition-colors">
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-xs">
-                    {formatReference(item, contentData.type)}
-                  </Badge>
-                </div>
-                <h3 className="font-medium text-dashboard-text dark:text-dashboard-text text-base mb-2">
-                  {item.title}
-                </h3>
+        <div className="space-y-8">
+          {summaryData.map((item, index) => (
+            <div 
+              key={item.id} 
+              className="group relative"
+              onMouseEnter={() => setHoveredCard(item.id)} 
+              onMouseLeave={() => setHoveredCard(null)}
+            >
+              {/* Page/Section Reference */}
+              <div className="text-xs text-primary font-medium mb-2 tracking-wide">
+                {formatReference(item, contentData.type)}
               </div>
-              {hoveredCard === item.id && <Button variant="ghost" size="sm" onClick={() => handleCopyItem(item)} className="text-dashboard-text-secondary dark:text-dashboard-text-secondary hover:text-dashboard-text dark:hover:text-dashboard-text opacity-0 animate-fade-in" style={{
-            opacity: 1
-          }}>
-                  <Copy className="h-4 w-4" />
-                </Button>}
-            </div>
-            
-            <div className="space-y-1">
-              {item.summary.map((point, index) => <div key={index} className="flex items-start gap-2">
-                  <div className="w-1 h-1 rounded-full bg-dashboard-text-secondary/40 dark:bg-dashboard-text-secondary/40 mt-2 shrink-0" />
-                  <p className="text-dashboard-text-secondary dark:text-dashboard-text-secondary text-sm leading-relaxed">
+              
+              {/* Section Number and Title */}
+              <div className="flex items-start justify-between gap-4 mb-3">
+                <h3 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text leading-tight">
+                  {index + 1}. {item.title}
+                </h3>
+                
+                {hoveredCard === item.id && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleCopyItem(item)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-dashboard-text-secondary hover:text-dashboard-text shrink-0"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              
+              {/* Summary Content */}
+              <div className="text-dashboard-text-secondary dark:text-dashboard-text-secondary leading-relaxed">
+                {item.summary.map((point, pointIndex) => (
+                  <p key={pointIndex} className="mb-2 last:mb-0">
                     {point}
                   </p>
-                </div>)}
+                ))}
+              </div>
             </div>
-            </div>)}
+          ))}
         </div>
       )}
     </div>;
