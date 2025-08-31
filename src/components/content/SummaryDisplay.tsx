@@ -28,10 +28,10 @@ const transformChaptersToSummaryItems = (chapters: Array<{ id: string; title: st
   }));
 };
 
-// Get summary data - prioritize real chapters for PDF, fallback to sample data
+// Get summary data - prioritize real chapters for PDF and Word documents, fallback to sample data
 const getSummaryData = (contentData: ContentData): SummaryItem[] => {
-  // For PDF content, check if we have real AI-generated chapters
-  if (contentData.type === 'pdf' && contentData.chapters && contentData.chapters.length > 0) {
+  // For PDF content or Word documents (type 'file'), check if we have real AI-generated chapters
+  if ((contentData.type === 'pdf' || contentData.type === 'file') && contentData.chapters && contentData.chapters.length > 0) {
     return transformChaptersToSummaryItems(contentData.chapters);
   }
   
@@ -47,6 +47,13 @@ const getSampleSummaryData = (contentType: string): SummaryItem[] => {
         id: '1',
         reference: 'Section 1',
         title: 'Processing PDF...',
+        summary: ['Content is being processed by AI', 'Summary will be available shortly']
+      }];
+    case 'file':
+      return [{
+        id: '1',
+        reference: 'Section 1',
+        title: 'Processing Document...',
         summary: ['Content is being processed by AI', 'Summary will be available shortly']
       }];
     case 'video':
@@ -102,6 +109,7 @@ const getSampleSummaryData = (contentType: string): SummaryItem[] => {
 const getContentIcon = (contentType: string) => {
   switch (contentType) {
     case 'pdf':
+    case 'file': // Word documents
       return FileText;
     case 'video':
     case 'youtube':
@@ -130,8 +138,8 @@ export function SummaryDisplay({
   const ContentIcon = getContentIcon(contentData.type);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   
-  // Show loading state if PDF is still processing
-  const isProcessing = contentData.type === 'pdf' && contentData.processing_status === 'processing';
+  // Show loading state if PDF or Word document is still processing
+  const isProcessing = (contentData.type === 'pdf' || contentData.type === 'file') && contentData.processing_status === 'processing';
   const handleCopyAll = () => {
     const fullSummary = summaryData.map(item => `${item.title}\n${item.summary.map(point => `• ${point}`).join('\n')}`).join('\n\n');
     navigator.clipboard.writeText(fullSummary);
