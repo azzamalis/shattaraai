@@ -540,9 +540,6 @@ export function ContentLeftSidebar({
                     </div>
                   ) : contentData.text_content ? (
                     <div className="space-y-6">
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">
-                        Full Transcript
-                      </div>
                       <div className="space-y-6">
                         <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                           {contentData.text_content}
