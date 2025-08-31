@@ -755,16 +755,35 @@ export const useContent = () => {
 
         case 'file':
           if (file) {
-            console.log('DEBUG: useContent - Processing document file');
+            console.log('DEBUG: useContent - Processing document file, type:', file.type);
+            
+            // Determine which extraction function to use based on file type
+            const isWordDocument = file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+                                   file.type === 'application/msword' ||
+                                   file.name.toLowerCase().endsWith('.docx') ||
+                                   file.name.toLowerCase().endsWith('.doc');
+            
             try {
-              await supabase.functions.invoke('extract-document-text', {
-                body: {
-                  contentId: contentId,
-                  storagePath: contentData.storage_path || contentData.url,
-                  fileType: file.type
-                }
-              });
-              toast.success('Document uploaded! Text extraction in progress...');
+              if (isWordDocument) {
+                console.log('DEBUG: useContent - Detected Word document, using extract-word-text function');
+                await supabase.functions.invoke('extract-word-text', {
+                  body: {
+                    contentId: contentId,
+                    storageUrl: contentData.storage_path || contentData.url
+                  }
+                });
+                toast.success('Word document uploaded! Text extraction in progress...');
+              } else {
+                console.log('DEBUG: useContent - Using general extract-document-text function');
+                await supabase.functions.invoke('extract-document-text', {
+                  body: {
+                    contentId: contentId,
+                    storagePath: contentData.storage_path || contentData.url,
+                    fileType: file.type
+                  }
+                });
+                toast.success('Document uploaded! Text extraction in progress...');
+              }
               
               // Auto-trigger AI enhancement after text extraction
               setTimeout(async () => {
@@ -775,6 +794,7 @@ export const useContent = () => {
                   .single();
                 
                 if (updatedContent?.text_content) {
+                  console.log('DEBUG: useContent - Triggering AI enhancement for extracted text');
                   await supabase.functions.invoke('enhance-content-ai', {
                     body: {
                       contentId: contentId,
@@ -787,6 +807,7 @@ export const useContent = () => {
             } catch (extractionError) {
               console.error('DEBUG: useContent - Document text extraction failed:', extractionError);
               console.log('DEBUG: useContent - Document text extraction not available, content saved without processing');
+              toast.error('Document processing failed, but file was saved');
             }
           }
           break;
