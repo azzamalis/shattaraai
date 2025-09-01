@@ -206,7 +206,8 @@ async function processInBackground(
         const chapterResponse = await supabase.functions.invoke('generate-chapters', {
           body: {
             contentId: recordingId,
-            transcript: fullTranscript
+            transcript: fullTranscript,
+            duration: result.duration || 0
           }
         });
         

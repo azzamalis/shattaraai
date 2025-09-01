@@ -18,11 +18,26 @@ serve(async (req) => {
   }
 
   try {
-    const { contentId, transcript } = await req.json();
+    const { contentId, transcript, duration } = await req.json();
 
     if (!contentId || !transcript) {
       throw new Error('Missing content ID or transcript');
     }
+
+    // Get content data to check for duration if not provided
+    const { data: contentData, error: contentError } = await supabase
+      .from('content')
+      .select('metadata')
+      .eq('id', contentId)
+      .single();
+
+    if (contentError) {
+      console.error('Error fetching content data:', contentError);
+    }
+
+    // Extract duration from metadata if available
+    const actualDuration = duration || contentData?.metadata?.duration;
+    const durationText = actualDuration ? ` (Total duration: ${Math.floor(actualDuration / 60)}:${String(Math.floor(actualDuration % 60)).padStart(2, '0')})` : '';
 
     console.log(`Generating chapters for content ${contentId}`);
 
@@ -46,7 +61,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an expert content analyzer. Generate meaningful chapters for the provided transcript. 
+            content: `You are an expert content analyzer. Generate meaningful chapters for the provided transcript${durationText}. 
             Return a JSON array of chapters with this exact structure:
             [
               {
@@ -63,11 +78,13 @@ serve(async (req) => {
             - Use descriptive titles that capture the main topic
             - Ensure chapters don't overlap
             - Provide meaningful summaries
+            - IMPORTANT: All timestamps must be within the actual duration${actualDuration ? ` (${actualDuration} seconds max)` : ''}
+            - Chapters should cover the entire content duration proportionally
             - Return only the JSON array, no additional text`
           },
           {
             role: 'user',
-            content: `Please analyze this transcript and create chapters:\n\n${transcript}`
+            content: `Please analyze this transcript and create chapters${durationText}:\n\n${transcript}`
           }
         ],
         max_tokens: 1000
@@ -105,7 +122,22 @@ serve(async (req) => {
     } catch (parseError) {
       console.error('Error parsing chapters JSON:', parseError);
       throw new Error('Failed to parse generated chapters');
-    }
+      }
+
+      // Validate and fix timestamps to ensure they don't exceed the actual duration
+      if (actualDuration) {
+        chapters = chapters.map((chapter, index) => {
+          const maxEndTime = actualDuration;
+          const adjustedStartTime = Math.min(chapter.startTime || 0, maxEndTime);
+          const adjustedEndTime = Math.min(chapter.endTime || maxEndTime, maxEndTime);
+          
+          return {
+            ...chapter,
+            startTime: adjustedStartTime,
+            endTime: adjustedEndTime > adjustedStartTime ? adjustedEndTime : maxEndTime
+          };
+        });
+      }
 
     // Update content with generated chapters
     const { error: updateError } = await supabase
