@@ -70,6 +70,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
     return (
       <WaveformAudioPlayer 
         metadata={{ audioUrl: url }}
+        currentTimestamp={currentTimestamp}
       />
     );
   };
