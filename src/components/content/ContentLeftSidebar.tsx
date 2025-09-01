@@ -235,7 +235,8 @@ export function ContentLeftSidebar({
               metadata={audioMetadata} 
               onTimeUpdate={time => {
                 console.log('Audio playback time:', time);
-              }} 
+              }}
+              currentTimestamp={currentTimestamp}
             />
           </div>;
       }
@@ -302,7 +303,8 @@ export function ContentLeftSidebar({
           }} onTimeUpdate={time => {
           // Update current playback time for chapter navigation
           console.log('Current time:', time);
-        }} />
+        }}
+        currentTimestamp={currentTimestamp} />
         </div>;
     }
 

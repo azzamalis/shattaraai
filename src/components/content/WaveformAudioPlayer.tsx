@@ -11,9 +11,10 @@ interface WaveformAudioPlayerProps {
     transcript?: string;
   };
   onTimeUpdate?: (currentTime: number) => void;
+  currentTimestamp?: number;
 }
 
-export function WaveformAudioPlayer({ metadata, onTimeUpdate }: WaveformAudioPlayerProps) {
+export function WaveformAudioPlayer({ metadata, onTimeUpdate, currentTimestamp }: WaveformAudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(metadata.duration || 0);
@@ -80,6 +81,13 @@ export function WaveformAudioPlayer({ metadata, onTimeUpdate }: WaveformAudioPla
       audio.removeEventListener('ended', handleEnded);
     };
   }, [onTimeUpdate]);
+
+  // Handle timestamp seeking
+  useEffect(() => {
+    if (currentTimestamp !== undefined && audioRef.current) {
+      audioRef.current.currentTime = currentTimestamp;
+    }
+  }, [currentTimestamp]);
 
   const togglePlayback = () => {
     const audio = audioRef.current;
