@@ -26,6 +26,12 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Update processing status to 'processing'
+    await supabase
+      .from('content')
+      .update({ processing_status: 'processing' })
+      .eq('id', contentId);
+
     // Get content details
     const { data: content, error: contentError } = await supabase
       .from('content')
@@ -37,11 +43,24 @@ serve(async (req) => {
       throw new Error(`Content not found: ${contentError?.message}`);
     }
 
+    // Extract file path from storage URL
+    let filePath = content.storage_path;
+    if (content.storage_path.includes('/storage/v1/object/public/videos/')) {
+      // Extract just the file path from the full URL
+      filePath = content.storage_path.split('/storage/v1/object/public/videos/')[1];
+    } else if (content.storage_path.startsWith('http')) {
+      // If it's still a full URL, try to extract the filename
+      const urlParts = content.storage_path.split('/');
+      filePath = urlParts[urlParts.length - 1];
+    }
+
+    console.log('Extracted file path for download:', filePath);
+
     // Download video file from storage
     const { data: videoData, error: downloadError } = await supabase
       .storage
       .from('videos')
-      .download(content.storage_path);
+      .download(filePath);
 
     if (downloadError || !videoData) {
       throw new Error(`Failed to download video: ${downloadError?.message}`);
@@ -53,69 +72,39 @@ serve(async (req) => {
     const arrayBuffer = await videoData.arrayBuffer();
     const base64Video = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
 
+    // Extract video metadata for duration if available
+    const videoMetadata = content.metadata || {};
+    const videoDuration = videoMetadata.duration;
+
     // For now, we'll simulate audio extraction and directly transcribe
     // In production, you'd use FFmpeg WASM to extract audio
     console.log('Simulating audio extraction from video...');
 
-    // Send to audio transcription
-    const transcriptionResponse = await fetch(`${supabaseUrl}/functions/v1/audio-transcription`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${supabaseServiceKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        audio: base64Video,
-        contentId: contentId
-      }),
+    // Send to audio transcription with proper parameters
+    const transcriptionResponse = await supabase.functions.invoke('audio-transcription', {
+      body: {
+        audioData: base64Video,
+        recordingId: contentId,
+        chunkIndex: 0,
+        isRealTime: false,
+        timestamp: Date.now(),
+        originalFileName: content.name || 'video-audio.mp4'
+      }
     });
 
-    if (!transcriptionResponse.ok) {
-      const errorText = await transcriptionResponse.text();
-      console.error('Transcription failed:', errorText);
-      throw new Error(`Transcription failed: ${errorText}`);
+    if (transcriptionResponse.error) {
+      console.error('Transcription failed:', transcriptionResponse.error);
+      throw new Error(`Transcription failed: ${transcriptionResponse.error.message}`);
     }
 
-    const transcriptionResult = await transcriptionResponse.json();
     console.log('Audio extraction and transcription completed');
 
-    // Update content with processing status
-    await supabase
-      .from('content')
-      .update({
-        processing_status: 'completed',
-        text_content: transcriptionResult.transcript,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', contentId);
-
-    // Generate chapters if transcript is available
-    if (transcriptionResult.transcript) {
-      console.log('Generating chapters for video content...');
-      
-      const chaptersResponse = await fetch(`${supabaseUrl}/functions/v1/generate-chapters`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${supabaseServiceKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contentId: contentId,
-          transcript: transcriptionResult.transcript
-        }),
-      });
-
-      if (chaptersResponse.ok) {
-        console.log('Chapters generated successfully');
-      } else {
-        console.error('Chapter generation failed');
-      }
-    }
+    // The audio-transcription function will update the content and generate chapters
+    // So we don't need to do that here anymore
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        transcript: transcriptionResult.transcript,
         message: 'Video audio extraction and processing completed'
       }),
       {
@@ -125,6 +114,21 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in extract-video-audio function:', error);
+    
+    // Update processing status to failed
+    try {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const { contentId } = await req.json().catch(() => ({}));
+      
+      if (contentId) {
+        await supabase
+          .from('content')
+          .update({ processing_status: 'failed' })
+          .eq('id', contentId);
+      }
+    } catch (updateError) {
+      console.error('Failed to update processing status:', updateError);
+    }
     
     return new Response(
       JSON.stringify({ 
