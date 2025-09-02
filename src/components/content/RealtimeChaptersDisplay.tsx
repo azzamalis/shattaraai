@@ -24,6 +24,7 @@ interface RealtimeChaptersDisplayProps {
   onChapterClick?: (startTime: number) => void;
   onRetryProcessing?: () => void;
   isLoadingData?: boolean;
+  onSeekToTimestamp?: (timestamp: number) => void;
 }
 
 export const RealtimeChaptersDisplay = ({
@@ -36,7 +37,8 @@ export const RealtimeChaptersDisplay = ({
   onRequestChapters,
   onChapterClick,
   onRetryProcessing,
-  isLoadingData = false
+  isLoadingData = false,
+  onSeekToTimestamp
 }: RealtimeChaptersDisplayProps) => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -135,8 +137,11 @@ export const RealtimeChaptersDisplay = ({
         {chapters.map((chapter, index) => (
           <div 
             key={index}
-            className="group cursor-pointer"
-            onClick={() => onChapterClick?.(chapter.startTime)}
+            className="group cursor-pointer hover:bg-muted/20 rounded-lg p-3 transition-colors"
+            onClick={() => {
+              onChapterClick?.(chapter.startTime);
+              onSeekToTimestamp?.(chapter.startTime);
+            }}
           >
             {/* Timestamp */}
             <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">

@@ -197,6 +197,11 @@ export default function ContentPage() {
     setCurrentTimestamp(timestamp);
   };
 
+  // Handle seek to timestamp functionality for video player
+  const handleSeekToTimestamp = (timestamp: number) => {
+    setCurrentTimestamp(timestamp);
+  };
+
   // Loading state
   if (loading) {
     return <DashboardLayout className="content-page-layout p-0">
@@ -242,7 +247,23 @@ export default function ContentPage() {
         <div className="flex-1 px-4 py-[10px] md:px-[16px] overflow-hidden">
           <ResizablePanelGroup direction="horizontal" className="h-full gap-4 overflow-hidden">
             <ResizablePanel defaultSize={50} minSize={25} maxSize={60} className="bg-card rounded-lg">
-              <ContentLeftSidebar contentData={contentData} onUpdateContent={updateContentData} isRecording={isRecording} toggleRecording={toggleRecording} recordingTime={formatTime(recordingTime)} selectedMicrophone={selectedMicrophone} onMicrophoneSelect={handleMicrophoneSelect} onMicrophoneClear={handleMicrophoneClear} recordingStateInfo={recordingStateInfo} recordingMetadata={recordingMetadata} isRecordingLoading={false} onTextAction={handleTextAction} onChapterClick={handleChapterClick} currentTimestamp={currentTimestamp} />
+            <ContentLeftSidebar 
+              contentData={contentData} 
+              onUpdateContent={updateContentData} 
+              isRecording={isRecording} 
+              toggleRecording={toggleRecording} 
+              recordingTime={formatTime(recordingTime)} 
+              selectedMicrophone={selectedMicrophone} 
+              onMicrophoneSelect={handleMicrophoneSelect} 
+              onMicrophoneClear={handleMicrophoneClear} 
+              recordingStateInfo={recordingStateInfo} 
+              recordingMetadata={recordingMetadata} 
+              isRecordingLoading={false} 
+              onTextAction={handleTextAction} 
+              onChapterClick={handleChapterClick} 
+              currentTimestamp={currentTimestamp} 
+              onSeekToTimestamp={handleSeekToTimestamp} 
+            />
             </ResizablePanel>
             
             <ResizableHandle withHandle className="w-0.5 opacity-0 hover:opacity-100 transition-opacity duration-200">

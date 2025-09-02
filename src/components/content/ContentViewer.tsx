@@ -13,10 +13,12 @@ interface ContentViewerProps {
   onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
   currentTimestamp?: number;
   onExpandText?: () => void;
+  onSeekToTimestamp?: (timestamp: number) => void;
 }
 
-export function ContentViewer({ contentData, onUpdateContent, onTextAction, currentTimestamp, onExpandText }: ContentViewerProps) {
+export function ContentViewer({ contentData, onUpdateContent, onTextAction, currentTimestamp, onExpandText, onSeekToTimestamp }: ContentViewerProps) {
   const youtubePlayerRef = useRef<HTMLIFrameElement>(null);
+  const videoPlayerRef = useRef<HTMLVideoElement>(null);
   
   console.log('DEBUG: ContentViewer - Rendering with content data:', {
     id: contentData.id,
@@ -28,33 +30,67 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
     metadataKeys: contentData.metadata ? Object.keys(contentData.metadata) : []
   });
 
-  // Handle timestamp changes for YouTube videos
+  // Handle timestamp changes for YouTube videos and regular videos
   useEffect(() => {
-    if (contentData.type === 'youtube' && currentTimestamp !== undefined && youtubePlayerRef.current) {
-      // Use postMessage to seek to timestamp in YouTube iframe
-      const iframe = youtubePlayerRef.current;
-      const videoId = contentData.url ? extractYouTubeId(contentData.url) : '';
-      
-      if (videoId) {
-        // Send seekTo command to YouTube player
-        iframe.contentWindow?.postMessage(
-          `{"event":"command","func":"seekTo","args":[${currentTimestamp}, true]}`,
-          'https://www.youtube.com'
-        );
+    if (currentTimestamp !== undefined) {
+      if (contentData.type === 'youtube' && youtubePlayerRef.current) {
+        // Use postMessage to seek to timestamp in YouTube iframe
+        const iframe = youtubePlayerRef.current;
+        const videoId = contentData.url ? extractYouTubeId(contentData.url) : '';
         
-        // Also send playVideo command to ensure it plays
-        iframe.contentWindow?.postMessage(
-          `{"event":"command","func":"playVideo","args":[]}`,
-          'https://www.youtube.com'
-        );
+        if (videoId) {
+          // Send seekTo command to YouTube player
+          iframe.contentWindow?.postMessage(
+            `{"event":"command","func":"seekTo","args":[${currentTimestamp}, true]}`,
+            'https://www.youtube.com'
+          );
+          
+          // Also send playVideo command to ensure it plays
+          iframe.contentWindow?.postMessage(
+            `{"event":"command","func":"playVideo","args":[]}`,
+            'https://www.youtube.com'
+          );
+        }
+      } else if (contentData.type === 'video' && videoPlayerRef.current) {
+        // Seek regular video player to timestamp
+        videoPlayerRef.current.currentTime = currentTimestamp;
+        videoPlayerRef.current.play().catch(console.error);
       }
     }
   }, [currentTimestamp, contentData.type, contentData.url]);
+  
+  // Expose seek functionality to parent component
+  useEffect(() => {
+    if (onSeekToTimestamp) {
+      const seekHandler = (timestamp: number) => {
+        if (contentData.type === 'video' && videoPlayerRef.current) {
+          videoPlayerRef.current.currentTime = timestamp;
+          videoPlayerRef.current.play().catch(console.error);
+        } else if (contentData.type === 'youtube' && youtubePlayerRef.current) {
+          const videoId = contentData.url ? extractYouTubeId(contentData.url) : '';
+          if (videoId) {
+            youtubePlayerRef.current.contentWindow?.postMessage(
+              `{"event":"command","func":"seekTo","args":[${timestamp}, true]}`,
+              'https://www.youtube.com'
+            );
+            youtubePlayerRef.current.contentWindow?.postMessage(
+              `{"event":"command","func":"playVideo","args":[]}`,
+              'https://www.youtube.com'
+            );
+          }
+        }
+      };
+      
+      // Store the seek handler for external access
+      (onSeekToTimestamp as any).seekHandler = seekHandler;
+    }
+  }, [contentData.type, contentData.url, onSeekToTimestamp]);
 
   const renderVideoPlayer = (url: string) => {
     console.log('DEBUG: ContentViewer - Rendering video player with URL:', url);
     return (
       <video
+        ref={videoPlayerRef}
         src={url}
         controls
         className="w-full h-full object-cover"

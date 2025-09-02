@@ -34,6 +34,7 @@ interface ContentLeftSidebarProps {
   onTextAction?: (action: 'explain' | 'search' | 'summarize', text: string) => void;
   onChapterClick?: (timestamp: number) => void;
   currentTimestamp?: number;
+  onSeekToTimestamp?: (timestamp: number) => void;
 }
 export function ContentLeftSidebar({
   contentData,
@@ -49,7 +50,8 @@ export function ContentLeftSidebar({
   isRecordingLoading,
   onTextAction,
   onChapterClick,
-  currentTimestamp
+  currentTimestamp,
+  onSeekToTimestamp
 }: ContentLeftSidebarProps) {
   const [activeTab, setActiveTab] = useState("chapters");
   const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
@@ -318,7 +320,14 @@ export function ContentLeftSidebar({
       return null; // Document viewer will be rendered in the main layout
     }
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
-        <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} onTextAction={onTextAction} currentTimestamp={currentTimestamp} onExpandText={() => setIsTextExpanded(true)} />
+      <ContentViewer 
+        contentData={contentData} 
+        onUpdateContent={onUpdateContent} 
+        onTextAction={onTextAction} 
+        currentTimestamp={currentTimestamp} 
+        onExpandText={() => setIsTextExpanded(true)} 
+        onSeekToTimestamp={onSeekToTimestamp} 
+      />
       </div>;
   };
   const renderTabContent = () => {
@@ -361,6 +370,7 @@ export function ContentLeftSidebar({
                     isProcessingFinal={isProcessingFinal}
                     onRequestChapters={requestChapters}
                     onChapterClick={handleChapterClick}
+                    onSeekToTimestamp={onSeekToTimestamp}
                     isLoadingData={isLoadingData || false}
                   />
                 )}
@@ -376,7 +386,9 @@ export function ContentLeftSidebar({
                     })) : []}
                     transcriptionStatus={contentData.text_content ? 'completed' : 'pending'}
                     processingStatus={contentData.processing_status as 'pending' | 'processing' | 'completed' | 'failed'}
+                    contentType={contentData.type}
                     onChapterClick={handleChapterClick}
+                    onSeekToTimestamp={onSeekToTimestamp}
                     onRetryProcessing={() => contentData.id && retryProcessing(contentData.id)}
                   />
                 )}
