@@ -517,17 +517,16 @@ export function ContentLeftSidebar({
                     fullTranscript={fullTranscript}
                     transcriptionProgress={transcriptionProgress}
                     transcriptionStatus={transcriptionStatus}
-                    averageConfidence={averageConfidence}
-                    isProcessingAudio={isProcessingAudio}
-                    isProcessingFinal={isProcessingFinal}
-                    isRecording={isRecording && !isPaused && contentData.type === 'live_recording'}
-                    isLoadingData={isLoadingData || false}
-                    contentType={contentType}
-                    currentTimestamp={currentTimestamp}
-                    onSeekToTimestamp={onSeekToTimestamp}
-                  />
+                     averageConfidence={averageConfidence}
+                     isProcessingAudio={isProcessingAudio}
+                     isProcessingFinal={isProcessingFinal}
+                     isRecording={isRecording && !isPaused && contentData.type === 'live_recording'}
+                     isLoadingData={isLoadingData || false}
+                     contentType={contentData.type}
+                     currentTimestamp={currentTimestamp}
+                     onSeekToTimestamp={onSeekToTimestamp}
                    />
-                )}
+                 )}
                 
                 {/* Audio/Video file transcripts */}
                 {(contentData.type === 'audio_file' || contentData.type === 'video') && (
