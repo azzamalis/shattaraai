@@ -3,6 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
+interface TranscriptionWord {
+  word: string;
+  start: number;
+  end: number;
+  confidence: number;
+}
+
 interface TranscriptionChunk {
   chunkIndex: number;
   timestamp: number;
@@ -10,6 +17,7 @@ interface TranscriptionChunk {
   confidence: number;
   segments: any[];
   duration: number;
+  words: TranscriptionWord[];
 }
 
 interface ChapterData {

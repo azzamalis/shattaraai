@@ -522,6 +522,10 @@ export function ContentLeftSidebar({
                     isProcessingFinal={isProcessingFinal}
                     isRecording={isRecording && !isPaused && contentData.type === 'live_recording'}
                     isLoadingData={isLoadingData || false}
+                    contentType={contentType}
+                    currentTimestamp={currentTimestamp}
+                    onSeekToTimestamp={onSeekToTimestamp}
+                  />
                    />
                 )}
                 

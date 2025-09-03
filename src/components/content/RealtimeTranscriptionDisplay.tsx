@@ -6,6 +6,13 @@ import { Loader2, Mic, CheckCircle, AlertCircle } from 'lucide-react';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 import { ContentType } from '@/lib/types';
 
+interface TranscriptionWord {
+  word: string;
+  start: number;
+  end: number;
+  confidence: number;
+}
+
 interface TranscriptionChunk {
   chunkIndex: number;
   timestamp: number;
@@ -13,6 +20,7 @@ interface TranscriptionChunk {
   confidence: number;
   segments: any[];
   duration: number;
+  words: TranscriptionWord[];
 }
 
 interface RealtimeTranscriptionDisplayProps {
@@ -26,6 +34,8 @@ interface RealtimeTranscriptionDisplayProps {
   isRecording?: boolean;
   isLoadingData?: boolean;
   contentType?: ContentType;
+  currentTimestamp?: number;
+  onSeekToTimestamp?: (timestamp: number) => void;
 }
 
 export const RealtimeTranscriptionDisplay = ({
@@ -38,7 +48,9 @@ export const RealtimeTranscriptionDisplay = ({
   isProcessingFinal = false,
   isRecording = false,
   isLoadingData = false,
-  contentType = 'audio_file'
+  contentType = 'audio_file',
+  currentTimestamp = 0,
+  onSeekToTimestamp
 }: RealtimeTranscriptionDisplayProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const lastChunkRef = useRef<HTMLDivElement>(null);
@@ -89,11 +101,21 @@ export const RealtimeTranscriptionDisplay = ({
   };
 
   const formatTime = (timestamp: number) => {
-    // Convert timestamp to seconds (assuming timestamp is in milliseconds)
-    const totalSeconds = Math.floor(timestamp / 1000);
+    // Convert timestamp to seconds (timestamp should be in seconds for video)
+    const totalSeconds = Math.floor(timestamp);
     const mins = Math.floor(totalSeconds / 60);
     const secs = Math.floor(totalSeconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const isWordActive = (wordStart: number, wordEnd: number) => {
+    return currentTimestamp >= wordStart && currentTimestamp <= wordEnd;
+  };
+
+  const handleWordClick = (timestamp: number) => {
+    if (onSeekToTimestamp) {
+      onSeekToTimestamp(timestamp);
+    }
   };
 
   // Get processing message based on content type
@@ -154,23 +176,43 @@ export const RealtimeTranscriptionDisplay = ({
     <div className="space-y-8">
       {/* Real-time Transcription Display */}
       <div className="space-y-8">
-        {/* Show chunks for real-time display */}
+        {/* Show word-by-word transcription */}
         {transcriptionChunks.length > 0 ? (
           transcriptionChunks.map((chunk, index) => (
             <div 
               key={`${chunk.chunkIndex}-${chunk.timestamp}`}
-              className="group"
+              className="group mb-6"
               ref={index === transcriptionChunks.length - 1 ? lastChunkRef : undefined}
             >
-              {/* Timestamp */}
-              <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
+              {/* Timestamp Badge */}
+              <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-3">
                 {formatTime(chunk.timestamp)}
               </div>
               
-              {/* Transcript Text */}
-              <p className="text-sm text-foreground leading-relaxed">
-                {chunk.text || 'Processing...'}
-              </p>
+              {/* Word-by-word Display */}
+              <div className="flex flex-wrap gap-1 leading-relaxed">
+                {chunk.words && chunk.words.length > 0 ? (
+                  chunk.words.map((word, wordIndex) => (
+                    <span
+                      key={`${chunk.chunkIndex}-${wordIndex}`}
+                      className={`cursor-pointer px-1 py-0.5 rounded transition-all duration-200 ${
+                        isWordActive(word.start, word.end)
+                          ? 'bg-primary/20 text-primary font-medium'
+                          : 'hover:bg-muted/50 text-foreground'
+                      }`}
+                      onClick={() => handleWordClick(word.start)}
+                      title={`${formatTime(word.start)} - ${formatTime(word.end)} (${Math.round(word.confidence * 100)}%)`}
+                    >
+                      {word.word}
+                    </span>
+                  ))
+                ) : (
+                  /* Fallback to regular text if no word-level data */
+                  <span className="text-sm text-foreground">
+                    {chunk.text || 'Processing...'}
+                  </span>
+                )}
+              </div>
             </div>
           ))
         ) : (
