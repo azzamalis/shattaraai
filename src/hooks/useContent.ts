@@ -910,6 +910,84 @@ export const useContent = () => {
     return mapping[contentType];
   };
 
+  // Auto-retry mechanism for stuck video processing
+  const checkAndRetryStuckVideos = async () => {
+    if (!user) return;
+    
+    try {
+      // Find videos stuck in processing for more than 5 minutes
+      const { data: stuckVideos, error } = await supabase
+        .from('content')
+        .select('id, storage_path, updated_at, created_at')
+        .eq('user_id', user.id)
+        .eq('type', 'video')
+        .eq('processing_status', 'processing')
+        .is('text_content', null)
+        .gte('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()) // Last hour
+        .lt('updated_at', new Date(Date.now() - 5 * 60 * 1000).toISOString()); // More than 5 minutes ago
+        
+      if (error) {
+        console.error('Error checking for stuck videos:', error);
+        return;
+      }
+      
+      if (stuckVideos && stuckVideos.length > 0) {
+        console.log(`Found ${stuckVideos.length} stuck video(s), auto-retrying...`);
+        
+        for (const video of stuckVideos) {
+          try {
+            console.log('Auto-retrying video processing for:', video.id);
+            
+            // Reset to pending status
+            await supabase
+              .from('content')
+              .update({ 
+                processing_status: 'pending',
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', video.id);
+            
+            // Retry the processing after a short delay
+            setTimeout(async () => {
+              try {
+                await supabase.functions.invoke('extract-video-audio', {
+                  body: { contentId: video.id }
+                });
+                console.log('Auto-retry initiated for video:', video.id);
+              } catch (retryError) {
+                console.error('Auto-retry failed for video:', video.id, retryError);
+                // Mark as failed after retry attempt
+                await supabase
+                  .from('content')
+                  .update({ processing_status: 'failed' })
+                  .eq('id', video.id);
+              }
+            }, 2000 * stuckVideos.indexOf(video)); // Stagger retries
+          } catch (updateError) {
+            console.error('Error updating stuck video status:', updateError);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error in auto-retry mechanism:', error);
+    }
+  };
+
+  // Run auto-retry check every 2 minutes
+  useEffect(() => {
+    if (!user) return;
+    
+    const retryInterval = setInterval(checkAndRetryStuckVideos, 2 * 60 * 1000);
+    
+    // Run initial check after 30 seconds
+    const initialTimeout = setTimeout(checkAndRetryStuckVideos, 30000);
+    
+    return () => {
+      clearInterval(retryInterval);
+      clearTimeout(initialTimeout);
+    };
+  }, [user]);
+
   useEffect(() => {
     console.log('DEBUG: useContent - useEffect triggered for user change:', user?.id);
     if (user) {
