@@ -540,9 +540,18 @@ export function ContentLeftSidebar({
                           <p className="text-sm font-medium text-foreground mb-1">
                             Processing audio/video
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-muted-foreground mb-3">
                             Generating transcript automatically...
                           </p>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => contentData.id && retryProcessing(contentData.id)}
+                            className="text-xs"
+                          >
+                            <RefreshCw className="h-3 w-3 mr-1" />
+                            Retry Processing
+                          </Button>
                         </div>
                       </div>
                       {/* Shimmer loading placeholders */}
