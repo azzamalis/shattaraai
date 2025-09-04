@@ -4,16 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Mic, CheckCircle, AlertCircle } from 'lucide-react';
 import { TextShimmer } from '@/components/ui/text-shimmer';
-import { ContentType } from '@/lib/types';
-
-interface TranscriptionChunk {
-  chunkIndex: number;
-  timestamp: number;
-  text: string;
-  confidence: number;
-  segments: any[];
-  duration: number;
-}
+import { ContentType, TranscriptionChunk, TranscriptionSegment } from '@/lib/types';
 
 interface RealtimeTranscriptionDisplayProps {
   transcriptionChunks: TranscriptionChunk[];
@@ -89,11 +80,59 @@ export const RealtimeTranscriptionDisplay = ({
   };
 
   const formatTime = (timestamp: number) => {
-    // Convert timestamp to seconds (assuming timestamp is in milliseconds)
-    const totalSeconds = Math.floor(timestamp / 1000);
+    // Convert timestamp to MM:SS format (timestamp should be in seconds)
+    const totalSeconds = Math.floor(timestamp);
     const mins = Math.floor(totalSeconds / 60);
     const secs = Math.floor(totalSeconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Process segments from transcription chunks to create timestamped text blocks
+  const getTimestampedSegments = () => {
+    const segments: Array<{ timestamp: number; text: string }> = [];
+    
+    // Process chunks and their segments
+    transcriptionChunks.forEach(chunk => {
+      if (chunk.segments && chunk.segments.length > 0) {
+        chunk.segments.forEach(segment => {
+          segments.push({
+            timestamp: segment.start,
+            text: segment.text.trim()
+          });
+        });
+      } else if (chunk.text) {
+        // Fallback to chunk-level if no segments available
+        segments.push({
+          timestamp: chunk.timestamp / 1000, // Convert ms to seconds if needed
+          text: chunk.text.trim()
+        });
+      }
+    });
+
+    // Sort by timestamp and merge segments that are very close together
+    segments.sort((a, b) => a.timestamp - b.timestamp);
+    
+    const mergedSegments: Array<{ timestamp: number; text: string }> = [];
+    let currentSegment: { timestamp: number; text: string } | null = null;
+    
+    segments.forEach(segment => {
+      if (!currentSegment) {
+        currentSegment = { ...segment };
+      } else if (segment.timestamp - currentSegment.timestamp < 30) {
+        // Merge segments that are within 30 seconds of each other
+        currentSegment.text += ' ' + segment.text;
+      } else {
+        // Start a new segment
+        mergedSegments.push(currentSegment);
+        currentSegment = { ...segment };
+      }
+    });
+    
+    if (currentSegment) {
+      mergedSegments.push(currentSegment);
+    }
+    
+    return mergedSegments;
   };
 
   // Get processing message based on content type
@@ -150,62 +189,60 @@ export const RealtimeTranscriptionDisplay = ({
     );
   }
 
-  return (
-    <div className="space-y-8">
-      {/* Real-time Transcription Display */}
-      <div className="space-y-8">
-        {/* Show chunks for real-time display */}
-        {transcriptionChunks.length > 0 ? (
-          transcriptionChunks.map((chunk, index) => (
-            <div 
-              key={`${chunk.chunkIndex}-${chunk.timestamp}`}
-              className="group"
-              ref={index === transcriptionChunks.length - 1 ? lastChunkRef : undefined}
-            >
-              {/* Timestamp */}
-              <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
-                {formatTime(chunk.timestamp)}
-              </div>
-              
-              {/* Transcript Text */}
-              <p className="text-sm text-foreground leading-relaxed">
-                {chunk.text || 'Processing...'}
-              </p>
-            </div>
-          ))
-        ) : (
-          /* Show full transcript if no chunks available */
-          fullTranscript && (
-            <div className="space-y-6">
-              <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
-                00:00
-              </div>
-              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                {fullTranscript}
-              </p>
-            </div>
-          )
-        )}
+  // Get timestamped segments for display
+  const timestampedSegments = getTimestampedSegments();
 
-        {/* Live indicator for recording */}
-        {isRecording && transcriptionStatus === 'processing' && (
-          <div className="group">
-            <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
-              Live
+  return (
+    <div className="space-y-6">
+      {/* Timestamped Transcription Display */}
+      {timestampedSegments.length > 0 ? (
+        timestampedSegments.map((segment, index) => (
+          <div 
+            key={`${segment.timestamp}-${index}`}
+            className="group"
+            ref={index === timestampedSegments.length - 1 ? lastChunkRef : undefined}
+          >
+            {/* Timestamp */}
+            <div className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 font-mono">
+              {formatTime(segment.timestamp)}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" />
-                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-              </div>
-              <TextShimmer className="text-base">
-                {getProcessingMessage()}
-              </TextShimmer>
-            </div>
+            
+            {/* Transcript Text */}
+            <p className="text-sm text-dashboard-text dark:text-dashboard-text leading-relaxed mb-6">
+              {segment.text}
+            </p>
           </div>
-        )}
-      </div>
+        ))
+      ) : fullTranscript ? (
+        /* Show full transcript if no segments available */
+        <div>
+          <div className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 font-mono">
+            00:00
+          </div>
+          <p className="text-sm text-dashboard-text dark:text-dashboard-text leading-relaxed whitespace-pre-wrap">
+            {fullTranscript}
+          </p>
+        </div>
+      ) : null}
+
+      {/* Live indicator for recording */}
+      {isRecording && transcriptionStatus === 'processing' && (
+        <div className="group">
+          <div className="text-xs text-dashboard-text-secondary dark:text-dashboard-text-secondary mb-3 font-mono">
+            Live
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              <div className="w-1.5 h-1.5 bg-dashboard-accent rounded-full animate-bounce" />
+              <div className="w-1.5 h-1.5 bg-dashboard-accent rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+              <div className="w-1.5 h-1.5 bg-dashboard-accent rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+            </div>
+            <TextShimmer className="text-sm text-dashboard-text dark:text-dashboard-text">
+              {getProcessingMessage()}
+            </TextShimmer>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
