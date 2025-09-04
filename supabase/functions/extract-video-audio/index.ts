@@ -98,9 +98,16 @@ async function extractAudioFromVideo(videoUrl: string): Promise<{
       offset += chunk.byteLength;
     }
     
-    // Convert to base64
+    // Convert to base64 in smaller chunks to avoid call stack overflow
     console.log('Converting to base64...');
-    const base64Audio = btoa(String.fromCharCode.apply(null, Array.from(combinedBuffer)));
+    const chunkSize = 8192; // 8KB chunks to avoid call stack issues
+    let base64Audio = '';
+    
+    for (let i = 0; i < combinedBuffer.length; i += chunkSize) {
+      const chunk = combinedBuffer.slice(i, i + chunkSize);
+      const chunkString = String.fromCharCode(...chunk);
+      base64Audio += btoa(chunkString);
+    }
     
     console.log('Real audio extraction completed successfully');
     console.log('Final audio size:', base64Audio.length, 'characters');
