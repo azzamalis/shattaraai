@@ -187,7 +187,6 @@ By the end of this tutorial, you'll have a solid understanding of academic writi
     formData.append('file', blob, fileName);
     formData.append('model', 'whisper-1');
     formData.append('response_format', 'verbose_json');
-    formData.append('timestamp_granularities[]', 'word'); // Request word-level timestamps
     formData.append('language', 'en'); // Can be made dynamic if needed
 
     // Send to OpenAI Whisper API

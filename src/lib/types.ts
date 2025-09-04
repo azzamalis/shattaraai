@@ -26,37 +26,6 @@ export interface ContentHandlers {
   onUpdateContent: (id: string, updates: any) => Promise<void>;
 }
 
-// Transcription types for word-level timestamps
-export interface WordSegment {
-  word: string;
-  start: number;
-  end: number;
-  confidence?: number;
-}
-
-export interface TranscriptionSegment {
-  id: number;
-  seek: number;
-  start: number;
-  end: number;
-  text: string;
-  tokens: number[];
-  temperature: number;
-  avg_logprob: number;
-  compression_ratio: number;
-  no_speech_prob: number;
-  words?: WordSegment[];
-}
-
-export interface TranscriptionChunk {
-  chunkIndex: number;
-  timestamp: number;
-  text: string;
-  confidence: number;
-  segments: TranscriptionSegment[];
-  duration: number;
-}
-
 // Chat types
 export type ChatTabType = 'chat' | 'flashcards' | 'quizzes' | 'summary' | 'notes';
 
