@@ -517,16 +517,13 @@ export function ContentLeftSidebar({
                     fullTranscript={fullTranscript}
                     transcriptionProgress={transcriptionProgress}
                     transcriptionStatus={transcriptionStatus}
-                     averageConfidence={averageConfidence}
-                     isProcessingAudio={isProcessingAudio}
-                     isProcessingFinal={isProcessingFinal}
-                     isRecording={isRecording && !isPaused && contentData.type === 'live_recording'}
-                     isLoadingData={isLoadingData || false}
-                     contentType={contentData.type}
-                     currentTimestamp={currentTimestamp}
-                     onSeekToTimestamp={onSeekToTimestamp}
+                    averageConfidence={averageConfidence}
+                    isProcessingAudio={isProcessingAudio}
+                    isProcessingFinal={isProcessingFinal}
+                    isRecording={isRecording && !isPaused && contentData.type === 'live_recording'}
+                    isLoadingData={isLoadingData || false}
                    />
-                 )}
+                )}
                 
                 {/* Audio/Video file transcripts */}
                 {(contentData.type === 'audio_file' || contentData.type === 'video') && (
@@ -541,7 +538,7 @@ export function ContentLeftSidebar({
                             Processing audio/video
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Generating transcript automatically... Auto-retry active.
+                            Generating transcript automatically...
                           </p>
                         </div>
                       </div>

@@ -656,47 +656,24 @@ export const useContent = () => {
           break;
 
         case 'video':
-          console.log('DEBUG: useContent - Processing video content for audio extraction');
-          try {
-            // Update status to processing first
-            await supabase
-              .from('content')
-              .update({ processing_status: 'processing' })
-              .eq('id', contentId);
-
-            // Use the enhanced video audio extraction function
-            const { data, error } = await supabase.functions.invoke('extract-video-audio', {
-              body: {
-                contentId: contentId
-              }
-            });
-
-            if (error) {
-              console.error('DEBUG: useContent - Video extraction function error:', error);
+          if (file) {
+            console.log('DEBUG: useContent - Processing video file for audio extraction');
+            try {
+              // Use the new video audio extraction function
+              await supabase.functions.invoke('extract-video-audio', {
+                body: {
+                  contentId: contentId
+                }
+              });
+              toast.success('Video uploaded! Audio extraction and transcription in progress...');
+            } catch (extractionError) {
+              console.error('DEBUG: useContent - Video audio extraction failed:', extractionError);
+              toast.error('Video processing failed');
               await supabase
                 .from('content')
-                .update({ 
-                  processing_status: 'failed',
-                  text_content: `Video processing failed: ${error.message || 'Unknown error'}`
-                })
+                .update({ processing_status: 'failed' })
                 .eq('id', contentId);
-              toast.error('Video processing failed: ' + (error.message || 'Unknown error'));
-            } else {
-              console.log('DEBUG: useContent - Video extraction initiated successfully:', data);
-              toast.success('Video uploaded! Audio extraction and transcription in progress...');
             }
-          } catch (extractionError) {
-            console.error('DEBUG: useContent - Video audio extraction failed:', extractionError);
-            const errorMessage = extractionError instanceof Error ? extractionError.message : 'Unknown error';
-            toast.error('Video processing failed: ' + errorMessage);
-            
-            await supabase
-              .from('content')
-              .update({ 
-                processing_status: 'failed',
-                text_content: `Processing error: ${errorMessage}`
-              })
-              .eq('id', contentId);
           }
           break;
 
@@ -932,104 +909,6 @@ export const useContent = () => {
     };
     return mapping[contentType];
   };
-
-  // Enhanced auto-retry mechanism for stuck video processing
-  const checkAndRetryStuckVideos = async () => {
-    if (!user) return;
-    
-    try {
-      // Find videos stuck in processing for more than 3 minutes OR failed videos from the last hour
-      const { data: stuckVideos, error } = await supabase
-        .from('content')
-        .select('id, storage_path, updated_at, created_at, processing_status, text_content')
-        .eq('user_id', user.id)
-        .eq('type', 'video')
-        .or('processing_status.eq.processing,processing_status.eq.failed')
-        .is('text_content', null)
-        .gte('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()) // Last hour
-        .lt('updated_at', new Date(Date.now() - 3 * 60 * 1000).toISOString()); // More than 3 minutes ago
-        
-      if (error) {
-        console.error('Error checking for stuck videos:', error);
-        return;
-      }
-      
-      if (stuckVideos && stuckVideos.length > 0) {
-        console.log(`Found ${stuckVideos.length} stuck/failed video(s), auto-retrying...`);
-        
-        for (const video of stuckVideos) {
-          try {
-            console.log(`Auto-retrying video processing for: ${video.id} (status: ${video.processing_status})`);
-            
-            // Reset to pending status with clean state
-            await supabase
-              .from('content')
-              .update({ 
-                processing_status: 'pending',
-                text_content: null,
-                chapters: null,
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', video.id);
-            
-            // Retry the processing after a short delay with better error handling
-            setTimeout(async () => {
-              try {
-                console.log('Initiating retry for video:', video.id);
-                const { data, error } = await supabase.functions.invoke('extract-video-audio', {
-                  body: { contentId: video.id }
-                });
-                
-                if (error) {
-                  console.error('Auto-retry function error for video:', video.id, error);
-                  await supabase
-                    .from('content')
-                    .update({ 
-                      processing_status: 'failed',
-                      text_content: `Auto-retry failed: ${error.message || 'Unknown error'}`
-                    })
-                    .eq('id', video.id);
-                } else {
-                  console.log('Auto-retry initiated successfully for video:', video.id, data);
-                }
-              } catch (retryError) {
-                console.error('Auto-retry exception for video:', video.id, retryError);
-                const errorMessage = retryError instanceof Error ? retryError.message : 'Unknown error';
-                await supabase
-                  .from('content')
-                  .update({ 
-                    processing_status: 'failed',
-                    text_content: `Auto-retry exception: ${errorMessage}`
-                  })
-                  .eq('id', video.id);
-              }
-            }, 2000 * stuckVideos.indexOf(video)); // Stagger retries
-          } catch (updateError) {
-            console.error('Error updating stuck video status:', updateError);
-          }
-        }
-      } else {
-        console.log('No stuck videos found to retry');
-      }
-    } catch (error) {
-      console.error('Error in enhanced auto-retry mechanism:', error);
-    }
-  };
-
-  // Run auto-retry check every 2 minutes
-  useEffect(() => {
-    if (!user) return;
-    
-    const retryInterval = setInterval(checkAndRetryStuckVideos, 2 * 60 * 1000);
-    
-    // Run initial check after 30 seconds
-    const initialTimeout = setTimeout(checkAndRetryStuckVideos, 30000);
-    
-    return () => {
-      clearInterval(retryInterval);
-      clearTimeout(initialTimeout);
-    };
-  }, [user]);
 
   useEffect(() => {
     console.log('DEBUG: useContent - useEffect triggered for user change:', user?.id);
