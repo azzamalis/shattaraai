@@ -7,7 +7,7 @@ import {
   Mic, 
   Globe, 
   MessageSquare, 
-  Music, 
+  AudioLines, 
   Upload, 
   Type,
   Text 
@@ -35,7 +35,7 @@ export const ContentTypeIcon: React.FC<ContentTypeIconProps> = ({ type }) => {
     case 'text':
       return <Type className="h-4 w-4 text-primary/60" />;
     case 'audio_file':
-      return <Music className="h-4 w-4 text-primary/60" />;
+      return <AudioLines className="h-4 w-4 text-primary/60" />;
     case 'upload':
       return <Upload className="h-4 w-4 text-primary/60" />;
     case 'chat':

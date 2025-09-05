@@ -17,7 +17,7 @@ import {
   Globe,
   Youtube,
   MessageSquare,
-  Music,
+  AudioLines,
   Type,
   Text
 } from 'lucide-react';
@@ -52,7 +52,7 @@ const getContentTypeIcon = (type: string) => {
     case 'text':
       return <Type size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     case 'audio_file':
-      return <Music size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
+      return <AudioLines size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     case 'chat':
       return <MessageSquare size={16} strokeWidth={2} className="opacity-60" aria-hidden="true" />;
     default:

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Mic, FileText, Globe, MessageSquare, Music, Upload, Type } from 'lucide-react';
+import { Play, Mic, FileText, Globe, MessageSquare, AudioLines, Upload, Type } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PDFThumbnailGenerator } from './PDFThumbnailGenerator';
 interface LearningCardThumbnailProps {
@@ -58,7 +58,7 @@ export function LearningCardThumbnail({
     }
     if (isAudioFile) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Music className="w-12 h-12 text-muted-foreground" />
+          <AudioLines className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isWebsite) {
