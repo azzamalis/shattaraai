@@ -55,6 +55,38 @@ export interface NotesBlock {
   level?: number;
 }
 
+// Word-level transcription types
+export interface WordSegment {
+  word: string;
+  start: number;
+  end: number;
+  confidence?: number;
+}
+
+export interface TranscriptionSegment {
+  id: number;
+  seek: number;
+  start: number;
+  end: number;
+  text: string;
+  tokens: number[];
+  temperature: number;
+  avg_logprob: number;
+  compression_ratio: number;
+  no_speech_prob: number;
+  words?: WordSegment[];
+}
+
+export interface TranscriptionChunk {
+  chunkIndex: number;
+  timestamp: number;
+  text: string;
+  confidence: number;
+  segments: TranscriptionSegment[];
+  duration: number;
+  words?: WordSegment[];
+}
+
 // Recording types - expanded to include missing properties
 export interface RecordingMetadata {
   duration?: number;
@@ -74,6 +106,7 @@ export interface RecordingMetadata {
     startTime: number;
     endTime?: number;
   }>;
+  wordLevelTranscript?: TranscriptionChunk[];
 }
 
 export interface RecordingStateInfo {

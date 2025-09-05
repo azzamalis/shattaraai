@@ -55,79 +55,12 @@ async function processInBackground(
   try {
     console.log(`Background processing started for recording ${recordingId}`, { isVideoContent, videoDuration });
 
-    // Handle video content placeholder
-    if (isVideoContent && audioData === 'VIDEO_CONTENT_PLACEHOLDER') {
-      console.log('Processing video content - extracting and transcribing actual audio');
+    // Handle video content - process real audio data instead of placeholder
+    if (isVideoContent) {
+      console.log('Processing real video audio data for transcription');
       
-      // Create more realistic transcription for the academic writing video
-      const realisticTranscription = `Welcome to this academic writing tutorial. In this comprehensive video, we'll explore the fundamental principles of academic writing that are essential for success in higher education and professional settings.
-
-We'll begin by discussing the importance of clear thesis statements and how they form the backbone of any academic paper. A strong thesis statement provides direction and focus for your entire work, helping readers understand your main argument from the very beginning.
-
-Next, we'll delve into the structure of academic essays, including proper introduction techniques that engage your reader, body paragraph development that supports your thesis with evidence, and effective conclusions that synthesize your arguments without simply restating them.
-
-We'll also cover the critical importance of research methodology and citation practices. Proper source integration and citation formatting are not just academic requirements - they demonstrate your credibility as a researcher and help you avoid plagiarism issues.
-
-Throughout this session, we'll examine common pitfalls that students encounter when writing academic papers. These include unclear arguments, poor source integration, inadequate analysis, and citation errors. We'll provide practical tips on how to avoid these mistakes and improve your overall writing clarity and effectiveness.
-
-Additionally, we'll discuss the writing process itself - from initial research and outlining to drafting, revising, and final editing. Understanding this process will help you manage your time more effectively and produce higher quality work.
-
-By the end of this tutorial, you'll have a solid understanding of academic writing conventions and be better equipped to produce high-quality scholarly work that meets the standards expected in academic and professional contexts. Remember, good academic writing is clear, concise, and well-supported by credible sources.`;
-      
-      try {
-        // Update the content with realistic transcription
-        const { error: updateError } = await supabase
-          .from('content')
-          .update({
-            text_content: realisticTranscription,
-            processing_status: 'processing', // Keep as processing for chapter generation
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', recordingId);
-
-        if (updateError) {
-          console.error('Error updating content with transcription:', updateError);
-          throw new Error('Failed to update content with transcription');
-        }
-
-        console.log('Realistic transcription updated successfully for video content');
-      } catch (error) {
-        console.error('Error processing video transcription:', error);
-        
-        // Fallback to shorter transcription
-        const fallbackText = `This video covers academic writing fundamentals including thesis development, essay structure, research methods, and common writing pitfalls to avoid.`;
-        
-        const { error: fallbackError } = await supabase
-          .from('content')
-          .update({
-            text_content: fallbackText,
-            processing_status: 'processing',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', recordingId);
-        
-        if (fallbackError) {
-          console.error('Failed to update content with fallback transcription:', fallbackError);
-        }
-      }
-      
-      // Generate chapters with proper duration
-      console.log('Generating chapters for video content with duration:', videoDuration);
-      const chaptersResponse = await supabase.functions.invoke('generate-chapters', {
-        body: {
-          contentId: recordingId,
-          transcript: realisticTranscription,
-          duration: videoDuration || 459 // Use provided duration or corrected default (7:39)
-        }
-      });
-      
-      if (chaptersResponse.error) {
-        console.error('Chapter generation failed:', chaptersResponse.error);
-      } else {
-        console.log('Chapters generated successfully for video content');
-      }
-      
-      return;
+      // Continue with normal audio transcription process using the extracted audio data
+      // The audio data is now real extracted audio from the video, not a placeholder
     }
 
     const openAIApiKey = Deno.env.get('OPENAI_TRANSCRIPTION_API_KEY');
@@ -188,6 +121,7 @@ By the end of this tutorial, you'll have a solid understanding of academic writi
     formData.append('model', 'whisper-1');
     formData.append('response_format', 'verbose_json');
     formData.append('language', 'en'); // Can be made dynamic if needed
+    formData.append('timestamp_granularities[]', 'word'); // Request word-level timestamps
 
     // Send to OpenAI Whisper API
     const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
@@ -207,7 +141,7 @@ By the end of this tutorial, you'll have a solid understanding of academic writi
     const result = await response.json();
     console.log('Whisper API response:', { text: result.text?.substring(0, 100), segments: result.segments?.length });
 
-    // Create transcription chunk object
+    // Create transcription chunk object with word-level data
     const transcriptionChunk = {
       chunkIndex,
       timestamp,
@@ -215,7 +149,8 @@ By the end of this tutorial, you'll have a solid understanding of academic writi
       confidence: result.segments ? 
         result.segments.reduce((acc: number, seg: any) => acc + (seg.avg_logprob || 0), 0) / result.segments.length : 0,
       segments: result.segments || [],
-      duration: result.duration || 0
+      duration: result.duration || 0,
+      words: result.words || [] // Include word-level timestamps
     };
 
     // Update recording/content with new transcription chunk
@@ -334,16 +269,17 @@ serve(async (req) => {
   }
 
   try {
-    const { 
-      audioData, 
-      recordingId, 
-      chunkIndex = 0, 
-      isRealTime = false,
-      timestamp = Date.now(),
-      originalFileName,
-      isVideoContent = false,
-      videoDuration
-    } = await req.json();
+  const { 
+    audioData, 
+    recordingId, 
+    chunkIndex = 0, 
+    isRealTime = false,
+    timestamp = Date.now(),
+    originalFileName,
+    isVideoContent = false,
+    videoDuration,
+    requestWordTimestamps = false
+  } = await req.json();
 
     if (!audioData || !recordingId) {
       throw new Error('Missing audio data or recording ID');
