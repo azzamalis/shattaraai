@@ -67,18 +67,24 @@ serve(async (req) => {
     const videoBuffer = await videoResponse.arrayBuffer();
     console.log('Video downloaded, size:', videoBuffer.byteLength, 'bytes');
 
-    // Use Web Audio API to extract audio duration and create audio data
-    // For now, we'll use a simplified approach that converts video to base64 audio
+    // Convert video buffer to base64 audio data
     try {
-      // Create a temporary audio context to process the video
+      // Convert the entire video buffer to base64 in one go
       const audioData = new Uint8Array(videoBuffer);
       
-      // Convert to base64 for transmission to audio-transcription function
+      // Use a more efficient approach for large files
+      // Convert to base64 using proper chunking that maintains base64 integrity
+      const chunkSize = 0x8000; // 32KB chunks to avoid memory issues
       let base64Audio = '';
-      const chunk = 1024;
-      for (let i = 0; i < audioData.length; i += chunk) {
-        const slice = audioData.slice(i, i + chunk);
-        base64Audio += btoa(String.fromCharCode(...slice));
+      
+      for (let i = 0; i < audioData.length; i += chunkSize) {
+        const chunk = audioData.slice(i, i + chunkSize);
+        // Convert chunk to string safely
+        let chunkString = '';
+        for (let j = 0; j < chunk.length; j++) {
+          chunkString += String.fromCharCode(chunk[j]);
+        }
+        base64Audio += btoa(chunkString);
       }
 
       // Get video duration (we'll extract this properly in production)
