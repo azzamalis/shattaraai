@@ -6,6 +6,8 @@ import { NewPDFViewer } from './NewPDFViewer';
 import { WaveformAudioPlayer } from './WaveformAudioPlayer';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from "sonner";
 
 interface ContentViewerProps {
   contentData: ContentData;
@@ -19,6 +21,7 @@ interface ContentViewerProps {
 export function ContentViewer({ contentData, onUpdateContent, onTextAction, currentTimestamp, onExpandText, onSeekToTimestamp }: ContentViewerProps) {
   const youtubePlayerRef = useRef<HTMLIFrameElement>(null);
   const videoPlayerRef = useRef<HTMLVideoElement>(null);
+  const [isGeneratingChapters, setIsGeneratingChapters] = useState(false);
   
   console.log('DEBUG: ContentViewer - Rendering with content data:', {
     id: contentData.id,
@@ -29,6 +32,33 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
     hasMetadata: !!contentData.metadata,
     metadataKeys: contentData.metadata ? Object.keys(contentData.metadata) : []
   });
+
+  // Debug function to manually trigger chapter generation
+  const handleGenerateChapters = async () => {
+    setIsGeneratingChapters(true);
+    try {
+      console.log('Manually triggering chapter generation for content:', contentData.id);
+      
+      const { data, error } = await supabase.functions.invoke('test-chapters', {
+        body: { contentId: contentData.id }
+      });
+      
+      if (error) {
+        console.error('Chapter generation failed:', error);
+        toast.error(`Chapter generation failed: ${error.message}`);
+      } else {
+        console.log('Chapter generation successful:', data);
+        toast.success('Chapter generation triggered successfully!');
+        // Refresh the content data
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error triggering chapter generation:', error);
+      toast.error('Failed to trigger chapter generation');
+    } finally {
+      setIsGeneratingChapters(false);
+    }
+  };
 
   // Handle timestamp changes for YouTube videos and regular videos
   useEffect(() => {
@@ -127,7 +157,20 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
         const videoUrl = contentData.url && !contentData.url.startsWith('blob:') ? contentData.url : null;
         console.log('DEBUG: ContentViewer - Video URL processing:', { originalUrl: contentData.url, finalUrl: videoUrl });
         return (
-          <div className="w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+          <div className="relative w-full h-80 bg-dashboard-card dark:bg-dashboard-card rounded-xl border border-dashboard-separator dark:border-dashboard-separator overflow-hidden">
+            {/* Debug Button for Chapter Generation */}
+            <div className="absolute top-2 right-2 z-10">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateChapters}
+                disabled={isGeneratingChapters}
+                className="text-xs"
+              >
+                {isGeneratingChapters ? 'Generating...' : 'Generate Chapters'}
+              </Button>
+            </div>
+            
             {videoUrl ? (
               renderVideoPlayer(videoUrl)
             ) : (

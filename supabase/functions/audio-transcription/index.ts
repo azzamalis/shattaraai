@@ -193,7 +193,10 @@ async function processAudioFileFromUrl(
       
       // Trigger chapter generation
       const chapterResponse = await supabase.functions.invoke('generate-chapters', {
-        body: { contentId: contentId }
+        body: { 
+          contentId: contentId,
+          transcript: transcriptionText
+        }
       });
       
       if (chapterResponse.error) {
