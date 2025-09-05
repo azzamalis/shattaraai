@@ -1,8 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
-import { FFmpeg } from 'https://esm.sh/@ffmpeg/ffmpeg@0.12.10';
-import { fetchFile, toBlobURL } from 'https://esm.sh/@ffmpeg/util@0.12.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -69,79 +67,39 @@ serve(async (req) => {
     const videoBuffer = await videoResponse.arrayBuffer();
     console.log('Video downloaded, size:', videoBuffer.byteLength, 'bytes');
 
-    // Extract audio using FFmpeg WASM
+    // Use a simpler approach - send video file directly to transcription service
+    // This approach works in Deno environment without requiring Web Workers
     try {
-      console.log('Initializing FFmpeg for audio extraction...');
+      console.log('Processing video file for transcription...');
       
-      // Initialize FFmpeg
-      const ffmpeg = new FFmpeg();
+      // Convert video buffer to base64 for transmission
+      const videoData = new Uint8Array(videoBuffer);
       
-      // Load FFmpeg with proper WASM and worker URLs
-      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
-      await ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-        workerURL: await toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript'),
-      });
-      
-      console.log('FFmpeg loaded successfully');
-      
-      // Write input video file to FFmpeg filesystem
-      const inputFileName = 'input_video.mp4';
-      const outputFileName = 'output_audio.wav';
-      
-      await ffmpeg.writeFile(inputFileName, await fetchFile(new Blob([videoBuffer])));
-      console.log('Video file written to FFmpeg filesystem');
-      
-      // Extract audio from video with optimized settings for Whisper
-      // WAV format, 16kHz sample rate, mono channel for best Whisper compatibility
-      await ffmpeg.exec([
-        '-i', inputFileName,
-        '-vn', // No video
-        '-acodec', 'pcm_s16le', // 16-bit PCM
-        '-ar', '16000', // 16kHz sample rate (Whisper optimal)
-        '-ac', '1', // Mono channel
-        '-f', 'wav', // WAV format
-        outputFileName
-      ]);
-      
-      console.log('Audio extraction completed');
-      
-      // Read the extracted audio file
-      const audioData = await ffmpeg.readFile(outputFileName);
-      const audioUint8Array = new Uint8Array(audioData as ArrayBuffer);
-      
-      // Convert to base64 for transmission
-      let base64Audio = '';
+      // Convert to base64 in chunks to avoid memory issues
+      let base64Video = '';
       const chunkSize = 0x8000; // 32KB chunks
       
-      for (let i = 0; i < audioUint8Array.length; i += chunkSize) {
-        const chunk = audioUint8Array.slice(i, i + chunkSize);
+      for (let i = 0; i < videoData.length; i += chunkSize) {
+        const chunk = videoData.slice(i, i + chunkSize);
         let chunkString = '';
         for (let j = 0; j < chunk.length; j++) {
           chunkString += String.fromCharCode(chunk[j]);
         }
-        base64Audio += btoa(chunkString);
+        base64Video += btoa(chunkString);
       }
       
-      // Get video duration from FFmpeg metadata
+      console.log('Video data prepared for transcription, size:', videoData.length, 'bytes');
+      
+      // Get video duration from metadata
       let videoDuration = content.metadata?.duration || 0;
       
-      // Clean up FFmpeg instance
-      ffmpeg.terminate();
-      
-      console.log('Audio extraction completed, size:', audioUint8Array.length, 'bytes');
-      
-      // Update the content with extraction metadata
+      // Update the content with processing metadata
       const videoMetadata = {
         ...(content.metadata || {}),
-        audioExtracted: true,
-        extractedAt: new Date().toISOString(),
-        processingMethod: 'ffmpeg_wasm',
-        audioFormat: 'wav_16khz_mono',
-        duration: videoDuration,
-        originalFileSize: videoBuffer.byteLength,
-        extractedAudioSize: audioUint8Array.length
+        videoProcessing: true,
+        processedAt: new Date().toISOString(),
+        processingMethod: 'direct_video_transcription',
+        originalFileSize: videoBuffer.byteLength
       };
 
       await supabase
@@ -152,20 +110,20 @@ serve(async (req) => {
         })
         .eq('id', contentId);
 
-      console.log('Starting real audio transcription for video content...');
+      console.log('Starting video transcription...');
 
-      // Send the actual extracted audio data to transcription
+      // Send the video data directly to transcription service
       const transcriptionResponse = await supabase.functions.invoke('audio-transcription', {
         body: {
-          audioData: base64Audio,
+          audioData: base64Video,
           recordingId: contentId,
           chunkIndex: 0,
           isRealTime: false,
           timestamp: Date.now(),
-          originalFileName: content.filename || 'video-audio.mp4',
+          originalFileName: content.filename || 'video.mp4',
           isVideoContent: true,
           videoDuration: videoDuration,
-          requestWordTimestamps: true // Request word-level timestamps
+          requestWordTimestamps: true
         }
       });
 
