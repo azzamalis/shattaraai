@@ -553,12 +553,26 @@ export function ContentLeftSidebar({
                       ))}
                     </div>
                   ) : contentData.text_content ? (
-                    <div className="space-y-6">
-                      <div className="space-y-6">
-                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                          {contentData.text_content}
-                        </p>
-                      </div>
+                    <div className="space-y-8">
+                      {/* Parse and display transcript in segments like chapters */}
+                      {contentData.text_content.split(/\n\s*\n/).filter(paragraph => paragraph.trim()).map((paragraph, index) => (
+                        <div 
+                          key={index}
+                          className="group cursor-pointer hover:bg-muted/20 rounded-lg p-3 transition-colors"
+                        >
+                          {/* Timestamp placeholder - could be enhanced with actual timestamps if available */}
+                          <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
+                            {Math.floor(index * 30 / 60)}:{(index * 30 % 60).toString().padStart(2, '0')}
+                          </div>
+                          
+                          {/* Transcript text */}
+                          <div className="text-sm text-foreground leading-relaxed group-hover:text-primary transition-colors">
+                            <p className="leading-relaxed">
+                              {paragraph.trim()}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ) : contentData.processing_status === 'failed' ? (
                     <div className="text-center py-8">
