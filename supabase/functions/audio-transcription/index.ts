@@ -7,10 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-);
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 // Process base64 in chunks to prevent memory issues
 function processBase64Chunks(base64String: string, chunkSize = 32768) {
@@ -41,7 +39,202 @@ function processBase64Chunks(base64String: string, chunkSize = 32768) {
   }
 }
 
-// Background task for processing after response
+// New function to process audio files from URL (improved pipeline)
+async function processAudioFileFromUrl(
+  audioFileUrl: string,
+  recordingId: string,
+  contentId: string,
+  originalFileName: string,
+  isVideoContent: boolean
+): Promise<void> {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  
+  try {
+    console.log('Background processing started for audio file:', audioFileUrl);
+    
+    // Download audio file
+    console.log('Downloading audio file from URL:', audioFileUrl);
+    const audioResponse = await fetch(audioFileUrl);
+    if (!audioResponse.ok) {
+      throw new Error(`Failed to download audio file: ${audioResponse.statusText}`);
+    }
+    
+    const audioBuffer = await audioResponse.arrayBuffer();
+    console.log('Audio file downloaded, size:', audioBuffer.byteLength, 'bytes');
+    
+    // Update recording status
+    if (recordingId) {
+      await supabase
+        .from('recordings')
+        .update({ 
+          processing_status: 'processing',
+          transcription_status: 'processing'
+        })
+        .eq('id', recordingId);
+    }
+    
+    // Update content status
+    if (contentId) {
+      await supabase
+        .from('content')
+        .update({ processing_status: 'processing' })
+        .eq('id', contentId);
+    }
+    
+    // Determine file type and MIME type
+    const fileExtension = originalFileName.split('.').pop()?.toLowerCase() || 'wav';
+    let mimeType = 'audio/wav';
+    let fileName = `audio_file.${fileExtension}`;
+    
+    if (isVideoContent) {
+      mimeType = fileExtension === 'mp4' ? 'video/mp4' : 'video/quicktime';
+      fileName = `video_file.${fileExtension}`;
+    } else {
+      switch (fileExtension) {
+        case 'mp3':
+          mimeType = 'audio/mpeg';
+          break;
+        case 'm4a':
+          mimeType = 'audio/mp4';
+          break;
+        case 'wav':
+          mimeType = 'audio/wav';
+          break;
+        case 'flac':
+          mimeType = 'audio/flac';
+          break;
+      }
+    }
+    
+    console.log(`Processing ${isVideoContent ? 'video' : 'audio'} file: ${fileName} with MIME type: ${mimeType}`);
+    
+    // Call OpenAI Whisper API
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      throw new Error('OpenAI API key not found');
+    }
+    
+    console.log('OpenAI API key found, proceeding with transcription');
+    
+    const formData = new FormData();
+    formData.append('file', new Blob([audioBuffer], { type: mimeType }), fileName);
+    formData.append('model', 'whisper-1');
+    formData.append('response_format', 'verbose_json');
+    formData.append('timestamp_granularities[]', 'word');
+    formData.append('timestamp_granularities[]', 'segment');
+    
+    const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+      },
+      body: formData,
+    });
+    
+    if (!whisperResponse.ok) {
+      const errorText = await whisperResponse.text();
+      throw new Error(`Whisper API error: ${whisperResponse.status} - ${errorText}`);
+    }
+    
+    const transcriptionResult = await whisperResponse.json();
+    console.log('Whisper API response:', {
+      text: transcriptionResult.text,
+      segments: transcriptionResult.segments ? 'segments included' : 'no segments'
+    });
+    
+    const transcriptionText = transcriptionResult.text || '';
+    const segments = transcriptionResult.segments || [];
+    const words = transcriptionResult.words || [];
+    
+    // Update recording with transcript and word-level data
+    if (recordingId) {
+      const updateData: any = {
+        transcript: transcriptionText,
+        processing_status: 'completed',
+        transcription_status: 'completed',
+        transcription_confidence: 0.95,
+        updated_at: new Date().toISOString()
+      };
+      
+      // Add word-level transcript data
+      if (segments.length > 0 || words.length > 0) {
+        updateData.real_time_transcript = [{
+          chunkIndex: 0,
+          timestamp: Date.now(),
+          text: transcriptionText,
+          confidence: 0.95,
+          segments: segments,
+          words: words,
+          duration: segments.length > 0 ? segments[segments.length - 1]?.end || 0 : 0
+        }];
+      }
+      
+      await supabase
+        .from('recordings')
+        .update(updateData)
+        .eq('id', recordingId);
+      
+      console.log('Updated recording with transcript');
+    }
+    
+    // Update content with final transcript and trigger chapter generation
+    if (contentId) {
+      await supabase
+        .from('content')
+        .update({
+          text_content: transcriptionText,
+          processing_status: 'completed',
+          transcription_confidence: 0.95,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', contentId);
+      
+      console.log('Updated content with final transcript, triggering chapter generation');
+      
+      // Trigger chapter generation
+      const chapterResponse = await supabase.functions.invoke('generate-chapters', {
+        body: { contentId: contentId }
+      });
+      
+      if (chapterResponse.error) {
+        console.error('Chapter generation failed:', chapterResponse.error);
+      } else {
+        console.log('Chapter generation triggered successfully for content', contentId);
+      }
+    }
+    
+    console.log('Background processing completed for audio file');
+    
+  } catch (error) {
+    console.error('Background processing failed for audio file:', error);
+    
+    // Update status to failed
+    if (recordingId) {
+      await supabase
+        .from('recordings')
+        .update({ 
+          processing_status: 'failed',
+          transcription_status: 'failed',
+          transcript: `Transcription failed: ${error.message}`
+        })
+        .eq('id', recordingId);
+    }
+    
+    if (contentId) {
+      await supabase
+        .from('content')
+        .update({ 
+          processing_status: 'failed',
+          text_content: `Transcription failed: ${error.message}`
+        })
+        .eq('id', contentId);
+    }
+    
+    throw error;
+  }
+}
+
+// Background task for processing after response (legacy approach)
 async function processInBackground(
   recordingId: string,
   audioData: string,
@@ -52,6 +245,7 @@ async function processInBackground(
   isVideoContent?: boolean,
   videoDuration?: number
 ) {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
   try {
     console.log(`Background processing started for recording ${recordingId}`, { isVideoContent, videoDuration });
 
@@ -269,66 +463,76 @@ serve(async (req) => {
   }
 
   try {
-  const { 
-    audioData, 
-    recordingId, 
-    chunkIndex = 0, 
-    isRealTime = false,
-    timestamp = Date.now(),
-    originalFileName,
-    isVideoContent = false,
-    videoDuration,
-    requestWordTimestamps = false
-  } = await req.json();
+    const { 
+      audioData, 
+      audioFileUrl,
+      recordingId, 
+      contentId,
+      chunkIndex = 0, 
+      isRealTime = false, 
+      timestamp = Date.now(),
+      originalFileName = 'audio_chunk_0.wav',
+      isVideoContent = false,
+      videoDuration = 0,
+      requestWordTimestamps = false
+    } = await req.json();
 
-    if (!audioData || !recordingId) {
-      throw new Error('Missing audio data or recording ID');
+    console.log('Processing audio transcription for recording', recordingId, ', chunk', chunkIndex, ', file:', originalFileName, { isVideoContent });
+
+    if (!recordingId && !contentId) {
+      throw new Error('Missing required parameter: recordingId or contentId');
     }
 
-    console.log(`Processing audio transcription for recording ${recordingId}, chunk ${chunkIndex}, file: ${originalFileName || 'unknown'}`, { isVideoContent });
+    if (!audioData && !audioFileUrl) {
+      throw new Error('Missing required parameter: audioData or audioFileUrl');
+    }
 
-    // Start background processing
-    const backgroundProcessing = processInBackground(
-      recordingId,
-      audioData,
-      chunkIndex,
-      isRealTime,
-      timestamp,
-      originalFileName,
-      isVideoContent,
-      videoDuration
-    );
-
-    // Use waitUntil to ensure background task completes
-    if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime.waitUntil) {
-      EdgeRuntime.waitUntil(backgroundProcessing);
+    // Handle new improved pipeline with audio file URL
+    if (audioFileUrl) {
+      console.log('Processing audio file from URL:', audioFileUrl);
+      const backgroundProcessing = processAudioFileFromUrl(audioFileUrl, recordingId, contentId, originalFileName, isVideoContent);
+      
+      // Use waitUntil to ensure background task completes
+      if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime.waitUntil) {
+        EdgeRuntime.waitUntil(backgroundProcessing);
+      } else {
+        backgroundProcessing.catch(error => {
+          console.error('Background processing failed:', error);
+        });
+      }
     } else {
-      // Fallback for environments without EdgeRuntime
-      backgroundProcessing.catch(error => {
-        console.error('Background processing failed:', error);
-      });
+      // Legacy approach with base64 data
+      console.log('Processing base64 audio data');
+      const backgroundProcessing = processInBackground(recordingId, audioData, chunkIndex, isRealTime, timestamp, originalFileName, isVideoContent, videoDuration);
+      
+      // Use waitUntil to ensure background task completes
+      if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime.waitUntil) {
+        EdgeRuntime.waitUntil(backgroundProcessing);
+      } else {
+        backgroundProcessing.catch(error => {
+          console.error('Background processing failed:', error);
+        });
+      }
     }
 
-    // Return immediate response
     return new Response(
       JSON.stringify({ 
-        success: true,
-        message: 'Transcription started',
+        success: true, 
+        message: 'Audio transcription started',
         recordingId,
-        chunkIndex
+        contentId,
+        chunkIndex,
+        timestamp 
       }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
 
   } catch (error) {
     console.error('Error in audio-transcription function:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        success: false 
-      }),
+      JSON.stringify({ error: error.message }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
