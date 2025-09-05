@@ -173,7 +173,7 @@ serve(async (req) => {
       audioUrl = uploadResult.publicUrl;
       
       // Create or update recording entry
-      const { data: recordingData: newRecording, error: recordingError } = await supabase
+      const { data: newRecording, error: recordingError } = await supabase
         .from('recordings')
         .upsert({
           content_id: contentId,
