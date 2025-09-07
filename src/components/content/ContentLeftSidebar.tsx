@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
-import { UnifiedDocumentViewer } from '@/components/content/UnifiedDocumentViewer/UnifiedDocumentViewer';
+import { DocumentViewer } from '@/components/content/DocumentViewer/DocumentViewer';
 
 import { WaveformAudioPlayer } from '@/components/content/WaveformAudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
@@ -145,17 +145,12 @@ export function ContentLeftSidebar({
     }
   };
 
-  // Check if content should use unified document viewer
-  const shouldUseUnifiedViewer = (
-    contentData.type === 'pdf' ||
-    contentData.type === 'website' ||
-    contentData.type === 'text' ||
-    ((contentData.type === 'file' || contentData.type === 'upload') && 
-     contentData.filename?.match(/\.(doc|docx|pdf)$/i))
-  );
+  // Check if we should hide tabs (for PDF content or Word documents)
+  const shouldHideTabs = contentData.type === 'pdf';
 
-  // Check if we should hide tabs for document content
-  const shouldHideTabs = shouldUseUnifiedViewer;
+  // Check if it's a Word document
+  const isWordDocument = (contentData.type === 'file' || contentData.type === 'upload') && contentData.filename?.match(/\.(doc|docx)$/i);
+  const shouldHideTabsForDocument = isWordDocument;
   const renderControls = () => {
     // Show loading state while detecting recording state
     if (contentData.type === 'recording' && isRecordingLoading) {
@@ -320,9 +315,9 @@ export function ContentLeftSidebar({
       return null; // Website content is handled in tabs
     }
 
-    // Show UnifiedDocumentViewer for document content
-    if (shouldUseUnifiedViewer) {
-      return null; // Unified document viewer will be rendered in the main layout
+    // Show DocumentViewer for Word documents
+    if (isWordDocument) {
+      return null; // Document viewer will be rendered in the main layout
     }
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
       <ContentViewer 
@@ -647,10 +642,17 @@ export function ContentLeftSidebar({
       </>;
   };
 
-  // If it's document content, render the UnifiedDocumentViewer without tabs
+  // If it's PDF content, render without tabs
   if (shouldHideTabs) {
-    return <div className="h-full flex flex-col min-h-0 bg-background">
-        <UnifiedDocumentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
+    return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
+        {renderControls()}
+      </div>;
+  }
+
+  // If it's a Word document, render the DocumentViewer without tabs
+  if (shouldHideTabsForDocument) {
+    return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
+        <DocumentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
       </div>;
   }
 
