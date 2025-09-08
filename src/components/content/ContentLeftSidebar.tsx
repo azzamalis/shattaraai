@@ -772,15 +772,11 @@ export function ContentLeftSidebar({
       {renderControls()}
       
       {/* Processing indicator for YouTube content */}
-      {contentData.type === 'youtube' && (!contentData.metadata?.chapters || !contentData.text) && (
-        <div className="mx-4 mt-2 p-3 bg-primary/5 border-l-4 border-primary rounded-r-lg">
-          <div className="flex items-center justify-center gap-2 text-primary">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span className="text-sm font-medium">Processing YouTube video...</span>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1 text-center">
-            Extracting chapters and transcript from video
-          </p>
+      {contentData.type === 'youtube' && contentData.processing_status === 'processing' && (
+        <div className="mx-4 mt-2 p-4 flex items-center justify-center">
+          <TextShimmer className="text-base font-semibold" duration={1.5}>
+            Processing YouTube video...
+          </TextShimmer>
         </div>
       )}
       
