@@ -224,12 +224,16 @@ serve(async (req) => {
     
     const youtubeData = await getYouTubeData(videoId);
     
-    // Update content with extracted data
+    // Update content with extracted data and add YouTube URL to storage
     const { error: contentError } = await supabase
       .from('content')
       .update({
         title: youtubeData.title,
+        filename: youtubeData.title,
+        storage_path: url,
         text_content: youtubeData.transcript,
+        chapters: youtubeData.chapters,
+        processing_status: 'completed',
         metadata: {
           ...youtubeData.metadata,
           chapters: youtubeData.chapters,

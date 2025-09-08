@@ -4,6 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown, Expand, Minimize2, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { TextShimmer } from '@/components/ui/text-shimmer';
 import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
@@ -392,6 +393,24 @@ export function ContentLeftSidebar({
                     onRetryProcessing={() => contentData.id && retryProcessing(contentData.id)}
                   />
                 )}
+
+                {/* YouTube chapters */}
+                {contentData.type === 'youtube' && (
+                  <RealtimeChaptersDisplay
+                    chapters={contentData.chapters ? contentData.chapters.map((chapter: any) => ({
+                      title: chapter.title,
+                      summary: chapter.summary || '',
+                      startTime: chapter.startTime,
+                      endTime: chapter.endTime || chapter.startTime + 60
+                    })) : []}
+                    transcriptionStatus={contentData.text_content ? 'completed' : 'pending'}
+                    processingStatus={contentData.processing_status as 'pending' | 'processing' | 'completed' | 'failed'}
+                    contentType={contentData.type}
+                    onChapterClick={handleChapterClick}
+                    onSeekToTimestamp={onSeekToTimestamp}
+                    onRetryProcessing={() => contentData.id && retryProcessing(contentData.id)}
+                  />
+                )}
                 
                 {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (
                   <div className="flex items-center justify-center py-8">
@@ -586,6 +605,50 @@ export function ContentLeftSidebar({
                       </p>
                     </div>
                   ) : null
+                )}
+
+                {/* YouTube transcripts */}
+                {contentData.type === 'youtube' && (
+                  contentData.processing_status === 'processing' ? (
+                    <div className="flex items-center justify-center h-full py-16">
+                      <TextShimmer className="text-base font-semibold" duration={1.5}>
+                        Processing YouTube video...
+                      </TextShimmer>
+                    </div>
+                  ) : contentData.text_content ? (
+                    <div className="space-y-8">
+                      {/* Parse and display transcript in segments */}
+                      {contentData.text_content.split(/\n\s*\n/).filter(paragraph => paragraph.trim()).map((paragraph, index) => (
+                        <div 
+                          key={index}
+                          className="group cursor-pointer hover:bg-muted/20 rounded-lg p-3 transition-colors"
+                        >
+                          {/* Timestamp placeholder */}
+                          <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
+                            {Math.floor(index * 30 / 60)}:{(index * 30 % 60).toString().padStart(2, '0')}
+                          </div>
+                          
+                          {/* Transcript text */}
+                          <div className="text-sm text-foreground leading-relaxed group-hover:text-primary transition-colors">
+                            <p className="leading-relaxed">
+                              {paragraph.trim()}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : contentData.processing_status === 'failed' ? (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-destructive mb-2">Processing failed</p>
+                      <p className="text-xs text-muted-foreground">Unable to process YouTube video</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <p className="text-sm text-muted-foreground text-center">
+                        Transcript will be generated automatically when processing completes
+                      </p>
+                    </div>
+                  )
                 )}
                 
                 {(contentData.type === 'recording' && recordingStateInfo?.isNewRecording && isRecording) && (

@@ -64,7 +64,7 @@ export const RealtimeChaptersDisplay = ({
       case 'website':
         return 'Processing website...';
       case 'youtube':
-        return 'Processing video...';
+        return 'Processing YouTube video...';
       case 'text':
       case 'chat':
         return 'Processing text...';
