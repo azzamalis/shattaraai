@@ -1,15 +1,12 @@
-
 import React, { useRef } from 'react';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Upload, FileText, Mic, Link2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useContentContext } from '@/contexts/ContentContext';
-
 interface ActionCardsProps {
   onPasteClick: () => void;
 }
-
 export function ActionCards({
   onPasteClick
 }: ActionCardsProps) {
@@ -19,12 +16,10 @@ export function ActionCards({
     addContentWithFile
   } = useContentContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const handleUploadClick = () => {
     console.log('DEBUG: ActionCards - Upload button clicked');
     fileInputRef.current?.click();
   };
-
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     console.log('DEBUG: ActionCards - File selected:', file ? {
@@ -33,21 +28,18 @@ export function ActionCards({
       size: file.size,
       lastModified: file.lastModified
     } : 'No file selected');
-
     if (file) {
       try {
         // Determine content type based on file type and extension
         let contentType = 'upload';
         const fileType = file.type.toLowerCase();
         const fileName = file.name.toLowerCase();
-        
         console.log('DEBUG: ActionCards - File type analysis:', {
           originalFileType: file.type,
           lowerCaseFileType: fileType,
           originalFileName: file.name,
           lowerCaseFileName: fileName
         });
-
         if (fileType.includes('pdf') || fileName.endsWith('.pdf')) {
           contentType = 'pdf';
         } else if (fileType.includes('audio') || ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'].some(ext => fileName.endsWith(ext))) {
@@ -57,7 +49,6 @@ export function ActionCards({
         } else if (['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx'].some(ext => fileName.endsWith(ext))) {
           contentType = 'file';
         }
-
         console.log('DEBUG: ActionCards - Determined content type:', contentType);
         console.log('DEBUG: ActionCards - Starting file upload process with data:', {
           fileName: file.name,
@@ -88,7 +79,6 @@ export function ActionCards({
           },
           fileSize: file.size
         });
-
         const contentId = await addContentWithFile({
           title: file.name,
           type: contentType as any,
@@ -106,7 +96,6 @@ export function ActionCards({
         // Dismiss loading toast
         toast.dismiss(loadingToast);
         console.log('DEBUG: ActionCards - Upload completed, content ID received:', contentId);
-        
         if (contentId) {
           console.log('DEBUG: ActionCards - Content created successfully, preparing navigation');
           console.log('DEBUG: ActionCards - Navigation details:', {
@@ -140,7 +129,6 @@ export function ActionCards({
       console.warn('DEBUG: ActionCards - No file was selected in handleFileSelect');
     }
   };
-
   const handleRecordClick = async () => {
     console.log('DEBUG: ActionCards - Record button clicked');
     try {
@@ -158,9 +146,7 @@ export function ActionCards({
           createdAt: new Date().toISOString()
         }
       });
-
       console.log('DEBUG: ActionCards - Live recording content created:', contentId);
-
       if (contentId) {
         navigate(`/content/${contentId}?type=live_recording`);
         toast.success('Recording session created');
@@ -173,15 +159,10 @@ export function ActionCards({
       toast.error('Failed to create recording session. Please try again.');
     }
   };
-
   return <>
-      <input 
-        ref={fileInputRef} 
-        type="file" 
-        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.csv,.xls,.xlsx,audio/*,video/*,image/*" 
-        onChange={handleFileSelect} 
-        style={{ display: 'none' }} 
-      />
+      <input ref={fileInputRef} type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.csv,.xls,.xlsx,audio/*,video/*,image/*" onChange={handleFileSelect} style={{
+      display: 'none'
+    }} />
       
       <div className="sm:justify-center sm:items-center gap-3 sm:flex grid grid-cols-1 w-full">
         {/* Upload Card */}
@@ -197,7 +178,7 @@ export function ActionCards({
                         <div className="flex items-center gap-x-1">
                           <h3 className="text-sm text-left text-primary/80 group-hover:text-primary font-medium sm:text-base">Upload</h3>
                         </div>
-                        <p className="text-xs group-hover:text-primary/80 text-left text-primary/60 font-medium sm:text-sm">File, Audio, Video, PDF</p>
+                        <p className="text-xs group-hover:text-primary/80 text-left text-primary/60 font-medium sm:text-sm">File, audio, video</p>
                       </div>
                     </div>
                   </div>
