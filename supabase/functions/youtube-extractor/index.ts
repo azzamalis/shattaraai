@@ -224,13 +224,27 @@ serve(async (req) => {
     
     const youtubeData = await getYouTubeData(videoId);
     
-    // Update content with extracted data and add YouTube URL to storage
+    // Store YouTube URL in the youtube-content bucket
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('youtube-content')
+      .upload(`${contentId}/metadata.json`, JSON.stringify({
+        url,
+        videoId,
+        extractedAt: new Date().toISOString()
+      }), {
+        contentType: 'application/json',
+        upsert: true
+      });
+
+    const storagePath = uploadData?.path || url;
+
+    // Update content with extracted data and storage path
     const { error: contentError } = await supabase
       .from('content')
       .update({
         title: youtubeData.title,
         filename: youtubeData.title,
-        storage_path: url,
+        storage_path: storagePath,
         text_content: youtubeData.transcript,
         chapters: youtubeData.chapters,
         processing_status: 'completed',
