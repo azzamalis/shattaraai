@@ -21,6 +21,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       <Switch
         checked={isDark}
         onCheckedChange={toggleTheme}
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         className={cn(
           "data-[state=checked]:bg-primary",
           "data-[state=unchecked]:bg-muted"
