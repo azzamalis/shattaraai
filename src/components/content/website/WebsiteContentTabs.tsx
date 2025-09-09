@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { 
   BookOpen, 
-  List, 
+  ChartNoAxesGantt, 
   Info, 
   ExternalLink, 
   Maximize2, 
@@ -191,7 +191,7 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
     if (articleStructure.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center py-8">
-          <List className="h-8 w-8 text-muted-foreground mb-2" />
+          <ChartNoAxesGantt className="h-8 w-8 text-muted-foreground mb-2" />
           <p className="text-sm text-muted-foreground text-center">
             No clear structure detected in content
           </p>
@@ -202,7 +202,7 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-border">
-          <List className="h-4 w-4 text-primary" />
+          <ChartNoAxesGantt className="h-4 w-4 text-primary" />
           <h3 className="font-medium text-foreground">Content Outline</h3>
         </div>
         
@@ -415,7 +415,7 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
             "px-4"
           )}
         >
-          <List className="h-[14px] w-[14px]" />
+          <ChartNoAxesGantt className="h-[14px] w-[14px]" />
           <span>Structure</span>
         </TabsTrigger>
         
