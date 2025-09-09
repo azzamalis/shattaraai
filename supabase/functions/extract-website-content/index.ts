@@ -43,19 +43,125 @@ function extractTextFromHTML(html: string): string {
   return text;
 }
 
+function extractHeadings(html: string): Array<{level: number, text: string, id?: string}> {
+  const headings = [];
+  const headingRegex = /<h([1-6])[^>]*(?:id=['"]([^'"]*)['""])?[^>]*>([^<]*)<\/h[1-6]>/gi;
+  let match;
+  
+  while ((match = headingRegex.exec(html)) !== null) {
+    const level = parseInt(match[1]);
+    const id = match[2] || '';
+    const text = match[3].trim();
+    
+    if (text && level <= 3) { // Only h1, h2, h3
+      headings.push({
+        level,
+        text: text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'"),
+        ...(id && { id })
+      });
+    }
+  }
+  
+  return headings;
+}
+
+function extractLinks(html: string, baseUrl: string): Array<{text: string, href: string, internal: boolean}> {
+  const links = [];
+  const linkRegex = /<a[^>]*href=['"]([^'"]*)['""][^>]*>([^<]*)<\/a>/gi;
+  let match;
+  
+  const baseDomain = new URL(baseUrl).hostname.replace(/^www\./, '');
+  
+  while ((match = linkRegex.exec(html)) !== null) {
+    const href = match[1];
+    const text = match[2].trim();
+    
+    if (href && text && !href.startsWith('#') && !href.startsWith('javascript:')) {
+      try {
+        let fullUrl = href;
+        if (href.startsWith('/')) {
+          fullUrl = new URL(href, baseUrl).href;
+        } else if (!href.startsWith('http')) {
+          fullUrl = new URL(href, baseUrl).href;
+        }
+        
+        const linkDomain = new URL(fullUrl).hostname.replace(/^www\./, '');
+        const isInternal = linkDomain === baseDomain;
+        
+        links.push({
+          text: text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'"),
+          href: fullUrl,
+          internal: isInternal
+        });
+      } catch (e) {
+        // Skip invalid URLs
+      }
+    }
+  }
+  
+  // Remove duplicates
+  const uniqueLinks = links.filter((link, index, self) => 
+    index === self.findIndex(l => l.href === link.href)
+  );
+  
+  return uniqueLinks.slice(0, 50); // Limit to 50 links
+}
+
 function extractMetadata(html: string, url: string): any {
   const metadata: any = { url };
+
+  try {
+    const urlObj = new URL(url);
+    metadata.domain = urlObj.hostname.replace(/^www\./, '');
+  } catch (e) {
+    metadata.domain = url;
+  }
 
   // Extract title
   const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
   if (titleMatch) {
-    metadata.title = titleMatch[1].trim();
+    metadata.title = titleMatch[1].trim().replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
   }
 
   // Extract meta description
   const descMatch = html.match(/<meta[^>]*name=['"]*description['"]*[^>]*content=['"]*([^'"]*)['"]*[^>]*>/i);
   if (descMatch) {
     metadata.description = descMatch[1].trim();
+  }
+
+  // Extract author
+  const authorMatch = html.match(/<meta[^>]*name=['"]*author['"]*[^>]*content=['"]*([^'"]*)['"]*[^>]*>/i);
+  if (authorMatch) {
+    metadata.author = authorMatch[1].trim();
+  }
+
+  // Extract publication date - try multiple formats
+  let publishedDate = null;
+  
+  // Try article:published_time
+  const pubDateMatch1 = html.match(/<meta[^>]*property=['"]*article:published_time['"]*[^>]*content=['"]*([^'"]*)['"]*[^>]*>/i);
+  if (pubDateMatch1) {
+    publishedDate = pubDateMatch1[1].trim();
+  }
+  
+  // Try datePublished
+  if (!publishedDate) {
+    const pubDateMatch2 = html.match(/<meta[^>]*property=['"]*datePublished['"]*[^>]*content=['"]*([^'"]*)['"]*[^>]*>/i);
+    if (pubDateMatch2) {
+      publishedDate = pubDateMatch2[1].trim();
+    }
+  }
+  
+  // Try name="date"
+  if (!publishedDate) {
+    const pubDateMatch3 = html.match(/<meta[^>]*name=['"]*date['"]*[^>]*content=['"]*([^'"]*)['"]*[^>]*>/i);
+    if (pubDateMatch3) {
+      publishedDate = pubDateMatch3[1].trim();
+    }
+  }
+
+  if (publishedDate) {
+    metadata.published = publishedDate;
   }
 
   // Extract Open Graph data
@@ -74,17 +180,11 @@ function extractMetadata(html: string, url: string): any {
     metadata.ogImage = ogImageMatch[1].trim();
   }
 
-  // Extract publication date
-  const pubDateMatch = html.match(/<meta[^>]*property=['"]*article:published_time['"]*[^>]*content=['"]*([^'"]*)['"]*[^>]*>/i);
-  if (pubDateMatch) {
-    metadata.publishedAt = pubDateMatch[1].trim();
-  }
-
-  // Extract author
-  const authorMatch = html.match(/<meta[^>]*name=['"]*author['"]*[^>]*content=['"]*([^'"]*)['"]*[^>]*>/i);
-  if (authorMatch) {
-    metadata.author = authorMatch[1].trim();
-  }
+  // Extract headings
+  metadata.headings = extractHeadings(html);
+  
+  // Extract links
+  metadata.links = extractLinks(html, url);
 
   return metadata;
 }
@@ -130,10 +230,14 @@ serve(async (req) => {
 
     console.log(`Extracted ${extractedText.length} characters from website`);
 
+    // Prepare content update data
+    const contentTitle = websiteMetadata.title || websiteMetadata.ogTitle || 'Website Content';
+    
     // Update content with extracted data
     const { error: contentError } = await supabase
       .from('content')
       .update({
+        title: contentTitle,
         text_content: extractedText,
         metadata: {
           ...websiteMetadata,

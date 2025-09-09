@@ -29,6 +29,17 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
 
   // Extract article structure from content
   const articleStructure = useMemo(() => {
+    // Use metadata.headings if available, otherwise fall back to text parsing
+    if (contentData.metadata?.headings && Array.isArray(contentData.metadata.headings)) {
+      return contentData.metadata.headings.map((heading, index) => ({
+        id: heading.id || `heading-${index}`,
+        text: heading.text,
+        level: heading.level,
+        position: index
+      }));
+    }
+    
+    // Fallback to text parsing
     if (!contentData.text_content) return [];
     
     const content = contentData.text_content;
@@ -52,7 +63,7 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
     }
     
     return structure.slice(0, 10); // Limit to first 10 headings
-  }, [contentData.text_content]);
+  }, [contentData.text_content, contentData.metadata]);
 
   // Extract key metadata
   const websiteInfo = useMemo(() => {
@@ -61,15 +72,33 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
       title: metadata.title || contentData.title,
       description: metadata.description,
       author: metadata.author,
-      publishedDate: metadata.publishedDate || metadata.date,
-      domain: contentData.url ? new URL(contentData.url as string).hostname : null,
+      publishedDate: metadata.published || metadata.publishedAt || metadata.date,
+      domain: metadata.domain || (contentData.url ? new URL(contentData.url as string).hostname : null),
       readingTime: contentData.text_content ? Math.ceil(contentData.text_content.split(' ').length / 200) : null,
       wordCount: contentData.text_content ? contentData.text_content.split(' ').length : null
     };
   }, [contentData]);
 
-  // Extract links from content
+  // Extract links from metadata or content
   const extractedLinks = useMemo(() => {
+    // Use metadata.links if available
+    if (contentData.metadata?.links && Array.isArray(contentData.metadata.links)) {
+      return contentData.metadata.links.map((link, index) => ({
+        id: `link-${index}`,
+        url: link.href,
+        text: link.text,
+        domain: (() => {
+          try {
+            return new URL(String(link.href)).hostname;
+          } catch {
+            return String(link.href);
+          }
+        })(),
+        isExternal: !link.internal
+      }));
+    }
+    
+    // Fallback to text parsing
     if (!contentData.text_content) return [];
     
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -81,6 +110,7 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
         return {
           id: `link-${index}`,
           url,
+          text: url,
           domain: new URL(String(url)).hostname,
           isExternal: !String(url).includes(String(websiteInfo.domain || ''))
         };
@@ -88,12 +118,13 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
         return {
           id: `link-${index}`,
           url,
+          text: url,
           domain: String(url),
           isExternal: true
         };
       }
     });
-  }, [contentData.text_content, websiteInfo.domain]);
+  }, [contentData.text_content, contentData.metadata, websiteInfo.domain]);
 
   const renderProcessingState = (message: string) => (
     <div className="flex items-center justify-center h-full py-16">
@@ -330,47 +361,95 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
       );
     }
 
+    const internalLinks = extractedLinks.filter(link => !link.isExternal);
+    const externalLinks = extractedLinks.filter(link => link.isExternal);
+
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="flex items-center gap-2 pb-2 border-b border-border">
           <Link className="h-4 w-4 text-primary" />
           <h3 className="font-medium text-foreground">Related Links</h3>
           <span className="text-xs text-muted-foreground">({extractedLinks.length})</span>
         </div>
 
-        <div className="space-y-2">
-          {extractedLinks.map((link) => (
-            <div 
-              key={link.id}
-              className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/30 transition-colors group"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="flex items-center gap-1">
-                  <Globe className="h-3 w-3 text-muted-foreground" />
-                  {link.isExternal && (
-                    <ExternalLink className="h-3 w-3 text-muted-foreground" />
-                  )}
-                </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground truncate">
-            {String(link.domain)}
-          </p>
-          <p className="text-xs text-muted-foreground truncate">
-            {String(link.url)}
-          </p>
-        </div>
-      </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-        onClick={() => window.open(String(link.url), '_blank', 'noopener,noreferrer')}
-              >
-                <ExternalLink className="h-3 w-3" />
-              </Button>
+        {internalLinks.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              <h4 className="text-sm font-medium text-foreground">Internal Links</h4>
+              <span className="text-xs text-muted-foreground">({internalLinks.length})</span>
             </div>
-          ))}
-        </div>
+            <div className="space-y-2">
+              {internalLinks.map((link) => (
+                <div 
+                  key={link.id}
+                  className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/30 transition-colors group"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Globe className="h-3 w-3 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {String(link.text || link.domain)}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {String(link.url)}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    onClick={() => window.open(String(link.url), '_blank', 'noopener,noreferrer')}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {externalLinks.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              <h4 className="text-sm font-medium text-foreground">External Links</h4>
+              <span className="text-xs text-muted-foreground">({externalLinks.length})</span>
+            </div>
+            <div className="space-y-2">
+              {externalLinks.map((link) => (
+                <div 
+                  key={link.id}
+                  className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/30 transition-colors group"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Globe className="h-3 w-3 text-muted-foreground" />
+                      <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {String(link.text || link.domain)}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {String(link.url)}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    onClick={() => window.open(String(link.url), '_blank', 'noopener,noreferrer')}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
