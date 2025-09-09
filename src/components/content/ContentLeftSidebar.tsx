@@ -20,6 +20,8 @@ import RealtimeChaptersDisplay from './RealtimeChaptersDisplay';
 import { AudioChunker, getOptimalAudioStream } from '@/utils/audioChunking';
 import { useContent } from '@/hooks/useContent';
 import { RefreshCw } from 'lucide-react';
+import { WebsiteContentTabs } from './website/WebsiteContentTabs';
+import { EnhancedWebsiteProcessing } from './website/EnhancedWebsiteProcessing';
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -719,6 +721,46 @@ export function ContentLeftSidebar({
       </div>;
   }
 
+  // Website content gets special treatment with enhanced tabs
+  if (contentData.type === 'website' || (contentData.url && contentData.url.startsWith('http'))) {
+    return (
+      <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg relative">
+        {/* Full-page text content overlay */}
+        {isTextExpanded && contentData.text && (
+          <div className="absolute inset-0 z-50 bg-background flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-semibold text-foreground">{contentData.title || 'Website Content'}</h2>
+              <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(false)} className="h-8 w-8 p-0">
+                <Minimize2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <ScrollArea className="flex-1 p-6">
+              <div className="max-w-4xl mx-auto">
+                <pre className="whitespace-pre-wrap font-sans text-foreground">{contentData.text}</pre>
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+
+        {renderControls()}
+        
+        {/* Enhanced website processing indicator */}
+        {(contentData.type === 'website' || (contentData.url && contentData.url.startsWith('http'))) && contentData.processing_status === 'processing' && (
+          <EnhancedWebsiteProcessing 
+            url={contentData.url || ''} 
+            processingStatus={contentData.processing_status}
+          />
+        )}
+        
+        <WebsiteContentTabs 
+          contentData={contentData}
+          onTextExpand={() => setIsTextExpanded(true)}
+          isProcessing={contentData.processing_status === 'processing'}
+        />
+      </div>
+    );
+  }
+
   // Default layout with tabs for other content types
   return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg relative">
       {/* Full-page transcript overlay */}
@@ -747,7 +789,7 @@ export function ContentLeftSidebar({
         </div>}
       
       {/* Full-page text content overlay */}
-      {isTextExpanded && (contentData.type === 'text' || contentData.type === 'website') && contentData.text && <div className="absolute inset-0 z-50 bg-background flex flex-col">
+      {isTextExpanded && (contentData.type === 'text' || contentData.url?.startsWith('http')) && contentData.text && <div className="absolute inset-0 z-50 bg-background flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-lg font-semibold text-foreground">{contentData.title || 'Text Content'}</h2>
             <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(false)} className="h-8 w-8 p-0">
@@ -771,13 +813,20 @@ export function ContentLeftSidebar({
 
       {renderControls()}
       
-      {/* Processing indicator for YouTube content */}
+      {/* Processing indicators */}
       {contentData.type === 'youtube' && contentData.processing_status === 'processing' && (
         <div className="mx-4 mt-2 p-4 flex items-center justify-center">
           <TextShimmer className="text-base font-semibold" duration={1.5}>
             Processing YouTube video...
           </TextShimmer>
         </div>
+      )}
+      
+      {(contentData.url?.startsWith('http')) && contentData.processing_status === 'processing' && (
+        <EnhancedWebsiteProcessing 
+          url={contentData.url || ''} 
+          processingStatus={contentData.processing_status}
+        />
       )}
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-background ">

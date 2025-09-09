@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, Globe, AlertTriangle } from 'lucide-react';
+import { Loader2, Globe, AlertTriangle, BookOpen, Type, Maximize2, Minimize2 } from 'lucide-react';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface HTMLRendererProps {
   htmlContent: string;
@@ -20,6 +22,8 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
   } = useUnifiedDocument();
 
   const [processedContent, setProcessedContent] = useState<string>('');
+  const [isReaderMode, setIsReaderMode] = useState(false);
+  const [fontSize, setFontSize] = useState(16);
 
   useEffect(() => {
     if (htmlContent) {
@@ -97,9 +101,63 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
 
   return (
     <div className="h-full w-full overflow-auto bg-background">
-      <div className="max-w-4xl mx-auto">
+      {/* Enhanced toolbar */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border p-2">
+        <div className="flex items-center justify-between max-w-4xl mx-auto">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsReaderMode(!isReaderMode)}
+              className={cn(
+                "h-8 px-3",
+                isReaderMode && "bg-primary/10 text-primary"
+              )}
+            >
+              <BookOpen className="h-4 w-4 mr-1" />
+              Reader Mode
+            </Button>
+            
+            <div className="h-4 w-px bg-border" />
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setFontSize(Math.max(12, fontSize - 2))}
+              disabled={fontSize <= 12}
+              className="h-8 w-8 p-0"
+            >
+              <Type className="h-3 w-3" />
+            </Button>
+            <span className="text-xs text-muted-foreground min-w-[2rem] text-center">
+              {fontSize}px
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setFontSize(Math.min(24, fontSize + 2))}
+              disabled={fontSize >= 24}
+              className="h-8 w-8 p-0"
+            >
+              <Type className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">{zoom}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div className={cn(
+        "mx-auto transition-all duration-300",
+        isReaderMode ? "max-w-2xl" : "max-w-4xl"
+      )}>
         <div 
-          className="bg-card border border-border rounded-lg mx-4 my-6 shadow-sm"
+          className={cn(
+            "bg-card border border-border rounded-lg mx-4 my-6 shadow-sm transition-all duration-300",
+            isReaderMode && "shadow-lg"
+          )}
           style={{ 
             transform: `scale(${zoom / 100})`,
             transformOrigin: 'top center',
@@ -107,21 +165,34 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
           }}
         >
           {title && (
-            <div className="p-4 border-b border-border bg-muted/30">
-              <h1 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <div className={cn(
+              "p-4 border-b border-border bg-muted/30 transition-all duration-300",
+              isReaderMode && "p-6"
+            )}>
+              <h1 className={cn(
+                "font-semibold text-foreground flex items-center gap-2 transition-all duration-300",
+                isReaderMode ? "text-xl" : "text-lg"
+              )}>
                 <Globe className="h-5 w-5" />
                 {title}
               </h1>
             </div>
           )}
           
-          <div className="p-6">
+          <div className={cn(
+            "transition-all duration-300",
+            isReaderMode ? "p-8" : "p-6"
+          )}>
             <div 
-              className="prose prose-sm max-w-none dark:prose-invert"
+              className={cn(
+                "prose max-w-none dark:prose-invert transition-all duration-300",
+                isReaderMode ? "prose-lg" : "prose-sm"
+              )}
               dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
               style={{
                 color: 'hsl(var(--foreground))',
-                lineHeight: '1.6',
+                lineHeight: isReaderMode ? '1.7' : '1.6',
+                fontSize: `${fontSize}px`,
               }}
             />
           </div>

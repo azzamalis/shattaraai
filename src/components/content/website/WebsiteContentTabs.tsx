@@ -1,0 +1,494 @@
+import React, { useState, useMemo } from 'react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { 
+  BookOpen, 
+  List, 
+  Info, 
+  ExternalLink, 
+  Maximize2, 
+  Clock, 
+  User, 
+  Calendar,
+  Globe,
+  Link,
+  Tag
+} from 'lucide-react';
+import { TextShimmer } from '@/components/ui/text-shimmer';
+
+interface WebsiteContentTabsProps {
+  contentData: any;
+  onTextExpand?: () => void;
+  isProcessing?: boolean;
+}
+
+export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: WebsiteContentTabsProps) {
+  const [activeTab, setActiveTab] = useState('article');
+
+  // Extract article structure from content
+  const articleStructure = useMemo(() => {
+    if (!contentData.text_content) return [];
+    
+    const content = contentData.text_content;
+    const lines = content.split('\n').filter(line => line.trim());
+    const structure = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Detect headings (lines that are shorter and likely titles)
+      if (line.length > 10 && line.length < 100 && 
+          !line.endsWith('.') && !line.endsWith(',') && 
+          line.split(' ').length < 12) {
+        structure.push({
+          id: `heading-${i}`,
+          text: line,
+          level: line.length < 50 ? 1 : 2,
+          position: i
+        });
+      }
+    }
+    
+    return structure.slice(0, 10); // Limit to first 10 headings
+  }, [contentData.text_content]);
+
+  // Extract key metadata
+  const websiteInfo = useMemo(() => {
+    const metadata = contentData.metadata || {};
+    return {
+      title: metadata.title || contentData.title,
+      description: metadata.description,
+      author: metadata.author,
+      publishedDate: metadata.publishedDate || metadata.date,
+      domain: contentData.url ? new URL(contentData.url as string).hostname : null,
+      readingTime: contentData.text_content ? Math.ceil(contentData.text_content.split(' ').length / 200) : null,
+      wordCount: contentData.text_content ? contentData.text_content.split(' ').length : null
+    };
+  }, [contentData]);
+
+  // Extract links from content
+  const extractedLinks = useMemo(() => {
+    if (!contentData.text_content) return [];
+    
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const matches = contentData.text_content.match(urlRegex) || [];
+    const uniqueLinks = [...new Set(matches)];
+    
+    return uniqueLinks.slice(0, 8).map((url, index) => {
+      try {
+        return {
+          id: `link-${index}`,
+          url,
+          domain: new URL(String(url)).hostname,
+          isExternal: !String(url).includes(String(websiteInfo.domain || ''))
+        };
+      } catch {
+        return {
+          id: `link-${index}`,
+          url,
+          domain: String(url),
+          isExternal: true
+        };
+      }
+    });
+  }, [contentData.text_content, websiteInfo.domain]);
+
+  const renderProcessingState = (message: string) => (
+    <div className="flex items-center justify-center h-full py-16">
+      <TextShimmer className="text-base font-semibold" duration={1.5}>
+        {message}
+      </TextShimmer>
+    </div>
+  );
+
+  const renderArticleView = () => {
+    if (isProcessing) {
+      return renderProcessingState('Extracting article content...');
+    }
+
+    if (!contentData.text_content) {
+      return (
+        <div className="flex flex-col items-center justify-center py-8">
+          <BookOpen className="h-8 w-8 text-muted-foreground mb-2" />
+          <p className="text-sm text-muted-foreground text-center">
+            Article content will be available after processing
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* Article header */}
+        <div className="border-b border-border pb-4">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-foreground line-clamp-2">
+              {websiteInfo.title}
+            </h2>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onTextExpand}
+              className="h-8 w-8 p-0 shrink-0"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          {websiteInfo.description && (
+            <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
+              {websiteInfo.description}
+            </p>
+          )}
+          
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            {websiteInfo.readingTime && (
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                <span>{websiteInfo.readingTime} min read</span>
+              </div>
+            )}
+            {websiteInfo.wordCount && (
+              <span>{websiteInfo.wordCount.toLocaleString()} words</span>
+            )}
+          </div>
+        </div>
+
+        {/* Article content preview */}
+        <div className="prose prose-sm max-w-none dark:prose-invert">
+          <div className="text-sm text-foreground leading-relaxed space-y-4">
+            {contentData.text_content.split('\n\n').slice(0, 8).map((paragraph, index) => (
+              <p key={index} className="text-foreground/90">
+                {paragraph.trim()}
+              </p>
+            ))}
+            
+            {contentData.text_content.split('\n\n').length > 8 && (
+              <div className="pt-4 border-t border-border">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={onTextExpand}
+                  className="text-primary hover:text-primary"
+                >
+                  Read full article <ExternalLink className="h-3 w-3 ml-1" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderStructureView = () => {
+    if (isProcessing) {
+      return renderProcessingState('Analyzing content structure...');
+    }
+
+    if (articleStructure.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-8">
+          <List className="h-8 w-8 text-muted-foreground mb-2" />
+          <p className="text-sm text-muted-foreground text-center">
+            No clear structure detected in content
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border">
+          <List className="h-4 w-4 text-primary" />
+          <h3 className="font-medium text-foreground">Content Outline</h3>
+        </div>
+        
+        <div className="space-y-2">
+          {articleStructure.map((heading, index) => (
+            <div 
+              key={heading.id}
+              className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group"
+            >
+              <div className="text-xs text-muted-foreground font-mono mt-1 w-6">
+                {index + 1}
+              </div>
+              <div className="flex-1">
+                <p className={cn(
+                  "text-sm text-foreground group-hover:text-primary transition-colors",
+                  heading.level === 1 ? "font-medium" : "font-normal"
+                )}>
+                  {heading.text}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderWebsiteInfo = () => {
+    if (isProcessing) {
+      return renderProcessingState('Gathering website information...');
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 pb-2 border-b border-border">
+          <Info className="h-4 w-4 text-primary" />
+          <h3 className="font-medium text-foreground">Website Information</h3>
+        </div>
+
+        <div className="space-y-4">
+          {/* Basic info */}
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Source
+              </label>
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                <a 
+                  href={contentData.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline"
+                >
+                  {websiteInfo.domain}
+                </a>
+              </div>
+            </div>
+
+            {websiteInfo.author && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Author
+                </label>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">{String(websiteInfo.author)}</span>
+                </div>
+              </div>
+            )}
+
+            {websiteInfo.publishedDate && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Published
+                </label>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">
+                    {new Date(String(websiteInfo.publishedDate)).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+            {websiteInfo.wordCount && (
+              <div className="text-center p-3 bg-muted/30 rounded-lg">
+                <div className="text-lg font-semibold text-foreground">
+                  {websiteInfo.wordCount.toLocaleString()}
+                </div>
+                <div className="text-xs text-muted-foreground">Words</div>
+              </div>
+            )}
+            
+            {websiteInfo.readingTime && (
+              <div className="text-center p-3 bg-muted/30 rounded-lg">
+                <div className="text-lg font-semibold text-foreground">
+                  {websiteInfo.readingTime}
+                </div>
+                <div className="text-xs text-muted-foreground">Min Read</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderRelatedLinks = () => {
+    if (isProcessing) {
+      return renderProcessingState('Extracting related links...');
+    }
+
+    if (extractedLinks.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-8">
+          <Link className="h-8 w-8 text-muted-foreground mb-2" />
+          <p className="text-sm text-muted-foreground text-center">
+            No related links found in content
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border">
+          <Link className="h-4 w-4 text-primary" />
+          <h3 className="font-medium text-foreground">Related Links</h3>
+          <span className="text-xs text-muted-foreground">({extractedLinks.length})</span>
+        </div>
+
+        <div className="space-y-2">
+          {extractedLinks.map((link) => (
+            <div 
+              key={link.id}
+              className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/30 transition-colors group"
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="flex items-center gap-1">
+                  <Globe className="h-3 w-3 text-muted-foreground" />
+                  {link.isExternal && (
+                    <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-foreground truncate">
+            {String(link.domain)}
+          </p>
+          <p className="text-xs text-muted-foreground truncate">
+            {String(link.url)}
+          </p>
+        </div>
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={() => window.open(String(link.url), '_blank', 'noopener,noreferrer')}
+              >
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-background">
+      <TabsList className={cn(
+        "w-fit justify-start gap-1 p-1 h-12 shrink-0 mx-4 my-2",
+        "bg-card dark:bg-card",
+        "transition-colors duration-200",
+        "rounded-xl"
+      )}>
+        <TabsTrigger 
+          value="article" 
+          className={cn(
+            "flex-1 h-full rounded-md flex items-center justify-center gap-2",
+            "text-sm font-medium",
+            "text-muted-foreground",
+            "hover:text-foreground",
+            "data-[state=active]:text-primary",
+            "data-[state=active]:bg-primary/10",
+            "data-[state=active]:hover:bg-primary/20",
+            "transition-colors duration-200",
+            "px-4"
+          )}
+        >
+          <BookOpen className="h-[14px] w-[14px]" />
+          <span>Article</span>
+        </TabsTrigger>
+        
+        <TabsTrigger 
+          value="structure" 
+          className={cn(
+            "flex-1 h-full rounded-md flex items-center justify-center gap-2",
+            "text-sm font-medium",
+            "text-muted-foreground",
+            "hover:text-foreground",
+            "data-[state=active]:text-primary",
+            "data-[state=active]:bg-primary/10",
+            "data-[state=active]:hover:bg-primary/20",
+            "transition-colors duration-200",
+            "px-4"
+          )}
+        >
+          <List className="h-[14px] w-[14px]" />
+          <span>Structure</span>
+        </TabsTrigger>
+        
+        <TabsTrigger 
+          value="info" 
+          className={cn(
+            "flex-1 h-full rounded-md flex items-center justify-center gap-2",
+            "text-sm font-medium",
+            "text-muted-foreground",
+            "hover:text-foreground",
+            "data-[state=active]:text-primary",
+            "data-[state=active]:bg-primary/10",
+            "data-[state=active]:hover:bg-primary/20",
+            "transition-colors duration-200",
+            "px-4"
+          )}
+        >
+          <Info className="h-[14px] w-[14px]" />
+          <span>Info</span>
+        </TabsTrigger>
+        
+        <TabsTrigger 
+          value="links" 
+          className={cn(
+            "flex-1 h-full rounded-md flex items-center justify-center gap-2",
+            "text-sm font-medium",
+            "text-muted-foreground",
+            "hover:text-foreground",
+            "data-[state=active]:text-primary",
+            "data-[state=active]:bg-primary/10",
+            "data-[state=active]:hover:bg-primary/20",
+            "transition-colors duration-200",
+            "px-4"
+          )}
+        >
+          <Link className="h-[14px] w-[14px]" />
+          <span>Links</span>
+        </TabsTrigger>
+      </TabsList>
+
+      <div className="flex-1 relative overflow-hidden">
+        <TabsContent value="article" className="absolute inset-0 mt-0">
+          <ScrollArea className="h-full">
+            <div className="p-4">
+              {renderArticleView()}
+            </div>
+          </ScrollArea>
+        </TabsContent>
+        
+        <TabsContent value="structure" className="absolute inset-0 mt-0">
+          <ScrollArea className="h-full">
+            <div className="p-4">
+              {renderStructureView()}
+            </div>
+          </ScrollArea>
+        </TabsContent>
+        
+        <TabsContent value="info" className="absolute inset-0 mt-0">
+          <ScrollArea className="h-full">
+            <div className="p-4">
+              {renderWebsiteInfo()}
+            </div>
+          </ScrollArea>
+        </TabsContent>
+        
+        <TabsContent value="links" className="absolute inset-0 mt-0">
+          <ScrollArea className="h-full">
+            <div className="p-4">
+              {renderRelatedLinks()}
+            </div>
+          </ScrollArea>
+        </TabsContent>
+      </div>
+    </Tabs>
+  );
+}
