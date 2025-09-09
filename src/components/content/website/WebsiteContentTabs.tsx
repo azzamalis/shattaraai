@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { 
-  BookOpen, 
+  Newspaper, 
   ChartNoAxesGantt, 
   Info, 
   ExternalLink, 
@@ -111,7 +111,7 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
     if (!contentData.text_content) {
       return (
         <div className="flex flex-col items-center justify-center py-8">
-          <BookOpen className="h-8 w-8 text-muted-foreground mb-2" />
+          <Newspaper className="h-8 w-8 text-muted-foreground mb-2" />
           <p className="text-sm text-muted-foreground text-center">
             Article content will be available after processing
           </p>
@@ -397,7 +397,7 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
             "px-4"
           )}
         >
-          <BookOpen className="h-[14px] w-[14px]" />
+          <Newspaper className="h-[14px] w-[14px]" />
           <span>Article</span>
         </TabsTrigger>
         
