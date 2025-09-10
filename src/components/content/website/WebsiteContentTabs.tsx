@@ -269,75 +269,167 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
 
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-2 pb-2 border-b border-border">
-          <Info className="h-4 w-4 text-primary" />
-          <h3 className="font-medium text-foreground">Website Information</h3>
-        </div>
-
+        {/* Header Section */}
         <div className="space-y-4">
-          {/* Basic info */}
           <div className="space-y-3">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Source
-              </label>
-              <div className="flex items-center gap-2">
+            {/* Website Title */}
+            <h1 className="text-xl font-bold text-foreground line-clamp-2">
+              {websiteInfo.title || 'Website Content'}
+            </h1>
+            
+            {/* Favicon + Domain */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 flex-1">
+                <img 
+                  src={`https://www.google.com/s2/favicons?domain=${websiteInfo.domain}&sz=16`}
+                  alt="Favicon"
+                  className="h-4 w-4"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
                 <Globe className="h-4 w-4 text-muted-foreground" />
-                <a 
-                  href={contentData.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline"
-                >
-                  {websiteInfo.domain}
-                </a>
+                <span className="text-sm font-medium text-foreground">{websiteInfo.domain}</span>
               </div>
             </div>
 
+            {/* Author/Publisher */}
             {websiteInfo.author && (
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Author
-                </label>
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground">{String(websiteInfo.author)}</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">by</span>
+                <span className="text-sm font-medium text-foreground">{String(websiteInfo.author)}</span>
               </div>
             )}
 
+            {/* Published Date */}
             {websiteInfo.publishedDate && (
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Published
-                </label>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground">
-                    {new Date(String(websiteInfo.publishedDate)).toLocaleDateString()}
-                  </span>
-                </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  Published {new Date(String(websiteInfo.publishedDate)).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </span>
               </div>
             )}
           </div>
+        </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-            {websiteInfo.wordCount && (
-              <div className="text-center p-3 bg-muted/30 rounded-lg">
-                <div className="text-lg font-semibold text-foreground">
-                  {websiteInfo.wordCount.toLocaleString()}
+        {/* Preview Image */}
+        {contentData.metadata?.ogImage && (
+          <div className="rounded-lg overflow-hidden border border-border">
+            <img 
+              src={String(contentData.metadata.ogImage)}
+              alt="Preview"
+              className="w-full h-32 object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).parentElement?.remove();
+              }}
+            />
+          </div>
+        )}
+
+        {/* Quick Stats Cards */}
+        <div className="grid grid-cols-2 gap-3">
+          {websiteInfo.wordCount && (
+            <div className="bg-card border border-border rounded-lg p-4 text-center">
+              <div className="text-lg font-bold text-foreground">
+                {websiteInfo.wordCount.toLocaleString()}
+              </div>
+              <div className="text-xs text-muted-foreground">Words</div>
+            </div>
+          )}
+          
+          {websiteInfo.readingTime && (
+            <div className="bg-card border border-border rounded-lg p-4 text-center">
+              <div className="text-lg font-bold text-foreground">
+                {websiteInfo.readingTime}
+              </div>
+              <div className="text-xs text-muted-foreground">Min Read</div>
+            </div>
+          )}
+
+          {contentData.metadata?.contentLength && (
+            <div className="bg-card border border-border rounded-lg p-4 text-center">
+              <div className="text-lg font-bold text-foreground">
+                {Math.round(Number(contentData.metadata.contentLength) / 1024)}KB
+              </div>
+              <div className="text-xs text-muted-foreground">Content Size</div>
+            </div>
+          )}
+
+          {contentData.metadata?.extractedAt && (
+            <div className="bg-card border border-border rounded-lg p-4 text-center">
+              <div className="text-xs font-bold text-foreground">
+                {new Date(String(contentData.metadata.extractedAt)).toLocaleDateString()}
+              </div>
+              <div className="text-xs text-muted-foreground">Extracted</div>
+            </div>
+          )}
+        </div>
+
+        {/* Metadata Table */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-border">
+            <Info className="h-4 w-4 text-primary" />
+            <h3 className="font-medium text-foreground">Metadata</h3>
+          </div>
+
+          <div className="space-y-3">
+            {/* Canonical URL */}
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Canonical URL
+              </span>
+              <a 
+                href={contentData.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline break-all"
+              >
+                {String(contentData.url)}
+              </a>
+            </div>
+
+            {/* Domain */}
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Domain
+              </span>
+              <span className="text-sm text-foreground">{websiteInfo.domain}</span>
+            </div>
+
+            {/* Keywords/Tags */}
+            {contentData.metadata?.keywords && Array.isArray(contentData.metadata.keywords) && (
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Keywords
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {contentData.metadata.keywords.slice(0, 8).map((keyword: string, index: number) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 text-xs bg-muted rounded-md text-muted-foreground"
+                    >
+                      {String(keyword)}
+                    </span>
+                  ))}
                 </div>
-                <div className="text-xs text-muted-foreground">Words</div>
               </div>
             )}
-            
-            {websiteInfo.readingTime && (
-              <div className="text-center p-3 bg-muted/30 rounded-lg">
-                <div className="text-lg font-semibold text-foreground">
-                  {websiteInfo.readingTime}
-                </div>
-                <div className="text-xs text-muted-foreground">Min Read</div>
+
+            {/* Description */}
+            {contentData.metadata?.description && (
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Description
+                </span>
+                <p className="text-sm text-muted-foreground line-clamp-3">
+                  {String(contentData.metadata.description)}
+                </p>
               </div>
             )}
           </div>

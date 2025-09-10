@@ -259,6 +259,16 @@ function extractMetadata(html: string, url: string): any {
   
   // Extract links
   metadata.links = extractLinks(html, url);
+  
+  // Add content statistics
+  metadata.contentLength = html.length;
+  metadata.extractedAt = new Date().toISOString();
+  
+  // Extract keywords/tags if available
+  const keywordsMatch = html.match(/<meta[^>]*name=['"]*keywords['"]*[^>]*content=['"]*([^'"]*)['"]*[^>]*>/i);
+  if (keywordsMatch) {
+    metadata.keywords = keywordsMatch[1].trim().split(',').map(k => k.trim());
+  }
 
   return metadata;
 }
