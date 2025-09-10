@@ -315,8 +315,37 @@ serve(async (req) => {
 
     console.log(`Extracted ${extractedText.length} characters from website`);
 
-    // Prepare content update data
-    const contentTitle = websiteMetadata.title || websiteMetadata.ogTitle || 'Website Content';
+    // Prepare content update data with better title fallback
+    const generateTitleFromUrl = (url: string): string => {
+      try {
+        const urlObj = new URL(url);
+        const pathname = urlObj.pathname;
+        
+        // Extract the last meaningful part of the path
+        const pathParts = pathname.split('/').filter(part => part.length > 0);
+        if (pathParts.length > 0) {
+          const lastPart = pathParts[pathParts.length - 1];
+          // Remove file extensions and convert to readable format
+          const cleanPart = lastPart
+            .replace(/\.(html|htm|php|aspx|jsp)$/i, '')
+            .replace(/[-_]/g, ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+          
+          if (cleanPart.length > 2) {
+            return `${cleanPart} - ${urlObj.hostname}`;
+          }
+        }
+        
+        // Fallback to domain name if path doesn't yield good results
+        return urlObj.hostname.replace(/^www\./, '');
+      } catch {
+        return 'Website Content';
+      }
+    };
+    
+    const contentTitle = websiteMetadata.title || 
+                        websiteMetadata.ogTitle || 
+                        generateTitleFromUrl(url);
     
     // Update content with extracted data
     const { error: contentError } = await supabase
