@@ -363,7 +363,7 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
 
           {contentData.metadata?.extractedAt && (
             <div className="bg-card border border-border rounded-lg p-4 text-center">
-              <div className="text-xs font-bold text-foreground">
+              <div className="text-lg font-bold text-foreground">
                 {new Date(String(contentData.metadata.extractedAt)).toLocaleDateString()}
               </div>
               <div className="text-xs text-muted-foreground">Extracted</div>
