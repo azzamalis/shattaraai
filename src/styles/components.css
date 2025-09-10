@@ -128,5 +128,100 @@
   .react-pdf__Page__annotationLayer {
     display: none !important;
   }
+
+  /* Reader Mode Content Styles */
+  .reader-content {
+    font-family: inherit;
+    color: hsl(var(--foreground));
+  }
+
+  .reader-content h1,
+  .reader-content h2,
+  .reader-content h3,
+  .reader-content h4,
+  .reader-content h5,
+  .reader-content h6 {
+    @apply font-semibold text-foreground mt-6 mb-4 leading-tight;
+  }
+
+  .reader-content h1 {
+    @apply text-xl;
+  }
+
+  .reader-content h2 {
+    @apply text-lg;
+  }
+
+  .reader-content h3 {
+    @apply text-base;
+  }
+
+  .reader-content p {
+    @apply text-foreground/90 mb-4 leading-relaxed;
+  }
+
+  .reader-content blockquote {
+    @apply border-l-4 border-primary/30 pl-4 italic text-foreground/80 my-4;
+  }
+
+  .reader-content ul,
+  .reader-content ol {
+    @apply mb-4 pl-6 space-y-1;
+  }
+
+  .reader-content li {
+    @apply text-foreground/90;
+  }
+
+  .reader-content a {
+    @apply text-primary hover:text-primary/80 underline transition-colors;
+  }
+
+  .reader-content a.citation {
+    @apply text-xs bg-primary/10 px-1 py-0.5 rounded no-underline hover:bg-primary/20 transition-colors;
+  }
+
+  .reader-content strong,
+  .reader-content b {
+    @apply font-semibold text-foreground;
+  }
+
+  .reader-content em,
+  .reader-content i {
+    @apply italic;
+  }
+
+  .reader-content code {
+    @apply bg-muted px-1 py-0.5 rounded text-sm font-mono;
+  }
+
+  .reader-content pre {
+    @apply bg-muted p-3 rounded-md overflow-x-auto text-sm font-mono mb-4;
+  }
+
+  .reader-content img {
+    @apply max-w-full h-auto rounded-md my-4;
+  }
+
+  .reader-content figure {
+    @apply my-6;
+  }
+
+  .reader-content figcaption {
+    @apply text-sm text-muted-foreground mt-2 text-center italic;
+  }
+
+  .reader-content table {
+    @apply w-full border-collapse border border-border mb-4;
+  }
+
+  .reader-content th,
+  .reader-content td {
+    @apply border border-border px-3 py-2 text-left;
+  }
+
+  .reader-content th {
+    @apply bg-muted font-semibold;
+  }
 }
 

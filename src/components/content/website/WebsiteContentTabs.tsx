@@ -187,27 +187,28 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
           </div>
         </div>
 
-        {/* Article content preview */}
+        {/* Article content - Render as HTML */}
         <div className="prose prose-sm max-w-none dark:prose-invert">
-          <div className="text-sm text-foreground leading-relaxed space-y-4">
-            {contentData.text_content.split('\n\n').slice(0, 8).map((paragraph, index) => (
-              <p key={index} className="text-foreground/90">
-                {paragraph.trim()}
-              </p>
-            ))}
-            
-            {contentData.text_content.split('\n\n').length > 8 && (
-              <div className="pt-4 border-t border-border">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={onTextExpand}
-                  className="text-primary hover:text-primary"
-                >
-                  Read full article <ExternalLink className="h-3 w-3 ml-1" />
-                </Button>
-              </div>
-            )}
+          <div 
+            className="reader-content text-sm leading-relaxed space-y-4"
+            dangerouslySetInnerHTML={{ 
+              __html: contentData.text_content 
+            }}
+            style={{
+              // Reader mode styling
+              lineHeight: '1.7',
+            }}
+          />
+          
+          <div className="pt-6 border-t border-border mt-8">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onTextExpand}
+              className="text-primary hover:text-primary"
+            >
+              View full article <ExternalLink className="h-3 w-3 ml-1" />
+            </Button>
           </div>
         </div>
       </div>

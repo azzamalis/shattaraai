@@ -12,28 +12,102 @@ interface WebsiteExtractorRequest {
   contentId: string;
 }
 
-function extractTextFromHTML(html: string): string {
-  // Remove script and style elements
-  let text = html
+function extractCleanHTML(html: string): string {
+  // Remove unwanted elements while preserving content structure
+  let cleanedHtml = html
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
     .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
     .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
-    .replace(/<aside[^>]*>[\s\S]*?<\/aside>/gi, '');
+    .replace(/<aside[^>]*>[\s\S]*?<\/aside>/gi, '')
+    .replace(/<noscript[^>]*>[\s\S]*?<\/noscript>/gi, '')
+    .replace(/<!--[\s\S]*?-->/gi, '');
 
-  // Remove HTML tags
-  text = text.replace(/<[^>]+>/g, ' ');
+  // Extract main content area (prioritize article, main, or content-rich divs)
+  const mainContentMatch = 
+    cleanedHtml.match(/<article[^>]*>([\s\S]*?)<\/article>/gi) ||
+    cleanedHtml.match(/<main[^>]*>([\s\S]*?)<\/main>/gi) ||
+    cleanedHtml.match(/<div[^>]*class="[^"]*content[^"]*"[^>]*>([\s\S]*?)<\/div>/gi) ||
+    cleanedHtml.match(/<div[^>]*class="[^"]*post[^"]*"[^>]*>([\s\S]*?)<\/div>/gi) ||
+    cleanedHtml.match(/<div[^>]*class="[^"]*article[^"]*"[^>]*>([\s\S]*?)<\/div>/gi);
+
+  if (mainContentMatch && mainContentMatch[0]) {
+    cleanedHtml = mainContentMatch[0];
+  }
+
+  // Preserve semantic HTML elements
+  const allowedTags = [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'p', 'br', 'blockquote', 'cite',
+    'ul', 'ol', 'li', 'dl', 'dt', 'dd',
+    'strong', 'b', 'em', 'i', 'u',
+    'a', 'img', 'figure', 'figcaption',
+    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+    'code', 'pre', 'kbd', 'samp'
+  ];
+
+  // Remove all tags except allowed ones, but preserve their content
+  const tagRegex = /<\/?([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g;
+  cleanedHtml = cleanedHtml.replace(tagRegex, (match, tagName) => {
+    const lowerTagName = tagName.toLowerCase();
+    
+    if (allowedTags.includes(lowerTagName)) {
+      // Clean attributes for security, keep only essential ones
+      if (lowerTagName === 'a') {
+        const hrefMatch = match.match(/href\s*=\s*["']([^"']+)["']/i);
+        if (hrefMatch) {
+          return match.startsWith('</') ? '</a>' : `<a href="${hrefMatch[1]}" target="_blank" rel="noopener noreferrer">`;
+        }
+        return match.startsWith('</') ? '</a>' : '<a>';
+      } else if (lowerTagName === 'img') {
+        const srcMatch = match.match(/src\s*=\s*["']([^"']+)["']/i);
+        const altMatch = match.match(/alt\s*=\s*["']([^"']+)["']/i);
+        if (srcMatch) {
+          const altAttr = altMatch ? ` alt="${altMatch[1]}"` : '';
+          return `<img src="${srcMatch[1]}"${altAttr}>`;
+        }
+        return '';
+      } else {
+        // For other allowed tags, just keep the basic tag
+        return match.startsWith('</') ? `</${lowerTagName}>` : `<${lowerTagName}>`;
+      }
+    }
+    
+    // Remove disallowed tags but keep content
+    return '';
+  });
+
+  // Convert citation patterns like [1], [2] into proper reference links
+  cleanedHtml = cleanedHtml.replace(/\[(\d+)\]/g, '<a href="#ref-$1" class="citation">[$1]</a>');
 
   // Decode HTML entities
-  text = text
+  cleanedHtml = cleanedHtml
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, ' ');
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#91;/g, '[')
+    .replace(/&#93;/g, ']');
 
+  // Clean up excessive whitespace while preserving structure
+  cleanedHtml = cleanedHtml
+    .replace(/\n\s*\n/g, '\n')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleanedHtml;
+}
+
+function extractTextFromHTML(html: string): string {
+  // For backwards compatibility, extract plain text from HTML
+  const cleanHtml = extractCleanHTML(html);
+  
+  // Remove remaining HTML tags for plain text version
+  let text = cleanHtml.replace(/<[^>]+>/g, ' ');
+  
   // Clean up whitespace
   text = text
     .replace(/\s+/g, ' ')
@@ -221,6 +295,7 @@ serve(async (req) => {
     }
 
     const html = await response.text();
+    const extractedHtml = extractCleanHTML(html);
     const extractedText = extractTextFromHTML(html);
     const websiteMetadata = extractMetadata(html, url);
 
@@ -238,12 +313,13 @@ serve(async (req) => {
       .from('content')
       .update({
         title: contentTitle,
-        text_content: extractedText,
+        text_content: extractedHtml, // Store structured HTML for reader mode
         metadata: {
           ...websiteMetadata,
           extractedAt: new Date().toISOString(),
           contentLength: extractedText.length,
-          hasContent: extractedText.length > 0
+          hasContent: extractedText.length > 0,
+          plainText: extractedText // Keep plain text for search/processing
         }
       })
       .eq('id', contentId);
