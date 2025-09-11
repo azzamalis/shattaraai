@@ -3,6 +3,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Layers, FileText, ClipboardList } from 'lucide-react';
 import { ContentData } from '@/pages/ContentPage';
+import { ContentViewer } from '@/components/content/ContentViewer';
 import RealtimeTranscriptionDisplay from './RealtimeTranscriptionDisplay';
 import RealtimeChaptersDisplay from './RealtimeChaptersDisplay';
 import { useContent } from '@/hooks/useContent';
@@ -51,6 +52,25 @@ export function MediaLeftSidebar({
     }
   };
 
+  const renderMediaControls = () => {
+    // Show ContentViewer (which includes audio/video players) for media files
+    if (['audio_file', 'video', 'youtube'].includes(contentData.type) && (contentData.url || contentData.text)) {
+      return (
+        <div className="p-4 shrink-0 bg-background border-b border-border">
+          <ContentViewer 
+            contentData={contentData} 
+            onUpdateContent={onUpdateContent} 
+            onTextAction={onTextAction} 
+            currentTimestamp={currentTimestamp} 
+            onExpandText={() => {}}
+            onSeekToTimestamp={onSeekToTimestamp} 
+          />
+        </div>
+      );
+    }
+    return null;
+  };
+
   const hasContent = contentData.type === 'live_recording' ? (isRecording || transcriptionChunks.length > 0) : 
                     !!contentData.url || !!contentData.text;
 
@@ -64,6 +84,9 @@ export function MediaLeftSidebar({
 
   return (
     <div className="h-full flex flex-col bg-background overflow-hidden">
+      {/* Media Controls (Audio/Video Player) */}
+      {renderMediaControls()}
+      
       {/* Tabs */}
       <div className="sticky top-0 z-10 bg-background border-b border-border">
         <Tabs defaultValue="chapters" className="w-full" onValueChange={setActiveTab}>
