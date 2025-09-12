@@ -78,7 +78,7 @@ export function LearningCardThumbnail({
     }
     if (isVideo) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Play className="w-12 h-12 text-muted-foreground" />
+          <Play className="w-16 h-16 text-muted-foreground" />
         </div>;
     }
     if (isChat) {
