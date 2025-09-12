@@ -103,8 +103,13 @@ serve(async (req) => {
     let chapters;
     try {
       // Parse the response - it should be a JSON array of chapters
-      const responseText = result.choices[0].message.content;
+      let responseText = result.choices[0].message.content;
       console.log('Raw chapter generation response:', responseText);
+      
+      // Remove markdown code blocks if present
+      if (responseText.includes('```json')) {
+        responseText = responseText.replace(/```json\s*|\s*```/g, '').trim();
+      }
       
       // Try to parse as JSON array directly first
       try {
