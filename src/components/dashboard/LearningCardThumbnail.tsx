@@ -63,7 +63,7 @@ export function LearningCardThumbnail({
     }
     if (isWebsite) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Globe className="w-12 h-12 text-muted-foreground" />
+          <Globe className="w-16 h-16 text-muted-foreground" />
         </div>;
     }
     if (isText) {
