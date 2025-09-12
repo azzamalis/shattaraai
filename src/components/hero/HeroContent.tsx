@@ -74,7 +74,7 @@ const HeroContent = () => {
         <div className="mx-auto max-w-7xl px-6 relative z-10">
           <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
             <AnimatedGroup variants={transitionVariants}>
-              <HeroActionLink to="/signup" text="Try Your AI Tutor Free" />
+              <HeroActionLink to="/signup" text="Study Smarter, Not Harder" />
   
               <h1 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] bg-gradient-to-br from-[#FAFAFA] to-[#FAFAFA]/50 bg-clip-text text-primary my-[66px]">An AI tutor made for you</h1>
               <p className="mx-auto mt-8 max-w-2xl text-balance text-lg text-[#9A9A9A]">Your AI tutor that understands PDFs, videos, and lectures— built for the way MENA students actually learn.</p>
