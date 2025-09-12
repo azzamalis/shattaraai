@@ -566,7 +566,7 @@ export function ContentLeftSidebar({
   }
 
   // Website content gets special treatment with enhanced tabs
-  if (contentData.type === 'website') {
+  if (contentData.type === 'website' || contentData.url && contentData.url.startsWith('http')) {
     return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg relative">
         {/* Full-page text content overlay */}
         {isTextExpanded && contentData.text && <div className="absolute inset-0 z-50 bg-background flex flex-col">
@@ -651,17 +651,7 @@ export function ContentLeftSidebar({
           </TextShimmer>
         </div>}
       
-      {contentData.type === 'video' && contentData.processing_status === 'processing' && <div className="mx-4 mt-2 p-4 flex items-center justify-center">
-          <TextShimmer className="text-base font-semibold" duration={1.5}>
-            Processing video...
-          </TextShimmer>
-        </div>}
-      
-      {contentData.type === 'audio_file' && contentData.processing_status === 'processing' && <div className="mx-4 mt-2 p-4 flex items-center justify-center">
-          <TextShimmer className="text-base font-semibold" duration={1.5}>
-            Processing audio...
-          </TextShimmer>
-        </div>}
+      {contentData.url?.startsWith('http') && contentData.processing_status === 'processing'}
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-background ">
         <TabsList className={cn("w-fit justify-start gap-1 p-1 h-12 shrink-0 mx-4 my-2", "bg-card dark:bg-card", "transition-colors duration-200", "rounded-xl")}>
