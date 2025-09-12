@@ -58,12 +58,12 @@ export function LearningCardThumbnail({
     }
     if (isAudioFile) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <AudioLines className="w-16 h-16 text-muted-foreground" />
+          <AudioLines className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isWebsite) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Globe className="w-16 h-16 text-muted-foreground" />
+          <Globe className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isText) {
@@ -78,7 +78,7 @@ export function LearningCardThumbnail({
     }
     if (isVideo) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
-          <Play className="w-16 h-16 text-muted-foreground" />
+          <Play className="w-12 h-12 text-muted-foreground" />
         </div>;
     }
     if (isChat) {
@@ -96,7 +96,11 @@ export function LearningCardThumbnail({
       {children}
       
       <div className={cn("w-full h-full", "relative", "flex items-center justify-center", "bg-gradient-to-b from-transparent to-black/5 dark:to-black/20")}>
-        {isPdf && hasPdfSource ? <PDFThumbnailGenerator url={pdfUrl} title={title} className="w-full h-full" /> : displayThumbnail ? <img src={displayThumbnail} alt={title} className="object-cover w-full h-full absolute inset-0" onError={e => {
+        {isPdf && hasPdfSource ? <PDFThumbnailGenerator 
+          url={pdfUrl} 
+          title={title} 
+          className="w-full h-full" 
+        /> : displayThumbnail ? <img src={displayThumbnail} alt={title} className="object-cover w-full h-full absolute inset-0" onError={e => {
         // If maxresdefault fails for YouTube, try hqdefault
         if (isYoutube && youtubeThumbnail && e.currentTarget.src.includes('maxresdefault')) {
           const videoId = youtubeThumbnail.split('/')[4];
