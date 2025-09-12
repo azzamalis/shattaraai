@@ -566,7 +566,7 @@ export function ContentLeftSidebar({
   }
 
   // Website content gets special treatment with enhanced tabs
-  if (contentData.type === 'website' || contentData.url && contentData.url.startsWith('http')) {
+  if (contentData.type === 'website') {
     return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg relative">
         {/* Full-page text content overlay */}
         {isTextExpanded && contentData.text && <div className="absolute inset-0 z-50 bg-background flex flex-col">
