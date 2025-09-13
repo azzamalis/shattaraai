@@ -329,10 +329,17 @@ export const useContent = () => {
       // Auto-trigger content processing based on content type
       if (contentId) {
         console.log('DEBUG: useContent - Content with metadata created, starting automatic processing...', { contentId, type: finalContentData.type });
-        // Don't await - let it run in background
-        processContentAutomatically(contentId, finalContentData, undefined).catch(error => {
-          console.error('DEBUG: useContent - Background processing failed:', error);
-        });
+        // For text content, trigger enhanced processing
+        if (finalContentData.type === 'text' && finalContentData.text_content) {
+          triggerTextContentProcessing(contentId, finalContentData).catch(error => {
+            console.error('DEBUG: useContent - Text processing failed:', error);
+          });
+        } else {
+          // Don't await - let it run in background
+          processContentAutomatically(contentId, finalContentData, undefined).catch(error => {
+            console.error('DEBUG: useContent - Background processing failed:', error);
+          });
+        }
       }
       
       return contentId;
@@ -1019,6 +1026,47 @@ export const useContent = () => {
     } catch (error) {
       console.error('Error in retryProcessing:', error);
       toast.error('Failed to retry processing');
+    }
+  };
+
+  // Enhanced text content processing
+  const triggerTextContentProcessing = async (contentId: string, contentData: any) => {
+    console.log('DEBUG: useContent - Triggering enhanced text processing for:', contentId);
+    
+    try {
+      // Generate smart title and filename
+      const { generateSmartTitle, generateFilename } = await import('@/utils/textProcessing');
+      const smartTitle = generateSmartTitle(contentData.text_content || '');
+      const fileName = generateFilename(smartTitle);
+
+      const response = await supabase.functions.invoke('enhance-text-content', {
+        body: {
+          contentId,
+          textContent: contentData.text_content,
+          title: smartTitle,
+          filename: fileName
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to enhance text content');
+      }
+
+      console.log('DEBUG: useContent - Text enhancement completed:', response.data);
+      toast.success('Text content enhanced successfully');
+      
+      // Refresh content to get updated data
+      await fetchContent();
+    } catch (error) {
+      console.error('DEBUG: useContent - Text enhancement failed:', error);
+      
+      // Update content status to failed
+      await supabase
+        .from('content')
+        .update({ processing_status: 'failed' })
+        .eq('id', contentId);
+        
+      toast.error('Failed to enhance text content');
     }
   };
 

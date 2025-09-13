@@ -9,6 +9,7 @@ import { RecordingControls } from '@/components/recording/RecordingControls';
 import { MicrophoneSelector } from '@/components/recording/MicrophoneSelector';
 import { ContentViewer } from '@/components/content/ContentViewer';
 import { DocumentViewer } from '@/components/content/DocumentViewer/DocumentViewer';
+import { UnifiedDocumentViewer } from '@/components/content/UnifiedDocumentViewer/UnifiedDocumentViewer';
 import { WaveformAudioPlayer } from '@/components/content/WaveformAudioPlayer';
 import { ContentData } from '@/pages/ContentPage';
 import { RecordingStateInfo, RecordingMetadata } from '@/lib/types';
@@ -145,8 +146,8 @@ export function ContentLeftSidebar({
     }
   };
 
-  // Check if we should hide tabs (for PDF content or Word documents)
-  const shouldHideTabs = contentData.type === 'pdf';
+  // Check if we should hide tabs (for PDF content, Word documents, or text content)
+  const shouldHideTabs = contentData.type === 'pdf' || contentData.type === 'text';
 
   // Check if it's a Word document
   const isWordDocument = (contentData.type === 'file' || contentData.type === 'upload') && contentData.filename?.match(/\.(doc|docx)$/i);
@@ -287,6 +288,12 @@ export function ContentLeftSidebar({
     if (isWordDocument) {
       return null; // Document viewer will be rendered in the main layout
     }
+
+    // Show UnifiedDocumentViewer for text content
+    if (contentData.type === 'text') {
+      return null; // Text viewer will be rendered in the main layout
+    }
+
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
       <ContentViewer contentData={contentData} onUpdateContent={onUpdateContent} onTextAction={onTextAction} currentTimestamp={currentTimestamp} onExpandText={() => setIsTextExpanded(true)} onSeekToTimestamp={onSeekToTimestamp} />
       </div>;
@@ -565,6 +572,13 @@ export function ContentLeftSidebar({
       </div>;
   }
 
+  // If it's text content, render the UnifiedDocumentViewer without tabs
+  if (contentData.type === 'text') {
+    return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
+        <UnifiedDocumentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
+      </div>;
+  }
+
   // Website content gets special treatment with enhanced tabs
   if (contentData.type === 'website') {
     return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg relative">
@@ -620,7 +634,7 @@ export function ContentLeftSidebar({
         </div>}
       
       {/* Full-page text content overlay */}
-      {isTextExpanded && (contentData.type === 'text' || contentData.url?.startsWith('http')) && contentData.text && <div className="absolute inset-0 z-50 bg-background flex flex-col">
+      {isTextExpanded && (contentData.type as string === 'text' || contentData.url?.startsWith('http')) && contentData.text && <div className="absolute inset-0 z-50 bg-background flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-lg font-semibold text-foreground">{contentData.title || 'Text Content'}</h2>
             <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(false)} className="h-8 w-8 p-0">

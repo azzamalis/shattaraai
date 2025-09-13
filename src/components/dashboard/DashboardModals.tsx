@@ -7,6 +7,7 @@ import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { DeleteItem, ContentItem } from '@/lib/types';
 import { useContentContext } from '@/contexts/ContentContext';
+import { generateSmartTitle } from '@/utils/textProcessing';
 
 interface DashboardModalsProps {
   isPasteModalOpen: boolean;
@@ -48,6 +49,11 @@ export function DashboardModals({
         contentType = 'website';
         title = 'Website Content';
       }
+    }
+
+    // For text content, generate smart title and filename
+    if (contentType === 'text' && data.text) {
+      title = generateSmartTitle(data.text);
     }
 
     // Add content WITHOUT automatic room assignment (room_id: null)
