@@ -17,7 +17,7 @@ export function MyRoomsSection({
   const {
     getContentCountForRoom
   } = useRoomContentCounts();
-  return <section className="w-full py-0">
+  return <section className="w-full py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-foreground font-medium text-lg">My Rooms</h2>
       </div>
