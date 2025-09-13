@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare, FileText, BookOpen, BookCheck, FileStack } from "lucide-react";
+import { MessageCircle, StickyNote, ReceiptText, BookCheck, GalleryVerticalEnd } from "lucide-react";
 import AIChat from "@/components/recording/AIChat";
 import QuizPreferences from '@/components/recording/QuizPreferences';
 import Notes from '@/components/recording/Notes';
@@ -138,35 +138,23 @@ interface ContentRightSidebarProps {
   contentData: ContentData;
 }
 
-interface ChapterData {
-  id: string;
-  title: string;
-  summary?: string;
-  startTime?: number;
-  endTime?: number;
-}
-
 export function ContentRightSidebar({
   contentData
 }: ContentRightSidebarProps) {
   const [activeTab, setActiveTab] = useState("chat");
   const [isRecording, setIsRecording] = useState(false);
-
-  // Check if chapters exist for text content
-  const hasChapters = contentData.type === 'text' && contentData.chapters && Array.isArray(contentData.chapters) && contentData.chapters.length > 0;
-  const chapters = hasChapters ? contentData.chapters as ChapterData[] : [];
   return <div className="h-full flex flex-col content-right-sidebar bg-dashboard-card dark:bg-dashboard-card">
       {/* Header with TabsList */}
       <div className="border-b border-border/10 bg-background px-[8px] py-[8px]">
         <Tabs defaultValue="chat" onValueChange={setActiveTab} className="w-full">
           <TabsList className={cn("w-full justify-center gap-1 p-1 h-12 shrink-0", "bg-card dark:bg-card", "transition-colors duration-200", "rounded-xl")}>
             <TabsTrigger value="chat" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <MessageSquare className="h-[14px] w-[14px]" />
+              <MessageCircle className="h-[14px] w-[14px]" />
               <span className="text-sm">Chat</span>
             </TabsTrigger>
             
             <TabsTrigger value="flashcards" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <FileStack className="h-[14px] w-[14px]" />
+              <GalleryVerticalEnd className="h-[14px] w-[14px]" />
               <span className="text-sm">Flashcards</span>
             </TabsTrigger>
             
@@ -175,21 +163,13 @@ export function ContentRightSidebar({
               <span className="text-sm">Quizzes</span>
             </TabsTrigger>
             
-            {/* Conditionally render Chapters tab for text content with chapters */}
-            {contentData.type === 'text' && hasChapters && (
-              <TabsTrigger value="chapters" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-                <FileText className="h-[14px] w-[14px]" />
-                <span className="text-sm">Chapters</span>
-              </TabsTrigger>
-            )}
-
             <TabsTrigger value="summary" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <BookOpen className="h-[14px] w-[14px]" />
+              <ReceiptText className="h-[14px] w-[14px]" />
               <span className="text-sm">Summary</span>
             </TabsTrigger>
             
             <TabsTrigger value="notes" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <FileText className="h-[14px] w-[14px]" />
+              <StickyNote className="h-[14px] w-[14px]" />
               <span className="text-sm">Notes</span>
             </TabsTrigger>
           </TabsList>
@@ -225,49 +205,6 @@ export function ContentRightSidebar({
             </div>
           </TabsContent>
           
-          {/* Chapters tab content for text content */}
-          {contentData.type === 'text' && hasChapters && (
-            <TabsContent value="chapters" className="flex-1 overflow-hidden mx-4 mb-4">
-              <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-                <ScrollArea className="h-full">
-                  <div className="p-6 space-y-6">
-                    {chapters.map((chapter, index) => (
-                      <div key={chapter.id} className="group cursor-pointer p-4 rounded-lg bg-card/50 hover:bg-card transition-colors">
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
-                            {index + 1}
-                          </div>
-                          <div className="flex-1 space-y-2">
-                            <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
-                              {chapter.title}
-                            </h3>
-                            {chapter.summary && (
-                              <p className="text-sm text-muted-foreground leading-relaxed">
-                                {chapter.summary}
-                              </p>
-                            )}
-                            {(chapter.startTime !== undefined || chapter.endTime !== undefined) && (
-                              <div className="text-xs text-muted-foreground font-mono">
-                                {chapter.startTime !== undefined && (
-                                  <span>
-                                    {Math.floor(chapter.startTime / 60)}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                                  </span>
-                                )}
-                                {chapter.endTime !== undefined && chapter.startTime !== undefined && (
-                                  <span> - {Math.floor(chapter.endTime / 60)}:{(chapter.endTime % 60).toString().padStart(2, '0')}</span>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-            </TabsContent>
-          )}
-
           <TabsContent value="summary" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
               <ScrollArea className="h-full">
