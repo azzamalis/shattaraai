@@ -1,13 +1,13 @@
 
 import { cn } from "@/lib/utils";
-import { Edit, Layers, ListCheck, GraduationCap, MessageSquareText, FileCode } from "lucide-react";
+import { NotebookPen, Layers, ListCheck, BookCheck, Lightbulb, FileCode } from "lucide-react";
 import React from "react";
 
 export function FeaturesSectionWithHoverEffects() {
   const features = [{
     title: "AI-Generated Notes",
     description: "Turn any content into comprehensive study notes with our advanced AI technology.",
-    icon: <Edit className="w-6 h-6" />
+    icon: <NotebookPen className="w-6 h-6" />
   }, {
     title: "Smart Flashcards",
     description: "Create effective flashcards that adapt to your learning progress for better retention.",
@@ -19,11 +19,11 @@ export function FeaturesSectionWithHoverEffects() {
   }, {
     title: "Exam Preps",
     description: "Practice with realistic exam scenarios tailored to your specific curriculum and goals.",
-    icon: <GraduationCap className="w-6 h-6" />
+    icon: <BookCheck className="w-6 h-6" />
   }, {
     title: "Shattara AI Chat",
     description: "Get immediate answers and explanations from our specialized learning AI assistant.",
-    icon: <MessageSquareText className="w-6 h-6" />
+    icon: <Lightbulb className="w-6 h-6" />
   }, {
     title: "Audio & Video Transcripts",
     description: "Convert lectures and educational content into searchable, annotatable text.",
