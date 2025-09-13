@@ -44,22 +44,22 @@ export function extractTextMetadata(text: string): TextMetadata {
 }
 
 export function generateSmartTitle(text: string): string {
-  // First try to extract H1 or H2 headings from markdown-like content
+  // First try to extract H1 headings from markdown-like content
   const h1Match = text.match(/^#\s+(.+)$/m);
   if (h1Match) {
     return h1Match[1].trim();
   }
   
+  // Then try H2 headings
   const h2Match = text.match(/^##\s+(.+)$/m);
   if (h2Match) {
     return h2Match[1].trim();
   }
   
-  // Look for title patterns at the beginning
+  // Look for title-like patterns at the beginning (standalone lines)
   const titlePatterns = [
-    /^(.{10,60})[.!?]\s*\n/,  // First sentence ending with punctuation
-    /^(.{10,60})\n\s*\n/,      // First line followed by blank line
-    /^(.{10,60})$/m            // First meaningful line
+    /^([A-Z][^.!?\n]{10,60})$/m,  // Capitalized standalone line
+    /^(.{10,60})[.!?]\s*\n\s*\n/, // First sentence followed by blank line
   ];
   
   for (const pattern of titlePatterns) {
@@ -72,9 +72,10 @@ export function generateSmartTitle(text: string): string {
     }
   }
   
-  // Fallback: first 4-6 meaningful words
-  const words = text.trim().split(/\s+/).filter(word => 
-    word.length > 2 && !/^[^a-zA-Z]*$/.test(word)
+  // Fallback: first 4-6 meaningful words from the first sentence
+  const firstSentence = text.split(/[.!?]/)[0];
+  const words = firstSentence.trim().split(/\s+/).filter(word => 
+    word.length > 2 && /[a-zA-Z]/.test(word)
   );
   
   if (words.length >= 4) {
@@ -113,18 +114,18 @@ export function convertToMarkdown(text: string): string {
 }
 
 export function generateFilename(title: string): string {
-  const timestamp = Date.now();
-  
   if (title === 'Text Content') {
-    return `paste_${timestamp}.md`;
+    return `paste_${Date.now()}.md`;
   }
   
-  // Clean the title for filename
-  const cleanTitle = title
+  // Convert title to kebab-case filename
+  const kebabTitle = title
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
-    .replace(/\s+/g, '_')         // Replace spaces with underscores
-    .substring(0, 40);            // Limit length
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars except spaces and hyphens
+    .replace(/\s+/g, '-')         // Replace spaces with hyphens
+    .replace(/-+/g, '-')          // Replace multiple hyphens with single
+    .replace(/^-|-$/g, '')        // Remove leading/trailing hyphens
+    .substring(0, 50);            // Limit length
   
-  return `${cleanTitle}_${timestamp}.md`;
+  return `${kebabTitle || 'text-content'}.md`;
 }

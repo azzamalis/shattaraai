@@ -51,8 +51,53 @@ serve(async (req) => {
 
     console.log('Storing text file in Supabase storage...');
 
-    // Store the text content as a file in the text-content bucket
-    const fileName = filename || `text_${Date.now()}.md`;
+    // Generate smart filename from title if not provided
+    let smartFilename = filename;
+    if (!smartFilename) {
+      // Generate smart title first
+      let smartTitle = title || 'Text Content';
+      
+      // Try to extract H1 heading
+      const h1Match = textContent.match(/^#\s+(.+)$/m);
+      if (h1Match) {
+        smartTitle = h1Match[1].trim();
+      } else {
+        // Try H2 heading
+        const h2Match = textContent.match(/^##\s+(.+)$/m);
+        if (h2Match) {
+          smartTitle = h2Match[1].trim();
+        } else {
+          // Fallback: first 4-6 words from first sentence
+          const firstSentence = textContent.split(/[.!?]/)[0];
+          const words = firstSentence.trim().split(/\s+/).filter(word => 
+            word.length > 2 && /[a-zA-Z]/.test(word)
+          );
+          
+          if (words.length >= 4) {
+            smartTitle = words.slice(0, 6).join(' ');
+            if (smartTitle.length > 60) {
+              smartTitle = smartTitle.substring(0, 57) + '...';
+            }
+          }
+        }
+      }
+      
+      // Convert to kebab-case filename
+      if (smartTitle === 'Text Content') {
+        smartFilename = `paste_${Date.now()}.md`;
+      } else {
+        const kebabTitle = smartTitle
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '')
+          .substring(0, 50);
+        smartFilename = `${kebabTitle || 'text-content'}.md`;
+      }
+    }
+    
+    const fileName = smartFilename;
     const { data: fileData, error: fileError } = await supabase.storage
       .from('text-content')
       .upload(`${content.user_id}/${fileName}`, textContent, {
