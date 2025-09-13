@@ -90,7 +90,7 @@ const HeroHeader = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full text-foreground border-border hover:border-primary hover:bg-primary/10"
+                          className="w-full text-foreground border-border hover:border-primary hover:bg-accent"
                         >
                           Login
                         </Button>
