@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
@@ -7,11 +6,9 @@ import { NewFeaturePromo } from './NewFeaturePromo';
 import { ActionCards } from './ActionCards';
 import { useContent } from '@/contexts/ContentContext';
 import { motion } from 'framer-motion';
-
 interface DashboardHeroProps {
   onPasteClick: () => void;
 }
-
 export function DashboardHero({
   onPasteClick
 }: DashboardHeroProps) {
@@ -20,7 +17,6 @@ export function DashboardHero({
     onAddContent,
     addContentWithFile
   } = useContent();
-
   const handleAISubmit = async (value: string, files?: File[]) => {
     try {
       // For new chats, navigate directly to new chat route without creating content
@@ -31,7 +27,7 @@ export function DashboardHero({
       if (files && files.length > 0) {
         searchParams.set('hasFiles', 'true');
       }
-      
+
       // Navigate to new chat route - this will create a fresh conversation
       navigate(`/chat/new?${searchParams.toString()}`);
       toast.success(`Starting conversation with Shattara AI${files && files.length > 0 ? ` with ${files.length} file(s)` : ''}`);
@@ -40,7 +36,6 @@ export function DashboardHero({
       toast.error('Failed to start conversation');
     }
   };
-
   return <div className="max-w-[800px] mx-auto mb-12">
       <NewFeaturePromo />
       
@@ -81,22 +76,6 @@ export function DashboardHero({
       </motion.div>
 
       {/* Quick Tips Section with matching subtle styling */}
-      <motion.div initial={{
-      opacity: 0
-    }} animate={{
-      opacity: 1
-    }} transition={{
-      duration: 0.5,
-      delay: 0.6
-    }} className="text-center">
-        <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="h-1 w-1 rounded-full bg-primary/30" />
-          <span>Try asking about specific topics</span>
-          <span className="h-1 w-1 rounded-full bg-primary/30" />
-          <span>Attach PDFs or images for analysis</span>
-          <span className="h-1 w-1 rounded-full bg-primary/30" />
-          <span>Get detailed explanations</span>
-        </div>
-      </motion.div>
+      
     </div>;
 }
