@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { NotebookPen, Layers, ListCheck, BookCheck, Lightbulb, FileCode } from "lucide-react";
+import { NotebookPen, Layers, ListCheck, BookCheck, MessageSquareText, FileCode } from "lucide-react";
 import React from "react";
 
 export function FeaturesSectionWithHoverEffects() {
@@ -23,7 +23,7 @@ export function FeaturesSectionWithHoverEffects() {
   }, {
     title: "Shattara AI Chat",
     description: "Get immediate answers and explanations from our specialized learning AI assistant.",
-    icon: <Lightbulb className="w-6 h-6" />
+    icon: <MessageSquareText className="w-6 h-6" />
   }, {
     title: "Audio & Video Transcripts",
     description: "Convert lectures and educational content into searchable, annotatable text.",
