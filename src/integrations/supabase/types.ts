@@ -518,6 +518,36 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_audit_log: {
+        Row: {
+          action: string
+          changed_fields: Json | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          changed_fields?: Json | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          changed_fields?: Json | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -803,6 +833,10 @@ export type Database = {
           plan_type: Database["public"]["Enums"]["user_plan"]
         }[]
       }
+      user_owns_content: {
+        Args: { c_id: string }
+        Returns: boolean
+      }
       user_owns_exam: {
         Args: { exam_uuid: string }
         Returns: boolean
@@ -817,6 +851,17 @@ export type Database = {
       }
       user_owns_room_for_exam: {
         Args: { exam_uuid: string }
+        Returns: boolean
+      }
+      validate_invite_code: {
+        Args: { code: string }
+        Returns: {
+          is_valid: boolean
+          referrer_id: string
+        }[]
+      }
+      validate_profile_access: {
+        Args: { profile_id: string }
         Returns: boolean
       }
     }
