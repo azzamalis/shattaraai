@@ -50,22 +50,13 @@ export function TextRenderer({ content, title, isMarkdown = false }: TextRendere
     <div className="h-full w-full overflow-auto bg-background">
       <div className="max-w-4xl mx-auto">
         <div 
-          className="bg-card border border-border rounded-lg mx-4 my-6 shadow-sm"
+          className="bg-inherit mx-4 my-6"
           style={{ 
             transform: `scale(${zoom / 100})`,
             transformOrigin: 'top center',
             transition: 'transform 0.2s ease-in-out'
           }}
         >
-          {title && (
-            <div className="p-4 border-b border-border bg-muted/30">
-              <h1 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                {title}
-              </h1>
-            </div>
-          )}
-          
           <div className="p-6">
             {isMarkdown ? (
               <ReactMarkdown

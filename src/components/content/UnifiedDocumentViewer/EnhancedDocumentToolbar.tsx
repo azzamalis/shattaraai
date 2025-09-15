@@ -68,18 +68,6 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
         <Button
           variant="ghost"
           size="sm"
-          onClick={toggleViewMode}
-          className={`h-8 px-2 hover:bg-muted/50 ${
-            viewMode === 'thumbnail' ? 'bg-muted text-primary' : ''
-          }`}
-          title="Toggle thumbnail view"
-        >
-          <LayoutGrid className="h-4 w-4" />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
           onClick={toggleSearch}
           className={`h-8 px-2 hover:bg-muted/50 ${
             isSearchOpen ? 'bg-muted text-primary' : ''
@@ -177,26 +165,6 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
 
       {/* Right Section */}
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={rotateClockwise}
-          className="h-8 px-2 hover:bg-muted/50"
-          title="Rotate clockwise"
-        >
-          <RotateCw className="h-4 w-4" />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleDownload}
-          className="h-8 px-2 hover:bg-muted/50"
-          title="Download document"
-        >
-          <Download className="h-4 w-4" />
-        </Button>
-
         <Button
           variant="ghost"
           size="sm"
