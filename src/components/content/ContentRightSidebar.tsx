@@ -164,13 +164,6 @@ export function ContentRightSidebar({
               <span className="text-sm">Chat</span>
             </TabsTrigger>
             
-{shouldShowChapters && (
-              <TabsTrigger value="chapters" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-                <ListTodo className="h-[14px] w-[14px]" />
-                <span className="text-sm">Chapters</span>
-              </TabsTrigger>
-            )}
-            
             <TabsTrigger value="flashcards" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
               <GalleryVerticalEnd className="h-[14px] w-[14px]" />
               <span className="text-sm">Flashcards</span>
@@ -180,6 +173,13 @@ export function ContentRightSidebar({
               <BookCheck className="h-[14px] w-[14px]" />
               <span className="text-sm">Quizzes</span>
             </TabsTrigger>
+            
+{shouldShowChapters && (
+              <TabsTrigger value="chapters" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
+                <ListTodo className="h-[14px] w-[14px]" />
+                <span className="text-sm">Chapters</span>
+              </TabsTrigger>
+            )}
             
             <TabsTrigger value="summary" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
               <ReceiptText className="h-[14px] w-[14px]" />
@@ -207,6 +207,22 @@ export function ContentRightSidebar({
             </div>
           </TabsContent>
           
+          <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
+            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+              <FlashcardContainer initialCards={sampleFlashcards} />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="exams" className="flex-1 overflow-hidden mx-4 mb-4">
+            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+              <ScrollArea className="h-full">
+                <div className="flex flex-col items-center justify-start pt-8 h-full min-h-[400px]">
+                  <QuizPreferences />
+                </div>
+              </ScrollArea>
+            </div>
+          </TabsContent>
+          
           {shouldShowChapters && (
             <TabsContent value="chapters" className="flex-1 overflow-hidden mx-4 mb-4">
               <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
@@ -229,22 +245,6 @@ export function ContentRightSidebar({
               </div>
             </TabsContent>
           )}
-          
-          <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
-            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <FlashcardContainer initialCards={sampleFlashcards} />
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="exams" className="flex-1 overflow-hidden mx-4 mb-4">
-            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <ScrollArea className="h-full">
-                <div className="flex flex-col items-center justify-start pt-8 h-full min-h-[400px]">
-                  <QuizPreferences />
-                </div>
-              </ScrollArea>
-            </div>
-          </TabsContent>
           
           <TabsContent value="summary" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
