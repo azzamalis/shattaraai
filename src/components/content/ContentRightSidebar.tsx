@@ -134,17 +134,21 @@ const sampleFlashcards: FlashcardData[] = [{
   correct: true,
   isStarred: false
 }];
+
 interface ContentRightSidebarProps {
   contentData: ContentData;
 }
+
 export function ContentRightSidebar({
   contentData
 }: ContentRightSidebarProps) {
   const [activeTab, setActiveTab] = useState("chat");
   const [isRecording, setIsRecording] = useState(false);
-
+  
   // Check if chapters should be shown for this content type
-  const shouldShowChapters = contentData.type === 'text' && (contentData.chapters?.length > 0 || contentData.text_content);
+  const shouldShowChapters = contentData.type === 'text' && 
+    (contentData.chapters?.length > 0 || contentData.text_content);
+  
   const handleChapterClick = (startTime: number) => {
     // For text content, we don't have time-based navigation
     // This could be extended to scroll to specific sections
@@ -162,7 +166,7 @@ export function ContentRightSidebar({
             
             <TabsTrigger value="flashcards" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
               <GalleryVerticalEnd className="h-[14px] w-[14px]" />
-              <span className="text-sm">Flashcard</span>
+              <span className="text-sm">Flashcards</span>
             </TabsTrigger>
             
             <TabsTrigger value="exams" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
@@ -170,10 +174,12 @@ export function ContentRightSidebar({
               <span className="text-sm">Quizzes</span>
             </TabsTrigger>
             
-          {shouldShowChapters && <TabsTrigger value="chapters" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
+{shouldShowChapters && (
+              <TabsTrigger value="chapters" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
                 <ListTodo className="h-[14px] w-[14px]" />
                 <span className="text-sm">Chapters</span>
-              </TabsTrigger>}
+              </TabsTrigger>
+            )}
             
             <TabsTrigger value="summary" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
               <ReceiptText className="h-[14px] w-[14px]" />
@@ -217,20 +223,28 @@ export function ContentRightSidebar({
             </div>
           </TabsContent>
           
-          {shouldShowChapters && <TabsContent value="chapters" className="flex-1 overflow-hidden mx-4 mb-4">
+          {shouldShowChapters && (
+            <TabsContent value="chapters" className="flex-1 overflow-hidden mx-4 mb-4">
               <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
                 <ScrollArea className="h-full">
                   <div className="p-6">
-                    <RealtimeChaptersDisplay chapters={contentData.chapters ? contentData.chapters.map((chapter: any) => ({
-                  title: chapter.title,
-                  summary: chapter.summary || '',
-                  startTime: chapter.startTime || 0,
-                  endTime: chapter.endTime || 0
-                })) : []} transcriptionStatus={contentData.text_content ? 'completed' : 'pending'} processingStatus={contentData.processing_status as 'pending' | 'processing' | 'completed' | 'failed'} contentType={contentData.type} onChapterClick={handleChapterClick} />
+                    <RealtimeChaptersDisplay 
+                      chapters={contentData.chapters ? contentData.chapters.map((chapter: any) => ({
+                        title: chapter.title,
+                        summary: chapter.summary || '',
+                        startTime: chapter.startTime || 0,
+                        endTime: chapter.endTime || 0
+                      })) : []}
+                      transcriptionStatus={contentData.text_content ? 'completed' : 'pending'}
+                      processingStatus={contentData.processing_status as 'pending' | 'processing' | 'completed' | 'failed'}
+                      contentType={contentData.type}
+                      onChapterClick={handleChapterClick}
+                    />
                   </div>
                 </ScrollArea>
               </div>
-            </TabsContent>}
+            </TabsContent>
+          )}
           
           <TabsContent value="summary" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
