@@ -291,7 +291,12 @@ export function ContentLeftSidebar({
 
     // Show UnifiedDocumentViewer for text content
     if (contentData.type === 'text') {
-      return null; // Text viewer will be rendered in the main layout
+      return <div className="flex-1 overflow-hidden">
+        <UnifiedDocumentViewer 
+          contentData={contentData} 
+          onUpdateContent={onUpdateContent} 
+        />
+      </div>;
     }
 
     return <div className={cn("p-4 shrink-0 bg-background", shouldHideTabs && "flex-1")}>
