@@ -124,7 +124,10 @@ export function useChatConversation({
 
   useEffect(() => {
     const loadConversation = async () => {
-      if (!user) return;
+      if (!user) {
+        console.log('User not authenticated, waiting for authentication');
+        return;
+      }
 
       setIsLoading(true);
       try {

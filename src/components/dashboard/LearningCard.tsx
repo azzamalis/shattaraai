@@ -129,7 +129,10 @@ export function LearningCard({
             onSave={handleTitleUpdate}
             disabled={isExamSelectionMode}
           />
-          <LearningCardFooter roomName={contentRoom?.name} />
+          <LearningCardFooter 
+            roomName={contentRoom?.name} 
+            content={content}
+          />
         </div>
       </div>
     </div>
