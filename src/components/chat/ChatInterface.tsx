@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { ChatTabType } from '@/lib/types';
 import { UnifiedTabNavigation, UnifiedTabType } from '@/components/shared/UnifiedTabNavigation';
@@ -10,6 +9,7 @@ import { ChatSummaryDisplay } from './ChatSummaryDisplay';
 import { ChatFlashcardContainer } from './ChatFlashcardContainer';
 import { Brain } from 'lucide-react';
 import { useChatConversation } from '@/hooks/useChatConversation';
+import { ChatTitleGenerator } from './shared/ChatTitleGenerator';
 
 interface ChatInterfaceProps {
   activeTab: UnifiedTabType;
@@ -27,6 +27,7 @@ export function ChatInterface({
   const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
   
   const {
+    conversation,
     messages,
     isLoading,
     isSending,
@@ -38,6 +39,11 @@ export function ChatInterface({
     contextType: 'content',
     autoCreate: true
   });
+
+  const handleTitleGenerated = (title: string) => {
+    console.log('Chat title generated:', title);
+    // Title is automatically updated in the database by ChatTitleGenerator
+  };
 
   useEffect(() => {
     // Process initial query once the conversation is ready and we haven't processed it yet
@@ -71,6 +77,16 @@ export function ChatInterface({
 
   return (
     <div className="flex flex-col h-full bg-dashboard-card dark:bg-dashboard-card">
+      {/* Auto-generate chat titles */}
+      {conversation?.id && (
+        <ChatTitleGenerator
+          conversationId={conversation.id}
+          initialQuery={initialQuery}
+          contentId={contentId}
+          onTitleGenerated={handleTitleGenerated}
+        />
+      )}
+      
       <UnifiedTabNavigation 
         activeTab={activeTab} 
         onTabChange={onTabChange} 

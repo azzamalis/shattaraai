@@ -5,11 +5,13 @@ import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { UnifiedTabType } from '@/components/shared/UnifiedTabNavigation';
 import { ContentType } from '@/lib/types';
+import { useContent } from '@/hooks/useContent';
 
 export default function ChatPage() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('query');
+  const { fetchContentById } = useContent();
   
   console.log('ChatPage - Received query:', query, 'Content ID:', id);
   
@@ -25,6 +27,31 @@ export default function ChatPage() {
     isProcessing: false,
     hasError: false,
   });
+
+  // Load existing chat content if contentId is provided
+  useEffect(() => {
+    const loadChatContent = async () => {
+      if (contentId && contentId !== 'new' && contentId !== 'new-chat') {
+        try {
+          const existingContent = await fetchContentById(contentId);
+          if (existingContent) {
+            setContentData({
+              id: existingContent.id,
+              type: existingContent.type,
+              title: existingContent.title,
+              text: existingContent.text_content || '',
+              isProcessing: existingContent.processing_status === 'processing',
+              hasError: existingContent.processing_status === 'failed',
+            });
+          }
+        } catch (error) {
+          console.error('Failed to load chat content:', error);
+        }
+      }
+    };
+
+    loadChatContent();
+  }, [contentId, fetchContentById]);
 
   const [activeTab, setActiveTab] = useState<UnifiedTabType>('chat');
 

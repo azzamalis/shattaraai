@@ -329,8 +329,11 @@ export const useContent = () => {
       // Auto-trigger content processing based on content type
       if (contentId) {
         console.log('DEBUG: useContent - Content with metadata created, starting automatic processing...', { contentId, type: finalContentData.type });
-        // For text content, trigger enhanced processing
-        if (finalContentData.type === 'text' && finalContentData.text_content) {
+        // For chat content, trigger chat-specific processing
+        if (finalContentData.type === 'chat') {
+          // Skip automatic processing for chat content - it's handled by the chat interface
+          console.log('DEBUG: useContent - Skipping automatic processing for chat content');
+        } else if (finalContentData.type === 'text' && finalContentData.text_content) {
           triggerTextContentProcessing(contentId, finalContentData).catch(error => {
             console.error('DEBUG: useContent - Text processing failed:', error);
           });

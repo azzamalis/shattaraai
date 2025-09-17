@@ -1,4 +1,5 @@
 
+@tailwind components;
 
 @layer components {
   /* Dashboard specific component classes that use semantic CSS variables */
