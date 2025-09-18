@@ -85,7 +85,7 @@ const HeroHeader = () => {
                 <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-border">
                   {!loading && !user ? (
                     <>
-                      <Link to="/signin" onClick={() => setMenuState(false)}>
+                      <Link to="/signin" onClick={() => setMenuState(false)} aria-label="Login to your account">
                         <Button
                           variant="outline"
                           size="sm"
@@ -94,7 +94,7 @@ const HeroHeader = () => {
                           Login
                         </Button>
                       </Link>
-                      <Link to="/signup" onClick={() => setMenuState(false)}>
+                      <Link to="/signup" onClick={() => setMenuState(false)} aria-label="Sign up for an account">
                         <Button
                           size="sm"
                           className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
@@ -121,7 +121,7 @@ const HeroHeader = () => {
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
                 {!loading && !user ? (
                   <>
-                    <Link to="/signin">
+                    <Link to="/signin" aria-label="Login to your account">
                       <Button
                         variant="outline"
                         size="sm"
@@ -133,14 +133,14 @@ const HeroHeader = () => {
                         Login
                       </Button>
                     </Link>
-                    <Link to="/signup">
+                    <Link to="/signup" aria-label="Sign up for an account">
                       <Button
                         size="sm"
                         className={cn(isScrolled && 'lg:hidden', 'bg-primary text-primary-foreground hover:bg-primary/90')}>
                         Sign Up
                       </Button>
                     </Link>
-                    <Link to="/signup">
+                    <Link to="/signup" aria-label="Get started with SHATTARA AI">
                       <Button
                         size="sm"
                         className={cn(isScrolled ? 'lg:inline-flex' : 'hidden', 'bg-primary text-primary-foreground hover:bg-primary/90')}>
