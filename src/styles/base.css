@@ -18,7 +18,7 @@
     --popover: 0 0% 100%; /* Light mode popover background #FFFFFF */
     --popover-foreground: 0 0% 9%; /* Light mode popover text #171717 */
 
-    --primary: 210 100% 50%; /* Primary Blue #00A3FF */
+    --primary: 210 100% 42%; /* Primary Blue - adjusted for contrast #0069D6 */
     --primary-foreground: 0 0% 98%; /* Light text on blue #FAFAFA */
 
     --secondary: 0 0% 95%; /* Light mode unfilled #F3F3F3 */
@@ -35,16 +35,16 @@
 
     --border: 221 14% 89%; /* Light borders #E3E3E3 */
     --input: 221 14% 89%; /* Subtle gray input borders #E3E3E3 */
-    --ring: 210 100% 50%; /* Blue focus ring #00A3FF */
+    --ring: 210 100% 42%; /* Blue focus ring - adjusted for contrast #0069D6 */
 
     --sidebar-background: 0 0% 98%; /* #FAFAFA */
     --sidebar-foreground: 0 0% 4%; /* #0A0A0A */
-    --sidebar-primary: 210 100% 50%; /* #00A3FF */
+    --sidebar-primary: 210 100% 42%; /* Adjusted for contrast #0069D6 */
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 96%; /* #F5F5F5 */
     --sidebar-accent-foreground: 0 0% 4%; /* #0A0A0A */
     --sidebar-border: 0 0% 90%; /* #E5E5E5 */
-    --sidebar-ring: 210 100% 50%; /* #00A3FF */
+    --sidebar-ring: 210 100% 42%; /* Adjusted for contrast #0069D6 */
 
     --radius: 0.5rem;
   }

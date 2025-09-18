@@ -14,7 +14,7 @@ const Logo: React.FC<LogoProps> = ({
   return <div className={cn('flex items-center font-bold text-2xl text-foreground transition-colors duration-200 cursor-pointer hover:opacity-80', className)} onClick={handleLogoClick}>
       <span>SHATTARA </span>
       <span style={{
-      color: '#00A3FF'
+      color: '#0069D6'
     }} className="px-[2px]">AI</span>
     </div>;
 };
