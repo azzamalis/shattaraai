@@ -9,6 +9,7 @@ import { ChatSummaryDisplay } from './ChatSummaryDisplay';
 import { ChatFlashcardContainer } from './ChatFlashcardContainer';
 import { Brain } from 'lucide-react';
 import { useChatConversation } from '@/hooks/useChatConversation';
+import { useOpenAIChatContent } from '@/hooks/useOpenAIChatContent';
 import { ChatTitleGenerator } from './shared/ChatTitleGenerator';
 
 interface ChatInterfaceProps {
@@ -25,6 +26,7 @@ export function ChatInterface({
   contentId
 }: ChatInterfaceProps) {
   const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
+  const [isProcessingAI, setIsProcessingAI] = useState(false);
   
   const {
     conversation,
@@ -40,6 +42,20 @@ export function ChatInterface({
     autoCreate: true
   });
 
+  // Prepare conversation history for AI context
+  const conversationHistory = messages.slice(-10)
+    .filter(msg => msg.sender_type !== 'system') // Filter out system messages
+    .map(msg => ({
+      content: msg.content,
+      sender_type: msg.sender_type as 'user' | 'ai'
+    }));
+
+  const { sendMessageToAI } = useOpenAIChatContent({
+    conversationId: conversation?.id,
+    contextId: contentId,
+    conversationHistory
+  });
+
   const handleTitleGenerated = (title: string) => {
     console.log('Chat title generated:', title);
     // Title is automatically updated in the database by ChatTitleGenerator
@@ -48,16 +64,14 @@ export function ChatInterface({
   useEffect(() => {
     // Process initial query once the conversation is ready and we haven't processed it yet
     // Only process if we have no existing messages (empty conversation)
-    if (initialQuery && !hasProcessedInitialQuery && !isLoading && sendMessage && messages.length === 0) {
+    if (initialQuery && !hasProcessedInitialQuery && !isLoading && sendMessage && messages.length === 0 && conversation) {
       console.log('ChatInterface - Processing initial query:', initialQuery, 'Messages count:', messages.length);
       
-      // Delay the initial message to ensure conversation is fully set up
-      setTimeout(() => {
-        handleSendMessage(initialQuery);
-        setHasProcessedInitialQuery(true);
-      }, 100);
+      // Process immediately since conversation is ready
+      handleSendMessage(initialQuery);
+      setHasProcessedInitialQuery(true);
     }
-  }, [initialQuery, hasProcessedInitialQuery, isLoading, sendMessage, messages.length]);
+  }, [initialQuery, hasProcessedInitialQuery, isLoading, sendMessage, messages.length, conversation]);
 
   const handleSendMessage = async (content: string, attachments?: File[]) => {
     console.log('ChatInterface - handleSendMessage called with content:', content, 'attachments:', attachments);
@@ -65,10 +79,17 @@ export function ChatInterface({
     try {
       const userMessage = await sendMessage(content, attachments);
       if (userMessage) {
-        // Simulate AI response (replace with actual AI integration)
-        setTimeout(() => {
-          addAIResponse(`I understand you're asking about: "${content}". Let me help you with that!`);
-        }, 1000);
+        // Get AI response using the real OpenAI integration
+        setIsProcessingAI(true);
+        try {
+          const aiResponse = await sendMessageToAI(content);
+          await addAIResponse(aiResponse);
+        } catch (error) {
+          console.error('Error getting AI response:', error);
+          await addAIResponse('I apologize, but I\'m having trouble processing your request right now. Please try again.');
+        } finally {
+          setIsProcessingAI(false);
+        }
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -93,17 +114,18 @@ export function ChatInterface({
         variant="chat"
       />
       
-      <Tabs value={activeTab} onValueChange={onTabChange} className="flex-1 flex flex-col">
-        <div className="flex-1 overflow-hidden">
+      <Tabs value={activeTab} onValueChange={onTabChange} className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         <UnifiedTabContent activeTab="chat" variant="chat">
           <ChatContainer 
             messages={messages} 
             onSendMessage={handleSendMessage} 
             isLoading={isLoading} 
-            isSending={isSending} 
+            isSending={isSending || isProcessingAI} 
             inputPlaceholder="Ask me anything..." 
             emptyStateContent={
               <div className="text-center">
+                <Brain className="h-12 w-12 text-primary/60 mx-auto mb-4" />
                 <h3 className="text-dashboard-text dark:text-dashboard-text mb-2 font-medium text-lg">
                   Learn with the Shattara AI Tutor
                 </h3>
