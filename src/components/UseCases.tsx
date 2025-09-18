@@ -179,8 +179,10 @@ const UseCases = () => {
           </div>
           
           {/* Pagination Dots - Desktop Only */}
-          <div className="hidden md:flex justify-center gap-2 mt-6">
-            {useCases.map((_, index) => <button key={index} onClick={() => scrollToCard(index)} className={cn("w-2 h-2 rounded-full transition-colors", activeIndex === index ? "bg-[#00A3FF]" : "bg-[#00A3FF]/30")} aria-label={`Go to slide ${index + 1}`} />)}
+          <div className="hidden md:flex justify-center gap-3 mt-6">
+            {useCases.map((_, index) => <button key={index} onClick={() => scrollToCard(index)} className="w-6 h-6 rounded-full transition-colors flex items-center justify-center" aria-label={`Go to slide ${index + 1}`}>
+                <span className={cn("w-2 h-2 rounded-full transition-colors", activeIndex === index ? "bg-primary" : "bg-primary/30")} />
+              </button>)}
           </div>
         </div>
       </div>
