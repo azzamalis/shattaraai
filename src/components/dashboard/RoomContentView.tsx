@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ContentItem } from '@/lib/types';
+import { ContentItem } from '@/hooks/useContent';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 

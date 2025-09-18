@@ -2,7 +2,7 @@ import React from 'react';
 import { LearningCard } from './LearningCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
-import { ContentItem } from '@/lib/types';
+import { ContentItem } from '@/hooks/useContent';
 import { useContent } from '@/contexts/ContentContext';
 
 interface ExploreContentProps {

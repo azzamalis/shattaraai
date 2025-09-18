@@ -2,9 +2,8 @@
 // Import database types from Supabase
 import { Database } from '@/integrations/supabase/types';
 
-// Re-export Room and ContentItem from hooks for backward compatibility
+// Re-export Room from hooks for backward compatibility
 export type { Room } from '@/hooks/useRooms';
-export type { ContentItem } from '@/hooks/useContent';
 
 // Keep existing types that are still used
 export interface DeleteItem {

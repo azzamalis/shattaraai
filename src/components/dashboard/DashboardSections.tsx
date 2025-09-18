@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Room, ContentItem } from '@/lib/types';
+import { Room } from '@/lib/types';
+import { ContentItem } from '@/hooks/useContent';
 import { MyRoomsSection } from './MyRoomsSection';
 import { ContinueLearningSection } from './ContinueLearningSection';
 import { toast } from "sonner";

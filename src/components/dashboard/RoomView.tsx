@@ -7,7 +7,7 @@ import { PasteContentModal } from './PasteContentModal';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useRooms } from '@/hooks/useRooms';
-import { ContentItem } from '@/lib/types';
+import { ContentItem } from '@/hooks/useContent';
 
 interface RoomViewProps {
   title: string;

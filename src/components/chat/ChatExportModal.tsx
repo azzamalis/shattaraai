@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ContentItem } from '@/lib/types';
+import { ContentItem } from '@/hooks/useContent';
 import { 
   Dialog,
   DialogContent,

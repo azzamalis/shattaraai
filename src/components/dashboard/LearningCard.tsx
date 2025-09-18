@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ContentItem } from '@/lib/types';
+import { ContentItem } from '@/hooks/useContent';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 import { LearningCardMenu } from './LearningCardMenu';

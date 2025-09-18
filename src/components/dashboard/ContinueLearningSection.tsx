@@ -3,7 +3,7 @@ import { LearningCard } from './LearningCard';
 import { useContent } from '@/contexts/ContentContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
-import { ContentItem } from '@/lib/types';
+import { ContentItem } from '@/hooks/useContent';
 import { useNavigate } from 'react-router-dom';
 interface ContinueLearningProps {
   onDeleteCard: (item: ContentItem) => void;

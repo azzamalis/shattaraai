@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContentItem } from '@/lib/types';
+import { ContentItem } from '@/hooks/useContent';
 import { Badge } from '@/components/ui/badge';
 import { 
   MessageSquare, 

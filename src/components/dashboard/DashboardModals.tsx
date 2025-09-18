@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { PasteContentModal } from '@/components/dashboard/PasteContentModal';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
-import { DeleteItem, ContentItem } from '@/lib/types';
+import { DeleteItem } from '@/lib/types';
+import { ContentItem } from '@/hooks/useContent';
 import { useContentContext } from '@/contexts/ContentContext';
 import { generateSmartTitle } from '@/utils/textProcessing';
 
