@@ -37,7 +37,6 @@ const HeroHeader = () => {
             <div className="flex w-full justify-between lg:w-auto">
               <Link
                 to="/"
-                aria-label="home"
                 className="flex items-center space-x-2">
                 <Logo textColor="text-foreground" />
               </Link>
