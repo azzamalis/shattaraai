@@ -131,7 +131,6 @@ export function LearningCard({
           />
           <LearningCardFooter 
             roomName={contentRoom?.name} 
-            content={content}
           />
         </div>
       </div>
