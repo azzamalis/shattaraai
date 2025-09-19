@@ -4,6 +4,7 @@ import { Copy, Check, Paperclip } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from '@/hooks/useChatConversation';
+import { RichMessage } from '../RichMessage';
 
 interface ChatMessageItemProps {
   message: ChatMessage;
@@ -89,8 +90,19 @@ export function ChatMessageItem({
             isUser && "bg-[#00A3FF] text-white",
             !isUser && "bg-dashboard-card dark:bg-dashboard-card text-dashboard-text dark:text-dashboard-text border border-dashboard-separator/20 dark:border-white/10"
           )}>
-            <div className="whitespace-pre-wrap break-words">
-              {message.content}
+            <div className={cn(
+              "whitespace-pre-wrap break-words",
+              isUser && "text-white",
+              !isUser && "text-dashboard-text dark:text-dashboard-text"
+            )}>
+              {isUser ? (
+                message.content
+              ) : (
+                <RichMessage 
+                  content={message.content}
+                  className="text-dashboard-text dark:text-dashboard-text"
+                />
+              )}
             </div>
 
             {/* Copy Button */}

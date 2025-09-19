@@ -2,6 +2,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { uploadFileToStorage } from '@/lib/storage';
+import { toast } from '@/components/ui/use-toast';
 import { Database } from '@/integrations/supabase/types';
 
 export interface ChatMessage {
@@ -24,6 +26,8 @@ interface UseChatConversationProps {
   contextType?: string;
   autoCreate?: boolean;
 }
+
+type ConversationType = 'general' | 'content_discussion' | 'room_collaboration' | 'exam_support';
 
 export function useChatConversation({
   conversationType,
@@ -80,47 +84,60 @@ export function useChatConversation({
     }
   }, []);
 
-  const createConversation = useCallback(async (): Promise<string | null> => {
-    if (!user) {
-      console.error('User not authenticated');
-      return null;
-    }
+  const createConversation = useCallback(async (type: ConversationType, contextId?: string, contextType?: string) => {
+    if (!user?.id) throw new Error('User not authenticated');
 
-    try {
-      // For room collaboration, don't set context_id as it references content table
-      // Instead, store room info in metadata
-      const insertData = conversationType === 'room_collaboration' 
-        ? {
-            type: conversationType,
-            context_id: null, // Don't reference content table for rooms
-            context_type: contextType,
+    console.log('Creating conversation with params:', { type, contextId, contextType });
+
+    // Create content entry for general chats to make them persistent and accessible from dashboard
+    let contentId = contextId;
+    if (type === 'general' && !contextId) {
+      try {
+        const { data: contentData, error: contentError } = await supabase
+          .from('content')
+          .insert({
             user_id: user.id,
-            metadata: { room_id: contextId } // Store room ID in metadata instead
-          }
-        : {
-            type: conversationType,
-            context_id: contextId,
-            context_type: contextType,
-            user_id: user.id
-          };
+            title: 'AI Chat Session',
+            type: 'chat',
+            processing_status: 'completed',
+            text_content: '',
+            metadata: { conversation_type: 'general' }
+          })
+          .select()
+          .single();
 
-      const { data, error } = await supabase
-        .from('chat_conversations')
-        .insert([insertData])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating conversation:', error);
-        return null;
+        if (contentError) throw contentError;
+        contentId = contentData.id;
+        console.log('Created content entry for chat:', contentData);
+      } catch (error) {
+        console.error('Error creating content entry:', error);
+        toast({
+          title: "Warning",
+          description: "Chat created but may not appear in history.",
+          variant: "destructive",
+        });
       }
-
-      return data.id;
-    } catch (error) {
-      console.error('Error creating conversation:', error);
-      return null;
     }
-  }, [conversationType, contextId, contextType, user]);
+
+    const conversationData = {
+      user_id: user.id,
+      type,
+      context_id: contentId || null,
+      context_type: contextType || 'content',
+      metadata: type === 'room_collaboration' ? { room_id: contextId } : {}
+    };
+
+    const { data, error } = await supabase
+      .from('chat_conversations')
+      .insert(conversationData)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log('Created conversation:', data);
+    return data;
+  }, [user?.id]);
 
   useEffect(() => {
     const loadConversation = async () => {
@@ -166,18 +183,9 @@ export function useChatConversation({
           } else if (autoCreate) {
             // Create new conversation for this specific contextId
             console.log('Creating new conversation for contextId:', contextId);
-            const newConversationId = await createConversation();
-            if (newConversationId) {
-              setConversationId(newConversationId);
-              const newConversation = {
-                id: newConversationId,
-                type: conversationType,
-                context_id: conversationType === 'room_collaboration' ? null : contextId,
-                context_type: contextType || 'content',
-                user_id: user.id,
-                created_at: new Date().toISOString(),
-                metadata: conversationType === 'room_collaboration' ? { room_id: contextId } : null
-              };
+            const newConversation = await createConversation(conversationType, contextId, contextType);
+            if (newConversation) {
+              setConversationId(newConversation.id);
               setConversation(newConversation);
               setMessages([]); // Start with empty messages for new conversation
             }
@@ -185,17 +193,9 @@ export function useChatConversation({
         } else if (autoCreate) {
           // For general chat without contextId, always create a new conversation
           console.log('Creating new general conversation');
-          const newConversationId = await createConversation();
-          if (newConversationId) {
-            setConversationId(newConversationId);
-            const newConversation = {
-              id: newConversationId,
-              type: conversationType,
-              context_id: null,
-              context_type: null,
-              user_id: user.id,
-              created_at: new Date().toISOString()
-            };
+          const newConversation = await createConversation(conversationType);
+          if (newConversation) {
+            setConversationId(newConversation.id);
             setConversation(newConversation);
             setMessages([]); // Start with empty messages for new conversation
           }

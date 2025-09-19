@@ -137,6 +137,17 @@ serve(async (req) => {
 - Age-appropriate language
 - Encouraging and positive tone
 
+**IMPORTANT - Response Formatting:**
+Please format your responses using proper Markdown syntax:
+- Use # for main headings, ## for subheadings, ### for smaller headings
+- Use **bold** for emphasis and *italic* for emphasis
+- Use bullet points with - or * for lists
+- Use 1. 2. 3. for numbered lists
+- Use > for blockquotes
+- Use \`code\` for inline code and \`\`\`language\ncode\n\`\`\` for code blocks
+- Use proper paragraphs separated by line breaks
+- Structure your response to be clear, well-organized, and easy to read
+
 Respond to the student's question or message below:`;
 
     // Prepare messages for OpenAI

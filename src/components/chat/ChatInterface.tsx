@@ -27,6 +27,7 @@ export function ChatInterface({
 }: ChatInterfaceProps) {
   const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
+  const [isProcessingFiles, setIsProcessingFiles] = useState(false);
   
   const {
     conversation,
@@ -77,12 +78,30 @@ export function ChatInterface({
     console.log('ChatInterface - handleSendMessage called with content:', content, 'attachments:', attachments);
     
     try {
-      const userMessage = await sendMessage(content, attachments);
+      // Process files if attachments exist
+      let fileContent = '';
+      if (attachments && attachments.length > 0) {
+        setIsProcessingFiles(true);
+        try {
+          const { processAndUploadFiles, formatFileContentForAI } = await import('@/utils/fileProcessing');
+          const processedFiles = await processAndUploadFiles(attachments, conversation?.id || 'temp');
+          fileContent = formatFileContentForAI(processedFiles);
+        } catch (error) {
+          console.error('Error processing files:', error);
+          setIsProcessingFiles(false);
+          return;
+        }
+        setIsProcessingFiles(false);
+      }
+
+      const fullContent = content + fileContent;
+      const userMessage = await sendMessage(fullContent, attachments);
+      
       if (userMessage) {
         // Get AI response using the real OpenAI integration
         setIsProcessingAI(true);
         try {
-          const aiResponse = await sendMessageToAI(content);
+          const aiResponse = await sendMessageToAI(fullContent);
           await addAIResponse(aiResponse);
         } catch (error) {
           console.error('Error getting AI response:', error);
@@ -93,6 +112,8 @@ export function ChatInterface({
       }
     } catch (error) {
       console.error('Error sending message:', error);
+      setIsProcessingFiles(false);
+      setIsProcessingAI(false);
     }
   };
 
@@ -121,7 +142,7 @@ export function ChatInterface({
             messages={messages} 
             onSendMessage={handleSendMessage} 
             isLoading={isLoading} 
-            isSending={isSending || isProcessingAI} 
+            isSending={isSending || isProcessingAI || isProcessingFiles}
             inputPlaceholder="Ask me anything..." 
             emptyStateContent={
               <div className="text-center">
