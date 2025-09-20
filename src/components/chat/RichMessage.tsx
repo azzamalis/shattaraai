@@ -51,7 +51,7 @@ export function RichMessage({ content, className }: RichMessageProps) {
   const md = normalizeContent(content);
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('space-y-1', className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -59,10 +59,10 @@ export function RichMessage({ content, className }: RichMessageProps) {
             <h1 className="text-base font-bold text-foreground mb-1" {...props} />
           ),
           h2: ({ node, ...props }) => (
-            <h2 className="text-base font-semibold text-foreground mt-2 mb-1" {...props} />
+            <h2 className="text-base font-semibold text-foreground mb-1" {...props} />
           ),
           h3: ({ node, ...props }) => (
-            <h3 className="text-sm font-semibold text-foreground mt-2 mb-1" {...props} />
+            <h3 className="text-sm font-semibold text-foreground mb-1" {...props} />
           ),
           p: ({ node, ...props }) => (
             <p className="text-sm leading-6 text-foreground" {...props} />

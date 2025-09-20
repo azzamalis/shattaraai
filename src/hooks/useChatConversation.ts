@@ -97,11 +97,11 @@ export function useChatConversation({
           .from('content')
           .insert({
             user_id: user.id,
-            title: 'AI Chat Session',
+            title: 'New Chat Session',
             type: 'chat',
             processing_status: 'completed',
-            text_content: '',
-            metadata: { conversation_type: 'general' }
+            text_content: 'Chat conversation in progress...',
+            metadata: { conversation_type: 'general', auto_generated: true }
           })
           .select()
           .single();

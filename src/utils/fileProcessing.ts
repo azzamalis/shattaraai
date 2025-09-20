@@ -19,16 +19,23 @@ export async function processAndUploadFiles(files: File[], userId: string): Prom
       const fileName = `${userId}/${Date.now()}-${file.name}`;
       const bucket = getStorageBucket(file.type, fileExt);
       
+      console.log(`Uploading file ${file.name} to bucket ${bucket} with path ${fileName}`);
+      
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucket)
         .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error(`Upload error for ${file.name}:`, uploadError);
+        throw uploadError;
+      }
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from(bucket)
         .getPublicUrl(uploadData.path);
+
+      console.log(`File ${file.name} uploaded successfully. Public URL: ${publicUrl}`);
 
       // Process file content
       let content = '';
@@ -91,8 +98,8 @@ async function extractPDFContent(file: File): Promise<string> {
 
 async function extractImageContent(file: File): Promise<string> {
   try {
-    // For now, return a description. In the future, we could add OCR
-    return `[Image file: ${file.name} - Content will be analyzed by AI]`;
+    // For images, return a description that AI can work with
+    return `[Image file: ${file.name} - The AI will analyze this image when processing your message]`;
   } catch (error) {
     console.error('Image processing error:', error);
     return `[Image content could not be processed: ${file.name}]`;
