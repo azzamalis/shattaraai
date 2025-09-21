@@ -51,31 +51,31 @@ export function RichMessage({ content, className }: RichMessageProps) {
   const md = normalizeContent(content);
 
   return (
-    <div className={cn('space-y-1', className)}>
+    <div className={cn(className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ node, ...props }) => (
-            <h1 className="text-base font-bold text-foreground mb-1" {...props} />
+            <h1 className="text-base font-bold text-foreground mb-2" {...props} />
           ),
           h2: ({ node, ...props }) => (
-            <h2 className="text-base font-semibold text-foreground mb-1" {...props} />
+            <h2 className="text-base font-semibold text-foreground mb-2" {...props} />
           ),
           h3: ({ node, ...props }) => (
             <h3 className="text-sm font-semibold text-foreground mb-1" {...props} />
           ),
           p: ({ node, ...props }) => (
-            <p className="text-sm leading-6 text-foreground" {...props} />
+            <p className="text-sm leading-relaxed text-foreground mb-2" {...props} />
           ),
           ul: ({ node, ...props }) => (
-            <ul className="list-disc pl-5 space-y-1 text-foreground/90" {...props} />
+            <ul className="list-disc pl-5 mb-2 text-foreground/90" {...props} />
           ),
           ol: ({ node, ...props }) => (
-            <ol className="list-decimal pl-5 space-y-1 text-foreground/90" {...props} />
+            <ol className="list-decimal pl-5 mb-2 text-foreground/90" {...props} />
           ),
-          li: ({ node, ...props }) => <li className="text-sm" {...props} />,
+          li: ({ node, ...props }) => <li className="text-sm mb-1" {...props} />,
           blockquote: ({ node, ...props }) => (
-            <blockquote className="border-l-2 border-border pl-3 italic text-muted-foreground" {...props} />
+            <blockquote className="border-l-2 border-border pl-3 italic text-muted-foreground mb-2" {...props} />
           ),
           a: ({ node, ...props }) => (
             <a className="text-primary underline underline-offset-2" target="_blank" rel="noreferrer" {...props} />

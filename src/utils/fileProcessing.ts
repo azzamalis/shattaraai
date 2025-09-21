@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 export type ProcessedFile = {
   name: string;
@@ -60,11 +60,7 @@ export async function processAndUploadFiles(files: File[], userId: string): Prom
       
     } catch (error) {
       console.error(`Error processing file ${file.name}:`, error);
-      toast({
-        title: "File Processing Error",
-        description: `Failed to process ${file.name}. Please try again.`,
-        variant: "destructive",
-      });
+      toast.error(`Failed to process ${file.name}. Please try again.`);
     }
   }
   

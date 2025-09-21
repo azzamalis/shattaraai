@@ -16,6 +16,7 @@ interface ChatContainerProps {
   className?: string;
   showTimestamps?: boolean;
   inputPlaceholder?: string;
+  loadingContent?: React.ReactNode;
 }
 
 export function ChatContainer({
@@ -26,7 +27,8 @@ export function ChatContainer({
   emptyStateContent,
   className,
   showTimestamps = true,
-  inputPlaceholder = "Type your message..."
+  inputPlaceholder = "Type your message...",
+  loadingContent
 }: ChatContainerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +66,7 @@ export function ChatContainer({
               {emptyStateContent}
             </div>
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-1 pb-4">
               {messages.map((message) => {
                 console.log('ChatContainer - Rendering message:', message.id, 'with attachments:', message.attachments);
                 return (
@@ -75,6 +77,14 @@ export function ChatContainer({
                   />
                 );
               })}
+              
+              {/* Loading indicators in chat area */}
+              {loadingContent && (
+                <div className="px-4 py-2">
+                  {loadingContent}
+                </div>
+              )}
+              
               <div ref={messagesEndRef} />
             </div>
           )}

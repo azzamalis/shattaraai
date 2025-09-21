@@ -13,6 +13,7 @@ import { useOpenAIChatContent } from '@/hooks/useOpenAIChatContent';
 import { ChatTitleGenerator } from './shared/ChatTitleGenerator';
 import { LoadingIndicator } from './LoadingIndicator';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface ChatInterfaceProps {
   activeTab: UnifiedTabType;
@@ -83,19 +84,24 @@ export function ChatInterface({
     try {
       // Process files if attachments exist
       let fileContent = '';
-      if (attachments && attachments.length > 0) {
+      if (attachments && attachments.length > 0 && Array.isArray(attachments)) {
         if (!user?.id) {
           console.error('User not authenticated for file upload');
+          toast.error("Please sign in to upload files.");
           return;
         }
         
         setIsProcessingFiles(true);
         try {
           const { processAndUploadFiles, formatFileContentForAI } = await import('@/utils/fileProcessing');
+          console.log('Processing files:', attachments);
           const processedFiles = await processAndUploadFiles(attachments, user.id);
+          console.log('Processed files:', processedFiles);
           fileContent = formatFileContentForAI(processedFiles);
+          console.log('Formatted file content for AI:', fileContent);
         } catch (error) {
           console.error('Error processing files:', error);
+          toast.error("Failed to process attachments. Please try again.");
           setIsProcessingFiles(false);
           return;
         }
@@ -146,38 +152,34 @@ export function ChatInterface({
       <Tabs value={activeTab} onValueChange={onTabChange} className="flex-1 flex flex-col min-h-0">
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         <UnifiedTabContent activeTab="chat" variant="chat">
-          <div className="flex flex-col h-full">
-            <ChatContainer 
-              messages={messages} 
-              onSendMessage={handleSendMessage} 
-              isLoading={isLoading} 
-              isSending={isSending || isProcessingAI || isProcessingFiles}
-              inputPlaceholder="Ask me anything..." 
-              emptyStateContent={
-                <div className="text-center">
-                  <Brain className="h-12 w-12 text-primary/60 mx-auto mb-4" />
-                  <h3 className="text-dashboard-text dark:text-dashboard-text mb-2 font-medium text-lg">
-                    Learn with the Shattara AI Tutor
-                  </h3>
-                  <p className="text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 text-center max-w-md text-sm">
-                    Start a conversation to get help with any topic, generate quizzes, create flashcards, and more.
-                  </p>
-                </div>
-              } 
-            />
-            
-            {/* Loading indicators */}
-            {(isProcessingFiles || isProcessingAI) && (
-              <div className="px-4 pb-4">
+          <ChatContainer 
+            messages={messages} 
+            onSendMessage={handleSendMessage} 
+            isLoading={isLoading} 
+            isSending={isSending || isProcessingAI || isProcessingFiles}
+            inputPlaceholder="Ask me anything..." 
+            emptyStateContent={
+              <div className="text-center">
+                <Brain className="h-12 w-12 text-primary/60 mx-auto mb-4" />
+                <h3 className="text-dashboard-text dark:text-dashboard-text mb-2 font-medium text-lg">
+                  Learn with the Shattara AI Tutor
+                </h3>
+                <p className="text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 text-center max-w-md text-sm">
+                  Start a conversation to get help with any topic, generate quizzes, create flashcards, and more.
+                </p>
+              </div>
+            }
+            loadingContent={
+              <>
                 {isProcessingFiles && (
                   <LoadingIndicator type="files" message="Processing and uploading attachments..." />
                 )}
                 {isProcessingAI && !isProcessingFiles && (
                   <LoadingIndicator type="ai" message="AI is analyzing your message..." />
                 )}
-              </div>
-            )}
-          </div>
+              </>
+            }
+          />
         </UnifiedTabContent>
 
         <UnifiedTabContent activeTab="flashcards" variant="chat">
