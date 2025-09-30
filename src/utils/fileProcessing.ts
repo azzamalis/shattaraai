@@ -76,19 +76,37 @@ function getStorageBucket(fileType: string, fileExt?: string): string {
 
 async function extractPDFContent(file: File): Promise<string> {
   try {
-    // Use the existing PDF extraction edge function
-    const formData = new FormData();
-    formData.append('file', file);
+    // Import pdfjs-dist dynamically
+    const pdfjsLib = await import('pdfjs-dist');
     
-    const { data, error } = await supabase.functions.invoke('extract-pdf-text', {
-      body: formData,
-    });
+    // Set worker source
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
     
-    if (error) throw error;
-    return data.text || '';
+    // Read file as array buffer
+    const arrayBuffer = await file.arrayBuffer();
+    
+    // Load PDF document
+    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+    const pdf = await loadingTask.promise;
+    
+    console.log(`PDF loaded: ${pdf.numPages} pages`);
+    
+    // Extract text from all pages
+    let fullText = '';
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ');
+      fullText += pageText + '\n\n';
+    }
+    
+    console.log(`Extracted ${fullText.length} characters from PDF: ${file.name}`);
+    return fullText.trim() || `[No text content found in PDF: ${file.name}]`;
   } catch (error) {
     console.error('PDF extraction error:', error);
-    return `[PDF content could not be extracted: ${file.name}]`;
+    return `[PDF content could not be extracted: ${file.name}. Error: ${error instanceof Error ? error.message : 'Unknown error'}]`;
   }
 }
 
