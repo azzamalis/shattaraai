@@ -125,10 +125,6 @@ export default {
 						opacity: '1',
 						transform: 'scale(1.05)'
 					}
-				},
-				'shimmer': {
-					'0%': { backgroundPosition: '-200% 0' },
-					'100%': { backgroundPosition: '200% 0' }
 				}
 			},
 			animation: {
@@ -139,8 +135,7 @@ export default {
 				'slide-out': 'slide-out 0.3s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
 				'float-up': 'float-up 0.3s ease-out',
-				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
-				'shimmer': 'shimmer 2s linear infinite'
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite'
 			},
 			transitionProperty: {
 				'height': 'height',
