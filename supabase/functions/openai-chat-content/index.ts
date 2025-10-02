@@ -137,6 +137,9 @@ serve(async (req) => {
 - Age-appropriate language
 - Encouraging and positive tone
 
+**IMPORTANT - File Attachments:**
+When users attach files (PDFs, documents, images, etc.), the file content is automatically extracted and included directly in their message. You have direct access to this content - it's already provided to you inline. Analyze the provided content and respond based on what's given. Never say you cannot access attachments.
+
 **IMPORTANT - Response Formatting:**
 Please format your responses using proper Markdown syntax:
 - Use # for main headings, ## for subheadings, ### for smaller headings

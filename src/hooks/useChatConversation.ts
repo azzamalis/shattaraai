@@ -89,40 +89,10 @@ export function useChatConversation({
 
     console.log('Creating conversation with params:', { type, contextId, contextType });
 
-    // Create content entry for general chats to make them persistent and accessible from dashboard
-    let contentId = contextId;
-    if (type === 'general' && !contextId) {
-      try {
-        const { data: contentData, error: contentError } = await supabase
-          .from('content')
-          .insert({
-            user_id: user.id,
-            title: 'New Chat Session',
-            type: 'chat',
-            processing_status: 'completed',
-            text_content: 'Chat conversation in progress...',
-            metadata: { conversation_type: 'general', auto_generated: true }
-          })
-          .select()
-          .single();
-
-        if (contentError) throw contentError;
-        contentId = contentData.id;
-        console.log('Created content entry for chat:', contentData);
-      } catch (error) {
-        console.error('Error creating content entry:', error);
-        toast({
-          title: "Warning",
-          description: "Chat created but may not appear in history.",
-          variant: "destructive",
-        });
-      }
-    }
-
     const conversationData = {
       user_id: user.id,
       type,
-      context_id: contentId || null,
+      context_id: contextId || null,
       context_type: contextType || 'content',
       metadata: type === 'room_collaboration' ? { room_id: contextId } : {}
     };
@@ -191,13 +161,55 @@ export function useChatConversation({
             }
           }
         } else if (autoCreate) {
-          // For general chat without contextId, always create a new conversation
+          // For general chat without contextId, create content entry first then conversation
           console.log('Creating new general conversation');
-          const newConversation = await createConversation(conversationType);
+          
+          // Create content entry to make chat visible in dashboard
+          let contentId: string | undefined;
+          if (conversationType === 'general') {
+            try {
+              const { data: contentData, error: contentError } = await supabase
+                .from('content')
+                .insert({
+                  user_id: user.id,
+                  title: 'New Chat Session',
+                  type: 'chat',
+                  processing_status: 'pending',
+                  text_content: '',
+                  metadata: { conversation_type: 'general', auto_generated: true }
+                })
+                .select()
+                .single();
+
+              if (contentError) {
+                console.error('Error creating content entry:', contentError);
+              } else {
+                contentId = contentData.id;
+                console.log('Created content entry for chat:', contentData);
+              }
+            } catch (error) {
+              console.error('Error creating content entry:', error);
+            }
+          }
+          
+          const newConversation = await createConversation(
+            conversationType, 
+            contentId,
+            conversationType === 'general' ? 'content' : undefined
+          );
+          
           if (newConversation) {
             setConversationId(newConversation.id);
             setConversation(newConversation);
             setMessages([]); // Start with empty messages for new conversation
+            
+            // Update content status once conversation is ready
+            if (contentId) {
+              await supabase
+                .from('content')
+                .update({ processing_status: 'completed' })
+                .eq('id', contentId);
+            }
           }
         }
       } finally {

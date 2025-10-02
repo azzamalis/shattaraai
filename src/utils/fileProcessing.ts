@@ -141,12 +141,12 @@ async function extractDocxContent(file: File): Promise<string> {
 export function formatFileContentForAI(files: ProcessedFile[]): string {
   if (files.length === 0) return '';
   
-  let content = '\n\n--- Attached Files ---\n\n';
+  let content = '\n\n[Context: The user has attached the following files with their message. The file content is provided below for your analysis.]\n\n';
   
   files.forEach((file, index) => {
-    content += `**File ${index + 1}: ${file.name}**\n`;
-    content += `Type: ${file.type}\n`;
-    content += `Content:\n${file.content}\n\n`;
+    content += `--- Content from "${file.name}" (${file.type}) ---\n\n`;
+    content += `${file.content}\n\n`;
+    content += `--- End of ${file.name} ---\n\n`;
   });
   
   return content;

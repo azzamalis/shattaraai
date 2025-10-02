@@ -38,11 +38,11 @@ function normalizeContent(text: string): string {
     t = t.replace(re, (m, p1) => `${p1}\n### ${label}`);
   }
 
-  // Add blank line before headings for Markdown
-  t = t.replace(/\n(##?\#?\s)/g, '\n\n$1');
+  // Add single blank line before headings for Markdown
+  t = t.replace(/\n(##?\#?\s)/g, '\n$1');
 
-  // Collapse excessive blank lines
-  t = t.replace(/\n{3,}/g, '\n\n');
+  // Collapse excessive blank lines to single line
+  t = t.replace(/\n{2,}/g, '\n');
 
   return t.trim();
 }
@@ -65,13 +65,13 @@ export function RichMessage({ content, className }: RichMessageProps) {
             <h3 className="text-sm font-semibold text-foreground mb-1" {...props} />
           ),
           p: ({ node, ...props }) => (
-            <p className="text-sm leading-relaxed text-foreground mb-2" {...props} />
+            <p className="text-sm leading-relaxed text-foreground mb-1" {...props} />
           ),
           ul: ({ node, ...props }) => (
-            <ul className="list-disc pl-5 mb-2 text-foreground/90" {...props} />
+            <ul className="list-disc pl-5 mb-1 text-foreground/90" {...props} />
           ),
           ol: ({ node, ...props }) => (
-            <ol className="list-decimal pl-5 mb-2 text-foreground/90" {...props} />
+            <ol className="list-decimal pl-5 mb-1 text-foreground/90" {...props} />
           ),
           li: ({ node, ...props }) => <li className="text-sm mb-1" {...props} />,
           blockquote: ({ node, ...props }) => (
