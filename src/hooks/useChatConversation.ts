@@ -43,6 +43,7 @@ export function useChatConversation({
   const [conversation, setConversation] = useState<any>(null);
   const isCreatingRef = useRef(false);
   const isSendingRef = useRef(false);
+  const isAddingAIResponseRef = useRef(false);
 
   const fetchMessages = useCallback(async (conversationId: string) => {
     setIsLoading(true);
@@ -341,6 +342,13 @@ export function useChatConversation({
       return;
     }
 
+    // Prevent duplicate AI responses
+    if (isAddingAIResponseRef.current) {
+      console.log('Already adding AI response, skipping duplicate...');
+      return;
+    }
+
+    isAddingAIResponseRef.current = true;
     try {
       const { data, error } = await supabase
         .from('chat_messages')
@@ -378,6 +386,8 @@ export function useChatConversation({
       setMessages(prevMessages => [...prevMessages, aiMessage]);
     } catch (error) {
       console.error('Error adding AI response:', error);
+    } finally {
+      isAddingAIResponseRef.current = false;
     }
   };
 
