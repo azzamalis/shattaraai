@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { uploadFileToStorage } from '@/lib/storage';
@@ -41,6 +41,8 @@ export function useChatConversation({
   const { user } = useAuth();
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [conversation, setConversation] = useState<any>(null);
+  const isCreatingRef = useRef(false);
+  const isSendingRef = useRef(false);
 
   const fetchMessages = useCallback(async (conversationId: string) => {
     setIsLoading(true);
@@ -116,6 +118,12 @@ export function useChatConversation({
         return;
       }
 
+      // Prevent concurrent creation attempts
+      if (isCreatingRef.current) {
+        console.log('Already creating conversation, skipping...');
+        return;
+      }
+
       setIsLoading(true);
       try {
         // If we have a contextId, always look for that specific conversation first
@@ -161,6 +169,9 @@ export function useChatConversation({
             }
           }
         } else if (autoCreate) {
+          // Set lock to prevent concurrent creation
+          isCreatingRef.current = true;
+          
           // For general chat without contextId, create content entry first then conversation
           console.log('Creating new general conversation');
           
@@ -254,6 +265,7 @@ export function useChatConversation({
         }
       } finally {
         setIsLoading(false);
+        isCreatingRef.current = false;
       }
     };
 
@@ -266,6 +278,13 @@ export function useChatConversation({
       return null;
     }
 
+    // Prevent duplicate sends
+    if (isSendingRef.current) {
+      console.log('Already sending message, skipping duplicate...');
+      return null;
+    }
+
+    isSendingRef.current = true;
     setIsSending(true);
     try {
       // Process attachments into the format we need
@@ -312,6 +331,7 @@ export function useChatConversation({
       return newMessage;
     } finally {
       setIsSending(false);
+      isSendingRef.current = false;
     }
   };
 
