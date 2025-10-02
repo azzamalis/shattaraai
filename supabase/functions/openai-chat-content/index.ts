@@ -219,28 +219,8 @@ Respond to the student's question or message below:`;
       usedModel = 'fallback';
     }
 
-    // Store AI response in chat_messages if we have a conversation ID
-    if (conversationId && aiResponse) {
-      try {
-        await supabase
-          .from('chat_messages')
-          .insert({
-            conversation_id: conversationId,
-            user_id: user.id,
-            sender_type: 'ai',
-            content: aiResponse,
-            message_type: 'text',
-            metadata: {
-              model_used: usedModel,
-              request_type: 'chat_content',
-              context_id: contextId
-            }
-          });
-      } catch (error) {
-        console.error('Error storing AI message:', error);
-        // Don't fail the request if message storage fails
-      }
-    }
+    // Note: Message storage is handled by the client-side addAIResponse function
+    // to prevent duplicate entries. The edge function only generates the AI response.
 
     // Track AI usage
     try {

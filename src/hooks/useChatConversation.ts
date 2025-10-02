@@ -168,35 +168,75 @@ export function useChatConversation({
           let contentId: string | undefined;
           if (conversationType === 'general') {
             try {
-              const { data: contentData, error: contentError } = await supabase
+              // Check if a pending chat content already exists
+              const { data: existingContent } = await supabase
                 .from('content')
-                .insert({
-                  user_id: user.id,
-                  title: 'New Chat Session',
-                  type: 'chat',
-                  processing_status: 'pending',
-                  text_content: '',
-                  metadata: { conversation_type: 'general', auto_generated: true }
-                })
-                .select()
-                .single();
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('type', 'chat')
+                .eq('processing_status', 'pending')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
 
-              if (contentError) {
-                console.error('Error creating content entry:', contentError);
+              if (existingContent) {
+                contentId = existingContent.id;
+                console.log('Reusing existing content entry:', existingContent.id);
               } else {
-                contentId = contentData.id;
-                console.log('Created content entry for chat:', contentData);
+                const { data: contentData, error: contentError } = await supabase
+                  .from('content')
+                  .insert({
+                    user_id: user.id,
+                    title: 'New Chat Session',
+                    type: 'chat',
+                    processing_status: 'pending',
+                    text_content: '',
+                    metadata: { conversation_type: 'general', auto_generated: true }
+                  })
+                  .select()
+                  .single();
+
+                if (contentError) {
+                  console.error('Error creating content entry:', contentError);
+                } else {
+                  contentId = contentData.id;
+                  console.log('Created content entry for chat:', contentData);
+                }
               }
             } catch (error) {
               console.error('Error creating content entry:', error);
             }
           }
           
-          const newConversation = await createConversation(
-            conversationType, 
-            contentId,
-            conversationType === 'general' ? 'content' : undefined
-          );
+          // Check if conversation already exists for this content
+          let newConversation;
+          if (contentId) {
+            const { data: existingConversation } = await supabase
+              .from('chat_conversations')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('type', conversationType)
+              .eq('context_id', contentId)
+              .limit(1)
+              .maybeSingle();
+
+            if (existingConversation) {
+              newConversation = existingConversation;
+              console.log('Reusing existing conversation:', existingConversation.id);
+            } else {
+              newConversation = await createConversation(
+                conversationType, 
+                contentId,
+                conversationType === 'general' ? 'content' : undefined
+              );
+            }
+          } else {
+            newConversation = await createConversation(
+              conversationType, 
+              contentId,
+              conversationType === 'general' ? 'content' : undefined
+            );
+          }
           
           if (newConversation) {
             setConversationId(newConversation.id);
