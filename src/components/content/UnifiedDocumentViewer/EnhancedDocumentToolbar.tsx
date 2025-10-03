@@ -62,7 +62,7 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
   };
 
   return (
-    <div className="flex items-center justify-between w-full h-12 px-3 bg-background border-b border-border">
+    <div className="flex items-center justify-between w-full h-12 px-3 bg-background">
       {/* Left Section */}
       <div className="flex items-center gap-1">
         <Button
