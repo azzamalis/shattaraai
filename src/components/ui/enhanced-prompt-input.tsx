@@ -16,15 +16,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-const PLACEHOLDERS = [
-  "What topics do you need help with?",
-  "Upload your study materials...",
-  "Ask me anything about your content...",
-  "Need help understanding a concept?",
-  "Generate practice questions...",
-  "Summarize your documents...",
-];
-
 const AI_MODELS = [
   { value: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash" },
   { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro" },
@@ -38,32 +29,6 @@ interface EnhancedPromptInputProps {
   onSubmit?: (value: string, files?: File[]) => void;
   className?: string;
 }
-
-const letterVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.03,
-      duration: 0.2,
-    },
-  }),
-};
-
-const placeholderContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.03,
-    },
-  },
-  exit: {
-    opacity: 0,
-    transition: { duration: 0.2 },
-  },
-};
 
 const filePreviewVariants = {
   hidden: { opacity: 0, scale: 0.95, y: -10 },
@@ -131,18 +96,9 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState('google/gemini-2.5-flash');
   const [deepSearchActive, setDeepSearchActive] = useState(false);
-  const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const hasContent = inputValue.trim().length > 0 || attachedFiles.length > 0;
-
-  // Cycle through placeholders
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPlaceholderIndex((prev) => (prev + 1) % PLACEHOLDERS.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleFileAttach = () => {
     fileInputRef.current?.click();
@@ -208,31 +164,9 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
         className="relative"
       >
         <div className="relative">
-          {/* Animated Placeholder */}
-          {!inputValue && (
-            <div className="absolute inset-0 flex items-center px-4 pointer-events-none z-10">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={placeholderIndex}
-                  variants={placeholderContainerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="text-muted-foreground flex"
-                >
-                  {PLACEHOLDERS[placeholderIndex].split('').map((char, i) => (
-                    <motion.span key={i} custom={i} variants={letterVariants}>
-                      {char === ' ' ? '\u00A0' : char}
-                    </motion.span>
-                  ))}
-                </motion.span>
-              </AnimatePresence>
-            </div>
-          )}
-
           <PromptInputTextarea
-            placeholder=""
-            className="min-h-[56px] pr-12 relative z-20"
+            placeholder="Ask Shattara AI anything"
+            className="min-h-[56px] pr-12"
           />
 
           {/* Send Button */}
