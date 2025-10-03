@@ -235,7 +235,7 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
       <div className="w-[420px] bg-card shadow-xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border p-4">
-          <h2 className="text-lg font-semibold">Space Chat</h2>
+          <h2 className="text-lg font-semibold">Exam Chat</h2>
           <button 
             onClick={onClose}
             className="rounded-md p-1 hover:bg-accent"
