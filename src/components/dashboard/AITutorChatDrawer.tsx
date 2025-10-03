@@ -364,8 +364,8 @@ export function AITutorChatDrawer({
           )}
           
           {/* Messages Container */}
-          <ChatContainerRoot className="flex-1 overflow-y-auto px-4 py-6">
-            <ChatContainerContent className="space-y-6">
+          <ChatContainerRoot className="flex-1 px-4">
+            <ChatContainerContent className="space-y-6 py-6">
               {messages.map((message, index) => {
                 const isAssistant = message.sender_type === 'ai';
                 const isLastMessage = index === messages.length - 1;
@@ -482,8 +482,8 @@ export function AITutorChatDrawer({
                   </div>
                 </Message>
               )}
+              <ChatContainerScrollAnchor />
             </ChatContainerContent>
-            <ChatContainerScrollAnchor />
           </ChatContainerRoot>
           
           {/* Input Area */}
