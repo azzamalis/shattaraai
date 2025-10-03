@@ -569,12 +569,6 @@ export function AITutorChatDrawer({
                 </PromptInputActions>
               </div>
             </PromptInput>
-            
-            {!isMobile && (
-              <div className="text-xs text-muted-foreground mt-2 text-center">
-                Use Alt + ← → to resize, or drag the left border
-              </div>
-            )}
           </div>
         </div>
       </div>
