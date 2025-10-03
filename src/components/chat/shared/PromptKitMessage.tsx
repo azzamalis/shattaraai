@@ -3,7 +3,7 @@ import { Copy, Check, Paperclip, ThumbsUp, ThumbsDown, Pencil, Trash } from 'luc
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from '@/hooks/useChatConversation';
-import { Message, MessageAvatar, MessageActions, MessageAction } from '@/components/prompt-kit/message';
+import { Message, MessageActions, MessageAction } from '@/components/prompt-kit/message';
 import { RichMessage } from '../RichMessage';
 import { Button } from '@/components/ui/button';
 
@@ -54,20 +54,9 @@ export function PromptKitMessage({
   // User and AI messages using Prompt-Kit Message
   return (
     <Message className={cn(
-      "px-4 py-2",
-      isUser && "flex-row-reverse"
+      "px-4 py-2 justify-start",
+      isUser && "justify-end"
     )}>
-      {/* Avatar */}
-      <MessageAvatar
-        src={isUser ? "" : "/lovable-uploads/shattara-ai-avatar.png"}
-        alt={isUser ? "User" : "Shattara AI"}
-        fallback={isUser ? "U" : "AI"}
-        className={cn(
-          "h-8 w-8",
-          isUser && "bg-[#00A3FF] text-white"
-        )}
-      />
-
       {/* Content Container */}
       <div className={cn(
         "flex flex-col gap-2 max-w-[80%]",
