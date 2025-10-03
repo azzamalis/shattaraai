@@ -219,16 +219,22 @@ export function AITutorChatDrawer({
         }
       }
 
-      // Reset welcome message state and input
+      // Reset all local state
       setWelcomeMessageSent(false);
       setInput('');
       setRateLimitError(null);
+      setIsAITyping(false);
       
       toast.success('Started a new chat');
       
-      // Close and reopen drawer to trigger new conversation creation
+      // Force a complete refresh by closing and reopening the drawer
+      // This will trigger the useChatConversation hook to create a new conversation
+      const wasOpen = open;
       onOpenChange(false);
-      setTimeout(() => onOpenChange(true), 100);
+      if (wasOpen) {
+        // Small delay to ensure the drawer fully closes before reopening
+        setTimeout(() => onOpenChange(true), 150);
+      }
     } catch (error) {
       console.error('Error starting new chat:', error);
       toast.error('Failed to start new chat');
