@@ -558,7 +558,18 @@ export function AITutorChatDrawer({
                   <Button
                     size="icon"
                     disabled={!input.trim() || isSending || isAITyping || !conversation || !!rateLimitError}
-                    onClick={handleSendMessage}
+                    onClick={() => {
+                      console.log('Send button clicked', {
+                        input: input,
+                        inputTrimmed: input.trim(),
+                        isEmpty: !input.trim(),
+                        isSending,
+                        isAITyping,
+                        hasConversation: !!conversation,
+                        rateLimitError
+                      });
+                      handleSendMessage();
+                    }}
                     className="size-9 rounded-full"
                   >
                     {isSending || isAITyping ? (
