@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2 } from 'lucide-react';
+import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2, Square } from 'lucide-react';
 import { toast } from 'sonner';
 import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from '@/components/prompt-kit/chat-container';
 import { Message, MessageAvatar, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
@@ -255,20 +255,12 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
                   message.isUser ? "justify-end" : "justify-start"
                 )}
               >
-                {!message.isUser && (
-                  <MessageAvatar
-                    src="/lovable-uploads/a5f90647-c593-4fb0-ba43-1a5cedff3bb3.png"
-                    alt="Shattara AI"
-                    fallback="AI"
-                    className="mt-1"
-                  />
-                )}
                 
                 <div className="flex flex-col gap-1 max-w-[80%]">
                   <MessageContent
-                    markdown={!message.isUser}
+                    markdown={true}
                     className={cn(
-                      "text-sm",
+                      "text-sm p-3",
                       message.isUser 
                         ? "bg-[#00A3FF] text-white rounded-2xl rounded-br-md" 
                         : "bg-muted/50 text-foreground rounded-2xl rounded-bl-md"
@@ -357,12 +349,6 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
             {/* Typing Indicator */}
             {isTyping && (
               <Message className="justify-start">
-                <MessageAvatar
-                  src="/lovable-uploads/a5f90647-c593-4fb0-ba43-1a5cedff3bb3.png"
-                  alt="Shattara AI"
-                  fallback="AI"
-                  className="mt-1"
-                />
                 <div className="flex items-center gap-2 bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3">
                   <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Thinking...</span>
@@ -379,26 +365,26 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
           <PromptInput
             value={chatInput}
             onValueChange={setChatInput}
-            onSubmit={sendMessage}
             isLoading={isTyping}
-            className="min-h-[52px]"
+            onSubmit={sendMessage}
+            className="w-full"
           >
-            <PromptInputTextarea
-              placeholder="Ask a question..."
-              className="resize-none rounded-2xl border-border bg-muted/30 px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-primary min-h-[52px]"
-            />
-            <PromptInputActions className="absolute bottom-2 right-2">
-              <PromptInputAction tooltip="Send message">
+            <PromptInputTextarea placeholder="Ask a question..." />
+            <PromptInputActions className="justify-end pt-2">
+              <PromptInputAction
+                tooltip={isTyping ? "Stop generation" : "Send message"}
+              >
                 <Button
+                  variant="default"
                   size="icon"
+                  className="h-8 w-8 rounded-full"
                   onClick={sendMessage}
                   disabled={!chatInput.trim() || !examId || isTyping}
-                  className="h-8 w-8 rounded-full bg-primary hover:bg-primary/90"
                 >
                   {isTyping ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Square className="size-5 fill-current" />
                   ) : (
-                    <ArrowUp className="h-4 w-4" />
+                    <ArrowUp className="size-5" />
                   )}
                 </Button>
               </PromptInputAction>
