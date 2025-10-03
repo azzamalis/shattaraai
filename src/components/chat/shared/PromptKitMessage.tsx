@@ -97,8 +97,7 @@ export function PromptKitMessage({
           <div
             className={cn(
               "rounded-lg px-4 py-3",
-              isUser && "bg-[#00A3FF] text-white",
-              !isUser && "bg-card text-card-foreground border border-border"
+              isUser && "bg-[#00A3FF] text-white"
             )}
           >
             {isUser ? (
@@ -108,7 +107,7 @@ export function PromptKitMessage({
             ) : (
               <RichMessage 
                 content={message.content}
-                className="text-card-foreground"
+                className="text-foreground"
               />
             )}
           </div>
