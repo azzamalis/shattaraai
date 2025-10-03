@@ -3,6 +3,8 @@ import { X, Loader2, AlertCircle, Clock, GripVertical, SquarePen, Copy, ThumbsUp
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import {
   ChatContainerContent,
   ChatContainerRoot,
@@ -192,12 +194,45 @@ export function AITutorChatDrawer({
     }
   };
 
-  const handleNewChat = () => {
-    // Reset welcome message state and input
-    setWelcomeMessageSent(false);
-    setInput('');
-    setRateLimitError(null);
-    // The actual conversation/messages reset is handled by the hook
+  const handleNewChat = async () => {
+    try {
+      // Delete the current conversation and all its messages from Supabase
+      if (conversation?.id) {
+        // First delete all messages in the conversation
+        const { error: messagesError } = await supabase
+          .from('chat_messages')
+          .delete()
+          .eq('conversation_id', conversation.id);
+
+        if (messagesError) {
+          console.error('Error deleting messages:', messagesError);
+        }
+
+        // Then delete the conversation itself
+        const { error: conversationError } = await supabase
+          .from('chat_conversations')
+          .delete()
+          .eq('id', conversation.id);
+
+        if (conversationError) {
+          console.error('Error deleting conversation:', conversationError);
+        }
+      }
+
+      // Reset welcome message state and input
+      setWelcomeMessageSent(false);
+      setInput('');
+      setRateLimitError(null);
+      
+      toast.success('Started a new chat');
+      
+      // Close and reopen drawer to trigger new conversation creation
+      onOpenChange(false);
+      setTimeout(() => onOpenChange(true), 100);
+    } catch (error) {
+      console.error('Error starting new chat:', error);
+      toast.error('Failed to start new chat');
+    }
   };
 
   // Message action handlers
