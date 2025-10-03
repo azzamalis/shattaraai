@@ -16,6 +16,7 @@ export function Loader({
   if (variant === 'loading-dots') {
     return (
       <div className={cn("flex items-center gap-3", className)}>
+        <span className="text-sm text-muted-foreground">{text}</span>
         <div className="flex gap-1.5">
           {[0, 1, 2].map((i) => (
             <motion.div
@@ -34,7 +35,6 @@ export function Loader({
             />
           ))}
         </div>
-        <span className="text-sm text-muted-foreground">{text}</span>
       </div>
     );
   }

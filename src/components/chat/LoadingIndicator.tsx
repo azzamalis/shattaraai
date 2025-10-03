@@ -12,15 +12,13 @@ export function LoadingIndicator({ type, message }: LoadingIndicatorProps) {
       case 'files':
         return message || 'Processing and uploading attachments...';
       case 'ai':
-        return message || 'AI is analyzing your message...';
+        return message || 'Shattara AI is thinking';
       default:
         return message || 'Loading...';
     }
   };
 
   return (
-    <div className="flex items-center px-4 py-3 bg-card rounded-lg border border-border/50">
-      <Loader variant="loading-dots" text={getText()} />
-    </div>
+    <Loader variant="loading-dots" text={getText()} />
   );
 }
