@@ -247,7 +247,7 @@ const AIChat = ({ contentData }: AIChatProps) => {
                 <LoadingIndicator type="files" message="Processing and uploading attachments..." />
               )}
               {isProcessingAI && !isProcessingFiles && (
-                <LoadingIndicator type="ai" message="AI is analyzing your content..." />
+                <LoadingIndicator type="ai" />
               )}
             </>
           )}
