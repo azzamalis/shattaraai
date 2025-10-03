@@ -1,8 +1,14 @@
 import React from 'react';
-import { BaseModal } from '@/components/ui/base-modal';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Share2, Copy, Check, Link2, Twitter, Linkedin, MessageCircle } from 'lucide-react';
+import { Copy, Check, Link2, Twitter, Linkedin, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 interface ShareModalProps {
   open: boolean;
@@ -41,53 +47,91 @@ export function ShareModal({
     };
     window.open(urls[platform as keyof typeof urls], '_blank');
   };
-  return <BaseModal open={open} onOpenChange={onOpenChange} title={`Share ${type === 'exam' ? 'Exam' : 'Content'}`} description={`Share this ${type} with others`} className="sm:max-w-md">
-      <div className="space-y-6 py-4">
-        {/* Header with Icon */}
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md bg-card border-border">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold text-foreground">
+            Share {type === 'exam' ? 'Exam' : 'Content'}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Share this {type} with others
+          </DialogDescription>
+        </DialogHeader>
         
-
-        {/* URL Input Section */}
-        <div className="space-y-2">
-          <label htmlFor="share-url" className="text-sm font-medium text-foreground">
-            Share Link
-          </label>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="share-url" readOnly value={shareUrl} className="pl-9 bg-muted/50 border-border/50 text-foreground" />
+        <div className="space-y-6 py-4">
+          {/* URL Input Section */}
+          <div className="space-y-2">
+            <label htmlFor="share-url" className="text-sm font-medium text-foreground">
+              Share Link
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  id="share-url" 
+                  readOnly 
+                  value={shareUrl} 
+                  className="pl-9 bg-muted/50 border-border/50 text-foreground" 
+                />
+              </div>
+              <Button 
+                onClick={handleCopy} 
+                variant="outline" 
+                className="flex items-center gap-2 min-w-[100px] hover:bg-muted/50"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span>Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </Button>
             </div>
-            <Button onClick={handleCopy} variant="outline" className="flex items-center gap-2 min-w-[100px]">
-              {copied ? <>
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Copied</span>
-                </> : <>
-                  <Copy className="h-4 w-4" />
-                  <span>Copy</span>
-                </>}
-            </Button>
           </div>
-        </div>
 
-        {/* Social Share Section */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
-            Share via
-          </label>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" className="flex-1 hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]" onClick={() => handleSocialShare('twitter')}>
-              <Twitter className="h-4 w-4" />
-              <span className="sr-only">Share on Twitter</span>
-            </Button>
-            <Button variant="outline" size="icon" className="flex-1 hover:bg-[#25D366]/10 hover:text-[#25D366]" onClick={() => handleSocialShare('whatsapp')}>
-              <MessageCircle className="h-4 w-4" />
-              <span className="sr-only">Share on WhatsApp</span>
-            </Button>
-            <Button variant="outline" size="icon" className="flex-1 hover:bg-[#0A66C2]/10 hover:text-[#0A66C2]" onClick={() => handleSocialShare('linkedin')}>
-              <Linkedin className="h-4 w-4" />
-              <span className="sr-only">Share on LinkedIn</span>
-            </Button>
+          {/* Social Share Section */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Share via
+            </label>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="flex-1 hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2] transition-colors" 
+                onClick={() => handleSocialShare('twitter')}
+              >
+                <Twitter className="h-4 w-4" />
+                <span className="sr-only">Share on Twitter</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="flex-1 hover:bg-[#25D366]/10 hover:text-[#25D366] transition-colors" 
+                onClick={() => handleSocialShare('whatsapp')}
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span className="sr-only">Share on WhatsApp</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="flex-1 hover:bg-[#0A66C2]/10 hover:text-[#0A66C2] transition-colors" 
+                onClick={() => handleSocialShare('linkedin')}
+              >
+                <Linkedin className="h-4 w-4" />
+                <span className="sr-only">Share on LinkedIn</span>
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    </BaseModal>;
+      </DialogContent>
+    </Dialog>
+  );
 }
