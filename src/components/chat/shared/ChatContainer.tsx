@@ -1,11 +1,10 @@
-
-import React, { useRef, useEffect } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChatMessageItem } from './ChatMessageItem';
-import { ChatInput } from './ChatInput';
+import React from 'react';
+import { PromptKitMessage } from './PromptKitMessage';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from '@/hooks/useChatConversation';
+import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from '@/components/prompt-kit/chat-container';
+import { EnhancedPromptInput } from '@/components/ui/enhanced-prompt-input';
 
 interface ChatContainerProps {
   messages: ChatMessage[];
@@ -27,19 +26,9 @@ export function ChatContainer({
   emptyStateContent,
   className,
   showTimestamps = true,
-  inputPlaceholder = "Type your message...",
+  inputPlaceholder = "Ask Shattara AI anything",
   loadingContent
 }: ChatContainerProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const handleSendMessage = (content: string, attachments?: File[]) => {
     console.log('ChatContainer - Sending message with attachments:', attachments);
     onSendMessage(content, attachments);
@@ -58,19 +47,19 @@ export function ChatContainer({
 
   return (
     <div className={cn("flex flex-col h-full", className)}>
-      {/* Messages Area */}
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
+      {/* Messages Area - Prompt-Kit ChatContainer */}
+      <ChatContainerRoot className="flex-1 overflow-y-auto">
+        <ChatContainerContent className="space-y-1">
           {messages.length === 0 && emptyStateContent ? (
             <div className="flex items-center justify-center h-full p-8">
               {emptyStateContent}
             </div>
           ) : (
-            <div className="space-y-1 pb-4">
+            <>
               {messages.map((message) => {
                 console.log('ChatContainer - Rendering message:', message.id, 'with attachments:', message.attachments);
                 return (
-                  <ChatMessageItem
+                  <PromptKitMessage
                     key={message.id}
                     message={message}
                     showTimestamp={showTimestamps}
@@ -84,19 +73,17 @@ export function ChatContainer({
                   {loadingContent}
                 </div>
               )}
-              
-              <div ref={messagesEndRef} />
-            </div>
+            </>
           )}
-        </ScrollArea>
-      </div>
+          <ChatContainerScrollAnchor />
+        </ChatContainerContent>
+      </ChatContainerRoot>
 
-      {/* Input Area */}
-      <div className="border-t border-border dark:border-border p-4 bg-background dark:bg-background">
-        <ChatInput
-          onSendMessage={handleSendMessage}
-          disabled={isSending}
-          placeholder={inputPlaceholder}
+      {/* Input Area - Enhanced Prompt Input */}
+      <div className="relative px-4 pb-4 bg-background">
+        <EnhancedPromptInput
+          onSubmit={handleSendMessage}
+          className="border-border bg-card relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-sm"
         />
       </div>
     </div>
