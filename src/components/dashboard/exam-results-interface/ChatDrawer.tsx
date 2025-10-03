@@ -478,36 +478,34 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
         </ChatContainerRoot>
         
         {/* Input Area */}
-        <div className="border-t border-border p-4">
-          <PromptInput
-            value={chatInput}
-            onValueChange={setChatInput}
-            isLoading={isTyping}
-            onSubmit={sendMessage}
-            className="w-full"
-          >
-            <PromptInputTextarea placeholder="Ask a question..." />
-            <PromptInputActions className="justify-end pt-2">
-              <PromptInputAction
-                tooltip={isTyping ? "Stop generation" : "Send message"}
+        <PromptInput
+          value={chatInput}
+          onValueChange={setChatInput}
+          isLoading={isTyping}
+          onSubmit={sendMessage}
+          className="w-full border-t border-border p-4"
+        >
+          <PromptInputTextarea placeholder="Ask a question..." />
+          <PromptInputActions className="justify-end pt-2">
+            <PromptInputAction
+              tooltip={isTyping ? "Stop generation" : "Send message"}
+            >
+              <Button
+                variant="default"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={sendMessage}
+                disabled={!chatInput.trim() || !examId || isTyping}
               >
-                <Button
-                  variant="default"
-                  size="icon"
-                  className="h-8 w-8 rounded-full"
-                  onClick={sendMessage}
-                  disabled={!chatInput.trim() || !examId || isTyping}
-                >
-                  {isTyping ? (
-                    <Square className="size-5 fill-current" />
-                  ) : (
-                    <ArrowUp className="size-5" />
-                  )}
-                </Button>
-              </PromptInputAction>
-            </PromptInputActions>
-          </PromptInput>
-        </div>
+                {isTyping ? (
+                  <Square className="size-5 fill-current" />
+                ) : (
+                  <ArrowUp className="size-5" />
+                )}
+              </Button>
+            </PromptInputAction>
+          </PromptInputActions>
+        </PromptInput>
         </div>
       </div>
     </div>
