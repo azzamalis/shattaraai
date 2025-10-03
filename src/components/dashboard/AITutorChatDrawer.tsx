@@ -76,8 +76,9 @@ export function AITutorChatDrawer({
     autoCreate: true
   });
 
-  // Local UI messages state
-  const [messages, setMessages] = useState<typeof persistedMessages>([]);
+  // Use persistedMessages directly instead of maintaining separate local state
+  // This ensures messages are always in sync with the database
+  const messages = persistedMessages;
 
   // Prepare conversation history for AI context (use persisted messages)
   const conversationHistory = persistedMessages.slice(-10).map(msg => ({
@@ -135,9 +136,9 @@ export function AITutorChatDrawer({
     }
   }, [isResizing, handleResize, handleResizeEnd]);
 
-  // Load persisted messages and show welcome when drawer opens
+  // Show welcome message when drawer opens if no messages exist
   useEffect(() => {
-    if (open && conversation) {
+    if (open && conversation && persistedMessages.length === 0 && !welcomeMessageSent) {
       setRateLimitError(null);
       
       // Check usage when opening chat
@@ -146,29 +147,10 @@ export function AITutorChatDrawer({
         setIsNearLimit(usagePercent > 80);
       }
       
-      // Load persisted messages from database
-      if (persistedMessages.length > 0) {
-        setMessages(persistedMessages);
-        setWelcomeMessageSent(true);
-      } else {
-        // Add fresh welcome message only if no persisted messages
-        const welcomeMessage = roomContent.length > 0
-          ? `Hello! I'm Shattara AI Tutor. I can see you have ${roomContent.length} item(s) in this room. How can I help you learn today?`
-          : "Hello! I'm Shattara AI Tutor. This room doesn't have any content yet. Feel free to add some study materials, and I'll help you learn from them!";
-        
-        const welcomeMsg = {
-          id: `welcome-${Date.now()}`,
-          content: welcomeMessage,
-          sender_type: 'ai' as const,
-          created_at: new Date().toISOString(),
-          attachments: []
-        };
-        
-        setMessages([welcomeMsg]);
-        setWelcomeMessageSent(true);
-      }
+      // Mark welcome as sent (we'll rely on the hook's empty state)
+      setWelcomeMessageSent(true);
     }
-  }, [open, conversation, persistedMessages, roomContent.length, usageStats, planLimits]);
+  }, [open, conversation, persistedMessages.length, welcomeMessageSent, usageStats, planLimits]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || !conversation) return;
@@ -187,17 +169,7 @@ export function AITutorChatDrawer({
     setRateLimitError(null);
 
     try {
-      // Add user message to UI immediately
-      const tempUserMsg = {
-        id: `temp-user-${Date.now()}`,
-        content: userMessage,
-        sender_type: 'user' as const,
-        created_at: new Date().toISOString(),
-        attachments: []
-      };
-      setMessages(prev => [...prev, tempUserMsg]);
-
-      // Send user message to database
+      // Send user message to database (hook will update messages state)
       await sendMessage(userMessage);
       
       // Show AI typing indicator
@@ -206,22 +178,12 @@ export function AITutorChatDrawer({
       // Get AI response
       const aiResponse = await sendMessageToAI(userMessage);
       
-      // Add AI response to database
+      // Add AI response to database (hook will update messages state)
       await addAIResponse(aiResponse, 'ai_response', {
         model: 'o4-mini-2025-04-16',
         room_id: roomId,
         responded_to: userMessage
       });
-
-      // Add AI response to UI
-      const aiMsg = {
-        id: `ai-${Date.now()}`,
-        content: aiResponse,
-        sender_type: 'ai' as const,
-        created_at: new Date().toISOString(),
-        attachments: []
-      };
-      setMessages(prev => [...prev, aiMsg]);
 
     } catch (error) {
       console.error('Error handling message:', error);
@@ -231,27 +193,11 @@ export function AITutorChatDrawer({
   };
 
   const handleNewChat = () => {
-    // Clear local messages and reset welcome message state
-    setMessages([]);
+    // Reset welcome message state and input
     setWelcomeMessageSent(false);
     setInput('');
     setRateLimitError(null);
-    
-    // Add fresh welcome message
-    const welcomeMessage = roomContent.length > 0
-      ? `Hello! I'm Shattara AI Tutor. I can see you have ${roomContent.length} item(s) in this room. How can I help you learn today?`
-      : "Hello! I'm Shattara AI Tutor. This room doesn't have any content yet. Feel free to add some study materials, and I'll help you learn from them!";
-    
-    const welcomeMsg = {
-      id: `welcome-${Date.now()}`,
-      content: welcomeMessage,
-      sender_type: 'ai' as const,
-      created_at: new Date().toISOString(),
-      attachments: []
-    };
-    
-    setMessages([welcomeMsg]);
-    setWelcomeMessageSent(true);
+    // The actual conversation/messages reset is handled by the hook
   };
 
   // Message action handlers
@@ -264,7 +210,8 @@ export function AITutorChatDrawer({
   };
 
   const handleDeleteMessage = (messageId: string) => {
-    setMessages(prev => prev.filter(m => m.id !== messageId));
+    // TODO: Implement delete in database via hook
+    console.log('Delete message:', messageId);
   };
 
   const handleUpvote = (messageId: string) => {
