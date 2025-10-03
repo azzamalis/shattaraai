@@ -140,7 +140,7 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
   };
 
   return (
-    <div className={`h-full w-full flex flex-col bg-background border border-border/50 ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
+    <div className={`h-full w-full flex flex-col bg-background border border-border/50 rounded-lg ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
       <EnhancedDocumentToolbar 
         onDownload={handleDownload}
         contentData={contentData}
