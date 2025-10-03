@@ -1,8 +1,13 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Copy, Trash2, Check, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { chatMessageStyles } from '@/lib/chatStyles';
+import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from '@/components/prompt-kit/chat-container';
+import { Message, MessageAvatar, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
+import { PromptInput, PromptInputTextarea, PromptInputActions, PromptInputAction } from '@/components/prompt-kit/prompt-input';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { Markdown } from '@/components/prompt-kit/markdown';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ChatMessage {
@@ -10,7 +15,7 @@ interface ChatMessage {
   isUser: boolean;
   content: string;
   timestamp: Date;
-  status: 'sending' | 'sent' | 'delivered';
+  status?: 'sending' | 'sent' | 'delivered';
 }
 
 interface ChatDrawerProps {
@@ -28,8 +33,6 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [userName, setUserName] = useState<string>('');
-  const chatMessagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   // Get user name from Supabase
   useEffect(() => {
@@ -92,18 +95,6 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
       localStorage.setItem(chatKey, JSON.stringify(chatMessages));
     }
   }, [chatMessages, currentQuestionId, examId, chatType, roomId]);
-
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
-
-  // Focus input when chat opens
-  useEffect(() => {
-    if (isOpen) {
-      inputRef.current?.focus();
-    }
-  }, [isOpen]);
 
   const sendMessage = async () => {
     if (!chatInput.trim() || !examId) return;
@@ -196,21 +187,33 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+  const handleCopyMessage = async (content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      toast.success('Message copied to clipboard');
+    } catch (error) {
+      toast.error('Failed to copy message');
     }
   };
 
-  const copyMessage = (content: string) => {
-    navigator.clipboard.writeText(content);
-    toast.success('Message copied to clipboard');
+  const handleEditMessage = (messageId: string) => {
+    // TODO: Implement edit functionality
+    toast.info('Edit functionality coming soon');
   };
 
-  const deleteMessage = (messageId: string) => {
+  const handleDeleteMessage = (messageId: string) => {
     setChatMessages(prev => prev.filter(msg => msg.id !== messageId));
     toast.success('Message deleted');
+  };
+
+  const handleUpvote = (messageId: string) => {
+    // TODO: Implement upvote functionality
+    toast.success('Thanks for the feedback!');
+  };
+
+  const handleDownvote = (messageId: string) => {
+    // TODO: Implement downvote functionality
+    toast.info('Thanks for the feedback!');
   };
 
   const formatTimestamp = (date: Date) => {
@@ -241,65 +244,166 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
           </button>
         </div>
         
-        {/* Messages Area - Added overflow-x-hidden to prevent horizontal scroll */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4">
-          {chatMessages.map((message) => (
-            <div 
-              key={message.id} 
-              className={chatMessageStyles.wrapper(message.isUser)}
-            >
-              <div className="w-full">
-                <p className={chatMessageStyles.content}>{message.content}</p>
-                <div className={chatMessageStyles.timestamp}>
-                  {formatTimestamp(message.timestamp)}
-                  {message.isUser && (
-                    <span className="flex items-center ml-2">
-                      {message.status === 'sending' && <Clock className="h-3 w-3" />}
-                      {message.status === 'sent' && <Check className="h-3 w-3" />}
-                      {message.status === 'delivered' && <Check className="h-3 w-3" />}
-                    </span>
-                  )}
+        {/* Messages Area */}
+        <ChatContainerRoot className="flex-1 px-4">
+          <ChatContainerContent className="space-y-4 py-4">
+            {chatMessages.map((message) => (
+              <Message 
+                key={message.id}
+                className={cn(
+                  "group",
+                  message.isUser ? "justify-end" : "justify-start"
+                )}
+              >
+                {!message.isUser && (
+                  <MessageAvatar
+                    src="/lovable-uploads/a5f90647-c593-4fb0-ba43-1a5cedff3bb3.png"
+                    alt="Shattara AI"
+                    fallback="AI"
+                    className="mt-1"
+                  />
+                )}
+                
+                <div className="flex flex-col gap-1 max-w-[80%]">
+                  <MessageContent
+                    markdown={!message.isUser}
+                    className={cn(
+                      "text-sm",
+                      message.isUser 
+                        ? "bg-[#00A3FF] text-white rounded-2xl rounded-br-md" 
+                        : "bg-muted/50 text-foreground rounded-2xl rounded-bl-md"
+                    )}
+                  >
+                    {message.content}
+                  </MessageContent>
+                  
+                  <MessageActions className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    {message.isUser ? (
+                      <>
+                        <MessageAction tooltip="Edit">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleEditMessage(message.id)}
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction tooltip="Delete">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleDeleteMessage(message.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction tooltip="Copy">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleCopyMessage(message.content)}
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </MessageAction>
+                      </>
+                    ) : (
+                      <>
+                        <MessageAction tooltip="Copy">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleCopyMessage(message.content)}
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction tooltip="Upvote">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleUpvote(message.id)}
+                          >
+                            <ThumbsUp className="h-3 w-3" />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction tooltip="Downvote">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleDownvote(message.id)}
+                          >
+                            <ThumbsDown className="h-3 w-3" />
+                          </Button>
+                        </MessageAction>
+                      </>
+                    )}
+                  </MessageActions>
+                  
+                  <span className="text-xs text-muted-foreground px-3">
+                    {formatTimestamp(message.timestamp)}
+                  </span>
                 </div>
-              </div>
-            </div>
-          ))}
-          
-          {/* Typing Indicator */}
-          {isTyping && (
-            <div className="flex justify-start">
-              <div className="bg-accent text-foreground rounded-lg p-3">
-                <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-foreground rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-foreground rounded-full animate-bounce delay-100" />
-                  <div className="w-2 h-2 bg-foreground rounded-full animate-bounce delay-200" />
+              </Message>
+            ))}
+            
+            {/* Typing Indicator */}
+            {isTyping && (
+              <Message className="justify-start">
+                <MessageAvatar
+                  src="/lovable-uploads/a5f90647-c593-4fb0-ba43-1a5cedff3bb3.png"
+                  alt="Shattara AI"
+                  fallback="AI"
+                  className="mt-1"
+                />
+                <div className="flex items-center gap-2 bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Thinking...</span>
                 </div>
-              </div>
-            </div>
-          )}
-          
-          <div ref={chatMessagesEndRef} />
-        </div>
+              </Message>
+            )}
+            
+            <ChatContainerScrollAnchor />
+          </ChatContainerContent>
+        </ChatContainerRoot>
         
         {/* Input Area */}
         <div className="border-t border-border p-4">
-          <div className="flex gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyPress={handleKeyPress}
+          <PromptInput
+            value={chatInput}
+            onValueChange={setChatInput}
+            onSubmit={sendMessage}
+            isLoading={isTyping}
+            className="min-h-[52px]"
+          >
+            <PromptInputTextarea
               placeholder="Ask a question..."
-              className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none"
+              className="resize-none rounded-2xl border-border bg-muted/30 px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-primary min-h-[52px]"
             />
-            <button 
-              onClick={sendMessage}
-              disabled={!chatInput.trim() || !examId}
-              className="rounded-lg bg-primary px-3 py-2 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
-            >
-              <Send className="h-4 w-4" />
-            </button>
-          </div>
+            <PromptInputActions className="absolute bottom-2 right-2">
+              <PromptInputAction tooltip="Send message">
+                <Button
+                  size="icon"
+                  onClick={sendMessage}
+                  disabled={!chatInput.trim() || !examId || isTyping}
+                  className="h-8 w-8 rounded-full bg-primary hover:bg-primary/90"
+                >
+                  {isTyping ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ArrowUp className="h-4 w-4" />
+                  )}
+                </Button>
+              </PromptInputAction>
+            </PromptInputActions>
+          </PromptInput>
         </div>
       </div>
     </div>
