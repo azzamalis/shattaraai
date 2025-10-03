@@ -478,7 +478,7 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
         </ChatContainerRoot>
         
         {/* Input Area */}
-        <div className="border-t border-border p-4">
+        <div className="p-4">
           <PromptInput
             value={chatInput}
             onValueChange={setChatInput}
