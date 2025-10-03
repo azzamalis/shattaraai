@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2, Square } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2, Square, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from '@/components/prompt-kit/chat-container';
 import { Message, MessageAvatar, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Markdown } from '@/components/prompt-kit/markdown';
 import { supabase } from '@/integrations/supabase/client';
+import { useWindowSize } from '@/hooks/use-window-size';
 
 interface ChatMessage {
   id: string;
@@ -33,6 +34,83 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [userName, setUserName] = useState<string>('');
+  const [panelWidth, setPanelWidth] = useState(() => {
+    // Load saved width or default to 420px
+    if (typeof window !== 'undefined') {
+      return parseInt(localStorage.getItem('examChatDrawerWidth') || '420', 10);
+    }
+    return 420;
+  });
+  const [isResizing, setIsResizing] = useState(false);
+  const { isMobile, width: windowWidth } = useWindowSize();
+  const resizeRef = useRef<HTMLDivElement>(null);
+
+  // Persist panel width
+  const persistWidth = useCallback((newWidth: number) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('examChatDrawerWidth', newWidth.toString());
+    }
+  }, []);
+
+  // Handle resize
+  const handleResize = useCallback((e: MouseEvent) => {
+    if (!isResizing) return;
+    
+    const newWidth = Math.max(320, Math.min(windowWidth * 0.8, windowWidth - e.clientX));
+    setPanelWidth(newWidth);
+    persistWidth(newWidth);
+  }, [isResizing, windowWidth, persistWidth]);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  // Add resize event listeners
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleResize);
+      document.addEventListener('mouseup', handleResizeEnd);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      
+      return () => {
+        document.removeEventListener('mousemove', handleResize);
+        document.removeEventListener('mouseup', handleResizeEnd);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      };
+    }
+  }, [isResizing, handleResize, handleResizeEnd]);
+
+  // Handle keyboard resize
+  const handleKeyboardResize = useCallback((e: KeyboardEvent) => {
+    if (!isOpen) return;
+    
+    if (e.key === 'ArrowLeft' && e.altKey) {
+      e.preventDefault();
+      const newWidth = Math.max(320, panelWidth - 20);
+      setPanelWidth(newWidth);
+      persistWidth(newWidth);
+    } else if (e.key === 'ArrowRight' && e.altKey) {
+      e.preventDefault();
+      const newWidth = Math.min(windowWidth * 0.8, panelWidth + 20);
+      setPanelWidth(newWidth);
+      persistWidth(newWidth);
+    }
+  }, [isOpen, panelWidth, windowWidth, persistWidth]);
+
+  // Add keyboard event listener
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyboardResize);
+      return () => document.removeEventListener('keydown', handleKeyboardResize);
+    }
+  }, [isOpen, handleKeyboardResize]);
 
   // Get user name from Supabase
   useEffect(() => {
@@ -232,7 +310,46 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
         className="flex-1 bg-black/50" 
         onClick={onClose}
       />
-      <div className="w-[420px] bg-card shadow-xl flex flex-col">
+      
+      {/* Resizable Chat Panel */}
+      <div className="h-full flex">
+        {/* Resize Handle */}
+        {!isMobile && (
+          <div
+            ref={resizeRef}
+            className="w-1 bg-border hover:bg-primary/50 cursor-col-resize transition-colors relative group"
+            onMouseDown={handleResizeStart}
+            role="separator"
+            aria-label="Resize chat panel"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const newWidth = Math.max(320, panelWidth - 20);
+                setPanelWidth(newWidth);
+                persistWidth(newWidth);
+              } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const newWidth = Math.min(windowWidth * 0.8, panelWidth + 20);
+                setPanelWidth(newWidth);
+                persistWidth(newWidth);
+              }
+            }}
+          >
+            <div className="absolute inset-y-0 -left-1 -right-1 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <GripVertical className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </div>
+        )}
+
+        {/* Chat Content */}
+        <div 
+          style={{ 
+            width: isMobile ? '100vw' : panelWidth,
+            maxWidth: isMobile ? '100vw' : '80vw'
+          }}
+          className="bg-card shadow-xl flex flex-col"
+        >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border p-4">
           <h2 className="text-lg font-semibold">Exam Chat</h2>
@@ -390,6 +507,7 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
               </PromptInputAction>
             </PromptInputActions>
           </PromptInput>
+        </div>
         </div>
       </div>
     </div>
