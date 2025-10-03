@@ -1,4 +1,6 @@
 import React, { useState, useRef, ChangeEvent } from 'react';
+import { CommandDropdown } from '@/components/chat/CommandDropdown';
+import { CommandOption } from '@/lib/types';
 import {
   PromptInput,
   PromptInputAction,
@@ -7,7 +9,7 @@ import {
 } from "@/components/prompt-kit/prompt-input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ArrowUp, Plus, Mic, MoreHorizontal, Brain, X } from "lucide-react";
+import { ArrowUp, Plus, Mic, AtSign, Brain, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PromptInputChatBoxProps {
@@ -26,6 +28,23 @@ const AI_MODELS = [
   "GPT4.1 Mini"
 ];
 
+const commandOptions: CommandOption[] = [
+  // Learning category
+  { id: 'quiz', label: 'Quiz', description: 'Generate a quiz', category: 'Learning' },
+  { id: 'flashcards', label: 'Flashcards', description: 'Create flashcards', category: 'Learning' },
+  { id: 'timeline', label: 'Timeline', description: 'Create timeline', category: 'Learning' },
+  
+  // Charts category
+  { id: 'bar-chart', label: 'Bar Chart', description: 'Generate bar chart', category: 'Charts' },
+  { id: 'line-chart', label: 'Line Chart', description: 'Generate line chart', category: 'Charts' },
+  { id: 'pie-chart', label: 'Pie Chart', description: 'Generate pie chart', category: 'Charts' },
+  
+  // Diagrams category
+  { id: 'venn-diagram', label: 'Venn Diagram', description: 'Create Venn diagram', category: 'Diagrams' },
+  { id: 'flow-chart', label: 'Flow Chart', description: 'Create flow chart', category: 'Diagrams' },
+  { id: 'mind-map', label: 'Mind Map', description: 'Create mind map', category: 'Diagrams' }
+];
+
 export function PromptInputChatBox({
   onSendMessage,
   disabled = false,
@@ -35,6 +54,7 @@ export function PromptInputChatBox({
   const [inputValue, setInputValue] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState("Claude 4 Sonnet");
+  const [showCommandDropdown, setShowCommandDropdown] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
@@ -139,16 +159,30 @@ export function PromptInputChatBox({
                 </DropdownMenu>
               </PromptInputAction>
 
-              <PromptInputAction tooltip="More options">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-9 rounded-full"
-                  type="button"
-                >
-                  <MoreHorizontal size={18} />
-                </Button>
-              </PromptInputAction>
+              <div className="relative">
+                <PromptInputAction tooltip="Quick commands">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="size-9 rounded-full"
+                    type="button"
+                    onClick={() => setShowCommandDropdown(!showCommandDropdown)}
+                  >
+                    <AtSign size={18} />
+                  </Button>
+                </PromptInputAction>
+                
+                {showCommandDropdown && (
+                  <CommandDropdown
+                    commands={commandOptions}
+                    onSelect={(command) => {
+                      setInputValue(prev => `${prev}${prev ? ' ' : ''}${command.label}`);
+                      setShowCommandDropdown(false);
+                    }}
+                    onClose={() => setShowCommandDropdown(false)}
+                  />
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
