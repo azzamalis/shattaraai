@@ -9,12 +9,20 @@ interface UseOpenAIChatContentOptions {
     content: string;
     sender_type: 'user' | 'ai';
   }>;
+  contentData?: {
+    title: string;
+    type: string;
+    text_content?: string;
+    summary?: string;
+    chapters?: any[];
+  };
 }
 
 export function useOpenAIChatContent({
   conversationId,
   contextId,
-  conversationHistory = []
+  conversationHistory = [],
+  contentData
 }: UseOpenAIChatContentOptions) {
   
   const sendMessageToAI = useCallback(async (message: string): Promise<string> => {
@@ -24,7 +32,8 @@ export function useOpenAIChatContent({
           message,
           conversationId,
           contextId,
-          conversationHistory
+          conversationHistory,
+          contentData
         }
       });
 
@@ -64,7 +73,7 @@ export function useOpenAIChatContent({
       toast.error('An unexpected error occurred');
       return 'I apologize, but something unexpected happened. Please try again.';
     }
-  }, [conversationId, contextId, conversationHistory]);
+  }, [conversationId, contextId, conversationHistory, contentData]);
 
   return { sendMessageToAI };
 }

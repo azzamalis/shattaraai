@@ -199,11 +199,9 @@ export function ContentRightSidebar({
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col bg-background ">
           <TabsContent value="chat" className={cn("flex-1 overflow-hidden mx-4 mb-4", "content-page-tab-content")}>
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <ScrollArea className="h-full">
-                <div className="h-full min-h-[400px] pt-12">
-                  <AIChat />
-                </div>
-              </ScrollArea>
+              <div className="h-full min-h-[400px]">
+                <AIChat contentData={contentData} />
+              </div>
             </div>
           </TabsContent>
           
