@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, RotateCcw, User, Brain } from 'lucide-react';
+import { Copy, RotateCcw, Brain, ThumbsUp, ThumbsDown, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { PromptInputChatBox } from '@/components/chat/shared/PromptInputChatBox';
@@ -9,6 +9,7 @@ import { useChatConversation } from '@/hooks/useChatConversation';
 import { useOpenAIChatContent } from '@/hooks/useOpenAIChatContent';
 import { useAuth } from '@/hooks/useAuth';
 import { ContentData } from '@/pages/ContentPage';
+import { cn } from '@/lib/utils';
 import {
   ChatContainerRoot,
   ChatContainerContent,
@@ -16,7 +17,6 @@ import {
 } from '@/components/prompt-kit/chat-container';
 import {
   Message,
-  MessageAvatar,
   MessageContent,
   MessageActions,
   MessageAction,
@@ -146,46 +146,101 @@ const AIChat = ({ contentData }: AIChatProps) => {
             </div>
           ) : (
             <>
-              {messages.map((message) => (
-                <Message key={message.id} className="mb-4">
-                  <MessageAvatar
-                    src={message.sender_type === 'user' ? '/placeholder.svg' : '/lovable-uploads/a5f90647-c593-4fb0-ba43-1a5cedff3bb3.png'}
-                    alt={message.sender_type === 'user' ? 'User' : 'AI'}
-                    fallback={message.sender_type === 'user' ? 'U' : 'AI'}
-                  />
-                  <div className="flex-1 min-w-0">
-                    {message.sender_type === 'ai' ? (
-                      <div>
-                        <RichMessage content={message.content} className="mb-2" />
-                        <MessageActions>
-                          <MessageAction tooltip="Copy message">
+              {messages.map((message, index) => {
+                const isAssistant = message.sender_type === 'ai';
+                const isLastMessage = index === messages.length - 1;
+
+                return (
+                  <Message
+                    key={message.id}
+                    className={cn(
+                      "mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6",
+                      isAssistant ? "items-start" : "items-end"
+                    )}
+                  >
+                    {isAssistant ? (
+                      <div className="group flex w-full flex-col gap-0">
+                        <RichMessage content={message.content} className="w-full bg-transparent p-0" />
+                        <MessageActions
+                          className={cn(
+                            "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+                            isLastMessage && "opacity-100"
+                          )}
+                        >
+                          <MessageAction tooltip="Copy" delayDuration={100}>
                             <Button
                               variant="ghost"
-                              size="sm"
+                              size="icon"
+                              className="rounded-full"
                               onClick={() => handleCopy(message.content)}
-                              className="h-8 w-8 p-0"
                             >
-                              <Copy className="h-3.5 w-3.5" />
+                              <Copy />
                             </Button>
                           </MessageAction>
-                          <MessageAction tooltip="Regenerate response">
+                          <MessageAction tooltip="Upvote" delayDuration={100}>
                             <Button
                               variant="ghost"
-                              size="sm"
-                              onClick={() => handleRegenerate(message.id)}
-                              className="h-8 w-8 p-0"
+                              size="icon"
+                              className="rounded-full"
                             >
-                              <RotateCcw className="h-3.5 w-3.5" />
+                              <ThumbsUp />
+                            </Button>
+                          </MessageAction>
+                          <MessageAction tooltip="Downvote" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                            >
+                              <ThumbsDown />
                             </Button>
                           </MessageAction>
                         </MessageActions>
                       </div>
                     ) : (
-                      <MessageContent>{message.content}</MessageContent>
+                      <div className="group flex flex-col items-end gap-1">
+                        <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
+                          {message.content}
+                        </MessageContent>
+                        <MessageActions
+                          className={cn(
+                            "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                          )}
+                        >
+                          <MessageAction tooltip="Edit" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                            >
+                              <Pencil />
+                            </Button>
+                          </MessageAction>
+                          <MessageAction tooltip="Delete" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                            >
+                              <Trash />
+                            </Button>
+                          </MessageAction>
+                          <MessageAction tooltip="Copy" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                              onClick={() => handleCopy(message.content)}
+                            >
+                              <Copy />
+                            </Button>
+                          </MessageAction>
+                        </MessageActions>
+                      </div>
                     )}
-                  </div>
-                </Message>
-              ))}
+                  </Message>
+                );
+              })}
               
               {/* Loading indicators */}
               {isProcessingFiles && (
