@@ -1,11 +1,27 @@
-import React from 'react';
-import ReactMarkdown from 'react-markdown';
+import React, { memo, useMemo } from 'react';
+import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import { marked } from 'marked';
 import { cn } from '@/lib/utils';
+import { CodeBlock, CodeBlockCode } from '@/components/prompt-kit/code-block';
 
 interface RichMessageProps {
   content: string;
   className?: string;
+}
+
+// Parse markdown into blocks for better performance
+function parseMarkdownIntoBlocks(markdown: string): string[] {
+  const tokens = marked.lexer(markdown);
+  return tokens.map((token) => token.raw);
+}
+
+// Extract language from className
+function extractLanguage(className?: string): string {
+  if (!className) return "plaintext";
+  const match = className.match(/language-(\w+)/);
+  return match ? match[1] : "plaintext";
 }
 
 // Normalize raw AI text into clean Markdown so it renders clearly
@@ -47,60 +63,102 @@ function normalizeContent(text: string): string {
   return t.trim();
 }
 
-export function RichMessage({ content, className }: RichMessageProps) {
-  const md = normalizeContent(content);
+// Enhanced markdown components with code highlighting
+const markdownComponents: Partial<Components> = {
+  code: function CodeComponent({ className, children, ...props }) {
+    const isInline =
+      !props.node?.position?.start.line ||
+      props.node?.position?.start.line === props.node?.position?.end.line;
+
+    if (isInline) {
+      return (
+        <code
+          className={cn(
+            'rounded bg-muted px-1 py-0.5 text-xs text-foreground',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </code>
+      );
+    }
+
+    const language = extractLanguage(className);
+
+    return (
+      <CodeBlock className={className}>
+        <CodeBlockCode code={children as string} language={language} />
+      </CodeBlock>
+    );
+  },
+  pre: function PreComponent({ children }) {
+    return <>{children}</>;
+  },
+  h1: ({ node, ...props }) => (
+    <h1 className="text-base font-bold text-foreground mb-2" {...props} />
+  ),
+  h2: ({ node, ...props }) => (
+    <h2 className="text-base font-semibold text-foreground mb-2" {...props} />
+  ),
+  h3: ({ node, ...props }) => (
+    <h3 className="text-sm font-semibold text-foreground mb-1" {...props} />
+  ),
+  p: ({ node, ...props }) => (
+    <p className="text-sm leading-relaxed text-foreground mb-1" {...props} />
+  ),
+  ul: ({ node, ...props }) => (
+    <ul className="list-disc pl-5 mb-1 text-foreground/90" {...props} />
+  ),
+  ol: ({ node, ...props }) => (
+    <ol className="list-decimal pl-5 mb-1 text-foreground/90" {...props} />
+  ),
+  li: ({ node, ...props }) => <li className="text-sm mb-1" {...props} />,
+  blockquote: ({ node, ...props }) => (
+    <blockquote className="border-l-2 border-border pl-3 italic text-muted-foreground mb-2" {...props} />
+  ),
+  a: ({ node, ...props }) => (
+    <a className="text-primary underline underline-offset-2" target="_blank" rel="noreferrer" {...props} />
+  ),
+  hr: (props) => <hr className="my-3 border-border" {...props} />
+};
+
+// Memoized markdown block for better performance
+const MemoizedMarkdownBlock = memo(
+  function MarkdownBlock({ content }: { content: string }) {
+    return (
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkBreaks]}
+        components={markdownComponents}
+      >
+        {content}
+      </ReactMarkdown>
+    );
+  },
+  function propsAreEqual(prevProps, nextProps) {
+    return prevProps.content === nextProps.content;
+  }
+);
+
+MemoizedMarkdownBlock.displayName = "MemoizedMarkdownBlock";
+
+function RichMessageComponent({ content, className }: RichMessageProps) {
+  const normalizedContent = useMemo(() => normalizeContent(content), [content]);
+  const blocks = useMemo(() => parseMarkdownIntoBlocks(normalizedContent), [normalizedContent]);
 
   return (
-    <div className={cn(className)}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        components={{
-          h1: ({ node, ...props }) => (
-            <h1 className="text-base font-bold text-foreground mb-2" {...props} />
-          ),
-          h2: ({ node, ...props }) => (
-            <h2 className="text-base font-semibold text-foreground mb-2" {...props} />
-          ),
-          h3: ({ node, ...props }) => (
-            <h3 className="text-sm font-semibold text-foreground mb-1" {...props} />
-          ),
-          p: ({ node, ...props }) => (
-            <p className="text-sm leading-relaxed text-foreground mb-1" {...props} />
-          ),
-          ul: ({ node, ...props }) => (
-            <ul className="list-disc pl-5 mb-1 text-foreground/90" {...props} />
-          ),
-          ol: ({ node, ...props }) => (
-            <ol className="list-decimal pl-5 mb-1 text-foreground/90" {...props} />
-          ),
-          li: ({ node, ...props }) => <li className="text-sm mb-1" {...props} />,
-          blockquote: ({ node, ...props }) => (
-            <blockquote className="border-l-2 border-border pl-3 italic text-muted-foreground mb-2" {...props} />
-          ),
-          a: ({ node, ...props }) => (
-            <a className="text-primary underline underline-offset-2" target="_blank" rel="noreferrer" {...props} />
-          ),
-          code: ({ className, children, ...props }) => (
-            <code
-              className={cn(
-                'rounded bg-muted px-1 py-0.5 text-xs text-foreground',
-                className
-              )}
-              {...props}
-            >
-              {children}
-            </code>
-          ),
-          pre: ({ node, ...props }) => (
-            <pre className="bg-muted text-foreground p-3 rounded-md overflow-x-auto text-xs" {...props} />
-          ),
-          hr: (props) => <hr className="my-3 border-border" {...props} />
-        }}
-      >
-        {md}
-      </ReactMarkdown>
+    <div className={cn("prose prose-sm dark:prose-invert max-w-none", className)}>
+      {blocks.map((block, index) => (
+        <MemoizedMarkdownBlock
+          key={`block-${index}`}
+          content={block}
+        />
+      ))}
     </div>
   );
 }
+
+export const RichMessage = memo(RichMessageComponent);
+RichMessage.displayName = "RichMessage";
 
 export default RichMessage;
