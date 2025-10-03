@@ -136,7 +136,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
   };
 
   return (
-    <div className={className}>
+    <>
       {/* File Previews */}
       <AnimatePresence mode="popLayout">
         {attachedFiles.length > 0 && (
@@ -162,7 +162,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
         value={inputValue}
         onValueChange={setInputValue}
         onSubmit={handleSubmit}
-        className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
+        className={className || "border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"}
       >
         <div className="flex flex-col">
           <PromptInputTextarea
@@ -257,6 +257,6 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
         onChange={handleFileChange}
         className="hidden"
       />
-    </div>
+    </>
   );
 }
