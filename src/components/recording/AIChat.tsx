@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Copy, RotateCcw, User, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ChatInput } from '@/components/chat/shared/ChatInput';
+import { PromptInputChatBox } from '@/components/chat/shared/PromptInputChatBox';
 import { RichMessage } from '@/components/chat/RichMessage';
 import { LoadingIndicator } from '@/components/chat/LoadingIndicator';
 import { useChatConversation } from '@/hooks/useChatConversation';
@@ -202,11 +202,10 @@ const AIChat = ({ contentData }: AIChatProps) => {
       </ChatContainerRoot>
 
       <div className="px-4 pb-4">
-        <ChatInput
+        <PromptInputChatBox
           onSendMessage={handleSendMessage}
           disabled={isSending || isProcessingAI || isProcessingFiles}
-          placeholder="Ask me anything about this content..."
-          className="w-full"
+          placeholder="Ask anything about this content..."
         />
       </div>
     </div>
