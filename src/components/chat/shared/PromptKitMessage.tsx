@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Copy, Check, Paperclip } from 'lucide-react';
+import { Copy, Check, Paperclip, ThumbsUp, ThumbsDown, Pencil, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from '@/hooks/useChatConversation';
-import { Message, MessageAvatar } from '@/components/prompt-kit/message';
+import { Message, MessageAvatar, MessageActions, MessageAction } from '@/components/prompt-kit/message';
 import { RichMessage } from '../RichMessage';
 import { Button } from '@/components/ui/button';
 
@@ -103,8 +103,8 @@ export function PromptKitMessage({
           </div>
         )}
 
-        {/* Message Bubble */}
-        <div className="relative group">
+        {/* Message Bubble with Actions */}
+        <div className="group flex w-full flex-col gap-0">
           <div
             className={cn(
               "rounded-lg px-4 py-3",
@@ -124,23 +124,70 @@ export function PromptKitMessage({
             )}
           </div>
 
-          {/* Copy Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => copyToClipboard(message.content, message.id)}
+          {/* Message Actions */}
+          <MessageActions
             className={cn(
-              "absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity",
-              "hover:bg-secondary/20"
+              "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+              isUser ? "-mr-2.5 justify-end" : "-ml-2.5"
             )}
-            title="Copy message"
           >
-            {copiedId === message.id ? (
-              <Check className="h-3 w-3 text-[#00A3FF]" />
-            ) : (
-              <Copy className="h-3 w-3" />
+            <MessageAction tooltip="Copy" delayDuration={100}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-8 w-8"
+                onClick={() => copyToClipboard(message.content, message.id)}
+              >
+                {copiedId === message.id ? <Check className="h-4 w-4 text-[#00A3FF]" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </MessageAction>
+
+            {!isUser && (
+              <>
+                <MessageAction tooltip="Upvote" delayDuration={100}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-8 w-8"
+                  >
+                    <ThumbsUp className="h-4 w-4" />
+                  </Button>
+                </MessageAction>
+                <MessageAction tooltip="Downvote" delayDuration={100}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-8 w-8"
+                  >
+                    <ThumbsDown className="h-4 w-4" />
+                  </Button>
+                </MessageAction>
+              </>
             )}
-          </Button>
+
+            {isUser && (
+              <>
+                <MessageAction tooltip="Edit" delayDuration={100}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-8 w-8"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </MessageAction>
+                <MessageAction tooltip="Delete" delayDuration={100}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-8 w-8"
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </MessageAction>
+              </>
+            )}
+          </MessageActions>
         </div>
 
         {/* Timestamp */}
