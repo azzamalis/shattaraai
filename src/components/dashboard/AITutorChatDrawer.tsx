@@ -1,16 +1,29 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, AlertCircle, Clock, User, Bot, GripVertical, SquarePen } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { X, Loader2, AlertCircle, Clock, GripVertical, SquarePen, Copy, ThumbsUp, ThumbsDown, Pencil, Trash, ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { chatMessageStyles, formatTimestamp } from '@/lib/chatStyles';
+import {
+  ChatContainerContent,
+  ChatContainerRoot,
+  ChatContainerScrollAnchor,
+} from "@/components/prompt-kit/chat-container";
+import {
+  Message,
+  MessageAction,
+  MessageActions,
+  MessageContent,
+} from "@/components/prompt-kit/message";
+import {
+  PromptInput,
+  PromptInputActions,
+  PromptInputTextarea,
+} from "@/components/prompt-kit/prompt-input";
+import { cn } from "@/lib/utils";
 import { useChatConversation } from '@/hooks/useChatConversation';
 import { useOpenAIChat } from '@/hooks/useOpenAIChat';
 import { useAIUsageTracking } from '@/hooks/useAIUsageTracking';
 import { useWindowSize } from '@/hooks/use-window-size';
-import RichMessage from '@/components/chat/RichMessage';
 
 interface AITutorChatDrawerProps {
   open: boolean;
@@ -43,7 +56,6 @@ export function AITutorChatDrawer({
     return 400;
   });
   const [isResizing, setIsResizing] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { isMobile, width: windowWidth } = useWindowSize();
   const resizeRef = useRef<HTMLDivElement>(null);
 
@@ -158,12 +170,6 @@ export function AITutorChatDrawer({
     }
   }, [open, conversation, persistedMessages, roomContent.length, usageStats, planLimits]);
 
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, isAITyping]);
-
   const handleSendMessage = async () => {
     if (!input.trim() || !conversation) return;
 
@@ -248,11 +254,25 @@ export function AITutorChatDrawer({
     setWelcomeMessageSent(true);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
+  // Message action handlers
+  const handleCopyMessage = (content: string) => {
+    navigator.clipboard.writeText(content);
+  };
+
+  const handleEditMessage = (messageId: string) => {
+    console.log('Edit message:', messageId);
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    setMessages(prev => prev.filter(m => m.id !== messageId));
+  };
+
+  const handleUpvote = (messageId: string) => {
+    console.log('Upvote:', messageId);
+  };
+
+  const handleDownvote = (messageId: string) => {
+    console.log('Downvote:', messageId);
   };
 
   // Handle keyboard resize
@@ -397,91 +417,160 @@ export function AITutorChatDrawer({
           )}
           
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden">
-            <div className={chatMessageStyles.container}>
-              {messages.map(message => (
-                <div 
-                  key={message.id} 
-                  className={chatMessageStyles.wrapper(message.sender_type === 'user')}
-                >
-                  {/* Message Label */}
-                  <div className={message.sender_type === 'user' ? chatMessageStyles.userLabel : chatMessageStyles.aiLabel}>
-                    {message.sender_type === 'user' ? (
-                      <>
-                        <User className="h-3 w-3" />
-                        <span>You</span>
-                      </>
-                    ) : (
-                      <>
-                        <Bot className="h-3 w-3" />
-                        <span>AI Tutor</span>
-                      </>
-                    )}
-                  </div>
+          <ChatContainerRoot className="flex-1 overflow-y-auto px-4 py-6">
+            <ChatContainerContent className="space-y-6">
+              {messages.map((message, index) => {
+                const isAssistant = message.sender_type === 'ai';
+                const isLastMessage = index === messages.length - 1;
 
-                  {/* Message Content */}
-                  <div className="w-full">
-                    <RichMessage content={message.content} className={chatMessageStyles.content} />
-                    
-                    {/* Timestamp and metadata */}
-                    <div className={chatMessageStyles.timestamp}>
-                      <span>{formatTimestamp(new Date(message.created_at))}</span>
-                      {message.sender_type === 'ai' && (message as any).metadata?.cached && (
-                        <Badge variant="outline" className="text-xs py-0 px-1 shrink-0">
-                          Cached
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                return (
+                  <Message
+                    key={message.id}
+                    className={cn(
+                      "mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6",
+                      isAssistant ? "items-start" : "items-end"
+                    )}
+                  >
+                    {isAssistant ? (
+                      <div className="group flex w-full flex-col gap-0">
+                        <MessageContent
+                          className="text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0"
+                          markdown
+                        >
+                          {message.content}
+                        </MessageContent>
+                        <MessageActions
+                          className={cn(
+                            "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+                            isLastMessage && "opacity-100"
+                          )}
+                        >
+                          <MessageAction tooltip="Copy" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                              onClick={() => handleCopyMessage(message.content)}
+                            >
+                              <Copy />
+                            </Button>
+                          </MessageAction>
+                          <MessageAction tooltip="Upvote" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                              onClick={() => handleUpvote(message.id)}
+                            >
+                              <ThumbsUp />
+                            </Button>
+                          </MessageAction>
+                          <MessageAction tooltip="Downvote" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                              onClick={() => handleDownvote(message.id)}
+                            >
+                              <ThumbsDown />
+                            </Button>
+                          </MessageAction>
+                        </MessageActions>
+                      </div>
+                    ) : (
+                      <div className="group flex flex-col items-end gap-1">
+                        <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
+                          {message.content}
+                        </MessageContent>
+                        <MessageActions
+                          className={cn(
+                            "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                          )}
+                        >
+                          <MessageAction tooltip="Edit" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                              onClick={() => handleEditMessage(message.id)}
+                            >
+                              <Pencil />
+                            </Button>
+                          </MessageAction>
+                          <MessageAction tooltip="Delete" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                              onClick={() => handleDeleteMessage(message.id)}
+                            >
+                              <Trash />
+                            </Button>
+                          </MessageAction>
+                          <MessageAction tooltip="Copy" delayDuration={100}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                              onClick={() => handleCopyMessage(message.content)}
+                            >
+                              <Copy />
+                            </Button>
+                          </MessageAction>
+                        </MessageActions>
+                      </div>
+                    )}
+                  </Message>
+                );
+              })}
               
               {/* AI Typing Indicator */}
               {isAITyping && (
-                <div className={chatMessageStyles.wrapper(false)}>
-                  <div className={chatMessageStyles.aiLabel}>
-                    <Bot className="h-3 w-3" />
-                    <span>AI Tutor</span>
+                <Message
+                  className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 items-start"
+                >
+                  <div className="flex items-center gap-2 py-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Shattara AI is thinking...</span>
                   </div>
-                  <div className="w-full">
-                    <div className="flex items-center gap-2 py-2">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      <span className="text-sm text-muted-foreground">AI Tutor is thinking...</span>
-                    </div>
-                  </div>
-                </div>
+                </Message>
               )}
-              
-              <div ref={messagesEndRef} />
-            </div>
-          </div>
+            </ChatContainerContent>
+            <ChatContainerScrollAnchor />
+          </ChatContainerRoot>
           
           {/* Input Area */}
-          <div className="p-6 border-t border-border bg-background shrink-0">
-            <div className="flex gap-3">
-              <Input 
-                value={input} 
-                onChange={e => setInput(e.target.value)} 
-                onKeyDown={handleKeyDown} 
-                placeholder="Ask about your study materials..." 
-                className="bg-muted border-border text-foreground placeholder:text-muted-foreground min-w-0 flex-1"
-                disabled={isSending || isAITyping}
-              />
-              <Button 
-                onClick={handleSendMessage} 
-                disabled={!input.trim() || isSending || isAITyping || !conversation || !!rateLimitError} 
-                className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-sm shrink-0"
-              >
-                {isSending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-                <span className="sr-only">Send message</span>
-              </Button>
-            </div>
+          <div className="inset-x-0 bottom-0 mx-auto w-full shrink-0 px-6 pb-6">
+            <PromptInput
+              isLoading={isSending || isAITyping}
+              value={input}
+              onValueChange={setInput}
+              onSubmit={handleSendMessage}
+              className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
+            >
+              <div className="flex flex-col">
+                <PromptInputTextarea
+                  placeholder="Ask about your study materials..."
+                  className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3]"
+                />
+
+                <PromptInputActions className="mt-3 flex w-full items-center justify-end gap-2 px-3 pb-3">
+                  <Button
+                    size="icon"
+                    disabled={!input.trim() || isSending || isAITyping || !conversation || !!rateLimitError}
+                    onClick={handleSendMessage}
+                    className="size-9 rounded-full"
+                  >
+                    {isSending || isAITyping ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <ArrowUp size={18} />
+                    )}
+                  </Button>
+                </PromptInputActions>
+              </div>
+            </PromptInput>
             
-            {/* Resize hint for keyboard users */}
             {!isMobile && (
               <div className="text-xs text-muted-foreground mt-2 text-center">
                 Use Alt + ← → to resize, or drag the left border
