@@ -1,20 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Paperclip, Globe, Send, X, FileText, Image as ImageIcon } from 'lucide-react';
+import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import {
   PromptInput,
   PromptInputTextarea,
   PromptInputActions,
   PromptInputAction,
 } from '@/components/prompt-kit/prompt-input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 const AI_MODELS = [
   { value: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash" },
@@ -161,76 +162,90 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
         value={inputValue}
         onValueChange={setInputValue}
         onSubmit={handleSubmit}
-        className="relative"
+        className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
       >
-        <div className="relative">
+        <div className="flex flex-col">
           <PromptInputTextarea
             placeholder="Ask Shattara AI anything"
-            className="min-h-[56px] pr-12"
+            className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3]"
           />
 
-          {/* Send Button */}
-          <motion.div
-            className="absolute bottom-3 right-3 z-30"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{
-              scale: hasContent ? 1 : 0.8,
-              opacity: hasContent ? 1 : 0.3,
-            }}
-            transition={{ duration: 0.2 }}
-          >
-            <Button
-              size="icon"
-              onClick={handleSubmit}
-              disabled={!hasContent}
-              className="h-8 w-8 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </motion.div>
+          <PromptInputActions className="mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3">
+            <div className="flex items-center gap-2">
+              <PromptInputAction tooltip="Attach files">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleFileAttach}
+                  className="size-9 rounded-full"
+                >
+                  <Plus size={18} />
+                </Button>
+              </PromptInputAction>
+
+              <PromptInputAction tooltip="Search the web">
+                <Button
+                  variant="outline"
+                  onClick={() => setDeepSearchActive(!deepSearchActive)}
+                  className={`rounded-full ${deepSearchActive ? 'bg-accent' : ''}`}
+                >
+                  <Globe size={18} />
+                  Search
+                </Button>
+              </PromptInputAction>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="size-9 rounded-full"
+                  >
+                    <MoreHorizontal size={18} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                  <DropdownMenuLabel>AI Model</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {AI_MODELS.map((model) => (
+                    <DropdownMenuItem
+                      key={model.value}
+                      onClick={() => setSelectedModel(model.value)}
+                      className={selectedModel === model.value ? 'bg-accent' : ''}
+                    >
+                      {model.label}
+                      {selectedModel === model.value && (
+                        <span className="ml-auto">✓</span>
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <PromptInputAction tooltip="Voice input">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="size-9 rounded-full"
+                  disabled
+                >
+                  <Mic size={18} />
+                </Button>
+              </PromptInputAction>
+
+              <Button
+                size="icon"
+                disabled={!hasContent}
+                onClick={handleSubmit}
+                className="size-9 rounded-full"
+              >
+                <ArrowUp size={18} />
+              </Button>
+            </div>
+          </PromptInputActions>
         </div>
-
-        {/* Toolbar */}
-        <PromptInputActions className="flex items-center justify-between w-full px-3 pb-2 pt-1">
-          <div className="flex items-center gap-2">
-            <PromptInputAction tooltip="Attach files" side="top">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleFileAttach}
-                className="h-8 text-muted-foreground hover:text-foreground"
-              >
-                <Paperclip className="h-4 w-4 mr-1.5" />
-                <span className="text-xs">Attach</span>
-              </Button>
-            </PromptInputAction>
-
-            <PromptInputAction tooltip="Search the web" side="top">
-              <Button
-                variant={deepSearchActive ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => setDeepSearchActive(!deepSearchActive)}
-                className="h-8 text-muted-foreground hover:text-foreground"
-              >
-                <Globe className="h-4 w-4 mr-1.5" />
-                <span className="text-xs">Search</span>
-              </Button>
-            </PromptInputAction>
-          </div>
-
-          <Select value={selectedModel} onValueChange={setSelectedModel}>
-            <SelectTrigger className="w-[180px] h-8 text-xs border-border bg-background">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {AI_MODELS.map((model) => (
-                <SelectItem key={model.value} value={model.value} className="text-xs">
-                  {model.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </PromptInputActions>
       </PromptInput>
 
       {/* Hidden File Input */}
