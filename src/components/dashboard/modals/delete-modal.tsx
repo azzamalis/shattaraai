@@ -1,9 +1,15 @@
 
-
 import React from 'react';
-import { BaseModal } from '@/components/ui/base-modal';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 interface DeleteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -28,36 +34,33 @@ export function DeleteModal({
   itemToDelete,
   onConfirm
 }: DeleteModalProps) {
-  return <BaseModal open={open} onOpenChange={onOpenChange} title="" className="sm:max-w-lg" showCloseButton={false}>
-      <div className="space-y-4 py-1">
-        {/* Header with close button */}
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-foreground">
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="sm:max-w-lg bg-card border-border">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-lg font-semibold text-foreground">
             Are you sure you want to delete this {type}?
-          </h3>
-          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="h-8 w-8 rounded-md hover:bg-muted/50">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Subtitle */}
-        <p className="text-sm text-muted-foreground">
-          "{truncateText(itemToDelete.title)}" will be permanently deleted.
-        </p>
-
-        {/* Actions */}
-        <div className="flex justify-end gap-3 pt-2 py-0">
-          <Button variant="ghost" onClick={() => onOpenChange(false)} className="hover:bg-muted/50">
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-sm text-muted-foreground">
+            "{truncateText(itemToDelete.title)}" will be permanently deleted.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="hover:bg-muted/50">
             Cancel
-          </Button>
-          <Button variant="destructive" onClick={() => {
-          onConfirm();
-          onOpenChange(false);
-        }} className="bg-red-500 hover:bg-red-600 focus:ring-2 focus:ring-red-500/20">
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              onConfirm();
+              onOpenChange(false);
+            }}
+            className="bg-red-500 hover:bg-red-600 text-white focus:ring-2 focus:ring-red-500/20"
+          >
             Delete
-          </Button>
-        </div>
-      </div>
-    </BaseModal>;
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 }
 
