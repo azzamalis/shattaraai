@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
-import { AIChatInput } from '@/components/ui/ai-chat-input';
+import { EnhancedPromptInput } from '@/components/ui/enhanced-prompt-input';
 import { NewFeaturePromo } from './NewFeaturePromo';
 import { ActionCards } from './ActionCards';
 import { useContent } from '@/contexts/ContentContext';
@@ -75,9 +75,7 @@ export function DashboardHero({
     }} transition={{
       duration: 0.5
     }} className="relative my-6 sm:my-8">
-        <div className="relative">
-          <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
-        </div>
+        <EnhancedPromptInput onSubmit={handleAISubmit} />
       </motion.div>
 
       {/* Quick Tips Section with matching subtle styling */}
