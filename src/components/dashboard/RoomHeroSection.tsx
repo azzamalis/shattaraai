@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ActionCards } from './ActionCards';
-import { AIChatInput } from '@/components/ui/ai-chat-input';
+import { EnhancedPromptInput } from '@/components/ui/enhanced-prompt-input';
 import { PasteContentModal } from './PasteContentModal';
 import { ExamPrepStepOneRedesigned } from './exam-prep/ExamPrepStepOneRedesigned';
 import { Progress } from '@/components/ui/progress';
@@ -182,9 +182,7 @@ export function RoomHeroSection({
       }} transition={{
         duration: 0.5
       }} className="relative my-6 sm:my-8">
-          <div className="relative">
-            <AIChatInput onSubmit={handleAISubmit} initialIsActive={false} />
-          </div>
+          <EnhancedPromptInput onSubmit={handleAISubmit} />
         </motion.div>
 
         <motion.div initial={{
