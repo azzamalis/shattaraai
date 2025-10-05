@@ -68,16 +68,24 @@ export function ChatInterface({
   };
 
   useEffect(() => {
-    // Process initial query once the conversation is ready and we haven't processed it yet
-    // Only process if we have no existing messages (empty conversation)
-    if (initialQuery && !hasProcessedInitialQuery && !isLoading && sendMessage && messages.length === 0 && conversation) {
-      console.log('ChatInterface - Processing initial query:', initialQuery, 'Messages count:', messages.length);
-      
-      // Process immediately since conversation is ready
+    // Process initial query once the conversation is ready
+    // ONLY process if:
+    // 1. We have an initial query
+    // 2. Conversation is loaded (not loading)
+    // 3. We have NO existing messages (fresh conversation)
+    // 4. We haven't already processed it
+    if (
+      initialQuery && 
+      !hasProcessedInitialQuery && 
+      !isLoading && 
+      conversation && 
+      messages.length === 0
+    ) {
+      console.log('ChatInterface - Processing initial query once:', initialQuery);
       handleSendMessage(initialQuery);
       setHasProcessedInitialQuery(true);
     }
-  }, [initialQuery, hasProcessedInitialQuery, isLoading, sendMessage, messages.length, conversation]);
+  }, [initialQuery, conversation?.id, isLoading, messages.length]);
 
   const handleSendMessage = async (content: string, attachments?: File[]) => {
     console.log('ChatInterface - handleSendMessage called with content:', content, 'attachments:', attachments);
@@ -139,7 +147,7 @@ export function ChatInterface({
         }
 
         // 4. Update content status to completed after first exchange
-        if (contentId && !hasProcessedInitialQuery) {
+        if (contentId && messages.length === 0) {
           await supabase
             .from('content')
             .update({ 
@@ -147,8 +155,6 @@ export function ChatInterface({
               updated_at: new Date().toISOString()
             })
             .eq('id', contentId);
-          
-          setHasProcessedInitialQuery(true);
         }
       }
     } catch (error) {

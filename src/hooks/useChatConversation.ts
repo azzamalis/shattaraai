@@ -120,12 +120,21 @@ export function useChatConversation({
         return;
       }
 
+      // Skip if already creating or if we already have a conversation
       if (isCreatingRef.current) {
         console.log('Already creating conversation, skipping...');
         return;
       }
 
+      // Skip if we already have a conversation for this context
+      if (conversationId && conversation?.context_id === contextId) {
+        console.log('Conversation already loaded for this context:', conversationId);
+        return;
+      }
+
+      isCreatingRef.current = true;
       setIsLoading(true);
+      
       try {
         // If we have a contextId (content ID), try to find existing conversation first
         if (contextId) {
@@ -141,6 +150,7 @@ export function useChatConversation({
 
           if (error && error.code !== 'PGRST116') {
             console.error('Error fetching conversation:', error);
+            isCreatingRef.current = false;
             return;
           }
 
@@ -170,9 +180,13 @@ export function useChatConversation({
                   processing_status: 'processing'
                 })
                 .eq('id', contextId);
+              
+              console.log('New conversation created and linked:', newConversation.id);
             }
           }
         }
+      } catch (error) {
+        console.error('Error in loadConversation:', error);
       } finally {
         setIsLoading(false);
         isCreatingRef.current = false;
@@ -180,7 +194,7 @@ export function useChatConversation({
     };
 
     loadConversation();
-  }, [conversationType, contextId, contextType, user, fetchMessages, autoCreate, createConversation]);
+  }, [conversationType, contextId, contextType, user?.id]);
 
   const sendMessage = async (
     content: string, 
