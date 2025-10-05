@@ -23,7 +23,6 @@ export function DashboardHero({
       // Create content entry FIRST with initial query as title
       const title = value.slice(0, 100) + (value.length > 100 ? '...' : '');
       
-      const { onAddContentWithMetadata } = useContent();
       const contentId = await onAddContentWithMetadata({
         title: title,
         type: 'chat',
