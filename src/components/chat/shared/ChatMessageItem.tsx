@@ -58,7 +58,7 @@ export function ChatMessageItem({
           <div className="mb-2 flex flex-wrap gap-2">
             {message.attachments.map((attachment, index) => (
               <div
-                key={`${attachment.id || index}`}
+                key={`${attachment.name}-${index}`}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 rounded-lg text-sm border",
                   "bg-[#00A3FF]/10 border-[#00A3FF]/20 text-[#00A3FF]",

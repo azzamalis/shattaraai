@@ -14,6 +14,7 @@ interface RoomHeroSectionProps {
   // Exam prep props
   isExamMode?: boolean;
   examModeData?: {
+    roomId?: string;
     selectedCount: number;
     totalCount: number;
     isAllSelected: boolean;
@@ -86,14 +87,35 @@ export function RoomHeroSection({
     }
     setIsPasteModalOpen(false);
   };
-  const handleAISubmit = async (value: string) => {
+  const handleAISubmit = async (value: string, files?: File[]) => {
     try {
-      // Navigate directly to new chat route without creating content first
-      const searchParams = new URLSearchParams({
-        query: value
+      const title = value.slice(0, 100) + (value.length > 100 ? '...' : '');
+      
+      const contentId = await onAddContentWithMetadata({
+        title: title,
+        type: 'chat',
+        text_content: value,
+        room_id: examModeData?.roomId || null,
+        processing_status: 'pending',
+        metadata: {
+          initialQuery: value,
+          roomContext: true,
+          roomId: examModeData?.roomId,
+          hasAttachments: files && files.length > 0,
+          createdFrom: 'room_hero'
+        }
       });
-      navigate(`/chat/new?${searchParams.toString()}`);
-      toast.success("Starting conversation with Shattara AI");
+
+      if (contentId) {
+        const searchParams = new URLSearchParams();
+        searchParams.set('query', value);
+        if (files && files.length > 0) {
+          searchParams.set('hasFiles', 'true');
+        }
+        
+        navigate(`/chat/${contentId}?${searchParams.toString()}`);
+        toast.success('Starting conversation in room');
+      }
     } catch (error) {
       console.error('Error starting chat:', error);
       toast.error('Failed to start conversation');

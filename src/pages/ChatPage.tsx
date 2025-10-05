@@ -1,75 +1,68 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { UnifiedTabType } from '@/components/shared/UnifiedTabNavigation';
-import { ContentType } from '@/lib/types';
 import { useContent } from '@/hooks/useContent';
+import { Loader2 } from 'lucide-react';
 
 export default function ChatPage() {
-  const { id } = useParams<{ id: string }>();
+  const { contentId } = useParams<{ contentId: string }>();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('query');
   const { fetchContentById } = useContent();
   
-  console.log('ChatPage - Received query:', query, 'Content ID:', id);
-  
-  // Determine if this is a new chat or existing chat
-  const isNewChat = !id || id === 'new' || id === 'new-chat';
-  const contentId = isNewChat ? undefined : id;
-  
-  const [contentData, setContentData] = useState({
-    id: id || 'new-chat',
-    type: 'chat' as ContentType,
-    title: 'Chat with Shattara AI',
-    text: query || '',
-    isProcessing: false,
-    hasError: false,
-  });
+  const [contentData, setContentData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<UnifiedTabType>('chat');
 
-  // Load existing chat content if contentId is provided
+  // Load content from database
   useEffect(() => {
-    const loadChatContent = async () => {
-      if (contentId && contentId !== 'new' && contentId !== 'new-chat') {
-        try {
-          const existingContent = await fetchContentById(contentId);
-          if (existingContent) {
-            setContentData({
-              id: existingContent.id,
-              type: existingContent.type,
-              title: existingContent.title,
-              text: existingContent.text_content || '',
-              isProcessing: existingContent.processing_status === 'processing',
-              hasError: existingContent.processing_status === 'failed',
-            });
-          }
-        } catch (error) {
-          console.error('Failed to load chat content:', error);
+    const loadContent = async () => {
+      if (!contentId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const content = await fetchContentById(contentId);
+        if (content) {
+          setContentData(content);
         }
+      } catch (error) {
+        console.error('Failed to load chat content:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    loadChatContent();
+    loadContent();
   }, [contentId, fetchContentById]);
 
-  const [activeTab, setActiveTab] = useState<UnifiedTabType>('chat');
-
-  const updateContentData = (updates: any) => {
-    setContentData(prev => ({ ...prev, ...updates }));
-  };
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+            <p className="text-muted-foreground">Loading chat...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout 
       className="chat-page-layout p-0"
       contentData={contentData}
-      onUpdateContent={updateContentData}
+      onUpdateContent={(updates) => setContentData(prev => ({ ...prev, ...updates }))}
     >
       <div className="flex flex-col h-[calc(100vh-64px)] bg-background">
         <ChatInterface 
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          initialQuery={query}
+          initialQuery={query || contentData?.text_content}
           contentId={contentId}
         />
       </div>

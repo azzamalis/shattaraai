@@ -14,6 +14,7 @@ import { ChatTitleGenerator } from './shared/ChatTitleGenerator';
 import { LoadingIndicator } from './LoadingIndicator';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChatInterfaceProps {
   activeTab: UnifiedTabType;
@@ -81,41 +82,54 @@ export function ChatInterface({
   const handleSendMessage = async (content: string, attachments?: File[]) => {
     console.log('ChatInterface - handleSendMessage called with content:', content, 'attachments:', attachments);
     
+    const hasFiles = attachments && attachments.length > 0;
+    setIsProcessingFiles(hasFiles);
+    setIsProcessingAI(true);
+
     try {
-      // Process files if attachments exist
-      let fileContent = '';
-      if (attachments && attachments.length > 0 && Array.isArray(attachments)) {
-        if (!user?.id) {
-          console.error('User not authenticated for file upload');
-          toast.error("Please sign in to upload files.");
-          return;
+      // 1. Upload files to storage FIRST
+      const uploadedAttachments: Array<{
+        name: string;
+        type: string;
+        size: number;
+        url: string;
+        uploadedAt: string;
+      }> = [];
+
+      if (hasFiles) {
+        console.log(`Uploading ${attachments.length} files to storage...`);
+        
+        for (const file of attachments) {
+          try {
+            const { uploadFileToStorage } = await import('@/lib/storage');
+            const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
+            
+            uploadedAttachments.push({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              url: fileUrl,
+              uploadedAt: new Date().toISOString()
+            });
+            
+            console.log(`File uploaded: ${file.name} -> ${fileUrl}`);
+          } catch (uploadError) {
+            console.error(`Failed to upload ${file.name}:`, uploadError);
+            toast.error(`Failed to upload ${file.name}`);
+          }
         }
         
-        setIsProcessingFiles(true);
-        try {
-          const { processAndUploadFiles, formatFileContentForAI } = await import('@/utils/fileProcessing');
-          console.log('Processing files:', attachments);
-          const processedFiles = await processAndUploadFiles(attachments, user.id);
-          console.log('Processed files:', processedFiles);
-          fileContent = formatFileContentForAI(processedFiles);
-          console.log('Formatted file content for AI:', fileContent);
-        } catch (error) {
-          console.error('Error processing files:', error);
-          toast.error("Failed to process attachments. Please try again.");
-          setIsProcessingFiles(false);
-          return;
-        }
         setIsProcessingFiles(false);
       }
 
-      const fullContent = content + fileContent;
-      const userMessage = await sendMessage(fullContent, attachments);
+      // 2. Send user message with attachment URLs
+      const userMessage = await sendMessage(content, uploadedAttachments);
       
       if (userMessage) {
-        // Get AI response using the real OpenAI integration
+        // 3. Generate AI response
         setIsProcessingAI(true);
         try {
-          const aiResponse = await sendMessageToAI(fullContent);
+          const aiResponse = await sendMessageToAI(content);
           await addAIResponse(aiResponse);
         } catch (error) {
           console.error('Error getting AI response:', error);
@@ -123,11 +137,26 @@ export function ChatInterface({
         } finally {
           setIsProcessingAI(false);
         }
+
+        // 4. Update content status to completed after first exchange
+        if (contentId && !hasProcessedInitialQuery) {
+          await supabase
+            .from('content')
+            .update({ 
+              processing_status: 'completed',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', contentId);
+          
+          setHasProcessedInitialQuery(true);
+        }
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      setIsProcessingFiles(false);
+      toast.error('Failed to send message');
+    } finally {
       setIsProcessingAI(false);
+      setIsProcessingFiles(false);
     }
   };
 

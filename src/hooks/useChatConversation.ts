@@ -12,11 +12,11 @@ export interface ChatMessage {
   sender_type: 'user' | 'ai' | 'system';
   created_at: string;
   attachments?: Array<{
-    id: string;
     name: string;
     type: string;
     size: number;
-    url?: string;
+    url: string;
+    uploadedAt: string;
   }>;
 }
 
@@ -120,7 +120,6 @@ export function useChatConversation({
         return;
       }
 
-      // Prevent concurrent creation attempts
       if (isCreatingRef.current) {
         console.log('Already creating conversation, skipping...');
         return;
@@ -128,27 +127,17 @@ export function useChatConversation({
 
       setIsLoading(true);
       try {
-        // If we have a contextId, always look for that specific conversation first
+        // If we have a contextId (content ID), try to find existing conversation first
         if (contextId) {
           console.log('Looking for conversation with contextId:', contextId);
           
-          let query = supabase
+          const { data: existingConversation, error } = await supabase
             .from('chat_conversations')
             .select('*')
-            .eq('type', conversationType)
-            .eq('user_id', user.id)
+            .eq('context_id', contextId)
             .eq('context_type', contextType || 'content')
-            .order('created_at', { ascending: false })
-            .limit(1);
-
-          // For room collaboration, check metadata instead of context_id
-          if (conversationType === 'room_collaboration') {
-            query = query.contains('metadata', { room_id: contextId });
-          } else {
-            query = query.eq('context_id', contextId);
-          }
-
-          const { data: existingConversation, error } = await query.maybeSingle();
+            .eq('user_id', user.id)
+            .maybeSingle();
 
           if (error && error.code !== 'PGRST116') {
             console.error('Error fetching conversation:', error);
@@ -156,112 +145,31 @@ export function useChatConversation({
           }
 
           if (existingConversation) {
-            console.log('Loading existing conversation for contextId:', existingConversation.id);
+            console.log('Found existing conversation:', existingConversation.id);
             setConversationId(existingConversation.id);
             setConversation(existingConversation);
             await fetchMessages(existingConversation.id);
           } else if (autoCreate) {
-            // Create new conversation for this specific contextId
-            console.log('Creating new conversation for contextId:', contextId);
-            const newConversation = await createConversation(conversationType, contextId, contextType);
+            // Create new conversation linked to content
+            console.log('Creating new conversation with context:', contextId);
+            const newConversation = await createConversation(
+              conversationType,
+              contextId,
+              contextType || 'content'
+            );
+            
             if (newConversation) {
               setConversationId(newConversation.id);
               setConversation(newConversation);
-              setMessages([]); // Start with empty messages for new conversation
-            }
-          }
-        } else if (autoCreate) {
-          // Set lock to prevent concurrent creation
-          isCreatingRef.current = true;
-          
-          // For general chat without contextId, create content entry first then conversation
-          console.log('Creating new general conversation');
-          
-          // Create content entry to make chat visible in dashboard
-          let contentId: string | undefined;
-          if (conversationType === 'general') {
-            try {
-              // Check if a pending chat content already exists
-              const { data: existingContent } = await supabase
-                .from('content')
-                .select('id')
-                .eq('user_id', user.id)
-                .eq('type', 'chat')
-                .eq('processing_status', 'pending')
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .maybeSingle();
-
-              if (existingContent) {
-                contentId = existingContent.id;
-                console.log('Reusing existing content entry:', existingContent.id);
-              } else {
-                const { data: contentData, error: contentError } = await supabase
-                  .from('content')
-                  .insert({
-                    user_id: user.id,
-                    title: 'New Chat Session',
-                    type: 'chat',
-                    processing_status: 'pending',
-                    text_content: '',
-                    metadata: { conversation_type: 'general', auto_generated: true }
-                  })
-                  .select()
-                  .single();
-
-                if (contentError) {
-                  console.error('Error creating content entry:', contentError);
-                } else {
-                  contentId = contentData.id;
-                  console.log('Created content entry for chat:', contentData);
-                }
-              }
-            } catch (error) {
-              console.error('Error creating content entry:', error);
-            }
-          }
-          
-          // Check if conversation already exists for this content
-          let newConversation;
-          if (contentId) {
-            const { data: existingConversation } = await supabase
-              .from('chat_conversations')
-              .select('*')
-              .eq('user_id', user.id)
-              .eq('type', conversationType)
-              .eq('context_id', contentId)
-              .limit(1)
-              .maybeSingle();
-
-            if (existingConversation) {
-              newConversation = existingConversation;
-              console.log('Reusing existing conversation:', existingConversation.id);
-            } else {
-              newConversation = await createConversation(
-                conversationType, 
-                contentId,
-                conversationType === 'general' ? 'content' : undefined
-              );
-            }
-          } else {
-            newConversation = await createConversation(
-              conversationType, 
-              contentId,
-              conversationType === 'general' ? 'content' : undefined
-            );
-          }
-          
-          if (newConversation) {
-            setConversationId(newConversation.id);
-            setConversation(newConversation);
-            setMessages([]); // Start with empty messages for new conversation
-            
-            // Update content status once conversation is ready
-            if (contentId) {
+              
+              // Update content with conversation link in metadata
               await supabase
                 .from('content')
-                .update({ processing_status: 'completed' })
-                .eq('id', contentId);
+                .update({ 
+                  metadata: { conversationId: newConversation.id },
+                  processing_status: 'processing'
+                })
+                .eq('id', contextId);
             }
           }
         }
@@ -274,13 +182,21 @@ export function useChatConversation({
     loadConversation();
   }, [conversationType, contextId, contextType, user, fetchMessages, autoCreate, createConversation]);
 
-  const sendMessage = async (content: string, attachments?: File[]): Promise<ChatMessage | null> => {
+  const sendMessage = async (
+    content: string, 
+    attachments?: Array<{
+      name: string;
+      type: string;
+      size: number;
+      url: string;
+      uploadedAt: string;
+    }>
+  ): Promise<ChatMessage | null> => {
     if (!user || !conversationId) {
       console.error('User not authenticated or conversation not initialized');
       return null;
     }
 
-    // Prevent duplicate sends
     if (isSendingRef.current) {
       console.log('Already sending message, skipping duplicate...');
       return null;
@@ -289,29 +205,22 @@ export function useChatConversation({
     isSendingRef.current = true;
     setIsSending(true);
     try {
-      // Process attachments into the format we need
-      const processedAttachments = attachments?.map((file, index) => ({
-        id: `temp-${Date.now()}-${index}`,
-        name: file.name,
-        type: file.type,
-        size: file.size
-      })) || [];
-
-      console.log('Sending message with files:', attachments);
-      console.log('Sending message with processed attachments:', processedAttachments);
-
-      // Create the metadata object with attachments
-      const metadata = processedAttachments.length > 0 ? { attachments: processedAttachments } : null;
+      const metadata = attachments && attachments.length > 0 ? {
+        attachments: attachments,
+        hasAttachments: true,
+        attachmentCount: attachments.length
+      } : null;
 
       const { data, error } = await supabase
         .from('chat_messages')
-        .insert({
+        .insert([{
           conversation_id: conversationId,
           sender_type: 'user',
           content: content,
           user_id: user.id,
+          message_type: 'text',
           metadata: metadata
-        })
+        }])
         .select()
         .single();
 
@@ -325,7 +234,7 @@ export function useChatConversation({
         content: data.content,
         sender_type: data.sender_type as 'user' | 'ai' | 'system',
         created_at: data.created_at,
-        attachments: processedAttachments
+        attachments: attachments
       };
 
       console.log('Created new message with attachments:', newMessage);

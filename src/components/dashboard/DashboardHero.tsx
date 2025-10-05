@@ -15,24 +15,42 @@ export function DashboardHero({
   const navigate = useNavigate();
   const {
     onAddContent,
-    addContentWithFile
+    addContentWithFile,
+    onAddContentWithMetadata
   } = useContent();
   const handleAISubmit = async (value: string, files?: File[]) => {
     try {
-      // For new chats, navigate directly to new chat route without creating content
-      const searchParams = new URLSearchParams();
-      if (value.trim()) {
-        searchParams.set('query', value);
-      }
-      if (files && files.length > 0) {
-        searchParams.set('hasFiles', 'true');
-      }
+      // Create content entry FIRST with initial query as title
+      const title = value.slice(0, 100) + (value.length > 100 ? '...' : '');
+      
+      const { onAddContentWithMetadata } = useContent();
+      const contentId = await onAddContentWithMetadata({
+        title: title,
+        type: 'chat',
+        text_content: value,
+        room_id: null,
+        processing_status: 'pending',
+        metadata: {
+          initialQuery: value,
+          hasAttachments: files && files.length > 0,
+          attachmentCount: files?.length || 0,
+          createdFrom: 'dashboard_hero'
+        }
+      });
 
-      // Navigate to new chat route - this will create a fresh conversation
-      navigate(`/chat/new?${searchParams.toString()}`);
-      toast.success(`Starting conversation with Shattara AI${files && files.length > 0 ? ` with ${files.length} file(s)` : ''}`);
+      if (contentId) {
+        // Navigate with content ID and initial query
+        const searchParams = new URLSearchParams();
+        searchParams.set('query', value);
+        if (files && files.length > 0) {
+          searchParams.set('hasFiles', 'true');
+        }
+        
+        navigate(`/chat/${contentId}?${searchParams.toString()}`);
+        toast.success('Starting conversation with Shattara AI');
+      }
     } catch (error) {
-      console.error('Error handling AI submit:', error);
+      console.error('Error starting chat:', error);
       toast.error('Failed to start conversation');
     }
   };

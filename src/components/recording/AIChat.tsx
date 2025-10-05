@@ -69,38 +69,54 @@ const AIChat = ({ contentData }: AIChatProps) => {
   });
 
   const handleSendMessage = async (content: string, attachments?: File[]) => {
+    const hasFiles = attachments && attachments.length > 0;
+    setIsProcessingFiles(hasFiles);
+    setIsProcessingAI(true);
+
     try {
-      // Process files if attachments exist
-      let fileContent = '';
-      if (attachments && attachments.length > 0 && Array.isArray(attachments)) {
-        if (!user?.id) {
-          console.error('User not authenticated for file upload');
-          toast.error("Please sign in to upload files.");
-          return;
+      // 1. Upload files to storage FIRST
+      const uploadedAttachments: Array<{
+        name: string;
+        type: string;
+        size: number;
+        url: string;
+        uploadedAt: string;
+      }> = [];
+
+      if (hasFiles) {
+        console.log(`Uploading ${attachments.length} files to storage...`);
+        
+        for (const file of attachments) {
+          try {
+            const { uploadFileToStorage } = await import('@/lib/storage');
+            const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
+            
+            uploadedAttachments.push({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              url: fileUrl,
+              uploadedAt: new Date().toISOString()
+            });
+            
+            console.log(`File uploaded: ${file.name} -> ${fileUrl}`);
+          } catch (uploadError) {
+            console.error(`Failed to upload ${file.name}:`, uploadError);
+            toast.error(`Failed to upload ${file.name}`);
+          }
         }
         
-        setIsProcessingFiles(true);
-        try {
-          const { processAndUploadFiles, formatFileContentForAI } = await import('@/utils/fileProcessing');
-          const processedFiles = await processAndUploadFiles(attachments, user.id);
-          fileContent = formatFileContentForAI(processedFiles);
-        } catch (error) {
-          console.error('Error processing files:', error);
-          toast.error("Failed to process attachments. Please try again.");
-          setIsProcessingFiles(false);
-          return;
-        }
         setIsProcessingFiles(false);
       }
 
-      const fullContent = content + fileContent;
-      const userMessage = await sendMessage(fullContent, attachments);
+      // 2. Send user message with attachment URLs
+      const userMessage = await sendMessage(content, uploadedAttachments);
       
       if (userMessage) {
-        // Get AI response using real OpenAI integration with content context
+        // 3. Get AI response using real OpenAI integration with content context
         setIsProcessingAI(true);
         try {
-          const aiResponse = await sendMessageToAI(fullContent);
+          const aiResponse = await sendMessageToAI(content);
           await addAIResponse(aiResponse);
         } catch (error) {
           console.error('Error getting AI response:', error);
@@ -111,8 +127,10 @@ const AIChat = ({ contentData }: AIChatProps) => {
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      setIsProcessingFiles(false);
+      toast.error('Failed to send message');
+    } finally {
       setIsProcessingAI(false);
+      setIsProcessingFiles(false);
     }
   };
 
