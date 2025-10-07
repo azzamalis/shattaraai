@@ -32,6 +32,23 @@ export const getStorageBucket = (contentType: StorageContentType): string => {
   return bucketMap[contentType];
 };
 
+// Sanitize file name for storage (remove special characters and spaces)
+const sanitizeFileName = (fileName: string): string => {
+  // Get file extension
+  const lastDotIndex = fileName.lastIndexOf('.');
+  const name = lastDotIndex > 0 ? fileName.substring(0, lastDotIndex) : fileName;
+  const extension = lastDotIndex > 0 ? fileName.substring(lastDotIndex) : '';
+  
+  // Replace spaces with underscores and remove special characters
+  // Keep only alphanumeric, underscores, hyphens
+  const sanitizedName = name
+    .replace(/\s+/g, '_')
+    .replace(/[^a-zA-Z0-9_-]/g, '')
+    .substring(0, 100); // Limit length
+  
+  return sanitizedName + extension;
+};
+
 // Upload file to appropriate storage bucket
 export const uploadFileToStorage = async (
   file: File, 
@@ -48,11 +65,14 @@ export const uploadFileToStorage = async (
 
   const bucket = getStorageBucket(contentType);
   const timestamp = Date.now();
-  const fileName = `${userId}/${timestamp}_${file.name}`;
+  const sanitizedFileName = sanitizeFileName(file.name);
+  const fileName = `${userId}/${timestamp}_${sanitizedFileName}`;
   
   console.log('DEBUG: storage - Upload details:', {
     bucket,
     fileName,
+    originalFileName: file.name,
+    sanitizedFileName,
     timestamp
   });
 
