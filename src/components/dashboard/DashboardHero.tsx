@@ -5,6 +5,7 @@ import { EnhancedPromptInput } from '@/components/ui/enhanced-prompt-input';
 import { NewFeaturePromo } from './NewFeaturePromo';
 import { ActionCards } from './ActionCards';
 import { useContent } from '@/contexts/ContentContext';
+import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
 interface DashboardHeroProps {
   onPasteClick: () => void;
@@ -13,6 +14,7 @@ export function DashboardHero({
   onPasteClick
 }: DashboardHeroProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     onAddContent,
     addContentWithFile,
@@ -20,7 +22,36 @@ export function DashboardHero({
   } = useContent();
   const handleAISubmit = async (value: string, files?: File[]) => {
     try {
-      // Create content entry FIRST with initial query as title
+      // Upload files to storage first if present
+      const uploadedFiles: Array<{
+        name: string;
+        type: string;
+        size: number;
+        url: string;
+        uploadedAt: string;
+      }> = [];
+
+      if (files && files.length > 0) {
+        const { uploadFileToStorage } = await import('@/lib/storage');
+        
+        for (const file of files) {
+          try {
+            const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
+            uploadedFiles.push({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              url: fileUrl,
+              uploadedAt: new Date().toISOString()
+            });
+          } catch (error) {
+            console.error(`Failed to upload ${file.name}:`, error);
+            toast.error(`Failed to upload ${file.name}`);
+          }
+        }
+      }
+
+      // Create content entry with uploaded files in metadata
       const title = value.slice(0, 100) + (value.length > 100 ? '...' : '');
       
       const contentId = await onAddContentWithMetadata({
@@ -31,8 +62,9 @@ export function DashboardHero({
         processing_status: 'pending',
         metadata: {
           initialQuery: value,
-          hasAttachments: files && files.length > 0,
-          attachmentCount: files?.length || 0,
+          hasAttachments: uploadedFiles.length > 0,
+          attachmentCount: uploadedFiles.length,
+          attachments: uploadedFiles,
           createdFrom: 'dashboard_hero'
         }
       });
@@ -41,7 +73,7 @@ export function DashboardHero({
         // Navigate with content ID and initial query
         const searchParams = new URLSearchParams();
         searchParams.set('query', value);
-        if (files && files.length > 0) {
+        if (uploadedFiles.length > 0) {
           searchParams.set('hasFiles', 'true');
         }
         

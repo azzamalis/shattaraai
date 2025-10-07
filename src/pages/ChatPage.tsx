@@ -15,6 +15,7 @@ export default function ChatPage() {
   const [contentData, setContentData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<UnifiedTabType>('chat');
+  const [initialFiles, setInitialFiles] = useState<any[] | undefined>(undefined);
 
   // Load content from database
   useEffect(() => {
@@ -28,6 +29,11 @@ export default function ChatPage() {
         const content = await fetchContentById(contentId);
         if (content) {
           setContentData(content);
+          
+          // Extract initial files from metadata if present
+          if (content.metadata?.attachments && Array.isArray(content.metadata.attachments)) {
+            setInitialFiles(content.metadata.attachments);
+          }
         }
       } catch (error) {
         console.error('Failed to load chat content:', error);
@@ -64,6 +70,7 @@ export default function ChatPage() {
           onTabChange={setActiveTab}
           initialQuery={query || contentData?.text_content}
           contentId={contentId}
+          initialFiles={initialFiles}
         />
       </div>
     </DashboardLayout>

@@ -7,6 +7,7 @@ import { ExamPrepStepOneRedesigned } from './exam-prep/ExamPrepStepOneRedesigned
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { useContent } from '@/contexts/ContentContext';
+import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
 interface RoomHeroSectionProps {
   title: string;
@@ -33,6 +34,7 @@ export function RoomHeroSection({
   examStep = 1
 }: RoomHeroSectionProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     onAddContent,
     onAddContentWithMetadata
@@ -89,6 +91,35 @@ export function RoomHeroSection({
   };
   const handleAISubmit = async (value: string, files?: File[]) => {
     try {
+      // Upload files to storage first if present
+      const uploadedFiles: Array<{
+        name: string;
+        type: string;
+        size: number;
+        url: string;
+        uploadedAt: string;
+      }> = [];
+
+      if (files && files.length > 0) {
+        const { uploadFileToStorage } = await import('@/lib/storage');
+        
+        for (const file of files) {
+          try {
+            const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
+            uploadedFiles.push({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              url: fileUrl,
+              uploadedAt: new Date().toISOString()
+            });
+          } catch (error) {
+            console.error(`Failed to upload ${file.name}:`, error);
+            toast.error(`Failed to upload ${file.name}`);
+          }
+        }
+      }
+
       const title = value.slice(0, 100) + (value.length > 100 ? '...' : '');
       
       const contentId = await onAddContentWithMetadata({
@@ -101,7 +132,9 @@ export function RoomHeroSection({
           initialQuery: value,
           roomContext: true,
           roomId: examModeData?.roomId,
-          hasAttachments: files && files.length > 0,
+          hasAttachments: uploadedFiles.length > 0,
+          attachmentCount: uploadedFiles.length,
+          attachments: uploadedFiles,
           createdFrom: 'room_hero'
         }
       });
@@ -109,7 +142,7 @@ export function RoomHeroSection({
       if (contentId) {
         const searchParams = new URLSearchParams();
         searchParams.set('query', value);
-        if (files && files.length > 0) {
+        if (uploadedFiles.length > 0) {
           searchParams.set('hasFiles', 'true');
         }
         

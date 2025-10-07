@@ -21,13 +21,21 @@ interface ChatInterfaceProps {
   onTabChange: (tab: UnifiedTabType) => void;
   initialQuery?: string | null;
   contentId?: string;
+  initialFiles?: Array<{
+    name: string;
+    type: string;
+    size: number;
+    url: string;
+    uploadedAt: string;
+  }>;
 }
 
 export function ChatInterface({
   activeTab,
   onTabChange,
   initialQuery,
-  contentId
+  contentId,
+  initialFiles
 }: ChatInterfaceProps) {
   const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
@@ -81,28 +89,40 @@ export function ChatInterface({
       conversation && 
       messages.length === 0
     ) {
-      console.log('ChatInterface - Processing initial query once:', initialQuery);
-      handleSendMessage(initialQuery);
+      console.log('ChatInterface - Processing initial query with files:', { initialQuery, filesCount: initialFiles?.length });
+      
+      // Send message with pre-uploaded file attachments
+      handleSendMessage(initialQuery, undefined, initialFiles);
       setHasProcessedInitialQuery(true);
     }
-  }, [initialQuery, conversation?.id, isLoading, messages.length]);
+  }, [initialQuery, conversation?.id, isLoading, messages.length, initialFiles]);
 
-  const handleSendMessage = async (content: string, attachments?: File[]) => {
-    console.log('ChatInterface - handleSendMessage called with content:', content, 'attachments:', attachments);
+  const handleSendMessage = async (
+    content: string, 
+    attachments?: File[], 
+    preUploadedFiles?: Array<{
+      name: string;
+      type: string;
+      size: number;
+      url: string;
+      uploadedAt: string;
+    }>
+  ) => {
+    console.log('ChatInterface - handleSendMessage called with content:', content, 'attachments:', attachments, 'preUploaded:', preUploadedFiles);
     
     const hasFiles = attachments && attachments.length > 0;
     setIsProcessingFiles(hasFiles);
     setIsProcessingAI(true);
 
     try {
-      // 1. Upload files to storage FIRST
+      // 1. Upload files to storage FIRST (if new files provided)
       const uploadedAttachments: Array<{
         name: string;
         type: string;
         size: number;
         url: string;
         uploadedAt: string;
-      }> = [];
+      }> = preUploadedFiles ? [...preUploadedFiles] : [];
 
       if (hasFiles) {
         console.log(`Uploading ${attachments.length} files to storage...`);
