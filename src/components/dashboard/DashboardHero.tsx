@@ -6,6 +6,7 @@ import { NewFeaturePromo } from './NewFeaturePromo';
 import { ActionCards } from './ActionCards';
 import { useContent } from '@/contexts/ContentContext';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
 interface DashboardHeroProps {
   onPasteClick: () => void;
@@ -29,6 +30,7 @@ export function DashboardHero({
         size: number;
         url: string;
         uploadedAt: string;
+        content?: string;
       }> = [];
 
       if (files && files.length > 0) {
@@ -41,12 +43,33 @@ export function DashboardHero({
             const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
             console.log('DashboardHero - File uploaded successfully:', { name: file.name, url: fileUrl });
             
+            // Extract PDF content if it's a PDF file
+            let extractedContent: string | undefined;
+            if (file.type === 'application/pdf') {
+              try {
+                console.log(`DashboardHero - Extracting content from PDF: ${file.name}`);
+                const { data: pdfData, error: pdfError } = await supabase.functions.invoke('extract-pdf-text', {
+                  body: { fileUrl }
+                });
+                
+                if (!pdfError && pdfData?.text) {
+                  extractedContent = pdfData.text;
+                  console.log(`DashboardHero - PDF content extracted (${extractedContent.length} chars)`);
+                } else {
+                  console.error('DashboardHero - PDF extraction error:', pdfError);
+                }
+              } catch (pdfError) {
+                console.error('DashboardHero - Failed to extract PDF content:', pdfError);
+              }
+            }
+            
             uploadedFiles.push({
               name: file.name,
               type: file.type,
               size: file.size,
               url: fileUrl,
-              uploadedAt: new Date().toISOString()
+              uploadedAt: new Date().toISOString(),
+              content: extractedContent
             });
           } catch (error) {
             console.error(`DashboardHero - Failed to upload ${file.name}:`, error);
