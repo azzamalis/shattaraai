@@ -41,22 +41,38 @@ export function ChatTitleGenerator({
         
         if (!firstUserMessage || !isMounted) return;
 
-        // Generate a concise title from the first message (max 50 chars)
-        let generatedTitle = firstUserMessage.length > 50 
-          ? firstUserMessage.substring(0, 47) + '...'
-          : firstUserMessage;
+        // Use AI to generate a concise, descriptive title
+        let generatedTitle: string;
+        try {
+          const { data: titleData, error: titleError } = await supabase.functions.invoke('openai-chat-content', {
+            body: {
+              message: `Generate a concise, descriptive title (max 5 words) for this chat conversation. Only return the title, nothing else:\n\n${firstUserMessage}`,
+              conversationHistory: [],
+              skipCache: true
+            }
+          });
 
-        // Clean up the title
-        generatedTitle = generatedTitle
-          .replace(/^\s*help\s+me\s*/i, '')
-          .replace(/^\s*how\s+/i, 'How ')
-          .replace(/^\s*what\s+/i, 'What ')
-          .replace(/^\s*why\s+/i, 'Why ')
-          .replace(/^\s*when\s+/i, 'When ')
-          .replace(/^\s*where\s+/i, 'Where ')
-          .trim();
+          if (!titleError && titleData?.response) {
+            generatedTitle = titleData.response.trim().replace(/^["']|["']$/g, '');
+            // Ensure title isn't too long
+            if (generatedTitle.length > 60) {
+              generatedTitle = generatedTitle.substring(0, 57) + '...';
+            }
+          } else {
+            // Fallback to first message truncation
+            generatedTitle = firstUserMessage.length > 50 
+              ? firstUserMessage.substring(0, 47) + '...'
+              : firstUserMessage;
+          }
+        } catch (error) {
+          console.error('Error generating AI title:', error);
+          // Fallback to first message truncation
+          generatedTitle = firstUserMessage.length > 50 
+            ? firstUserMessage.substring(0, 47) + '...'
+            : firstUserMessage;
+        }
 
-        if (generatedTitle.length < 5) {
+        if (!isMounted || generatedTitle.length < 3) {
           generatedTitle = 'Chat with Shattara AI';
         }
 
