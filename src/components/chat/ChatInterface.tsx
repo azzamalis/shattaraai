@@ -110,7 +110,8 @@ export function ChatInterface({
         for (const file of attachments) {
           try {
             const { uploadFileToStorage } = await import('@/lib/storage');
-            const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
+            // Use 'file' as the content type which maps to 'documents' bucket
+            const fileUrl = await uploadFileToStorage(file, 'file', user.id);
             
             uploadedAttachments.push({
               name: file.name,
@@ -127,11 +128,13 @@ export function ChatInterface({
           }
         }
         
+        console.log(`All files uploaded. Total: ${uploadedAttachments.length}`);
         setIsProcessingFiles(false);
       }
 
       // 2. Send user message with attachment URLs
-      const userMessage = await sendMessage(content, uploadedAttachments);
+      console.log('Sending message with attachments:', uploadedAttachments);
+      const userMessage = await sendMessage(content, uploadedAttachments.length > 0 ? uploadedAttachments : undefined);
       
       if (userMessage) {
         // 3. Generate AI response
