@@ -266,16 +266,39 @@ export function useChatConversation({
       return;
     }
 
-    // Prevent duplicate AI responses using ref guard
+    // Prevent duplicate AI responses - use conversation ID + content hash
+    const responseHash = `${conversationId}-${content.substring(0, 50)}`;
     if (isAddingAIResponseRef.current) {
-      console.log('Already adding AI response, skipping duplicate call');
+      console.log('Already adding AI response, skipping duplicate...', responseHash);
       return;
     }
 
     isAddingAIResponseRef.current = true;
-    console.log('Adding AI response to conversation:', conversationId);
+    
+    // Add small delay to prevent race conditions
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     try {
+      // Double-check if this response was already added
+      const { data: existingMessages } = await supabase
+        .from('chat_messages')
+        .select('id, content')
+        .eq('conversation_id', conversationId)
+        .eq('sender_type', 'ai')
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      // Check if identical response already exists
+      const isDuplicate = existingMessages?.some(msg => 
+        msg.content === content || msg.content.substring(0, 100) === content.substring(0, 100)
+      );
+
+      if (isDuplicate) {
+        console.log('Duplicate AI response detected, skipping insert');
+        isAddingAIResponseRef.current = false;
+        return;
+      }
+
       const { data, error } = await supabase
         .from('chat_messages')
         .insert({
@@ -283,7 +306,7 @@ export function useChatConversation({
           sender_type: 'ai',
           content: content,
           user_id: user?.id || '',
-          message_type: 'ai_response',
+          message_type: 'ai_response', // Always use ai_response type
           metadata: metadata || null
         })
         .select()
@@ -291,6 +314,7 @@ export function useChatConversation({
 
       if (error) {
         console.error('Error adding AI response:', error);
+        isAddingAIResponseRef.current = false;
         return;
       }
 
@@ -315,10 +339,10 @@ export function useChatConversation({
     } catch (error) {
       console.error('Error adding AI response:', error);
     } finally {
-      // Reset flag after a brief delay to prevent rapid duplicate calls
+      // Keep the flag set for a bit longer to prevent rapid duplicates
       setTimeout(() => {
         isAddingAIResponseRef.current = false;
-      }, 300);
+      }, 500);
     }
   };
 
