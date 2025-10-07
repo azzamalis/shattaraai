@@ -27,6 +27,7 @@ interface ChatInterfaceProps {
     size: number;
     url: string;
     uploadedAt: string;
+    content?: string;
   }>;
 }
 
@@ -64,10 +65,16 @@ export function ChatInterface({
       sender_type: msg.sender_type as 'user' | 'ai'
     }));
 
+  // Get all attachments from messages for context
+  const allAttachments = messages
+    .filter(m => m.attachments && m.attachments.length > 0)
+    .flatMap(m => m.attachments || []);
+
   const { sendMessageToAI } = useOpenAIChatContent({
     conversationId: conversation?.id,
     contextId: contentId,
-    conversationHistory
+    conversationHistory,
+    attachments: allAttachments
   });
 
   const handleTitleGenerated = (title: string) => {
@@ -106,6 +113,7 @@ export function ChatInterface({
       size: number;
       url: string;
       uploadedAt: string;
+      content?: string;
     }>
   ) => {
     console.log('ChatInterface - handleSendMessage called with content:', content, 'attachments:', attachments, 'preUploaded:', preUploadedFiles);
@@ -122,6 +130,7 @@ export function ChatInterface({
         size: number;
         url: string;
         uploadedAt: string;
+        content?: string;
       }> = preUploadedFiles ? [...preUploadedFiles] : [];
 
       if (hasFiles) {
@@ -133,12 +142,33 @@ export function ChatInterface({
             // Use 'chat' content type to store in 'chat-content' bucket
             const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
             
+            // Extract PDF content if it's a PDF file
+            let extractedContent: string | undefined;
+            if (file.type === 'application/pdf') {
+              try {
+                console.log(`Extracting content from PDF: ${file.name}`);
+                const { data: pdfData, error: pdfError } = await supabase.functions.invoke('extract-pdf-text', {
+                  body: { fileUrl }
+                });
+                
+                if (!pdfError && pdfData?.text) {
+                  extractedContent = pdfData.text;
+                  console.log(`PDF content extracted: ${extractedContent.substring(0, 100)}...`);
+                } else {
+                  console.error('PDF extraction error:', pdfError);
+                }
+              } catch (pdfError) {
+                console.error('Failed to extract PDF content:', pdfError);
+              }
+            }
+            
             uploadedAttachments.push({
               name: file.name,
               type: file.type,
               size: file.size,
               url: fileUrl,
-              uploadedAt: new Date().toISOString()
+              uploadedAt: new Date().toISOString(),
+              content: extractedContent
             });
             
             console.log(`File uploaded: ${file.name} -> ${fileUrl}`);
@@ -157,10 +187,23 @@ export function ChatInterface({
       const userMessage = await sendMessage(content, uploadedAttachments.length > 0 ? uploadedAttachments : undefined);
       
       if (userMessage) {
-        // 3. Generate AI response
+        // 3. Generate AI response with attachment content
         setIsProcessingAI(true);
         try {
-          const aiResponse = await sendMessageToAI(content);
+          // Build message with attachment content inline
+          let messageWithAttachments = content;
+          
+          if (uploadedAttachments.length > 0) {
+            const attachmentsWithContent = uploadedAttachments.filter(a => a.content);
+            if (attachmentsWithContent.length > 0) {
+              messageWithAttachments += '\n\n--- Attached Documents ---\n';
+              for (const attachment of attachmentsWithContent) {
+                messageWithAttachments += `\n**File: ${attachment.name}**\n${attachment.content}\n`;
+              }
+            }
+          }
+          
+          const aiResponse = await sendMessageToAI(messageWithAttachments);
           await addAIResponse(aiResponse);
         } catch (error) {
           console.error('Error getting AI response:', error);
