@@ -32,11 +32,15 @@ export function DashboardHero({
       }> = [];
 
       if (files && files.length > 0) {
+        console.log('DashboardHero - Starting file upload process', { fileCount: files.length, userId: user.id });
         const { uploadFileToStorage } = await import('@/lib/storage');
         
         for (const file of files) {
           try {
+            console.log('DashboardHero - Uploading file:', { name: file.name, size: file.size, type: file.type });
             const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
+            console.log('DashboardHero - File uploaded successfully:', { name: file.name, url: fileUrl });
+            
             uploadedFiles.push({
               name: file.name,
               type: file.type,
@@ -45,10 +49,20 @@ export function DashboardHero({
               uploadedAt: new Date().toISOString()
             });
           } catch (error) {
-            console.error(`Failed to upload ${file.name}:`, error);
+            console.error(`DashboardHero - Failed to upload ${file.name}:`, error);
+            console.error('DashboardHero - Error details:', {
+              errorMessage: error instanceof Error ? error.message : 'Unknown error',
+              errorStack: error instanceof Error ? error.stack : undefined,
+              file: { name: file.name, size: file.size, type: file.type }
+            });
             toast.error(`Failed to upload ${file.name}`);
           }
         }
+        
+        console.log('DashboardHero - Upload process complete:', { 
+          totalFiles: files.length, 
+          successfulUploads: uploadedFiles.length 
+        });
       }
 
       // Create content entry with uploaded files in metadata
