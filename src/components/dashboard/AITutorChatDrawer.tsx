@@ -64,6 +64,7 @@ export function AITutorChatDrawer({
   const { checkRateLimit, usageStats, planLimits } = useAIUsageTracking();
 
   // Initialize chat conversation for room collaboration
+  // Only auto-create when drawer is opened
   const {
     conversation,
     messages: persistedMessages,
@@ -75,7 +76,7 @@ export function AITutorChatDrawer({
     conversationType: 'room_collaboration',
     contextId: roomId,
     contextType: 'room',
-    autoCreate: true
+    autoCreate: open  // Only create when drawer is actually opened
   });
 
   // Use persistedMessages directly instead of maintaining separate local state
