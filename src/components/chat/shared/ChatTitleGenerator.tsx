@@ -17,7 +17,11 @@ export function ChatTitleGenerator({
 }: ChatTitleGeneratorProps) {
   
   useEffect(() => {
+    let isMounted = true;
+    
     const generateTitleAndMetadata = async () => {
+      if (!isMounted) return;
+      
       try {
         // Get the first few messages from the conversation
         const { data: messages, error } = await supabase
@@ -25,17 +29,17 @@ export function ChatTitleGenerator({
           .select('*')
           .eq('conversation_id', conversationId)
           .order('created_at', { ascending: true })
-          .limit(10); // Get more messages for better metadata
+          .limit(10);
 
-        if (error || !messages || messages.length === 0) {
-          console.log('No messages found for title generation');
+        if (!isMounted || error || !messages || messages.length === 0) {
+          console.log('No messages found for title generation or component unmounted');
           return;
         }
 
         // Use the first user message or initial query to generate a title
         const firstUserMessage = messages.find(m => m.sender_type === 'user')?.content || initialQuery;
         
-        if (!firstUserMessage) return;
+        if (!firstUserMessage || !isMounted) return;
 
         // Generate a concise title from the first message (max 50 chars)
         let generatedTitle = firstUserMessage.length > 50 
@@ -44,50 +48,59 @@ export function ChatTitleGenerator({
 
         // Clean up the title
         generatedTitle = generatedTitle
-          .replace(/^\s*help\s+me\s*/i, '') // Remove "help me" prefix
-          .replace(/^\s*how\s+/i, 'How ') // Capitalize "how"
-          .replace(/^\s*what\s+/i, 'What ') // Capitalize "what"
-          .replace(/^\s*why\s+/i, 'Why ') // Capitalize "why"
-          .replace(/^\s*when\s+/i, 'When ') // Capitalize "when"
-          .replace(/^\s*where\s+/i, 'Where ') // Capitalize "where"
+          .replace(/^\s*help\s+me\s*/i, '')
+          .replace(/^\s*how\s+/i, 'How ')
+          .replace(/^\s*what\s+/i, 'What ')
+          .replace(/^\s*why\s+/i, 'Why ')
+          .replace(/^\s*when\s+/i, 'When ')
+          .replace(/^\s*where\s+/i, 'Where ')
           .trim();
 
-        // Fallback to generic title if too short
         if (generatedTitle.length < 5) {
           generatedTitle = 'Chat with Shattara AI';
         }
 
         console.log('Generated chat title:', generatedTitle);
 
-        // Update the conversation title
+        if (!isMounted) return;
+
+        // Update conversation title
         await supabase
           .from('chat_conversations')
           .update({ title: generatedTitle })
           .eq('id', conversationId);
 
-        // Update the content title and metadata if contentId is provided
+        // Update content title if contentId is provided
         if (contentId) {
           await supabase
             .from('content')
             .update({ title: generatedTitle })
             .eq('id', contentId);
+        }
 
-          // Generate and update comprehensive chat metadata
+        // Update metadata if contentId is provided
+        if (contentId && isMounted) {
           await updateContentWithChatMetadata(contentId, conversationId, messages);
         }
 
-        // Notify parent component
-        onTitleGenerated?.(generatedTitle);
+        if (isMounted) {
+          onTitleGenerated?.(generatedTitle);
+        }
 
       } catch (error) {
         console.error('Error generating chat title and metadata:', error);
       }
     };
 
-    // Generate title and metadata after a delay to allow messages to be added
-    const timer = setTimeout(generateTitleAndMetadata, 3000);
-    return () => clearTimeout(timer);
-  }, [conversationId, initialQuery, contentId, onTitleGenerated]);
+    // Trigger immediately when we have the initial query, otherwise wait for messages
+    const delay = initialQuery ? 1000 : 2000;
+    const timer = setTimeout(generateTitleAndMetadata, delay);
+    
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [conversationId, initialQuery, contentId]);
 
   // Set up real-time listener for message updates to refresh metadata
   useEffect(() => {
