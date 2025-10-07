@@ -95,8 +95,7 @@ export function useChatConversation({
     const conversationData = {
       user_id: user.id,
       type,
-      // For room_collaboration, context_id should be null (foreign key points to content table)
-      context_id: type === 'room_collaboration' ? null : (contextId || null),
+      context_id: contextId || null,
       context_type: contextType || 'content',
       metadata: type === 'room_collaboration' ? { room_id: contextId } : {}
     };

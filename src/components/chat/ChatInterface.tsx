@@ -21,6 +21,7 @@ interface ChatInterfaceProps {
   onTabChange: (tab: UnifiedTabType) => void;
   initialQuery?: string | null;
   contentId?: string;
+  roomId?: string | null;
   initialFiles?: Array<{
     name: string;
     type: string;
@@ -36,6 +37,7 @@ export function ChatInterface({
   onTabChange,
   initialQuery,
   contentId,
+  roomId,
   initialFiles
 }: ChatInterfaceProps) {
   const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
@@ -51,9 +53,9 @@ export function ChatInterface({
     sendMessage,
     addAIResponse
   } = useChatConversation({
-    conversationType: 'general',
-    contextId: contentId,
-    contextType: 'content',
+    conversationType: roomId ? 'room_collaboration' : 'general',
+    contextId: roomId || contentId,
+    contextType: roomId ? 'room' : 'content',
     autoCreate: true
   });
 

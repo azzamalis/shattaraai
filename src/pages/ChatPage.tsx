@@ -70,6 +70,7 @@ export default function ChatPage() {
           onTabChange={setActiveTab}
           initialQuery={query || contentData?.text_content}
           contentId={contentId}
+          roomId={contentData?.room_id}
           initialFiles={initialFiles}
         />
       </div>
