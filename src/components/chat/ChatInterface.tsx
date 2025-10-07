@@ -110,8 +110,8 @@ export function ChatInterface({
         for (const file of attachments) {
           try {
             const { uploadFileToStorage } = await import('@/lib/storage');
-            // Use 'file' as the content type which maps to 'documents' bucket
-            const fileUrl = await uploadFileToStorage(file, 'file', user.id);
+            // Use 'chat' content type to store in 'chat-content' bucket
+            const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
             
             uploadedAttachments.push({
               name: file.name,
