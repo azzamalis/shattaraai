@@ -92,10 +92,12 @@ export function useChatConversation({
 
     console.log('Creating conversation with params:', { type, contextId, contextType });
 
+    // For general conversations without a valid contextId, don't set context_id
+    // to avoid FK constraint issues with non-existent content entries
     const conversationData = {
       user_id: user.id,
       type,
-      context_id: contextId || null,
+      context_id: (contextId && contextType !== 'general') ? contextId : null,
       context_type: contextType || 'content',
       metadata: type === 'room_collaboration' ? { room_id: contextId } : {}
     };
@@ -159,7 +161,20 @@ export function useChatConversation({
             setConversation(existingConversation);
             await fetchMessages(existingConversation.id);
           } else if (autoCreate) {
-            // Create new conversation linked to content
+            // Verify content exists before creating conversation (prevent FK constraint violations)
+            const { data: contentExists } = await supabase
+              .from('content')
+              .select('id')
+              .eq('id', contextId)
+              .single();
+
+            if (!contentExists) {
+              console.error('Cannot create conversation: content does not exist', contextId);
+              isCreatingRef.current = false;
+              return;
+            }
+
+            // Create new conversation linked to existing content
             console.log('Creating new conversation with context:', contextId);
             const newConversation = await createConversation(
               conversationType,
