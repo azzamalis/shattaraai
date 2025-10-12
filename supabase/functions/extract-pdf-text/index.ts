@@ -1,18 +1,23 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import * as pdfjsLib from 'https://esm.sh/pdfjs-dist@3.11.174/build/pdf.mjs'
+// @ts-ignore - npm imports in Deno
+import * as pdfjsLib from 'npm:pdfjs-dist@3.11.174/legacy/build/pdf.mjs'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Configure PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://esm.sh/pdfjs-dist@3.11.174/build/pdf.worker.mjs'
-
 async function extractTextFromPDF(arrayBuffer: ArrayBuffer): Promise<string> {
   try {
-    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer })
+    // Load the PDF document
+    const loadingTask = pdfjsLib.getDocument({
+      data: new Uint8Array(arrayBuffer),
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true,
+    })
+    
     const pdfDoc = await loadingTask.promise
     
     let fullText = ''
@@ -24,15 +29,29 @@ async function extractTextFromPDF(arrayBuffer: ArrayBuffer): Promise<string> {
     console.log(`Extracting text from ${pagesToProcess} pages (total: ${totalPages})`)
     
     for (let pageNum = 1; pageNum <= pagesToProcess; pageNum++) {
-      const page = await pdfDoc.getPage(pageNum)
-      const textContent = await page.getTextContent()
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ')
-      fullText += pageText + '\n\n'
+      try {
+        const page = await pdfDoc.getPage(pageNum)
+        const textContent = await page.getTextContent()
+        const pageText = textContent.items
+          .map((item: any) => item.str || '')
+          .join(' ')
+        
+        if (pageText.trim()) {
+          fullText += pageText + '\n\n'
+        }
+      } catch (pageError) {
+        console.warn(`Error extracting page ${pageNum}:`, pageError)
+        // Continue with other pages
+      }
     }
     
-    return fullText.trim()
+    const trimmedText = fullText.trim()
+    
+    if (!trimmedText || trimmedText.length < 10) {
+      throw new Error('No meaningful text content found in PDF')
+    }
+    
+    return trimmedText
   } catch (error) {
     console.error('PDF text extraction error:', error)
     throw new Error(`Failed to extract text: ${error.message}`)
