@@ -17,7 +17,6 @@ export interface ChatMessage {
     size: number;
     url: string;
     uploadedAt: string;
-    content?: string;
   }>;
 }
 

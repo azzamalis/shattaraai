@@ -1,61 +1,10 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-// @ts-ignore - npm imports in Deno
-import * as pdfjsLib from 'npm:pdfjs-dist@3.11.174/legacy/build/pdf.mjs'
+import pdfParse from 'https://esm.sh/pdf-parse@1.1.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-async function extractTextFromPDF(arrayBuffer: ArrayBuffer): Promise<string> {
-  try {
-    // Load the PDF document
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(arrayBuffer),
-      useWorkerFetch: false,
-      isEvalSupported: false,
-      useSystemFonts: true,
-    })
-    
-    const pdfDoc = await loadingTask.promise
-    
-    let fullText = ''
-    const totalPages = pdfDoc.numPages
-    
-    // Limit to first 50 pages for performance
-    const pagesToProcess = Math.min(totalPages, 50)
-    
-    console.log(`Extracting text from ${pagesToProcess} pages (total: ${totalPages})`)
-    
-    for (let pageNum = 1; pageNum <= pagesToProcess; pageNum++) {
-      try {
-        const page = await pdfDoc.getPage(pageNum)
-        const textContent = await page.getTextContent()
-        const pageText = textContent.items
-          .map((item: any) => item.str || '')
-          .join(' ')
-        
-        if (pageText.trim()) {
-          fullText += pageText + '\n\n'
-        }
-      } catch (pageError) {
-        console.warn(`Error extracting page ${pageNum}:`, pageError)
-        // Continue with other pages
-      }
-    }
-    
-    const trimmedText = fullText.trim()
-    
-    if (!trimmedText || trimmedText.length < 10) {
-      throw new Error('No meaningful text content found in PDF')
-    }
-    
-    return trimmedText
-  } catch (error) {
-    console.error('PDF text extraction error:', error)
-    throw new Error(`Failed to extract text: ${error.message}`)
-  }
 }
 
 serve(async (req) => {
@@ -134,27 +83,16 @@ serve(async (req) => {
 
     console.log('PDF downloaded successfully, extracting text...')
 
-    // Convert blob to buffer for PDF.js
+    // Convert blob to buffer for pdf-parse
     const arrayBuffer = await fileData.arrayBuffer()
+    const buffer = new Uint8Array(arrayBuffer)
 
-    // Extract text from PDF using PDF.js
-    const extractedText = await extractTextFromPDF(arrayBuffer)
+    // Extract text from PDF
+    const result = await pdfParse(buffer)
+    const extractedText = result.text
 
     if (!extractedText || extractedText.trim().length === 0) {
-      console.warn('No text extracted from PDF - possibly scanned or image-based')
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          text: '',
-          warning: 'No text content found. This may be a scanned or image-based PDF.',
-          contentId,
-          textLength: 0,
-          message: 'PDF processed but no text extracted'
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      )
+      console.warn('No text extracted from PDF')
     }
 
     console.log(`Extracted ${extractedText.length} characters from PDF`)

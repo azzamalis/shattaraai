@@ -138,24 +138,45 @@ export function ChatInterface({
       if (hasFiles) {
         console.log(`Uploading ${attachments.length} files to storage...`);
         
-        // Use processAndUploadFiles which handles PDF extraction client-side
-        const { processAndUploadFiles } = await import('@/utils/fileProcessing');
-        const processedFiles = await processAndUploadFiles(attachments, user.id);
-        
-        // Convert processed files to the attachment format
-        for (const processed of processedFiles) {
-          uploadedAttachments.push({
-            name: processed.name,
-            type: processed.type,
-            size: processed.size,
-            url: processed.url,
-            uploadedAt: new Date().toISOString(),
-            content: processed.content // Already extracted by processAndUploadFiles
-          });
-          
-          console.log(`File uploaded: ${processed.name} -> ${processed.url}`);
-          if (processed.content) {
-            console.log(`Text extracted: ${processed.content.substring(0, 100)}...`);
+        for (const file of attachments) {
+          try {
+            const { uploadFileToStorage } = await import('@/lib/storage');
+            // Use 'chat' content type to store in 'chat-content' bucket
+            const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
+            
+            // Extract PDF content if it's a PDF file
+            let extractedContent: string | undefined;
+            if (file.type === 'application/pdf') {
+              try {
+                console.log(`Extracting content from PDF: ${file.name}`);
+                const { data: pdfData, error: pdfError } = await supabase.functions.invoke('extract-pdf-text', {
+                  body: { fileUrl }
+                });
+                
+                if (!pdfError && pdfData?.text) {
+                  extractedContent = pdfData.text;
+                  console.log(`PDF content extracted: ${extractedContent.substring(0, 100)}...`);
+                } else {
+                  console.error('PDF extraction error:', pdfError);
+                }
+              } catch (pdfError) {
+                console.error('Failed to extract PDF content:', pdfError);
+              }
+            }
+            
+            uploadedAttachments.push({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              url: fileUrl,
+              uploadedAt: new Date().toISOString(),
+              content: extractedContent
+            });
+            
+            console.log(`File uploaded: ${file.name} -> ${fileUrl}`);
+          } catch (uploadError) {
+            console.error(`Failed to upload ${file.name}:`, uploadError);
+            toast.error(`Failed to upload ${file.name}`);
           }
         }
         

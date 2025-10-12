@@ -35,27 +35,51 @@ export function DashboardHero({
 
       if (files && files.length > 0) {
         console.log('DashboardHero - Starting file upload process', { fileCount: files.length, userId: user.id });
+        const { uploadFileToStorage } = await import('@/lib/storage');
         
-        // Use processAndUploadFiles which handles PDF extraction client-side
-        const { processAndUploadFiles } = await import('@/utils/fileProcessing');
-        const processedFiles = await processAndUploadFiles(files, user.id);
-        
-        // Convert processed files to the attachment format
-        for (const processed of processedFiles) {
-          uploadedFiles.push({
-            name: processed.name,
-            type: processed.type,
-            size: processed.size,
-            url: processed.url,
-            uploadedAt: new Date().toISOString(),
-            content: processed.content // Already extracted by processAndUploadFiles
-          });
-          
-          console.log('DashboardHero - File processed:', { 
-            name: processed.name, 
-            url: processed.url,
-            hasContent: !!processed.content 
-          });
+        for (const file of files) {
+          try {
+            console.log('DashboardHero - Uploading file:', { name: file.name, size: file.size, type: file.type });
+            const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
+            console.log('DashboardHero - File uploaded successfully:', { name: file.name, url: fileUrl });
+            
+            // Extract PDF content if it's a PDF file
+            let extractedContent: string | undefined;
+            if (file.type === 'application/pdf') {
+              try {
+                console.log(`DashboardHero - Extracting content from PDF: ${file.name}`);
+                const { data: pdfData, error: pdfError } = await supabase.functions.invoke('extract-pdf-text', {
+                  body: { fileUrl }
+                });
+                
+                if (!pdfError && pdfData?.text) {
+                  extractedContent = pdfData.text;
+                  console.log(`DashboardHero - PDF content extracted (${extractedContent.length} chars)`);
+                } else {
+                  console.error('DashboardHero - PDF extraction error:', pdfError);
+                }
+              } catch (pdfError) {
+                console.error('DashboardHero - Failed to extract PDF content:', pdfError);
+              }
+            }
+            
+            uploadedFiles.push({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              url: fileUrl,
+              uploadedAt: new Date().toISOString(),
+              content: extractedContent
+            });
+          } catch (error) {
+            console.error(`DashboardHero - Failed to upload ${file.name}:`, error);
+            console.error('DashboardHero - Error details:', {
+              errorMessage: error instanceof Error ? error.message : 'Unknown error',
+              errorStack: error instanceof Error ? error.stack : undefined,
+              file: { name: file.name, size: file.size, type: file.type }
+            });
+            toast.error(`Failed to upload ${file.name}`);
+          }
         }
         
         console.log('DashboardHero - Upload process complete:', { 
