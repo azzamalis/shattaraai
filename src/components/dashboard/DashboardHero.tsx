@@ -35,63 +35,27 @@ export function DashboardHero({
 
       if (files && files.length > 0) {
         console.log('DashboardHero - Starting file upload process', { fileCount: files.length, userId: user.id });
-        const { uploadFileToStorage } = await import('@/lib/storage');
         
-        for (const file of files) {
-          try {
-            console.log('DashboardHero - Uploading file:', { name: file.name, size: file.size, type: file.type });
-            const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
-            console.log('DashboardHero - File uploaded successfully:', { name: file.name, url: fileUrl });
-            
-            // Extract PDF content if it's a PDF file
-            let extractedContent: string | undefined;
-            if (file.type === 'application/pdf') {
-              try {
-                console.log(`DashboardHero - Extracting content from PDF: ${file.name}`);
-                const { data: pdfData, error: pdfError } = await supabase.functions.invoke('extract-pdf-text', {
-                  body: { fileUrl }
-                });
-                
-                if (pdfError) {
-                  console.error('DashboardHero - PDF extraction error:', pdfError);
-                  toast.error(`Failed to extract text from ${file.name}`, {
-                    description: 'The file was uploaded but AI cannot read its content.'
-                  });
-                } else if (pdfData?.text) {
-                  extractedContent = pdfData.text;
-                  console.log(`DashboardHero - PDF content extracted (${extractedContent.length} chars)`);
-                  toast.success(`Text extracted from ${file.name}`);
-                } else if (pdfData?.warning) {
-                  console.warn('DashboardHero - PDF extraction warning:', pdfData.warning);
-                  toast.warning(`${file.name} processed`, {
-                    description: 'This appears to be a scanned or image-based PDF without text.'
-                  });
-                }
-              } catch (pdfError) {
-                console.error('DashboardHero - Failed to extract PDF content:', pdfError);
-                toast.error(`Error processing ${file.name}`, {
-                  description: 'The file was uploaded but extraction failed.'
-                });
-              }
-            }
-            
-            uploadedFiles.push({
-              name: file.name,
-              type: file.type,
-              size: file.size,
-              url: fileUrl,
-              uploadedAt: new Date().toISOString(),
-              content: extractedContent
-            });
-          } catch (error) {
-            console.error(`DashboardHero - Failed to upload ${file.name}:`, error);
-            console.error('DashboardHero - Error details:', {
-              errorMessage: error instanceof Error ? error.message : 'Unknown error',
-              errorStack: error instanceof Error ? error.stack : undefined,
-              file: { name: file.name, size: file.size, type: file.type }
-            });
-            toast.error(`Failed to upload ${file.name}`);
-          }
+        // Use processAndUploadFiles which handles PDF extraction client-side
+        const { processAndUploadFiles } = await import('@/utils/fileProcessing');
+        const processedFiles = await processAndUploadFiles(files, user.id);
+        
+        // Convert processed files to the attachment format
+        for (const processed of processedFiles) {
+          uploadedFiles.push({
+            name: processed.name,
+            type: processed.type,
+            size: processed.size,
+            url: processed.url,
+            uploadedAt: new Date().toISOString(),
+            content: processed.content // Already extracted by processAndUploadFiles
+          });
+          
+          console.log('DashboardHero - File processed:', { 
+            name: processed.name, 
+            url: processed.url,
+            hasContent: !!processed.content 
+          });
         }
         
         console.log('DashboardHero - Upload process complete:', { 
