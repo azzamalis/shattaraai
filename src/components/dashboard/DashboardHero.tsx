@@ -52,14 +52,26 @@ export function DashboardHero({
                   body: { fileUrl }
                 });
                 
-                if (!pdfError && pdfData?.text) {
+                if (pdfError) {
+                  console.error('DashboardHero - PDF extraction error:', pdfError);
+                  toast.error(`Failed to extract text from ${file.name}`, {
+                    description: 'The file was uploaded but AI cannot read its content.'
+                  });
+                } else if (pdfData?.text) {
                   extractedContent = pdfData.text;
                   console.log(`DashboardHero - PDF content extracted (${extractedContent.length} chars)`);
-                } else {
-                  console.error('DashboardHero - PDF extraction error:', pdfError);
+                  toast.success(`Text extracted from ${file.name}`);
+                } else if (pdfData?.warning) {
+                  console.warn('DashboardHero - PDF extraction warning:', pdfData.warning);
+                  toast.warning(`${file.name} processed`, {
+                    description: 'This appears to be a scanned or image-based PDF without text.'
+                  });
                 }
               } catch (pdfError) {
                 console.error('DashboardHero - Failed to extract PDF content:', pdfError);
+                toast.error(`Error processing ${file.name}`, {
+                  description: 'The file was uploaded but extraction failed.'
+                });
               }
             }
             

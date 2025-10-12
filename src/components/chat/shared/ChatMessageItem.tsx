@@ -72,11 +72,23 @@ export function ChatMessageItem({
                   <span className="truncate max-w-40 font-medium text-xs">
                     {attachment.name}
                   </span>
-                  {attachment.size && (
-                    <span className="text-xs opacity-70">
-                      {formatFileSize(attachment.size)}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {attachment.size && (
+                      <span className="text-xs opacity-70">
+                        {formatFileSize(attachment.size)}
+                      </span>
+                    )}
+                    {attachment.content && (
+                      <span className="text-xs opacity-70 flex items-center gap-1">
+                        • <span className="text-green-500">✓</span> Text extracted
+                      </span>
+                    )}
+                    {!attachment.content && attachment.name.endsWith('.pdf') && (
+                      <span className="text-xs opacity-70 flex items-center gap-1">
+                        • <span className="text-amber-500">⚠</span> No text
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
