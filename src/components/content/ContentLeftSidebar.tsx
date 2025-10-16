@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown, Expand, Minimize2, Globe } from 'lucide-react';
+import { ListTodo, AlignLeft, ClipboardList, FileText, Loader2, ChevronDown, Expand, Minimize2, Globe, ChevronsDownUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 import { RecordingControls } from '@/components/recording/RecordingControls';
@@ -61,6 +61,7 @@ export function ContentLeftSidebar({
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isVideoHidden, setIsVideoHidden] = useState(false);
 
   // Use content hook for triggering processing
   const {
@@ -661,20 +662,45 @@ export function ContentLeftSidebar({
           </ScrollArea>
         </div>}
 
-      {renderControls()}
+      {!isVideoHidden && renderControls()}
       
       
       <Tabs defaultValue="chapters" onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden bg-background ">
-        <TabsList className={cn("w-fit justify-start gap-1 p-1 h-12 shrink-0 mx-4 my-2", "bg-card dark:bg-card", "transition-colors duration-200", "rounded-xl")}>
-          <TabsTrigger value="chapters" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none", "px-6")}>
-            <ListTodo className="h-[14px] w-[14px]" />
-            <span>Chapters</span>
-          </TabsTrigger>
-          <TabsTrigger value="transcripts" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none", "px-6")}>
-            <AlignLeft className="h-[14px] w-[14px]" />
-            <span>Transcripts</span>
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between mx-4 my-2 gap-2">
+          <TabsList className={cn("w-fit justify-start gap-1 p-1 h-12 shrink-0", "bg-card dark:bg-card", "transition-colors duration-200", "rounded-xl")}>
+            <TabsTrigger value="chapters" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none", "px-6")}>
+              <ListTodo className="h-[14px] w-[14px]" />
+              <span>Chapters</span>
+            </TabsTrigger>
+            <TabsTrigger value="transcripts" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none", "px-6")}>
+              <AlignLeft className="h-[14px] w-[14px]" />
+              <span>Transcripts</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          {contentData.type === 'youtube' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsVideoHidden(!isVideoHidden)}
+              className={cn(
+                "h-9 w-9 p-0 rounded-lg border-2",
+                "opacity-0 hover:opacity-100 focus:opacity-100",
+                "transition-all duration-200",
+                "bg-card hover:bg-accent",
+                "border-border hover:border-primary/50",
+                "group"
+              )}
+              aria-label={isVideoHidden ? "Show video player" : "Hide video player"}
+            >
+              <ChevronsDownUp className={cn(
+                "h-4 w-4 transition-all duration-200",
+                "text-muted-foreground group-hover:text-primary",
+                isVideoHidden && "rotate-180"
+              )} />
+            </Button>
+          )}
+        </div>
 
         <div className="flex-1 relative overflow-hidden">
           {renderTabContent()}
