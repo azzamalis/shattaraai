@@ -29,7 +29,7 @@ export function GenerationPrompt({ type, onGenerate, onConfigure, contentData, i
   const config = contentConfig[type];
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full">
       <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-sm">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1">

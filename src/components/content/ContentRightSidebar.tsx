@@ -272,17 +272,19 @@ export function ContentRightSidebar({
           
           <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              {flashcards.length === 0 ? (
-                <div className="flex items-center justify-center h-full p-8">
-                  <GenerationPrompt
-                    type="flashcards"
-                    onGenerate={handleGenerateFlashcards}
-                    onConfigure={() => setShowFlashcardConfig(true)}
-                    contentData={contentData}
-                    isLoading={isGenerating && generationType === 'flashcards'}
-                  />
-                </div>
-              ) : (
+          {flashcards.length === 0 ? (
+            <div className="flex justify-end p-6 pt-8">
+              <div className="w-full max-w-2xl">
+                <GenerationPrompt
+                  type="flashcards"
+                  onGenerate={handleGenerateFlashcards}
+                  onConfigure={() => setShowFlashcardConfig(true)}
+                  contentData={contentData}
+                  isLoading={isGenerating && generationType === 'flashcards'}
+                />
+              </div>
+            </div>
+          ) : (
                 <FlashcardContainer initialCards={flashcards} />
               )}
             </div>
@@ -290,17 +292,19 @@ export function ContentRightSidebar({
           
           <TabsContent value="exams" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              {!quizData ? (
-                <div className="flex items-center justify-center h-full p-8">
-                  <GenerationPrompt
-                    type="quizzes"
-                    onGenerate={handleGenerateQuiz}
-                    onConfigure={() => setShowQuizConfig(true)}
-                    contentData={contentData}
-                    isLoading={isGenerating && generationType === 'quizzes'}
-                  />
-                </div>
-              ) : (
+          {!quizData ? (
+            <div className="flex justify-end p-6 pt-8">
+              <div className="w-full max-w-2xl">
+                <GenerationPrompt
+                  type="quizzes"
+                  onGenerate={handleGenerateQuiz}
+                  onConfigure={() => setShowQuizConfig(true)}
+                  contentData={contentData}
+                  isLoading={isGenerating && generationType === 'quizzes'}
+                />
+              </div>
+            </div>
+          ) : (
                 <ScrollArea className="h-full">
                   <div className="flex flex-col items-center justify-start pt-8 h-full min-h-[400px]">
                     <QuizPreferences />
@@ -328,14 +332,16 @@ export function ContentRightSidebar({
           <TabsContent value="summary" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
               {!summaryData ? (
-                <div className="flex items-center justify-center h-full p-8">
-                  <GenerationPrompt
-                    type="summary"
-                    onGenerate={handleGenerateSummary}
-                    onConfigure={() => setShowSummaryConfig(true)}
-                    contentData={contentData}
-                    isLoading={isGenerating && generationType === 'summary'}
-                  />
+                <div className="flex justify-end p-6 pt-8">
+                  <div className="w-full max-w-2xl">
+                    <GenerationPrompt
+                      type="summary"
+                      onGenerate={handleGenerateSummary}
+                      onConfigure={() => setShowSummaryConfig(true)}
+                      contentData={contentData}
+                      isLoading={isGenerating && generationType === 'summary'}
+                    />
+                  </div>
                 </div>
               ) : (
                 <ScrollArea className="h-full">
