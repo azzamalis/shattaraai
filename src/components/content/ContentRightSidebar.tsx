@@ -273,16 +273,14 @@ export function ContentRightSidebar({
           <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
           {flashcards.length === 0 ? (
-            <div className="flex justify-end p-6 pt-8">
-              <div className="w-full max-w-2xl">
-                <GenerationPrompt
-                  type="flashcards"
-                  onGenerate={handleGenerateFlashcards}
-                  onConfigure={() => setShowFlashcardConfig(true)}
-                  contentData={contentData}
-                  isLoading={isGenerating && generationType === 'flashcards'}
-                />
-              </div>
+            <div className="p-6">
+              <GenerationPrompt
+                type="flashcards"
+                onGenerate={handleGenerateFlashcards}
+                onConfigure={() => setShowFlashcardConfig(true)}
+                contentData={contentData}
+                isLoading={isGenerating && generationType === 'flashcards'}
+              />
             </div>
           ) : (
                 <FlashcardContainer initialCards={flashcards} />
@@ -293,16 +291,14 @@ export function ContentRightSidebar({
           <TabsContent value="exams" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
           {!quizData ? (
-            <div className="flex justify-end p-6 pt-8">
-              <div className="w-full max-w-2xl">
-                <GenerationPrompt
-                  type="quizzes"
-                  onGenerate={handleGenerateQuiz}
-                  onConfigure={() => setShowQuizConfig(true)}
-                  contentData={contentData}
-                  isLoading={isGenerating && generationType === 'quizzes'}
-                />
-              </div>
+            <div className="p-6">
+              <GenerationPrompt
+                type="quizzes"
+                onGenerate={handleGenerateQuiz}
+                onConfigure={() => setShowQuizConfig(true)}
+                contentData={contentData}
+                isLoading={isGenerating && generationType === 'quizzes'}
+              />
             </div>
           ) : (
                 <ScrollArea className="h-full">
@@ -332,16 +328,14 @@ export function ContentRightSidebar({
           <TabsContent value="summary" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
               {!summaryData ? (
-                <div className="flex justify-end p-6 pt-8">
-                  <div className="w-full max-w-2xl">
-                    <GenerationPrompt
-                      type="summary"
-                      onGenerate={handleGenerateSummary}
-                      onConfigure={() => setShowSummaryConfig(true)}
-                      contentData={contentData}
-                      isLoading={isGenerating && generationType === 'summary'}
-                    />
-                  </div>
+                <div className="p-6">
+                  <GenerationPrompt
+                    type="summary"
+                    onGenerate={handleGenerateSummary}
+                    onConfigure={() => setShowSummaryConfig(true)}
+                    contentData={contentData}
+                    isLoading={isGenerating && generationType === 'summary'}
+                  />
                 </div>
               ) : (
                 <ScrollArea className="h-full">
