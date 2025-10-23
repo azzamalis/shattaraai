@@ -221,6 +221,7 @@ export type Database = {
       }
       content: {
         Row: {
+          ai_summary: string | null
           chapters: Json | null
           created_at: string
           filename: string | null
@@ -229,6 +230,8 @@ export type Database = {
           processing_status: string | null
           room_id: string | null
           storage_path: string | null
+          summary_generated_at: string | null
+          summary_key_points: Json | null
           text_content: string | null
           title: string
           transcription_confidence: number | null
@@ -238,6 +241,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          ai_summary?: string | null
           chapters?: Json | null
           created_at?: string
           filename?: string | null
@@ -246,6 +250,8 @@ export type Database = {
           processing_status?: string | null
           room_id?: string | null
           storage_path?: string | null
+          summary_generated_at?: string | null
+          summary_key_points?: Json | null
           text_content?: string | null
           title: string
           transcription_confidence?: number | null
@@ -255,6 +261,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          ai_summary?: string | null
           chapters?: Json | null
           created_at?: string
           filename?: string | null
@@ -263,6 +270,8 @@ export type Database = {
           processing_status?: string | null
           room_id?: string | null
           storage_path?: string | null
+          summary_generated_at?: string | null
+          summary_key_points?: Json | null
           text_content?: string | null
           title?: string
           transcription_confidence?: number | null
@@ -488,6 +497,56 @@ export type Database = {
           },
         ]
       }
+      flashcards: {
+        Row: {
+          answer: string
+          concept: string
+          content_id: string
+          created_at: string | null
+          difficulty: string
+          explanation: string | null
+          hint: string | null
+          id: string
+          question: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          concept: string
+          content_id: string
+          created_at?: string | null
+          difficulty: string
+          explanation?: string | null
+          hint?: string | null
+          id?: string
+          question: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          concept?: string
+          content_id?: string
+          created_at?: string | null
+          difficulty?: string
+          explanation?: string | null
+          hint?: string | null
+          id?: string
+          question?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_subscribers: {
         Row: {
           confirmation_token: string | null
@@ -524,7 +583,7 @@ export type Database = {
           changed_fields: Json | null
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string
         }
@@ -533,7 +592,7 @@ export type Database = {
           changed_fields?: Json | null
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id: string
         }
@@ -542,7 +601,7 @@ export type Database = {
           changed_fields?: Json | null
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string
         }
@@ -592,6 +651,47 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      quizzes: {
+        Row: {
+          config: Json | null
+          content_id: string
+          created_at: string | null
+          id: string
+          questions: Json
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          config?: Json | null
+          content_id: string
+          created_at?: string | null
+          id?: string
+          questions: Json
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          config?: Json | null
+          content_id?: string
+          created_at?: string | null
+          id?: string
+          questions?: Json
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recordings: {
         Row: {
@@ -661,7 +761,7 @@ export type Database = {
           created_at: string
           id: string
           invite_code: string
-          ip_address: unknown | null
+          ip_address: unknown
           metadata: Json | null
           referee_user_id: string | null
           referrer_user_id: string
@@ -672,7 +772,7 @@ export type Database = {
           created_at?: string
           id?: string
           invite_code: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           referee_user_id?: string | null
           referrer_user_id: string
@@ -683,7 +783,7 @@ export type Database = {
           created_at?: string
           id?: string
           invite_code?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           referee_user_id?: string | null
           referrer_user_id?: string
@@ -816,14 +916,8 @@ export type Database = {
           reset_time: string
         }[]
       }
-      cleanup_expired_cache: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      generate_invite_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      cleanup_expired_cache: { Args: never; Returns: undefined }
+      generate_invite_code: { Args: never; Returns: string }
       get_user_plan_quotas: {
         Args: { user_uuid: string }
         Returns: {
@@ -833,14 +927,8 @@ export type Database = {
           plan_type: Database["public"]["Enums"]["user_plan"]
         }[]
       }
-      user_owns_content: {
-        Args: { c_id: string }
-        Returns: boolean
-      }
-      user_owns_exam: {
-        Args: { exam_uuid: string }
-        Returns: boolean
-      }
+      user_owns_content: { Args: { c_id: string }; Returns: boolean }
+      user_owns_exam: { Args: { exam_uuid: string }; Returns: boolean }
       user_owns_exam_attempt: {
         Args: { attempt_uuid: string }
         Returns: boolean
@@ -849,10 +937,7 @@ export type Database = {
         Args: { question_uuid: string }
         Returns: boolean
       }
-      user_owns_room_for_exam: {
-        Args: { exam_uuid: string }
-        Returns: boolean
-      }
+      user_owns_room_for_exam: { Args: { exam_uuid: string }; Returns: boolean }
       validate_invite_code: {
         Args: { code: string }
         Returns: {

@@ -30,6 +30,9 @@ export interface ContentData {
   errorMessage?: string;
   processing_status?: string;
   transcription_confidence?: number;
+  ai_summary?: string;
+  summary_key_points?: string[];
+  summary_generated_at?: string;
 }
 export default function ContentPage() {
   const {

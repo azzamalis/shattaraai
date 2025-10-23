@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, StickyNote, ReceiptText, BookCheck, GalleryVerticalEnd, ListTodo } from "lucide-react";
@@ -11,129 +11,13 @@ import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
 import { FlashcardData } from './Flashcard';
 import RealtimeChaptersDisplay from './RealtimeChaptersDisplay';
+import { GenerationPrompt } from './GenerationPrompt';
+import { FlashcardConfigModal } from './FlashcardConfigModal';
+import { QuizConfigModal } from './QuizConfigModal';
+import { SummaryConfigModal } from './SummaryConfigModal';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
-// Enhanced sample flashcards data with new fields
-const sampleFlashcards: FlashcardData[] = [{
-  id: "1",
-  question: "What is the capital of France?",
-  answer: "Paris",
-  hint: "It's known as the City of Light",
-  explanation: "Paris has been France's capital since 987 CE and is located in the north-central part of the country.",
-  source: "Geography Textbook",
-  page: 142,
-  concept: "European Capitals",
-  timeSpent: 30,
-  correct: true,
-  isStarred: false
-}, {
-  id: "2",
-  question: "What is the largest planet in our solar system?",
-  answer: "Jupiter",
-  hint: "It's a gas giant with distinctive bands",
-  explanation: "Jupiter is the fifth planet from the Sun and the largest in the Solar System, with a mass more than twice that of all other planets combined.",
-  source: "Astronomy Course",
-  page: 89,
-  concept: "Solar System",
-  timeSpent: 45,
-  correct: true,
-  isStarred: true
-}, {
-  id: "3",
-  question: "What is the chemical symbol for water?",
-  answer: "H2O",
-  hint: "It contains hydrogen and oxygen",
-  explanation: "H2O represents two hydrogen atoms bonded to one oxygen atom, forming the most essential compound for life.",
-  source: "Chemistry Fundamentals",
-  page: 23,
-  concept: "Chemical Formulas",
-  timeSpent: 20,
-  correct: false,
-  isStarred: false
-}, {
-  id: "4",
-  question: "Who painted the Mona Lisa?",
-  answer: "Leonardo da Vinci",
-  hint: "He was also an inventor and scientist",
-  explanation: "Leonardo da Vinci painted the Mona Lisa between 1503-1519. It's housed in the Louvre Museum in Paris.",
-  source: "Art History",
-  page: 156,
-  concept: "Renaissance Art",
-  timeSpent: 35,
-  correct: true,
-  isStarred: false
-}, {
-  id: "5",
-  question: "What is the capital of Japan?",
-  answer: "Tokyo",
-  hint: "It's one of the world's most populous metropolitan areas",
-  explanation: "Tokyo became Japan's capital in 1868, replacing Kyoto. It's the political and economic center of Japan.",
-  source: "World Geography",
-  page: 203,
-  concept: "Asian Capitals",
-  timeSpent: 25,
-  correct: true,
-  isStarred: true
-}, {
-  id: "6",
-  question: "What is the highest mountain in the world?",
-  answer: "Mount Everest",
-  hint: "It's located in the Himalayas",
-  explanation: "Mount Everest stands at 8,848.86 meters (29,031.7 feet) above sea level and is located on the border between Nepal and Tibet.",
-  source: "Physical Geography",
-  page: 78,
-  concept: "Mountain Ranges",
-  timeSpent: 40,
-  correct: true,
-  isStarred: false
-}, {
-  id: "7",
-  question: "What is the main function of the heart?",
-  answer: "Pump blood throughout the body",
-  hint: "It's the central organ of the circulatory system",
-  explanation: "The heart is a muscular organ that pumps blood through blood vessels to supply oxygen and nutrients to tissues throughout the body.",
-  source: "Human Biology",
-  page: 112,
-  concept: "Circulatory System",
-  timeSpent: 50,
-  correct: true,
-  isStarred: false
-}, {
-  id: "8",
-  question: "What is the square root of 64?",
-  answer: "8",
-  hint: "Think about what number times itself equals 64",
-  explanation: "The square root of 64 is 8 because 8 × 8 = 64. Square roots ask what number, when multiplied by itself, gives the original number.",
-  source: "Mathematics Basics",
-  page: 45,
-  concept: "Square Roots",
-  timeSpent: 15,
-  correct: true,
-  isStarred: true
-}, {
-  id: "9",
-  question: "What is the process by which plants make their own food?",
-  answer: "Photosynthesis",
-  hint: "It requires sunlight and involves converting CO2",
-  explanation: "Photosynthesis is the process where plants use sunlight, water, and carbon dioxide to produce glucose and oxygen.",
-  source: "Plant Biology",
-  page: 67,
-  concept: "Plant Processes",
-  timeSpent: 55,
-  correct: false,
-  isStarred: false
-}, {
-  id: "10",
-  question: "Which gas do plants absorb from the atmosphere?",
-  answer: "Carbon Dioxide",
-  hint: "It's what humans exhale",
-  explanation: "Plants absorb carbon dioxide (CO2) from the atmosphere through their stomata and use it in photosynthesis to produce glucose.",
-  source: "Environmental Science",
-  page: 134,
-  concept: "Plant Processes",
-  timeSpent: 30,
-  correct: true,
-  isStarred: false
-}];
 interface ContentRightSidebarProps {
   contentData: ContentData;
 }
@@ -142,6 +26,191 @@ export function ContentRightSidebar({
 }: ContentRightSidebarProps) {
   const [activeTab, setActiveTab] = useState("chat");
   const [isRecording, setIsRecording] = useState(false);
+
+  // Generation states
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationType, setGenerationType] = useState<'flashcards' | 'quizzes' | 'summary' | null>(null);
+  
+  // Data states
+  const [flashcards, setFlashcards] = useState<FlashcardData[]>([]);
+  const [quizData, setQuizData] = useState<any>(null);
+  const [summaryData, setSummaryData] = useState<{ summary: string; keyPoints: string[] } | null>(null);
+  
+  // Config modal states
+  const [showFlashcardConfig, setShowFlashcardConfig] = useState(false);
+  const [showQuizConfig, setShowQuizConfig] = useState(false);
+  const [showSummaryConfig, setShowSummaryConfig] = useState(false);
+  
+  // Config states
+  const [flashcardConfig, setFlashcardConfig] = useState({
+    numberOfCards: 20,
+    difficulty: 'medium' as 'easy' | 'medium' | 'hard',
+    includeHints: true,
+    includeExplanations: true,
+    focusOnKeyConcepts: true
+  });
+  
+  const [quizConfig, setQuizConfig] = useState({
+    numberOfQuestions: 15,
+    difficulty: 'medium' as 'easy' | 'medium' | 'hard',
+    includeExplanations: true,
+    questionTypes: {
+      multipleChoice: true,
+      trueFalse: true,
+      shortAnswer: false
+    }
+  });
+  
+  const [summaryConfig, setSummaryConfig] = useState({
+    length: 'standard' as 'brief' | 'standard' | 'detailed',
+    focusAreas: {
+      keyPoints: true,
+      mainTopics: true,
+      examples: false,
+      definitions: false,
+      all: false
+    },
+    format: 'bullets' as 'bullets' | 'paragraphs'
+  });
+
+  // Fetch existing data on mount
+  useEffect(() => {
+    if (contentData?.id) {
+      fetchFlashcards();
+      fetchQuizzes();
+      checkSummary();
+    }
+  }, [contentData?.id]);
+
+  const fetchFlashcards = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('flashcards')
+        .select('*')
+        .eq('content_id', contentData.id)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const formattedCards: FlashcardData[] = data.map((card, index) => ({
+          id: card.id,
+          question: card.question,
+          answer: card.answer,
+          hint: card.hint || undefined,
+          explanation: card.explanation || undefined,
+          concept: card.concept,
+          timeSpent: 0,
+          correct: true,
+          isStarred: false
+        }));
+        setFlashcards(formattedCards);
+      }
+    } catch (error) {
+      console.error('Error fetching flashcards:', error);
+    }
+  };
+
+  const fetchQuizzes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('quizzes')
+        .select('*')
+        .eq('content_id', contentData.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      if (data) setQuizData(data);
+    } catch (error) {
+      console.error('Error fetching quizzes:', error);
+    }
+  };
+
+  const checkSummary = async () => {
+    if (contentData.ai_summary && contentData.summary_key_points) {
+      setSummaryData({
+        summary: contentData.ai_summary,
+        keyPoints: contentData.summary_key_points as string[]
+      });
+    }
+  };
+
+  const handleGenerateFlashcards = async () => {
+    setIsGenerating(true);
+    setGenerationType('flashcards');
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-flashcards', {
+        body: {
+          contentId: contentData.id,
+          config: flashcardConfig
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast.success(`Generated ${data.count} flashcards!`);
+      await fetchFlashcards();
+    } catch (error) {
+      console.error('Flashcard generation error:', error);
+      toast.error('Failed to generate flashcards. Please try again.');
+    } finally {
+      setIsGenerating(false);
+      setGenerationType(null);
+    }
+  };
+
+  const handleGenerateQuiz = async () => {
+    setIsGenerating(true);
+    setGenerationType('quizzes');
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-quiz', {
+        body: {
+          contentId: contentData.id,
+          config: quizConfig
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast.success(`Generated quiz with ${data.questionCount} questions!`);
+      await fetchQuizzes();
+    } catch (error) {
+      console.error('Quiz generation error:', error);
+      toast.error('Failed to generate quiz. Please try again.');
+    } finally {
+      setIsGenerating(false);
+      setGenerationType(null);
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    setIsGenerating(true);
+    setGenerationType('summary');
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-summary', {
+        body: {
+          contentId: contentData.id,
+          config: summaryConfig
+        }
+      });
+      
+      if (error) throw error;
+      
+      setSummaryData(data);
+      toast.success('Summary generated successfully!');
+    } catch (error) {
+      console.error('Summary generation error:', error);
+      toast.error('Failed to generate summary. Please try again.');
+    } finally {
+      setIsGenerating(false);
+      setGenerationType(null);
+    }
+  };
 
   // Check if chapters should be shown for this content type
   const shouldShowChapters = contentData.type === 'text' && (contentData.chapters?.length > 0 || contentData.text_content);
@@ -203,17 +272,41 @@ export function ContentRightSidebar({
           
           <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <FlashcardContainer initialCards={sampleFlashcards} />
+              {flashcards.length === 0 ? (
+                <div className="flex items-center justify-center h-full p-8">
+                  <GenerationPrompt
+                    type="flashcards"
+                    onGenerate={handleGenerateFlashcards}
+                    onConfigure={() => setShowFlashcardConfig(true)}
+                    contentData={contentData}
+                    isLoading={isGenerating && generationType === 'flashcards'}
+                  />
+                </div>
+              ) : (
+                <FlashcardContainer initialCards={flashcards} />
+              )}
             </div>
           </TabsContent>
           
           <TabsContent value="exams" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <ScrollArea className="h-full">
-                <div className="flex flex-col items-center justify-start pt-8 h-full min-h-[400px]">
-                  <QuizPreferences />
+              {!quizData ? (
+                <div className="flex items-center justify-center h-full p-8">
+                  <GenerationPrompt
+                    type="quizzes"
+                    onGenerate={handleGenerateQuiz}
+                    onConfigure={() => setShowQuizConfig(true)}
+                    contentData={contentData}
+                    isLoading={isGenerating && generationType === 'quizzes'}
+                  />
                 </div>
-              </ScrollArea>
+              ) : (
+                <ScrollArea className="h-full">
+                  <div className="flex flex-col items-center justify-start pt-8 h-full min-h-[400px]">
+                    <QuizPreferences />
+                  </div>
+                </ScrollArea>
+              )}
             </div>
           </TabsContent>
           
@@ -234,9 +327,21 @@ export function ContentRightSidebar({
           
           <TabsContent value="summary" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              <ScrollArea className="h-full">
-                <SummaryDisplay contentData={contentData} />
-              </ScrollArea>
+              {!summaryData ? (
+                <div className="flex items-center justify-center h-full p-8">
+                  <GenerationPrompt
+                    type="summary"
+                    onGenerate={handleGenerateSummary}
+                    onConfigure={() => setShowSummaryConfig(true)}
+                    contentData={contentData}
+                    isLoading={isGenerating && generationType === 'summary'}
+                  />
+                </div>
+              ) : (
+                <ScrollArea className="h-full">
+                  <SummaryDisplay contentData={{ ...contentData, ai_summary: summaryData.summary, summary_key_points: summaryData.keyPoints }} />
+                </ScrollArea>
+              )}
             </div>
           </TabsContent>
           
@@ -247,5 +352,27 @@ export function ContentRightSidebar({
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Configuration Modals */}
+      <FlashcardConfigModal
+        open={showFlashcardConfig}
+        onOpenChange={setShowFlashcardConfig}
+        config={flashcardConfig}
+        onSave={setFlashcardConfig}
+      />
+      
+      <QuizConfigModal
+        open={showQuizConfig}
+        onOpenChange={setShowQuizConfig}
+        config={quizConfig}
+        onSave={setQuizConfig}
+      />
+      
+      <SummaryConfigModal
+        open={showSummaryConfig}
+        onOpenChange={setShowSummaryConfig}
+        config={summaryConfig}
+        onSave={setSummaryConfig}
+      />
     </div>;
 }
