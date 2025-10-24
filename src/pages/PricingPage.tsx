@@ -148,7 +148,7 @@ const PricingPage: React.FC = () => {
                             {billingCycle === "yearly" ? "Billed Annually" : "Billed Monthly"}
                           </span>
                         </div>
-                        <div className="text-green-500 bg-green-500/20 items-center backdrop-blur-md py-1 px-2 flex w-auto h-auto border-2 border-green-500/40 border-solid rounded-full text-xs font-medium">
+                        <div className="text-primary bg-primary/20 items-center backdrop-blur-md py-1 px-2 flex w-auto h-auto border-2 border-primary/40 border-solid rounded-full text-xs font-medium">
                           <span className="rounded-full">Popular</span>
                         </div>
                       </div>
