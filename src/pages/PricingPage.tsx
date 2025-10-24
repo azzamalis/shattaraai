@@ -25,10 +25,10 @@ const PricingPage: React.FC = () => {
             {/* Hero Section */}
             <div className="items-center justify-center text-center flex w-full mt-12 mb-6">
               <div className="flex-col w-full px-4">
-                <h1 className="text-4xl my-3 text-neutral-950 dark:text-white font-normal">
+                <h1 className="text-4xl my-3 text-foreground font-semibold">
                   Save hours, learn smarter.
                 </h1>
-                <h2 className="text-neutral-500 dark:text-neutral-400 text-xl mt-6 max-w-3xl mx-auto">
+                <h2 className="text-muted-foreground text-xl mt-6 max-w-3xl mx-auto font-normal">
                   Enjoy endless content uploads, chats, voice mode, recorded lectures, and more.
                 </h2>
               </div>
