@@ -102,35 +102,35 @@ export const TeamPlanDialog: React.FC<TeamPlanDialogProps> = ({
             <DialogDescription className="flex items-start text-xs sm:text-sm text-muted-foreground font-normal leading-relaxed">
               <span>
                 Save 55–75% with yearly billing: SR34/user (Seats 3–9), SR26/user (10–49), SR19/user (50+).
-                Monthly plans start at SR56.21/user. Tap the info icon for the full discount breakdown.
+                Monthly plans start at SR56.21/user. Tap the info icon for the full discount breakdown.{" "}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="inline w-4 h-4 text-muted-foreground hover:text-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs p-3">
+                      <div className="space-y-3 text-xs">
+                        <div>
+                          <div className="font-semibold mb-2">Yearly (best value – compared to Pro Monthly):</div>
+                          <ul className="space-y-1 ml-2">
+                            <li>• 1-9 seats: SR34/user/mo (55% off)</li>
+                            <li>• 10-49 seats: SR26/user/mo (65% off)</li>
+                            <li>• 50+ seats: SR19/user/mo (75% off)</li>
+                          </ul>
+                        </div>
+                        <div>
+                          <div className="font-semibold mb-2">Monthly (compared to Pro Monthly):</div>
+                          <ul className="space-y-1 ml-2">
+                            <li>• 1-9 seats: SR56.21/user/mo (25% off)</li>
+                            <li>• 10-49 seats: SR44.97/user/mo (40% off)</li>
+                            <li>• 50+ seats: SR33.72/user/mo (55% off)</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </span>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="inline w-4 h-4 ml-1 flex-shrink-0 text-muted-foreground hover:text-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs p-3">
-                    <div className="space-y-3 text-xs">
-                      <div>
-                        <div className="font-semibold mb-2">Yearly (best value – compared to Pro Monthly):</div>
-                        <ul className="space-y-1 ml-2">
-                          <li>• 1-9 seats: SR34/user/mo (55% off)</li>
-                          <li>• 10-49 seats: SR26/user/mo (65% off)</li>
-                          <li>• 50+ seats: SR19/user/mo (75% off)</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <div className="font-semibold mb-2">Monthly (compared to Pro Monthly):</div>
-                        <ul className="space-y-1 ml-2">
-                          <li>• 1-9 seats: SR56.21/user/mo (25% off)</li>
-                          <li>• 10-49 seats: SR44.97/user/mo (40% off)</li>
-                          <li>• 50+ seats: SR33.72/user/mo (55% off)</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
             </DialogDescription>
           </div>
         </DialogHeader>
