@@ -1,4 +1,4 @@
-import { ChevronLeft, MoreVertical } from 'lucide-react';
+import { ChevronLeft, MoreVertical, Settings2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -44,12 +44,14 @@ export const QuizHeader = ({
         <DropdownMenuContent align="end">
           {onSaveProgress && (
             <DropdownMenuItem onClick={onSaveProgress}>
-              Save Progress
+              <Settings2 className="w-4 h-4 mr-2" />
+              Edit Quiz
             </DropdownMenuItem>
           )}
           {onEndQuiz && (
             <DropdownMenuItem onClick={onEndQuiz}>
-              End Quiz
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Restart
             </DropdownMenuItem>
           )}
           {onReviewSettings && (
