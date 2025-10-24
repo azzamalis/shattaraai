@@ -144,7 +144,9 @@ const PricingPage: React.FC = () => {
                           <h1 className="text-4xl font-light my-3">
                             <span className="font-medium">Pro</span>
                           </h1>
-                          <span className="text-xs opacity-70">Billed Annually</span>
+                          <span className="text-xs opacity-70">
+                            {billingCycle === "yearly" ? "Billed Annually" : "Billed Monthly"}
+                          </span>
                         </div>
                         <div className="text-green-500 bg-green-500/20 items-center backdrop-blur-md py-1 px-2 flex w-auto h-auto border-2 border-green-500/40 border-solid rounded-full text-xs font-medium">
                           <span className="rounded-full">Popular</span>
@@ -230,7 +232,9 @@ const PricingPage: React.FC = () => {
                           <h1 className="text-4xl font-light my-3">
                             <span className="font-medium">Team</span>
                           </h1>
-                          <span className="text-xs opacity-70">Billed Annually</span>
+                          <span className="text-xs opacity-70">
+                            {billingCycle === "yearly" ? "Billed Annually" : "Billed Monthly"}
+                          </span>
                         </div>
                       </div>
                       <div className="mt-4">
