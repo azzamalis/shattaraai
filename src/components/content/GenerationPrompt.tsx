@@ -31,7 +31,7 @@ export function GenerationPrompt({
 }: GenerationPromptProps) {
   const config = contentConfig[type];
   return <div className="w-full">
-      <div className="bg-transparent rounded-2xl border-2 border-border p-6 shadow-sm px-[16px] py-[15px]">
+      <div className="bg-transparent rounded-2xl border-2 border-border p-6 shadow-sm px-[16px] py-[16px]">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-foreground mb-2">
