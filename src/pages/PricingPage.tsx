@@ -2,11 +2,9 @@ import React, { useState } from "react";
 import { Check, ArrowRight } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ContactSalesModal } from "@/components/dashboard/modals/ContactSalesModal";
 
 const PricingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
-  const [contactModalOpen, setContactModalOpen] = useState(false);
 
   const universityLogos = [
     { name: "King Saud University", src: "/images/king_saud_university.png" },
@@ -292,7 +290,6 @@ const PricingPage: React.FC = () => {
                       </div>
                     </div>
                     <button 
-                      onClick={() => setContactModalOpen(true)}
                       className="text-black bg-white items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 rounded-full overflow-visible hover:bg-neutral-100 transition-colors font-medium"
                     >
                       <div className="items-center justify-center flex">
@@ -395,8 +392,6 @@ const PricingPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      <ContactSalesModal open={contactModalOpen} onOpenChange={setContactModalOpen} />
     </DashboardLayout>
   );
 };
