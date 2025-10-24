@@ -115,6 +115,19 @@ export function ContentRightSidebar({
     }
   };
 
+  // Helper function to normalize question types from database format to component format
+  const normalizeQuestionType = (type: string): 'multiple-choice' | 'true-false' | 'short-answer' => {
+    const typeMap: Record<string, 'multiple-choice' | 'true-false' | 'short-answer'> = {
+      'multiple_choice': 'multiple-choice',
+      'true_false': 'true-false',
+      'short_answer': 'short-answer',
+      'multiple-choice': 'multiple-choice',
+      'true-false': 'true-false',
+      'short-answer': 'short-answer'
+    };
+    return typeMap[type] || 'multiple-choice';
+  };
+
   const fetchQuizzes = async () => {
     try {
       const { data, error } = await supabase
@@ -126,7 +139,19 @@ export function ContentRightSidebar({
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      if (data) setQuizData(data);
+      
+      if (data) {
+        // Normalize question types from database format (underscore) to component format (hyphen)
+        const questions = Array.isArray(data.questions) ? data.questions : [];
+        const normalizedData = {
+          ...data,
+          questions: questions.map((q: any) => ({
+            ...q,
+            type: normalizeQuestionType(q.type)
+          }))
+        };
+        setQuizData(normalizedData);
+      }
     } catch (error) {
       console.error('Error fetching quizzes:', error);
     }
