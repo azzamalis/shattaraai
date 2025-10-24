@@ -3,7 +3,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, StickyNote, ReceiptText, BookCheck, GalleryVerticalEnd, ListTodo } from "lucide-react";
 import AIChat from "@/components/recording/AIChat";
-import QuizPreferences from '@/components/recording/QuizPreferences';
 import Notes from '@/components/recording/Notes';
 import { FlashcardContainer } from './FlashcardContainer';
 import { SummaryDisplay } from './SummaryDisplay';
@@ -17,6 +16,8 @@ import { QuizConfigModal } from './QuizConfigModal';
 import { SummaryConfigModal } from './SummaryConfigModal';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { QuizDisplay } from './QuizDisplay';
+import { QuizTakingComponent } from './QuizTakingComponent';
 
 interface ContentRightSidebarProps {
   contentData: ContentData;
@@ -40,6 +41,9 @@ export function ContentRightSidebar({
   const [showFlashcardConfig, setShowFlashcardConfig] = useState(false);
   const [showQuizConfig, setShowQuizConfig] = useState(false);
   const [showSummaryConfig, setShowSummaryConfig] = useState(false);
+  
+  // Quiz taking state
+  const [showQuizTaking, setShowQuizTaking] = useState(false);
   
   // Config states
   const [flashcardConfig, setFlashcardConfig] = useState({
@@ -289,25 +293,71 @@ export function ContentRightSidebar({
           </TabsContent>
           
           <TabsContent value="exams" className="flex-1 overflow-hidden mx-4 mb-4">
-            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-          {!quizData ? (
-            <div className="p-6">
-              <GenerationPrompt
-                type="quizzes"
-                onGenerate={handleGenerateQuiz}
-                onConfigure={() => setShowQuizConfig(true)}
-                contentData={contentData}
-                isLoading={isGenerating && generationType === 'quizzes'}
-              />
-            </div>
-          ) : (
+            {showQuizTaking && quizData ? (
+              <div className="h-full">
+                <QuizTakingComponent
+                  quizId={quizData.id}
+                  quizData={{
+                    ...quizData,
+                    questions: Array.isArray(quizData.questions) ? quizData.questions : []
+                  }}
+                  onBack={() => setShowQuizTaking(false)}
+                  onComplete={(results) => {
+                    setShowQuizTaking(false);
+                    toast.success(`Quiz completed! Score: ${results.correctAnswers}/${results.totalQuestions}`);
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
                 <ScrollArea className="h-full">
-                  <div className="flex flex-col items-center justify-start pt-8 h-full min-h-[400px]">
-                    <QuizPreferences />
+                  <div className="flex flex-col space-y-6">
+                    {quizData && (
+                      <div className="px-6 pt-6">
+                        <QuizDisplay
+                          quiz={quizData}
+                          onStartQuiz={(quizId) => setShowQuizTaking(true)}
+                          onEditQuiz={(quizId) => {
+                            setShowQuizConfig(true);
+                            toast.info('Edit quiz configuration and regenerate');
+                          }}
+                          onRestartQuiz={(quizId) => {
+                            toast.info('Quiz restarted! Good luck!');
+                            setShowQuizTaking(true);
+                          }}
+                          onDeleteQuiz={async (quizId) => {
+                            try {
+                              const { error } = await supabase
+                                .from('quizzes')
+                                .delete()
+                                .eq('id', quizId);
+                              
+                              if (error) throw error;
+                              
+                              setQuizData(null);
+                              toast.success('Quiz deleted successfully');
+                            } catch (error) {
+                              console.error('Error deleting quiz:', error);
+                              toast.error('Failed to delete quiz');
+                            }
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    <div className="px-6 pb-6">
+                      <GenerationPrompt
+                        type="quizzes"
+                        onGenerate={handleGenerateQuiz}
+                        onConfigure={() => setShowQuizConfig(true)}
+                        contentData={contentData}
+                        isLoading={isGenerating && generationType === 'quizzes'}
+                      />
+                    </div>
                   </div>
                 </ScrollArea>
-              )}
-            </div>
+              </div>
+            )}
           </TabsContent>
           
           {shouldShowChapters && <TabsContent value="chapters" className="flex-1 overflow-hidden mx-4 mb-4">
