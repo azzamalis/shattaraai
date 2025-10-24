@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Check, ArrowRight, ChevronLeft } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ContactSalesModal } from "@/components/dashboard/modals/ContactSalesModal";
@@ -334,9 +334,8 @@ const PricingPage: React.FC = () => {
             <div className="w-full max-w-[56.25rem] m-auto text-lg min-[1400px]:max-w-[87.50rem]">
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="pro-plan" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="items-center flex-grow justify-between py-4 text-left flex w-full h-16 text-neutral-950 dark:text-white hover:no-underline">
-                    <span>What do I get with the Pro plan?</span>
-                    <ChevronLeft className="w-4 h-4 transition-transform duration-200 [&[data-state=open]]:rotate-[-90deg]" />
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                    What do I get with the Pro plan?
                   </AccordionTrigger>
                   <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
                     With the Pro plan, you get unlimited uploads, AI chats, quiz generation, practice exams, and more. You can upload files up to 2000 pages or 300MB in size, and access all premium features without any restrictions.
@@ -344,9 +343,8 @@ const PricingPage: React.FC = () => {
                 </AccordionItem>
 
                 <AccordionItem value="team-plan" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="items-center flex-grow justify-between py-4 text-left flex w-full h-16 text-neutral-950 dark:text-white hover:no-underline">
-                    <span>What do I get with the Team plan?</span>
-                    <ChevronLeft className="w-4 h-4 transition-transform duration-200 [&[data-state=open]]:rotate-[-90deg]" />
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                    What do I get with the Team plan?
                   </AccordionTrigger>
                   <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
                     The Team plan includes everything in Pro plus centralized billing, shared spaces, custom permissions, and discounts that scale with team size. Perfect for study groups and collaborative learning environments.
@@ -354,9 +352,8 @@ const PricingPage: React.FC = () => {
                 </AccordionItem>
 
                 <AccordionItem value="payment-methods" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="items-center flex-grow justify-between py-4 text-left flex w-full h-16 text-neutral-950 dark:text-white hover:no-underline">
-                    <span>What payment methods do you offer?</span>
-                    <ChevronLeft className="w-4 h-4 transition-transform duration-200 [&[data-state=open]]:rotate-[-90deg]" />
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                    What payment methods do you offer?
                   </AccordionTrigger>
                   <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
                     We accept all major credit cards, debit cards, and various local payment methods. All payments are processed securely through our payment partners.
@@ -364,9 +361,8 @@ const PricingPage: React.FC = () => {
                 </AccordionItem>
 
                 <AccordionItem value="cancel-plan" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="items-center flex-grow justify-between py-4 text-left flex w-full h-16 text-neutral-950 dark:text-white hover:no-underline">
-                    <span>Can I cancel my YouLearn plan at any time?</span>
-                    <ChevronLeft className="w-4 h-4 transition-transform duration-200 [&[data-state=open]]:rotate-[-90deg]" />
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                    Can I cancel my YouLearn plan at any time?
                   </AccordionTrigger>
                   <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
                     Yes, you can cancel your subscription at any time. If you cancel, you'll retain access to premium features until the end of your current billing period.
@@ -374,9 +370,8 @@ const PricingPage: React.FC = () => {
                 </AccordionItem>
 
                 <AccordionItem value="student-discount" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="items-center flex-grow justify-between py-4 text-left flex w-full h-16 text-neutral-950 dark:text-white hover:no-underline">
-                    <span>Do you offer student discount?</span>
-                    <ChevronLeft className="w-4 h-4 transition-transform duration-200 [&[data-state=open]]:rotate-[-90deg]" />
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                    Do you offer student discount?
                   </AccordionTrigger>
                   <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
                     Yes! We offer special discounts for students. Please contact our support team with your student ID or academic email address to learn more about available discounts.
@@ -384,9 +379,8 @@ const PricingPage: React.FC = () => {
                 </AccordionItem>
 
                 <AccordionItem value="refund-policy" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="items-center flex-grow justify-between py-4 text-left flex w-full h-16 text-neutral-950 dark:text-white hover:no-underline">
-                    <span>What is your refund policy?</span>
-                    <ChevronLeft className="w-4 h-4 transition-transform duration-200 [&[data-state=open]]:rotate-[-90deg]" />
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                    What is your refund policy?
                   </AccordionTrigger>
                   <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
                     We offer a 7-day money-back guarantee for all new subscriptions. If you're not satisfied within the first 7 days, contact our support team for a full refund.
