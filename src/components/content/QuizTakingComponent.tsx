@@ -55,6 +55,7 @@ export const QuizTakingComponent = ({
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [flagged, setFlagged] = useState<Set<string>>(new Set());
   const [startTime] = useState(Date.now());
+  const [assistanceTriggered, setAssistanceTriggered] = useState(false);
 
   const currentQuestion = quizData.questions[currentQuestionIndex];
   const currentAnswer = answers[currentQuestion?.id];
@@ -130,7 +131,7 @@ export const QuizTakingComponent = ({
   };
 
   const handleAssistanceClick = (type: 'hint' | 'walkthrough' | 'simple') => {
-    // This will be handled by the chat interface
+    setAssistanceTriggered(true);
     toast.info(`Requesting ${type} assistance...`);
   };
 
@@ -242,6 +243,7 @@ export const QuizTakingComponent = ({
             currentQuestionIndex={currentQuestionIndex}
             totalQuestions={quizData.questions.length}
             userAnswer={currentAnswer}
+            assistanceTriggered={assistanceTriggered}
           />
         </div>
       </div>

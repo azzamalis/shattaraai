@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useChatConversation } from '@/hooks/useChatConversation';
 import { useOpenAIChatContent } from '@/hooks/useOpenAIChatContent';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -13,6 +14,7 @@ interface QuizChatInterfaceProps {
   currentQuestionIndex: number;
   totalQuestions: number;
   userAnswer?: any;
+  assistanceTriggered?: boolean;
 }
 
 export const QuizChatInterface = ({
@@ -21,7 +23,10 @@ export const QuizChatInterface = ({
   currentQuestionIndex,
   totalQuestions,
   userAnswer,
+  assistanceTriggered = false,
 }: QuizChatInterfaceProps) => {
+  const [isChatActive, setIsChatActive] = useState(false);
+
   const {
     conversation,
     messages,
@@ -35,6 +40,13 @@ export const QuizChatInterface = ({
     contextType: 'quiz',
     autoCreate: true,
   });
+
+  // Activate chat when assistance is triggered or messages exist
+  useEffect(() => {
+    if (assistanceTriggered || messages.length > 0) {
+      setIsChatActive(true);
+    }
+  }, [assistanceTriggered, messages.length]);
 
   const { sendMessageToAI } = useOpenAIChatContent({
     conversationId: conversation?.id,
@@ -58,6 +70,9 @@ export const QuizChatInterface = ({
   const handleSendMessage = async (messageText: string) => {
     if (!messageText.trim() || isSending) return;
 
+    // Activate chat when user sends first message
+    setIsChatActive(true);
+
     try {
       await sendMessage(messageText);
       const aiResponse = await sendMessageToAI(messageText);
@@ -75,10 +90,11 @@ export const QuizChatInterface = ({
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Chat Messages Area */}
-      <ScrollArea className="flex-1 min-h-0 px-2">
-        <div className="flex flex-col space-y-4 py-4">
-          {messages.map((message) => (
+      {/* Chat Messages Area - Hidden by default */}
+      {isChatActive && (
+        <ScrollArea className="flex-1 min-h-0 px-2">
+          <div className="flex flex-col space-y-4 py-4">
+            {messages.map((message) => (
             <div key={message.id} className="flex flex-col">
               {message.sender_type === 'user' ? (
                 // User message
@@ -156,11 +172,12 @@ export const QuizChatInterface = ({
               </div>
             </div>
           )}
-        </div>
-      </ScrollArea>
+          </div>
+        </ScrollArea>
+      )}
 
       {/* Chat Input */}
-      <div className="pb-4 pt-2 px-2">
+      <div className={`pb-4 px-2 ${isChatActive ? 'pt-2' : 'pt-0'}`}>
         <PromptInputChatBox
           onSendMessage={handleSendMessage}
           disabled={isSending}
