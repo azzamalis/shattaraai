@@ -62,9 +62,9 @@ const PricingPage: React.FC = () => {
                   {/* Free Plan */}
                   <div className="text-neutral-800 dark:text-neutral-200 bg-[linear-gradient(to_right_bottom,rgb(255,255,255),rgb(245,245,245))] dark:bg-[linear-gradient(to_right_bottom,rgb(75,75,75),rgb(64,64,64))] flex-col justify-between flex w-full max-w-xs border-2 border-neutral-200 dark:border-neutral-700 border-solid rounded-3xl overflow-hidden p-8">
                     <div className="mb-6">
-                      <div className="items-center justify-between flex text-4xl font-light">
+                       <div className="items-center justify-between flex">
                         <div className="items-center flex">
-                          <h1 className="my-3"><span className="font-medium">Free</span></h1>
+                          <h1 className="text-4xl font-light my-3"><span className="font-medium">Free</span></h1>
                         </div>
                       </div>
                       <div className="mt-4">
