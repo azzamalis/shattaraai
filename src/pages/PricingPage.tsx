@@ -19,7 +19,7 @@ const PricingPage: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full overflow-auto bg-white dark:bg-[#000] text-neutral-950 dark:text-white transition-colors duration-300">
+      <div className="flex flex-col h-full overflow-auto bg-background text-foreground transition-colors duration-300">
         <div className="pb-6 h-full mt-2 md:mt-4">
           <div className="items-center flex-col flex gap-4">
             {/* Hero Section */}
