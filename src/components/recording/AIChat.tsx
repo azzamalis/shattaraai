@@ -10,26 +10,19 @@ import { useOpenAIChatContent } from '@/hooks/useOpenAIChatContent';
 import { useAuth } from '@/hooks/useAuth';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
-import {
-  ChatContainerRoot,
-  ChatContainerContent,
-  ChatContainerScrollAnchor,
-} from '@/components/prompt-kit/chat-container';
-import {
-  Message,
-  MessageContent,
-  MessageActions,
-  MessageAction,
-} from '@/components/prompt-kit/message';
-
+import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from '@/components/prompt-kit/chat-container';
+import { Message, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
 interface AIChatProps {
   contentData?: ContentData;
 }
-
-const AIChat = ({ contentData }: AIChatProps) => {
+const AIChat = ({
+  contentData
+}: AIChatProps) => {
   const [isProcessingFiles, setIsProcessingFiles] = useState(false);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
 
   // Real AI integration with content context
   const {
@@ -47,32 +40,32 @@ const AIChat = ({ contentData }: AIChatProps) => {
   });
 
   // Prepare conversation history for AI context
-  const conversationHistory = messages.slice(-10)
-    .filter(msg => msg.sender_type !== 'system')
-    .map(msg => ({
-      content: msg.content,
-      sender_type: msg.sender_type as 'user' | 'ai'
-    }));
+  const conversationHistory = messages.slice(-10).filter(msg => msg.sender_type !== 'system').map(msg => ({
+    content: msg.content,
+    sender_type: msg.sender_type as 'user' | 'ai'
+  }));
 
   // AI hook with content context
-  const { sendMessageToAI } = useOpenAIChatContent({
+  const {
+    sendMessageToAI
+  } = useOpenAIChatContent({
     conversationId: conversation?.id,
     contextId: contentData?.id,
     conversationHistory,
     contentData: contentData ? {
       title: contentData.title,
       type: contentData.type,
-      text_content: contentData.text_content?.slice(0, 15000) || contentData.text?.slice(0, 15000), // Limit to avoid token overflow
-      summary: '', // Summary field not in ContentData type
+      text_content: contentData.text_content?.slice(0, 15000) || contentData.text?.slice(0, 15000),
+      // Limit to avoid token overflow
+      summary: '',
+      // Summary field not in ContentData type
       chapters: contentData.chapters
     } : undefined
   });
-
   const handleSendMessage = async (content: string, attachments?: File[]) => {
     const hasFiles = attachments && attachments.length > 0;
     setIsProcessingFiles(hasFiles);
     setIsProcessingAI(true);
-
     try {
       // 1. Upload files to storage FIRST
       const uploadedAttachments: Array<{
@@ -82,15 +75,14 @@ const AIChat = ({ contentData }: AIChatProps) => {
         url: string;
         uploadedAt: string;
       }> = [];
-
       if (hasFiles) {
         console.log(`Uploading ${attachments.length} files to storage...`);
-        
         for (const file of attachments) {
           try {
-            const { uploadFileToStorage } = await import('@/lib/storage');
+            const {
+              uploadFileToStorage
+            } = await import('@/lib/storage');
             const fileUrl = await uploadFileToStorage(file, 'chat', user.id);
-            
             uploadedAttachments.push({
               name: file.name,
               type: file.type,
@@ -98,20 +90,17 @@ const AIChat = ({ contentData }: AIChatProps) => {
               url: fileUrl,
               uploadedAt: new Date().toISOString()
             });
-            
             console.log(`File uploaded: ${file.name} -> ${fileUrl}`);
           } catch (uploadError) {
             console.error(`Failed to upload ${file.name}:`, uploadError);
             toast.error(`Failed to upload ${file.name}`);
           }
         }
-        
         setIsProcessingFiles(false);
       }
 
       // 2. Send user message with attachment URLs
       const userMessage = await sendMessage(content, uploadedAttachments);
-      
       if (userMessage) {
         // 3. Get AI response using real OpenAI integration with content context
         setIsProcessingAI(true);
@@ -133,7 +122,6 @@ const AIChat = ({ contentData }: AIChatProps) => {
       setIsProcessingFiles(false);
     }
   };
-
   const handleCopy = async (content: string) => {
     try {
       await navigator.clipboard.writeText(content);
@@ -142,147 +130,80 @@ const AIChat = ({ contentData }: AIChatProps) => {
       toast.error("Failed to copy message");
     }
   };
-
   const handleRegenerate = (messageId: string) => {
     toast.info("Regenerating response...");
     // TODO: Implement regenerate logic
   };
-
-  return (
-    <div className="flex flex-col h-full gap-4">
+  return <div className="flex flex-col h-full gap-4">
       <ChatContainerRoot className="flex-1 min-h-0 px-4">
         <ChatContainerContent>
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center p-8">
+          {messages.length === 0 ? <div className="flex flex-col items-center justify-center h-full text-center p-8">
               <Brain className="h-16 w-16 text-primary/60 mb-4" />
-              <h3 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text mb-2">
-                Chat about this content
-              </h3>
+              <h3 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text mb-2">Learn with Shattara AI</h3>
               <p className="text-sm text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 max-w-sm">
                 Ask questions, request summaries, generate quizzes, or create flashcards from this content.
               </p>
-            </div>
-          ) : (
-            <>
+            </div> : <>
               {messages.map((message, index) => {
-                const isAssistant = message.sender_type === 'ai';
-                const isLastMessage = index === messages.length - 1;
-
-                return (
-                  <Message
-                    key={message.id}
-                    className={cn(
-                      "mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6",
-                      isAssistant ? "items-start" : "items-end"
-                    )}
-                  >
-                    {isAssistant ? (
-                      <div className="group flex w-full flex-col gap-0">
+            const isAssistant = message.sender_type === 'ai';
+            const isLastMessage = index === messages.length - 1;
+            return <Message key={message.id} className={cn("mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6", isAssistant ? "items-start" : "items-end")}>
+                    {isAssistant ? <div className="group flex w-full flex-col gap-0">
                         <RichMessage content={message.content} className="w-full bg-transparent p-0" />
-                        <MessageActions
-                          className={cn(
-                            "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                            isLastMessage && "opacity-100"
-                          )}
-                        >
+                        <MessageActions className={cn("-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100", isLastMessage && "opacity-100")}>
                           <MessageAction tooltip="Copy" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                              onClick={() => handleCopy(message.content)}
-                            >
+                            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => handleCopy(message.content)}>
                               <Copy />
                             </Button>
                           </MessageAction>
                           <MessageAction tooltip="Upvote" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                            >
+                            <Button variant="ghost" size="icon" className="rounded-full">
                               <ThumbsUp />
                             </Button>
                           </MessageAction>
                           <MessageAction tooltip="Downvote" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                            >
+                            <Button variant="ghost" size="icon" className="rounded-full">
                               <ThumbsDown />
                             </Button>
                           </MessageAction>
                         </MessageActions>
-                      </div>
-                    ) : (
-                      <div className="group flex flex-col items-end gap-1">
+                      </div> : <div className="group flex flex-col items-end gap-1">
                         <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
                           {message.content}
                         </MessageContent>
-                        <MessageActions
-                          className={cn(
-                            "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-                          )}
-                        >
+                        <MessageActions className={cn("flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100")}>
                           <MessageAction tooltip="Edit" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                            >
+                            <Button variant="ghost" size="icon" className="rounded-full">
                               <Pencil />
                             </Button>
                           </MessageAction>
                           <MessageAction tooltip="Delete" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                            >
+                            <Button variant="ghost" size="icon" className="rounded-full">
                               <Trash />
                             </Button>
                           </MessageAction>
                           <MessageAction tooltip="Copy" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                              onClick={() => handleCopy(message.content)}
-                            >
+                            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => handleCopy(message.content)}>
                               <Copy />
                             </Button>
                           </MessageAction>
                         </MessageActions>
-                      </div>
-                    )}
-                  </Message>
-                );
-              })}
+                      </div>}
+                  </Message>;
+          })}
               
               {/* Loading indicators */}
-              {isProcessingFiles && (
-                <LoadingIndicator type="files" message="Processing and uploading attachments..." />
-              )}
-              {isProcessingAI && !isProcessingFiles && (
-                <LoadingIndicator type="ai" />
-              )}
-            </>
-          )}
+              {isProcessingFiles && <LoadingIndicator type="files" message="Processing and uploading attachments..." />}
+              {isProcessingAI && !isProcessingFiles && <LoadingIndicator type="ai" />}
+            </>}
           
           <ChatContainerScrollAnchor />
         </ChatContainerContent>
       </ChatContainerRoot>
 
       <div className="px-4 pb-4">
-        <PromptInputChatBox
-          onSendMessage={handleSendMessage}
-          disabled={isSending || isProcessingAI || isProcessingFiles}
-          placeholder="Ask anything about this content..."
-        />
+        <PromptInputChatBox onSendMessage={handleSendMessage} disabled={isSending || isProcessingAI || isProcessingFiles} placeholder="Ask anything about this content..." />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AIChat;
