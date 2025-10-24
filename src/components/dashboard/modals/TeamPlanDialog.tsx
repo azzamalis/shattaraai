@@ -65,6 +65,64 @@ export const TeamPlanDialog: React.FC<TeamPlanDialogProps> = ({
     return seats * 56.21;
   };
 
+  // Calculate tiered breakdown for summary display
+  const calculateTieredBreakdown = (totalSeats: number, cycle: "monthly" | "yearly") => {
+    const tiers: Array<{
+      range: string;
+      pricePerSeat: number;
+      seats: number;
+      subtotal: number;
+      multiplier: number;
+    }> = [];
+    let remainingSeats = totalSeats;
+    
+    // Tier 1: Seats 1-9
+    if (remainingSeats > 0) {
+      const seatsInTier = Math.min(remainingSeats, 9);
+      const pricePerSeat = cycle === "monthly" ? 56.21 : 34;
+      const multiplier = cycle === "yearly" ? 12 : 1;
+      tiers.push({
+        range: totalSeats <= 9 ? `Seats 1-${totalSeats}` : "Seats 1-9",
+        pricePerSeat,
+        seats: seatsInTier,
+        subtotal: pricePerSeat * seatsInTier * multiplier,
+        multiplier
+      });
+      remainingSeats -= seatsInTier;
+    }
+    
+    // Tier 2: Seats 10-49
+    if (remainingSeats > 0) {
+      const seatsInTier = Math.min(remainingSeats, 40);
+      const pricePerSeat = cycle === "monthly" ? 44.97 : 26;
+      const multiplier = cycle === "yearly" ? 12 : 1;
+      const endRange = Math.min(49, totalSeats);
+      tiers.push({
+        range: `Seats 10-${endRange}`,
+        pricePerSeat,
+        seats: seatsInTier,
+        subtotal: pricePerSeat * seatsInTier * multiplier,
+        multiplier
+      });
+      remainingSeats -= seatsInTier;
+    }
+    
+    // Tier 3: Seats 50+
+    if (remainingSeats > 0) {
+      const pricePerSeat = cycle === "monthly" ? 33.72 : 19;
+      const multiplier = cycle === "yearly" ? 12 : 1;
+      tiers.push({
+        range: totalSeats === 50 ? "Seats 50" : `Seats 50-${totalSeats}`,
+        pricePerSeat,
+        seats: remainingSeats,
+        subtotal: pricePerSeat * remainingSeats * multiplier,
+        multiplier
+      });
+    }
+    
+    return tiers;
+  };
+
   const handleSeatsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 3;
     setSeats(Math.max(3, value));
@@ -331,23 +389,24 @@ export const TeamPlanDialog: React.FC<TeamPlanDialogProps> = ({
               <div className="space-y-4 mb-6 flex-1">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <div>
-                      <div className="text-sm sm:font-medium text-foreground">
-                        Team Plan - {seats} Seats ({billingCycle === "monthly" ? "Monthly" : "Yearly"})
-                      </div>
+                    <div className="text-sm sm:font-medium text-foreground">
+                      Team Plan - {seats} Seats ({billingCycle === "monthly" ? "Monthly" : "Yearly"})
                     </div>
-                    <div className="text-right">
-                      <div className="text-sm sm:font-medium text-foreground">
-                        SR{getTotalPrice().toFixed(2)}
-                      </div>
+                    <div className="text-sm sm:font-medium text-foreground">
+                      SR{getTotalPrice().toFixed(2)}
                     </div>
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground ml-4">
-                    <span>
-                      Seats 1-{seats}: SR{getPricePerUser(seats, billingCycle)}/month × {seats}
-                    </span>
-                    <span>SR{getTotalPrice().toFixed(2)}</span>
-                  </div>
+                  
+                  {/* Tiered breakdown */}
+                  {calculateTieredBreakdown(seats, billingCycle).map((tier, index) => (
+                    <div key={index} className="flex justify-between text-xs text-muted-foreground ml-4">
+                      <span>
+                        {tier.range}: SR{tier.pricePerSeat}/
+                        {billingCycle === "yearly" ? "seat * 12 mos" : "month"} × {tier.seats}
+                      </span>
+                      <span>SR{tier.subtotal.toFixed(2)}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
