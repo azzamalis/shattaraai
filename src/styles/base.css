@@ -14,6 +14,7 @@
     --card: 0 0% 99%; /* Unified component background #FDFDFD */
     --card-foreground: 0 0% 0%; /* Pure Black text */
     --card-hover: 0 0% 96%; /* Light Gray #F5F5F5 */
+    --card-dark: 0 0% 15%; /* Dark card for premium plans #262626 */
 
     --popover: 0 0% 100%; /* Light mode popover background #FFFFFF */
     --popover-foreground: 0 0% 9%; /* Light mode popover text #171717 */
@@ -58,6 +59,7 @@
     --card: 0 0% 8%; /* Dark component background #141414 */
     --card-foreground: 0 0% 98%; /* Light text */
     --card-hover: 0 0% 15%; /* #262626 */
+    --card-dark: 0 0% 12%; /* Dark card for premium plans in dark mode #1F1F1F */
 
     --popover: 0 0% 7%; /* Dark mode popover background #121212 */
     --popover-foreground: 0 0% 98%; /* Dark mode popover text #FAFAFA */
