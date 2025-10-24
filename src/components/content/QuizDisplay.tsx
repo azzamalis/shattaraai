@@ -47,8 +47,8 @@ export const QuizDisplay = ({
 
   return (
     <div className="text-primary">
-      <div className="flex items-center justify-between text-sm text-secondary font-medium mb-2">
-        <h3>My Quizzes</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold text-primary">My Quizzes</h3>
       </div>
       
       <div className="flex flex-col mb-4">
