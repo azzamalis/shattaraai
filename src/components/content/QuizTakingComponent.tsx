@@ -137,18 +137,24 @@ export const QuizTakingComponent = ({
     }
   };
 
-  const handleFlag = () => {
-    setFlagged((prev) => {
-      const newFlagged = new Set(prev);
-      if (newFlagged.has(currentQuestion.id)) {
-        newFlagged.delete(currentQuestion.id);
-        toast.info('Question unflagged');
-      } else {
-        newFlagged.add(currentQuestion.id);
-        toast.info('Question flagged for review');
-      }
-      return newFlagged;
-    });
+  const handleDeleteQuestion = () => {
+    // Remove current question from quiz data
+    const updatedQuestions = quizData.questions.filter((_, index) => index !== currentQuestionIndex);
+    
+    if (updatedQuestions.length === 0) {
+      toast.error('Cannot delete the last question');
+      return;
+    }
+
+    // Update quiz data
+    quizData.questions = updatedQuestions;
+    
+    // Move to next question or previous if at the end
+    if (currentQuestionIndex >= updatedQuestions.length) {
+      setCurrentQuestionIndex(updatedQuestions.length - 1);
+    }
+    
+    toast.success('Question deleted');
   };
 
   const handleCompleteQuiz = () => {
@@ -255,10 +261,8 @@ export const QuizTakingComponent = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleFlag}
-                  className={`shrink-0 w-8 h-8 rounded-xl ${
-                    flagged.has(currentQuestion?.id) ? 'text-destructive' : ''
-                  }`}
+                  onClick={handleDeleteQuestion}
+                  className="shrink-0 w-8 h-8 rounded-xl text-destructive hover:text-destructive"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
