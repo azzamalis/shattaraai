@@ -36,10 +36,10 @@ const PricingPage: React.FC = () => {
 
             <div className="items-center flex-col justify-center flex gap-12 w-full">
               {/* Billing Toggle */}
-              <div className="text-neutral-500 bg-neutral-100 dark:bg-neutral-800 items-center justify-center inline-flex h-auto rounded-full p-1 text-sm font-medium">
+              <div className="text-neutral-500 bg-neutral-100 dark:bg-neutral-800 items-center justify-center inline-flex rounded-full p-1 text-sm font-medium">
                 <button 
                   onClick={() => setBillingCycle("monthly")}
-                  className={`items-center cursor-pointer justify-center py-2 px-3 text-center inline-flex w-full h-auto min-h-[2.50rem] rounded-full overflow-visible transition-all ${
+                  className={`items-center cursor-pointer justify-center py-2 px-3 text-center flex w-28 h-10 rounded-full transition-all ${
                     billingCycle === "monthly" ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-700" : ""
                   }`}
                 >
@@ -47,12 +47,12 @@ const PricingPage: React.FC = () => {
                 </button>
                 <button 
                   onClick={() => setBillingCycle("yearly")}
-                  className={`items-center cursor-pointer justify-between py-2 px-3 text-center flex w-full h-auto min-h-[2.50rem] rounded-full overflow-visible transition-all ${
+                  className={`items-center cursor-pointer justify-between py-2 px-3 text-center flex w-40 h-10 rounded-full transition-all ${
                     billingCycle === "yearly" ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-700" : ""
                   }`}
                 >
                   Pay Yearly
-                  <span className="text-emerald-500 text-xs rounded-full p-1 ml-1">Save 40%</span>
+                  <span className="text-emerald-500 text-xs rounded-full p-1">Save 40%</span>
                 </button>
               </div>
 
