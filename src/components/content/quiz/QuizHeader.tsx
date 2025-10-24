@@ -25,7 +25,7 @@ export const QuizHeader = ({
       <Button
         variant="ghost"
         onClick={onBack}
-        className="text-muted items-center cursor-pointer text-sm font-medium justify-center py-1 px-3 h-9 rounded-xl"
+        className="text-secondary items-center cursor-pointer text-sm font-medium justify-center py-1 px-3 h-9 rounded-xl hover:text-primary"
       >
         <ChevronLeft className="w-4 h-4" />
         Back
