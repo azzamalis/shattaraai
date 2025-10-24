@@ -7,6 +7,7 @@ interface QuizActionButtonsProps {
   onDontKnow: () => void;
   canUndo: boolean;
   hasAnswer: boolean;
+  isShortAnswer?: boolean;
 }
 
 export const QuizActionButtons = ({
@@ -15,10 +16,11 @@ export const QuizActionButtons = ({
   onDontKnow,
   canUndo,
   hasAnswer,
+  isShortAnswer = false,
 }: QuizActionButtonsProps) => {
   return (
     <div className="px-2 mt-3">
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center gap-2">
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -41,7 +43,7 @@ export const QuizActionButtons = ({
           </Button>
         </div>
         
-        <div className="flex ml-2 text-sm font-medium">
+        <div className="flex gap-2 text-sm font-medium">
           <Button
             variant="outline"
             onClick={onDontKnow}
@@ -49,6 +51,16 @@ export const QuizActionButtons = ({
           >
             Don't know
           </Button>
+          
+          {isShortAnswer && (
+            <Button
+              onClick={onCheck}
+              disabled={!hasAnswer}
+              className="w-20 h-10 rounded-xl"
+            >
+              Submit
+            </Button>
+          )}
         </div>
       </div>
     </div>
