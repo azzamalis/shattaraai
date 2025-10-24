@@ -289,7 +289,7 @@ const PricingPage: React.FC = () => {
                     </div>
                     <button 
                       onClick={() => setContactModalOpen(true)}
-                      className="text-black bg-white items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 rounded-full overflow-visible hover:bg-neutral-100 transition-colors"
+                      className="text-black bg-white items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 rounded-full overflow-visible hover:bg-neutral-100 transition-colors font-medium"
                     >
                       <div className="items-center justify-center flex">
                         Choose Team
