@@ -155,7 +155,7 @@ const PricingPage: React.FC = () => {
                           <div>
                             <span className="text-5xl">
                               <span className="font-light">SR</span>
-                              <span className="ml-1.5">{billingCycle === "yearly" ? "45" : "60"}</span>
+                              <span className="ml-1.5">{billingCycle === "yearly" ? "45" : "75"}</span>
                             </span>
                             <span className="text-lg font-light opacity-70"> / month</span>
                           </div>
@@ -238,7 +238,7 @@ const PricingPage: React.FC = () => {
                           <div>
                             <span className="text-5xl">
                               <span className="font-light">SR</span>
-                              <span className="ml-1.5">{billingCycle === "yearly" ? "34" : "45"}</span>
+                              <span className="ml-1.5">{billingCycle === "yearly" ? "34" : "56"}</span>
                             </span>
                             <span className="text-lg font-light opacity-70"> / month / seat</span>
                             <div className="text-xs opacity-60 mt-1.5">Minimum 3 seats required</div>
