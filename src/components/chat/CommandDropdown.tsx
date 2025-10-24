@@ -46,7 +46,7 @@ export function CommandDropdown({ commands, onSelect, onClose }: CommandDropdown
               onClick={() => onSelect(command)}
               className="w-full px-3 py-2 text-left hover:bg-accent transition-colors flex flex-col"
             >
-              <span className="font-medium text-sm">{command.label}</span>
+              <span className="font-medium text-sm text-primary">{command.label}</span>
               <span className="text-xs text-muted-foreground">{command.description}</span>
             </button>
           ))}

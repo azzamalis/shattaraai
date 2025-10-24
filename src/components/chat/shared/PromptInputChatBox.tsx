@@ -176,7 +176,7 @@ export function PromptInputChatBox({
                   <CommandDropdown
                     commands={commandOptions}
                     onSelect={(command) => {
-                      setInputValue(prev => `${prev}${prev ? ' ' : ''}${command.label}`);
+                      setInputValue(prev => `${prev}${prev ? ' ' : ''}Create a ${command.label} on`);
                       setShowCommandDropdown(false);
                     }}
                     onClose={() => setShowCommandDropdown(false)}
