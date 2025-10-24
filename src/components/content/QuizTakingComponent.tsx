@@ -58,6 +58,7 @@ export const QuizTakingComponent = ({
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [flagged, setFlagged] = useState<Set<string>>(new Set());
   const [startTime] = useState(Date.now());
+  const [isChatVisible, setIsChatVisible] = useState(false);
 
   const currentQuestion = quizData.questions[currentQuestionIndex];
   const currentAnswer = answers[currentQuestion?.id];
@@ -182,12 +183,15 @@ export const QuizTakingComponent = ({
       simple: 'Explain this question in simpler terms.',
     };
     
+    setIsChatVisible(true);
     await handleChatMessage(prompts[type]);
   };
 
   const handleChatMessage = async (messageText: string) => {
     if (!messageText.trim() || isSending) return;
 
+    setIsChatVisible(true);
+    
     try {
       await sendMessage(messageText);
       const aiResponse = await sendMessageToAI(messageText);
@@ -295,15 +299,26 @@ export const QuizTakingComponent = ({
             <AssistanceButton type="simple" onClick={() => handleAssistanceClick('simple')} />
           </div>
 
-          {/* Chat Messages */}
-          <QuizChatInterface messages={messages} isSending={isSending} />
+          {/* Chat Prompt - Shows here when chat is visible */}
+          {isChatVisible && (
+            <>
+              <div className="mb-4">
+                <QuizChatPrompt onSendMessage={handleChatMessage} isSending={isSending} />
+              </div>
+              
+              {/* Chat Messages */}
+              <QuizChatInterface messages={messages} isSending={isSending} />
+            </>
+          )}
         </div>
       </ScrollArea>
 
-      {/* Fixed Chat Prompt at Bottom */}
-      <div className="shrink-0">
-        <QuizChatPrompt onSendMessage={handleChatMessage} isSending={isSending} />
-      </div>
+      {/* Fixed Chat Prompt at Bottom - Shows when chat is hidden */}
+      {!isChatVisible && (
+        <div className="shrink-0">
+          <QuizChatPrompt onSendMessage={handleChatMessage} isSending={isSending} />
+        </div>
+      )}
     </div>
   );
 };
