@@ -138,7 +138,7 @@ export const QuizDisplay = ({
                     style={{ width: `${progress}%` }}
                   />
                 </div>
-                <span className="text-secondary text-xs font-medium">{progress}%</span>
+                <span className="text-muted-foreground text-xs font-medium">{progress}%</span>
               </div>
             </div>
           </div>
