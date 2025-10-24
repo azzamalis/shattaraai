@@ -131,7 +131,7 @@ const PricingPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <button className="text-white bg-neutral-900 dark:bg-white dark:text-black items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 border-2 border-neutral-200 dark:border-neutral-700 border-solid rounded-full overflow-visible hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors">
+                    <button className="text-white bg-neutral-900 dark:bg-white dark:text-black items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 border-2 border-neutral-200 dark:border-neutral-700 border-solid rounded-full overflow-visible hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors font-medium">
                       <div className="items-center justify-center flex">Get Started</div>
                     </button>
                   </div>
