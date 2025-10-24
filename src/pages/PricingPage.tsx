@@ -362,7 +362,7 @@ const PricingPage: React.FC = () => {
 
                 <AccordionItem value="cancel-plan" className="border-b-2 border-neutral-200 dark:border-neutral-700">
                   <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
-                    Can I cancel my YouLearn plan at any time?
+                    Can I cancel my Shattara AI plan at any time?
                   </AccordionTrigger>
                   <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
                     Yes, you can cancel your subscription at any time. If you cancel, you'll retain access to premium features until the end of your current billing period.
