@@ -108,7 +108,7 @@ export const TeamPlanDialog: React.FC<TeamPlanDialogProps> = ({
                     <TooltipTrigger asChild>
                       <Info className="inline w-4 h-4 text-muted-foreground hover:text-foreground cursor-help" />
                     </TooltipTrigger>
-                    <TooltipContent className="max-w-xs p-3">
+                    <TooltipContent side="bottom" className="max-w-xs p-3">
                       <div className="space-y-3 text-xs">
                         <div>
                           <div className="font-semibold mb-2">Yearly (best value – compared to Pro Monthly):</div>
