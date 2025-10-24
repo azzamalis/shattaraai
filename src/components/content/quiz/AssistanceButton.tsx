@@ -17,10 +17,10 @@ export const AssistanceButton = ({ type, onClick }: AssistanceButtonProps) => {
     <Button
       variant="outline"
       onClick={onClick}
-      className="items-center cursor-pointer flex h-full border-2 border-border rounded-2xl p-2 justify-start"
+      className="items-center cursor-pointer flex border-2 border-border rounded-2xl p-2 justify-start h-auto"
     >
-      <CornerDownRight className="w-6 h-6 ml-1 shrink-0" />
-      <span className="ml-3 overflow-hidden text-ellipsis">{labels[type]}</span>
+      <CornerDownRight className="w-6 h-6 shrink-0" />
+      <span className="ml-3 overflow-hidden text-ellipsis whitespace-nowrap">{labels[type]}</span>
     </Button>
   );
 };
