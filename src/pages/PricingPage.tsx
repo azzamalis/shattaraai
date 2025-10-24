@@ -19,7 +19,7 @@ const PricingPage: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full overflow-auto bg-white dark:bg-[#000] text-neutral-950 dark:text-white transition-colors duration-300">
+      <div className="flex flex-col h-full overflow-auto bg-background text-foreground transition-colors duration-300">
         <div className="pb-6 h-full mt-2 md:mt-4">
           <div className="items-center flex-col flex gap-4">
             {/* Hero Section */}
@@ -36,11 +36,11 @@ const PricingPage: React.FC = () => {
 
             <div className="items-center flex-col justify-center flex gap-12 w-full">
               {/* Billing Toggle */}
-              <div className="text-neutral-500 bg-neutral-100 dark:bg-neutral-800 items-center justify-center inline-flex rounded-full p-1 text-sm font-medium">
+              <div className="text-muted-foreground bg-muted items-center justify-center inline-flex rounded-full p-1 text-sm font-medium">
                 <button 
                   onClick={() => setBillingCycle("monthly")}
                   className={`items-center cursor-pointer justify-center py-2 px-3 text-center flex w-28 h-10 rounded-full transition-all ${
-                    billingCycle === "monthly" ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-700" : ""
+                    billingCycle === "monthly" ? "text-foreground bg-card" : ""
                   }`}
                 >
                   Pay Monthly
@@ -48,11 +48,11 @@ const PricingPage: React.FC = () => {
                 <button 
                   onClick={() => setBillingCycle("yearly")}
                   className={`items-center cursor-pointer justify-between py-2 px-3 text-center flex w-40 h-10 rounded-full transition-all ${
-                    billingCycle === "yearly" ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-700" : ""
+                    billingCycle === "yearly" ? "text-foreground bg-card" : ""
                   }`}
                 >
                   Pay Yearly
-                  <span className="text-emerald-500 text-xs rounded-full p-1">Save 40%</span>
+                  <span className="text-accent text-xs rounded-full p-1">Save 40%</span>
                 </button>
               </div>
 
@@ -60,7 +60,7 @@ const PricingPage: React.FC = () => {
               <div className="justify-center flex w-full">
                 <div className="items-center flex-col px-4 flex gap-8 lg:flex-row max-w-7xl">
                   {/* Free Plan */}
-                  <div className="text-neutral-800 dark:text-neutral-200 bg-[linear-gradient(to_right_bottom,rgb(255,255,255),rgb(245,245,245))] dark:bg-[linear-gradient(to_right_bottom,rgb(75,75,75),rgb(64,64,64))] flex-col justify-between flex w-full max-w-xs border-2 border-neutral-200 dark:border-neutral-700 border-solid rounded-3xl overflow-hidden p-8">
+                  <div className="text-foreground bg-card flex-col justify-between flex w-full max-w-xs border-2 border-border border-solid rounded-3xl overflow-hidden p-8">
                     <div className="mb-6">
                        <div className="items-center justify-between flex">
                         <div className="items-center flex">
@@ -78,12 +78,12 @@ const PricingPage: React.FC = () => {
                           </div>
                         </div>
                         <div className="text-base mt-4">Start your learning journey here.</div>
-                        <div className="bg-neutral-600 dark:bg-neutral-500 w-full h-px my-4"></div>
+                        <div className="bg-border w-full h-px my-4"></div>
                       </div>
                       <div className="flex-col flex min-h-[17.50rem] mt-4 gap-3">
                         <div className="items-start flex w-full">
                           <div className="mt-1">
-                            <Check className="w-4 h-4 mt-1 mr-4 text-neutral-800 dark:text-neutral-200" strokeWidth={2} />
+                            <Check className="w-4 h-4 mt-1 mr-4 text-foreground" strokeWidth={2} />
                           </div>
                           <div className="items-start flex-grow flex text-sm">
                             <span className="mb-2">3 uploads, pastes, and records / day</span>
@@ -91,7 +91,7 @@ const PricingPage: React.FC = () => {
                         </div>
                         <div className="items-start flex w-full">
                           <div className="mt-1">
-                            <Check className="w-4 h-4 mt-1 mr-4 text-neutral-800 dark:text-neutral-200" strokeWidth={2} />
+                            <Check className="w-4 h-4 mt-1 mr-4 text-foreground" strokeWidth={2} />
                           </div>
                           <div className="items-start flex-grow flex text-sm">
                             <span className="mb-2">5 AI chats / day (10 / month with <span className="underline decoration-dotted cursor-pointer">Learn+</span> mode)</span>
@@ -99,7 +99,7 @@ const PricingPage: React.FC = () => {
                         </div>
                         <div className="items-start flex w-full">
                           <div className="mt-1">
-                            <Check className="w-4 h-4 mt-1 mr-4 text-neutral-800 dark:text-neutral-200" strokeWidth={2} />
+                            <Check className="w-4 h-4 mt-1 mr-4 text-foreground" strokeWidth={2} />
                           </div>
                           <div className="items-start flex-grow flex text-sm">
                             <span className="mb-2">10 quiz answers / day</span>
@@ -107,7 +107,7 @@ const PricingPage: React.FC = () => {
                         </div>
                         <div className="items-start flex w-full">
                           <div className="mt-1">
-                            <Check className="w-4 h-4 mt-1 mr-4 text-neutral-800 dark:text-neutral-200" strokeWidth={2} />
+                            <Check className="w-4 h-4 mt-1 mr-4 text-foreground" strokeWidth={2} />
                           </div>
                           <div className="items-start flex-grow flex text-sm">
                             <span className="mb-2">2 practice exams / month</span>
@@ -115,7 +115,7 @@ const PricingPage: React.FC = () => {
                         </div>
                         <div className="items-start flex w-full">
                           <div className="mt-1">
-                            <Check className="w-4 h-4 mt-1 mr-4 text-neutral-800 dark:text-neutral-200" strokeWidth={2} />
+                            <Check className="w-4 h-4 mt-1 mr-4 text-foreground" strokeWidth={2} />
                           </div>
                           <div className="items-start flex-grow flex text-sm">
                             <span className="mb-2">1 podcast / day</span>
@@ -123,7 +123,7 @@ const PricingPage: React.FC = () => {
                         </div>
                         <div className="items-start flex w-full">
                           <div className="mt-1">
-                            <Check className="w-4 h-4 mt-1 mr-4 text-neutral-800 dark:text-neutral-200" strokeWidth={2} />
+                            <Check className="w-4 h-4 mt-1 mr-4 text-foreground" strokeWidth={2} />
                           </div>
                           <div className="items-start flex-grow flex text-sm">
                             <span className="mb-2">Upload files, each up to 100 pages / 10 MB in size</span>
@@ -131,13 +131,13 @@ const PricingPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <button className="text-white bg-neutral-900 dark:bg-white dark:text-black items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 border-2 border-neutral-200 dark:border-neutral-700 border-solid rounded-full overflow-visible hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors">
+                    <button className="text-primary-foreground bg-primary items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 border-2 border-border border-solid rounded-full overflow-visible hover:bg-primary/90 transition-colors">
                       <div className="items-center justify-center flex">Get Started</div>
                     </button>
                   </div>
 
                   {/* Pro Plan */}
-                  <div className="text-white bg-[linear-gradient(to_right_bottom,rgb(23,23,23),rgb(38,38,38))] dark:bg-[linear-gradient(to_right_bottom,rgb(23,23,23),rgb(38,38,38))] flex-col justify-between flex w-full max-w-xs rounded-3xl overflow-hidden p-8">
+                  <div className="text-primary-foreground bg-card-dark flex-col justify-between flex w-full max-w-xs rounded-3xl overflow-hidden p-8 border-2 border-primary/20">
                     <div className="mb-6">
                       <div className="items-center justify-between flex gap-2">
                         <div className="items-center flex gap-2">
@@ -148,7 +148,7 @@ const PricingPage: React.FC = () => {
                             {billingCycle === "yearly" ? "Billed Annually" : "Billed Monthly"}
                           </span>
                         </div>
-                        <div className="text-primary bg-primary/20 items-center backdrop-blur-md py-1 px-2 flex w-auto h-auto border-2 border-primary/40 border-solid rounded-full text-xs font-medium">
+                        <div className="text-accent bg-accent/20 items-center backdrop-blur-md py-1 px-2 flex w-auto h-auto border-2 border-accent/40 border-solid rounded-full text-xs font-medium">
                           <span className="rounded-full">Popular</span>
                         </div>
                       </div>
@@ -163,7 +163,7 @@ const PricingPage: React.FC = () => {
                           </div>
                         </div>
                         <div className="text-base mt-4">Learn at the highest level.</div>
-                        <div className="bg-neutral-600 w-full h-px my-4"></div>
+                        <div className="bg-border w-full h-px my-4"></div>
                       </div>
                       <div className="flex-col flex min-h-[17.50rem] mt-4 gap-3">
                         <div className="items-start flex w-full">
@@ -216,7 +216,7 @@ const PricingPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <button className="text-black bg-white items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 rounded-full overflow-visible hover:bg-neutral-100 transition-colors">
+                    <button className="text-primary bg-primary-foreground items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 rounded-full overflow-visible hover:bg-primary-foreground/90 transition-colors">
                       <div className="items-center justify-center flex">
                         <span className="font-medium">Start your 7 day free trial</span>
                         <ArrowRight className="w-4 h-4 ml-2" strokeWidth={2} />
@@ -225,7 +225,7 @@ const PricingPage: React.FC = () => {
                   </div>
 
                   {/* Team Plan */}
-                  <div className="text-white bg-[linear-gradient(to_right_bottom,rgb(23,23,23),rgb(38,38,38))] dark:bg-[linear-gradient(to_right_bottom,rgb(23,23,23),rgb(38,38,38))] flex-col justify-between flex w-full max-w-xs rounded-3xl overflow-hidden p-8">
+                  <div className="text-primary-foreground bg-card-dark flex-col justify-between flex w-full max-w-xs rounded-3xl overflow-hidden p-8 border-2 border-primary/20">
                     <div className="mb-6">
                       <div className="items-center justify-between flex">
                         <div className="items-center flex gap-2">
@@ -249,7 +249,7 @@ const PricingPage: React.FC = () => {
                           </div>
                         </div>
                         <div className="text-base mt-4">For study groups and teams.</div>
-                        <div className="bg-neutral-600 w-full h-px my-4"></div>
+                        <div className="bg-border w-full h-px my-4"></div>
                       </div>
                       <div className="flex-col flex min-h-[17.50rem] mt-4 gap-3">
                         <div className="items-start flex w-full text-sm font-semibold">
@@ -293,7 +293,7 @@ const PricingPage: React.FC = () => {
                     </div>
                     <button 
                       onClick={() => setTeamPlanDialogOpen(true)}
-                      className="text-black bg-white items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 rounded-full overflow-visible hover:bg-neutral-100 transition-colors font-medium"
+                      className="text-primary bg-primary-foreground items-center cursor-pointer justify-center py-2 px-4 text-center flex w-full h-12 rounded-full overflow-visible hover:bg-primary-foreground/90 transition-colors font-medium"
                     >
                       <div className="items-center justify-center flex">
                         Choose Team
@@ -308,7 +308,7 @@ const PricingPage: React.FC = () => {
 
           {/* University Logos */}
           <div className="flex-col text-center hidden w-full mt-16 gap-6 lg:flex px-4">
-            <h2 className="text-neutral-500 dark:text-neutral-400 text-sm">Trusted by over 1.5 million learners</h2>
+            <h2 className="text-muted-foreground text-sm">Trusted by over 1.5 million learners</h2>
             <div className="items-center flex-wrap justify-center flex gap-10">
               {universityLogos.map((logo, index) => (
                 <img 
@@ -326,67 +326,67 @@ const PricingPage: React.FC = () => {
 
           {/* FAQ Section */}
           <div className="flex-col py-12 flex mt-16 px-4">
-            <h1 className="text-2xl text-center hidden my-3 lg:block text-neutral-950 dark:text-white">
+            <h1 className="text-2xl text-center hidden my-3 lg:block text-foreground">
               Frequently Asked Questions
             </h1>
-            <span className="text-neutral-500 dark:text-neutral-400 text-center mt-4 mb-10 lg:mb-12">
+            <span className="text-muted-foreground text-center mt-4 mb-10 lg:mb-12">
               Can't find the answer here? &nbsp;
-              <a href="/contact" className="underline hover:text-neutral-700 dark:hover:text-neutral-300">
+              <a href="/contact" className="underline hover:text-foreground/80">
                 Contact us
               </a>
             </span>
             <div className="w-full max-w-[56.25rem] m-auto text-lg min-[1400px]:max-w-[87.50rem]">
               <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="pro-plan" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                <AccordionItem value="pro-plan" className="border-b-2 border-border">
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-foreground hover:no-underline">
                     What do I get with the Pro plan?
                   </AccordionTrigger>
-                  <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
+                  <AccordionContent className="text-muted-foreground pb-4">
                     With the Pro plan, you get unlimited uploads, AI chats, quiz generation, practice exams, and more. You can upload files up to 2000 pages or 300MB in size, and access all premium features without any restrictions.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="team-plan" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                <AccordionItem value="team-plan" className="border-b-2 border-border">
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-foreground hover:no-underline">
                     What do I get with the Team plan?
                   </AccordionTrigger>
-                  <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
+                  <AccordionContent className="text-muted-foreground pb-4">
                     The Team plan includes everything in Pro plus centralized billing, shared spaces, custom permissions, and discounts that scale with team size. Perfect for study groups and collaborative learning environments.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="payment-methods" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                <AccordionItem value="payment-methods" className="border-b-2 border-border">
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-foreground hover:no-underline">
                     What payment methods do you offer?
                   </AccordionTrigger>
-                  <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
+                  <AccordionContent className="text-muted-foreground pb-4">
                     We accept all major credit cards, debit cards, and various local payment methods. All payments are processed securely through our payment partners.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="cancel-plan" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                <AccordionItem value="cancel-plan" className="border-b-2 border-border">
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-foreground hover:no-underline">
                     Can I cancel my Shattara AI plan at any time?
                   </AccordionTrigger>
-                  <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
+                  <AccordionContent className="text-muted-foreground pb-4">
                     Yes, you can cancel your subscription at any time. If you cancel, you'll retain access to premium features until the end of your current billing period.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="student-discount" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                <AccordionItem value="student-discount" className="border-b-2 border-border">
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-foreground hover:no-underline">
                     Do you offer student discount?
                   </AccordionTrigger>
-                  <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
+                  <AccordionContent className="text-muted-foreground pb-4">
                     Yes! We offer special discounts for students. Please contact our support team with your student ID or academic email address to learn more about available discounts.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="refund-policy" className="border-b-2 border-neutral-200 dark:border-neutral-700">
-                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-neutral-950 dark:text-white hover:no-underline">
+                <AccordionItem value="refund-policy" className="border-b-2 border-border">
+                  <AccordionTrigger className="py-4 text-left text-lg font-medium text-foreground hover:no-underline">
                     What is your refund policy?
                   </AccordionTrigger>
-                  <AccordionContent className="text-neutral-600 dark:text-neutral-400 pb-4">
+                  <AccordionContent className="text-muted-foreground pb-4">
                     We offer a 7-day money-back guarantee for all new subscriptions. If you're not satisfied within the first 7 days, contact our support team for a full refund.
                   </AccordionContent>
                 </AccordionItem>
