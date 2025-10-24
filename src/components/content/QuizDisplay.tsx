@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreVertical, Circle } from 'lucide-react';
+import { MoreVertical, Circle, Settings2, RotateCcw, Trash } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,6 +81,7 @@ export const QuizDisplay = ({
                         onEditQuiz(quiz.id);
                       }}
                     >
+                      <Settings2 className="w-4 h-4 mr-2" />
                       Edit Quiz
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -89,6 +90,7 @@ export const QuizDisplay = ({
                         onRestartQuiz(quiz.id);
                       }}
                     >
+                      <RotateCcw className="w-4 h-4 mr-2" />
                       Restart
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -98,6 +100,7 @@ export const QuizDisplay = ({
                       }}
                       className="text-destructive"
                     >
+                      <Trash className="w-4 h-4 mr-2" />
                       Delete Quiz
                     </DropdownMenuItem>
                   </DropdownMenuContent>
