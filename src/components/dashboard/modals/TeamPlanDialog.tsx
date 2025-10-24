@@ -72,7 +72,7 @@ export const TeamPlanDialog: React.FC<TeamPlanDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] sm:max-w-4xl w-full p-0 gap-0 bg-background border rounded-xl shadow-small overflow-hidden">
+      <DialogContent className="max-w-[90vw] sm:max-w-5xl w-full p-0 gap-0 bg-background border rounded-xl shadow-small overflow-hidden">
         {/* Custom Close Button */}
         <button
           onClick={() => onOpenChange(false)}
