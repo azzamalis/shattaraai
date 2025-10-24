@@ -186,21 +186,13 @@ export const QuizTakingComponent = ({
 
       {/* Scrollable Question Area */}
       <ScrollArea className="flex-1 min-h-0">
-        <div className="p-2">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex-1">{renderQuestion()}</div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleFlag}
-              className={`w-8 h-8 rounded-xl ml-2 ${
-                flagged.has(currentQuestion?.id) ? 'text-destructive' : ''
-              }`}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+        <div className="p-4">
+          {/* Question Section */}
+          <div className="mb-6">
+            {renderQuestion()}
           </div>
 
+          {/* Action Buttons */}
           <QuizActionButtons
             onUndo={handleUndo}
             onCheck={handleCheck}
