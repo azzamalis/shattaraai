@@ -31,8 +31,10 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
       const { error } = await signOut();
       if (!error) {
         toast.success('Logged out successfully');
-        navigate('/signin');
         onOpenChange(false);
+        setTimeout(() => {
+          navigate('/signin');
+        }, 150);
       } else {
         toast.error('Failed to log out');
       }
@@ -42,8 +44,11 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
   };
 
   const handleNavigation = (path: string) => {
-    navigate(path);
+    // Close drawer first, then navigate after a brief delay
     onOpenChange(false);
+    setTimeout(() => {
+      navigate(path);
+    }, 150);
   };
 
   const userEmail = user?.email || 'No email';
