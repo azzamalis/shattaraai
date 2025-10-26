@@ -1,5 +1,6 @@
 import React from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,16 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from '@/components/ui/sidebar';
 import { User, History, Bell, Crown, LogOut, MoreVertical } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { useWindowSize } from '@/hooks/use-window-size';
 
 interface NavUserProps {
   onOpenChange: (open: boolean) => void;
@@ -26,7 +22,8 @@ interface NavUserProps {
 
 export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
   const navigate = useNavigate();
-  const { isMobile } = useSidebar();
+  const { width } = useWindowSize();
+  const isMobile = width < 768;
   const { user, signOut } = useAuth();
 
   const handleLogout = async () => {
@@ -54,26 +51,24 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <Avatar className="h-8 w-8 rounded-lg grayscale border-2 border-border">
-                <AvatarFallback className="rounded-lg bg-primary text-primary-foreground font-medium">
-                  {userInitials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium text-sidebar-foreground">{userName}</span>
-                <span className="truncate text-xs text-muted-foreground">{userEmail}</span>
-              </div>
-              <MoreVertical className="ml-auto h-4 w-4 text-muted-foreground" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="w-full flex items-center justify-between gap-3 hover:bg-accent transition-colors duration-200 py-6 px-2 h-auto data-[state=open]:bg-accent"
+        >
+          <Avatar className="h-8 w-8 rounded-lg grayscale border-2 border-border">
+            <AvatarFallback className="rounded-lg bg-primary text-primary-foreground font-medium">
+              {userInitials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-medium text-foreground">{userName}</span>
+            <span className="truncate text-xs text-muted-foreground">{userEmail}</span>
+          </div>
+          <MoreVertical className="ml-auto h-4 w-4 text-muted-foreground" />
+        </Button>
+      </DropdownMenuTrigger>
           
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg bg-popover border-border"
@@ -138,10 +133,8 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
             >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log Out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
   );
 };
