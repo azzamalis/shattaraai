@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, History, Bell, Crown, LogOut, MoreVertical } from 'lucide-react';
+import { User, History, Crown, LogOut, MoreVertical } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
@@ -109,21 +109,14 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
                 <span>History</span>
               </DropdownMenuItem>
               
-              <DropdownMenuItem className="cursor-pointer opacity-50 pointer-events-none">
-                <Bell className="mr-2 h-4 w-4" />
-                <span>Notifications</span>
+              <DropdownMenuItem
+                className="cursor-pointer relative overflow-hidden bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 hover:from-amber-400/30 hover:via-yellow-400/30 hover:to-amber-400/30 focus:from-amber-400/30 focus:via-yellow-400/30 focus:to-amber-400/30 transition-all duration-300"
+                onClick={() => handleNavigation('/pricing')}
+              >
+                <Crown className="mr-2 h-4 w-4 text-amber-500" />
+                <span className="font-medium">Upgrade Plan</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            
-            <DropdownMenuSeparator className="bg-border" />
-            
-            <DropdownMenuItem
-              className="cursor-pointer relative overflow-hidden bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 hover:from-amber-400/30 hover:via-yellow-400/30 hover:to-amber-400/30 focus:from-amber-400/30 focus:via-yellow-400/30 focus:to-amber-400/30 transition-all duration-300"
-              onClick={() => handleNavigation('/pricing')}
-            >
-              <Crown className="mr-2 h-4 w-4 text-amber-500" />
-              <span className="font-medium">Upgrade Plan</span>
-            </DropdownMenuItem>
             
             <DropdownMenuSeparator className="bg-border" />
             
