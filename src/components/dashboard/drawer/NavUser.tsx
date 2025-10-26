@@ -1,0 +1,147 @@
+import React from 'react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from '@/components/ui/sidebar';
+import { User, History, Bell, Crown, LogOut, MoreVertical } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+
+interface NavUserProps {
+  onOpenChange: (open: boolean) => void;
+}
+
+export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
+  const navigate = useNavigate();
+  const { isMobile } = useSidebar();
+  const { user, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await signOut();
+      if (!error) {
+        toast.success('Logged out successfully');
+        navigate('/signin');
+        onOpenChange(false);
+      } else {
+        toast.error('Failed to log out');
+      }
+    } catch (error) {
+      toast.error('An error occurred during logout');
+    }
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    onOpenChange(false);
+  };
+
+  const userEmail = user?.email || 'No email';
+  const userName = user?.email?.split('@')[0] || 'User';
+  const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <Avatar className="h-8 w-8 rounded-lg grayscale border-2 border-border">
+                <AvatarFallback className="rounded-lg bg-primary text-primary-foreground font-medium">
+                  {userInitials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium text-sidebar-foreground">{userName}</span>
+                <span className="truncate text-xs text-muted-foreground">{userEmail}</span>
+              </div>
+              <MoreVertical className="ml-auto h-4 w-4 text-muted-foreground" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          
+          <DropdownMenuContent
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg bg-popover border-border"
+            side={isMobile ? 'bottom' : 'right'}
+            align="end"
+            sideOffset={4}
+          >
+            <DropdownMenuLabel className="p-0 font-normal">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm bg-muted/50">
+                <Avatar className="h-8 w-8 rounded-lg border-2 border-border">
+                  <AvatarFallback className="rounded-lg bg-primary text-primary-foreground font-medium">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium text-popover-foreground">{userName}</span>
+                  <span className="truncate text-xs text-muted-foreground">{userEmail}</span>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+            
+            <DropdownMenuSeparator className="bg-border" />
+            
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => handleNavigation('/profile')}
+              >
+                <User className="mr-2 h-4 w-4" />
+                <span>Account</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => handleNavigation('/history')}
+              >
+                <History className="mr-2 h-4 w-4" />
+                <span>History</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem className="cursor-pointer opacity-50 pointer-events-none">
+                <Bell className="mr-2 h-4 w-4" />
+                <span>Notifications</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            
+            <DropdownMenuSeparator className="bg-border" />
+            
+            <DropdownMenuItem
+              className="cursor-pointer relative overflow-hidden bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 hover:from-amber-400/30 hover:via-yellow-400/30 hover:to-amber-400/30 focus:from-amber-400/30 focus:via-yellow-400/30 focus:to-amber-400/30 transition-all duration-300"
+              onClick={() => handleNavigation('/pricing')}
+            >
+              <Crown className="mr-2 h-4 w-4 text-amber-500" />
+              <span className="font-medium">Upgrade Plan</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuSeparator className="bg-border" />
+            
+            <DropdownMenuItem
+              className="cursor-pointer text-destructive focus:text-destructive-foreground focus:bg-destructive"
+              onClick={handleLogout}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log Out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+};

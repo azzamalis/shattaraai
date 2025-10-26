@@ -12,7 +12,7 @@ import { InviteEarnModal } from './modals/InviteEarnModal';
 import { RoomsSection } from './drawer/RoomsSection';
 import { HistorySection } from './drawer/HistorySection';
 import { HelpTools } from './drawer/HelpTools';
-import { UserProfile } from './drawer/UserProfile';
+import { NavUser } from './drawer/NavUser';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Room } from '@/lib/types';
@@ -149,7 +149,7 @@ export function DashboardDrawer({
           {/* User Profile */}
           <div className="mt-auto">
             <div className="px-4 py-4">
-              <UserProfile onOpenChange={onOpenChange} />
+              <NavUser onOpenChange={onOpenChange} />
             </div>
           </div>
         </SheetContent>
