@@ -30,7 +30,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onOpenChan
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-3xl h-[70vh] md:h-[600px] p-0 gap-0 overflow-hidden">
+      <DialogContent className="w-[95vw] max-w-[90vw] md:max-w-4xl lg:max-w-5xl h-[70vh] md:h-[600px] p-0 gap-0 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col md:flex-row h-full min-h-0">
           {/* Mobile Tab Navigation */}
           <div className="block md:hidden border-b border-border p-2">
