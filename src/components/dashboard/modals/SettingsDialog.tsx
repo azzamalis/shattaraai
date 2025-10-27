@@ -73,10 +73,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onOpenChan
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors line-clamp-1 relative justify-start data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-primary/70 data-[state=inactive]:hover:text-foreground data-[state=inactive]:hover:bg-muted/50"
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors relative justify-start whitespace-nowrap data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-primary/70 data-[state=inactive]:hover:text-foreground data-[state=inactive]:hover:bg-muted/50"
                 >
-                  <tab.icon className="h-4 w-4" />
-                  {tab.label}
+                  <tab.icon className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{tab.label}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
