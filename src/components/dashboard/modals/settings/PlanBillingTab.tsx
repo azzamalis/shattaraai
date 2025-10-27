@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Crown } from 'lucide-react';
+
 
 export const PlanBillingTab: React.FC = () => {
   const { profile } = useAuth();
@@ -24,8 +24,7 @@ export const PlanBillingTab: React.FC = () => {
           </p>
         </div>
         {planType === 'free' && (
-          <Button onClick={handleUpgrade} className="flex items-center gap-2">
-            <Crown className="h-4 w-4" />
+          <Button onClick={handleUpgrade}>
             Upgrade Plan
           </Button>
         )}

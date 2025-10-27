@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Download, Trash2 } from 'lucide-react';
+
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -65,7 +65,6 @@ export const DataControlsTab: React.FC = () => {
             </p>
           </div>
           <Button variant="outline" onClick={handleExportData} className="flex-shrink-0">
-            <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
         </div>
@@ -84,7 +83,6 @@ export const DataControlsTab: React.FC = () => {
             onClick={() => setShowDeleteDialog(true)}
             className="flex-shrink-0"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
             Delete
           </Button>
         </div>
