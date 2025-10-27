@@ -60,7 +60,7 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
   return (
     <>
       <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           className="w-full flex items-center justify-between gap-3 hover:bg-accent transition-colors duration-200 py-6 px-2 h-auto data-[state=open]:bg-accent"
@@ -103,8 +103,11 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() => {
-                  setSettingsOpen(true);
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTimeout(() => {
+                    setSettingsOpen(true);
+                  }, 100);
                   onOpenChange(false);
                 }}
               >
