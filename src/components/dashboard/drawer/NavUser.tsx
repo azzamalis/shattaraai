@@ -50,10 +50,8 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange, onSettingsOpen }
   const handleThemeToggle = (checked: boolean) => {
     if (checked) {
       setDarkTheme();
-      toast.success('Switched to dark theme');
     } else {
       setLightTheme();
-      toast.success('Switched to light theme');
     }
   };
 
