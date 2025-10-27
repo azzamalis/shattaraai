@@ -83,7 +83,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onOpenChan
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 overflow-y-auto max-h-full">
+          <div className="flex-1 overflow-y-auto max-h-full max-w-2xl">
             <div className="p-4 md:p-6">
               <TabsContent value="account" className="mt-0">
                 <AccountTab />
