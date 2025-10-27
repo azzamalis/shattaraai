@@ -15,7 +15,6 @@ import { HistorySection } from './drawer/HistorySection';
 import { HelpTools } from './drawer/HelpTools';
 import { NavUser } from './drawer/NavUser';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Room } from '@/lib/types';
 
 interface DashboardDrawerProps {
@@ -97,12 +96,9 @@ export function DashboardDrawer({
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="left" className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r border-border`} closeButton={false}>
-          {/* Header with Logo and Theme Toggle */}
+          {/* Header with Logo */}
           <div className="flex items-center justify-between px-4 py-4 mb-2">
-            <div className="flex flex-col items-start gap-2">
-              <Logo className="h-8 w-auto" textColor="text-foreground" />
-              <ThemeToggle />
-            </div>
+            <Logo className="h-8 w-auto" textColor="text-foreground" />
             <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-foreground hover:text-foreground hover:bg-accent rounded-lg h-8 w-8">
               <ChevronsLeft className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
