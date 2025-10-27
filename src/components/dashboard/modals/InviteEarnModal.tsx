@@ -1,12 +1,15 @@
 import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
+import { DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Copy, Share2, Link, Crown, Zap, X } from 'lucide-react';
+import { Copy, Link, Crown, Zap, MessageSquare, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
 interface InviteEarnModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
 export function InviteEarnModal({
   open,
   onOpenChange
@@ -31,110 +34,105 @@ export function InviteEarnModal({
     }
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Join Shattara',
-          text: 'Join me on Shattara and get exclusive benefits!',
-          url: inviteLink
-        });
-      } catch (error) {
-        // User cancelled sharing
-      }
-    } else {
-      handleCopyLink();
-    }
-  };
-
   return (
     <BaseModal 
       open={open} 
       onOpenChange={onOpenChange} 
       title="" 
-      className="w-[450px] bg-card border-border p-0 rounded-xl shadow-lg" 
+      className="max-w-[95vw] md:max-w-lg border-none" 
+      contentClassName="p-6 flex flex-col gap-4 overflow-y-auto max-h-[95vh]"
       showCloseButton={false}
     >
-      <div className="p-5">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-medium text-foreground">Spread the love</h2>
-            <p className="text-sm text-muted-foreground">and earn free months</p>
+      <DialogTitle className="sr-only">Refer &amp; Earn</DialogTitle>
+
+      {/* Banner Section */}
+      <div className="flex flex-col space-y-1.5 text-left">
+        <div className="relative h-fit overflow-hidden rounded-xl">
+          <button 
+            className="absolute right-4 top-4 z-10 bg-transparent"
+            onClick={() => onOpenChange(false)}
+          >
+            <X className="h-5 w-5 cursor-pointer text-muted-foreground" />
+          </button>
+          <img 
+            src="/images/referral-dark.png" 
+            alt="Referral" 
+            className="hidden w-full object-contain dark:block" 
+          />
+          <img 
+            src="/images/referral-light.png" 
+            alt="Referral" 
+            className="block w-full object-contain dark:hidden" 
+          />
+        </div>
+      </div>
+
+      {/* How it works section */}
+      <div className="md:py-2">
+        <div className="mb-3 text-base font-normal text-muted-foreground">How it works:</div>
+        
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <Zap className="h-5 w-5 shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-base font-normal text-foreground">Share your invite link</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Crown className="h-5 w-5 shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-base font-normal text-foreground">
+                They sign up and get <b>extra 10 credits</b>
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <MessageSquare className="h-5 w-5 shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-base font-normal text-foreground">
+                You get <b>10 credits</b> once they publish their first website
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Invite link section */}
+      <div className="flex flex-col">
+        <span className="mb-3 flex items-center gap-4 pr-2 text-base font-normal text-muted-foreground">
+          Your invite link:
+          <div className="h-0.5 flex-1 bg-border"></div>
+          <span className="flex items-center gap-2 text-muted-foreground">
+            <span>used by <b>0</b> users</span>
+          </span>
+        </span>
+        
+        <div className="flex flex-col items-center space-y-2 rounded-xl bg-muted p-2 sm:flex-row sm:space-y-0">
+          <div className="flex w-full flex-1 items-center px-2">
+            <Link className="mr-2 h-5 w-5 text-muted-foreground shrink-0" />
+            <input 
+              className="flex h-9 w-full border-none shadow-none focus:outline-none focus:ring-0 focus-visible:ring-0 bg-transparent text-base md:text-sm"
+              readOnly 
+              value={inviteLink}
+              tabIndex={-1}
+            />
           </div>
           <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => onOpenChange(false)} 
-            className="text-muted-foreground hover:text-foreground hover:bg-accent"
+            onClick={handleCopyLink}
+            className="h-8 px-4 py-2 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 sm:w-24 text-sm font-medium"
           >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
+            Copy link
           </Button>
         </div>
+      </div>
 
-        {/* How it works section */}
-        <div className="space-y-4 mb-6">
-          <h3 className="text-sm font-medium text-foreground">How it works:</h3>
-          
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-              <Zap className="h-3 w-3 text-primary" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm text-foreground font-medium">Share your invite link</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-              <Crown className="h-3 w-3 text-primary" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm text-foreground">
-                They sign up and get <span className="font-medium">1 month free</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-              <div className="w-3 h-3 rounded bg-primary"></div>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm text-foreground">
-                You get <span className="font-medium">1 month free</span> once they subscribe to a Pro plan
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Invite link section */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium text-foreground">Your invite link:</label>
-          
-          <div className="flex items-center gap-2 p-3 bg-muted border-none rounded-lg">
-            <Link className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span className="text-sm font-mono text-foreground truncate flex-1">{inviteLink}</span>
-          </div>
-
-          <div className="flex items-center justify-between pt-2">
-            <Button 
-              variant="ghost" 
-              className="text-muted-foreground hover:text-foreground hover:bg-accent"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-
-            <Button 
-              onClick={handleCopyLink} 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              <Copy className="h-4 w-4 mr-2" />
-              Copy link
-            </Button>
-          </div>
-        </div>
+      {/* Footer */}
+      <div className="flex justify-center">
+        <button className="text-xs font-normal text-muted-foreground underline hover:underline underline-offset-4 transition-colors duration-100">
+          View Terms and Conditions
+        </button>
       </div>
     </BaseModal>
   );
