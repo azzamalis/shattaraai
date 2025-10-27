@@ -57,12 +57,12 @@ export function InviteEarnModal({
             <X className="h-5 w-5 cursor-pointer text-muted-foreground" />
           </button>
           <img 
-            src="/images/referral-dark.png" 
+            src="/images/referral-dark-v2.png" 
             alt="Referral" 
             className="hidden w-full object-contain dark:block" 
           />
           <img 
-            src="/images/referral-light.png" 
+            src="/images/referral-light-v2.png" 
             alt="Referral" 
             className="block w-full object-contain dark:hidden" 
           />
