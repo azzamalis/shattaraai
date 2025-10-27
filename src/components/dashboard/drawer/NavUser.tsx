@@ -1,4 +1,3 @@
-import React from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,11 +9,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, History, Crown, LogOut, MoreVertical } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { User, History, Crown, LogOut, MoreVertical, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useWindowSize } from '@/hooks/use-window-size';
+import { useTheme } from '@/hooks/useTheme';
 
 interface NavUserProps {
   onOpenChange: (open: boolean) => void;
@@ -26,6 +28,7 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange, onSettingsOpen }
   const { width } = useWindowSize();
   const isMobile = width < 768;
   const { user, signOut } = useAuth();
+  const { theme, setLightTheme, setDarkTheme } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -41,6 +44,16 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange, onSettingsOpen }
       }
     } catch (error) {
       toast.error('An error occurred during logout');
+    }
+  };
+
+  const handleThemeToggle = (checked: boolean) => {
+    if (checked) {
+      setDarkTheme();
+      toast.success('Switched to dark theme');
+    } else {
+      setLightTheme();
+      toast.success('Switched to light theme');
     }
   };
 
@@ -127,6 +140,23 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange, onSettingsOpen }
           >
             <Crown className="mr-2 h-4 w-4 text-amber-500" />
             <span className="font-medium">Upgrade Plan</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={(e) => e.preventDefault()}
+          >
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center">
+                <Moon className="mr-2 h-4 w-4" />
+                <Label htmlFor="dark-mode-switch" className="cursor-pointer">Dark mode</Label>
+              </div>
+              <Switch
+                id="dark-mode-switch"
+                checked={theme === 'dark'}
+                onCheckedChange={handleThemeToggle}
+              />
+            </div>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         
