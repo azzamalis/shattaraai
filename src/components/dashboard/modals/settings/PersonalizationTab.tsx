@@ -41,9 +41,11 @@ export const PersonalizationTab: React.FC = () => {
         </div>
         <Select value={language} onValueChange={handleLanguageChange}>
           <SelectTrigger className="w-[180px] h-9 border-0 bg-transparent hover:bg-accent hover:text-accent-foreground">
-            <SelectValue placeholder="Select language" />
+            <SelectValue placeholder="Select language">
+              {languages.find(l => l.value === language)?.label || 'Select language'}
+            </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-[110]">
             {languages.map((lang) => (
               <SelectItem key={lang.value} value={lang.value}>
                 {lang.label}
@@ -64,9 +66,11 @@ export const PersonalizationTab: React.FC = () => {
         </div>
         <Select value={theme} onValueChange={handleThemeChange}>
           <SelectTrigger className="w-[180px] h-9 border-0 bg-transparent hover:bg-accent hover:text-accent-foreground">
-            <SelectValue placeholder="Select theme" />
+            <SelectValue placeholder="Select theme">
+              {theme === 'light' ? 'Light' : 'Dark'}
+            </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-[110]">
             <SelectItem value="light">Light</SelectItem>
             <SelectItem value="dark">Dark</SelectItem>
           </SelectContent>
