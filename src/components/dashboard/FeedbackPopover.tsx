@@ -46,7 +46,7 @@ export function FeedbackPopover({
               <div className="flex flex-col space-y-4">
                 <div className="flex items-center justify-between mb-2">
                   <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
-                  <Button type="button" variant="ghost" size="icon" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground hover:bg-accent">
+                  <Button type="button" variant="ghost" size="icon" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl">
                     <X size={18} />
                     <span className="sr-only">Close</span>
                   </Button>
@@ -57,14 +57,14 @@ export function FeedbackPopover({
                 </div>
                 
                 <div className="flex justify-between items-center gap-x-2">
-                  <Button type="button" variant="outline" className="text-muted-foreground hover:text-foreground" onClick={() => setOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground rounded-xl">
                     Cancel
                   </Button>
                   
                   <div className="flex items-center gap-x-2">
                     
                     
-                    <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={!feedback.trim() || isSubmitting}>
+                    <Button onClick={handleSubmit} disabled={!feedback.trim() || isSubmitting} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl">
                       {isSubmitting ? <div className="flex items-center gap-2">
                           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
                           <span>Sending...</span>
