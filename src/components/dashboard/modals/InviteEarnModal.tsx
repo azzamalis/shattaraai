@@ -2,8 +2,9 @@ import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Copy, Link, Crown, Zap, MessageSquare, X } from 'lucide-react';
+import { Crown, Zap, MessageSquare, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface InviteEarnModalProps {
   open: boolean;
@@ -15,6 +16,7 @@ export function InviteEarnModal({
   onOpenChange
 }: InviteEarnModalProps) {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const inviteCode = "INVITE123";
   const inviteLink = `https://shattara.com/invite/${inviteCode}`;
 
@@ -83,7 +85,7 @@ export function InviteEarnModal({
             <Crown className="h-5 w-5 shrink-0" />
             <div className="flex flex-col">
               <span className="text-base font-normal text-foreground">
-                They sign up and get <b>extra 10 credits</b>
+                They sign up and get <b>1 month free</b>
               </span>
             </div>
           </div>
@@ -92,7 +94,7 @@ export function InviteEarnModal({
             <MessageSquare className="h-5 w-5 shrink-0" />
             <div className="flex flex-col">
               <span className="text-base font-normal text-foreground">
-                You get <b>10 credits</b> once they publish their first website
+                You get <b>1 month free</b> once they upload their first content
               </span>
             </div>
           </div>
@@ -111,7 +113,6 @@ export function InviteEarnModal({
         
         <div className="flex flex-col items-center space-y-2 rounded-xl bg-muted p-2 sm:flex-row sm:space-y-0">
           <div className="flex w-full flex-1 items-center px-2">
-            <Link className="mr-2 h-5 w-5 text-muted-foreground shrink-0" />
             <input 
               className="flex h-9 w-full border-none shadow-none focus:outline-none focus:ring-0 focus-visible:ring-0 bg-transparent text-base md:text-sm"
               readOnly 
@@ -130,7 +131,10 @@ export function InviteEarnModal({
 
       {/* Footer */}
       <div className="flex justify-center">
-        <button className="text-xs font-normal text-muted-foreground underline hover:underline underline-offset-4 transition-colors duration-100">
+        <button 
+          onClick={() => navigate('/terms')}
+          className="text-xs font-normal text-muted-foreground underline hover:underline underline-offset-4 transition-colors duration-100"
+        >
           View Terms and Conditions
         </button>
       </div>
