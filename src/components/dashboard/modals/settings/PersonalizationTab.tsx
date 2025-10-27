@@ -40,7 +40,7 @@ export const PersonalizationTab: React.FC = () => {
           <span className="text-sm font-medium">Language</span>
         </div>
         <Select value={language} onValueChange={handleLanguageChange}>
-          <SelectTrigger className="w-[180px] h-9">
+          <SelectTrigger className="w-[180px] h-9 border-0 bg-transparent hover:bg-accent hover:text-accent-foreground">
             <SelectValue placeholder="Select language" />
           </SelectTrigger>
           <SelectContent>
@@ -63,7 +63,7 @@ export const PersonalizationTab: React.FC = () => {
           <span className="text-sm font-medium">Theme</span>
         </div>
         <Select value={theme} onValueChange={handleThemeChange}>
-          <SelectTrigger className="w-[180px] h-9">
+          <SelectTrigger className="w-[180px] h-9 border-0 bg-transparent hover:bg-accent hover:text-accent-foreground">
             <SelectValue placeholder="Select theme" />
           </SelectTrigger>
           <SelectContent>
