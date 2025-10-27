@@ -9,6 +9,7 @@ import { Plus, ChevronsLeft } from 'lucide-react';
 import { TutorialModal } from './TutorialModal';
 import { CalculatorModal } from './modals/CalculatorModal';
 import { InviteEarnModal } from './modals/InviteEarnModal';
+import { SettingsDialog } from './modals/SettingsDialog';
 import { RoomsSection } from './drawer/RoomsSection';
 import { HistorySection } from './drawer/HistorySection';
 import { HelpTools } from './drawer/HelpTools';
@@ -38,6 +39,7 @@ export function DashboardDrawer({
   const [tutorialModalOpen, setTutorialModalOpen] = useState(false);
   const [calculatorModalOpen, setCalculatorModalOpen] = useState(false);
   const [inviteEarnModalOpen, setInviteEarnModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [hasSeenTutorial, setHasSeenTutorial] = useState(() => {
     return localStorage.getItem('hasSeenTutorial') === 'true';
@@ -149,7 +151,7 @@ export function DashboardDrawer({
           {/* User Profile */}
           <div className="mt-auto">
             <div className="px-4 py-4">
-              <NavUser onOpenChange={onOpenChange} />
+              <NavUser onOpenChange={onOpenChange} onSettingsOpen={() => setSettingsModalOpen(true)} />
             </div>
           </div>
         </SheetContent>
@@ -158,6 +160,7 @@ export function DashboardDrawer({
       <TutorialModal open={tutorialModalOpen} onOpenChange={setTutorialModalOpen} />
       <CalculatorModal open={calculatorModalOpen} onOpenChange={setCalculatorModalOpen} />
       <InviteEarnModal open={inviteEarnModalOpen} onOpenChange={setInviteEarnModalOpen} />
+      <SettingsDialog open={settingsModalOpen} onOpenChange={setSettingsModalOpen} />
       <DeleteModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} type="room" itemToDelete={{
       id: roomToDelete || '',
       title: roomToDeleteName
