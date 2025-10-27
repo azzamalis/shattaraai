@@ -21,7 +21,6 @@ import ChatPage from "./pages/ChatPage";
 import PricingPage from "./pages/PricingPage";
 import Contact from "./pages/Contact";
 import HistoryPage from "./pages/HistoryPage";
-import Profile from "./pages/Profile";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Teachers from "./pages/Teachers";
@@ -60,11 +59,10 @@ function App() {
                   
                   <Route path="/content/:contentId" element={<ContentPage />} />
                   <Route path="/chat/:contentId" element={<ChatPage />} />
-                  <Route path="/pricing" element={<PricingPage />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/history" element={<HistoryPage />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/privacy" element={<Privacy />} />
+                   <Route path="/pricing" element={<PricingPage />} />
+                   <Route path="/contact" element={<Contact />} />
+                   <Route path="/history" element={<HistoryPage />} />
+                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/teachers" element={<Teachers />} />
                   <Route path="/team" element={<Team />} />

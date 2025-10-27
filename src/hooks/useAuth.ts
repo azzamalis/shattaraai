@@ -15,6 +15,7 @@ export interface UserProfile {
   onboarding_completed: boolean | null;
   created_at: string | null;
   updated_at: string | null;
+  plan_type: Database['public']['Enums']['user_plan'];
 }
 
 export const useAuth = () => {

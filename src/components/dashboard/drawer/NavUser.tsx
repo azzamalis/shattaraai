@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useWindowSize } from '@/hooks/use-window-size';
+import { SettingsDialog } from '@/components/dashboard/modals/SettingsDialog';
 
 interface NavUserProps {
   onOpenChange: (open: boolean) => void;
@@ -25,6 +26,7 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
   const { width } = useWindowSize();
   const isMobile = width < 768;
   const { user, signOut } = useAuth();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -56,7 +58,8 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
 
   return (
-    <DropdownMenu>
+    <>
+      <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -100,7 +103,10 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() => handleNavigation('/profile')}
+                onClick={() => {
+                  setSettingsOpen(true);
+                  onOpenChange(false);
+                }}
               >
                 <User className="mr-2 h-4 w-4" />
                 <span>Account</span>
@@ -134,5 +140,8 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange }) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      
+      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+    </>
   );
 };
