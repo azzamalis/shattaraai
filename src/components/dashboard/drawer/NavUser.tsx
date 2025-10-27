@@ -161,7 +161,7 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange, onSettingsOpen }
         <DropdownMenuSeparator className="bg-border" />
         
         <DropdownMenuItem
-          className="cursor-pointer text-destructive focus:text-destructive-foreground focus:bg-destructive"
+          className="cursor-pointer hover:text-destructive focus:text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
           onClick={handleLogout}
         >
           <LogOut className="mr-2 h-4 w-4" />
