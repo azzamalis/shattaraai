@@ -6,11 +6,13 @@ interface HistoryEmptyStateProps {
   hasSearch?: boolean;
   searchQuery?: string;
   onClearFilters?: () => void;
+  viewMode?: 'grid' | 'table';
 }
 export function HistoryEmptyState({
   hasSearch = false,
   searchQuery = '',
-  onClearFilters
+  onClearFilters,
+  viewMode = 'table'
 }: HistoryEmptyStateProps) {
   const navigate = useNavigate();
   if (hasSearch) {

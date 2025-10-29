@@ -1,19 +1,19 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HistoryHeader } from './HistoryHeader';
 import { HistorySearch } from './HistorySearch';
 import { HistoryFilter } from './HistoryFilter';
 import { HistoryTable, HistoryItem } from './HistoryTable';
+import { HistoryGrid } from './HistoryGrid';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Room } from '@/lib/types';
 import { useContent } from '@/hooks/useContent';
 import { useRooms } from '@/hooks/useRooms';
-import { Loader2 } from 'lucide-react';
-
-const ITEMS_PER_PAGE = 10;
+import { Loader2, LayoutGrid, List } from 'lucide-react';
 
 interface HistoryProps {
   rooms?: Room[];
@@ -31,7 +31,18 @@ export function History({
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() => {
+    const saved = localStorage.getItem('historyViewMode');
+    return (saved as 'grid' | 'table') || 'grid';
+  });
   const navigate = useNavigate();
+
+  // Persist view mode preference
+  useEffect(() => {
+    localStorage.setItem('historyViewMode', viewMode);
+  }, [viewMode]);
+
+  const itemsPerPage = viewMode === 'grid' ? 20 : 10;
 
   const { content, loading, deleteContent, updateContent } = useContent();
   const { rooms: allRooms } = useRooms();
@@ -62,9 +73,9 @@ export function History({
   }, [historyItems, searchQuery, typeFilter]);
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
 
   const handleItemClick = (id: string) => {
     const item = content.find(c => c.id === id);
@@ -130,38 +141,70 @@ export function History({
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className={viewMode === 'grid' ? 'container mx-auto px-4 sm:px-0 py-6' : 'container mx-auto p-6'}>
       <div className="flex flex-col space-y-6">
         <HistoryHeader onClearHistory={handleClearHistory} />
         
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <HistorySearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-          <HistoryFilter typeFilter={typeFilter} onFilterChange={setTypeFilter} />
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="h-8 px-3"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('table')}
+                className="h-8 px-3"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+            <HistoryFilter typeFilter={typeFilter} onFilterChange={setTypeFilter} />
+          </div>
         </div>
         
-        <Card className="bg-card border-border shadow-lg">
-          <CardHeader className="border-b border-border">
-            <CardTitle className="text-foreground text-lg">Recent Activity</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              View and manage your recent interactions
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <HistoryTable 
-              items={paginatedItems} 
-              onItemClick={handleItemClick} 
-              rooms={allRooms} 
-              onAddToRoom={handleAddToRoom} 
-              onDelete={handleDelete}
-              searchQuery={searchQuery}
-              onClearFilters={handleClearFilters}
-            />
-          </CardContent>
-        </Card>
+        {viewMode === 'grid' ? (
+          <HistoryGrid
+            items={paginatedItems}
+            rooms={allRooms}
+            onItemClick={handleItemClick}
+            onAddToRoom={handleAddToRoom}
+            onDelete={handleDelete}
+            searchQuery={searchQuery}
+            onClearFilters={handleClearFilters}
+          />
+        ) : (
+          <Card className="bg-card border-border shadow-lg">
+            <CardHeader className="border-b border-border">
+              <CardTitle className="text-foreground text-lg">Recent Activity</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                View and manage your recent interactions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <HistoryTable 
+                items={paginatedItems} 
+                onItemClick={handleItemClick} 
+                rooms={allRooms} 
+                onAddToRoom={handleAddToRoom} 
+                onDelete={handleDelete}
+                searchQuery={searchQuery}
+                onClearFilters={handleClearFilters}
+              />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Pagination */}
         {totalPages > 0 && (
-          <div className="flex justify-center mt-6">
+          <div className={viewMode === 'grid' ? 'flex justify-center mt-8' : 'flex justify-center mt-6'}>
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
