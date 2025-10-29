@@ -141,7 +141,7 @@ export function History({
   }
 
   return (
-    <div className={viewMode === 'grid' ? 'container mx-auto px-4 sm:px-0 py-6' : 'container mx-auto p-6'}>
+    <div className="container mx-auto p-6">
       <div className="flex flex-col space-y-6">
         <HistoryHeader onClearHistory={handleClearHistory} />
         
