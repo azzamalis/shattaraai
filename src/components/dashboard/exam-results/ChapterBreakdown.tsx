@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, AlignLeft } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, AlignLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ChapterData {
@@ -24,25 +24,37 @@ interface ChapterBreakdownProps {
 
 export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className="flex flex-col rounded-2xl border-2 border-border bg-card px-6 pb-2 pt-6">
+    <div className="flex flex-col rounded-2xl border-2 border-border px-6 pb-2 pt-6 text-foreground">
       <div className="flex flex-col">
         <div>
           <h3 className="flex font-medium">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex h-6 w-full items-center justify-between"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              className="flex h-6 w-full items-center justify-between overflow-visible"
             >
-              <div className="flex items-center gap-2">
-                <ChevronDown className={cn("h-4 w-4 transition-transform", !isExpanded && "-rotate-90")} />
-                <AlignLeft className="h-4 w-4 text-foreground" />
-                <span className="overflow-hidden text-ellipsis">Social-NCERT-Chapter-1</span>
-              </div>
+              <h3 className="flex items-center gap-2">
+                {isHovered ? (
+                  isExpanded ? (
+                    <ChevronUp className="h-4 w-4 text-foreground" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-foreground" />
+                  )
+                ) : (
+                  <AlignLeft className="h-4 w-4 text-foreground" />
+                )}
+                <span className="max-w-[8.13rem] overflow-hidden text-ellipsis sm:max-w-[15.63rem] md:max-w-[18.75rem] lg:max-w-[25.00rem]">
+                  Social-NCERT-Chapter-1
+                </span>
+              </h3>
               <div className="flex items-center gap-4">
-                <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
+                <div className="h-3.5 w-full overflow-hidden rounded-full bg-muted">
                   <div 
-                    className="h-full rounded-full bg-orange-500"
+                    className="h-full w-16 flex-grow bg-orange-500 sm:w-24 md:w-32"
                     style={{ width: `${(examData.correctAnswers / examData.totalQuestions) * 100}%` }}
                   />
                 </div>
@@ -53,7 +65,7 @@ export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) 
 
           {/* Expanded Content */}
           {isExpanded && (
-            <div className="flex flex-col pl-3 text-sm">
+            <div className="flex flex-col overflow-hidden text-sm sm:pl-3">
               <div className="flex flex-col gap-4 pb-4 pl-3 pt-4">
                 {chapters.map((chapter, index) => (
                   <div key={index} className="flex items-center justify-between">

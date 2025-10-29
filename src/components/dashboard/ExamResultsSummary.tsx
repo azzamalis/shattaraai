@@ -257,8 +257,8 @@ export function ExamResultsSummary() {
               </div>
 
               {/* Chapter Breakdown */}
-              <div className="mb-6">
-                <ChapterBreakdown 
+              <div className="mb-4">
+                <ChapterBreakdown
                   chapters={[
                     { title: 'A Map and Its Components', timeRange: 'Page 3 - 5', correct: 1, total: 2 },
                     { title: 'Understanding Coordinates', timeRange: 'Page 7 - 8', correct: 1, total: 6 },
