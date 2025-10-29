@@ -123,7 +123,7 @@ export function DashboardHero({
     }
   };
   return <div className="max-w-[800px] mx-auto mb-12">
-      <NewFeaturePromo />
+      {/* <NewFeaturePromo /> */}
       
       <motion.h1 initial={{
       opacity: 0,
