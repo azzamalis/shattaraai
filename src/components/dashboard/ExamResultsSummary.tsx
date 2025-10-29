@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, Share2, X } from 'lucide-react';
-import Logo from '@/components/Logo';
+import { ChevronDown, Share2, X, RotateCcw, Repeat, BookCheck } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { CircularProgress } from './exam-results/CircularProgress';
 import { ChapterBreakdown } from './exam-results/ChapterBreakdown';
-import { ExamActionButtons } from './exam-results/ExamActionButtons';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ChapterData {
@@ -181,106 +179,154 @@ export function ExamResultsSummary() {
     setIsShareModalOpen(true);
   };
 
+  const handleGoToSpace = () => {
+    navigate(`/rooms/${roomId}`);
+  };
+
   return (
-    <div className="h-full bg-background">
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-border bg-background px-6 py-4">
-        <div className="flex items-center gap-2">
-          <Logo className="h-8 w-auto" textColor="text-foreground" />
-        </div>
-        <div className="flex items-center gap-2 text-foreground">
-          <span>{examAttempt?.exams?.title || 'Exam Results'}</span>
-          <ChevronRight className="h-4 w-4" />
-        </div>
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={handleShare}
-            className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm text-foreground hover:bg-accent/80"
-          >
-            <Share2 className="h-4 w-4" />
-            Share exam
-          </button>
-          <button 
-            onClick={handleClose}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <X className="h-5 w-5" />
-          </button>
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-10 border-b-2 border-border bg-background/95 backdrop-blur-sm">
+        <div className="flex items-center p-4">
+          {/* Left: Close Button */}
+          <div className="flex items-center">
+            <button 
+              onClick={handleClose}
+              className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Center: Exam Title Dropdown */}
+          <div className="flex flex-grow items-center justify-center text-sm font-medium">
+            <button className="flex h-10 w-28 items-center justify-center gap-2 rounded-xl border-2 border-border bg-card px-4 py-2 text-center hover:bg-accent">
+              <span className="text-muted-foreground">Exam 1</span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground/60" />
+            </button>
+          </div>
+
+          {/* Right: Share Button */}
+          <div className="flex items-center justify-end text-sm font-medium">
+            <button 
+              onClick={handleShare}
+              className="flex h-10 w-28 items-center justify-center rounded-xl border-2 border-border bg-card px-4 py-2 text-center hover:bg-accent"
+            >
+              Share exam
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Main Content - Reduce top padding */}
-      <main className="container mx-auto max-w-4xl px-6 pt-16">
-        {loading ? (
-          <div className="flex justify-center pt-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        ) : examData ? (
-          <>
-            {/* Title - Add 1rem top padding */}
-            <h1 className="mb-4 pt-4 text-center text-3xl font-bold text-foreground">
-              Keep up the momentum!
-            </h1>
-
-            {/* Stats Row - Reduce margin */}
-            <div className="mb-4 flex items-center justify-center gap-16">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-foreground">{examData.skipped}</div>
-                <div className="text-sm text-muted-foreground">Skipped</div>
-              </div>
-              <CircularProgress percentage={examData.score} />
-              <div className="text-center">
-                <div className="text-3xl font-bold text-foreground">{examData.timeTaken}</div>
-                <div className="text-sm text-muted-foreground">Time Taken</div>
-              </div>
+      {/* Main Content */}
+      <main className="flex-grow px-6">
+        <div className="px-6 py-8">
+          {loading ? (
+            <div className="flex justify-center pt-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
+          ) : examData ? (
+            <>
+              {/* Title */}
+              <div className="text-center">
+                <h2 className="mb-4 text-2xl font-medium text-foreground/80">
+                  Keep up the momentum!
+                </h2>
 
-            {/* Preview Link - Reduce margin */}
-            <div className="mb-4 text-center">
-              <button className="text-sm text-muted-foreground underline hover:text-foreground">
-                Preview {examAttempt?.exams?.title || 'Exam'}
-              </button>
-            </div>
-
-            {/* Content Breakdown - Add padding adjustment */}
-            <div className="pb-4">
-              <div className="rounded-lg border border-border bg-card p-6">
-                <h2 className="mb-4 text-lg font-semibold text-foreground">Content Breakdown</h2>
-                <div className="text-center text-muted-foreground">
-                  <p>Detailed breakdown will be available soon.</p>
-                  <p className="mt-2">
-                    Score: {examData.correctAnswers} / {examData.totalQuestions} ({examData.score}%)
-                  </p>
+                {/* Stats Row */}
+                <div className="mb-4 flex items-center justify-center gap-x-24">
+                  <div>
+                    <div className="text-2xl font-medium">{examData.skipped}</div>
+                    <div className="text-sm text-muted-foreground/80">Skipped</div>
+                  </div>
+                  <div className="relative flex flex-col items-center justify-center">
+                    <CircularProgress percentage={examData.score} />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-medium">{examData.timeTaken}</div>
+                    <div className="text-sm text-muted-foreground/80">Time Taken</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
-        ) : (
-          <div className="text-center pt-8">
-            <p className="text-muted-foreground">No exam results found.</p>
-          </div>
-        )}
 
-        {/* Action Buttons - Ensure proper spacing */}
-        <div className="mt-4">
-          <ExamActionButtons
-            onTryAgain={handleTryAgain}
-            onRetake={handleRetake}
-            onCreateNew={handleCreateNew}
-          />
+              {/* Preview Link */}
+              <div className="mb-6 flex justify-center text-sm font-semibold text-foreground/60">
+                <button className="flex h-10 w-32 items-center justify-center rounded-xl px-4 py-2 text-center underline hover:text-foreground">
+                  Preview {examAttempt?.exams?.title || 'Exam 1'}
+                </button>
+              </div>
+
+              {/* Chapter Breakdown */}
+              <div className="mb-6">
+                <ChapterBreakdown 
+                  chapters={[
+                    { title: 'A Map and Its Components', timeRange: 'Page 3 - 5', correct: 1, total: 2 },
+                    { title: 'Understanding Coordinates', timeRange: 'Page 7 - 8', correct: 1, total: 6 },
+                    { title: 'Greenwich Meridian', timeRange: 'Page 11 - 14', correct: 0, total: 1 },
+                    { title: 'Understanding Time Zones', timeRange: 'Page 14 - 17', correct: 1, total: 2 },
+                    { title: 'Locating Places on the Earth', timeRange: 'Page 1 - 3', correct: 0, total: 1 },
+                  ]} 
+                  examData={examData}
+                />
+              </div>
+
+              {/* Middle Action Buttons */}
+              <div className="flex justify-center gap-4 text-sm font-medium">
+                <button 
+                  onClick={handleTryAgain}
+                  className="flex h-11 w-auto items-center justify-center gap-x-2 rounded-full border-2 border-border px-8 hover:bg-accent sm:w-28 sm:px-4"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  <span className="hidden sm:inline">Try Again</span>
+                </button>
+                <button 
+                  onClick={handleRetake}
+                  className="flex h-11 w-auto items-center justify-center gap-x-2 rounded-full border-2 border-border px-8 hover:bg-accent sm:w-48 sm:px-4"
+                >
+                  <Repeat className="h-4 w-4" />
+                  <span className="hidden sm:inline">New-Question Retake</span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center pt-8">
+              <p className="text-muted-foreground">No exam results found.</p>
+            </div>
+          )}
         </div>
       </main>
 
+      {/* Sticky Footer */}
+      <footer className="sticky bottom-0 z-10 border-t-2 border-border bg-background px-4 py-10 font-medium">
+        <div className="flex justify-center">
+          <div className="flex w-full max-w-4xl flex-col justify-center gap-3 sm:flex-row">
+            <button 
+              onClick={handleGoToSpace}
+              className="flex h-12 w-full items-center justify-center rounded-full border-2 border-border px-8 hover:bg-accent sm:w-96"
+            >
+              Go to Space
+            </button>
+            <button 
+              onClick={handleCreateNew}
+              className="flex h-12 w-full items-center justify-center gap-x-2 rounded-full bg-foreground px-8 text-background hover:bg-foreground/90 sm:w-96"
+            >
+              <BookCheck className="h-4 w-4" />
+              Create Exam
+            </button>
+          </div>
+        </div>
+      </footer>
+
       {/* Share Modal */}
-        <ShareModal
-          open={isShareModalOpen}
-          onOpenChange={setIsShareModalOpen}
-          type="exam"
-          itemToShare={{
-            id: roomId,
-            title: examAttempt?.exams?.title || 'Exam',
-          }}
-        />
+      <ShareModal
+        open={isShareModalOpen}
+        onOpenChange={setIsShareModalOpen}
+        type="exam"
+        itemToShare={{
+          id: roomId,
+          title: examAttempt?.exams?.title || 'Exam',
+        }}
+      />
     </div>
   );
 }
