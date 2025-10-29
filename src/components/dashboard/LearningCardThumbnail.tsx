@@ -92,10 +92,10 @@ export function LearningCardThumbnail({
         <span className="text-muted-foreground text-sm">No thumbnail</span>
       </div>;
   };
-  return <div className={cn("relative w-full aspect-video", "rounded-lg overflow-hidden", "border border-border/10")}>
+  return <div className={cn("relative w-full aspect-video", "rounded-t-2xl border-b border-border overflow-hidden")}>
       {children}
       
-      <div className={cn("w-full h-full", "relative", "flex items-center justify-center", "bg-gradient-to-b from-transparent to-black/5 dark:to-black/20")}>
+      <div className={cn("w-full h-full", "relative", "flex items-center justify-center")}>
         {isPdf && hasPdfSource ? <PDFThumbnailGenerator 
           url={pdfUrl} 
           title={title} 

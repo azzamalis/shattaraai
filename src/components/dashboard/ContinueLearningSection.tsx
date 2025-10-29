@@ -1,7 +1,7 @@
 import React from 'react';
 import { LearningCard } from './LearningCard';
 import { useContent } from '@/contexts/ContentContext';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+
 import { cn } from '@/lib/utils';
 import { ContentItem } from '@/hooks/useContent';
 import { useNavigate } from 'react-router-dom';
@@ -50,31 +50,29 @@ export function ContinueLearningSection({
         </div>
       </section>;
   }
-  return <section className="w-full py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-foreground font-medium text-lg">Continue Learning</h2>
-        <button onClick={handleViewAll} className={cn("text-sm text-muted-foreground", "hover:text-foreground transition-colors", "px-4 py-2 rounded-lg", "hover:bg-accent/50")}>
+  return <section className="w-full mb-11">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-foreground text-lg">Continue Learning</h2>
+        <button 
+          onClick={handleViewAll}
+          className="inline-flex items-center justify-center w-20 h-9 rounded-xl text-sm px-3 text-center cursor-pointer transition-colors hover:bg-accent/50"
+        >
           View all
         </button>
       </div>
       
-      <div className="relative -mx-4 px-4">
-        <Carousel className="w-full" opts={{
-        align: "start",
-        loop: true,
-        skipSnaps: false,
-        dragFree: true
-      }}>
-          <CarouselContent className="-ml-4">
-            {content.map(item => <CarouselItem key={item.id} className={cn("pl-4", "basis-[280px] sm:basis-[320px] md:basis-[360px]", "first:pl-4")}>
-                <LearningCard content={item} onDelete={() => onDeleteCard(item)} onShare={() => onShareCard(item)} onAddToRoom={roomId => handleAddToRoom(roomId, item)} availableRooms={availableRooms} currentRoom={currentRoom} />
-              </CarouselItem>)}
-          </CarouselContent>
-          {content.length > 1 && <>
-              <CarouselPrevious className={cn("hidden md:flex -left-12", "bg-background/80 backdrop-blur", "border-border hover:bg-accent", "text-foreground", "transition-colors duration-200")} />
-              <CarouselNext className={cn("hidden md:flex -right-12", "bg-background/80 backdrop-blur", "border-border hover:bg-accent", "text-foreground", "transition-colors duration-200")} />
-            </>}
-        </Carousel>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 min-[1920px]:grid-cols-5 gap-4">
+        {content.map(item => (
+          <LearningCard 
+            key={item.id}
+            content={item} 
+            onDelete={() => onDeleteCard(item)} 
+            onShare={() => onShareCard(item)} 
+            onAddToRoom={roomId => handleAddToRoom(roomId, item)} 
+            availableRooms={availableRooms} 
+            currentRoom={currentRoom} 
+          />
+        ))}
       </div>
     </section>;
 }
