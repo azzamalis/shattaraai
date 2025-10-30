@@ -45,9 +45,9 @@ export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) 
                 </span>
               </h3>
               <div className="flex items-center gap-4">
-                <div className="relative w-full overflow-hidden rounded-full bg-primary/5 dark:bg-primary/10 h-3.5">
+                <div className="relative w-16 sm:w-24 md:w-32 overflow-hidden rounded-full bg-primary/5 dark:bg-primary/10 h-3.5">
                   <div 
-                    className="h-full flex-1 transition-all w-16 sm:w-24 md:w-32 bg-orange-500"
+                    className="h-full flex-1 transition-all bg-orange-500"
                     style={{ width: `${(examData.correctAnswers / examData.totalQuestions) * 100}%` }}
                   />
                 </div>
