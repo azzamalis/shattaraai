@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, ChevronRight, AlignLeft } from 'lucide-react';
+import { ChevronDown, ChevronRight, AlignLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ChapterData {
@@ -24,49 +24,42 @@ interface ChapterBreakdownProps {
 
 export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className="flex flex-col rounded-2xl border-2 border-border px-6 pb-4 pt-8 text-foreground font-medium">
-      <div className="flex flex-col font-medium">
-        <div>
+    <div className="mb-8 flex flex-col gap-6 rounded-2xl border border-border p-6 pb-2 dark:bg-neutral-950/20">
+      <div className="flex flex-col gap-6">
+        <div className="border-b last:border-b-0 last:mb-0">
           <h3 className="flex">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              className="flex h-6 w-full items-center justify-between overflow-visible"
+              className="group flex flex-1 cursor-pointer items-center justify-between p-0 font-medium mb-4 transition-all"
             >
-              <h3 className="flex items-center gap-2">
-                {isHovered ? (
-                  isExpanded ? (
-                    <ChevronUp className="h-4 w-4 text-foreground" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-foreground" />
-                  )
-                ) : (
-                  <AlignLeft className="h-4 w-4 text-foreground" />
-                )}
-              <span className="text-sm sm:text-base truncate max-w-[130px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[400px]">
-                Social-NCERT-Chapter-1
-              </span>
+              <h3 className="flex items-center gap-2 text-base font-medium">
+                <AlignLeft className="h-4 w-4 text-neutral-800 dark:text-neutral-200 block group-hover:hidden flex-shrink-0" />
+                <ChevronDown className={cn(
+                  "h-4 w-4 text-neutral-400 dark:text-neutral-500 hidden group-hover:block transition-transform duration-200 flex-shrink-0",
+                  isExpanded && "rotate-180"
+                )} />
+                <span className="text-base truncate max-w-[130px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[400px]">
+                  Social-NCERT-Chapter-1
+                </span>
               </h3>
               <div className="flex items-center gap-4">
-                <div className="h-3.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="relative w-full overflow-hidden rounded-full bg-primary/5 dark:bg-primary/10 h-3.5">
                   <div 
-                    className="h-full w-16 flex-grow bg-orange-500 sm:w-24 md:w-32"
+                    className="h-full flex-1 transition-all w-16 sm:w-24 md:w-32 bg-orange-500"
                     style={{ width: `${(examData.correctAnswers / examData.totalQuestions) * 100}%` }}
                   />
                 </div>
-                <span className="text-sm text-muted-foreground">{examData.correctAnswers}/{examData.totalQuestions}</span>
+                <span className="text-sm text-neutral-600 dark:text-neutral-400">{examData.correctAnswers}/{examData.totalQuestions}</span>
               </div>
             </button>
           </h3>
 
           {/* Expanded Content */}
           {isExpanded && (
-            <div className="flex flex-col overflow-hidden text-sm sm:pl-3">
-              <div className="flex flex-col gap-4 pb-4 pl-3 pt-4">
+            <div className="flex flex-col overflow-hidden text-sm sm:pl-3 animate-in fade-in duration-300 gap-4 space-y-1">
+              <div className="flex flex-col gap-4 pb-4 pl-3">
                 {chapters.map((chapter, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-foreground">

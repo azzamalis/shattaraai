@@ -228,8 +228,7 @@ export function ExamResultsSummary() {
               </div>
 
               {/* Chapter Breakdown */}
-              <div className="mb-4">
-                <ChapterBreakdown chapters={[{
+              <ChapterBreakdown chapters={[{
               title: 'A Map and Its Components',
               timeRange: 'Page 3 - 5',
               correct: 1,
@@ -255,7 +254,6 @@ export function ExamResultsSummary() {
               correct: 0,
               total: 1
             }]} examData={examData} />
-              </div>
 
               {/* Middle Action Buttons */}
               <div className="flex flex-col justify-center gap-4 text-sm font-medium sm:flex-row">
