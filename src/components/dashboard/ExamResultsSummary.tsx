@@ -258,14 +258,14 @@ export function ExamResultsSummary() {
               </div>
 
               {/* Middle Action Buttons */}
-              <div className="flex justify-center gap-4 text-sm font-medium">
-                <button onClick={handleTryAgain} className="flex h-11 w-auto items-center justify-center gap-x-2 rounded-full border-2 border-border px-8 hover:bg-accent sm:w-28 sm:px-4">
+              <div className="flex flex-col justify-center gap-4 text-sm font-medium sm:flex-row">
+                <button onClick={handleTryAgain} className="inline-flex h-11 w-28 items-center justify-center gap-x-2 overflow-visible rounded-full border-2 border-border px-4 text-sm font-medium">
                   <RotateCcw className="h-4 w-4" />
-                  <span className="hidden sm:inline">Try Again</span>
+                  Try Again
                 </button>
-                <button onClick={handleRetake} className="flex h-11 w-auto items-center justify-center gap-x-2 rounded-full border-2 border-border px-8 hover:bg-accent sm:w-48 sm:px-4">
+                <button onClick={handleRetake} className="inline-flex h-11 w-48 items-center justify-center gap-x-2 overflow-visible rounded-full border-2 border-border px-4 text-sm font-medium">
                   <Repeat className="h-4 w-4" />
-                  <span className="hidden sm:inline">New-Question Retake</span>
+                  New-Question Retake
                 </button>
               </div>
             </> : <div className="text-center pt-8">
