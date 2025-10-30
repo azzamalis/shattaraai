@@ -47,9 +47,9 @@ export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) 
                 ) : (
                   <AlignLeft className="h-4 w-4 text-foreground" />
                 )}
-                <span className="max-w-[8.13rem] overflow-hidden text-ellipsis sm:max-w-[15.63rem] md:max-w-[18.75rem] lg:max-w-[25.00rem]">
-                  Social-NCERT-Chapter-1
-                </span>
+              <span className="text-sm sm:text-base truncate max-w-[130px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[400px]">
+                Social-NCERT-Chapter-1
+              </span>
               </h3>
               <div className="flex items-center gap-4">
                 <div className="h-3.5 w-full overflow-hidden rounded-full bg-muted">
