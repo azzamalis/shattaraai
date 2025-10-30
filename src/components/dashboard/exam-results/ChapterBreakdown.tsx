@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, AlignLeft } from 'lucide-react';
+import { ChevronDown, AlignLeft, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ChapterData {
@@ -70,7 +70,7 @@ export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) 
                     <div className="flex items-center gap-4 text-muted-foreground">
                       <button className="flex h-6 w-16 items-center justify-center gap-1.5 rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-2 py-1 text-xs text-yellow-500 hover:bg-yellow-500/20">
                         Review
-                        <ChevronRight className="h-3 w-3" />
+                        <ArrowUpRight className="h-3 w-3" />
                       </button>
                       <span className="font-medium text-muted-foreground">
                         {chapter.correct}/{chapter.total}
