@@ -26,7 +26,7 @@ export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) 
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="mb-8 flex flex-col gap-6 rounded-2xl border border-border p-6 pb-2 dark:bg-neutral-950/20">
+    <div className="mb-8 flex flex-col gap-6 rounded-2xl border border-border p-6 pb-2 dark:bg-neutral-950/20 md:max-w-[450px] md:mx-auto">
       <div className="flex flex-col gap-6">
         <div className="border-b last:border-b-0 last:mb-0">
           <h3 className="flex">
