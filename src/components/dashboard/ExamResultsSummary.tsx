@@ -276,7 +276,7 @@ export function ExamResultsSummary() {
       <footer className="sticky bottom-0 z-10 border-t-2 border-border bg-background px-4 py-10 font-medium">
         <div className="flex justify-center">
           <div className="flex w-full max-w-4xl flex-col justify-center gap-3 sm:flex-row">
-            <button onClick={handleGoToSpace} className="flex h-12 w-full items-center justify-center rounded-full border border-border px-8 hover:bg-accent sm:w-96">Go to Room</button>
+            <button onClick={handleGoToSpace} className="flex h-12 w-full items-center justify-center rounded-full border border-border px-8 hover:text-primary hover:bg-primary/5 transition-all sm:w-96">Go to Room</button>
             <button onClick={handleCreateNew} className="flex h-12 w-full items-center justify-center gap-x-2 rounded-full bg-foreground px-8 text-background hover:bg-foreground/90 sm:w-96">
               <BookCheck className="h-4 w-4" />
               Create Exam
