@@ -177,7 +177,7 @@ export function ExamResultsSummary() {
 
           {/* Center: Exam Title Dropdown */}
           <div className="flex flex-grow items-center justify-center text-sm font-medium">
-            <button className="flex h-10 w-28 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-center hover:bg-accent">
+            <button className="flex h-10 w-28 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-center hover:text-primary hover:bg-primary/5 transition-all">
               <span className="text-muted-foreground">Exam 1</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground/60" />
             </button>
@@ -185,7 +185,7 @@ export function ExamResultsSummary() {
 
           {/* Right: Share Button */}
           <div className="flex items-center justify-end text-sm font-medium">
-            <button onClick={handleShare} className="flex h-10 w-28 items-center justify-center rounded-xl border border-border bg-card px-4 py-2 text-center hover:bg-accent">
+            <button onClick={handleShare} className="flex h-10 w-28 items-center justify-center rounded-xl border border-border bg-card px-4 py-2 text-center hover:text-primary hover:bg-primary/5 transition-all">
               Share exam
             </button>
           </div>
