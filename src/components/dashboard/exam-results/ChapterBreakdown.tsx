@@ -27,10 +27,10 @@ export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) 
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className="flex flex-col rounded-2xl border-2 border-border px-6 pb-2 pt-6 text-foreground">
-      <div className="flex flex-col">
+    <div className="flex flex-col rounded-2xl border-2 border-border px-6 pb-2 pt-6 text-foreground font-medium">
+      <div className="flex flex-col font-medium">
         <div>
-          <h3 className="flex font-medium">
+          <h3 className="flex">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               onMouseEnter={() => setIsHovered(true)}
