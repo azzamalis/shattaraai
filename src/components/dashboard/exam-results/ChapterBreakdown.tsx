@@ -68,9 +68,9 @@ export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) 
                       <span className="text-muted-foreground/80">{chapter.timeRange}</span>
                     </div>
                     <div className="flex items-center gap-4 text-muted-foreground">
-                      <button className="flex h-6 w-16 items-center justify-center rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-2 py-1 text-xs text-yellow-500 hover:bg-yellow-500/20">
+                      <button className="flex h-6 w-16 items-center justify-center rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-2 py-1 text-xs text-yellow-500 hover:bg-yellow-500/20 gap-1.5">
                         Review
-                        <ChevronRight className="h-3 w-3" />
+                        <ChevronRight className="h-3 w-3 text-yellow-500 flex-shrink-0" />
                       </button>
                       <span className="font-medium text-muted-foreground">
                         {chapter.correct}/{chapter.total}
