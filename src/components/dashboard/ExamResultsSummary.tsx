@@ -177,7 +177,7 @@ export function ExamResultsSummary() {
 
           {/* Center: Exam Title Dropdown */}
           <div className="flex flex-grow items-center justify-center text-sm font-medium">
-            <button className="flex h-10 w-28 items-center justify-center gap-2 rounded-xl border-2 border-border bg-card px-4 py-2 text-center hover:bg-accent">
+            <button className="flex h-10 w-28 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-center hover:bg-accent">
               <span className="text-muted-foreground">Exam 1</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground/60" />
             </button>
@@ -185,7 +185,7 @@ export function ExamResultsSummary() {
 
           {/* Right: Share Button */}
           <div className="flex items-center justify-end text-sm font-medium">
-            <button onClick={handleShare} className="flex h-10 w-28 items-center justify-center rounded-xl border-2 border-border bg-card px-4 py-2 text-center hover:bg-accent">
+            <button onClick={handleShare} className="flex h-10 w-28 items-center justify-center rounded-xl border border-border bg-card px-4 py-2 text-center hover:bg-accent">
               Share exam
             </button>
           </div>
@@ -257,11 +257,11 @@ export function ExamResultsSummary() {
 
               {/* Middle Action Buttons */}
               <div className="flex flex-col justify-center gap-4 text-sm font-medium sm:flex-row">
-                <button onClick={handleTryAgain} className="inline-flex h-11 w-28 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border-2 border-border px-4 text-sm font-medium hover:bg-accent transition-colors">
+                <button onClick={handleTryAgain} className="inline-flex h-11 w-28 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border border-border px-4 text-sm font-medium hover:bg-accent transition-colors">
                   <RotateCcw className="h-4 w-4 flex-shrink-0" />
                   Try Again
                 </button>
-                <button onClick={handleRetake} className="inline-flex h-11 w-48 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border-2 border-border px-4 text-sm font-medium hover:bg-accent transition-colors">
+                <button onClick={handleRetake} className="inline-flex h-11 w-48 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border border-border px-4 text-sm font-medium hover:bg-accent transition-colors">
                   <Repeat className="h-4 w-4 flex-shrink-0" />
                   New-Question Retake
                 </button>
@@ -276,7 +276,7 @@ export function ExamResultsSummary() {
       <footer className="sticky bottom-0 z-10 border-t-2 border-border bg-background px-4 py-10 font-medium">
         <div className="flex justify-center">
           <div className="flex w-full max-w-4xl flex-col justify-center gap-3 sm:flex-row">
-            <button onClick={handleGoToSpace} className="flex h-12 w-full items-center justify-center rounded-full border-2 border-border px-8 hover:bg-accent sm:w-96">Go to Room</button>
+            <button onClick={handleGoToSpace} className="flex h-12 w-full items-center justify-center rounded-full border border-border px-8 hover:bg-accent sm:w-96">Go to Room</button>
             <button onClick={handleCreateNew} className="flex h-12 w-full items-center justify-center gap-x-2 rounded-full bg-foreground px-8 text-background hover:bg-foreground/90 sm:w-96">
               <BookCheck className="h-4 w-4" />
               Create Exam
