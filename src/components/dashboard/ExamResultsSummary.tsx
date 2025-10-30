@@ -222,38 +222,38 @@ export function ExamResultsSummary() {
 
               {/* Preview Link */}
               <div className="mb-6 flex justify-center text-sm font-semibold text-foreground/60">
-                <button className="flex h-10 w-32 items-center justify-center rounded-xl px-4 py-2 text-center underline hover:text-foreground">
+                <button className="flex h-10 w-32 items-center justify-center rounded-xl py-2 text-center underline hover:text-foreground px-[14px]">
                   Preview {examAttempt?.exams?.title || 'Exam 1'}
                 </button>
               </div>
 
               {/* Chapter Breakdown */}
               <ChapterBreakdown chapters={[{
-              title: 'A Map and Its Components',
-              timeRange: 'Page 3 - 5',
-              correct: 1,
-              total: 2
-            }, {
-              title: 'Understanding Coordinates',
-              timeRange: 'Page 7 - 8',
-              correct: 1,
-              total: 6
-            }, {
-              title: 'Greenwich Meridian',
-              timeRange: 'Page 11 - 14',
-              correct: 0,
-              total: 1
-            }, {
-              title: 'Understanding Time Zones',
-              timeRange: 'Page 14 - 17',
-              correct: 1,
-              total: 2
-            }, {
-              title: 'Locating Places on the Earth',
-              timeRange: 'Page 1 - 3',
-              correct: 0,
-              total: 1
-            }]} examData={examData} />
+            title: 'A Map and Its Components',
+            timeRange: 'Page 3 - 5',
+            correct: 1,
+            total: 2
+          }, {
+            title: 'Understanding Coordinates',
+            timeRange: 'Page 7 - 8',
+            correct: 1,
+            total: 6
+          }, {
+            title: 'Greenwich Meridian',
+            timeRange: 'Page 11 - 14',
+            correct: 0,
+            total: 1
+          }, {
+            title: 'Understanding Time Zones',
+            timeRange: 'Page 14 - 17',
+            correct: 1,
+            total: 2
+          }, {
+            title: 'Locating Places on the Earth',
+            timeRange: 'Page 1 - 3',
+            correct: 0,
+            total: 1
+          }]} examData={examData} />
 
               {/* Middle Action Buttons */}
               <div className="flex flex-col justify-center gap-4 text-sm font-medium sm:flex-row">
