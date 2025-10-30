@@ -257,11 +257,11 @@ export function ExamResultsSummary() {
 
               {/* Middle Action Buttons */}
               <div className="flex flex-col justify-center gap-4 text-sm font-medium sm:flex-row">
-                <button onClick={handleTryAgain} className="inline-flex h-11 w-28 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border-2 border-border px-4 text-sm font-medium">
+                <button onClick={handleTryAgain} className="inline-flex h-11 w-28 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border-2 border-border px-4 text-sm font-medium hover:bg-accent transition-colors">
                   <RotateCcw className="h-4 w-4 flex-shrink-0" />
                   Try Again
                 </button>
-                <button onClick={handleRetake} className="inline-flex h-11 w-48 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border-2 border-border px-4 text-sm font-medium">
+                <button onClick={handleRetake} className="inline-flex h-11 w-48 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border-2 border-border px-4 text-sm font-medium hover:bg-accent transition-colors">
                   <Repeat className="h-4 w-4 flex-shrink-0" />
                   New-Question Retake
                 </button>
