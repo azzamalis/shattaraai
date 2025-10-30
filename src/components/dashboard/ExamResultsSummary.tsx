@@ -222,9 +222,9 @@ export function ExamResultsSummary() {
 
               {/* Preview Link */}
               <div className="mb-6 flex justify-center text-sm font-semibold text-foreground/60">
-                <button className="flex h-10 w-32 items-center justify-center rounded-xl px-4 py-2 text-center underline hover:text-foreground">
-                  Preview {examAttempt?.exams?.title || 'Exam 1'}
-                </button>
+              <button className="flex h-10 w-32 items-center justify-center rounded-xl px-4 py-2 text-center underline hover:text-foreground whitespace-nowrap">
+                Preview {examAttempt?.exams?.title || 'Exam 1'}
+              </button>
               </div>
 
               {/* Chapter Breakdown */}
