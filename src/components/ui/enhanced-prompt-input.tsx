@@ -201,7 +201,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-9 w-fit px-2 gap-1 rounded-full"
+                  className="size-9 w-fit px-2 gap-1 rounded-full text-primary/60 hover:text-primary/80 hover:bg-transparent"
                 >
                   <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
                   <span className="text-xs capitalize md:block hidden">
