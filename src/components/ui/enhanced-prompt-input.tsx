@@ -185,9 +185,9 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
 
               <PromptInputAction tooltip="Search the web">
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => setDeepSearchActive(!deepSearchActive)}
-                  className={`rounded-full ${deepSearchActive ? 'bg-accent' : ''}`}
+                  className={`rounded-full ${deepSearchActive ? 'bg-primary/5 text-primary' : ''}`}
                 >
                   <Globe size={18} />
                   Search
