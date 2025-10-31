@@ -211,12 +211,12 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                     <ChevronDown className="h-4 w-4 opacity-50" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-2">
+                <DropdownMenuContent align="start" className="w-56">
                   {AI_MODELS.map((model) => (
                     <DropdownMenuItem
                       key={model.value}
                       onClick={() => setSelectedModel(model.value)}
-                      className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? 'bg-accent' : ''}`}
+                      className={`flex items-center justify-between ${selectedModel === model.value ? 'bg-accent' : ''}`}
                     >
                       <div className="flex items-center gap-2">
                         {selectedModel === model.value && (
