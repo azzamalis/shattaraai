@@ -26,18 +26,18 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
           <Button 
             variant="ghost" 
             className="w-full flex items-center justify-start gap-2 
-              bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
-              transition-colors duration-200 rounded-lg py-2 px-2"
+              bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
+              transition-all duration-200 rounded-xl py-2 px-2"
           >
-            <MessageCircle className="h-4 w-4 text-primary/60" />
+            <MessageCircle className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Feedback</span>
           </Button>
         </FeedbackPopover>
         
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
-            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
-            transition-colors duration-200 rounded-lg py-2 px-2" onClick={onTutorialClick}>
-          <Book className="h-4 w-4 text-primary/60" />
+            bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
+            transition-all duration-200 rounded-xl py-2 px-2" onClick={onTutorialClick}>
+          <Book className="h-4 w-4 text-muted-foreground" />
           <span className="relative text-sm font-medium">
             Tutorial
             <span className="absolute -top-1.5 right-[-6px] flex h-1.5 w-1.5">
@@ -48,25 +48,25 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
         </Button>
 
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
-            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
-            transition-colors duration-200 rounded-lg py-2 px-2" asChild>
+            bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
+            transition-all duration-200 rounded-xl py-2 px-2" asChild>
           <Link to="/reports" className="flex items-center gap-2">
-            <BarChart className="h-4 w-4 text-primary/60" />
+            <BarChart className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Reports</span>
           </Link>
         </Button>
         
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
-            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
-            transition-colors duration-200 rounded-lg py-2 px-2" onClick={onCalculatorClick}>
-          <Calculator className="h-4 w-4 text-primary/60" />
+            bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
+            transition-all duration-200 rounded-xl py-2 px-2" onClick={onCalculatorClick}>
+          <Calculator className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">Calculator</span>
         </Button>
 
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
-            bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
-            transition-colors duration-200 rounded-lg py-2 px-2" onClick={onInviteEarnClick}>
-          <Gift className="h-4 w-4 text-primary/60" />
+            bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
+            transition-all duration-200 rounded-xl py-2 px-2" onClick={onInviteEarnClick}>
+          <Gift className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">Invite & Earn</span>
         </Button>
       </div>

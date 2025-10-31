@@ -74,8 +74,8 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange, onSettingsOpen }
           variant="ghost"
           className="w-full flex items-center justify-between gap-3 hover:bg-accent transition-colors duration-200 py-6 px-2 h-auto data-[state=open]:bg-accent"
         >
-          <Avatar className="h-8 w-8 rounded-lg grayscale border-2 border-border">
-            <AvatarFallback className="rounded-lg bg-primary text-primary-foreground font-medium">
+          <Avatar className="h-8 w-8 rounded-xl grayscale border-2 border-border">
+            <AvatarFallback className="rounded-xl bg-primary text-primary-foreground font-medium">
               {userInitials}
             </AvatarFallback>
           </Avatar>
@@ -95,8 +95,8 @@ export const NavUser: React.FC<NavUserProps> = ({ onOpenChange, onSettingsOpen }
       >
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm bg-muted/50">
-            <Avatar className="h-8 w-8 rounded-lg border-2 border-border">
-              <AvatarFallback className="rounded-lg bg-primary text-primary-foreground font-medium">
+            <Avatar className="h-8 w-8 rounded-xl border-2 border-border">
+              <AvatarFallback className="rounded-xl bg-primary text-primary-foreground font-medium">
                 {userInitials}
               </AvatarFallback>
             </Avatar>

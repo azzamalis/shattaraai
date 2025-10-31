@@ -65,9 +65,9 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
       <h2 className="ml-2 mb-2 text-foreground text-sm font-semibold">Rooms</h2>
       <div className="flex w-full flex-col space-y-1">
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
-            bg-transparent border-2 border-dashed border-primary/10 
-            text-primary/80 hover:bg-primary/5 hover:text-primary hover:border-primary/10
-            transition-colors duration-200 rounded-lg py-2 px-2 mb-1
+            bg-accent text-accent-foreground 
+            hover:bg-primary/5 hover:text-primary
+            transition-all duration-200 rounded-xl py-2 px-2 mb-1
             disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleAddRoomClick} disabled={isCreating}>
           <Plus className="h-4 w-4" />
           <span className="text-sm font-medium">
@@ -78,8 +78,8 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
         {visibleRooms.map(room => <RoomItem key={room.id} room={room} editingRoomId={editingRoomId} editedRoomName={editedRoomName} setEditedRoomName={setEditedRoomName} onRoomClick={handleRoomClick} onRenameClick={handleRenameClick} onSaveRename={handleSaveRenameWithEdit} onCancelRename={handleCancelRename} onDeleteClick={handleDeleteClick} />)}
 
         {hasHiddenRooms && <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
-              bg-transparent text-primary/80 hover:bg-primary/5 hover:text-primary
-              transition-colors duration-200 rounded-lg py-2 px-2" onClick={() => setShowMoreRooms(!showMoreRooms)}>
+              bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
+              transition-all duration-200 rounded-xl py-2 px-2" onClick={() => setShowMoreRooms(!showMoreRooms)}>
             <ChevronDown className="h-4 w-4" />
             <span className="text-sm font-normal">
               {showMoreRooms ? 'Show less' : `Show ${rooms.length - 3} more`}

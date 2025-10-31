@@ -95,11 +95,11 @@ export function DashboardDrawer({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r border-border`} closeButton={false}>
+        <SheetContent side="left" className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r-2 border-border`} closeButton={false}>
           {/* Header with Logo */}
           <div className="flex items-center justify-between px-4 py-4 mb-2">
             <Logo className="h-8 w-auto" textColor="text-foreground" />
-            <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-foreground hover:text-foreground hover:bg-accent rounded-lg h-8 w-8">
+            <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-foreground hover:text-foreground hover:bg-accent rounded-xl h-8 w-8">
               <ChevronsLeft className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
             </Button>
@@ -110,9 +110,9 @@ export function DashboardDrawer({
               {/* Add Content Button */}
               <div className="w-full">
                 <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
-                    bg-transparent border-2 border-dashed border-primary/10 
-                    text-primary hover:bg-primary/5 hover:text-primary hover:border-primary/10
-                    transition-colors duration-200 rounded-lg py-2 px-2" onClick={() => {
+                    bg-accent text-accent-foreground 
+                    hover:bg-primary/5 hover:text-primary
+                    transition-all duration-200 rounded-xl py-2 px-2" onClick={() => {
                 navigate('/dashboard');
                 onOpenChange(false);
               }}>
