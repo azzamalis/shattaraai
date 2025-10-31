@@ -91,11 +91,11 @@ export const RecentItem: React.FC<RecentItemProps> = ({
   };
   return <div className="flex items-center justify-between gap-2 group">
       {isEditing ? <RecentItemEditor value={editedTitle} onChange={setEditedTitle} onSave={handleSaveRename} onCancel={handleCancelRename} onKeyDown={handleKeyDown} /> : <>
-          <Link to={getRouteForContent()} className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-primary/5 hover:text-primary transition-all duration-200 flex-1 min-w-0">
+          <Link to={getRouteForContent()} className="flex items-center gap-2 px-2 py-2 rounded-xl hover:bg-primary/5 hover:text-primary transition-all duration-200 flex-1 min-w-0">
             <div className="flex-shrink-0 w-4 h-4">
               <ContentTypeIcon type={content.type} />
             </div>
-            <span className="text-foreground truncate text-sm font-normal min-w-0">
+            <span className="text-muted-foreground truncate text-sm font-medium min-w-0">
               {content.title}
             </span>
           </Link>
