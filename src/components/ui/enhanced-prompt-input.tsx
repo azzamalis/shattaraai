@@ -197,19 +197,19 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
 
             <div className="flex items-center gap-2">
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-9 w-fit px-2 gap-1 rounded-full text-primary/60 hover:bg-primary/5 dark:hover:bg-primary/10"
-                  >
-                    <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
-                    <span className="text-xs capitalize md:block hidden">
-                      {AI_MODELS.find(model => model.value === selectedModel)?.label}
-                    </span>
-                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-9 w-fit px-2 gap-1 rounded-full"
+                >
+                  <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
+                  <span className="text-xs capitalize md:block hidden">
+                    {AI_MODELS.find(model => model.value === selectedModel)?.label}
+                  </span>
+                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5">
                   {AI_MODELS.map((model) => (
                     <DropdownMenuItem
