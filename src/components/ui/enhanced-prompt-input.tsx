@@ -18,12 +18,12 @@ import {
 } from '@/components/prompt-kit/prompt-input';
 
 const AI_MODELS = [
-  { value: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash" },
-  { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro" },
-  { value: "google/gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Lite" },
-  { value: "openai/gpt-5", label: "GPT-5" },
-  { value: "openai/gpt-5-mini", label: "GPT-5 Mini" },
-  { value: "openai/gpt-5-nano", label: "GPT-5 Nano" },
+  { value: "auto", label: "Auto", isPremium: false },
+  { value: "openai/gpt-5-mini", label: "GPT-5 Mini", isPremium: false },
+  { value: "anthropic/claude-sonnet-4-5", label: "Claude 4.5 Sonnet", isPremium: true },
+  { value: "openai/gpt-5", label: "GPT-5", isPremium: true },
+  { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro", isPremium: true },
+  { value: "xai/grok-4", label: "Grok 4", isPremium: true },
 ];
 
 interface EnhancedPromptInputProps {
@@ -95,7 +95,7 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
 export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [selectedModel, setSelectedModel] = useState('google/gemini-2.5-flash');
+  const [selectedModel, setSelectedModel] = useState('openai/gpt-5-mini');
   const [deepSearchActive, setDeepSearchActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -216,11 +216,18 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                     <DropdownMenuItem
                       key={model.value}
                       onClick={() => setSelectedModel(model.value)}
-                      className={selectedModel === model.value ? 'bg-accent' : ''}
+                      className={`flex items-center justify-between ${selectedModel === model.value ? 'bg-accent' : ''}`}
                     >
-                      {model.label}
-                      {selectedModel === model.value && (
-                        <span className="ml-auto">✓</span>
+                      <div className="flex items-center gap-2">
+                        {selectedModel === model.value && (
+                          <span className="text-primary">✓</span>
+                        )}
+                        <span>{model.label}</span>
+                      </div>
+                      {model.isPremium && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
+                          Upgrade
+                        </span>
                       )}
                     </DropdownMenuItem>
                   ))}
