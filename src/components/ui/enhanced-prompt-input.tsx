@@ -187,7 +187,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                 <Button
                   variant="ghost"
                   onClick={() => setDeepSearchActive(!deepSearchActive)}
-                  className={`rounded-full ${deepSearchActive ? 'bg-primary/5 text-primary' : ''}`}
+                  className={`rounded-full ${deepSearchActive ? 'bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary' : ''}`}
                 >
                   <Globe size={18} />
                   Search
