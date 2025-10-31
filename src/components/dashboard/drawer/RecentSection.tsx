@@ -37,7 +37,7 @@ export const RecentSection: React.FC<RecentSectionProps> = ({
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 text-muted-foreground font-medium">
       {recentContent.slice(0, 5).map((content) => (
         <RecentItem
           key={content.id}

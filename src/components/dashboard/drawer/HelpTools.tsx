@@ -21,7 +21,7 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
   return (
     <div>
       <h2 className="ml-2 mb-2 text-foreground text-sm font-semibold">Help & Tools</h2>
-      <div className="flex flex-col space-y-1">
+      <div className="flex flex-col space-y-1 text-muted-foreground font-medium">
         <FeedbackPopover>
           <Button 
             variant="ghost" 
@@ -29,7 +29,7 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
               bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
               transition-all duration-200 rounded-xl py-2 px-2"
           >
-            <MessageCircle className="h-4 w-4 text-muted-foreground" />
+            <MessageCircle className="h-4 w-4" />
             <span className="text-sm font-medium">Feedback</span>
           </Button>
         </FeedbackPopover>
@@ -37,7 +37,7 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
             bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
             transition-all duration-200 rounded-xl py-2 px-2" onClick={onTutorialClick}>
-          <Book className="h-4 w-4 text-muted-foreground" />
+          <Book className="h-4 w-4" />
           <span className="relative text-sm font-medium">
             Tutorial
             <span className="absolute -top-1.5 right-[-6px] flex h-1.5 w-1.5">
@@ -51,7 +51,7 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
             bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
             transition-all duration-200 rounded-xl py-2 px-2" asChild>
           <Link to="/reports" className="flex items-center gap-2">
-            <BarChart className="h-4 w-4 text-muted-foreground" />
+            <BarChart className="h-4 w-4" />
             <span className="text-sm font-medium">Reports</span>
           </Link>
         </Button>
@@ -59,14 +59,14 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
             bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
             transition-all duration-200 rounded-xl py-2 px-2" onClick={onCalculatorClick}>
-          <Calculator className="h-4 w-4 text-muted-foreground" />
+          <Calculator className="h-4 w-4" />
           <span className="text-sm font-medium">Calculator</span>
         </Button>
 
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
             bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
             transition-all duration-200 rounded-xl py-2 px-2" onClick={onInviteEarnClick}>
-          <Gift className="h-4 w-4 text-muted-foreground" />
+          <Gift className="h-4 w-4" />
           <span className="text-sm font-medium">Invite & Earn</span>
         </Button>
       </div>
