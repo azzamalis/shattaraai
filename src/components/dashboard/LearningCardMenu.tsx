@@ -43,7 +43,7 @@ export function LearningCardMenu({
           className={cn(
             "absolute z-30 top-2.5 right-2.5",
             "p-1 hover:scale-110 duration-200 cursor-pointer rounded-full",
-            "bg-muted/50 hover:bg-accent transition-all",
+            "lg:bg-transparent hover:bg-accent transition-all",
             "group-hover:bg-accent"
           )}
         >
