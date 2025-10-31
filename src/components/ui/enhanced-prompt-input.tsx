@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown } from 'lucide-react';
+import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -196,13 +196,18 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="rounded-full gap-2"
+                  <button
+                    type="button"
+                    className="flex items-center justify-between h-7 p-1.5 w-fit border-none focus:border-none focus:ring-0 focus:outline-none focus:ring-offset-0 text-primary/60 bg-transparent transition-all hover:bg-primary/5 dark:hover:bg-primary/10 rounded-full mb-1"
                   >
-                    {AI_MODELS.find(model => model.value === selectedModel)?.label}
-                    <ChevronDown size={18} />
-                  </Button>
+                    <div className="flex items-center text-xs mr-1 pl-0.5">
+                      <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
+                      <span className="capitalize md:block hidden">
+                        {AI_MODELS.find(model => model.value === selectedModel)?.label}
+                      </span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
                   {AI_MODELS.map((model) => (
