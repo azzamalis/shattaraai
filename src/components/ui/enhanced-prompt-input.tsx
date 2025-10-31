@@ -197,7 +197,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     className="size-9 rounded-full"
                   >
