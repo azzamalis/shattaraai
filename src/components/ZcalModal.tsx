@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface ZcalModalProps {
   children: React.ReactNode;
@@ -31,7 +31,6 @@ const ZcalModal = ({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { toast } = useToast();
 
   const handleIframeLoad = () => {
     setIsLoading(false);
@@ -41,11 +40,7 @@ const ZcalModal = ({
     setIsLoading(false);
     setHasError(true);
     
-    toast({
-      title: "Booking Calendar Error",
-      description: "We couldn't load the booking calendar. Please try again later.",
-      variant: "destructive",
-    });
+    toast.error("We couldn't load the booking calendar. Please try again later.");
   };
 
   // Listen for messages from the iframe
@@ -57,10 +52,7 @@ const ZcalModal = ({
           const data = event.data;
           if (data.type === 'booking_completed') {
             // Show success toast
-            toast({
-              title: "Demo Scheduled!",
-              description: "We've received your request and will be in touch soon.",
-            });
+            toast.success("We've received your request and will be in touch soon.");
             
             // Close modal after booking
             setIsOpen(false);
@@ -73,7 +65,7 @@ const ZcalModal = ({
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [toast]);
+  }, []);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

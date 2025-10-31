@@ -3,7 +3,7 @@ import { BaseModal } from '@/components/ui/base-modal';
 import { DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Crown, Zap, MessageSquare, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 interface InviteEarnModalProps {
@@ -15,7 +15,6 @@ export function InviteEarnModal({
   open,
   onOpenChange
 }: InviteEarnModalProps) {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const inviteCode = "INVITE123";
   const inviteLink = `https://shattara.com/invite/${inviteCode}`;
@@ -23,16 +22,9 @@ export function InviteEarnModal({
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(inviteLink);
-      toast({
-        title: "Link copied!",
-        description: "Invite link has been copied to your clipboard."
-      });
+      toast.success("Invite link has been copied to your clipboard.");
     } catch (error) {
-      toast({
-        title: "Failed to copy",
-        description: "Please copy the link manually.",
-        variant: "destructive"
-      });
+      toast.error("Failed to copy. Please copy the link manually.");
     }
   };
 

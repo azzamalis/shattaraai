@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Image, X } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 interface FeedbackPopoverProps {
   children: React.ReactNode;
 }
@@ -12,9 +12,6 @@ export function FeedbackPopover({
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
-  const {
-    toast
-  } = useToast();
   const handleSubmit = async () => {
     if (!feedback.trim()) return;
     setIsSubmitting(true);
@@ -24,11 +21,7 @@ export function FeedbackPopover({
       setIsSubmitting(false);
       setFeedback('');
       setOpen(false);
-      toast({
-        title: "Feedback Sent",
-        description: "Thank you for your feedback!",
-        duration: 3000
-      });
+      toast.success("Thank you for your feedback!");
     }, 1000);
   };
   return <>

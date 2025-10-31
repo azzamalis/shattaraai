@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { uploadFileToStorage } from '@/lib/storage';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
 
 export interface ChatMessage {

@@ -6,34 +6,23 @@ import { Label } from "@/components/ui/label";
 import { Facebook, Instagram, Linkedin, Twitter, Loader2 } from "lucide-react";
 import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ThemeToggle } from './theme-toggle';
 
 function StackedCircularFooter() {
   const currentYear = new Date().getFullYear();
-  const {
-    toast
-  } = useToast();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
-      toast({
-        title: "Email Required",
-        description: "Please enter your email address to subscribe.",
-        variant: "destructive"
-      });
+      toast.error("Please enter your email address to subscribe.");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid email address.",
-        variant: "destructive"
-      });
+      toast.error("Please enter a valid email address.");
       return;
     }
     setIsSubmitting(true);
@@ -49,30 +38,20 @@ function StackedCircularFooter() {
       if (error) {
         // Check if it's a 409 conflict (already subscribed)
         if (error.message && error.message.includes('already subscribed')) {
-          toast({
-            title: "Already Subscribed!",
-            description: "You're already subscribed to our newsletter. Thank you!"
-          });
+          toast.success("You're already subscribed to our newsletter. Thank you!");
           setEmail(''); // Clear the form
           return;
         }
         throw error;
       }
-      toast({
-        title: "Successfully Subscribed!",
-        description: "Thank you for subscribing! Check your email for a welcome message."
-      });
+      toast.success("Thank you for subscribing! Check your email for a welcome message.");
       setEmail(''); // Clear the form
     } catch (error: any) {
       console.error('Error subscribing to newsletter:', error);
 
       // Handle specific error messages from the backend
       const errorMessage = error.message || "Failed to subscribe to newsletter. Please try again later.";
-      toast({
-        title: "Subscription Failed",
-        description: errorMessage,
-        variant: "destructive"
-      });
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

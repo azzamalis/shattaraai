@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { MapPin, Mail, Phone, MessageCircle, Headphones, BookOpen, Building, Loader2 } from 'lucide-react';
 interface ContactFormData {
@@ -21,9 +21,6 @@ interface FormErrors {
   message?: string;
 }
 const Contact = () => {
-  const {
-    toast
-  } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
@@ -68,11 +65,7 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
-      toast({
-        title: "Validation Error",
-        description: "Please fix the errors in the form before submitting.",
-        variant: "destructive"
-      });
+      toast.error("Please fix the errors in the form before submitting.");
       return;
     }
     setIsSubmitting(true);
@@ -86,10 +79,7 @@ const Contact = () => {
       if (error) {
         throw error;
       }
-      toast({
-        title: "Message Sent Successfully!",
-        description: "Thank you for your message. We'll get back to you within 24-48 hours."
-      });
+      toast.success("Thank you for your message. We'll get back to you within 24-48 hours.");
       setFormData({
         name: '',
         email: '',
@@ -98,11 +88,7 @@ const Contact = () => {
       });
     } catch (error: any) {
       console.error('Error sending contact form:', error);
-      toast({
-        title: "Failed to Send Message",
-        description: "There was an error sending your message. Please try again or contact us directly.",
-        variant: "destructive"
-      });
+      toast.error("There was an error sending your message. Please try again or contact us directly.");
     } finally {
       setIsSubmitting(false);
     }

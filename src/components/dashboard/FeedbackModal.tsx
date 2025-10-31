@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/compone
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, Image, X } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 interface FeedbackModalProps {
   open: boolean;
@@ -13,7 +13,6 @@ interface FeedbackModalProps {
 export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
 
   const handleSubmit = async () => {
     if (!feedback.trim()) return;
@@ -26,11 +25,7 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
       setFeedback('');
       onOpenChange(false);
       
-      toast({
-        title: "Feedback Sent",
-        description: "Thank you for your feedback!",
-        duration: 3000,
-      });
+      toast.success("Thank you for your feedback!");
     }, 1000);
   };
 

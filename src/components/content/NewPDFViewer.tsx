@@ -5,7 +5,7 @@ import { Upload, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useTheme } from '@/hooks/useTheme';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -27,9 +27,6 @@ export function NewPDFViewer({
   const [pdfUrl, setPdfUrl] = useState<string>(contentData?.url || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
-    toast
-  } = useToast();
-  const {
     theme
   } = useTheme();
 
@@ -39,11 +36,7 @@ export function NewPDFViewer({
     const file = event.target.files?.[0];
     if (!file) return;
     if (file.type !== 'application/pdf') {
-      toast({
-        title: "Invalid file type",
-        description: "Please select a PDF file",
-        variant: "destructive"
-      });
+      toast.error("Please select a PDF file");
       return;
     }
     setUploading(true);
@@ -76,17 +69,10 @@ export function NewPDFViewer({
       } = supabase.storage.from('user-uploads').getPublicUrl(data.path);
       setPdfUrl(publicUrl);
       onFileUploaded?.(publicUrl);
-      toast({
-        title: "Upload successful",
-        description: "Your PDF has been uploaded and is ready to view"
-      });
+      toast.success("Your PDF has been uploaded and is ready to view");
     } catch (error) {
       console.error('Upload error:', error);
-      toast({
-        title: "Upload failed",
-        description: "Failed to upload PDF. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Failed to upload PDF. Please try again.");
     } finally {
       setUploading(false);
       if (fileInputRef.current) {

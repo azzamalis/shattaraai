@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Copy, Check } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 interface UpgradeModalProps {
   onClose: () => void;
@@ -13,11 +13,7 @@ export function UpgradeModal({
   const [activePlan, setActivePlan] = useState<'annual' | 'monthly'>('annual');
   const copyPromoCode = () => {
     navigator.clipboard.writeText('FINALS25');
-    toast({
-      title: "Promo code copied!",
-      description: "The promo code FINALS25 has been copied to your clipboard.",
-      duration: 3000
-    });
+    toast.success("Promo code FINALS25 copied to clipboard!");
   };
   return <DialogContent className="bg-[#111] border border-zinc-800 p-0 max-w-[600px] text-white">
       {/* Close button */}
