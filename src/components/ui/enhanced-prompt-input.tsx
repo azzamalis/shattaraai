@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown, Sparkles } from 'lucide-react';
+import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown, Sparkles, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -213,23 +213,24 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5">
                   {AI_MODELS.map((model) => (
-                    <DropdownMenuItem
-                      key={model.value}
-                      onClick={() => setSelectedModel(model.value)}
-                      className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? 'bg-accent' : ''}`}
-                    >
-                      <div className="flex items-center gap-2">
+                    <div key={model.value} className="flex items-center gap-2">
+                      <div className="w-4 h-4 flex items-center justify-center">
                         {selectedModel === model.value && (
-                          <span className="text-primary">✓</span>
+                          <Check className="h-4 w-4 text-primary" />
                         )}
-                        <span>{model.label}</span>
                       </div>
-                      {model.isPremium && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
-                          Upgrade
-                        </span>
-                      )}
-                    </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setSelectedModel(model.value)}
+                        className={`flex items-center justify-between rounded-xl flex-1 ${selectedModel === model.value ? 'bg-accent' : ''}`}
+                      >
+                        <span>{model.label}</span>
+                        {model.isPremium && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
+                            Upgrade
+                          </span>
+                        )}
+                      </DropdownMenuItem>
+                    </div>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
