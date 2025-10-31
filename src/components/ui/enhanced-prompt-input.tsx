@@ -193,7 +193,9 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                   Search
                 </Button>
               </PromptInputAction>
+            </div>
 
+            <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -224,9 +226,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
 
-            <div className="flex items-center gap-2">
               <PromptInputAction tooltip="Voice input">
                 <Button
                   variant="outline"
