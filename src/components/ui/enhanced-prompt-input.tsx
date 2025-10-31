@@ -174,7 +174,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
             <div className="flex items-center gap-2">
               <PromptInputAction tooltip="Attach files">
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="icon"
                   onClick={handleFileAttach}
                   className="size-9 rounded-full"
