@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon } from 'lucide-react';
+import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -198,10 +198,10 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="size-9 rounded-full"
+                    className="rounded-full gap-2"
                   >
-                    <MoreHorizontal size={18} />
+                    {AI_MODELS.find(model => model.value === selectedModel)?.label}
+                    <ChevronDown size={18} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
