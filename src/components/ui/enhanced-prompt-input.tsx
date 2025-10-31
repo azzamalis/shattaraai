@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown, Sparkles } from 'lucide-react';
+import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown, Sparkles, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -220,7 +220,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                     >
                       <div className="flex items-center gap-2">
                         {selectedModel === model.value && (
-                          <span className="text-primary">✓</span>
+                          <Check className="h-4 w-4 text-primary" />
                         )}
                         <span>{model.label}</span>
                       </div>
