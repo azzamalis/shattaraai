@@ -56,7 +56,7 @@ export const RoomItem: React.FC<RoomItemProps> = ({
               <div className="flex-shrink-0 w-4 h-4">
                 <Box className="h-4 w-4 text-muted-foreground" />
               </div>
-              <span className="truncate text-sm font-medium min-w-0">{room.name}</span>
+              <span className="truncate text-sm min-w-0">{room.name}</span>
             </div>
           </Button>
           <DropdownMenu>
