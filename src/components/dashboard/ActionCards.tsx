@@ -207,7 +207,7 @@ export function ActionCards({
                         <div className="flex items-center gap-x-1">
                           <h3 className="text-sm text-left text-primary/80 group-hover:text-primary font-medium sm:text-base">Paste</h3>
                         </div>
-                        <p className="text-xs group-hover:text-primary/80 text-left text-primary/60 font-medium sm:text-sm">YouTube, website, text</p>
+                        <p className="text-xs group-hover:text-primary/80 text-left text-primary/60 font-medium sm:text-sm">YouTube, Website, Text</p>
                       </div>
                     </div>
                   </div>
