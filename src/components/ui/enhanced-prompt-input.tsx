@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown, Sparkles, Check } from 'lucide-react';
+import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,12 +18,12 @@ import {
 } from '@/components/prompt-kit/prompt-input';
 
 const AI_MODELS = [
-  { value: "auto", label: "Auto", isPremium: false },
-  { value: "openai/gpt-5-mini", label: "GPT-5 Mini", isPremium: false },
-  { value: "anthropic/claude-sonnet-4-5", label: "Claude 4.5 Sonnet", isPremium: true },
-  { value: "openai/gpt-5", label: "GPT-5", isPremium: true },
-  { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro", isPremium: true },
-  { value: "xai/grok-4", label: "Grok 4", isPremium: true },
+  { value: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash" },
+  { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+  { value: "google/gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Lite" },
+  { value: "openai/gpt-5", label: "GPT-5" },
+  { value: "openai/gpt-5-mini", label: "GPT-5 Mini" },
+  { value: "openai/gpt-5-nano", label: "GPT-5 Nano" },
 ];
 
 interface EnhancedPromptInputProps {
@@ -95,7 +95,7 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
 export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [selectedModel, setSelectedModel] = useState('openai/gpt-5-mini');
+  const [selectedModel, setSelectedModel] = useState('google/gemini-2.5-flash');
   const [deepSearchActive, setDeepSearchActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -193,46 +193,40 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                   Search
                 </Button>
               </PromptInputAction>
-            </div>
 
-            <div className="flex items-center gap-2">
               <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-9 w-fit px-2 gap-1 rounded-full"
-                >
-                  <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
-                  <span className="text-xs capitalize md:block hidden">
-                    {AI_MODELS.find(model => model.value === selectedModel)?.label}
-                  </span>
-                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                </Button>
-              </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5">
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center justify-between h-7 p-1.5 w-fit border-none focus:border-none focus:ring-0 focus:outline-none focus:ring-offset-0 text-primary/60 bg-transparent transition-all hover:bg-primary/5 dark:hover:bg-primary/10 rounded-full mb-1"
+                  >
+                    <div className="flex items-center text-xs mr-1 pl-0.5">
+                      <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
+                      <span className="capitalize md:block hidden">
+                        {AI_MODELS.find(model => model.value === selectedModel)?.label}
+                      </span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
                   {AI_MODELS.map((model) => (
                     <DropdownMenuItem
                       key={model.value}
                       onClick={() => setSelectedModel(model.value)}
-                      className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? 'bg-accent' : ''}`}
+                      className={selectedModel === model.value ? 'bg-accent' : ''}
                     >
-                      <div className="flex items-center gap-2">
-                        {selectedModel === model.value && (
-                          <Check className="h-4 w-4 text-primary" />
-                        )}
-                        <span>{model.label}</span>
-                      </div>
-                      {model.isPremium && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
-                          Upgrade
-                        </span>
+                      {model.label}
+                      {selectedModel === model.value && (
+                        <span className="ml-auto">✓</span>
                       )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+            </div>
 
+            <div className="flex items-center gap-2">
               <PromptInputAction tooltip="Voice input">
                 <Button
                   variant="outline"
