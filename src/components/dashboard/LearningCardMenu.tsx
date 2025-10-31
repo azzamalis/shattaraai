@@ -43,11 +43,11 @@ export function LearningCardMenu({
           className={cn(
             "absolute z-30 top-2.5 right-2.5",
             "p-1 hover:scale-110 duration-200 cursor-pointer rounded-full",
-            "bg-accent/50 hover:bg-accent active:bg-accent/80",
+            "bg-accent/50 hover:bg-accent",
             "group-hover:bg-accent transition-all"
           )}
         >
-          <MoreVertical className="w-3.5 h-3.5 opacity-100 xl:opacity-0 group-hover:opacity-100 text-accent-foreground hover:text-accent-foreground active:text-accent-foreground" />
+          <MoreVertical className="w-3.5 h-3.5 opacity-100 xl:opacity-0 group-hover:opacity-100 text-accent-foreground" />
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-1" side="right" align="start" sideOffset={8}>
