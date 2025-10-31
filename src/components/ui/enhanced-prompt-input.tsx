@@ -205,8 +205,6 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuLabel>AI Model</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
                   {AI_MODELS.map((model) => (
                     <DropdownMenuItem
                       key={model.value}
