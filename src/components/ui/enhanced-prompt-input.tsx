@@ -28,8 +28,6 @@ import {
   PromptInputActions,
   PromptInputAction,
 } from "@/components/prompt-kit/prompt-input";
-import { useAuth } from "@/hooks/useAuth";
-import { UpgradeModal } from "@/components/dashboard/UpgradeModal";
 
 const AI_MODELS = [
   { value: "auto", label: "Auto", isPremium: false },
@@ -109,12 +107,9 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState("openai/gpt-5-mini");
   const [deepSearchActive, setDeepSearchActive] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { profile } = useAuth();
 
   const hasContent = inputValue.trim().length > 0 || attachedFiles.length > 0;
-  const isFreePlan = profile?.plan_type === 'free' || !profile?.plan_type;
 
   const handleFileAttach = () => {
     fileInputRef.current?.click();
@@ -220,13 +215,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                   {AI_MODELS.map((model) => (
                     <DropdownMenuItem
                       key={model.value}
-                      onClick={() => {
-                        if (model.isPremium && isFreePlan) {
-                          setShowUpgradeModal(true);
-                        } else {
-                          setSelectedModel(model.value);
-                        }
-                      }}
+                      onClick={() => setSelectedModel(model.value)}
                       className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? "bg-accent" : ""}`}
                     >
                       <div className="flex items-center gap-2">
@@ -266,9 +255,6 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
         onChange={handleFileChange}
         className="hidden"
       />
-
-      {/* Upgrade Modal */}
-      <UpgradeModal open={showUpgradeModal} onOpenChange={setShowUpgradeModal} />
     </>
   );
 }
