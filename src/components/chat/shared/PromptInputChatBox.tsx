@@ -9,7 +9,7 @@ import {
 } from "@/components/prompt-kit/prompt-input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ArrowUp, Plus, Mic, AtSign, Brain, X } from "lucide-react";
+import { ArrowUp, Plus, Mic, AtSign, Brain, X, ChevronDown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PromptInputChatBoxProps {
@@ -162,12 +162,16 @@ export function PromptInputChatBox({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="outline"
-                      className="rounded-full h-9 px-3"
+                      variant="ghost"
+                      size="icon"
+                      className="size-9 w-fit px-2 gap-1 rounded-full text-primary/60 hover:text-primary/80 hover:bg-transparent"
                       type="button"
                     >
-                      <Brain size={18} />
-                      <span className="ml-2 text-sm">{selectedModel}</span>
+                      <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
+                      <span className="text-xs capitalize md:block hidden">
+                        {selectedModel}
+                      </span>
+                      <ChevronDown className="h-3.5 w-3.5 opacity-50" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" side="top" className="w-48 bg-popover">
