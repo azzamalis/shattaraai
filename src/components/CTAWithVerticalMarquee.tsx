@@ -137,7 +137,7 @@ export default function CTAWithVerticalMarquee() {
                 {marqueeItems.map((item, idx) => (
                   <div 
                     key={idx} 
-                    className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight py-8 marquee-item"
+                    className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium tracking-tight py-8 marquee-item"
                   >
                     {item}
                   </div>
