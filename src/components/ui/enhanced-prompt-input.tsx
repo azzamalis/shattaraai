@@ -1,7 +1,19 @@
-import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Globe, ArrowUp, MoreHorizontal, Mic, X, FileText, Image as ImageIcon, ChevronDown, Sparkles, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Plus,
+  Globe,
+  ArrowUp,
+  MoreHorizontal,
+  Mic,
+  X,
+  FileText,
+  Image as ImageIcon,
+  ChevronDown,
+  Sparkles,
+  Check,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,18 +21,18 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   PromptInput,
   PromptInputTextarea,
   PromptInputActions,
   PromptInputAction,
-} from '@/components/prompt-kit/prompt-input';
+} from "@/components/prompt-kit/prompt-input";
 
 const AI_MODELS = [
   { value: "auto", label: "Auto", isPremium: false },
   { value: "openai/gpt-5-mini", label: "GPT-5 Mini", isPremium: false },
-  { value: "anthropic/claude-sonnet-4-5", label: "Claude 4.5 Sonnet", isPremium: true },
+  { value: "anthropic/claude-sonnet-4-5", label: "Claude 4.5", isPremium: true },
   { value: "openai/gpt-5", label: "GPT-5", isPremium: true },
   { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro", isPremium: true },
   { value: "xai/grok-4", label: "Grok 4", isPremium: true },
@@ -37,7 +49,7 @@ const filePreviewVariants = {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 25 },
+    transition: { type: "spring" as const, stiffness: 300, damping: 25 },
   },
   exit: {
     opacity: 0,
@@ -48,8 +60,8 @@ const filePreviewVariants = {
 };
 
 function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void }) {
-  const isPDF = file.type === 'application/pdf';
-  const isImage = file.type.startsWith('image/');
+  const isPDF = file.type === "application/pdf";
+  const isImage = file.type.startsWith("image/");
 
   return (
     <motion.div
@@ -76,9 +88,7 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
-        <p className="text-xs text-muted-foreground">
-          {(file.size / 1024).toFixed(1)} KB
-        </p>
+        <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</p>
       </div>
       <Button
         variant="ghost"
@@ -93,9 +103,9 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
 }
 
 export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInputProps) {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [selectedModel, setSelectedModel] = useState('openai/gpt-5-mini');
+  const [selectedModel, setSelectedModel] = useState("openai/gpt-5-mini");
   const [deepSearchActive, setDeepSearchActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -108,18 +118,18 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const validFiles = files.filter((file) => {
-      const isPDF = file.type === 'application/pdf';
-      const isImage = file.type.startsWith('image/');
+      const isPDF = file.type === "application/pdf";
+      const isImage = file.type.startsWith("image/");
       return isPDF || isImage;
     });
 
     if (validFiles.length !== files.length) {
-      console.warn('Some files were filtered out. Only PDF and image files are allowed.');
+      console.warn("Some files were filtered out. Only PDF and image files are allowed.");
     }
 
     setAttachedFiles((prev) => [...prev, ...validFiles]);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -130,7 +140,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
   const handleSubmit = () => {
     if (hasContent) {
       onSubmit?.(inputValue, attachedFiles.length > 0 ? attachedFiles : undefined);
-      setInputValue('');
+      setInputValue("");
       setAttachedFiles([]);
     }
   };
@@ -142,16 +152,12 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
         {attachedFiles.length > 0 && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="mb-3 space-y-2"
           >
             {attachedFiles.map((file, index) => (
-              <FilePreviewCard
-                key={`${file.name}-${index}`}
-                file={file}
-                onRemove={() => removeFile(index)}
-              />
+              <FilePreviewCard key={`${file.name}-${index}`} file={file} onRemove={() => removeFile(index)} />
             ))}
           </motion.div>
         )}
@@ -173,12 +179,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
           <PromptInputActions className="mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3">
             <div className="flex items-center gap-2">
               <PromptInputAction tooltip="Attach files">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleFileAttach}
-                  className="size-9 rounded-full"
-                >
+                <Button variant="outline" size="icon" onClick={handleFileAttach} className="size-9 rounded-full">
                   <Plus size={18} />
                 </Button>
               </PromptInputAction>
@@ -187,7 +188,7 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                 <Button
                   variant="ghost"
                   onClick={() => setDeepSearchActive(!deepSearchActive)}
-                  className={`rounded-full ${deepSearchActive ? 'bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary' : ''}`}
+                  className={`rounded-full ${deepSearchActive ? "bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary" : ""}`}
                 >
                   <Globe size={18} />
                   Search
@@ -197,30 +198,28 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
 
             <div className="flex items-center gap-2">
               <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-9 w-fit px-2 gap-1 rounded-full text-primary/60 hover:text-primary/80 hover:bg-transparent"
-                >
-                  <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
-                  <span className="text-xs capitalize md:block hidden">
-                    {AI_MODELS.find(model => model.value === selectedModel)?.label}
-                  </span>
-                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                </Button>
-              </DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-9 w-fit px-2 gap-1 rounded-full text-primary/60 hover:text-primary/80 hover:bg-transparent"
+                  >
+                    <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
+                    <span className="text-xs capitalize md:block hidden">
+                      {AI_MODELS.find((model) => model.value === selectedModel)?.label}
+                    </span>
+                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5">
                   {AI_MODELS.map((model) => (
                     <DropdownMenuItem
                       key={model.value}
                       onClick={() => setSelectedModel(model.value)}
-                      className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? 'bg-accent' : ''}`}
+                      className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? "bg-accent" : ""}`}
                     >
                       <div className="flex items-center gap-2">
-                        {selectedModel === model.value && (
-                          <Check className="h-4 w-4 text-primary" />
-                        )}
+                        {selectedModel === model.value && <Check className="h-4 w-4 text-primary" />}
                         <span>{model.label}</span>
                       </div>
                       {model.isPremium && (
@@ -234,22 +233,12 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
               </DropdownMenu>
 
               <PromptInputAction tooltip="Voice input">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-9 rounded-full"
-                  disabled
-                >
+                <Button variant="outline" size="icon" className="size-9 rounded-full" disabled>
                   <Mic size={18} />
                 </Button>
               </PromptInputAction>
 
-              <Button
-                size="icon"
-                disabled={!hasContent}
-                onClick={handleSubmit}
-                className="size-9 rounded-full"
-              >
+              <Button size="icon" disabled={!hasContent} onClick={handleSubmit} className="size-9 rounded-full">
                 <ArrowUp size={18} />
               </Button>
             </div>
