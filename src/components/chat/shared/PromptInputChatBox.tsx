@@ -133,6 +133,31 @@ export function PromptInputChatBox({
                 </Button>
               </PromptInputAction>
 
+              <div className="relative">
+                <PromptInputAction tooltip="Quick commands">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="size-9 rounded-full"
+                    type="button"
+                    onClick={() => setShowCommandDropdown(!showCommandDropdown)}
+                  >
+                    <AtSign size={18} />
+                  </Button>
+                </PromptInputAction>
+                
+                {showCommandDropdown && (
+                  <CommandDropdown
+                    commands={commandOptions}
+                    onSelect={(command) => {
+                      setInputValue(prev => `${prev}${prev ? ' ' : ''}Create a ${command.label} on`);
+                      setShowCommandDropdown(false);
+                    }}
+                    onClose={() => setShowCommandDropdown(false)}
+                  />
+                )}
+              </div>
+
               <PromptInputAction tooltip={selectedModel}>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -158,31 +183,6 @@ export function PromptInputChatBox({
                   </DropdownMenuContent>
                 </DropdownMenu>
               </PromptInputAction>
-
-              <div className="relative">
-                <PromptInputAction tooltip="Quick commands">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="size-9 rounded-full"
-                    type="button"
-                    onClick={() => setShowCommandDropdown(!showCommandDropdown)}
-                  >
-                    <AtSign size={18} />
-                  </Button>
-                </PromptInputAction>
-                
-                {showCommandDropdown && (
-                  <CommandDropdown
-                    commands={commandOptions}
-                    onSelect={(command) => {
-                      setInputValue(prev => `${prev}${prev ? ' ' : ''}Create a ${command.label} on`);
-                      setShowCommandDropdown(false);
-                    }}
-                    onClose={() => setShowCommandDropdown(false)}
-                  />
-                )}
-              </div>
             </div>
 
             <div className="flex items-center gap-2">
