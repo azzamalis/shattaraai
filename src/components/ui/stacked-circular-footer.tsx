@@ -1,6 +1,5 @@
 import React from 'react';
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
-import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
 
 function StackedCircularFooter() {
@@ -10,9 +9,8 @@ function StackedCircularFooter() {
     <footer className="bg-background text-foreground border-t border-border">
       <div className="container mx-auto px-8 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Left Side: Logo + Copyright */}
+          {/* Left Side: Copyright */}
           <div className="flex items-center gap-3">
-            <Logo textColor="text-foreground" className="scale-75" />
             <p className="text-sm text-muted-foreground whitespace-nowrap">
               © {currentYear} SHATTARA AI — Built by people, Powered by AI
             </p>
