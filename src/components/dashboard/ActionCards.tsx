@@ -170,7 +170,7 @@ export function ActionCards({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="border border-border text-card-foreground shadow-sm rounded-3xl group bg-card/50 cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]" onClick={handleUploadClick}>
+                <div className="border border-border text-card-foreground shadow-sm rounded-3xl group bg-card/75 cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]" onClick={handleUploadClick}>
                   <div className="bg-green-500/10 text-green-500 text-xs font-medium py-1 px-2 absolute right-2 top-2 z-20 rounded-xl">Popular</div>
                   <div className="p-4 sm:h-28 flex flex-col sm:flex-col items-start justify-center gap-y-1">
                     <div className="flex items-center gap-x-3 sm:block">
@@ -200,7 +200,7 @@ export function ActionCards({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="border border-border text-card-foreground shadow-sm rounded-3xl group bg-card/50 cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]" onClick={onPasteClick}>
+                <div className="border border-border text-card-foreground shadow-sm rounded-3xl group bg-card/75 cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]" onClick={onPasteClick}>
                   <div className="p-4 sm:h-28 flex flex-col sm:flex-col items-start justify-center gap-y-1">
                     <div className="flex items-center gap-x-3 sm:block">
                       <Link2 className="h-6 w-6 text-primary/80 group-hover:text-primary transition-colors sm:mb-2 flex-shrink-0" />
@@ -229,7 +229,7 @@ export function ActionCards({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="border border-border text-card-foreground shadow-sm rounded-3xl group bg-card/50 cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]" onClick={handleRecordClick}>
+                <div className="border border-border text-card-foreground shadow-sm rounded-3xl group bg-card/75 cursor-pointer transition-all duration-200 relative hover:shadow-md dark:hover:shadow-[0_0_8px_rgba(255,255,255,0.1)]" onClick={handleRecordClick}>
                   <div className="p-4 sm:h-28 flex flex-col sm:flex-col items-start justify-center gap-y-1">
                     <div className="flex items-center gap-x-3 sm:block">
                       <Mic className="h-6 w-6 text-primary/80 group-hover:text-primary transition-colors sm:mb-2 flex-shrink-0" />
