@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Parser } from 'expr-eval';
 import * as math from 'mathjs';
-import { X } from 'lucide-react';
+
 
 interface CalculatorModalProps {
   open: boolean;
@@ -209,15 +209,6 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
           {/* Header */}
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-medium text-foreground">Calculator</h2>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => onOpenChange(false)} 
-              className="text-muted-foreground hover:text-foreground hover:bg-accent"
-            >
-              <X size={18} />
-              <span className="sr-only">Close</span>
-            </Button>
           </div>
 
           <Tabs defaultValue="standard" className="w-full" onValueChange={setActiveTab}>

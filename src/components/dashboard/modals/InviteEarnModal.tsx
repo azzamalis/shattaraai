@@ -2,7 +2,7 @@ import React from 'react';
 import { BaseModal } from '@/components/ui/base-modal';
 import { DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Crown, Zap, MessageSquare, X } from 'lucide-react';
+import { Crown, Zap, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -35,19 +35,12 @@ export function InviteEarnModal({
       title="" 
       className="max-w-[95vw] md:max-w-lg border-none" 
       contentClassName="p-6 flex flex-col gap-4 overflow-y-auto max-h-[95vh]"
-      showCloseButton={false}
     >
       <DialogTitle className="sr-only">Refer &amp; Earn</DialogTitle>
 
       {/* Banner Section */}
       <div className="flex flex-col space-y-1.5 text-left">
         <div className="relative h-fit overflow-hidden rounded-xl">
-          <button 
-            className="absolute right-4 top-4 z-10 bg-transparent"
-            onClick={() => onOpenChange(false)}
-          >
-            <X className="h-5 w-5 cursor-pointer text-muted-foreground" />
-          </button>
           <img 
             src="/images/referral-dark-v2.png" 
             alt="Referral" 

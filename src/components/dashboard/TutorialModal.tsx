@@ -129,15 +129,6 @@ export function TutorialModal({
     onOpenChange(isOpen);
   }}>
       <DialogContent className="!max-w-3xl w-[95vw] gap-0 p-0 bg-card border border-border">
-        {/* Close button - X in the top right */}
-        <button onClick={() => onOpenChange(false)} className="absolute right-4 top-4 z-50 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-            <path d="M18 6 6 18"></path>
-            <path d="m6 6 12 12"></path>
-          </svg>
-          <span className="sr-only">Close</span>
-        </button>
-
         {/* Header */}
         <DialogHeader className="p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
           <DialogTitle className="text-2xl font-semibold tracking-tight text-foreground">
