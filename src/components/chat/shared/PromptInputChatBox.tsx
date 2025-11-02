@@ -174,12 +174,12 @@ export function PromptInputChatBox({
                       <ChevronDown className="h-3.5 w-3.5 opacity-50" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" side="top" className="w-48 bg-popover">
+                  <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5">
                     {AI_MODELS.map((model) => (
                       <DropdownMenuItem
                         key={model}
                         onClick={() => setSelectedModel(model)}
-                        className={selectedModel === model ? "bg-accent" : ""}
+                        className={`rounded-xl ${selectedModel === model ? "bg-accent" : ""}`}
                       >
                         {model}
                       </DropdownMenuItem>
