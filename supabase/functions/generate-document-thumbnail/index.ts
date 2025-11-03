@@ -33,9 +33,12 @@ serve(async (req) => {
     }
 
     const arrayBuffer = await fileResponse.arrayBuffer();
+    
+    // Convert ArrayBuffer to Buffer for mammoth
+    const buffer = new Uint8Array(arrayBuffer);
 
     // Convert DOCX to HTML to get preview text
-    const result = await mammoth.convertToHtml({ arrayBuffer } as any, {
+    const result = await mammoth.convertToHtml({ buffer }, {
       includeDefaultStyleMap: true,
     });
 
