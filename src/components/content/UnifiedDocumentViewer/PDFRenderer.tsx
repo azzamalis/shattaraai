@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
+import { pageNavigationPlugin } from '@react-pdf-viewer/page-navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
 import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/page-navigation/lib/styles/index.css';
 
 interface PDFRendererProps {
   url: string;
@@ -23,7 +25,10 @@ export function PDFRenderer({ url }: PDFRendererProps) {
   } = useUnifiedDocument();
 
   const [pdfFile, setPdfFile] = useState<string | null>(null);
-  const [key, setKey] = useState(0);
+  
+  // Initialize page navigation plugin
+  const pageNavigationPluginInstance = pageNavigationPlugin();
+  const { jumpToPage } = pageNavigationPluginInstance;
 
   useEffect(() => {
     if (url) {
@@ -34,10 +39,12 @@ export function PDFRenderer({ url }: PDFRendererProps) {
     }
   }, [url, setIsLoading, setError]);
 
-  // Force re-render when currentPage changes externally (from search)
+  // Navigate to page when currentPage changes (from search or other actions)
   useEffect(() => {
-    setKey(prev => prev + 1);
-  }, [currentPage]);
+    if (jumpToPage && currentPage > 0) {
+      jumpToPage(currentPage - 1); // PDF.js uses 0-based indexing
+    }
+  }, [currentPage, jumpToPage]);
 
   const handleDocumentLoad = (e: any) => {
     if (e.doc) {
@@ -47,6 +54,7 @@ export function PDFRenderer({ url }: PDFRendererProps) {
 
   const handlePageChange = (e: any) => {
     const newPage = e.currentPage + 1; // PDF.js uses 0-based indexing
+    // Only update if the page actually changed to avoid loops
     if (newPage !== currentPage) {
       setCurrentPage(newPage);
     }
@@ -90,12 +98,12 @@ export function PDFRenderer({ url }: PDFRendererProps) {
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
         <div className="h-full w-full max-w-4xl">
           <Viewer
-            key={key}
             fileUrl={pdfFile}
             defaultScale={zoom / 100}
             initialPage={currentPage - 1}
             onDocumentLoad={handleDocumentLoad}
             onPageChange={handlePageChange}
+            plugins={[pageNavigationPluginInstance]}
             theme={{
               theme: 'auto',
             }}
