@@ -79,7 +79,7 @@ export function PDFRenderer({ url }: PDFRendererProps) {
 
   return (
     <div className="h-full w-full bg-white dark:bg-neutral-800/50 flex justify-center overflow-auto">
-      <Worker workerUrl="/pdf.worker.min.mjs">
+      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
         <div className="h-full w-full max-w-4xl">
           <Viewer
             fileUrl={pdfFile}
