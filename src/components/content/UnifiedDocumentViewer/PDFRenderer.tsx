@@ -25,6 +25,8 @@ export function PDFRenderer({ url }: PDFRendererProps) {
   } = useUnifiedDocument();
 
   const [pdfFile, setPdfFile] = useState<string | null>(null);
+  const [internalPage, setInternalPage] = useState(currentPage);
+  const isUserScrolling = React.useRef(false);
   
   // Initialize page navigation plugin
   const pageNavigationPluginInstance = pageNavigationPlugin();
@@ -39,25 +41,35 @@ export function PDFRenderer({ url }: PDFRendererProps) {
     }
   }, [url, setIsLoading, setError]);
 
-  // Navigate to page when currentPage changes (from search or other actions)
+  // Only jump to page when it's a programmatic change (not from user scrolling)
   useEffect(() => {
-    if (jumpToPage && currentPage > 0) {
-      jumpToPage(currentPage - 1); // PDF.js uses 0-based indexing
+    if (currentPage !== internalPage && !isUserScrolling.current) {
+      // Programmatic page change (from search, thumbnail, etc.)
+      if (jumpToPage) {
+        jumpToPage(currentPage - 1);
+        setInternalPage(currentPage);
+      }
     }
-  }, [currentPage, jumpToPage]);
+  }, [currentPage, internalPage, jumpToPage]);
 
   const handleDocumentLoad = (e: any) => {
     if (e.doc) {
       setTotalPages(e.doc.numPages || 1);
+      setInternalPage(1);
     }
   };
 
   const handlePageChange = (e: any) => {
-    const newPage = e.currentPage + 1; // PDF.js uses 0-based indexing
-    // Only update if the page actually changed to avoid loops
-    if (newPage !== currentPage) {
-      setCurrentPage(newPage);
-    }
+    const newPage = e.currentPage + 1;
+    // Mark as user scrolling
+    isUserScrolling.current = true;
+    setInternalPage(newPage);
+    setCurrentPage(newPage);
+    
+    // Reset the flag after a short delay
+    setTimeout(() => {
+      isUserScrolling.current = false;
+    }, 100);
   };
 
   if (isLoading) {
