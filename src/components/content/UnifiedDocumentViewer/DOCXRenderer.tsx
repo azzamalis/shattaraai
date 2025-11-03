@@ -126,28 +126,6 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
     return htmlContent.replace(regex, '<mark class="search-highlight bg-yellow-200 dark:bg-yellow-800" data-search-index="$1">$1</mark>');
   };
 
-  // Scroll to current search result
-  useEffect(() => {
-    if (searchResults.length > 0 && currentSearchIndex >= 0 && contentRef.current) {
-      const highlights = contentRef.current.querySelectorAll('.search-highlight');
-      const currentHighlight = highlights[currentSearchIndex];
-      
-      if (currentHighlight) {
-        // Remove active class from all highlights
-        highlights.forEach(h => h.classList.remove('bg-orange-300', 'dark:bg-orange-600'));
-        
-        // Add active class to current highlight
-        currentHighlight.classList.add('bg-orange-300', 'dark:bg-orange-600');
-        
-        // Scroll to the highlight
-        currentHighlight.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-      }
-    }
-  }, [currentSearchIndex, searchResults]);
-
   // Update search results when search term changes
   useEffect(() => {
     if (!searchTerm || !textContent) {
@@ -173,7 +151,40 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
 
     // Update context with search results
     setSearchResults(matches, matches.length > 0 ? 0 : -1);
-  }, [searchTerm, textContent, setSearchResults]);
+  }, [searchTerm, textContent]); // Removed setSearchResults from deps to prevent infinite loop
+
+  // Scroll to current search result
+  useEffect(() => {
+    if (searchResults.length > 0 && currentSearchIndex >= 0 && contentRef.current) {
+      // Use setTimeout to ensure DOM has been updated with new highlights
+      setTimeout(() => {
+        if (!contentRef.current) return;
+        
+        const highlights = contentRef.current.querySelectorAll('.search-highlight');
+        
+        if (highlights.length > 0 && currentSearchIndex < highlights.length) {
+          const currentHighlight = highlights[currentSearchIndex];
+          
+          // Remove active class from all highlights
+          highlights.forEach(h => {
+            h.classList.remove('bg-orange-300', 'dark:bg-orange-600');
+            h.classList.add('bg-yellow-200', 'dark:bg-yellow-800');
+          });
+          
+          // Add active class to current highlight
+          currentHighlight.classList.remove('bg-yellow-200', 'dark:bg-yellow-800');
+          currentHighlight.classList.add('bg-orange-300', 'dark:bg-orange-600');
+          
+          // Scroll to the highlight
+          currentHighlight.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'nearest'
+          });
+        }
+      }, 100);
+    }
+  }, [currentSearchIndex, searchResults.length]);
 
   if (isLoading) {
     return (
