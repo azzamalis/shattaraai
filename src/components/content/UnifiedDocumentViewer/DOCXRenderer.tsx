@@ -19,6 +19,7 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
     setIsLoading,
     setError,
     setSearchResults,
+    setThumbnailDataUrl,
     error,
     isLoading
   } = useUnifiedDocument();
@@ -26,6 +27,7 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [textContent, setTextContent] = useState<string>('');
   const contentRef = React.useRef<HTMLDivElement>(null);
+  const thumbnailRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const processDocument = async () => {
@@ -83,6 +85,11 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
         // Set total pages to 1 for DOCX (continuous scroll)
         setTotalPages(1);
         
+        // Generate thumbnail after a short delay to ensure DOM is rendered
+        setTimeout(async () => {
+          await generateThumbnail();
+        }, 1000);
+        
       } catch (err) {
         console.error('Error processing DOCX:', err);
         setError(err instanceof Error ? err.message : 'Failed to process document');
@@ -93,6 +100,32 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
 
     processDocument();
   }, [url]); // Remove setter functions from dependencies to prevent infinite loop
+
+  const generateThumbnail = async () => {
+    if (!thumbnailRef.current) return;
+
+    try {
+      // Dynamically import html2canvas to avoid circular dependencies
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const canvas = await html2canvas(thumbnailRef.current, {
+        scale: 0.3,
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: 1000,
+        windowWidth: 800,
+        windowHeight: 1000,
+      });
+      
+      const thumbnailDataUrl = canvas.toDataURL('image/png');
+      setThumbnailDataUrl(thumbnailDataUrl);
+    } catch (error) {
+      console.error('Error generating thumbnail:', error);
+    }
+  };
 
   const processMarkdownInHTML = (html: string): string => {
     // Convert markdown headers to HTML headers
@@ -234,6 +267,7 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
         }}
       >
         <div 
+          ref={thumbnailRef}
           className="p-8 bg-white dark:bg-neutral-900/50 shadow-sm mx-4 rounded-lg border border-border"
           style={{ 
             transform: `scale(${zoom / 100})`,

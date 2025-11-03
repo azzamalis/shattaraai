@@ -36,6 +36,9 @@ interface UnifiedDocumentState {
   
   // Audio state
   isAudioPlaying: boolean;
+  
+  // Thumbnail state
+  thumbnailDataUrl: string | null;
 }
 
 interface UnifiedDocumentContextType extends UnifiedDocumentState {
@@ -79,6 +82,9 @@ interface UnifiedDocumentContextType extends UnifiedDocumentState {
   
   // Internal state setter for renderers
   setSearchResults: (results: SearchResult[], currentIndex?: number) => void;
+  
+  // Thumbnail controls
+  setThumbnailDataUrl: (dataUrl: string | null) => void;
 }
 
 const UnifiedDocumentContext = createContext<UnifiedDocumentContextType | undefined>(undefined);
@@ -103,6 +109,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     error: null,
     pdfUrl: null,
     isAudioPlaying: false,
+    thumbnailDataUrl: null,
   });
 
   // View controls
@@ -240,6 +247,9 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
       isSearching: false 
     }));
   };
+  
+  // Thumbnail controls
+  const setThumbnailDataUrl = (dataUrl: string | null) => setState(prev => ({ ...prev, thumbnailDataUrl: dataUrl }));
 
   const value: UnifiedDocumentContextType = {
     ...state,
@@ -270,6 +280,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     goToPage,
     toggleAudio,
     setSearchResults,
+    setThumbnailDataUrl,
   };
 
   return (
