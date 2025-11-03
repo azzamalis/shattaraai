@@ -117,12 +117,7 @@ export function ContentViewer({ contentData, onUpdateContent, onTextAction, curr
 
     switch (contentData.type) {
       case 'pdf':
-        return (
-          <NewPDFViewer 
-            contentData={contentData}
-            onFileUploaded={(url) => onUpdateContent({ url })}
-          />
-        );
+        return null; // PDF will be handled by UnifiedDocumentViewer in ContentLeftSidebar
       
       case 'video':
         const videoUrl = contentData.url && !contentData.url.startsWith('blob:') ? contentData.url : null;

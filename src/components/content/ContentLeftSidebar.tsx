@@ -147,11 +147,11 @@ export function ContentLeftSidebar({
     }
   };
 
-  // Check if we should hide tabs (for PDF content, Word documents, or text content)
-  const shouldHideTabs = contentData.type === 'pdf' || contentData.type === 'text';
-
   // Check if it's a Word document
   const isWordDocument = (contentData.type === 'file' || contentData.type === 'upload') && contentData.filename?.match(/\.(doc|docx)$/i);
+  
+  // Check if we should hide tabs (for PDF content, Word documents, or text content)
+  const shouldHideTabs = contentData.type === 'pdf' || contentData.type === 'text' || isWordDocument;
   const shouldHideTabsForDocument = isWordDocument;
   const renderControls = () => {
     // Show loading state while detecting recording state
@@ -285,13 +285,18 @@ export function ContentLeftSidebar({
       return null; // Website content is handled in tabs
     }
 
-    // Show DocumentViewer for Word documents
+    // Show UnifiedDocumentViewer for Word documents
     if (isWordDocument) {
-      return null; // Document viewer will be rendered in the main layout
+      return <div className="flex-1 overflow-hidden">
+        <UnifiedDocumentViewer 
+          contentData={contentData} 
+          onUpdateContent={onUpdateContent} 
+        />
+      </div>;
     }
 
-    // Show UnifiedDocumentViewer for text content
-    if (contentData.type === 'text') {
+    // Show UnifiedDocumentViewer for text content and PDFs
+    if (contentData.type === 'text' || contentData.type === 'pdf') {
       return <div className="flex-1 overflow-hidden">
         <UnifiedDocumentViewer 
           contentData={contentData} 
