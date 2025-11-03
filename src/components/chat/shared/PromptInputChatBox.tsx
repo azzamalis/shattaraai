@@ -9,7 +9,9 @@ import {
 } from "@/components/prompt-kit/prompt-input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ArrowUp, Plus, Mic, AtSign, Brain, X, ChevronDown, Sparkles } from "lucide-react";
+import { Dialog } from '@/components/ui/dialog';
+import { UpgradeModal } from '@/components/dashboard/UpgradeModal';
+import { ArrowUp, Plus, Mic, AtSign, Brain, X, ChevronDown, Sparkles, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PromptInputChatBoxProps {
@@ -17,15 +19,16 @@ interface PromptInputChatBoxProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
+  userPlan?: 'free' | 'pro';
 }
 
 const AI_MODELS = [
-  "Gemini 2.5 Flash",
-  "Claude 4 Sonnet", 
-  "GPT4.1",
-  "Gemini 2.5 Pro",
-  "Grok4",
-  "GPT4.1 Mini"
+  { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash", isPremium: false },
+  { value: "claude-4-sonnet", label: "Claude 4 Sonnet", isPremium: false },
+  { value: "gpt-4.1-mini", label: "GPT4.1 Mini", isPremium: false },
+  { value: "gemini-2.5-pro", label: "Gemini 2.5 Pro", isPremium: true },
+  { value: "grok-4", label: "Grok4", isPremium: true },
+  { value: "gpt-4.1", label: "GPT4.1", isPremium: true },
 ];
 
 const commandOptions: CommandOption[] = [
@@ -49,12 +52,14 @@ export function PromptInputChatBox({
   onSendMessage,
   disabled = false,
   placeholder = "Ask anything...",
-  className
+  className,
+  userPlan = 'free'
 }: PromptInputChatBoxProps) {
   const [inputValue, setInputValue] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
-  const [selectedModel, setSelectedModel] = useState("Claude 4 Sonnet");
+  const [selectedModel, setSelectedModel] = useState("claude-4-sonnet");
   const [showCommandDropdown, setShowCommandDropdown] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
@@ -79,6 +84,14 @@ export function PromptInputChatBox({
 
   const triggerFileSelect = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleModelSelect = (modelValue: string, isPremium: boolean) => {
+    if (userPlan === 'free' && isPremium) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+    setSelectedModel(modelValue);
   };
 
   return (
@@ -158,7 +171,7 @@ export function PromptInputChatBox({
                 )}
               </div>
 
-              <PromptInputAction tooltip={selectedModel}>
+              <PromptInputAction tooltip={AI_MODELS.find(m => m.value === selectedModel)?.label || "Select AI Model"}>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -169,19 +182,30 @@ export function PromptInputChatBox({
                     >
                       <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
                       <span className="text-xs capitalize md:block hidden">
-                        {selectedModel}
+                        {AI_MODELS.find(m => m.value === selectedModel)?.label}
                       </span>
                       <ChevronDown className="h-3.5 w-3.5 opacity-50" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5">
+                  <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5 bg-popover z-50">
                     {AI_MODELS.map((model) => (
                       <DropdownMenuItem
-                        key={model}
-                        onClick={() => setSelectedModel(model)}
-                        className={`rounded-xl ${selectedModel === model ? "bg-accent" : ""}`}
+                        key={model.value}
+                        onClick={() => handleModelSelect(model.value, model.isPremium)}
+                        className={cn(
+                          "flex items-center justify-between rounded-xl",
+                          selectedModel === model.value ? "bg-accent" : ""
+                        )}
                       >
-                        {model}
+                        <div className="flex items-center gap-2">
+                          {selectedModel === model.value && <Check className="h-4 w-4 text-primary" />}
+                          <span>{model.label}</span>
+                        </div>
+                        {model.isPremium && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
+                            Upgrade
+                          </span>
+                        )}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
@@ -229,6 +253,11 @@ export function PromptInputChatBox({
         onChange={handleFileSelect}
         className="hidden"
       />
+
+      {/* Upgrade Modal */}
+      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
+        <UpgradeModal onClose={() => setUpgradeModalOpen(false)} />
+      </Dialog>
     </div>
   );
 }
