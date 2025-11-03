@@ -37,25 +37,8 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
 
         const arrayBuffer = await response.arrayBuffer();
         
-        // Convert DOCX to HTML using mammoth with table support
-        const result = await mammoth.convertToHtml(
-          { arrayBuffer } as any,
-          {
-            styleMap: [
-              "p[style-name='Heading 1'] => h1:fresh",
-              "p[style-name='Heading 2'] => h2:fresh",
-              "p[style-name='Heading 3'] => h3:fresh",
-            ],
-            includeDefaultStyleMap: true,
-            convertImage: mammoth.images.imgElement((image) => {
-              return image.read("base64").then((imageBuffer) => {
-                return {
-                  src: "data:" + image.contentType + ";base64," + imageBuffer,
-                };
-              });
-            }),
-          }
-        );
+        // Convert DOCX to HTML using mammoth
+        const result = await mammoth.convertToHtml({ arrayBuffer } as any);
         
         if (result.messages.length > 0) {
           console.warn('Document conversion warnings:', result.messages);
@@ -181,11 +164,9 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
               prose-ul:list-disc prose-ul:my-4 prose-ul:pl-6
               prose-ol:list-decimal prose-ol:my-4 prose-ol:pl-6
               prose-li:my-2
-              prose-table:border-collapse prose-table:w-full prose-table:my-6 prose-table:border prose-table:border-border
-              prose-th:border prose-th:border-border prose-th:bg-muted prose-th:p-3 prose-th:text-left prose-th:font-semibold
-              prose-td:border prose-td:border-border prose-td:p-3 prose-td:align-top
-              prose-tr:border-b prose-tr:border-border
-              prose-thead:border-b-2 prose-thead:border-border"
+              prose-table:border-collapse prose-table:w-full prose-table:my-6
+              prose-th:border prose-th:border-border prose-th:bg-muted prose-th:p-3
+              prose-td:border prose-td:border-border prose-td:p-3"
             dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
             style={{
               color: 'hsl(var(--foreground))',
