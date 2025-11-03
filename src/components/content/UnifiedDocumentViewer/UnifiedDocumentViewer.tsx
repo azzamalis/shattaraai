@@ -32,6 +32,7 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
     setDocumentType,
     setError,
     setPdfUrl,
+    setContentMetadata,
   } = useUnifiedDocument();
 
   // Detect content type based on contentData
@@ -46,6 +47,7 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
   useEffect(() => {
     const detectedType = detectContentType(contentData);
     setDocumentType(detectedType);
+    setContentMetadata(contentData);
     
     // Set PDF URL if it's a PDF
     if (detectedType === 'pdf' && contentData.url) {
@@ -57,7 +59,7 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
     if (detectedType === 'unknown') {
       setError('Unsupported document type');
     }
-  }, [contentData, setDocumentType, setError, setPdfUrl]);
+  }, [contentData, setDocumentType, setError, setPdfUrl, setContentMetadata]);
 
   const handleDownload = () => {
     if (contentData.url) {
