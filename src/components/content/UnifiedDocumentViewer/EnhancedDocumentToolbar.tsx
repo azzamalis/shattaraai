@@ -116,7 +116,12 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
               type="text"
               placeholder="Search..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                if (e.target.value.trim()) {
+                  performSearch(e.target.value);
+                }
+              }}
               className="bg-white dark:bg-neutral-800 rounded-lg px-2 py-1 border dark:border-neutral-700 text-xs w-32"
               autoFocus
             />

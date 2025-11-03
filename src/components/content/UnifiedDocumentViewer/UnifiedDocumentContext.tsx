@@ -24,6 +24,7 @@ interface UnifiedDocumentState {
   searchResults: SearchResult[];
   currentSearchIndex: number;
   isSearchOpen: boolean;
+  isSearching: boolean;
   
   // Document state
   rotation: number; // 0, 90, 180, 270
@@ -49,7 +50,7 @@ interface UnifiedDocumentContextType extends UnifiedDocumentState {
   // Search controls
   setSearchTerm: (term: string) => void;
   toggleSearch: () => void;
-  performSearch: (term: string) => void;
+  performSearch: (term: string) => Promise<void>;
   nextSearchResult: () => void;
   previousSearchResult: () => void;
   
@@ -91,6 +92,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     searchResults: [],
     currentSearchIndex: 0,
     isSearchOpen: false,
+    isSearching: false,
     rotation: 0,
     documentData: null,
     documentType: 'unknown',
@@ -110,36 +112,96 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
 
   // Search controls
   const setSearchTerm = (term: string) => setState(prev => ({ ...prev, searchTerm: term }));
-  const toggleSearch = () => setState(prev => ({ ...prev, isSearchOpen: !prev.isSearchOpen, searchTerm: !prev.isSearchOpen ? '' : prev.searchTerm }));
+  const toggleSearch = () => setState(prev => ({ ...prev, isSearchOpen: !prev.isSearchOpen, searchTerm: !prev.isSearchOpen ? '' : prev.searchTerm, searchResults: !prev.isSearchOpen ? [] : prev.searchResults }));
   
-  const performSearch = (term: string) => {
+  const performSearch = async (term: string) => {
     setSearchTerm(term);
+    
     if (!term.trim()) {
-      setState(prev => ({ ...prev, searchResults: [], currentSearchIndex: 0 }));
+      setState(prev => ({ ...prev, searchResults: [], currentSearchIndex: 0, isSearching: false }));
       return;
     }
-    // Implementation will vary by document type
-    // For now, just set the search term
-    setState(prev => ({ ...prev, searchResults: [], currentSearchIndex: 0 }));
+
+    setState(prev => ({ ...prev, isSearching: true }));
+
+    try {
+      // For PDF documents, search through PDF content
+      if (state.documentType === 'pdf' && state.pdfUrl) {
+        const pdfjsLib = await import('pdfjs-dist');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        
+        const loadingTask = pdfjsLib.getDocument(state.pdfUrl);
+        const pdf = await loadingTask.promise;
+        const results: SearchResult[] = [];
+        const searchRegex = new RegExp(term, 'gi');
+
+        // Search through all pages
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items
+            .map((item: any) => item.str)
+            .join(' ');
+
+          let match;
+          while ((match = searchRegex.exec(pageText)) !== null) {
+            results.push({
+              id: `${pageNum}-${match.index}`,
+              page: pageNum,
+              text: pageText.substring(
+                Math.max(0, match.index - 30),
+                Math.min(pageText.length, match.index + term.length + 30)
+              ),
+              position: { x: 0, y: 0 }
+            });
+          }
+        }
+
+        setState(prev => ({ 
+          ...prev, 
+          searchResults: results, 
+          currentSearchIndex: results.length > 0 ? 0 : -1,
+          isSearching: false
+        }));
+
+        // Navigate to first result if found
+        if (results.length > 0) {
+          setCurrentPage(results[0].page);
+        }
+      } else {
+        // For non-PDF documents, search in text content or HTML
+        // This is a simplified implementation
+        setState(prev => ({ ...prev, searchResults: [], currentSearchIndex: 0, isSearching: false }));
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      setState(prev => ({ ...prev, searchResults: [], currentSearchIndex: 0, isSearching: false }));
+    }
   };
 
   const nextSearchResult = () => {
     if (state.searchResults.length > 0) {
+      const nextIndex = (state.currentSearchIndex + 1) % state.searchResults.length;
       setState(prev => ({ 
         ...prev, 
-        currentSearchIndex: (prev.currentSearchIndex + 1) % prev.searchResults.length 
+        currentSearchIndex: nextIndex
       }));
+      // Navigate to the page of the next result
+      setCurrentPage(state.searchResults[nextIndex].page);
     }
   };
 
   const previousSearchResult = () => {
     if (state.searchResults.length > 0) {
+      const prevIndex = state.currentSearchIndex === 0 
+        ? state.searchResults.length - 1 
+        : state.currentSearchIndex - 1;
       setState(prev => ({ 
         ...prev, 
-        currentSearchIndex: prev.currentSearchIndex === 0 
-          ? prev.searchResults.length - 1 
-          : prev.currentSearchIndex - 1 
+        currentSearchIndex: prevIndex
       }));
+      // Navigate to the page of the previous result
+      setCurrentPage(state.searchResults[prevIndex].page);
     }
   };
 

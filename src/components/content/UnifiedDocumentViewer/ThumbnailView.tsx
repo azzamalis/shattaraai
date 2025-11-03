@@ -18,6 +18,10 @@ function PDFThumbnail({ pageNumber, isCurrentPage, onClick, pdfUrl }: PDFThumbna
     const renderThumbnail = async () => {
       if (!canvasRef.current || !pdfUrl || isRendering) return;
       
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      
       setIsRendering(true);
       try {
         // Configure PDF.js worker
@@ -26,10 +30,6 @@ function PDFThumbnail({ pageNumber, isCurrentPage, onClick, pdfUrl }: PDFThumbna
         const loadingTask = pdfjsLib.getDocument(pdfUrl);
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(pageNumber);
-        
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
-        if (!context) return;
         
         // Scale down for thumbnail
         const viewport = page.getViewport({ scale: 0.3 });
@@ -48,7 +48,7 @@ function PDFThumbnail({ pageNumber, isCurrentPage, onClick, pdfUrl }: PDFThumbna
     };
 
     renderThumbnail();
-  }, [pageNumber, pdfUrl, isRendering]);
+  }, [pageNumber, pdfUrl]);
 
   return (
     <div
