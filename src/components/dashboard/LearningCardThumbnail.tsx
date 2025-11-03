@@ -32,7 +32,9 @@ export function LearningCardThumbnail({
   pdfUrl,
   children
 }: LearningCardThumbnailProps) {
-  const isPdf = contentType === 'pdf' || contentType === 'file';
+  // Check if the file is a DOCX based on URL extension
+  const isDocx = pdfUrl?.toLowerCase().endsWith('.docx') || pdfUrl?.includes('.docx?');
+  const isPdf = (contentType === 'pdf' || contentType === 'file') && !isDocx;
   const isYoutube = contentType === 'youtube';
   const isVideo = contentType === 'video';
   const isRecording = contentType === 'recording' || contentType === 'live_recording';
@@ -51,6 +53,11 @@ export function LearningCardThumbnail({
 
   // Function to render icon thumbnails for content types without images
   const renderIconThumbnail = () => {
+    if (isDocx) {
+      return <div className="w-full h-full flex items-center justify-center bg-card">
+          <FileText className="w-12 h-12 text-muted-foreground" />
+        </div>;
+    }
     if (isRecording) {
       return <div className="w-full h-full flex items-center justify-center bg-card">
           <Mic className="w-12 h-12 text-muted-foreground" />
