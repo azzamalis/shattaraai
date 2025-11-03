@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { pageNavigationPlugin } from '@react-pdf-viewer/page-navigation';
+import { searchPlugin } from '@react-pdf-viewer/search';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/page-navigation/lib/styles/index.css';
+import '@react-pdf-viewer/search/lib/styles/index.css';
 
 interface PDFRendererProps {
   url: string;
@@ -16,6 +18,7 @@ export function PDFRenderer({ url }: PDFRendererProps) {
     currentPage,
     rotation,
     viewMode,
+    searchTerm,
     setTotalPages,
     setCurrentPage,
     setIsLoading,
@@ -32,6 +35,12 @@ export function PDFRenderer({ url }: PDFRendererProps) {
   const pageNavigationPluginInstance = pageNavigationPlugin();
   const { jumpToPage } = pageNavigationPluginInstance;
 
+  // Initialize search plugin
+  const searchPluginInstance = searchPlugin({
+    keyword: searchTerm || '',
+  });
+  const { highlight } = searchPluginInstance;
+
   useEffect(() => {
     if (url) {
       setIsLoading(true);
@@ -40,6 +49,13 @@ export function PDFRenderer({ url }: PDFRendererProps) {
       setIsLoading(false);
     }
   }, [url, setIsLoading, setError]);
+
+  // Highlight search term when it changes
+  useEffect(() => {
+    if (searchTerm && highlight) {
+      highlight([searchTerm]);
+    }
+  }, [searchTerm, highlight]);
 
   // Only jump to page when it's a programmatic change (not from user scrolling)
   useEffect(() => {
@@ -115,7 +131,7 @@ export function PDFRenderer({ url }: PDFRendererProps) {
             initialPage={currentPage - 1}
             onDocumentLoad={handleDocumentLoad}
             onPageChange={handlePageChange}
-            plugins={[pageNavigationPluginInstance]}
+            plugins={[pageNavigationPluginInstance, searchPluginInstance]}
             theme={{
               theme: 'auto',
             }}
