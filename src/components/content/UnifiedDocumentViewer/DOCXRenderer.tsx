@@ -38,7 +38,7 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
         const arrayBuffer = await response.arrayBuffer();
         
         // Convert DOCX to HTML using mammoth
-        const result = await mammoth.convertToHtml({ arrayBuffer });
+        const result = await mammoth.convertToHtml({ arrayBuffer } as any);
         
         if (result.messages.length > 0) {
           console.warn('Document conversion warnings:', result.messages);
@@ -123,7 +123,14 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
           }}
         >
           <div 
-            className="prose prose-sm max-w-none dark:prose-invert"
+            className="prose prose-sm max-w-none dark:prose-invert 
+              prose-headings:font-bold prose-headings:tracking-tight
+              prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
+              prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80
+              prose-ul:list-disc prose-ol:list-decimal prose-li:my-1
+              prose-table:border-collapse prose-table:w-full
+              prose-th:border prose-th:border-border prose-th:bg-muted prose-th:p-2
+              prose-td:border prose-td:border-border prose-td:p-2"
             dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
             style={{
               color: 'hsl(var(--foreground))',
