@@ -66,7 +66,7 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
     };
 
     processDocument();
-  }, [url, setIsLoading, setError, setDocumentData, setTotalPages]);
+  }, [url]); // Remove setter functions from dependencies to prevent infinite loop
 
   const getHighlightedContent = () => {
     if (!searchTerm || !htmlContent) return htmlContent;
