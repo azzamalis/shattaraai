@@ -23,6 +23,7 @@ export function PDFRenderer({ url }: PDFRendererProps) {
   } = useUnifiedDocument();
 
   const [pdfFile, setPdfFile] = useState<string | null>(null);
+  const [key, setKey] = useState(0);
 
   useEffect(() => {
     if (url) {
@@ -33,15 +34,22 @@ export function PDFRenderer({ url }: PDFRendererProps) {
     }
   }, [url, setIsLoading, setError]);
 
+  // Force re-render when currentPage changes externally (from search)
+  useEffect(() => {
+    setKey(prev => prev + 1);
+  }, [currentPage]);
+
   const handleDocumentLoad = (e: any) => {
     if (e.doc) {
       setTotalPages(e.doc.numPages || 1);
-      setCurrentPage(1);
     }
   };
 
   const handlePageChange = (e: any) => {
-    setCurrentPage(e.currentPage + 1); // PDF.js uses 0-based indexing
+    const newPage = e.currentPage + 1; // PDF.js uses 0-based indexing
+    if (newPage !== currentPage) {
+      setCurrentPage(newPage);
+    }
   };
 
   if (isLoading) {
@@ -82,6 +90,7 @@ export function PDFRenderer({ url }: PDFRendererProps) {
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
         <div className="h-full w-full max-w-4xl">
           <Viewer
+            key={key}
             fileUrl={pdfFile}
             defaultScale={zoom / 100}
             initialPage={currentPage - 1}
