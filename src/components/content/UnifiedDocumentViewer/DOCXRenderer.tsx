@@ -37,14 +37,35 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
 
         const arrayBuffer = await response.arrayBuffer();
         
-        // Convert DOCX to HTML using mammoth
-        const result = await mammoth.convertToHtml({ arrayBuffer } as any);
+        // Convert DOCX to HTML using mammoth with table support
+        const result = await mammoth.convertToHtml(
+          { arrayBuffer } as any,
+          {
+            styleMap: [
+              "p[style-name='Heading 1'] => h1:fresh",
+              "p[style-name='Heading 2'] => h2:fresh",
+              "p[style-name='Heading 3'] => h3:fresh",
+            ],
+            includeDefaultStyleMap: true,
+            convertImage: mammoth.images.imgElement((image) => {
+              return image.read("base64").then((imageBuffer) => {
+                return {
+                  src: "data:" + image.contentType + ";base64," + imageBuffer,
+                };
+              });
+            }),
+          }
+        );
         
         if (result.messages.length > 0) {
           console.warn('Document conversion warnings:', result.messages);
         }
 
-        const html = result.value;
+        let html = result.value;
+        
+        // Post-process HTML to convert markdown syntax and improve formatting
+        html = processMarkdownInHTML(html);
+        
         setHtmlContent(html);
 
         // Extract text content for search functionality
@@ -67,6 +88,31 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
 
     processDocument();
   }, [url]); // Remove setter functions from dependencies to prevent infinite loop
+
+  const processMarkdownInHTML = (html: string): string => {
+    // Convert markdown headers to HTML headers
+    html = html.replace(/<p>(###\s+(.+?))<\/p>/g, '<h3>$2</h3>');
+    html = html.replace(/<p>(##\s+(.+?))<\/p>/g, '<h2>$2</h2>');
+    html = html.replace(/<p>(#\s+(.+?))<\/p>/g, '<h1>$2</h1>');
+    
+    // Convert markdown bold **text** to <strong>
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    
+    // Convert markdown italic *text* to <em>
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    // Add spacing between paragraphs and sections
+    html = html.replace(/<\/p>/g, '</p>\n');
+    html = html.replace(/<\/h1>/g, '</h1>\n');
+    html = html.replace(/<\/h2>/g, '</h2>\n');
+    html = html.replace(/<\/h3>/g, '</h3>\n');
+    
+    // Handle empty paragraphs (□ symbols) and convert to line breaks
+    html = html.replace(/<p>□<\/p>/g, '<div class="my-4"></div>');
+    html = html.replace(/<p>\s*<\/p>/g, '<div class="my-2"></div>');
+    
+    return html;
+  };
 
   const getHighlightedContent = () => {
     if (!searchTerm || !htmlContent) return htmlContent;
@@ -123,18 +169,27 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
           }}
         >
           <div 
-            className="prose prose-sm max-w-none dark:prose-invert 
-              prose-headings:font-bold prose-headings:tracking-tight
-              prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
+            className="prose prose-base max-w-none dark:prose-invert 
+              prose-headings:font-bold prose-headings:tracking-tight prose-headings:mb-4 prose-headings:mt-8
+              prose-h1:text-3xl prose-h1:mb-6 prose-h1:mt-0
+              prose-h2:text-2xl prose-h2:mb-4 prose-h2:mt-8
+              prose-h3:text-xl prose-h3:mb-3 prose-h3:mt-6
+              prose-p:mb-4 prose-p:leading-relaxed
               prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80
-              prose-ul:list-disc prose-ol:list-decimal prose-li:my-1
-              prose-table:border-collapse prose-table:w-full
-              prose-th:border prose-th:border-border prose-th:bg-muted prose-th:p-2
-              prose-td:border prose-td:border-border prose-td:p-2"
+              prose-strong:font-semibold prose-strong:text-foreground
+              prose-em:italic
+              prose-ul:list-disc prose-ul:my-4 prose-ul:pl-6
+              prose-ol:list-decimal prose-ol:my-4 prose-ol:pl-6
+              prose-li:my-2
+              prose-table:border-collapse prose-table:w-full prose-table:my-6 prose-table:border prose-table:border-border
+              prose-th:border prose-th:border-border prose-th:bg-muted prose-th:p-3 prose-th:text-left prose-th:font-semibold
+              prose-td:border prose-td:border-border prose-td:p-3 prose-td:align-top
+              prose-tr:border-b prose-tr:border-border
+              prose-thead:border-b-2 prose-thead:border-border"
             dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
             style={{
               color: 'hsl(var(--foreground))',
-              lineHeight: '1.6',
+              lineHeight: '1.7',
             }}
           />
         </div>
