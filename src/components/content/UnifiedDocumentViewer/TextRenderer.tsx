@@ -55,28 +55,38 @@ export function TextRenderer({
     } else {
       setSearchResults([], -1);
     }
-  }, [searchTerm, displayContent, setSearchResults]);
+  }, [searchTerm, displayContent]); // Removed setSearchResults from dependencies to prevent infinite loop
 
   // Scroll to current search result
   useEffect(() => {
     if (!contentRef.current || !searchTerm || currentSearchIndex < 0) return;
 
-    const marks = contentRef.current.querySelectorAll('mark');
-    if (marks[currentSearchIndex]) {
-      marks[currentSearchIndex].scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
+    // Use setTimeout to ensure DOM is updated after render
+    const timeoutId = setTimeout(() => {
+      if (!contentRef.current) return;
       
-      // Highlight current result differently
-      marks.forEach((mark, index) => {
-        if (index === currentSearchIndex) {
-          mark.className = 'bg-orange-400 dark:bg-orange-600';
-        } else {
-          mark.className = 'bg-yellow-200 dark:bg-yellow-800';
-        }
-      });
-    }
+      const marks = contentRef.current.querySelectorAll('mark');
+      
+      if (marks.length > 0 && marks[currentSearchIndex]) {
+        // Highlight current result differently
+        marks.forEach((mark, index) => {
+          if (index === currentSearchIndex) {
+            mark.className = 'bg-orange-400 dark:bg-orange-600';
+          } else {
+            mark.className = 'bg-yellow-200 dark:bg-yellow-800';
+          }
+        });
+
+        // Scroll to the highlighted mark
+        marks[currentSearchIndex].scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }
+    }, 100); // Small delay to ensure DOM is rendered
+
+    return () => clearTimeout(timeoutId);
   }, [currentSearchIndex, searchTerm]);
 
   const getHighlightedContent = (text: string) => {
