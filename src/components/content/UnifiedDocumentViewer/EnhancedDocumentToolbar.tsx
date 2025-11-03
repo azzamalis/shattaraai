@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   PanelLeft, 
   Search, 
@@ -53,11 +53,27 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
   } = useUnifiedDocument();
 
   const [pageInputValue, setPageInputValue] = useState(currentPage.toString());
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    performSearch(searchTerm);
+    if (localSearchTerm.trim()) {
+      performSearch(localSearchTerm);
+    }
   };
+
+  // Debounced search - only search after user stops typing for 500ms
+  useEffect(() => {
+    if (localSearchTerm.trim().length > 2) {
+      const timeoutId = setTimeout(() => {
+        performSearch(localSearchTerm);
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    } else if (localSearchTerm.trim().length === 0) {
+      // Clear search when input is empty
+      setSearchTerm('');
+    }
+  }, [localSearchTerm, performSearch, setSearchTerm]);
 
   const handleDownload = () => {
     if (onDownload) {
@@ -115,13 +131,8 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
             <input
               type="text"
               placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                if (e.target.value.trim()) {
-                  performSearch(e.target.value);
-                }
-              }}
+              value={localSearchTerm}
+              onChange={(e) => setLocalSearchTerm(e.target.value)}
               className="bg-white dark:bg-neutral-800 rounded-lg px-2 py-1 border dark:border-neutral-700 text-xs w-32"
               autoFocus
             />

@@ -50,10 +50,13 @@ export function PDFRenderer({ url }: PDFRendererProps) {
     }
   }, [url, setIsLoading, setError]);
 
-  // Highlight search term when it changes
+  // Highlight search term when it changes (debounced)
   useEffect(() => {
-    if (searchTerm && highlight) {
-      highlight([searchTerm]);
+    if (searchTerm && searchTerm.trim().length > 2 && highlight) {
+      const timeoutId = setTimeout(() => {
+        highlight([searchTerm]);
+      }, 300);
+      return () => clearTimeout(timeoutId);
     }
   }, [searchTerm, highlight]);
 
