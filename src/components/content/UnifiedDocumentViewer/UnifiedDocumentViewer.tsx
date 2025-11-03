@@ -146,19 +146,16 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
         onDownload={handleDownload}
         contentData={contentData}
       />
-      <div className="flex-1 min-h-0 relative grid transition-all duration-300 bg-white dark:bg-neutral-800/50" style={{ gridTemplateColumns: isThumbnailsOpen ? 'auto 0 1fr' : '0 0 1fr' }}>
+      <div className="flex-1 min-h-0 relative flex transition-all duration-300 bg-white dark:bg-neutral-800/50">
         {/* Thumbnail Sidebar */}
         {isThumbnailsOpen && (
-          <div className="overflow-y-auto overflow-x-hidden border-r border-primary/10">
+          <div className="w-48 flex-shrink-0 overflow-y-auto overflow-x-hidden border-r border-primary/10">
             <ThumbnailView />
           </div>
         )}
         
-        {/* Empty middle column for future use */}
-        <div className="overflow-y-auto overflow-x-hidden"></div>
-        
         {/* Main Content */}
-        <div className="overflow-auto">
+        <div className="flex-1 overflow-auto">
           {renderDocumentContent()}
         </div>
       </div>
