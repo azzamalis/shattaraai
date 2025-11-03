@@ -590,31 +590,14 @@ export function ContentLeftSidebar({
       </div>;
   }
 
-  // Website content gets special treatment with enhanced tabs
+  // Show UnifiedDocumentViewer for website content
   if (contentData.type === 'website') {
-    return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg relative">
-        {/* Full-page text content overlay */}
-        {isTextExpanded && contentData.text && <div className="absolute inset-0 z-50 bg-background flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <h2 className="text-lg font-semibold text-foreground">{contentData.title || 'Website Content'}</h2>
-              <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(false)} className="h-8 w-8 p-0">
-                <Minimize2 className="h-4 w-4" />
-              </Button>
-            </div>
-            <ScrollArea className="flex-1 p-6">
-              <div className="max-w-4xl mx-auto">
-                <pre className="whitespace-pre-wrap font-sans text-foreground">{contentData.text}</pre>
-              </div>
-            </ScrollArea>
-          </div>}
-
-        {renderControls()}
-        
-        {/* Enhanced website processing indicator */}
-        {(contentData.type === 'website' || contentData.url && contentData.url.startsWith('http')) && contentData.processing_status === 'processing' && <EnhancedWebsiteProcessing url={contentData.url || ''} processingStatus={contentData.processing_status} />}
-        
-        <WebsiteContentTabs contentData={contentData} onTextExpand={() => setIsTextExpanded(true)} isProcessing={contentData.processing_status === 'processing'} />
-      </div>;
+    return <div className="flex-1 overflow-hidden">
+      <UnifiedDocumentViewer 
+        contentData={contentData} 
+        onUpdateContent={onUpdateContent} 
+      />
+    </div>;
   }
 
   // Default layout with tabs for other content types
