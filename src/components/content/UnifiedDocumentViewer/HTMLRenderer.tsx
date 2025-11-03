@@ -100,9 +100,9 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
   }
 
   return (
-    <div className="h-full w-full overflow-auto bg-background">
+    <div className="h-full w-full overflow-auto bg-white dark:bg-neutral-800/50">
       {/* Enhanced toolbar */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border p-2">
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm border-b border-border p-2">
         <div className="flex items-center justify-between max-w-4xl mx-auto">
           <div className="flex items-center gap-2">
             <Button
@@ -150,12 +150,12 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
       </div>
 
       <div className={cn(
-        "mx-auto transition-all duration-300",
+        "mx-auto transition-all duration-300 py-6",
         isReaderMode ? "max-w-2xl" : "max-w-4xl"
       )}>
         <div 
           className={cn(
-            "bg-card border border-border rounded-lg mx-4 my-6 shadow-sm transition-all duration-300",
+            "bg-white dark:bg-neutral-900/50 border border-border rounded-lg mx-4 shadow-sm transition-all duration-300",
             isReaderMode && "shadow-lg"
           )}
           style={{ 

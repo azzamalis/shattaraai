@@ -13,8 +13,8 @@ export function ThumbnailView() {
   if (documentType === 'pdf') {
     // For PDF, show page thumbnails
     return (
-      <div className="h-full w-full overflow-auto bg-background p-4">
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="overflow-x-hidden">
+        <div className="flex flex-col gap-4 items-center py-4">
           {Array.from({ length: totalPages }, (_, index) => {
             const pageNumber = index + 1;
             const isCurrentPage = pageNumber === currentPage;
@@ -23,25 +23,20 @@ export function ThumbnailView() {
               <div
                 key={pageNumber}
                 onClick={() => goToPage(pageNumber)}
-                className={`
-                  cursor-pointer rounded-lg border-2 transition-all duration-200 hover:shadow-lg
-                  ${isCurrentPage 
-                    ? 'border-primary bg-primary/10' 
-                    : 'border-border hover:border-primary/50'
-                  }
-                `}
+                style={{ minHeight: '150px', minWidth: '10px' }}
               >
-                <div className="aspect-[3/4] bg-card rounded-md flex items-center justify-center relative overflow-hidden">
-                  {/* Placeholder for PDF page thumbnail */}
-                  <div className="w-full h-full bg-muted/30 flex items-center justify-center">
-                    <FileText className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  
-                  {/* Page number overlay */}
-                  <div className="absolute bottom-1 left-1 right-1 bg-background/90 rounded text-xs text-center py-1">
-                    {pageNumber}
-                  </div>
-                </div>
+                <canvas
+                  className={`transition-all w-48 hover:shadow-lg cursor-pointer ${
+                    isCurrentPage 
+                      ? 'outline outline-2 outline-primary' 
+                      : 'hover:outline hover:outline-neutral-300 dark:hover:outline-neutral-600'
+                  }`}
+                  role="button"
+                  tabIndex={0}
+                  width={400}
+                  height={529}
+                  style={{ transform: 'rotate(0deg)' }}
+                />
               </div>
             );
           })}

@@ -28,6 +28,7 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
     viewMode,
     documentType,
     isFullscreen,
+    isThumbnailsOpen,
     setDocumentType,
     setError,
   } = useUnifiedDocument();
@@ -140,13 +141,26 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
   };
 
   return (
-    <div className={`h-full w-full flex flex-col bg-background border border-border/50 rounded-2xl ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
+    <div className={`h-full w-full flex flex-col bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl border border-primary/10 overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
       <EnhancedDocumentToolbar 
         onDownload={handleDownload}
         contentData={contentData}
       />
-      <div className="flex-1 overflow-hidden">
-        {renderDocumentContent()}
+      <div className="flex-1 min-h-0 relative grid transition-all duration-300 bg-white dark:bg-neutral-800/50" style={{ gridTemplateColumns: isThumbnailsOpen ? 'auto 0 1fr' : '0 0 1fr' }}>
+        {/* Thumbnail Sidebar */}
+        {isThumbnailsOpen && (
+          <div className="overflow-y-auto overflow-x-hidden border-r border-primary/10">
+            <ThumbnailView />
+          </div>
+        )}
+        
+        {/* Empty middle column for future use */}
+        <div className="overflow-y-auto overflow-x-hidden"></div>
+        
+        {/* Main Content */}
+        <div className="overflow-auto">
+          {renderDocumentContent()}
+        </div>
       </div>
     </div>
   );

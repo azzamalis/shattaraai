@@ -1,22 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
-  LayoutGrid, 
+  PanelLeft, 
   Search, 
-  ChevronLeft, 
-  ChevronRight, 
+  Moon, 
+  Volume2, 
+  ChevronDown,
   RotateCw, 
   Download, 
-  Maximize, 
-  Minimize,
+  Maximize,
   X,
-  ArrowUp,
-  ArrowDown
+  ChevronUp,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
-import { ZoomDropdown } from './ZoomDropdown';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface EnhancedDocumentToolbarProps {
   onDownload?: () => void;
@@ -30,15 +31,16 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
   const {
     currentPage,
     totalPages,
-    viewMode,
+    zoom,
     isFullscreen,
     searchTerm,
     searchResults,
     currentSearchIndex,
     isSearchOpen,
-    toggleViewMode,
+    isThumbnailsOpen,
     toggleFullscreen,
     toggleSearch,
+    toggleThumbnails,
     setSearchTerm,
     performSearch,
     nextSearchResult,
@@ -46,7 +48,11 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
     rotateClockwise,
     nextPage,
     previousPage,
+    setZoom,
+    setCurrentPage,
   } = useUnifiedDocument();
+
+  const [pageInputValue, setPageInputValue] = useState(currentPage.toString());
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,123 +67,170 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
     }
   };
 
+  const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPageInputValue(e.target.value);
+  };
+
+  const handlePageInputBlur = () => {
+    const page = parseInt(pageInputValue, 10);
+    if (!isNaN(page) && page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    } else {
+      setPageInputValue(currentPage.toString());
+    }
+  };
+
+  const handlePageInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handlePageInputBlur();
+    }
+  };
+
+  React.useEffect(() => {
+    setPageInputValue(currentPage.toString());
+  }, [currentPage]);
+
   return (
-    <div className="flex items-center justify-between w-full h-12 px-3 bg-background">
-      {/* Left Section */}
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleSearch}
-          className={`h-8 px-2 hover:bg-muted/50 ${
-            isSearchOpen ? 'bg-muted text-primary' : ''
-          }`}
-          title="Search document"
-        >
-          <Search className="h-4 w-4" />
-        </Button>
+    <div className="bg-white dark:bg-neutral-800/50 border-b border-primary/10 p-2 py-[4.5px] flex items-center text-sm text-neutral-600 dark:text-neutral-300 gap-2 rounded-t-lg">
+      {/* Left Section - View Controls */}
+      <button
+        className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full"
+        title="Toggle Thumbnails"
+        onClick={toggleThumbnails}
+      >
+        <PanelLeft className="w-4 h-4" stroke="#525252" />
+      </button>
 
-        {isSearchOpen && (
-          <div className="flex items-center gap-1 ml-2">
-            <form onSubmit={handleSearch} className="flex items-center gap-1">
-              <Input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-7 w-32 text-xs"
-                autoFocus
-              />
-              {searchResults.length > 0 && (
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-muted-foreground px-1">
-                    {currentSearchIndex + 1} of {searchResults.length}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={previousSearchResult}
-                    className="h-6 w-6 p-0 hover:bg-muted/50"
-                  >
-                    <ArrowUp className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={nextSearchResult}
-                    className="h-6 w-6 p-0 hover:bg-muted/50"
-                  >
-                    <ArrowDown className="h-3 w-3" />
-                  </Button>
-                </div>
-              )}
-            </form>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleSearch}
-              className="h-6 w-6 p-0 hover:bg-muted/50"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        )}
-      </div>
+      <button
+        className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full ml-[-8px]"
+        title="Toggle Search"
+        onClick={toggleSearch}
+      >
+        <Search className="w-4 h-4" stroke="#525252" />
+      </button>
 
-      {/* Center Section */}
-      <div className="flex items-center gap-2">
-        <ThemeToggle />
-        
-        {/* Pagination Controls */}
+      {isSearchOpen && (
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={previousPage}
-            disabled={currentPage <= 1}
-            className="h-8 px-2 hover:bg-muted/50 disabled:opacity-50"
-            title="Previous page"
+          <form onSubmit={handleSearch} className="flex items-center gap-1">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-white dark:bg-neutral-800 rounded-lg px-2 py-1 border dark:border-neutral-700 text-xs w-32"
+              autoFocus
+            />
+            {searchResults.length > 0 && (
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-muted-foreground px-1">
+                  {currentSearchIndex + 1} / {searchResults.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={previousSearchResult}
+                  className="p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full"
+                >
+                  <ChevronUp className="h-3 w-3" />
+                </button>
+                <button
+                  type="button"
+                  onClick={nextSearchResult}
+                  className="p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full"
+                >
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+          </form>
+          <button
+            onClick={toggleSearch}
+            className="p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full"
           >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          
-          <div className="flex items-center gap-1 px-2">
-            <span className="text-xs font-mono text-muted-foreground">
-              {currentPage} / {totalPages}
-            </span>
-          </div>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={nextPage}
-            disabled={currentPage >= totalPages}
-            className="h-8 px-2 hover:bg-muted/50 disabled:opacity-50"
-            title="Next page"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+            <X className="h-3 w-3" />
+          </button>
         </div>
+      )}
 
-        {/* Zoom Dropdown */}
-        <ZoomDropdown />
+      <button
+        className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full ml-[-8px]"
+        title="Switch PDF to dark theme"
+      >
+        <Moon className="w-4 h-4" stroke="#525252" />
+      </button>
+
+      <button
+        className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full ml-[-8px]"
+        title="Read aloud"
+      >
+        <Volume2 className="w-4 h-4" stroke="#525252" />
+      </button>
+
+      <span className="flex-grow"></span>
+
+      {/* Center Section - Page Navigation */}
+      <div className="flex items-center gap-1">
+        <input
+          className="bg-white dark:bg-neutral-800 rounded-lg px-0 py-1 border dark:border-neutral-700 text-center"
+          type="text"
+          value={pageInputValue}
+          onChange={handlePageInputChange}
+          onBlur={handlePageInputBlur}
+          onKeyDown={handlePageInputKeyDown}
+          style={{ width: '2.5em', textAlign: 'center' }}
+        />
+        <span> / </span>
+        <div>{totalPages}</div>
       </div>
 
-      {/* Right Section */}
+      <div className="h-6 w-[1px] bg-neutral-300 dark:bg-neutral-700 ml-1.5"></div>
+
+      {/* Zoom Dropdown */}
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleFullscreen}
-          className="h-8 px-2 hover:bg-muted/50"
-          title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-1 px-2 py-1 text-sm bg-white dark:bg-neutral-800 rounded-lg border dark:border-neutral-700">
+              {zoom === 100 ? 'Page fit' : `${zoom}%`}
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="center">
+            <DropdownMenuItem onClick={() => setZoom(50)}>50%</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setZoom(75)}>75%</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setZoom(100)}>Page fit (100%)</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setZoom(125)}>125%</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setZoom(150)}>150%</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setZoom(200)}>200%</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <span className="flex-grow"></span>
+
+      {/* Right Section - Action Controls */}
+      <div className="flex items-center gap-2">
+        <button
+          className="p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 rounded-full"
+          title="Rotate 90° Clockwise"
+          onClick={rotateClockwise}
         >
-          {isFullscreen ? (
-            <Minimize className="h-4 w-4" />
-          ) : (
-            <Maximize className="h-4 w-4" />
-          )}
-        </Button>
+          <RotateCw className="w-4 h-4" stroke="#525252" />
+        </button>
+
+        <button
+          className="p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 rounded-full"
+          title="Download PDF"
+          onClick={handleDownload}
+        >
+          <Download className="w-4 h-4" stroke="#525252" />
+        </button>
+
+        <button
+          className="p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 rounded-full"
+          title="Full Screen"
+          onClick={toggleFullscreen}
+        >
+          <Maximize className="w-4 h-4" stroke="#525252" />
+        </button>
       </div>
     </div>
   );

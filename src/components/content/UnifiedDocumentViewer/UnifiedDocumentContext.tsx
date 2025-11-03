@@ -17,6 +17,7 @@ interface UnifiedDocumentState {
   totalPages: number;
   viewMode: ViewMode;
   isFullscreen: boolean;
+  isThumbnailsOpen: boolean;
   
   // Search state
   searchTerm: string;
@@ -30,6 +31,9 @@ interface UnifiedDocumentState {
   documentType: DocumentType;
   isLoading: boolean;
   error: string | null;
+  
+  // Audio state
+  isAudioPlaying: boolean;
 }
 
 interface UnifiedDocumentContextType extends UnifiedDocumentState {
@@ -39,6 +43,7 @@ interface UnifiedDocumentContextType extends UnifiedDocumentState {
   setTotalPages: (pages: number) => void;
   toggleViewMode: () => void;
   toggleFullscreen: () => void;
+  toggleThumbnails: () => void;
   
   // Search controls
   setSearchTerm: (term: string) => void;
@@ -65,6 +70,9 @@ interface UnifiedDocumentContextType extends UnifiedDocumentState {
   nextPage: () => void;
   previousPage: () => void;
   goToPage: (page: number) => void;
+  
+  // Audio controls
+  toggleAudio: () => void;
 }
 
 const UnifiedDocumentContext = createContext<UnifiedDocumentContextType | undefined>(undefined);
@@ -76,6 +84,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     totalPages: 1,
     viewMode: 'document',
     isFullscreen: false,
+    isThumbnailsOpen: false,
     searchTerm: '',
     searchResults: [],
     currentSearchIndex: 0,
@@ -85,6 +94,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     documentType: 'unknown',
     isLoading: false,
     error: null,
+    isAudioPlaying: false,
   });
 
   // View controls
@@ -93,6 +103,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
   const setTotalPages = (pages: number) => setState(prev => ({ ...prev, totalPages: Math.max(1, pages) }));
   const toggleViewMode = () => setState(prev => ({ ...prev, viewMode: prev.viewMode === 'document' ? 'thumbnail' : 'document' }));
   const toggleFullscreen = () => setState(prev => ({ ...prev, isFullscreen: !prev.isFullscreen }));
+  const toggleThumbnails = () => setState(prev => ({ ...prev, isThumbnailsOpen: !prev.isThumbnailsOpen }));
 
   // Search controls
   const setSearchTerm = (term: string) => setState(prev => ({ ...prev, searchTerm: term }));
@@ -148,6 +159,9 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
   const previousPage = () => setCurrentPage(state.currentPage - 1);
   const goToPage = (page: number) => setCurrentPage(page);
 
+  // Audio controls
+  const toggleAudio = () => setState(prev => ({ ...prev, isAudioPlaying: !prev.isAudioPlaying }));
+
   const value: UnifiedDocumentContextType = {
     ...state,
     setZoom,
@@ -155,6 +169,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     setTotalPages,
     toggleViewMode,
     toggleFullscreen,
+    toggleThumbnails,
     setSearchTerm,
     toggleSearch,
     performSearch,
@@ -173,6 +188,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     nextPage,
     previousPage,
     goToPage,
+    toggleAudio,
   };
 
   return (

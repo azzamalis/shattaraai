@@ -112,10 +112,10 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
   }
 
   return (
-    <div className="h-full w-full overflow-auto bg-background">
-      <div className="max-w-4xl mx-auto">
+    <div className="h-full w-full overflow-auto bg-white dark:bg-neutral-800/50">
+      <div className="max-w-4xl mx-auto py-6">
         <div 
-          className="p-8 bg-card shadow-sm mx-4 my-6 rounded-lg border border-border"
+          className="p-8 bg-white dark:bg-neutral-900/50 shadow-sm mx-4 rounded-lg border border-border"
           style={{ 
             transform: `scale(${zoom / 100})`,
             transformOrigin: 'top center',

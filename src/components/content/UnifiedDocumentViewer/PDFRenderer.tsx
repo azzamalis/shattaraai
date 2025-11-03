@@ -78,9 +78,9 @@ export function PDFRenderer({ url }: PDFRendererProps) {
   }
 
   return (
-    <div className="h-full w-full bg-muted/10">
+    <div className="h-full w-full bg-white dark:bg-neutral-800/50 flex justify-center overflow-auto">
       <Worker workerUrl="/pdf.worker.min.mjs">
-        <div className="h-full">
+        <div className="h-full w-full max-w-4xl">
           <Viewer
             fileUrl={pdfFile}
             defaultScale={zoom / 100}
