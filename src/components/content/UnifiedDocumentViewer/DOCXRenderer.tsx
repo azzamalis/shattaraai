@@ -11,16 +11,21 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
   const {
     zoom,
     searchTerm,
+    rotation,
+    currentSearchIndex,
+    searchResults,
     setTotalPages,
     setDocumentData,
     setIsLoading,
     setError,
+    setSearchResults,
     error,
     isLoading
   } = useUnifiedDocument();
 
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [textContent, setTextContent] = useState<string>('');
+  const contentRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const processDocument = async () => {
@@ -118,8 +123,57 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
     if (!searchTerm || !htmlContent) return htmlContent;
 
     const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return htmlContent.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>');
+    return htmlContent.replace(regex, '<mark class="search-highlight bg-yellow-200 dark:bg-yellow-800" data-search-index="$1">$1</mark>');
   };
+
+  // Scroll to current search result
+  useEffect(() => {
+    if (searchResults.length > 0 && currentSearchIndex >= 0 && contentRef.current) {
+      const highlights = contentRef.current.querySelectorAll('.search-highlight');
+      const currentHighlight = highlights[currentSearchIndex];
+      
+      if (currentHighlight) {
+        // Remove active class from all highlights
+        highlights.forEach(h => h.classList.remove('bg-orange-300', 'dark:bg-orange-600'));
+        
+        // Add active class to current highlight
+        currentHighlight.classList.add('bg-orange-300', 'dark:bg-orange-600');
+        
+        // Scroll to the highlight
+        currentHighlight.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+    }
+  }, [currentSearchIndex, searchResults]);
+
+  // Update search results when search term changes
+  useEffect(() => {
+    if (!searchTerm || !textContent) {
+      setSearchResults([], 0);
+      return;
+    }
+
+    const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    const matches = [];
+    let match;
+    
+    while ((match = regex.exec(textContent)) !== null) {
+      matches.push({
+        id: `docx-${match.index}`,
+        page: 1, // DOCX is single page
+        text: textContent.substring(
+          Math.max(0, match.index - 30),
+          Math.min(textContent.length, match.index + searchTerm.length + 30)
+        ),
+        position: { x: 0, y: match.index }
+      });
+    }
+
+    // Update context with search results
+    setSearchResults(matches, matches.length > 0 ? 0 : -1);
+  }, [searchTerm, textContent, setSearchResults]);
 
   if (isLoading) {
     return (
@@ -159,7 +213,15 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
 
   return (
     <div className="h-full w-full overflow-auto bg-white dark:bg-neutral-800/50">
-      <div className="max-w-4xl mx-auto py-6">
+      <div 
+        className="max-w-4xl mx-auto py-6"
+        style={{
+          transform: `rotate(${rotation}deg)`,
+          transformOrigin: 'center center',
+          transition: 'transform 0.3s ease-in-out',
+          minHeight: '100%'
+        }}
+      >
         <div 
           className="p-8 bg-white dark:bg-neutral-900/50 shadow-sm mx-4 rounded-lg border border-border"
           style={{ 
@@ -169,6 +231,7 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
           }}
         >
           <div 
+            ref={contentRef}
             className="prose prose-base max-w-none dark:prose-invert 
               prose-headings:font-bold prose-headings:tracking-tight prose-headings:mb-4 prose-headings:mt-8
               prose-h1:text-3xl prose-h1:mb-6 prose-h1:mt-0

@@ -76,6 +76,9 @@ interface UnifiedDocumentContextType extends UnifiedDocumentState {
   
   // Audio controls
   toggleAudio: () => void;
+  
+  // Internal state setter for renderers
+  setSearchResults: (results: SearchResult[], currentIndex?: number) => void;
 }
 
 const UnifiedDocumentContext = createContext<UnifiedDocumentContextType | undefined>(undefined);
@@ -169,9 +172,9 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
           setCurrentPage(results[0].page);
         }
       } else {
-        // For non-PDF documents, search in text content or HTML
-        // This is a simplified implementation
-        setState(prev => ({ ...prev, searchResults: [], currentSearchIndex: 0, isSearching: false }));
+        // For non-PDF documents (DOCX, HTML, etc.), the renderer will handle search
+        // Just update the search term and let the renderer populate results
+        setState(prev => ({ ...prev, isSearching: false }));
       }
     } catch (error) {
       console.error('Search error:', error);
@@ -227,6 +230,16 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
 
   // Audio controls
   const toggleAudio = () => setState(prev => ({ ...prev, isAudioPlaying: !prev.isAudioPlaying }));
+  
+  // Internal state setter for renderers
+  const setSearchResults = (results: SearchResult[], currentIndex: number = 0) => {
+    setState(prev => ({ 
+      ...prev, 
+      searchResults: results, 
+      currentSearchIndex: currentIndex,
+      isSearching: false 
+    }));
+  };
 
   const value: UnifiedDocumentContextType = {
     ...state,
@@ -256,6 +269,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     previousPage,
     goToPage,
     toggleAudio,
+    setSearchResults,
   };
 
   return (
