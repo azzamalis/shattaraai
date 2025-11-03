@@ -31,6 +31,7 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
     isThumbnailsOpen,
     setDocumentType,
     setError,
+    setPdfUrl,
   } = useUnifiedDocument();
 
   // Detect content type based on contentData
@@ -46,10 +47,17 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
     const detectedType = detectContentType(contentData);
     setDocumentType(detectedType);
     
+    // Set PDF URL if it's a PDF
+    if (detectedType === 'pdf' && contentData.url) {
+      setPdfUrl(contentData.url);
+    } else {
+      setPdfUrl(null);
+    }
+    
     if (detectedType === 'unknown') {
       setError('Unsupported document type');
     }
-  }, [contentData, setDocumentType, setError]);
+  }, [contentData, setDocumentType, setError, setPdfUrl]);
 
   const handleDownload = () => {
     if (contentData.url) {

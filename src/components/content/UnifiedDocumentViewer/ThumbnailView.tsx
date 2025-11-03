@@ -1,6 +1,78 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Grid, FileText } from 'lucide-react';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
+import * as pdfjsLib from 'pdfjs-dist';
+
+interface PDFThumbnailProps {
+  pageNumber: number;
+  isCurrentPage: boolean;
+  onClick: () => void;
+  pdfUrl: string;
+}
+
+function PDFThumbnail({ pageNumber, isCurrentPage, onClick, pdfUrl }: PDFThumbnailProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isRendering, setIsRendering] = useState(false);
+
+  useEffect(() => {
+    const renderThumbnail = async () => {
+      if (!canvasRef.current || !pdfUrl || isRendering) return;
+      
+      setIsRendering(true);
+      try {
+        // Configure PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        const pdf = await loadingTask.promise;
+        const page = await pdf.getPage(pageNumber);
+        
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        if (!context) return;
+        
+        // Scale down for thumbnail
+        const viewport = page.getViewport({ scale: 0.3 });
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        
+        await page.render({
+          canvasContext: context,
+          viewport: viewport,
+        }).promise;
+      } catch (error) {
+        console.error('Error rendering PDF thumbnail:', error);
+      } finally {
+        setIsRendering(false);
+      }
+    };
+
+    renderThumbnail();
+  }, [pageNumber, pdfUrl, isRendering]);
+
+  return (
+    <div
+      onClick={onClick}
+      className="p-2 cursor-pointer"
+    >
+      <canvas
+        ref={canvasRef}
+        className={`transition-all hover:shadow-lg max-w-[150px] ${
+          isCurrentPage 
+            ? 'outline outline-2 outline-primary' 
+            : 'hover:outline hover:outline-1 hover:outline-muted-foreground/30'
+        }`}
+        role="button"
+        tabIndex={0}
+      />
+      <div className="text-center mt-1">
+        <span className={`text-xs ${isCurrentPage ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+          {pageNumber}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export function ThumbnailView() {
   const {
@@ -8,36 +80,26 @@ export function ThumbnailView() {
     totalPages,
     documentType,
     goToPage,
+    pdfUrl,
   } = useUnifiedDocument();
 
-  if (documentType === 'pdf') {
+  if (documentType === 'pdf' && pdfUrl) {
     // For PDF, show page thumbnails
     return (
-      <div className="overflow-x-hidden">
-        <div className="flex flex-col gap-4 items-center py-4">
+      <div className="overflow-y-auto overflow-x-hidden">
+        <div className="flex flex-col items-center py-2">
           {Array.from({ length: totalPages }, (_, index) => {
             const pageNumber = index + 1;
             const isCurrentPage = pageNumber === currentPage;
             
             return (
-              <div
+              <PDFThumbnail
                 key={pageNumber}
+                pageNumber={pageNumber}
+                isCurrentPage={isCurrentPage}
                 onClick={() => goToPage(pageNumber)}
-                style={{ minHeight: '150px', minWidth: '10px' }}
-              >
-                <canvas
-                  className={`transition-all w-48 hover:shadow-lg cursor-pointer ${
-                    isCurrentPage 
-                      ? 'outline outline-2 outline-primary' 
-                      : 'hover:outline hover:outline-neutral-300 dark:hover:outline-neutral-600'
-                  }`}
-                  role="button"
-                  tabIndex={0}
-                  width={400}
-                  height={529}
-                  style={{ transform: 'rotate(0deg)' }}
-                />
-              </div>
+                pdfUrl={pdfUrl}
+              />
             );
           })}
         </div>

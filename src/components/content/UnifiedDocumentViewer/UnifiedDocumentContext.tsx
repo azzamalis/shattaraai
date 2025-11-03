@@ -31,6 +31,7 @@ interface UnifiedDocumentState {
   documentType: DocumentType;
   isLoading: boolean;
   error: string | null;
+  pdfUrl: string | null;
   
   // Audio state
   isAudioPlaying: boolean;
@@ -58,6 +59,7 @@ interface UnifiedDocumentContextType extends UnifiedDocumentState {
   setDocumentType: (type: DocumentType) => void;
   setIsLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  setPdfUrl: (url: string | null) => void;
   
   // Zoom controls
   zoomIn: () => void;
@@ -94,6 +96,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     documentType: 'unknown',
     isLoading: false,
     error: null,
+    pdfUrl: null,
     isAudioPlaying: false,
   });
 
@@ -146,6 +149,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
   const setDocumentType = (type: DocumentType) => setState(prev => ({ ...prev, documentType: type }));
   const setIsLoading = (loading: boolean) => setState(prev => ({ ...prev, isLoading: loading }));
   const setError = (error: string | null) => setState(prev => ({ ...prev, error }));
+  const setPdfUrl = (url: string | null) => setState(prev => ({ ...prev, pdfUrl: url }));
 
   // Zoom controls
   const zoomIn = () => setZoom(state.zoom + 25);
@@ -180,6 +184,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     setDocumentType,
     setIsLoading,
     setError,
+    setPdfUrl,
     zoomIn,
     zoomOut,
     setZoomLevel,
