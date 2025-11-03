@@ -783,18 +783,6 @@ export const useContent = () => {
                   }
                 });
                 toast.success('Word document uploaded! Text extraction in progress...');
-                
-                // Generate thumbnail for Word documents
-                console.log('DEBUG: useContent - Generating thumbnail for Word document');
-                supabase.functions.invoke('generate-document-thumbnail', {
-                  body: {
-                    contentId: contentId,
-                    url: contentData.storage_path || contentData.url
-                  }
-                }).catch(error => {
-                  console.error('DEBUG: useContent - Thumbnail generation failed:', error);
-                  // Don't show error to user - thumbnail generation is not critical
-                });
               } else {
                 console.log('DEBUG: useContent - Using general extract-document-text function');
                 await supabase.functions.invoke('extract-document-text', {

@@ -81,7 +81,6 @@ export function ThumbnailView() {
     documentType,
     goToPage,
     pdfUrl,
-    contentMetadata,
   } = useUnifiedDocument();
 
   if (documentType === 'pdf' && pdfUrl) {
@@ -109,65 +108,36 @@ export function ThumbnailView() {
   }
 
   if (documentType === 'docx' || documentType === 'html' || documentType === 'text') {
-    // For DOCX/HTML/Text documents, try to show thumbnail from database
-    const thumbnailUrl = contentMetadata?.thumbnail_url;
-
+    // For other document types, show section overview
     return (
       <div className="h-full w-full overflow-auto bg-background p-4">
-        <div className="flex flex-col items-center py-2">
-          {thumbnailUrl ? (
-            <div
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-6">
+            <Grid className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+            <h3 className="text-lg font-medium text-foreground">Document Overview</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              This document is displayed as a continuous scroll
+            </p>
+          </div>
+          
+          <div className="space-y-4">
+            <div 
+              className="p-4 border border-border rounded-lg cursor-pointer hover:bg-muted/30 transition-colors"
               onClick={() => goToPage(1)}
-              className="p-2 cursor-pointer"
             >
-              <img
-                src={thumbnailUrl}
-                alt="Document thumbnail"
-                className="transition-all hover:shadow-lg max-w-[150px] outline outline-2 outline-primary rounded bg-white"
-                role="button"
-                tabIndex={0}
-              />
-              <div className="text-center mt-2">
-                <span className="text-xs text-primary font-medium">
-                  Document Preview
-                </span>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {documentType === 'docx' && 'Word Document'}
-                  {documentType === 'html' && 'Web Page'}
-                  {documentType === 'text' && 'Text Content'}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="max-w-2xl mx-auto">
-              <div className="text-center mb-6">
-                <Grid className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                <h3 className="text-lg font-medium text-foreground">Document Overview</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  This document is displayed as a continuous scroll
-                </p>
-              </div>
-              
-              <div className="space-y-4">
-                <div 
-                  className="p-4 border border-border rounded-lg cursor-pointer hover:bg-muted/30 transition-colors"
-                  onClick={() => goToPage(1)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-foreground">Document Content</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {documentType === 'docx' && 'Word Document'}
-                        {documentType === 'html' && 'Web Page Content'}
-                        {documentType === 'text' && 'Text Content'}
-                      </p>
-                    </div>
-                    <FileText className="h-5 w-5 text-muted-foreground" />
-                  </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-foreground">Document Content</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {documentType === 'docx' && 'Word Document'}
+                    {documentType === 'html' && 'Web Page Content'}
+                    {documentType === 'text' && 'Text Content'}
+                  </p>
                 </div>
+                <FileText className="h-5 w-5 text-muted-foreground" />
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );
