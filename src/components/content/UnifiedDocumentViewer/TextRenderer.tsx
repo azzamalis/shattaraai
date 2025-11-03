@@ -15,11 +15,16 @@ export function TextRenderer({
 }: TextRendererProps) {
   const {
     zoom,
+    rotation,
     searchTerm,
+    currentSearchIndex,
     setTotalPages,
-    setDocumentData
+    setDocumentData,
+    setSearchResults
   } = useUnifiedDocument();
   const [displayContent, setDisplayContent] = useState<string>('');
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (content) {
       setDisplayContent(content);
@@ -27,6 +32,53 @@ export function TextRenderer({
       setTotalPages(1); // Text content is continuous scroll
     }
   }, [content, setDocumentData, setTotalPages]);
+
+  // Handle search and create search results
+  useEffect(() => {
+    if (!displayContent) return;
+
+    if (searchTerm.trim()) {
+      const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      const matches = displayContent.match(regex);
+      
+      if (matches && matches.length > 0) {
+        const results = matches.map((match, index) => ({
+          id: `text-${index}`,
+          page: 1,
+          text: match,
+          position: { x: 0, y: 0 }
+        }));
+        setSearchResults(results, 0);
+      } else {
+        setSearchResults([], -1);
+      }
+    } else {
+      setSearchResults([], -1);
+    }
+  }, [searchTerm, displayContent, setSearchResults]);
+
+  // Scroll to current search result
+  useEffect(() => {
+    if (!contentRef.current || !searchTerm || currentSearchIndex < 0) return;
+
+    const marks = contentRef.current.querySelectorAll('mark');
+    if (marks[currentSearchIndex]) {
+      marks[currentSearchIndex].scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+      
+      // Highlight current result differently
+      marks.forEach((mark, index) => {
+        if (index === currentSearchIndex) {
+          mark.className = 'bg-orange-400 dark:bg-orange-600';
+        } else {
+          mark.className = 'bg-yellow-200 dark:bg-yellow-800';
+        }
+      });
+    }
+  }, [currentSearchIndex, searchTerm]);
+
   const getHighlightedContent = (text: string) => {
     if (!searchTerm) return text;
     const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
@@ -40,10 +92,10 @@ export function TextRenderer({
         </div>
       </div>;
   }
-  return <div className="h-full w-full overflow-auto bg-white dark:bg-neutral-800/50">
+  return <div className="h-full w-full overflow-auto bg-white dark:bg-neutral-800/50" ref={contentRef}>
       <div className="max-w-4xl mx-auto py-6">
         <div className="bg-white dark:bg-neutral-900/50 mx-4 p-8 rounded-lg border border-border shadow-sm" style={{
-        transform: `scale(${zoom / 100})`,
+        transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
         transformOrigin: 'top center',
         transition: 'transform 0.2s ease-in-out'
       }}>
