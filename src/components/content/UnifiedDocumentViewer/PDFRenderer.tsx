@@ -127,7 +127,13 @@ export function PDFRenderer({ url }: PDFRendererProps) {
   return (
     <div className="h-full w-full bg-white dark:bg-neutral-800/50 flex justify-center overflow-auto">
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-        <div className="h-full w-full max-w-4xl">
+        <div 
+          className="h-full w-full max-w-4xl transition-transform duration-300"
+          style={{
+            transform: `rotate(${rotation}deg)`,
+            transformOrigin: 'center center'
+          }}
+        >
           <Viewer
             key={`pdf-${zoom}-${rotation}`}
             fileUrl={pdfFile}
