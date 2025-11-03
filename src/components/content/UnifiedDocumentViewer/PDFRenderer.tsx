@@ -129,6 +129,7 @@ export function PDFRenderer({ url }: PDFRendererProps) {
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
         <div className="h-full w-full max-w-4xl">
           <Viewer
+            key={`pdf-${zoom}-${rotation}`}
             fileUrl={pdfFile}
             defaultScale={zoom / 100}
             initialPage={currentPage - 1}
