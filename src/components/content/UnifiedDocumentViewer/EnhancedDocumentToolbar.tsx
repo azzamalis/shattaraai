@@ -12,6 +12,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
+import { useTheme } from '@/hooks/useTheme';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,6 +52,8 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
     setZoom,
     setCurrentPage,
   } = useUnifiedDocument();
+
+  const { toggleTheme } = useTheme();
 
   const [pageInputValue, setPageInputValue] = useState(currentPage.toString());
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
@@ -170,6 +173,7 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
       <button
         className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full ml-[-8px]"
         title="Switch PDF to dark theme"
+        onClick={toggleTheme}
       >
         <Moon className="w-4 h-4" stroke="#525252" />
       </button>
