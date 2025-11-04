@@ -160,11 +160,19 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
 
   return (
     <div className="h-full w-full overflow-auto bg-white dark:bg-neutral-800/50">
-      <div className="max-w-4xl mx-auto py-6">
+      <div 
+        className="max-w-4xl mx-auto py-6"
+        style={{
+          transform: `rotate(${rotation}deg)`,
+          transformOrigin: 'center center',
+          transition: 'transform 0.3s ease-in-out',
+          minHeight: '100%'
+        }}
+      >
         <div 
-          className="bg-white dark:bg-neutral-900/50 mx-4 p-8 rounded-lg border border-border shadow-sm"
-          style={{
-            transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
+          className="p-8 bg-white dark:bg-neutral-900/50 shadow-sm mx-4 rounded-lg border border-border"
+          style={{ 
+            transform: `scale(${zoom / 100})`,
             transformOrigin: 'top center',
             transition: 'transform 0.2s ease-in-out'
           }}
