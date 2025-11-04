@@ -8,8 +8,6 @@ import { HTMLRenderer } from './HTMLRenderer';
 import { TextRenderer } from './TextRenderer';
 import { ThumbnailView } from './ThumbnailView';
 import { WebsiteRenderer } from './WebsiteRenderer';
-import { WebsiteMetadataSidebar } from './WebsiteMetadataSidebar';
-import { useWebsiteData } from './useWebsiteData';
 
 interface ContentData {
   id?: string;
@@ -32,20 +30,10 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
     documentType,
     isFullscreen,
     isThumbnailsOpen,
-    isMetadataOpen,
     setDocumentType,
     setError,
     setPdfUrl,
   } = useUnifiedDocument();
-
-  // For HTML content, extract metadata for sidebar using the hook
-  const websiteData = documentType === 'html' 
-    ? useWebsiteData(
-        contentData.text_content || '',
-        contentData,
-        contentData.title || contentData.filename
-      )
-    : null;
 
   // Detect content type based on contentData
   const detectContentType = (data: ContentData): DocumentType => {
@@ -168,29 +156,16 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
         onDownload={handleDownload}
         contentData={contentData}
       />
-      <div className="flex-1 min-h-0 relative grid transition-all duration-300 bg-white dark:bg-neutral-800/50"
-        style={{
-          gridTemplateColumns: `${isThumbnailsOpen ? 'auto' : '0'} ${isMetadataOpen && documentType === 'html' ? 'auto' : '0'} 1fr`
-        }}
-      >
-        {/* Thumbnail Sidebar - Left (for PDFs) */}
+      <div className="flex-1 min-h-0 relative flex transition-all duration-300 bg-white dark:bg-neutral-800/50">
+        {/* Thumbnail Sidebar */}
         {isThumbnailsOpen && (
-          <div className="overflow-y-auto overflow-x-hidden border-r border-primary/10">
+          <div className="w-48 flex-shrink-0 overflow-y-auto overflow-x-hidden border-r border-primary/10">
             <ThumbnailView />
           </div>
         )}
         
-        {/* Metadata Sidebar - Center (for HTML) */}
-        {isMetadataOpen && documentType === 'html' && websiteData && (
-          <WebsiteMetadataSidebar
-            articleStructure={websiteData.articleStructure}
-            extractedLinks={websiteData.extractedLinks}
-            websiteInfo={websiteData.websiteInfo}
-          />
-        )}
-        
-        {/* Main Content - Right */}
-        <div className="overflow-auto">
+        {/* Main Content */}
+        <div className="flex-1 overflow-auto">
           {renderDocumentContent()}
         </div>
       </div>
