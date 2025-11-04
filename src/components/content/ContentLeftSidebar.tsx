@@ -20,8 +20,6 @@ import RealtimeChaptersDisplay from './RealtimeChaptersDisplay';
 import { AudioChunker, getOptimalAudioStream } from '@/utils/audioChunking';
 import { useContent } from '@/hooks/useContent';
 import { RefreshCw } from 'lucide-react';
-import { WebsiteContentTabs } from './website/WebsiteContentTabs';
-import { EnhancedWebsiteProcessing } from './website/EnhancedWebsiteProcessing';
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
