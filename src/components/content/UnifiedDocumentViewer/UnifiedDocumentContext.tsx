@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 export type ViewMode = 'document' | 'thumbnail';
 export type DocumentType = 'pdf' | 'docx' | 'html' | 'text' | 'unknown';
@@ -114,10 +114,10 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
   const toggleThumbnails = () => setState(prev => ({ ...prev, isThumbnailsOpen: !prev.isThumbnailsOpen }));
 
   // Search controls
-  const setSearchTerm = (term: string) => setState(prev => ({ ...prev, searchTerm: term }));
-  const toggleSearch = () => setState(prev => ({ ...prev, isSearchOpen: !prev.isSearchOpen, searchTerm: !prev.isSearchOpen ? '' : prev.searchTerm, searchResults: !prev.isSearchOpen ? [] : prev.searchResults }));
+  const setSearchTerm = useCallback((term: string) => setState(prev => ({ ...prev, searchTerm: term })), []);
+  const toggleSearch = useCallback(() => setState(prev => ({ ...prev, isSearchOpen: !prev.isSearchOpen, searchTerm: !prev.isSearchOpen ? '' : prev.searchTerm, searchResults: !prev.isSearchOpen ? [] : prev.searchResults })), []);
   
-  const performSearch = async (term: string) => {
+  const performSearch = useCallback(async (term: string) => {
     setSearchTerm(term);
     
     if (!term.trim()) {
@@ -180,7 +180,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
       console.error('Search error:', error);
       setState(prev => ({ ...prev, searchResults: [], currentSearchIndex: 0, isSearching: false }));
     }
-  };
+  }, [state.documentType, state.pdfUrl]);
 
   const nextSearchResult = () => {
     if (state.searchResults.length > 0) {
