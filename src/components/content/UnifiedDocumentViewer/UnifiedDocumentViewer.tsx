@@ -7,7 +7,6 @@ import { DOCXRenderer } from './DOCXRenderer';
 import { HTMLRenderer } from './HTMLRenderer';
 import { TextRenderer } from './TextRenderer';
 import { ThumbnailView } from './ThumbnailView';
-import { WebsiteRenderer } from './WebsiteRenderer';
 
 interface ContentData {
   id?: string;
@@ -110,10 +109,9 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
           );
         }
         return (
-          <WebsiteRenderer 
+          <HTMLRenderer 
             htmlContent={contentData.text_content} 
             title={contentData.title || contentData.filename}
-            contentData={contentData}
           />
         );
 

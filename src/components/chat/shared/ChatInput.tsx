@@ -1,10 +1,9 @@
+
 import React, { useState, useRef, ChangeEvent } from 'react';
-import { Send, Loader2, Paperclip, X, Brain, ChevronDown, Check } from 'lucide-react';
+import { Send, Loader2, Paperclip, X, Brain, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Dialog } from '@/components/ui/dialog';
-import { UpgradeModal } from '@/components/dashboard/UpgradeModal';
 import { cn } from '@/lib/utils';
 
 interface ChatInputProps {
@@ -12,29 +11,26 @@ interface ChatInputProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
-  userPlan?: 'free' | 'pro';
 }
 
 const AI_MODELS = [
-  { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash", isPremium: false },
-  { value: "claude-4-sonnet", label: "Claude 4 Sonnet", isPremium: false },
-  { value: "gpt-4.1-mini", label: "GPT4.1 Mini", isPremium: false },
-  { value: "gemini-2.5-pro", label: "Gemini 2.5 Pro", isPremium: true },
-  { value: "grok-4", label: "Grok4", isPremium: true },
-  { value: "gpt-4.1", label: "GPT4.1", isPremium: true },
+  "Gemini 2.5 Flash",
+  "Claude 4 Sonnet", 
+  "GPT4.1",
+  "Gemini 2.5 Pro",
+  "Grok4",
+  "GPT4.1 Mini"
 ];
 
 export function ChatInput({
   onSendMessage,
   disabled = false,
   placeholder = "Type your message...",
-  className,
-  userPlan = 'free'
+  className
 }: ChatInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
-  const [selectedModel, setSelectedModel] = useState("claude-4-sonnet");
-  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("Claude 4 Sonnet");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -68,14 +64,6 @@ export function ChatInput({
 
   const triggerFileSelect = () => {
     fileInputRef.current?.click();
-  };
-
-  const handleModelSelect = (modelValue: string, isPremium: boolean) => {
-    if (userPlan === 'free' && isPremium) {
-      setUpgradeModalOpen(true);
-      return;
-    }
-    setSelectedModel(modelValue);
   };
 
   return (
@@ -140,25 +128,14 @@ export function ChatInput({
               <Brain className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="top" className="w-48 bg-popover z-50">
+          <DropdownMenuContent align="end" side="top" className="w-48">
             {AI_MODELS.map((model) => (
               <DropdownMenuItem
-                key={model.value}
-                onClick={() => handleModelSelect(model.value, model.isPremium)}
-                className={cn(
-                  "flex items-center justify-between",
-                  selectedModel === model.value ? "bg-accent" : ""
-                )}
+                key={model}
+                onClick={() => setSelectedModel(model)}
+                className={selectedModel === model ? "bg-accent" : ""}
               >
-                <div className="flex items-center gap-2">
-                  {selectedModel === model.value && <Check className="h-4 w-4 text-primary" />}
-                  <span>{model.label}</span>
-                </div>
-                {model.isPremium && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
-                    Upgrade
-                  </span>
-                )}
+                {model}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -212,11 +189,6 @@ export function ChatInput({
         onChange={handleFileSelect}
         className="hidden"
       />
-
-      {/* Upgrade Modal */}
-      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
-        <UpgradeModal onClose={() => setUpgradeModalOpen(false)} />
-      </Dialog>
     </form>
   );
 }
