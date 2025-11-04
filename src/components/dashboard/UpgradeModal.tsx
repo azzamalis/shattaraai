@@ -4,11 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface UpgradeModalProps {
-  onClose: () => void;
-}
-
-export function UpgradeModal({ onClose }: UpgradeModalProps) {
+export function UpgradeModal() {
   const [activePlan, setActivePlan] = useState<'annual' | 'monthly'>('annual');
 
   return (

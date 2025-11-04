@@ -215,7 +215,7 @@ export function ChatInput({
 
       {/* Upgrade Modal */}
       <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
-        <UpgradeModal onClose={() => setUpgradeModalOpen(false)} />
+        <UpgradeModal />
       </Dialog>
     </form>
   );
