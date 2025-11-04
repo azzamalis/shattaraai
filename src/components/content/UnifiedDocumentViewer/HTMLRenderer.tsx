@@ -160,15 +160,17 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
 
   return (
     <div className="h-full overflow-auto">
-      <div className="max-w-4xl mx-auto p-8">
+      <div 
+        className="w-full min-h-full flex justify-center p-8"
+        style={{
+          transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
+          transformOrigin: 'top center',
+          transition: 'transform 0.2s ease-out',
+        }}
+      >
         <div
           ref={contentRef}
-          className="prose prose-sm max-w-none dark:prose-invert"
-          style={{
-            transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-            transformOrigin: 'top center',
-            transition: 'transform 0.2s ease-out',
-          }}
+          className="prose prose-sm max-w-4xl w-full dark:prose-invert"
           dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
         />
       </div>

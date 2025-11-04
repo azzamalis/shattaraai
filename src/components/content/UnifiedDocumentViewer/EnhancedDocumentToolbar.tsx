@@ -110,7 +110,7 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
   }, [currentPage]);
 
   return (
-    <div className="bg-white dark:bg-neutral-800/50 border-b border-primary/10 p-2 py-[4.5px] flex items-center text-sm text-neutral-600 dark:text-neutral-300 gap-2 rounded-t-lg">
+    <div className="sticky top-0 z-20 bg-white dark:bg-neutral-800/50 border-b border-primary/10 p-2 py-[4.5px] flex items-center text-sm text-neutral-600 dark:text-neutral-300 gap-2 rounded-t-lg">
       {/* Left Section - View Controls */}
       <button
         className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full"
