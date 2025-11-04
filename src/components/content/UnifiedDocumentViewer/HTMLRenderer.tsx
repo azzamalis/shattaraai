@@ -159,18 +159,22 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
   }
 
   return (
-    <div className="h-full overflow-auto">
-      <div className="p-8">
-        <div
-          ref={contentRef}
-          className="prose prose-sm max-w-4xl mx-auto dark:prose-invert"
+    <div className="h-full w-full overflow-auto bg-white dark:bg-neutral-800/50">
+      <div className="max-w-4xl mx-auto py-6">
+        <div 
+          className="bg-white dark:bg-neutral-900/50 mx-4 p-8 rounded-lg border border-border shadow-sm"
           style={{
             transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
             transformOrigin: 'top center',
-            transition: 'transform 0.2s ease-out',
+            transition: 'transform 0.2s ease-in-out'
           }}
-          dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
-        />
+        >
+          <div
+            ref={contentRef}
+            className="prose prose-sm max-w-none dark:prose-invert"
+            dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}
+          />
+        </div>
       </div>
     </div>
   );
