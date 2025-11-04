@@ -20,6 +20,8 @@ import RealtimeChaptersDisplay from './RealtimeChaptersDisplay';
 import { AudioChunker, getOptimalAudioStream } from '@/utils/audioChunking';
 import { useContent } from '@/hooks/useContent';
 import { RefreshCw } from 'lucide-react';
+import { WebsiteContentTabs } from './website/WebsiteContentTabs';
+import { EnhancedWebsiteProcessing } from './website/EnhancedWebsiteProcessing';
 interface ContentLeftSidebarProps {
   contentData: ContentData;
   onUpdateContent: (updates: Partial<ContentData>) => void;
@@ -148,8 +150,8 @@ export function ContentLeftSidebar({
   // Check if it's a Word document
   const isWordDocument = (contentData.type === 'file' || contentData.type === 'upload') && contentData.filename?.match(/\.(doc|docx)$/i);
   
-  // Check if we should hide tabs (for PDF content, Word documents, text content, or website content)
-  const shouldHideTabs = contentData.type === 'pdf' || contentData.type === 'text' || contentData.type === 'website' || isWordDocument;
+  // Check if we should hide tabs (for PDF content, Word documents, or text content)
+  const shouldHideTabs = contentData.type === 'pdf' || contentData.type === 'text' || isWordDocument;
   const shouldHideTabsForDocument = isWordDocument;
   const renderControls = () => {
     // Show loading state while detecting recording state
@@ -278,6 +280,10 @@ export function ContentLeftSidebar({
         </div>;
     }
 
+    // Default content viewer for other types (excluding website)
+    if (contentData.type === 'website') {
+      return null; // Website content is handled in tabs
+    }
 
     // Show UnifiedDocumentViewer for Word documents
     if (isWordDocument) {
@@ -289,8 +295,8 @@ export function ContentLeftSidebar({
       </div>;
     }
 
-    // Show UnifiedDocumentViewer for text content, PDFs, and website content
-    if (contentData.type === 'text' || contentData.type === 'pdf' || contentData.type === 'website') {
+    // Show UnifiedDocumentViewer for text content and PDFs
+    if (contentData.type === 'text' || contentData.type === 'pdf') {
       return <div className="flex-1 overflow-hidden">
         <UnifiedDocumentViewer 
           contentData={contentData} 
@@ -389,6 +395,21 @@ export function ContentLeftSidebar({
                             {chapter.summary}
                           </p>}
                       </div>)}
+                  </div>}
+                {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-foreground">
+                    <div className="bg-card p-4 rounded-lg border border-border relative">
+                      <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(!isTextExpanded)} className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-muted">
+                        {isTextExpanded ? <Minimize2 className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
+                      </Button>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-3 pr-10">
+                          Website Content Summary
+                        </p>
+                        <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed pr-10 line-clamp-6">
+                          {contentData.text}
+                        </p>
+                      </div>
+                    </div>
                   </div>}
                   
                 {/* Empty state for audio/video files without chapters */}
@@ -548,11 +569,35 @@ export function ContentLeftSidebar({
       </>;
   };
 
-  // If it's content that should be shown without tabs (PDF, text, website, Word)
+  // If it's PDF content, render without tabs
   if (shouldHideTabs) {
     return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
         {renderControls()}
       </div>;
+  }
+
+  // If it's a Word document, render the DocumentViewer without tabs
+  if (shouldHideTabsForDocument) {
+    return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
+        <DocumentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
+      </div>;
+  }
+
+  // If it's text content, render the UnifiedDocumentViewer without tabs
+  if (contentData.type === 'text') {
+    return <div className="h-full flex flex-col min-h-0 bg-dashboard-bg dark:bg-dashboard-bg">
+        <UnifiedDocumentViewer contentData={contentData} onUpdateContent={onUpdateContent} />
+      </div>;
+  }
+
+  // Show UnifiedDocumentViewer for website content
+  if (contentData.type === 'website') {
+    return <div className="flex-1 overflow-hidden">
+      <UnifiedDocumentViewer 
+        contentData={contentData} 
+        onUpdateContent={onUpdateContent} 
+      />
+    </div>;
   }
 
   // Default layout with tabs for other content types

@@ -28,6 +28,8 @@ import {
   PromptInputActions,
   PromptInputAction,
 } from "@/components/prompt-kit/prompt-input";
+import { Dialog } from "@/components/ui/dialog";
+import { UpgradeModal } from "@/components/dashboard/UpgradeModal";
 
 const AI_MODELS = [
   { value: "auto", label: "Auto", isPremium: false },
@@ -41,6 +43,7 @@ const AI_MODELS = [
 interface EnhancedPromptInputProps {
   onSubmit?: (value: string, files?: File[]) => void;
   className?: string;
+  userPlan?: 'free' | 'pro'; // Default to 'free' if not provided
 }
 
 const filePreviewVariants = {
@@ -102,11 +105,12 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
   );
 }
 
-export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInputProps) {
+export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState("openai/gpt-5-mini");
   const [deepSearchActive, setDeepSearchActive] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const hasContent = inputValue.trim().length > 0 || attachedFiles.length > 0;
@@ -143,6 +147,16 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
       setInputValue("");
       setAttachedFiles([]);
     }
+  };
+
+  const handleModelSelect = (modelValue: string, isPremium: boolean) => {
+    // If user is on Free plan and clicks a premium model, show upgrade modal
+    if (userPlan === 'free' && isPremium) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+    // Otherwise, select the model
+    setSelectedModel(modelValue);
   };
 
   return (
@@ -211,11 +225,11 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
                     <ChevronDown className="h-3.5 w-3.5 opacity-50" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5">
+                <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5 bg-popover z-50">
                   {AI_MODELS.map((model) => (
                     <DropdownMenuItem
                       key={model.value}
-                      onClick={() => setSelectedModel(model.value)}
+                      onClick={() => handleModelSelect(model.value, model.isPremium)}
                       className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? "bg-accent" : ""}`}
                     >
                       <div className="flex items-center gap-2">
@@ -255,6 +269,11 @@ export function EnhancedPromptInput({ onSubmit, className }: EnhancedPromptInput
         onChange={handleFileChange}
         className="hidden"
       />
+
+      {/* Upgrade Modal */}
+      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
+        <UpgradeModal onClose={() => setUpgradeModalOpen(false)} />
+      </Dialog>
     </>
   );
 }
