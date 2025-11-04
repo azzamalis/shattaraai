@@ -7,8 +7,9 @@ import { DOCXRenderer } from './DOCXRenderer';
 import { HTMLRenderer } from './HTMLRenderer';
 import { TextRenderer } from './TextRenderer';
 import { ThumbnailView } from './ThumbnailView';
-import { WebsiteRenderer, WebsiteContentDisplay } from './WebsiteRenderer';
+import { WebsiteRenderer } from './WebsiteRenderer';
 import { WebsiteMetadataSidebar } from './WebsiteMetadataSidebar';
+import { useWebsiteData } from './useWebsiteData';
 
 interface ContentData {
   id?: string;
@@ -37,15 +38,14 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
     setPdfUrl,
   } = useUnifiedDocument();
 
-  // For HTML content, extract metadata for sidebar
-  const websiteData = documentType === 'html' ? (() => {
-    const renderer = WebsiteRenderer({
-      htmlContent: contentData.text_content || '',
-      title: contentData.title || contentData.filename,
-      contentData,
-    });
-    return renderer;
-  })() : null;
+  // For HTML content, extract metadata for sidebar using the hook
+  const websiteData = documentType === 'html' 
+    ? useWebsiteData(
+        contentData.text_content || '',
+        contentData,
+        contentData.title || contentData.filename
+      )
+    : null;
 
   // Detect content type based on contentData
   const detectContentType = (data: ContentData): DocumentType => {
@@ -111,7 +111,7 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
         return <DOCXRenderer url={contentData.url} />;
 
       case 'html':
-        if (!contentData.text_content || !websiteData) {
+        if (!contentData.text_content) {
           return (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -122,15 +122,10 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
           );
         }
         return (
-          <WebsiteContentDisplay 
-            htmlContent={websiteData.htmlContent}
-            articleStructure={websiteData.articleStructure}
-            extractedLinks={websiteData.extractedLinks}
-            websiteInfo={websiteData.websiteInfo}
-            contentRef={websiteData.contentRef}
-            zoom={websiteData.zoom}
-            rotation={websiteData.rotation}
+          <WebsiteRenderer 
+            htmlContent={contentData.text_content} 
             title={contentData.title || contentData.filename}
+            contentData={contentData}
           />
         );
 

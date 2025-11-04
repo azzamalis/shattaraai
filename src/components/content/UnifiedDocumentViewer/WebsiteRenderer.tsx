@@ -1,19 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
-import { 
-  ChartNoAxesGantt, 
-  Info, 
-  ExternalLink, 
-  Clock, 
-  User, 
-  Calendar,
-  Globe,
-  Link,
-  ChevronRight
-} from 'lucide-react';
+import { useWebsiteData } from './useWebsiteData';
 
 interface WebsiteRendererProps {
   htmlContent: string;
@@ -34,55 +22,14 @@ export function WebsiteRenderer({ htmlContent, title, contentData }: WebsiteRend
     setError,
   } = useUnifiedDocument();
 
-  const [showMetadata, setShowMetadata] = useState(false);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
-  // Extract article structure from content
-  const articleStructure = useMemo(() => {
-    if (contentData?.metadata?.headings && Array.isArray(contentData.metadata.headings)) {
-      return contentData.metadata.headings.map((heading: any, index: number) => ({
-        id: heading.id || `heading-${index}`,
-        text: heading.text,
-        level: heading.level,
-        position: index
-      }));
-    }
-    return [];
-  }, [contentData?.metadata]);
-
-  // Extract key metadata
-  const websiteInfo = useMemo(() => {
-    const metadata = contentData?.metadata || {};
-    return {
-      title: metadata.title || title,
-      description: metadata.description,
-      author: metadata.author,
-      publishedDate: metadata.published || metadata.publishedAt || metadata.date,
-      domain: metadata.domain || (contentData?.url ? new URL(contentData.url as string).hostname : null),
-      readingTime: htmlContent ? Math.ceil(htmlContent.split(' ').length / 200) : null,
-      wordCount: htmlContent ? htmlContent.split(' ').length : null
-    };
-  }, [contentData, title, htmlContent]);
-
-  // Extract links
-  const extractedLinks = useMemo(() => {
-    if (contentData?.metadata?.links && Array.isArray(contentData.metadata.links)) {
-      return contentData.metadata.links.slice(0, 8).map((link: any, index: number) => ({
-        id: `link-${index}`,
-        url: link.href,
-        text: link.text,
-        domain: (() => {
-          try {
-            return new URL(String(link.href)).hostname;
-          } catch {
-            return String(link.href);
-          }
-        })(),
-        isExternal: !link.internal
-      }));
-    }
-    return [];
-  }, [contentData?.metadata]);
+  // Use custom hook to extract website data
+  const { articleStructure, extractedLinks, websiteInfo } = useWebsiteData(
+    htmlContent,
+    contentData,
+    title
+  );
 
   // Initialize
   React.useEffect(() => {
@@ -156,37 +103,6 @@ export function WebsiteRenderer({ htmlContent, title, contentData }: WebsiteRend
 
   const displayContent = getHighlightedContent(htmlContent);
 
-  return {
-    htmlContent: displayContent,
-    articleStructure,
-    extractedLinks,
-    websiteInfo,
-    contentRef,
-    zoom,
-    rotation,
-  };
-}
-
-// Separate display component
-interface WebsiteContentDisplayProps {
-  htmlContent: string;
-  articleStructure: any[];
-  extractedLinks: any[];
-  websiteInfo: any;
-  contentRef: React.RefObject<HTMLDivElement>;
-  zoom: number;
-  rotation: number;
-  title?: string;
-}
-
-export function WebsiteContentDisplay({
-  htmlContent,
-  websiteInfo,
-  contentRef,
-  zoom,
-  rotation,
-  title,
-}: WebsiteContentDisplayProps) {
   return (
     <ScrollArea className="h-full">
       <div className="max-w-4xl mx-auto p-8">
@@ -212,12 +128,9 @@ export function WebsiteContentDisplay({
             transformOrigin: 'top center',
             transition: 'transform 0.2s ease-out',
           }}
-          dangerouslySetInnerHTML={{ __html: htmlContent }}
+          dangerouslySetInnerHTML={{ __html: displayContent }}
         />
       </div>
     </ScrollArea>
   );
 }
-
-// Re-export for compatibility
-export { WebsiteRenderer as default };
