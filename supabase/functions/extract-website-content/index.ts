@@ -22,7 +22,24 @@ function extractCleanHTML(html: string): string {
     .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
     .replace(/<aside[^>]*>[\s\S]*?<\/aside>/gi, '')
     .replace(/<noscript[^>]*>[\s\S]*?<\/noscript>/gi, '')
-    .replace(/<!--[\s\S]*?-->/gi, '');
+    .replace(/<!--[\s\S]*?-->/gi, '')
+    // Remove Wikipedia-specific navigation and structural elements
+    .replace(/<table[^>]*class="[^"]*infobox[^"]*"[^>]*>[\s\S]*?<\/table>/gi, '')
+    .replace(/<table[^>]*class="[^"]*navbox[^"]*"[^>]*>[\s\S]*?<\/table>/gi, '')
+    .replace(/<table[^>]*class="[^"]*vertical-navbox[^"]*"[^>]*>[\s\S]*?<\/table>/gi, '')
+    .replace(/<table[^>]*class="[^"]*sidebar[^"]*"[^>]*>[\s\S]*?<\/table>/gi, '')
+    .replace(/<div[^>]*class="[^"]*mbox[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*class="[^"]*hatnote[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*role="navigation"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*id="toc"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<span[^>]*class="[^"]*mw-editsection[^"]*"[^>]*>[\s\S]*?<\/span>/gi, '')
+    // Remove common navigation patterns
+    .replace(/<div[^>]*class="[^"]*\bnav\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*class="[^"]*\bmenu\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*class="[^"]*\bsidebar\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*class="[^"]*\bwidget\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*class="[^"]*\badvertisement\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*class="[^"]*\bad\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '');
 
   // Extract main content area (prioritize article, main, or content-rich divs)
   const mainContentMatch = 
@@ -35,6 +52,12 @@ function extractCleanHTML(html: string): string {
   if (mainContentMatch && mainContentMatch[0]) {
     cleanedHtml = mainContentMatch[0];
   }
+
+  // Remove reference and citation sections (typically at end of articles)
+  cleanedHtml = cleanedHtml
+    .replace(/<div[^>]*class="[^"]*reflist[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*class="[^"]*references[^"]*"[^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<ol[^>]*class="[^"]*references[^"]*"[^>]*>[\s\S]*?<\/ol>/gi, '');
 
   // Preserve semantic HTML elements
   const allowedTags = [
@@ -91,6 +114,12 @@ function extractCleanHTML(html: string): string {
     .replace(/&nbsp;/g, ' ')
     .replace(/&#91;/g, '[')
     .replace(/&#93;/g, ']');
+
+  // Remove "Jump to:" navigation text and standalone navigation words
+  cleanedHtml = cleanedHtml
+    .replace(/Jump to:\s*(navigation|search|content)[,\s]*/gi, '')
+    .replace(/\b(From Wikipedia, the free encyclopedia)\b/gi, '')
+    .replace(/<[^>]*>\s*\b(navigation|search|edit|view history|talk|contributions)\b\s*<\/[^>]*>/gi, '');
 
   // Clean up excessive whitespace while preserving structure
   cleanedHtml = cleanedHtml
