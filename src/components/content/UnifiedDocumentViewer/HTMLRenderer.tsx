@@ -160,7 +160,12 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
 
   return (
     <div className="h-full overflow-auto">
-      <div className="p-8">
+      <div 
+        className="p-8"
+        style={{
+          minHeight: `${100 * (100 / zoom)}%`,
+        }}
+      >
         <div
           ref={contentRef}
           className="prose prose-sm max-w-4xl mx-auto dark:prose-invert"
