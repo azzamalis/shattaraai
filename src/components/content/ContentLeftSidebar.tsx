@@ -280,10 +280,7 @@ export function ContentLeftSidebar({
         </div>;
     }
 
-    // Default content viewer for other types (excluding website)
-    if (contentData.type === 'website') {
-      return null; // Website content is handled in tabs
-    }
+    // Default content viewer for other types
 
     // Show UnifiedDocumentViewer for Word documents
     if (isWordDocument) {

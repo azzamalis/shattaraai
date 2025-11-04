@@ -110,10 +110,9 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
           );
         }
         return (
-          <WebsiteRenderer 
+          <HTMLRenderer 
             htmlContent={contentData.text_content} 
             title={contentData.title || contentData.filename}
-            contentData={contentData}
           />
         );
 
