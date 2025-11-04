@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DialogContent } from '@/components/ui/dialog';
+import { DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -13,33 +13,14 @@ export function UpgradeModal({ onClose }: UpgradeModalProps) {
 
   return (
     <DialogContent className="bg-card border border-border rounded-3xl p-6 pb-6 sm:pb-4 max-w-md sm:max-w-[500px] text-foreground overflow-hidden">
-      {/* Close button */}
-      <button 
-        onClick={onClose} 
-        className="absolute right-2 top-2 p-1 rounded-full hover:bg-accent text-muted-foreground hover:text-foreground z-10"
-      >
-        <svg 
-          width="24" 
-          height="24" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-        >
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-        <span className="sr-only">Close</span>
-      </button>
+      <DialogTitle className="flex py-4 flex-initial border-b-0 mb-0 pb-0 px-0 sm:px-6 text-2xl font-medium">
+        Keep Going with 7 Days Free
+      </DialogTitle>
+      <DialogDescription className="sr-only">
+        Upgrade to unlock unlimited features and start your 7-day free trial
+      </DialogDescription>
       
       <div className="flex flex-col">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-2">
-          <header className="flex py-4 flex-initial border-b-0 mb-0 pb-0 px-0 sm:px-6 text-2xl font-medium">
-            Keep Going with 7 Days Free
-          </header>
-        </div>
 
         {/* Social proof subtitle */}
         <div className="sm:ml-6 mt-1 text-xs text-muted-foreground flex items-center">
