@@ -149,13 +149,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
     }
   };
 
-  const handleModelSelect = (modelValue: string, isPremium: boolean) => {
-    // If user is on Free plan and clicks a premium model, show upgrade modal
-    if (userPlan === 'free' && isPremium) {
-      setUpgradeModalOpen(true);
-      return;
-    }
-    // Otherwise, select the model
+  const handleModelSelect = (modelValue: string) => {
     setSelectedModel(modelValue);
   };
 
@@ -229,7 +223,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
                   {AI_MODELS.map((model) => (
                     <DropdownMenuItem
                       key={model.value}
-                      onClick={() => handleModelSelect(model.value, model.isPremium)}
+                      onClick={() => handleModelSelect(model.value)}
                       className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? "bg-accent" : ""}`}
                     >
                       <div className="flex items-center gap-2">

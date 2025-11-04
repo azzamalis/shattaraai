@@ -70,11 +70,7 @@ export function ChatInput({
     fileInputRef.current?.click();
   };
 
-  const handleModelSelect = (modelValue: string, isPremium: boolean) => {
-    if (userPlan === 'free' && isPremium) {
-      setUpgradeModalOpen(true);
-      return;
-    }
+  const handleModelSelect = (modelValue: string) => {
     setSelectedModel(modelValue);
   };
 
@@ -144,7 +140,7 @@ export function ChatInput({
             {AI_MODELS.map((model) => (
               <DropdownMenuItem
                 key={model.value}
-                onClick={() => handleModelSelect(model.value, model.isPremium)}
+                onClick={() => handleModelSelect(model.value)}
                 className={cn(
                   "flex items-center justify-between",
                   selectedModel === model.value ? "bg-accent" : ""
