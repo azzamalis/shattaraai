@@ -161,14 +161,6 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
   return (
     <div className="h-full overflow-auto">
       <div className="max-w-4xl mx-auto p-8">
-        {title && (
-          <div className="mb-6 pb-4 border-b border-border">
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Globe className="h-6 w-6" />
-              {title}
-            </h1>
-          </div>
-        )}
         <div
           ref={contentRef}
           className="prose prose-sm max-w-none dark:prose-invert"
