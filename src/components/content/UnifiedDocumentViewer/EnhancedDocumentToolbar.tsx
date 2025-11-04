@@ -10,6 +10,7 @@ import {
   Maximize,
   X,
   ChevronUp,
+  PanelRight,
 } from 'lucide-react';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
 import { useTheme } from '@/hooks/useTheme';
@@ -39,9 +40,12 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
     currentSearchIndex,
     isSearchOpen,
     isThumbnailsOpen,
+    isMetadataOpen,
+    documentType,
     toggleFullscreen,
     toggleSearch,
     toggleThumbnails,
+    toggleMetadata,
     setSearchTerm,
     performSearch,
     nextSearchResult,
@@ -109,23 +113,38 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
     setPageInputValue(currentPage.toString());
   }, [currentPage]);
 
+  const isHtmlContent = documentType === 'html';
+  const showPageNavigation = totalPages > 1;
+
   return (
     <div className="bg-white dark:bg-neutral-800/50 border-b border-primary/10 p-2 py-[4.5px] flex items-center text-sm text-neutral-600 dark:text-neutral-300 gap-2 rounded-t-lg">
       {/* Left Section - View Controls */}
-      <button
-        className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full"
-        title="Toggle Thumbnails"
-        onClick={toggleThumbnails}
-      >
-        <PanelLeft className="w-4 h-4" stroke="#525252" />
-      </button>
+      {!isHtmlContent && (
+        <button
+          className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full"
+          title="Toggle Thumbnails"
+          onClick={toggleThumbnails}
+        >
+          <PanelLeft className="w-4 h-4" />
+        </button>
+      )}
+
+      {isHtmlContent && (
+        <button
+          className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full"
+          title="Toggle Website Info"
+          onClick={toggleMetadata}
+        >
+          <PanelRight className="w-4 h-4" />
+        </button>
+      )}
 
       <button
         className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full ml-[-8px]"
         title="Toggle Search"
         onClick={toggleSearch}
       >
-        <Search className="w-4 h-4" stroke="#525252" />
+        <Search className="w-4 h-4" />
       </button>
 
       {isSearchOpen && (
@@ -172,51 +191,55 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
 
       <button
         className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full ml-[-8px]"
-        title="Switch PDF to dark theme"
+        title="Switch theme"
         onClick={toggleTheme}
       >
-        <Moon className="w-4 h-4" stroke="#525252" />
+        <Moon className="w-4 h-4" />
       </button>
 
       <button
         className="px-2 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 py-1 rounded-full ml-[-8px]"
         title="Read aloud"
       >
-        <Volume2 className="w-4 h-4" stroke="#525252" />
+        <Volume2 className="w-4 h-4" />
       </button>
 
       <span className="flex-grow"></span>
 
       {/* Center Section - Page Navigation */}
-      <div className="flex items-center gap-1">
-        <input
-          className="bg-white dark:bg-neutral-800 rounded-lg px-0 py-1 border dark:border-neutral-700 text-center"
-          type="text"
-          value={pageInputValue}
-          onChange={handlePageInputChange}
-          onBlur={handlePageInputBlur}
-          onKeyDown={handlePageInputKeyDown}
-          style={{ width: '2.5em', textAlign: 'center' }}
-        />
-        <span> / </span>
-        <div>{totalPages}</div>
-      </div>
+      {showPageNavigation && (
+        <>
+          <div className="flex items-center gap-1">
+            <input
+              className="bg-white dark:bg-neutral-800 rounded-lg px-0 py-1 border dark:border-neutral-700 text-center"
+              type="text"
+              value={pageInputValue}
+              onChange={handlePageInputChange}
+              onBlur={handlePageInputBlur}
+              onKeyDown={handlePageInputKeyDown}
+              style={{ width: '2.5em', textAlign: 'center' }}
+            />
+            <span> / </span>
+            <div>{totalPages}</div>
+          </div>
 
-      <div className="h-6 w-[1px] bg-neutral-300 dark:bg-neutral-700 ml-1.5"></div>
+          <div className="h-6 w-[1px] bg-neutral-300 dark:bg-neutral-700 ml-1.5"></div>
+        </>
+      )}
 
       {/* Zoom Dropdown */}
       <div className="flex items-center gap-1">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-1 px-2 py-1 text-sm bg-white dark:bg-neutral-800 rounded-lg border dark:border-neutral-700">
-              {zoom === 100 ? 'Page fit' : `${zoom}%`}
+              {isHtmlContent ? `${zoom}%` : (zoom === 100 ? 'Page fit' : `${zoom}%`)}
               <ChevronDown className="w-4 h-4" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="center">
+          <DropdownMenuContent align="center" className="z-50">
             <DropdownMenuItem onClick={() => setZoom(50)}>50%</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setZoom(75)}>75%</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setZoom(100)}>Page fit (100%)</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setZoom(100)}>{isHtmlContent ? '100%' : 'Page fit (100%)'}</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setZoom(125)}>125%</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setZoom(150)}>150%</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setZoom(200)}>200%</DropdownMenuItem>
@@ -233,15 +256,15 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
           title="Rotate 90° Clockwise"
           onClick={rotateClockwise}
         >
-          <RotateCw className="w-4 h-4" stroke="#525252" />
+          <RotateCw className="w-4 h-4" />
         </button>
 
         <button
           className="p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:text-neutral-800/50 dark:hover:text-neutral-100 rounded-full"
-          title="Download PDF"
+          title="Download"
           onClick={handleDownload}
         >
-          <Download className="w-4 h-4" stroke="#525252" />
+          <Download className="w-4 h-4" />
         </button>
 
         <button
@@ -249,7 +272,7 @@ export function EnhancedDocumentToolbar({ onDownload, contentData }: EnhancedDoc
           title="Full Screen"
           onClick={toggleFullscreen}
         >
-          <Maximize className="w-4 h-4" stroke="#525252" />
+          <Maximize className="w-4 h-4" />
         </button>
       </div>
     </div>

@@ -156,142 +156,68 @@ export function WebsiteRenderer({ htmlContent, title, contentData }: WebsiteRend
 
   const displayContent = getHighlightedContent(htmlContent);
 
+  return {
+    htmlContent: displayContent,
+    articleStructure,
+    extractedLinks,
+    websiteInfo,
+    contentRef,
+    zoom,
+    rotation,
+  };
+}
+
+// Separate display component
+interface WebsiteContentDisplayProps {
+  htmlContent: string;
+  articleStructure: any[];
+  extractedLinks: any[];
+  websiteInfo: any;
+  contentRef: React.RefObject<HTMLDivElement>;
+  zoom: number;
+  rotation: number;
+  title?: string;
+}
+
+export function WebsiteContentDisplay({
+  htmlContent,
+  websiteInfo,
+  contentRef,
+  zoom,
+  rotation,
+  title,
+}: WebsiteContentDisplayProps) {
   return (
-    <div className="flex h-full">
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        <ScrollArea className="h-full">
-          <div className="max-w-4xl mx-auto p-8">
-            {/* Article Header */}
-            <div className="mb-8 pb-6 border-b border-border">
-              <h1 className="text-3xl font-bold text-foreground mb-4">
-                {websiteInfo.title || title}
-              </h1>
-              
-              {websiteInfo.description && (
-                <p className="text-lg text-muted-foreground mb-4">
-                  {websiteInfo.description}
-                </p>
-              )}
-              
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                {websiteInfo.domain && (
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    <span>{websiteInfo.domain}</span>
-                  </div>
-                )}
-                {websiteInfo.readingTime && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{websiteInfo.readingTime} min read</span>
-                  </div>
-                )}
-                {websiteInfo.author && (
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span>{String(websiteInfo.author)}</span>
-                  </div>
-                )}
-              </div>
-            </div>
+    <ScrollArea className="h-full">
+      <div className="max-w-4xl mx-auto p-8">
+        {/* Article Header */}
+        <div className="mb-8 pb-6 border-b border-border">
+          <h1 className="text-3xl font-bold text-foreground mb-4">
+            {websiteInfo.title || title}
+          </h1>
+          
+          {websiteInfo.description && (
+            <p className="text-lg text-muted-foreground mb-4">
+              {websiteInfo.description}
+            </p>
+          )}
+        </div>
 
-            {/* Article Content */}
-            <div
-              ref={contentRef}
-              className="prose prose-sm max-w-none dark:prose-invert"
-              style={{
-                transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                transformOrigin: 'top center',
-                transition: 'transform 0.2s ease-out',
-              }}
-              dangerouslySetInnerHTML={{ __html: displayContent }}
-            />
-
-            {/* Toggle Metadata Button */}
-            <div className="mt-8 pt-6 border-t border-border">
-              <Button
-                variant="outline"
-                onClick={() => setShowMetadata(!showMetadata)}
-                className="w-full"
-              >
-                <Info className="h-4 w-4 mr-2" />
-                {showMetadata ? 'Hide' : 'Show'} Website Info
-                <ChevronRight className={cn(
-                  "h-4 w-4 ml-2 transition-transform",
-                  showMetadata && "rotate-90"
-                )} />
-              </Button>
-
-              {/* Metadata Section */}
-              {showMetadata && (
-                <div className="mt-6 space-y-6">
-                  {/* Structure */}
-                  {articleStructure.length > 0 && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <ChartNoAxesGantt className="h-4 w-4 text-primary" />
-                        <h3 className="font-medium text-foreground">Content Outline</h3>
-                      </div>
-                      <div className="space-y-2">
-                        {articleStructure.map((heading: any, index: number) => (
-                          <div 
-                            key={heading.id}
-                            className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
-                          >
-                            <div className="text-xs text-muted-foreground font-mono mt-1 w-6">
-                              {index + 1}
-                            </div>
-                            <p className={cn(
-                              "text-sm text-foreground",
-                              heading.level === 1 ? "font-medium" : "font-normal"
-                            )}>
-                              {heading.text}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Links */}
-                  {extractedLinks.length > 0 && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Link className="h-4 w-4 text-primary" />
-                        <h3 className="font-medium text-foreground">Related Links</h3>
-                      </div>
-                      <div className="space-y-2">
-                        {extractedLinks.map((link: any) => (
-                          <a
-                            key={link.id}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/30 transition-colors group"
-                          >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-foreground truncate">
-                                  {link.text || link.domain}
-                                </p>
-                                <p className="text-xs text-muted-foreground truncate">
-                                  {link.domain}
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </ScrollArea>
+        {/* Article Content */}
+        <div
+          ref={contentRef}
+          className="prose prose-sm max-w-none dark:prose-invert"
+          style={{
+            transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
+            transformOrigin: 'top center',
+            transition: 'transform 0.2s ease-out',
+          }}
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
+        />
       </div>
-    </div>
+    </ScrollArea>
   );
 }
+
+// Re-export for compatibility
+export { WebsiteRenderer as default };

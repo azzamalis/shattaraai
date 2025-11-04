@@ -18,6 +18,7 @@ interface UnifiedDocumentState {
   viewMode: ViewMode;
   isFullscreen: boolean;
   isThumbnailsOpen: boolean;
+  isMetadataOpen: boolean;
   
   // Search state
   searchTerm: string;
@@ -46,6 +47,7 @@ interface UnifiedDocumentContextType extends UnifiedDocumentState {
   toggleViewMode: () => void;
   toggleFullscreen: () => void;
   toggleThumbnails: () => void;
+  toggleMetadata: () => void;
   
   // Search controls
   setSearchTerm: (term: string) => void;
@@ -91,6 +93,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     viewMode: 'document',
     isFullscreen: false,
     isThumbnailsOpen: false,
+    isMetadataOpen: false,
     searchTerm: '',
     searchResults: [],
     currentSearchIndex: 0,
@@ -112,6 +115,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
   const toggleViewMode = () => setState(prev => ({ ...prev, viewMode: prev.viewMode === 'document' ? 'thumbnail' : 'document' }));
   const toggleFullscreen = () => setState(prev => ({ ...prev, isFullscreen: !prev.isFullscreen }));
   const toggleThumbnails = () => setState(prev => ({ ...prev, isThumbnailsOpen: !prev.isThumbnailsOpen }));
+  const toggleMetadata = () => setState(prev => ({ ...prev, isMetadataOpen: !prev.isMetadataOpen }));
 
   // Search controls
   const setSearchTerm = (term: string) => setState(prev => ({ ...prev, searchTerm: term }));
@@ -249,6 +253,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
     toggleViewMode,
     toggleFullscreen,
     toggleThumbnails,
+    toggleMetadata,
     setSearchTerm,
     toggleSearch,
     performSearch,

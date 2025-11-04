@@ -7,7 +7,8 @@ import { DOCXRenderer } from './DOCXRenderer';
 import { HTMLRenderer } from './HTMLRenderer';
 import { TextRenderer } from './TextRenderer';
 import { ThumbnailView } from './ThumbnailView';
-import { WebsiteRenderer } from './WebsiteRenderer';
+import { WebsiteRenderer, WebsiteContentDisplay } from './WebsiteRenderer';
+import { WebsiteMetadataSidebar } from './WebsiteMetadataSidebar';
 
 interface ContentData {
   id?: string;
@@ -30,10 +31,21 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
     documentType,
     isFullscreen,
     isThumbnailsOpen,
+    isMetadataOpen,
     setDocumentType,
     setError,
     setPdfUrl,
   } = useUnifiedDocument();
+
+  // For HTML content, extract metadata for sidebar
+  const websiteData = documentType === 'html' ? (() => {
+    const renderer = WebsiteRenderer({
+      htmlContent: contentData.text_content || '',
+      title: contentData.title || contentData.filename,
+      contentData,
+    });
+    return renderer;
+  })() : null;
 
   // Detect content type based on contentData
   const detectContentType = (data: ContentData): DocumentType => {
@@ -99,7 +111,7 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
         return <DOCXRenderer url={contentData.url} />;
 
       case 'html':
-        if (!contentData.text_content) {
+        if (!contentData.text_content || !websiteData) {
           return (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -110,10 +122,15 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
           );
         }
         return (
-          <WebsiteRenderer 
-            htmlContent={contentData.text_content} 
+          <WebsiteContentDisplay 
+            htmlContent={websiteData.htmlContent}
+            articleStructure={websiteData.articleStructure}
+            extractedLinks={websiteData.extractedLinks}
+            websiteInfo={websiteData.websiteInfo}
+            contentRef={websiteData.contentRef}
+            zoom={websiteData.zoom}
+            rotation={websiteData.rotation}
             title={contentData.title || contentData.filename}
-            contentData={contentData}
           />
         );
 
@@ -156,16 +173,29 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
         onDownload={handleDownload}
         contentData={contentData}
       />
-      <div className="flex-1 min-h-0 relative flex transition-all duration-300 bg-white dark:bg-neutral-800/50">
-        {/* Thumbnail Sidebar */}
+      <div className="flex-1 min-h-0 relative grid transition-all duration-300 bg-white dark:bg-neutral-800/50"
+        style={{
+          gridTemplateColumns: `${isThumbnailsOpen ? 'auto' : '0'} ${isMetadataOpen && documentType === 'html' ? 'auto' : '0'} 1fr`
+        }}
+      >
+        {/* Thumbnail Sidebar - Left (for PDFs) */}
         {isThumbnailsOpen && (
-          <div className="w-48 flex-shrink-0 overflow-y-auto overflow-x-hidden border-r border-primary/10">
+          <div className="overflow-y-auto overflow-x-hidden border-r border-primary/10">
             <ThumbnailView />
           </div>
         )}
         
-        {/* Main Content */}
-        <div className="flex-1 overflow-auto">
+        {/* Metadata Sidebar - Center (for HTML) */}
+        {isMetadataOpen && documentType === 'html' && websiteData && (
+          <WebsiteMetadataSidebar
+            articleStructure={websiteData.articleStructure}
+            extractedLinks={websiteData.extractedLinks}
+            websiteInfo={websiteData.websiteInfo}
+          />
+        )}
+        
+        {/* Main Content - Right */}
+        <div className="overflow-auto">
           {renderDocumentContent()}
         </div>
       </div>
