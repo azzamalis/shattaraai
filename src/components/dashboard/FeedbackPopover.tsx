@@ -76,7 +76,7 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 maxLength={maxLength}
-                className="min-h-[120px] resize-none"
+                className="min-h-[120px] resize-none pointer-events-auto"
               />
               <p className="text-xs text-muted-foreground text-right">
                 {feedback.length}/{maxLength}
