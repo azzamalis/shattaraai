@@ -121,12 +121,27 @@ export function PromptInputChatBox({
         onSubmit={handleSubmit}
         className="border-input bg-popover relative w-full rounded-3xl border p-0 pt-1 shadow-sm"
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col relative">
           <PromptInputTextarea
             placeholder={placeholder}
-            className="min-h-[44px] pt-3 pl-4 pr-4 text-base leading-[1.3]"
+            className="min-h-[44px] pt-3 pl-4 pr-12 text-base leading-[1.3]"
             disabled={disabled}
           />
+
+          {/* Submit Button - Absolutely Positioned */}
+          <Button
+            size="icon"
+            disabled={disabled || (!inputValue.trim() && attachments.length === 0)}
+            onClick={handleSubmit}
+            className="absolute right-2 top-2 size-9 rounded-full z-10"
+            type="button"
+          >
+            {disabled ? (
+              <span className="size-3 rounded-xs bg-white" />
+            ) : (
+              <ArrowUp size={18} />
+            )}
+          </Button>
 
           <PromptInputActions className="mt-3 flex w-full items-center justify-between gap-2 px-3 pb-3">
             <div className="flex items-center gap-2">
@@ -221,20 +236,6 @@ export function PromptInputChatBox({
                   <Mic size={18} />
                 </Button>
               </PromptInputAction>
-
-              <Button
-                size="icon"
-                disabled={disabled || (!inputValue.trim() && attachments.length === 0)}
-                onClick={handleSubmit}
-                className="size-9 rounded-full"
-                type="button"
-              >
-                {disabled ? (
-                  <span className="size-3 rounded-xs bg-white" />
-                ) : (
-                  <ArrowUp size={18} />
-                )}
-              </Button>
             </div>
           </PromptInputActions>
         </div>

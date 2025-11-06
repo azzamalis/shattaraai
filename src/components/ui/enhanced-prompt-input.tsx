@@ -178,11 +178,21 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
         onSubmit={handleSubmit}
         className={className || "border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"}
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col relative">
           <PromptInputTextarea
             placeholder="Ask Shattara AI anything"
-            className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3]"
+            className="min-h-[44px] pt-3 pl-4 pr-12 text-base leading-[1.3]"
           />
+
+          {/* Submit Button - Absolutely Positioned */}
+          <Button 
+            size="icon" 
+            disabled={!hasContent} 
+            onClick={handleSubmit} 
+            className="absolute right-2 top-2 size-9 rounded-full z-10"
+          >
+            <ArrowUp size={18} />
+          </Button>
 
           <PromptInputActions className="mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3">
             <div className="flex items-center gap-2">
@@ -245,10 +255,6 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
                   <Mic size={18} />
                 </Button>
               </PromptInputAction>
-
-              <Button size="icon" disabled={!hasContent} onClick={handleSubmit} className="size-9 rounded-full">
-                <ArrowUp size={18} />
-              </Button>
             </div>
           </PromptInputActions>
         </div>
