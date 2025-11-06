@@ -5,7 +5,6 @@ import {
   Globe,
   ArrowUp,
   MoreHorizontal,
-  Mic,
   X,
   FileText,
   Image as ImageIcon,
@@ -249,12 +248,6 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              <PromptInputAction tooltip="Voice input">
-                <Button variant="outline" size="icon" className="size-9 rounded-full" disabled>
-                  <Mic size={18} />
-                </Button>
-              </PromptInputAction>
             </div>
           </PromptInputActions>
         </div>

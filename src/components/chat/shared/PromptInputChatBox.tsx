@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog } from '@/components/ui/dialog';
 import { UpgradeModal } from '@/components/dashboard/UpgradeModal';
-import { ArrowUp, Plus, Mic, AtSign, Brain, X, ChevronDown, Sparkles, Check } from "lucide-react";
+import { ArrowUp, Plus, AtSign, Brain, X, ChevronDown, Sparkles, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PromptInputChatBoxProps {
@@ -221,20 +221,6 @@ export function PromptInputChatBox({
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </PromptInputAction>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <PromptInputAction tooltip="Voice input (coming soon)">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-9 rounded-full"
-                  disabled
-                  type="button"
-                >
-                  <Mic size={18} />
-                </Button>
               </PromptInputAction>
             </div>
           </PromptInputActions>
