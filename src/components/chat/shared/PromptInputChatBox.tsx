@@ -1,17 +1,12 @@
 import React, { useState, useRef, ChangeEvent } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CommandDropdown } from '@/components/chat/CommandDropdown';
 import { CommandOption } from '@/lib/types';
-import {
-  PromptInput,
-  PromptInputAction,
-  PromptInputActions,
-  PromptInputTextarea,
-} from "@/components/prompt-kit/prompt-input";
+import { ModelAndContextControls } from '@/components/chat/ModelAndContextControls';
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog } from '@/components/ui/dialog';
 import { UpgradeModal } from '@/components/dashboard/UpgradeModal';
-import { ArrowUp, Plus, Mic, AtSign, Brain, X, ChevronDown, Sparkles, Check } from "lucide-react";
+import { Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PromptInputChatBoxProps {
@@ -21,15 +16,6 @@ interface PromptInputChatBoxProps {
   className?: string;
   userPlan?: 'free' | 'pro';
 }
-
-const AI_MODELS = [
-  { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash", isPremium: false },
-  { value: "claude-4-sonnet", label: "Claude 4 Sonnet", isPremium: false },
-  { value: "gpt-4.1-mini", label: "GPT4.1 Mini", isPremium: false },
-  { value: "gemini-2.5-pro", label: "Gemini 2.5 Pro", isPremium: true },
-  { value: "grok-4", label: "Grok4", isPremium: true },
-  { value: "gpt-4.1", label: "GPT4.1", isPremium: true },
-];
 
 const commandOptions: CommandOption[] = [
   // Learning category
@@ -60,7 +46,13 @@ export function PromptInputChatBox({
   const [selectedModel, setSelectedModel] = useState("claude-4-sonnet");
   const [showCommandDropdown, setShowCommandDropdown] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [searchActive, setSearchActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const hasContent = inputValue.trim().length > 0;
+  const showControls = isFocused || hasContent || attachments.length > 0;
 
   const handleSubmit = () => {
     if ((inputValue.trim() || attachments.length > 0) && !disabled) {
@@ -91,154 +83,107 @@ export function PromptInputChatBox({
   };
 
   return (
-    <div className={cn("space-y-3", className)}>
+    <div className={cn("w-full max-w-3xl mx-auto flex flex-col items-center gap-2", className)}>
       {/* Attachments Preview */}
-      {attachments.length > 0 && (
-        <div className="flex flex-wrap gap-2 p-3 bg-card border border-border rounded-lg">
-          {attachments.map((file, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 px-3 py-2 bg-muted text-muted-foreground rounded-md text-sm"
-            >
-              <span className="truncate max-w-32">{file.name}</span>
-              <button
-                type="button"
-                onClick={() => removeAttachment(index)}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+      <AnimatePresence mode="popLayout">
+        {attachments.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="w-full flex flex-wrap gap-2 p-3 bg-[#4B4B4B] border border-[#A6A6A6]/20 rounded-xl"
+          >
+            {attachments.map((file, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 px-3 py-2 bg-[#000] text-[#A6A6A6] rounded-lg text-sm"
               >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          ))}
+                <span className="truncate max-w-32">{file.name}</span>
+                <button
+                  type="button"
+                  onClick={() => removeAttachment(index)}
+                  className="text-[#A6A6A6] hover:text-[#FFF] transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Input Area - Always Visible */}
+      <div className="relative w-full">
+        <textarea
+          ref={textareaRef}
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            // Auto-resize
+            if (textareaRef.current) {
+              textareaRef.current.style.height = 'auto';
+              textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 240)}px`;
+            }
+          }}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
+          placeholder={placeholder}
+          disabled={disabled}
+          className="w-full min-h-[44px] max-h-[240px] resize-none rounded-2xl border border-[#A6A6A6] bg-[#4B4B4B] px-4 py-3 pr-12 text-sm text-[#FFF] placeholder:text-[#A6A6A6] focus-visible:ring-0 focus-visible:outline-none focus:border-[#00A3FF]/50 transition-all shadow-sm"
+          rows={1}
+        />
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          disabled={disabled || (!inputValue.trim() && attachments.length === 0)}
+          className="absolute right-2 top-2 h-8 w-8 rounded-full bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#00A3FF] hover:text-[#FFF] transition-colors p-0 disabled:opacity-50"
+        >
+          <Send className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Controls Section - Conditionally Rendered */}
+      <AnimatePresence>
+        {showControls && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="w-full"
+          >
+            <ModelAndContextControls
+              selectedModel={selectedModel}
+              onModelSelect={handleModelSelect}
+              onFileAttach={triggerFileSelect}
+              onCommandTrigger={() => setShowCommandDropdown(!showCommandDropdown)}
+              onSearchToggle={() => setSearchActive(!searchActive)}
+              searchActive={searchActive}
+              userPlan={userPlan}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Command Dropdown */}
+      {showCommandDropdown && (
+        <div className="relative w-full">
+          <CommandDropdown
+            commands={commandOptions}
+            onSelect={(command) => {
+              setInputValue(prev => `${prev}${prev ? ' ' : ''}Create a ${command.label} on`);
+              setShowCommandDropdown(false);
+            }}
+            onClose={() => setShowCommandDropdown(false)}
+          />
         </div>
       )}
-
-      {/* Prompt Input */}
-      <PromptInput
-        isLoading={disabled}
-        value={inputValue}
-        onValueChange={setInputValue}
-        onSubmit={handleSubmit}
-        className="border-input bg-popover relative w-full rounded-3xl border p-0 pt-1 shadow-sm"
-      >
-        <div className="flex flex-col">
-          <PromptInputTextarea
-            placeholder={placeholder}
-            className="min-h-[44px] pt-3 pl-4 pr-4 text-base leading-[1.3]"
-            disabled={disabled}
-          />
-
-          <PromptInputActions className="mt-3 flex w-full items-center justify-between gap-2 px-3 pb-3">
-            <div className="flex items-center gap-2">
-              <PromptInputAction tooltip="Attach files">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-9 rounded-full"
-                  onClick={triggerFileSelect}
-                  type="button"
-                >
-                  <Plus size={18} />
-                </Button>
-              </PromptInputAction>
-
-              <div className="relative">
-                <PromptInputAction tooltip="Quick commands">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="size-9 rounded-full"
-                    type="button"
-                    onClick={() => setShowCommandDropdown(!showCommandDropdown)}
-                  >
-                    <AtSign size={18} />
-                  </Button>
-                </PromptInputAction>
-                
-                {showCommandDropdown && (
-                  <CommandDropdown
-                    commands={commandOptions}
-                    onSelect={(command) => {
-                      setInputValue(prev => `${prev}${prev ? ' ' : ''}Create a ${command.label} on`);
-                      setShowCommandDropdown(false);
-                    }}
-                    onClose={() => setShowCommandDropdown(false)}
-                  />
-                )}
-              </div>
-
-              <PromptInputAction tooltip={AI_MODELS.find(m => m.value === selectedModel)?.label || "Select AI Model"}>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-9 w-fit px-2 gap-1 rounded-full text-primary/60 hover:text-primary/80 hover:bg-transparent"
-                      type="button"
-                    >
-                      <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
-                      <span className="text-xs capitalize md:block hidden">
-                        {AI_MODELS.find(m => m.value === selectedModel)?.label}
-                      </span>
-                      <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5 bg-popover z-50">
-                    {AI_MODELS.map((model) => (
-                      <DropdownMenuItem
-                        key={model.value}
-                        onClick={() => handleModelSelect(model.value)}
-                        className={cn(
-                          "flex items-center justify-between rounded-xl",
-                          selectedModel === model.value ? "bg-accent" : ""
-                        )}
-                      >
-                        <div className="flex items-center gap-2">
-                          {selectedModel === model.value && <Check className="h-4 w-4 text-primary" />}
-                          <span>{model.label}</span>
-                        </div>
-                        {model.isPremium && (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
-                            Upgrade
-                          </span>
-                        )}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </PromptInputAction>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <PromptInputAction tooltip="Voice input (coming soon)">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-9 rounded-full"
-                  disabled
-                  type="button"
-                >
-                  <Mic size={18} />
-                </Button>
-              </PromptInputAction>
-
-              <Button
-                size="icon"
-                disabled={disabled || (!inputValue.trim() && attachments.length === 0)}
-                onClick={handleSubmit}
-                className="size-9 rounded-full"
-                type="button"
-              >
-                {disabled ? (
-                  <span className="size-3 rounded-xs bg-white" />
-                ) : (
-                  <ArrowUp size={18} />
-                )}
-              </Button>
-            </div>
-          </PromptInputActions>
-        </div>
-      </PromptInput>
 
       {/* Hidden File Input */}
       <input
