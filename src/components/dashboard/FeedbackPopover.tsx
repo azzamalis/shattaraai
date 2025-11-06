@@ -55,11 +55,11 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
   };
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
+    <Popover open={open} onOpenChange={handleOpenChange} modal={false}>
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-80 z-[100]" align="end" side="right" sideOffset={8}>
+      <PopoverContent className="w-80" align="end" side="right" sideOffset={8}>
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">Share Your Feedback</h4>
