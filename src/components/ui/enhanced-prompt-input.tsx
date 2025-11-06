@@ -137,7 +137,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="w-full flex flex-wrap gap-2 p-3 bg-[#4B4B4B] border border-[#A6A6A6]/20 rounded-xl"
+            className="w-full flex flex-wrap gap-2 p-3 bg-card border border-border rounded-xl"
           >
             {attachedFiles.map((file, index) => (
               <FilePreviewCard key={`${file.name}-${index}`} file={file} onRemove={() => removeFile(index)} />
@@ -168,14 +168,14 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
             }
           }}
           placeholder="Ask Shattara AI anything"
-          className="w-full min-h-[44px] max-h-[240px] resize-none rounded-2xl border border-[#A6A6A6] bg-[#4B4B4B] px-4 py-3 pr-12 text-sm text-[#FFF] placeholder:text-[#A6A6A6] focus-visible:ring-0 focus-visible:outline-none focus:border-[#00A3FF]/50 transition-all shadow-sm"
+          className="w-full min-h-[44px] max-h-[240px] resize-none rounded-2xl border border-input bg-card px-4 py-3 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:outline-none focus:border-primary/50 transition-all shadow-sm"
           rows={1}
         />
         <Button
           type="button"
           onClick={handleSubmit}
           disabled={!inputValue.trim() && attachedFiles.length === 0}
-          className="absolute right-2 top-2 h-8 w-8 rounded-full bg-[#4B4B4B] text-[#A6A6A6] hover:bg-[#00A3FF] hover:text-[#FFF] transition-colors p-0 disabled:opacity-50"
+          className="absolute right-2 top-2 h-8 w-8 rounded-full bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors p-0 disabled:opacity-50"
         >
           <Send className="h-4 w-4" />
         </Button>
