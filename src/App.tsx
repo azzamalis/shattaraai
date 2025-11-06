@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ContentProvider } from "@/contexts/ContentContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { PopoverProvider } from "@/contexts/PopoverContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
@@ -42,10 +43,11 @@ function App() {
         <TooltipProvider>
           <LanguageProvider>
             <ContentProvider>
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <div className="min-h-screen bg-background">
+              <PopoverProvider>
+                <Sonner />
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <div className="min-h-screen bg-background">
                   <Routes>
                   <Route path="/" element={<Index />} />
                    <Route path="/signin" element={<SignIn />} />
@@ -75,10 +77,11 @@ function App() {
                   </Routes>
                 </div>
               </BrowserRouter>
-            </ContentProvider>
-          </LanguageProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
+            </PopoverProvider>
+          </ContentProvider>
+        </LanguageProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
     </ErrorBoundary>
   );
 }

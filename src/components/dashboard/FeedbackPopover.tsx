@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,15 +8,27 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { toast } from "sonner";
+import { usePopoverState } from "@/contexts/PopoverContext";
 
 interface FeedbackPopoverProps {
   children: React.ReactNode;
 }
 
+const FEEDBACK_POPOVER_ID = "feedback-popover";
+
 export function FeedbackPopover({ children }: FeedbackPopoverProps) {
   const [feedback, setFeedback] = useState("");
-  const [open, setOpen] = useState(false);
+  const { openPopover, closePopover, isPopoverOpen } = usePopoverState();
+  const open = isPopoverOpen(FEEDBACK_POPOVER_ID);
   const maxLength = 500;
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen) {
+      openPopover(FEEDBACK_POPOVER_ID);
+    } else {
+      closePopover(FEEDBACK_POPOVER_ID);
+    }
+  };
 
   const handleSubmit = () => {
     if (feedback.trim().length === 0) {
@@ -34,16 +46,16 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
     });
     
     setFeedback("");
-    setOpen(false);
+    closePopover(FEEDBACK_POPOVER_ID);
   };
 
   const handleCancel = () => {
     setFeedback("");
-    setOpen(false);
+    closePopover(FEEDBACK_POPOVER_ID);
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
