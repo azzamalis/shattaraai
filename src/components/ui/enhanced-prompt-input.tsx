@@ -1,16 +1,44 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  Plus,
+  Globe,
+  ArrowUp,
+  MoreHorizontal,
+  Mic,
   X,
   FileText,
   Image as ImageIcon,
-  Send,
+  ChevronDown,
+  Sparkles,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  PromptInput,
+  PromptInputTextarea,
+  PromptInputActions,
+  PromptInputAction,
+} from "@/components/prompt-kit/prompt-input";
 import { Dialog } from "@/components/ui/dialog";
 import { UpgradeModal } from "@/components/dashboard/UpgradeModal";
-import { ModelAndContextControls } from "@/components/chat/ModelAndContextControls";
-import { cn } from "@/lib/utils";
+
+const AI_MODELS = [
+  { value: "auto", label: "Auto", isPremium: false },
+  { value: "openai/gpt-5-mini", label: "GPT-5 Mini", isPremium: false },
+  { value: "anthropic/claude-sonnet-4-5", label: "Claude 4.5", isPremium: true },
+  { value: "openai/gpt-5", label: "GPT-5", isPremium: true },
+  { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro", isPremium: true },
+  { value: "xai/grok-4", label: "Grok 4", isPremium: true },
+];
 
 interface EnhancedPromptInputProps {
   onSubmit?: (value: string, files?: File[]) => void;
@@ -80,15 +108,12 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
 export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [selectedModel, setSelectedModel] = useState("gemini-2.5-flash");
+  const [selectedModel, setSelectedModel] = useState("openai/gpt-5-mini");
   const [deepSearchActive, setDeepSearchActive] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const hasContent = inputValue.trim().length > 0;
-  const showControls = isFocused || hasContent || attachedFiles.length > 0;
+  const hasContent = inputValue.trim().length > 0 || attachedFiles.length > 0;
 
   const handleFileAttach = () => {
     fileInputRef.current?.click();
@@ -117,7 +142,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
   };
 
   const handleSubmit = () => {
-    if (inputValue.trim() || attachedFiles.length > 0) {
+    if (hasContent) {
       onSubmit?.(inputValue, attachedFiles.length > 0 ? attachedFiles : undefined);
       setInputValue("");
       setAttachedFiles([]);
@@ -129,7 +154,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
   };
 
   return (
-    <div className={cn("w-full max-w-3xl mx-auto flex flex-col items-center gap-2", className)}>
+    <>
       {/* File Previews */}
       <AnimatePresence mode="popLayout">
         {attachedFiles.length > 0 && (
@@ -137,7 +162,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="w-full flex flex-wrap gap-2 p-3 bg-card border border-border rounded-xl"
+            className="mb-3 space-y-2"
           >
             {attachedFiles.map((file, index) => (
               <FilePreviewCard key={`${file.name}-${index}`} file={file} onRemove={() => removeFile(index)} />
@@ -146,62 +171,88 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
         )}
       </AnimatePresence>
 
-      {/* Input Area - Always Visible */}
-      <div className="relative w-full">
-        <textarea
-          ref={textareaRef}
-          value={inputValue}
-          onChange={(e) => {
-            setInputValue(e.target.value);
-            // Auto-resize
-            if (textareaRef.current) {
-              textareaRef.current.style.height = 'auto';
-              textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 240)}px`;
-            }
-          }}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit();
-            }
-          }}
-          placeholder="Ask Shattara AI anything"
-          className="w-full min-h-[44px] max-h-[240px] resize-none rounded-2xl border border-input bg-card px-4 py-3 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:outline-none focus:border-primary/50 transition-all shadow-sm"
-          rows={1}
-        />
-        <Button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!inputValue.trim() && attachedFiles.length === 0}
-          className="absolute right-2 top-2 h-8 w-8 rounded-full bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors p-0 disabled:opacity-50"
-        >
-          <Send className="h-4 w-4" />
-        </Button>
-      </div>
+      {/* Main Input */}
+      <PromptInput
+        value={inputValue}
+        onValueChange={setInputValue}
+        onSubmit={handleSubmit}
+        className={className || "border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"}
+      >
+        <div className="flex flex-col">
+          <PromptInputTextarea
+            placeholder="Ask Shattara AI anything"
+            className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3]"
+          />
 
-      {/* Controls Section - Conditionally Rendered */}
-      <AnimatePresence>
-        {showControls && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="w-full"
-          >
-            <ModelAndContextControls
-              selectedModel={selectedModel}
-              onModelSelect={handleModelSelect}
-              onFileAttach={handleFileAttach}
-              onSearchToggle={() => setDeepSearchActive(!deepSearchActive)}
-              searchActive={deepSearchActive}
-              userPlan={userPlan}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+          <PromptInputActions className="mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3">
+            <div className="flex items-center gap-2">
+              <PromptInputAction tooltip="Attach files">
+                <Button variant="outline" size="icon" onClick={handleFileAttach} className="size-9 rounded-full">
+                  <Plus size={18} />
+                </Button>
+              </PromptInputAction>
+
+              <PromptInputAction tooltip="Search the web">
+                <Button
+                  variant="ghost"
+                  onClick={() => setDeepSearchActive(!deepSearchActive)}
+                  className={`rounded-full ${deepSearchActive ? "bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary" : ""}`}
+                >
+                  <Globe size={18} />
+                  Search
+                </Button>
+              </PromptInputAction>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-9 w-fit px-2 gap-1 rounded-full text-primary/60 hover:text-primary/80 hover:bg-transparent"
+                  >
+                    <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
+                    <span className="text-xs capitalize md:block hidden">
+                      {AI_MODELS.find((model) => model.value === selectedModel)?.label}
+                    </span>
+                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5 bg-popover z-50">
+                  {AI_MODELS.map((model) => (
+                    <DropdownMenuItem
+                      key={model.value}
+                      onClick={() => handleModelSelect(model.value)}
+                      className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? "bg-accent" : ""}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {selectedModel === model.value && <Check className="h-4 w-4 text-primary" />}
+                        <span>{model.label}</span>
+                      </div>
+                      {model.isPremium && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
+                          Upgrade
+                        </span>
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <PromptInputAction tooltip="Voice input">
+                <Button variant="outline" size="icon" className="size-9 rounded-full" disabled>
+                  <Mic size={18} />
+                </Button>
+              </PromptInputAction>
+
+              <Button size="icon" disabled={!hasContent} onClick={handleSubmit} className="size-9 rounded-full">
+                <ArrowUp size={18} />
+              </Button>
+            </div>
+          </PromptInputActions>
+        </div>
+      </PromptInput>
 
       {/* Hidden File Input */}
       <input
@@ -217,6 +268,6 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
       <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
         <UpgradeModal />
       </Dialog>
-    </div>
+    </>
   );
 }
