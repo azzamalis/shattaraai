@@ -110,11 +110,9 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
   const [selectedModel, setSelectedModel] = useState("openai/gpt-5-mini");
   const [deepSearchActive, setDeepSearchActive] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const hasContent = inputValue.trim().length > 0 || attachedFiles.length > 0;
-  const showControls = isFocused || hasContent || attachedFiles.length > 0;
 
   const handleFileAttach = () => {
     fileInputRef.current?.click();
@@ -183,8 +181,6 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
           <PromptInputTextarea
             placeholder="Ask Shattara AI anything"
             className="min-h-[44px] pt-3 pl-4 pr-12 text-base leading-[1.3]"
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
           />
 
           {/* Submit Button - Absolutely Positioned */}
@@ -194,18 +190,10 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
             onClick={handleSubmit} 
             className="absolute right-2 top-2 size-9 rounded-full z-10"
           >
-            <ArrowUp className="h-5 w-5" />
+            <ArrowUp size={18} />
           </Button>
 
-          <AnimatePresence>
-            {showControls && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <PromptInputActions className="mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3">
+          <PromptInputActions className="mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3">
             <div className="flex items-center gap-2">
               <PromptInputAction tooltip="Attach files">
                 <Button variant="outline" size="icon" onClick={handleFileAttach} className="size-9 rounded-full">
@@ -262,9 +250,6 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
               </DropdownMenu>
             </div>
           </PromptInputActions>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </PromptInput>
 

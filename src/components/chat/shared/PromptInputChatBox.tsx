@@ -1,5 +1,4 @@
 import React, { useState, useRef, ChangeEvent } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { CommandDropdown } from '@/components/chat/CommandDropdown';
 import { CommandOption } from '@/lib/types';
 import {
@@ -61,10 +60,7 @@ export function PromptInputChatBox({
   const [selectedModel, setSelectedModel] = useState("claude-4-sonnet");
   const [showCommandDropdown, setShowCommandDropdown] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const showControls = isFocused || inputValue.trim().length > 0 || attachments.length > 0;
 
   const handleSubmit = () => {
     if ((inputValue.trim() || attachments.length > 0) && !disabled) {
@@ -130,8 +126,6 @@ export function PromptInputChatBox({
             placeholder={placeholder}
             className="min-h-[44px] pt-3 pl-4 pr-12 text-base leading-[1.3]"
             disabled={disabled}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
           />
 
           {/* Submit Button - Absolutely Positioned */}
@@ -145,19 +139,11 @@ export function PromptInputChatBox({
             {disabled ? (
               <span className="size-3 rounded-xs bg-white" />
             ) : (
-              <ArrowUp className="h-5 w-5" />
+              <ArrowUp size={18} />
             )}
           </Button>
 
-          <AnimatePresence>
-            {showControls && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <PromptInputActions className="mt-3 flex w-full items-center justify-between gap-2 px-3 pb-3">
+          <PromptInputActions className="mt-3 flex w-full items-center justify-between gap-2 px-3 pb-3">
             <div className="flex items-center gap-2">
               <PromptInputAction tooltip="Attach files">
                 <Button
@@ -238,9 +224,6 @@ export function PromptInputChatBox({
               </PromptInputAction>
             </div>
           </PromptInputActions>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </PromptInput>
 
