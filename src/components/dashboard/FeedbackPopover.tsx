@@ -59,15 +59,15 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end" side="right" sideOffset={8}>
-        <div className="grid gap-4">
+      <PopoverContent className="w-80 pointer-events-auto" align="end" side="right" sideOffset={8}>
+        <div className="grid gap-4 pointer-events-auto">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">Share Your Feedback</h4>
             <p className="text-sm text-muted-foreground">
               Help us improve by sharing your thoughts and suggestions.
             </p>
           </div>
-          <div className="grid gap-3">
+          <div className="grid gap-3 pointer-events-auto">
             <div className="space-y-2">
               <Label htmlFor="feedback">Your Feedback</Label>
               <Textarea
