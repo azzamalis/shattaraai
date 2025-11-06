@@ -28,7 +28,6 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
             className="w-full flex items-center justify-start gap-2 
               bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
               transition-all duration-200 rounded-xl py-2 px-2"
-            onClick={(e) => e.stopPropagation()}
           >
             <MessageCircle className="h-4 w-4" />
             <span className="text-sm font-medium">Feedback</span>
