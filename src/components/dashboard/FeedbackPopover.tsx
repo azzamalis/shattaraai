@@ -64,6 +64,7 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
         align="end" 
         side="right" 
         sideOffset={8}
+        onOpenAutoFocus={(e) => e.preventDefault()}
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
       >
