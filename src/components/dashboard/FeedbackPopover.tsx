@@ -59,7 +59,14 @@ export function FeedbackPopover({ children }: FeedbackPopoverProps) {
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-80 pointer-events-auto" align="end" side="right" sideOffset={8}>
+      <PopoverContent 
+        className="w-80 pointer-events-auto" 
+        align="end" 
+        side="right" 
+        sideOffset={8}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <div className="grid gap-4 pointer-events-auto">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">Share Your Feedback</h4>
