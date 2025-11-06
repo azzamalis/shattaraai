@@ -1,73 +1,94 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Image, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { toast } from "sonner";
+
 interface FeedbackPopoverProps {
   children: React.ReactNode;
 }
-export function FeedbackPopover({
-  children
-}: FeedbackPopoverProps) {
-  const [feedback, setFeedback] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [open, setOpen] = useState(false);
-  const handleSubmit = async () => {
-    if (!feedback.trim()) return;
-    setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setFeedback('');
-      setOpen(false);
-      toast.success("Thank you for your feedback!");
-    }, 1000);
+export function FeedbackPopover({ children }: FeedbackPopoverProps) {
+  const [feedback, setFeedback] = useState("");
+  const [open, setOpen] = useState(false);
+  const maxLength = 500;
+
+  const handleSubmit = () => {
+    if (feedback.trim().length === 0) {
+      toast.error("Feedback required", {
+        description: "Please enter your feedback before submitting.",
+      });
+      return;
+    }
+
+    // Here you would typically send the feedback to your backend
+    console.log("Feedback submitted:", feedback);
+    
+    toast.success("Thank you!", {
+      description: "Your feedback has been submitted successfully.",
+    });
+    
+    setFeedback("");
+    setOpen(false);
   };
-  return <>
-      <div onClick={() => setOpen(true)}>
+
+  const handleCancel = () => {
+    setFeedback("");
+    setOpen(false);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         {children}
-      </div>
-      
-      {open && <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-20">
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/10" onClick={() => setOpen(false)} />
-          
-          {/* Modal Content - positioned like a popover */}
-          <div className="relative bg-card border border-border rounded-xl shadow-lg w-[450px] p-0 m-4">
-            <div className="w-full max-w-md p-4">
-              <div className="flex flex-col space-y-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-xl font-medium text-foreground">Send Feedback</h2>
-                  <Button type="button" variant="ghost" size="icon" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl">
-                    <X size={18} />
-                    <span className="sr-only">Close</span>
-                  </Button>
-                </div>
-                
-                <div className="space-y-2">
-                  <Textarea placeholder="Share your thoughts..." className="min-h-[120px] resize-none" value={feedback} onChange={e => setFeedback(e.target.value)} name="message" autoFocus />
-                </div>
-                
-                <div className="flex justify-between items-center gap-x-2">
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground rounded-xl">
-                    Cancel
-                  </Button>
-                  
-                  <div className="flex items-center gap-x-2">
-                    
-                    
-                    <Button onClick={handleSubmit} disabled={!feedback.trim() || isSubmitting} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl">
-                      {isSubmitting ? <div className="flex items-center gap-2">
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
-                          <span>Sending...</span>
-                        </div> : <span>Send feedback</span>}
-                    </Button>
-                  </div>
-                </div>
-              </div>
+      </PopoverTrigger>
+      <PopoverContent className="w-80" align="end" side="right">
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h4 className="font-medium leading-none">Share Your Feedback</h4>
+            <p className="text-sm text-muted-foreground">
+              Help us improve by sharing your thoughts and suggestions.
+            </p>
+          </div>
+          <div className="grid gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="feedback">Your Feedback</Label>
+              <Textarea
+                id="feedback"
+                placeholder="Tell us what you think..."
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                maxLength={maxLength}
+                className="min-h-[120px] resize-none"
+              />
+              <p className="text-xs text-muted-foreground text-right">
+                {feedback.length}/{maxLength}
+              </p>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCancel}
+                className="hover:bg-accent"
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSubmit}
+              >
+                Submit
+              </Button>
             </div>
           </div>
-        </div>}
-    </>;
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
 }
