@@ -145,7 +145,7 @@ export function PromptInputChatBox({
             {disabled ? (
               <span className="size-3 rounded-xs bg-white" />
             ) : (
-              <ArrowUp size={18} />
+              <ArrowUp className="h-5 w-5" />
             )}
           </Button>
 

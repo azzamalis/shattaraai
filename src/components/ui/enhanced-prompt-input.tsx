@@ -194,7 +194,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
             onClick={handleSubmit} 
             className="absolute right-2 top-2 size-9 rounded-full z-10"
           >
-            <ArrowUp size={18} />
+            <ArrowUp className="h-5 w-5" />
           </Button>
 
           <AnimatePresence>
