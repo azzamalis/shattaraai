@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { SquareCheckBig, FileText, ToggleLeft, Type } from 'lucide-react';
+import { PillButton } from './config/PillButton';
+import { StarDifficulty } from './config/StarDifficulty';
+import { TopicsSelector } from './config/TopicsSelector';
 
 interface QuizConfig {
   numberOfQuestions: number;
@@ -15,6 +17,7 @@ interface QuizConfig {
     multipleChoice: boolean;
     trueFalse: boolean;
     shortAnswer: boolean;
+    fillInBlank?: boolean;
   };
 }
 
@@ -27,6 +30,27 @@ interface QuizConfigModalProps {
 
 export function QuizConfigModal({ open, onOpenChange, config, onSave }: QuizConfigModalProps) {
   const [localConfig, setLocalConfig] = useState<QuizConfig>(config);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [focusInstructions, setFocusInstructions] = useState('');
+
+  // Mock topics
+  const availableTopics = ['Introduction', 'Chapter 1', 'Chapter 2', 'Key Concepts', 'Examples'];
+
+  const questionTypeOptions = [
+    { key: 'multipleChoice' as const, icon: SquareCheckBig, label: 'Multiple Choice', colorClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' },
+    { key: 'shortAnswer' as const, icon: FileText, label: 'Free Response', colorClass: 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20' },
+    { key: 'trueFalse' as const, icon: ToggleLeft, label: 'True or False', colorClass: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20' },
+  ];
+
+  const toggleQuestionType = (type: keyof QuizConfig['questionTypes']) => {
+    setLocalConfig({
+      ...localConfig,
+      questionTypes: {
+        ...localConfig.questionTypes,
+        [type]: !localConfig.questionTypes[type],
+      },
+    });
+  };
 
   const handleSave = () => {
     onSave(localConfig);
@@ -35,118 +59,87 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave }: QuizConf
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Quiz Settings</DialogTitle>
+          <DialogTitle>Customize Quiz</DialogTitle>
+          <DialogDescription>
+            Create quiz sets with preferred question types, difficulty, and more.
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <form className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label>Number of Questions: {localConfig.numberOfQuestions}</Label>
-            <Slider
-              value={[localConfig.numberOfQuestions]}
-              onValueChange={([value]) => setLocalConfig({ ...localConfig, numberOfQuestions: value })}
-              min={5}
-              max={50}
-              step={5}
-              className="w-full"
-            />
-            <p className="text-xs text-muted-foreground">
-              Generate between 5 and 50 questions
-            </p>
+            <Label>
+              Question Types <span className="text-red-500">*</span>
+            </Label>
+            <div className="p-1.5 rounded-2xl border border-primary/20 bg-card w-full">
+              <div className="flex flex-wrap gap-1.5">
+                {questionTypeOptions.map((option) => (
+                  <PillButton
+                    key={option.key}
+                    icon={option.icon}
+                    label={option.label}
+                    selected={localConfig.questionTypes[option.key]}
+                    onClick={() => toggleQuestionType(option.key)}
+                    colorClass={option.colorClass}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Difficulty Level</Label>
-            <ToggleGroup
-              type="single"
+            <Label>
+              Difficulty <span className="text-red-500">*</span>
+            </Label>
+            <StarDifficulty
               value={localConfig.difficulty}
-              onValueChange={(value) => value && setLocalConfig({ ...localConfig, difficulty: value as any })}
-              className="justify-start"
-            >
-              <ToggleGroupItem value="easy" className="px-4">
-                Easy
-              </ToggleGroupItem>
-              <ToggleGroupItem value="medium" className="px-4">
-                Medium
-              </ToggleGroupItem>
-              <ToggleGroupItem value="hard" className="px-4">
-                Hard
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-
-          <div className="space-y-3">
-            <Label>Question Types</Label>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="multipleChoice"
-                  checked={localConfig.questionTypes.multipleChoice}
-                  onCheckedChange={(checked) =>
-                    setLocalConfig({
-                      ...localConfig,
-                      questionTypes: { ...localConfig.questionTypes, multipleChoice: checked as boolean }
-                    })
-                  }
-                />
-                <label htmlFor="multipleChoice" className="text-sm font-medium">
-                  Multiple Choice
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="trueFalse"
-                  checked={localConfig.questionTypes.trueFalse}
-                  onCheckedChange={(checked) =>
-                    setLocalConfig({
-                      ...localConfig,
-                      questionTypes: { ...localConfig.questionTypes, trueFalse: checked as boolean }
-                    })
-                  }
-                />
-                <label htmlFor="trueFalse" className="text-sm font-medium">
-                  True/False
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="shortAnswer"
-                  checked={localConfig.questionTypes.shortAnswer}
-                  onCheckedChange={(checked) =>
-                    setLocalConfig({
-                      ...localConfig,
-                      questionTypes: { ...localConfig.questionTypes, shortAnswer: checked as boolean }
-                    })
-                  }
-                />
-                <label htmlFor="shortAnswer" className="text-sm font-medium">
-                  Short Answer
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Include Explanations</Label>
-              <p className="text-xs text-muted-foreground">
-                Add detailed explanations for each answer
-              </p>
-            </div>
-            <Switch
-              checked={localConfig.includeExplanations}
-              onCheckedChange={(checked) => setLocalConfig({ ...localConfig, includeExplanations: checked })}
+              onChange={(difficulty) => setLocalConfig({ ...localConfig, difficulty })}
             />
           </div>
-        </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="numberOfQuestions">Number of Questions</Label>
+            <Input
+              id="numberOfQuestions"
+              type="number"
+              min={1}
+              max={30}
+              value={localConfig.numberOfQuestions}
+              onChange={(e) => setLocalConfig({ ...localConfig, numberOfQuestions: parseInt(e.target.value) || 10 })}
+              placeholder="10"
+              className="p-6"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Topics</Label>
+            <TopicsSelector
+              topics={availableTopics}
+              selectedTopics={selectedTopics}
+              onTopicsChange={setSelectedTopics}
+              placeholder="Select topics for this set"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="focusInstructions">What should the quiz focus on?</Label>
+            <Textarea
+              id="focusInstructions"
+              value={focusInstructions}
+              onChange={(e) => setFocusInstructions(e.target.value)}
+              placeholder="Focus on the parts that are about..."
+              className="min-h-[80px] max-h-[80px] resize-none p-3"
+            />
+          </div>
+        </form>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button onClick={handleSave}>
-            Save Settings
+            Generate
           </Button>
         </DialogFooter>
       </DialogContent>
