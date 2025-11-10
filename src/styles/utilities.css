@@ -48,6 +48,26 @@
   }
 }
 
+/* Number input stepper styling */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+  height: 100%;
+  background-color: hsl(var(--muted));
+  border-left: 1px solid hsl(var(--border));
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+input[type="number"]::-webkit-inner-spin-button:hover,
+input[type="number"]::-webkit-outer-spin-button:hover {
+  background-color: hsl(var(--accent));
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* Improved scrollbar for dark theme */
 ::-webkit-scrollbar {
   width: 8px;
