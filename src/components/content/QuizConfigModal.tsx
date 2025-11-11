@@ -8,6 +8,7 @@ import { SquareCheckBig, FileText, ToggleLeft, Type } from 'lucide-react';
 import { PillButton } from './config/PillButton';
 import { StarDifficulty } from './config/StarDifficulty';
 import { TopicsSelector } from './config/TopicsSelector';
+import { toast } from 'sonner';
 
 interface QuizConfig {
   numberOfQuestions: number;
@@ -64,6 +65,14 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave, topics = [
 
   const handleSave = () => {
     const questionsCount = parseInt(numberOfQuestions) || 10;
+    
+    // Validate that at least one question type is selected
+    const hasSelectedType = Object.values(localConfig.questionTypes).some(value => value === true);
+    if (!hasSelectedType) {
+      toast.error('Please select at least one question type');
+      return;
+    }
+    
     onSave({ ...localConfig, numberOfQuestions: questionsCount });
     onOpenChange(false);
   };
