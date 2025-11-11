@@ -67,53 +67,55 @@ export function TopicsSelector({ topics, selectedTopics, onTopicsChange, placeho
         onClick={handleContainerClick}
       >
         <div className="relative flex flex-wrap gap-1 pr-8">
-          {isAllSelected && !showAll ? (
-            <Badge className="bg-foreground text-background hover:bg-foreground/90 border-transparent">
-              Selected All Topics
-              <button
-                type="button"
-                className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                onClick={handleClearAll}
-                title="Clear all selected items"
-              >
-                <X className="h-3 w-3 text-background/60 hover:text-background" />
-              </button>
-            </Badge>
-          ) : (
-            displayTopics.map((topic) => (
-              <Badge key={topic} className="bg-foreground text-background hover:bg-foreground/90 border-transparent">
-                {topic}
+          <div className="flex flex-wrap gap-1 items-center">
+            {isAllSelected && !showAll ? (
+              <Badge className="bg-foreground text-background hover:bg-foreground/90 border-transparent">
+                Selected All Topics
                 <button
                   type="button"
                   className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  onClick={() => handleRemoveTopic(topic)}
+                  onClick={handleClearAll}
+                  title="Clear all selected items"
                 >
                   <X className="h-3 w-3 text-background/60 hover:text-background" />
                 </button>
               </Badge>
-            ))
-          )}
-          
-          {selectedTopics.length > 3 && !showAll && (
-            <button
-              type="button"
-              className="ml-1 outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 group"
-              onClick={() => setShowAll(true)}
-              title="Show all selected items"
-            >
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-muted-foreground group-hover:text-foreground">Show all items</span>
-                <ChevronRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground" />
-              </div>
-            </button>
-          )}
+            ) : (
+              displayTopics.map((topic) => (
+                <Badge key={topic} className="bg-foreground text-background hover:bg-foreground/90 border-transparent">
+                  {topic}
+                  <button
+                    type="button"
+                    className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    onClick={() => handleRemoveTopic(topic)}
+                  >
+                    <X className="h-3 w-3 text-background/60 hover:text-background" />
+                  </button>
+                </Badge>
+              ))
+            )}
+            
+            {selectedTopics.length > 3 && !showAll && (
+              <button
+                type="button"
+                className="ml-1 outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 group whitespace-nowrap"
+                onClick={() => setShowAll(true)}
+                title="Show all selected items"
+              >
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground group-hover:text-foreground">Show all items</span>
+                  <ChevronRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground" />
+                </div>
+              </button>
+            )}
 
-          <CommandInput
-            placeholder={placeholder}
-            className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground ml-1"
-            value={inputValue}
-            onValueChange={setInputValue}
-          />
+            <CommandInput
+              placeholder={placeholder}
+              className="flex-1 min-w-[200px] bg-transparent outline-none placeholder:text-muted-foreground ml-1"
+              value={inputValue}
+              onValueChange={setInputValue}
+            />
+          </div>
 
           <button
             type="button"
