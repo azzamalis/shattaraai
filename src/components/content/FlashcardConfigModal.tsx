@@ -19,15 +19,15 @@ interface FlashcardConfigModalProps {
   onOpenChange: (open: boolean) => void;
   config: FlashcardConfig;
   onSave: (config: FlashcardConfig) => void;
+  topics?: string[];
 }
 
-export function FlashcardConfigModal({ open, onOpenChange, config, onSave }: FlashcardConfigModalProps) {
+export function FlashcardConfigModal({ open, onOpenChange, config, onSave, topics = [] }: FlashcardConfigModalProps) {
   const [localConfig, setLocalConfig] = useState<FlashcardConfig>(config);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [focusInstructions, setFocusInstructions] = useState('');
 
-  // Mock topics - in real app, these would come from content analysis
-  const availableTopics = ['Introduction', 'Chapter 1', 'Chapter 2', 'Key Concepts', 'Examples'];
+  const availableTopics = topics.length > 0 ? topics : ['General Content'];
 
   const handleSave = () => {
     onSave(localConfig);

@@ -28,6 +28,36 @@ export function ContentRightSidebar({
   const [activeTab, setActiveTab] = useState("chat");
   const [isRecording, setIsRecording] = useState(false);
 
+  // Extract topics from content metadata
+  const extractTopics = (): string[] => {
+    const topics: string[] = [];
+    
+    // Extract from chapters
+    if (contentData?.chapters && Array.isArray(contentData.chapters)) {
+      contentData.chapters.forEach((chapter: any) => {
+        if (chapter.title) {
+          topics.push(chapter.title);
+        }
+      });
+    }
+    
+    // Extract from metadata
+    if (contentData?.metadata) {
+      if (contentData.metadata.keyTopics && Array.isArray(contentData.metadata.keyTopics)) {
+        topics.push(...contentData.metadata.keyTopics);
+      }
+      if (contentData.metadata.keywords && Array.isArray(contentData.metadata.keywords)) {
+        // Add top 5 keywords as topics
+        topics.push(...contentData.metadata.keywords.slice(0, 5));
+      }
+    }
+    
+    // Remove duplicates and return
+    return [...new Set(topics)].filter(Boolean);
+  };
+
+  const availableTopics = extractTopics();
+
   // Generation states
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationType, setGenerationType] = useState<'flashcards' | 'quizzes' | 'summary' | null>(null);
@@ -444,6 +474,7 @@ export function ContentRightSidebar({
         onOpenChange={setShowFlashcardConfig}
         config={flashcardConfig}
         onSave={setFlashcardConfig}
+        topics={availableTopics}
       />
       
       <QuizConfigModal
@@ -451,6 +482,7 @@ export function ContentRightSidebar({
         onOpenChange={setShowQuizConfig}
         config={quizConfig}
         onSave={setQuizConfig}
+        topics={availableTopics}
       />
       
       <SummaryConfigModal

@@ -26,15 +26,15 @@ interface QuizConfigModalProps {
   onOpenChange: (open: boolean) => void;
   config: QuizConfig;
   onSave: (config: QuizConfig) => void;
+  topics?: string[];
 }
 
-export function QuizConfigModal({ open, onOpenChange, config, onSave }: QuizConfigModalProps) {
+export function QuizConfigModal({ open, onOpenChange, config, onSave, topics = [] }: QuizConfigModalProps) {
   const [localConfig, setLocalConfig] = useState<QuizConfig>(config);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [focusInstructions, setFocusInstructions] = useState('');
 
-  // Mock topics
-  const availableTopics = ['Introduction', 'Chapter 1', 'Chapter 2', 'Key Concepts', 'Examples'];
+  const availableTopics = topics.length > 0 ? topics : ['General Content'];
 
   const questionTypeOptions = [
     { key: 'multipleChoice' as const, icon: SquareCheckBig, label: 'Multiple Choice', colorClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' },
