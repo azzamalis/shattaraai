@@ -110,7 +110,7 @@ export function TopicsSelector({ topics, selectedTopics, onTopicsChange, placeho
 
           <CommandInput
             placeholder={placeholder}
-            className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground ml-1"
+            className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground ml-1 border-none shadow-none [&>svg]:hidden"
             value={inputValue}
             onValueChange={setInputValue}
           />
