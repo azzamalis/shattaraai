@@ -26,11 +26,13 @@ export function FlashcardConfigModal({ open, onOpenChange, config, onSave, topic
   const [localConfig, setLocalConfig] = useState<FlashcardConfig>(config);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [focusInstructions, setFocusInstructions] = useState('');
+  const [numberOfCards, setNumberOfCards] = useState<string>('');
 
   const availableTopics = topics.length > 0 ? topics : ['General Content'];
 
   const handleSave = () => {
-    onSave(localConfig);
+    const cardsCount = parseInt(numberOfCards) || 10;
+    onSave({ ...localConfig, numberOfCards: cardsCount });
     onOpenChange(false);
   };
 
@@ -53,8 +55,8 @@ export function FlashcardConfigModal({ open, onOpenChange, config, onSave, topic
               id="numberOfCards"
               type="number"
               max={50}
-              value={localConfig.numberOfCards}
-              onChange={(e) => setLocalConfig({ ...localConfig, numberOfCards: parseInt(e.target.value) || 10 })}
+              value={numberOfCards}
+              onChange={(e) => setNumberOfCards(e.target.value)}
               placeholder="e.g., 10"
               className="p-6"
             />
