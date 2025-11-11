@@ -52,10 +52,9 @@ export function FlashcardConfigModal({ open, onOpenChange, config, onSave, topic
             <Input
               id="numberOfCards"
               type="number"
-              min={5}
               max={50}
               value={localConfig.numberOfCards}
-              onChange={(e) => setLocalConfig({ ...localConfig, numberOfCards: parseInt(e.target.value) || 5 })}
+              onChange={(e) => setLocalConfig({ ...localConfig, numberOfCards: parseInt(e.target.value) || 10 })}
               placeholder="e.g., 10"
               className="p-6"
             />
