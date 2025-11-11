@@ -57,6 +57,8 @@ export const QuizTakingComponent = ({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [flagged, setFlagged] = useState<Set<string>>(new Set());
+  const [checkedQuestions, setCheckedQuestions] = useState<Set<string>>(new Set());
+  const [dontKnowQuestions, setDontKnowQuestions] = useState<Set<string>>(new Set());
   const [startTime] = useState(Date.now());
 
   const currentQuestion = quizData.questions[currentQuestionIndex];
@@ -112,10 +114,14 @@ export const QuizTakingComponent = ({
       return;
     }
 
+    // Mark question as checked to show feedback
+    setCheckedQuestions((prev) => new Set([...prev, currentQuestion.id]));
+  };
+
+  const handleNext = () => {
     // Move to next question or complete quiz
     if (currentQuestionIndex < quizData.questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
-      toast.success('Answer recorded!');
     } else {
       handleCompleteQuiz();
     }
@@ -128,13 +134,8 @@ export const QuizTakingComponent = ({
   };
 
   const handleDontKnow = () => {
-    // Mark as skipped and move to next
-    if (currentQuestionIndex < quizData.questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-      toast.info('Question skipped');
-    } else {
-      handleCompleteQuiz();
-    }
+    // Mark question to show correct answer
+    setDontKnowQuestions((prev) => new Set([...prev, currentQuestion.id]));
   };
 
   const handleDeleteQuestion = () => {
@@ -201,6 +202,9 @@ export const QuizTakingComponent = ({
   const renderQuestion = () => {
     if (!currentQuestion) return null;
 
+    const isChecked = checkedQuestions.has(currentQuestion.id);
+    const showDontKnow = dontKnowQuestions.has(currentQuestion.id);
+
     switch (currentQuestion.type) {
       case 'multiple-choice':
         return (
@@ -209,6 +213,11 @@ export const QuizTakingComponent = ({
             options={currentQuestion.options || []}
             selectedAnswer={currentAnswer}
             onSelectAnswer={handleSelectAnswer}
+            isChecked={isChecked}
+            correctAnswer={currentQuestion.correctAnswer}
+            showDontKnow={showDontKnow}
+            explanation={currentQuestion.explanation}
+            reference={currentQuestion.hint}
           />
         );
       case 'true-false':
@@ -274,10 +283,13 @@ export const QuizTakingComponent = ({
               <QuizActionButtons
                 onUndo={handleUndo}
                 onCheck={handleCheck}
+                onNext={handleNext}
                 onDontKnow={handleDontKnow}
                 canUndo={currentQuestionIndex > 0}
                 hasAnswer={!!currentAnswer}
                 isShortAnswer={currentQuestion?.type === 'short-answer'}
+                isChecked={checkedQuestions.has(currentQuestion?.id)}
+                showDontKnow={dontKnowQuestions.has(currentQuestion?.id)}
               />
             </div>
           </div>
