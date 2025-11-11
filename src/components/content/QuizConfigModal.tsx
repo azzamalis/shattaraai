@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -36,6 +36,15 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave, topics = [
   const [numberOfQuestions, setNumberOfQuestions] = useState<string>('');
 
   const availableTopics = topics.length > 0 ? topics : ['General Content'];
+
+  // Reset fields when modal opens
+  useEffect(() => {
+    if (open) {
+      setNumberOfQuestions('');
+      setSelectedTopics([]);
+      setFocusInstructions('');
+    }
+  }, [open]);
 
   const questionTypeOptions = [
     { key: 'multipleChoice' as const, icon: SquareCheckBig, label: 'Multiple Choice', colorClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' },
