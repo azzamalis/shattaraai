@@ -61,7 +61,7 @@ export function TopicsSelector({ topics, selectedTopics, onTopicsChange, placeho
   };
 
   return (
-    <Command className="h-auto overflow-visible bg-transparent" ref={containerRef}>
+    <Command className="h-auto overflow-visible bg-transparent [&_[cmdk-input-wrapper]]:border-0 [&_[cmdk-input-wrapper]>svg]:hidden" ref={containerRef}>
       <div 
         className="min-h-10 rounded-md border border-input text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 px-3 py-2 cursor-text max-h-56 overflow-y-auto w-full"
         onClick={handleContainerClick}
