@@ -19,10 +19,11 @@ interface FlashcardConfigModalProps {
   onOpenChange: (open: boolean) => void;
   config: FlashcardConfig;
   onSave: (config: FlashcardConfig) => void;
+  onGenerate?: () => void;
   topics?: string[];
 }
 
-export function FlashcardConfigModal({ open, onOpenChange, config, onSave, topics = [] }: FlashcardConfigModalProps) {
+export function FlashcardConfigModal({ open, onOpenChange, config, onSave, onGenerate, topics = [] }: FlashcardConfigModalProps) {
   const [localConfig, setLocalConfig] = useState<FlashcardConfig>(config);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [focusInstructions, setFocusInstructions] = useState('');
@@ -41,8 +42,14 @@ export function FlashcardConfigModal({ open, onOpenChange, config, onSave, topic
 
   const handleSave = () => {
     const cardsCount = parseInt(numberOfCards) || 10;
-    onSave({ ...localConfig, numberOfCards: cardsCount });
+    const updatedConfig = { ...localConfig, numberOfCards: cardsCount };
+    onSave(updatedConfig);
     onOpenChange(false);
+    
+    // Trigger generation after saving config
+    if (onGenerate) {
+      onGenerate();
+    }
   };
 
   return (

@@ -474,6 +474,7 @@ export function ContentRightSidebar({
         onOpenChange={setShowFlashcardConfig}
         config={flashcardConfig}
         onSave={setFlashcardConfig}
+        onGenerate={handleGenerateFlashcards}
         topics={availableTopics}
       />
       
@@ -482,6 +483,7 @@ export function ContentRightSidebar({
         onOpenChange={setShowQuizConfig}
         config={quizConfig}
         onSave={setQuizConfig}
+        onGenerate={handleGenerateQuiz}
         topics={availableTopics}
       />
       

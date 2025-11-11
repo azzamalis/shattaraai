@@ -27,10 +27,11 @@ interface QuizConfigModalProps {
   onOpenChange: (open: boolean) => void;
   config: QuizConfig;
   onSave: (config: QuizConfig) => void;
+  onGenerate?: () => void;
   topics?: string[];
 }
 
-export function QuizConfigModal({ open, onOpenChange, config, onSave, topics = [] }: QuizConfigModalProps) {
+export function QuizConfigModal({ open, onOpenChange, config, onSave, onGenerate, topics = [] }: QuizConfigModalProps) {
   const [localConfig, setLocalConfig] = useState<QuizConfig>(config);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [focusInstructions, setFocusInstructions] = useState('');
@@ -73,8 +74,14 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave, topics = [
       return;
     }
     
-    onSave({ ...localConfig, numberOfQuestions: questionsCount });
+    const updatedConfig = { ...localConfig, numberOfQuestions: questionsCount };
+    onSave(updatedConfig);
     onOpenChange(false);
+    
+    // Trigger generation after saving config
+    if (onGenerate) {
+      onGenerate();
+    }
   };
 
   return (
