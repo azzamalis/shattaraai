@@ -33,6 +33,7 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave, topics = [
   const [localConfig, setLocalConfig] = useState<QuizConfig>(config);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [focusInstructions, setFocusInstructions] = useState('');
+  const [numberOfQuestions, setNumberOfQuestions] = useState<string>('');
 
   const availableTopics = topics.length > 0 ? topics : ['General Content'];
 
@@ -53,7 +54,8 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave, topics = [
   };
 
   const handleSave = () => {
-    onSave(localConfig);
+    const questionsCount = parseInt(numberOfQuestions) || 10;
+    onSave({ ...localConfig, numberOfQuestions: questionsCount });
     onOpenChange(false);
   };
 
@@ -103,11 +105,10 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave, topics = [
             <Input
               id="numberOfQuestions"
               type="number"
-              min={1}
               max={30}
-              value={localConfig.numberOfQuestions}
-              onChange={(e) => setLocalConfig({ ...localConfig, numberOfQuestions: parseInt(e.target.value) || 10 })}
-              placeholder="10"
+              value={numberOfQuestions}
+              onChange={(e) => setNumberOfQuestions(e.target.value)}
+              placeholder="e.g., 10"
               className="p-6"
             />
           </div>
