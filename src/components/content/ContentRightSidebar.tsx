@@ -476,6 +476,7 @@ export function ContentRightSidebar({
         onSave={setFlashcardConfig}
         onGenerate={handleGenerateFlashcards}
         topics={availableTopics}
+        isLoading={isGenerating && generationType === 'flashcards'}
       />
       
       <QuizConfigModal
@@ -485,6 +486,7 @@ export function ContentRightSidebar({
         onSave={setQuizConfig}
         onGenerate={handleGenerateQuiz}
         topics={availableTopics}
+        isLoading={isGenerating && generationType === 'quizzes'}
       />
       
       <SummaryConfigModal

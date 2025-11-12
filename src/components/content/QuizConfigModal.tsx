@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { SquareCheckBig, FileText, ToggleLeft, Type } from 'lucide-react';
+import { SquareCheckBig, FileText, ToggleLeft, Type, Loader2 } from 'lucide-react';
 import { PillButton } from './config/PillButton';
 import { StarDifficulty } from './config/StarDifficulty';
 import { TopicsSelector } from './config/TopicsSelector';
@@ -29,9 +29,10 @@ interface QuizConfigModalProps {
   onSave: (config: QuizConfig) => void;
   onGenerate?: () => void;
   topics?: string[];
+  isLoading?: boolean;
 }
 
-export function QuizConfigModal({ open, onOpenChange, config, onSave, onGenerate, topics = [] }: QuizConfigModalProps) {
+export function QuizConfigModal({ open, onOpenChange, config, onSave, onGenerate, topics = [], isLoading = false }: QuizConfigModalProps) {
   const [localConfig, setLocalConfig] = useState<QuizConfig>(config);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [focusInstructions, setFocusInstructions] = useState('');
@@ -161,11 +162,18 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave, onGenerate
         </form>
 
         <DialogFooter>
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+          <Button variant="secondary" onClick={() => onOpenChange(false)} disabled={isLoading}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>
-            Generate
+          <Button onClick={handleSave} disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Generating...
+              </>
+            ) : (
+              'Generate'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

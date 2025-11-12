@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
 import { TopicsSelector } from './config/TopicsSelector';
 
 interface FlashcardConfig {
@@ -21,9 +22,10 @@ interface FlashcardConfigModalProps {
   onSave: (config: FlashcardConfig) => void;
   onGenerate?: () => void;
   topics?: string[];
+  isLoading?: boolean;
 }
 
-export function FlashcardConfigModal({ open, onOpenChange, config, onSave, onGenerate, topics = [] }: FlashcardConfigModalProps) {
+export function FlashcardConfigModal({ open, onOpenChange, config, onSave, onGenerate, topics = [], isLoading = false }: FlashcardConfigModalProps) {
   const [localConfig, setLocalConfig] = useState<FlashcardConfig>(config);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [focusInstructions, setFocusInstructions] = useState('');
@@ -101,11 +103,18 @@ export function FlashcardConfigModal({ open, onOpenChange, config, onSave, onGen
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>
-            Create Set
+          <Button onClick={handleSave} disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Creating...
+              </>
+            ) : (
+              'Create Set'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
