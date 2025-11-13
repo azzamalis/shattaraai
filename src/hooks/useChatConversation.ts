@@ -232,7 +232,24 @@ export function useChatConversation({
 
     isSendingRef.current = true;
     setIsSending(true);
+    
     try {
+      const messageId = crypto.randomUUID();
+      const timestamp = new Date().toISOString();
+      
+      // Check for duplicate using UUID and timestamp (within 5 seconds)
+      const existingMessages = await supabase
+        .from('chat_messages')
+        .select('id, created_at')
+        .eq('conversation_id', conversationId)
+        .eq('content', content)
+        .gte('created_at', new Date(Date.now() - 5000).toISOString());
+      
+      if (existingMessages.data && existingMessages.data.length > 0) {
+        console.log('Duplicate message detected (recent identical content), skipping...');
+        return null;
+      }
+      
       const metadata = attachments && attachments.length > 0 ? {
         attachments: attachments,
         hasAttachments: true,
@@ -242,6 +259,7 @@ export function useChatConversation({
       const { data, error } = await supabase
         .from('chat_messages')
         .insert([{
+          id: messageId,
           conversation_id: conversationId,
           sender_type: 'user',
           content: content,
@@ -254,7 +272,7 @@ export function useChatConversation({
 
       if (error) {
         console.error('Error sending message:', error);
-        return null;
+        throw error;
       }
 
       const newMessage: ChatMessage = {
@@ -268,6 +286,10 @@ export function useChatConversation({
       console.log('Created new message with attachments:', newMessage);
       setMessages(prevMessages => [...prevMessages, newMessage]);
       return newMessage;
+    } catch (error) {
+      console.error('Error in sendMessage:', error);
+      toast.error('Failed to send message. Please try again.');
+      return null;
     } finally {
       setIsSending(false);
       isSendingRef.current = false;

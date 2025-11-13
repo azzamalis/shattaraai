@@ -97,20 +97,13 @@ export function ActionCards({
         toast.dismiss(loadingToast);
         console.log('DEBUG: ActionCards - Upload completed, content ID received:', contentId);
         if (contentId) {
-          console.log('DEBUG: ActionCards - Content created successfully, preparing navigation');
-          console.log('DEBUG: ActionCards - Navigation details:', {
-            contentId,
-            targetRoute: `/content/${contentId}`,
-            timestamp: new Date().toISOString()
+          console.log('DEBUG: ActionCards - Content uploaded, processing in background');
+          // Keep user on dashboard, show success with background processing indicator
+          toast.success(`${file.name} uploaded! Processing in background...`, {
+            description: 'You\'ll be notified when it\'s ready',
+            duration: 5000
           });
-
-          // Add a small delay to ensure database transaction is complete
-          setTimeout(() => {
-            console.log('DEBUG: ActionCards - Executing navigation to content page:', contentId);
-            navigate(`/content/${contentId}`);
-            toast.success(`File "${file.name}" uploaded successfully`);
-            console.log('DEBUG: ActionCards - Navigation completed and success toast shown');
-          }, 100);
+          // Don't navigate - let user continue working on dashboard
         } else {
           console.error('DEBUG: ActionCards - Upload failed: No content ID returned');
           throw new Error('Failed to create content - no ID returned');

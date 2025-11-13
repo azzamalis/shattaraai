@@ -75,7 +75,12 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave, onGenerate
       return;
     }
     
-    const updatedConfig = { ...localConfig, numberOfQuestions: questionsCount };
+    const updatedConfig = { 
+      ...localConfig, 
+      numberOfQuestions: questionsCount,
+      selectedTopics: selectedTopics,
+      focusInstructions: focusInstructions
+    };
     onSave(updatedConfig);
     onOpenChange(false);
     

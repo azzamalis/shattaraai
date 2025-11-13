@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ContentItem } from '@/hooks/useContent';
 import { cn } from '@/lib/utils';
-import { Check, Pencil } from 'lucide-react';
+import { Check, Pencil, Loader2 } from 'lucide-react';
 import { LearningCardMenu } from './LearningCardMenu';
 import { LearningCardThumbnail } from './LearningCardThumbnail';
 import { ContentTypeIcon } from './drawer/recent/ContentTypeIcon';
@@ -13,6 +13,7 @@ import { useContentContext } from '@/contexts/ContentContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X, Check as CheckIcon } from 'lucide-react';
+import { useRealtimeContentStatus } from '@/hooks/useRealtimeContentStatus';
 
 interface LearningCardProps {
   content: ContentItem;
@@ -43,6 +44,10 @@ export function LearningCard({
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editValue, setEditValue] = useState(content.title);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Track real-time processing status
+  const processingStatus = useRealtimeContentStatus(content.id, true);
+  const isProcessing = processingStatus.status === 'processing' || processingStatus.status === 'pending';
 
   const handleCardClick = () => {
     if (isExamSelectionMode && onToggleSelection) {
@@ -124,6 +129,7 @@ export function LearningCard({
         "flex flex-col justify-between",
         "shadow-[0_4px_10px_rgba(0,0,0,0.02)]",
         "bg-card",
+        isProcessing && "opacity-70",
         "cursor-pointer transition-all duration-200 rounded-2xl border border-border",
         "group relative",
         "hover:shadow-md dark:hover:border-border/40",
@@ -155,6 +161,13 @@ export function LearningCard({
             onAddToRoom={handleAddToRoom}
             availableRooms={availableRooms}
           />
+        )}
+        {/* Processing status badge */}
+        {isProcessing && (
+          <div className="absolute top-2 left-2 bg-primary/90 text-primary-foreground px-2 py-1 rounded-md text-xs flex items-center gap-1.5 backdrop-blur-sm">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            {processingStatus.currentStep || 'Processing...'}
+          </div>
         )}
       </LearningCardThumbnail>
 

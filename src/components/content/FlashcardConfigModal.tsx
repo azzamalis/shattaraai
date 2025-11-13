@@ -44,7 +44,12 @@ export function FlashcardConfigModal({ open, onOpenChange, config, onSave, onGen
 
   const handleSave = () => {
     const cardsCount = parseInt(numberOfCards) || 10;
-    const updatedConfig = { ...localConfig, numberOfCards: cardsCount };
+    const updatedConfig = { 
+      ...localConfig, 
+      numberOfCards: cardsCount,
+      selectedTopics: selectedTopics,
+      focusInstructions: focusInstructions
+    };
     onSave(updatedConfig);
     onOpenChange(false);
     
