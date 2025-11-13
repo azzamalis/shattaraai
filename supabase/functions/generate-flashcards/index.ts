@@ -62,7 +62,7 @@ serve(async (req) => {
       hard: 'Create advanced, complex flashcards that test deep understanding.'
     };
 
-    const systemPrompt = `You are an expert educator creating flashcards from educational content.
+    let systemPrompt = `You are an expert educator creating flashcards from educational content.
 
 ${difficultyInstructions[config.difficulty || 'medium']}
 
@@ -71,9 +71,19 @@ ${config.focusOnKeyConcepts ? 'Focus on the most important concepts and key take
 Generate exactly ${config.numberOfCards || 20} flashcards.
 
 ${config.includeHints ? 'Include helpful hints for each flashcard.' : ''}
-${config.includeExplanations ? 'Include detailed explanations for each answer.' : ''}
+${config.includeExplanations ? 'Include detailed explanations for each answer.' : ''}`;
 
-Each flashcard should:
+    // Add topic-specific instructions if topics are selected
+    if (config.selectedTopics && config.selectedTopics.length > 0) {
+      systemPrompt += `\n\nFocus specifically on these topics: ${config.selectedTopics.join(', ')}`;
+    }
+
+    // Add custom focus instructions if provided
+    if (config.focusInstructions && config.focusInstructions.trim()) {
+      systemPrompt += `\n\nAdditional focus: ${config.focusInstructions}`;
+    }
+
+    systemPrompt += `\n\nEach flashcard should:
 - Have a clear, concise question
 - Provide an accurate, complete answer
 - Identify the main concept being tested

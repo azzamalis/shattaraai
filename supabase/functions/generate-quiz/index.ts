@@ -61,7 +61,7 @@ serve(async (req) => {
     if (config.questionTypes?.trueFalse) questionTypes.push('true/false');
     if (config.questionTypes?.shortAnswer) questionTypes.push('short answer');
 
-    const systemPrompt = `You are an expert educator creating quiz questions from educational content.
+    let systemPrompt = `You are an expert educator creating quiz questions from educational content.
 
 Create ${config.numberOfQuestions || 15} questions at ${config.difficulty || 'medium'} difficulty level.
 
@@ -71,9 +71,19 @@ ${config.includeExplanations ? 'Include detailed explanations for each correct a
 
 For multiple choice questions, provide 4 options.
 For true/false questions, the answer should be either "true" or "false".
-For short answer questions, provide a model answer.
+For short answer questions, provide a model answer.`;
 
-Each question should test understanding and be appropriately challenging.`;
+    // Add topic-specific instructions if topics are selected
+    if (config.selectedTopics && config.selectedTopics.length > 0) {
+      systemPrompt += `\n\nFocus specifically on these topics: ${config.selectedTopics.join(', ')}`;
+    }
+
+    // Add custom focus instructions if provided
+    if (config.focusInstructions && config.focusInstructions.trim()) {
+      systemPrompt += `\n\nAdditional focus: ${config.focusInstructions}`;
+    }
+
+    systemPrompt += `\n\nEach question should test understanding and be appropriately challenging.`;
 
     const userPrompt = `Create quiz questions from the following content:\n\n${contentText.substring(0, 15000)}`;
 
