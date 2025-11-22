@@ -204,7 +204,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[450px] bg-card border-border p-5 rounded-xl shadow-lg">
+      <DialogContent className="w-full max-w-[calc(100vw-2rem)] sm:max-w-[450px] bg-card border-border p-4 sm:p-5 rounded-xl shadow-lg">
         <div className="flex flex-col space-y-4">
           {/* Header */}
           <div className="flex items-center justify-between">

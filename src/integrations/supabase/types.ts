@@ -233,6 +233,7 @@ export type Database = {
           summary_generated_at: string | null
           summary_key_points: Json | null
           text_content: string | null
+          thumbnail_url: string | null
           title: string
           transcription_confidence: number | null
           type: string
@@ -253,6 +254,7 @@ export type Database = {
           summary_generated_at?: string | null
           summary_key_points?: Json | null
           text_content?: string | null
+          thumbnail_url?: string | null
           title: string
           transcription_confidence?: number | null
           type: string
@@ -273,6 +275,7 @@ export type Database = {
           summary_generated_at?: string | null
           summary_key_points?: Json | null
           text_content?: string | null
+          thumbnail_url?: string | null
           title?: string
           transcription_confidence?: number | null
           type?: string
