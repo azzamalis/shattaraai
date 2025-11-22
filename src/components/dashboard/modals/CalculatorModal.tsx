@@ -246,13 +246,13 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                 <div className="text-right text-2xl font-semibold min-h-[2rem] text-foreground">
                   {standardResult}
                 </div>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-2 sm:gap-3">
                   {['7', '8', '9', '/'].map((key) => (
                     <Button
                       key={key}
                       variant="secondary"
                       onClick={() => setStandardInput(standardInput + key)}
-                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                      className="h-12 sm:h-10 text-base sm:text-sm bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -262,7 +262,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                       key={key}
                       variant="secondary"
                       onClick={() => setStandardInput(standardInput + key)}
-                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                      className="h-12 sm:h-10 text-base sm:text-sm bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -272,7 +272,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                       key={key}
                       variant="secondary"
                       onClick={() => setStandardInput(standardInput + key)}
-                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                      className="h-12 sm:h-10 text-base sm:text-sm bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {key}
                     </Button>
@@ -283,22 +283,22 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                       variant={key === '=' ? 'default' : 'secondary'}
                       onClick={() => key === '=' ? calculateStandard() : setStandardInput(standardInput + key)}
                       className={key === '=' ? 
-                        "bg-primary hover:bg-primary/90 text-primary-foreground" : 
-                        "bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                        "h-12 sm:h-10 text-base sm:text-sm bg-primary hover:bg-primary/90 text-primary-foreground" : 
+                        "h-12 sm:h-10 text-base sm:text-sm bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                       }
                     >
                       {key}
                     </Button>
                   ))}
                   <Button
-                    className="col-span-2 bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                    className="col-span-2 h-12 sm:h-10 text-base sm:text-sm bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     variant="secondary"
                     onClick={() => setStandardInput('')}
                   >
                     Clear
                   </Button>
                   <Button
-                    className="col-span-2 bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                    className="col-span-2 h-12 sm:h-10 text-base sm:text-sm bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
                     variant="secondary"
                     onClick={() => setStandardInput(standardInput.slice(0, -1))}
                   >
@@ -332,13 +332,13 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                 <div className="text-right text-2xl font-semibold min-h-[2rem] text-foreground">
                   {scientificResult}
                 </div>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
                   {['sin', 'cos', 'tan', 'π', '^'].map((key) => (
                     <Button
                       key={key}
                       variant="secondary"
                       onClick={() => setScientificInput(scientificInput + key + (key === 'π' ? '' : '('))}
-                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                      className="h-11 sm:h-9 text-sm sm:text-xs bg-muted text-foreground hover:bg-accent hover:text-accent-foreground px-1"
                     >
                       {key}
                     </Button>
@@ -348,7 +348,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                       key={key}
                       variant="secondary"
                       onClick={() => setScientificInput(scientificInput + key + (key === '√' ? '(' : ''))}
-                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                      className="h-11 sm:h-9 text-sm sm:text-xs bg-muted text-foreground hover:bg-accent hover:text-accent-foreground px-1"
                     >
                       {key}
                     </Button>
@@ -358,7 +358,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                       key={key}
                       variant="secondary"
                       onClick={() => setScientificInput(scientificInput + key)}
-                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                      className="h-11 sm:h-9 text-sm sm:text-xs bg-muted text-foreground hover:bg-accent hover:text-accent-foreground px-1"
                     >
                       {key}
                     </Button>
@@ -368,7 +368,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                       key={key}
                       variant="secondary"
                       onClick={() => setScientificInput(scientificInput + key)}
-                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                      className="h-11 sm:h-9 text-sm sm:text-xs bg-muted text-foreground hover:bg-accent hover:text-accent-foreground px-1"
                     >
                       {key}
                     </Button>
@@ -379,8 +379,8 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                       variant={key === '=' ? 'default' : 'secondary'}
                       onClick={() => key === '=' ? calculateScientific() : setScientificInput(scientificInput + key)}
                       className={key === '=' ? 
-                        "bg-primary hover:bg-primary/90 text-primary-foreground" : 
-                        "bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                        "h-11 sm:h-9 text-sm sm:text-xs bg-primary hover:bg-primary/90 text-primary-foreground px-1" : 
+                        "h-11 sm:h-9 text-sm sm:text-xs bg-muted text-foreground hover:bg-accent hover:text-accent-foreground px-1"
                       }
                     >
                       {key}
@@ -402,7 +402,7 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
                             setScientificInput(scientificInput + key);
                         }
                       }}
-                      className="bg-muted text-foreground hover:bg-accent hover:text-accent-foreground"
+                      className="h-11 sm:h-9 text-sm sm:text-xs bg-muted text-foreground hover:bg-accent hover:text-accent-foreground px-1"
                     >
                       {key}
                     </Button>
