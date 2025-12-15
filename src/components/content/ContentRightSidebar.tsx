@@ -505,6 +505,15 @@ export function ContentRightSidebar({
                   <ScrollArea className="h-full">
                     <div className="flex flex-col space-y-6">
                       <div className="px-6 pt-6">
+                        <GenerationPrompt
+                          type="flashcards"
+                          onGenerate={handleGenerateFlashcards}
+                          onConfigure={() => setShowFlashcardConfig(true)}
+                          contentData={contentData}
+                          isLoading={isGenerating && generationType === 'flashcards'}
+                        />
+                      </div>
+                      <div className="px-6 pb-6">
                         <FlashcardListDisplay
                           flashcards={flashcards}
                           onStartFlashcards={() => setShowFlashcardStudy(true)}
@@ -528,15 +537,6 @@ export function ContentRightSidebar({
                               toast.error('Failed to delete flashcards');
                             }
                           }}
-                        />
-                      </div>
-                      <div className="px-6 pb-6">
-                        <GenerationPrompt
-                          type="flashcards"
-                          onGenerate={handleGenerateFlashcards}
-                          onConfigure={() => setShowFlashcardConfig(true)}
-                          contentData={contentData}
-                          isLoading={isGenerating && generationType === 'flashcards'}
                         />
                       </div>
                     </div>
@@ -578,6 +578,16 @@ export function ContentRightSidebar({
                   <ScrollArea className="h-full">
                     <div className="flex flex-col space-y-6">
                       <div className="px-6 pt-6">
+                        <GenerationPrompt
+                          type="quizzes"
+                          onGenerate={handleGenerateQuiz}
+                          onConfigure={() => setShowQuizConfig(true)}
+                          contentData={contentData}
+                          isLoading={isGenerating && generationType === 'quizzes'}
+                        />
+                      </div>
+                      
+                      <div className="px-6 pb-6">
                         <QuizDisplay
                           quiz={quizData}
                           onStartQuiz={(quizId) => setShowQuizTaking(true)}
@@ -605,16 +615,6 @@ export function ContentRightSidebar({
                               toast.error('Failed to delete quiz');
                             }
                           }}
-                        />
-                      </div>
-                      
-                      <div className="p-6">
-                        <GenerationPrompt
-                          type="quizzes"
-                          onGenerate={handleGenerateQuiz}
-                          onConfigure={() => setShowQuizConfig(true)}
-                          contentData={contentData}
-                          isLoading={isGenerating && generationType === 'quizzes'}
                         />
                       </div>
                     </div>
