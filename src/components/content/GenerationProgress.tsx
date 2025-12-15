@@ -56,20 +56,24 @@ export function GenerationProgress({ type, isActive, onComplete }: GenerationPro
     const timers: NodeJS.Timeout[] = [];
 
     const advanceStep = () => {
-      if (stepIndex < steps.length) {
-        setCurrentStepIndex(stepIndex);
+      // Bounds check before accessing steps array
+      if (stepIndex >= steps.length) return;
+      
+      setCurrentStepIndex(stepIndex);
+      const currentStep = steps[stepIndex];
+      
+      if (!currentStep) return;
+      
+      const timer = setTimeout(() => {
+        setCompletedSteps(prev => new Set([...prev, currentStep.id]));
+        stepIndex++;
         
-        const timer = setTimeout(() => {
-          setCompletedSteps(prev => new Set([...prev, steps[stepIndex].id]));
-          stepIndex++;
-          
-          if (stepIndex < steps.length) {
-            advanceStep();
-          }
-        }, steps[stepIndex].estimatedDuration);
-        
-        timers.push(timer);
-      }
+        if (stepIndex < steps.length) {
+          advanceStep();
+        }
+      }, currentStep.estimatedDuration);
+      
+      timers.push(timer);
     };
 
     advanceStep();
