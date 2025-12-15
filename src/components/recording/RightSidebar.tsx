@@ -16,31 +16,51 @@ const RightSidebar = () => {
           <TabsList className="w-fit mx-auto flex items-center gap-1 p-1.5 rounded-2xl border border-primary/10 bg-card">
             <TabsTrigger value="chat" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                {activeTab === "chat" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <MessageCircle className="h-4 w-4" />
+                )}
                 Chat
               </div>
             </TabsTrigger>
             <TabsTrigger value="flashcards" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
-                <FileStack className="h-4 w-4" />
+                {activeTab === "flashcards" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <FileStack className="h-4 w-4" />
+                )}
                 Flashcards
               </div>
             </TabsTrigger>
             <TabsTrigger value="exams" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
-                <Brain className="h-4 w-4" />
+                {activeTab === "exams" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <Brain className="h-4 w-4" />
+                )}
                 Exams
               </div>
             </TabsTrigger>
             <TabsTrigger value="summary" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
+                {activeTab === "summary" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <BookOpen className="h-4 w-4" />
+                )}
                 Summary
               </div>
             </TabsTrigger>
             <TabsTrigger value="notes" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
+                {activeTab === "notes" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <FileText className="h-4 w-4" />
+                )}
                 Notes
               </div>
             </TabsTrigger>

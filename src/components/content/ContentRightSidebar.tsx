@@ -399,21 +399,33 @@ export function ContentRightSidebar({
           <TabsList className="w-fit mx-auto flex items-center gap-2 p-1.5 h-auto rounded-2xl border border-primary/10 bg-white dark:bg-neutral-800/50 dark:border-primary/5 overflow-x-auto">
             <TabsTrigger value="chat" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                {activeTab === "chat" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <MessageCircle className="h-4 w-4" />
+                )}
                 Chat
               </div>
             </TabsTrigger>
             
             <TabsTrigger value="flashcards" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
-                <GalleryVerticalEnd className="h-4 w-4" />
+                {activeTab === "flashcards" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <GalleryVerticalEnd className="h-4 w-4" />
+                )}
                 Flashcards
               </div>
             </TabsTrigger>
             
             <TabsTrigger value="exams" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
-                <BookCheck className="h-4 w-4" />
+                {activeTab === "exams" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <BookCheck className="h-4 w-4" />
+                )}
                 Quizzes
               </div>
             </TabsTrigger>
@@ -421,7 +433,11 @@ export function ContentRightSidebar({
             {shouldShowChapters && (
               <TabsTrigger value="chapters" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
                 <div className="flex items-center gap-2">
-                  <ListTodo className="h-4 w-4" />
+                  {activeTab === "chapters" ? (
+                    <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  ) : (
+                    <ListTodo className="h-4 w-4" />
+                  )}
                   Chapters
                 </div>
               </TabsTrigger>
@@ -429,14 +445,22 @@ export function ContentRightSidebar({
             
             <TabsTrigger value="summary" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
-                <ReceiptText className="h-4 w-4" />
+                {activeTab === "summary" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <ReceiptText className="h-4 w-4" />
+                )}
                 Summary
               </div>
             </TabsTrigger>
             
             <TabsTrigger value="notes" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
-                <StickyNote className="h-4 w-4" />
+                {activeTab === "notes" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                ) : (
+                  <StickyNote className="h-4 w-4" />
+                )}
                 Notes
               </div>
             </TabsTrigger>
