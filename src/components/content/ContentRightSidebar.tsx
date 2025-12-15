@@ -205,20 +205,40 @@ export function ContentRightSidebar({
   };
 
   const checkSummary = async () => {
-    if (contentData.ai_summary && contentData.summary_key_points) {
-      const existingSummary = {
-        id: `summary-existing-${contentData.id}`,
-        title: 'Detailed Summary',
-        type: 'detailed' as const,
-        summary: contentData.ai_summary,
-        keyPoints: contentData.summary_key_points as string[],
-        createdAt: new Date(contentData.summary_generated_at || Date.now()),
-      };
-      setSummariesList([existingSummary]);
-      setSummaryData({
-        summary: contentData.ai_summary,
-        keyPoints: contentData.summary_key_points as string[]
-      });
+    try {
+      // Fetch summaries from the database
+      const { data: summaries, error } = await supabase
+        .from('summaries')
+        .select('*')
+        .eq('content_id', contentData.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (summaries && summaries.length > 0) {
+        const formattedSummaries = summaries.map(s => ({
+          id: s.id,
+          title: s.title,
+          type: s.type as 'brief' | 'standard' | 'detailed',
+          summary: s.summary,
+          keyPoints: (s.key_points as string[]) || [],
+          createdAt: new Date(s.created_at),
+        }));
+        setSummariesList(formattedSummaries);
+      } else if (contentData.ai_summary && contentData.summary_key_points) {
+        // Legacy: check if there's a summary in the content table
+        const existingSummary = {
+          id: `summary-existing-${contentData.id}`,
+          title: 'Detailed Summary',
+          type: 'detailed' as const,
+          summary: contentData.ai_summary,
+          keyPoints: contentData.summary_key_points as string[],
+          createdAt: new Date(contentData.summary_generated_at || Date.now()),
+        };
+        setSummariesList([existingSummary]);
+      }
+    } catch (error) {
+      console.error('Error fetching summaries:', error);
     }
   };
 
@@ -278,6 +298,11 @@ export function ContentRightSidebar({
     setGenerationType('summary');
     
     try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        throw new Error('User not authenticated');
+      }
+
       const { data, error } = await supabase.functions.invoke('generate-summary', {
         body: {
           contentId: contentData.id,
@@ -294,17 +319,33 @@ export function ContentRightSidebar({
         detailed: 'Detailed Summary',
       };
       
+      // Save to database
+      const { data: savedSummary, error: saveError } = await supabase
+        .from('summaries')
+        .insert({
+          content_id: contentData.id,
+          user_id: userData.user.id,
+          title: typeLabels[summaryType],
+          type: summaryType,
+          summary: data.summary,
+          key_points: data.keyPoints || [],
+        })
+        .select()
+        .single();
+
+      if (saveError) throw saveError;
+      
       const newSummary = {
-        id: `summary-${Date.now()}`,
-        title: typeLabels[summaryType],
-        type: summaryType,
-        summary: data.summary,
-        keyPoints: data.keyPoints || [],
-        createdAt: new Date(),
+        id: savedSummary.id,
+        title: savedSummary.title,
+        type: savedSummary.type as 'brief' | 'standard' | 'detailed',
+        summary: savedSummary.summary,
+        keyPoints: (savedSummary.key_points as string[]) || [],
+        createdAt: new Date(savedSummary.created_at),
       };
       
-      setSummariesList(prev => [...prev, newSummary]);
-      setSummaryData(data);
+      setSummariesList(prev => [newSummary, ...prev]);
+      setSummaryData({ summary: data.summary, keyPoints: data.keyPoints || [] });
       
       // Show the newly generated summary
       setViewingSummary(newSummary);
@@ -317,6 +358,30 @@ export function ContentRightSidebar({
     } finally {
       setIsGenerating(false);
       setGenerationType(null);
+    }
+  };
+
+  const handleDeleteSummary = async (summaryId: string) => {
+    try {
+      // Check if it's a legacy summary (not in DB)
+      if (summaryId.startsWith('summary-existing-')) {
+        setSummariesList(prev => prev.filter(s => s.id !== summaryId));
+        toast.success('Summary removed');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('summaries')
+        .delete()
+        .eq('id', summaryId);
+
+      if (error) throw error;
+
+      setSummariesList(prev => prev.filter(s => s.id !== summaryId));
+      toast.success('Summary deleted');
+    } catch (error) {
+      console.error('Error deleting summary:', error);
+      toast.error('Failed to delete summary');
     }
   };
 
@@ -532,10 +597,7 @@ export function ContentRightSidebar({
                       setViewingSummary(fullSummary);
                     }
                   }}
-                  onDeleteSummary={(summaryId) => {
-                    setSummariesList(prev => prev.filter(s => s.id !== summaryId));
-                    toast.success('Summary deleted');
-                  }}
+                  onDeleteSummary={handleDeleteSummary}
                   onConfigure={() => setShowSummaryConfig(true)}
                   isLoading={isGenerating && generationType === 'summary'}
                   autoGenerate={autoGenerateSummary}

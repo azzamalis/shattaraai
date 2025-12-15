@@ -868,6 +868,50 @@ export type Database = {
         }
         Relationships: []
       }
+      summaries: {
+        Row: {
+          content_id: string
+          created_at: string
+          id: string
+          key_points: Json | null
+          summary: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          id?: string
+          key_points?: Json | null
+          summary: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          id?: string
+          key_points?: Json | null
+          summary?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "summaries_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_referrals: {
         Row: {
           created_at: string
