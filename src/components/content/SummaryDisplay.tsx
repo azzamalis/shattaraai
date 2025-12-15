@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
+import { DetailedSummaryDisplay } from './summary/DetailedSummaryDisplay';
+
 interface SummaryItem {
   id: string;
   reference: string;
@@ -12,8 +14,14 @@ interface SummaryItem {
   timestamp?: number;
   page?: number;
 }
+
 interface SummaryDisplayProps {
   contentData: ContentData;
+  summaryData?: {
+    summary: string;
+    keyPoints: string[];
+  } | null;
+  summaryTemplate?: 'brief' | 'standard' | 'detailed';
 }
 
 // Transform AI-generated chapters to SummaryItem format
@@ -106,6 +114,7 @@ const getSampleSummaryData = (contentType: string): SummaryItem[] => {
       }];
   }
 };
+
 const getContentIcon = (contentType: string) => {
   switch (contentType) {
     case 'pdf':
@@ -120,6 +129,7 @@ const getContentIcon = (contentType: string) => {
       return FileText;
   }
 };
+
 const formatReference = (item: SummaryItem, contentType: string) => {
   if (contentType === 'pdf' && item.page) {
     return `Page ${item.page}`;
@@ -131,29 +141,64 @@ const formatReference = (item: SummaryItem, contentType: string) => {
   }
   return item.reference;
 };
+
 export function SummaryDisplay({
-  contentData
+  contentData,
+  summaryData,
+  summaryTemplate = 'detailed'
 }: SummaryDisplayProps) {
-  const summaryData = getSummaryData(contentData);
-  const ContentIcon = getContentIcon(contentData.type);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  
+  // If we have AI-generated summary data, use the DetailedSummaryDisplay
+  if (summaryData && summaryData.summary) {
+    return (
+      <DetailedSummaryDisplay
+        summary={summaryData.summary}
+        keyPoints={summaryData.keyPoints}
+        title={contentData.title}
+      />
+    );
+  }
+  
+  // Also check if content has ai_summary field
+  if (contentData.ai_summary) {
+    const keyPoints = Array.isArray(contentData.summary_key_points) 
+      ? contentData.summary_key_points 
+      : [];
+    
+    return (
+      <DetailedSummaryDisplay
+        summary={contentData.ai_summary}
+        keyPoints={keyPoints as string[]}
+        title={contentData.title}
+      />
+    );
+  }
+
+  // Fallback to legacy section-based display
+  const summaryItems = getSummaryData(contentData);
+  const ContentIcon = getContentIcon(contentData.type);
   
   // Show loading state if PDF or Word document is still processing
   const isProcessing = (contentData.type === 'pdf' || contentData.type === 'file') && contentData.processing_status === 'processing';
+  
   const handleCopyAll = () => {
-    const fullSummary = summaryData.map(item => `${item.title}\n${item.summary.map(point => `• ${point}`).join('\n')}`).join('\n\n');
+    const fullSummary = summaryItems.map(item => `${item.title}\n${item.summary.map(point => `• ${point}`).join('\n')}`).join('\n\n');
     navigator.clipboard.writeText(fullSummary);
     console.log('Summary copied to clipboard');
   };
+  
   const handleCopyItem = (item: SummaryItem) => {
     const itemText = `${item.title}\n${item.summary.map(point => `• ${point}`).join('\n')}`;
     navigator.clipboard.writeText(itemText);
     console.log('Item copied to clipboard');
   };
-  return <div className="h-full p-6 overflow-y-auto">
+  
+  return (
+    <div className="h-full p-6 overflow-y-auto">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl font-medium text-dashboard-text dark:text-dashboard-text">Summary</h2>
-        {summaryData.length > 1 && (
+        {summaryItems.length > 1 && (
           <Button 
             variant="ghost" 
             size="sm" 
@@ -182,7 +227,7 @@ export function SummaryDisplay({
         </div>
       ) : (
         <div className="space-y-8">
-          {summaryData.map((item, index) => (
+          {summaryItems.map((item, index) => (
             <div 
               key={item.id} 
               className="group relative"
@@ -224,5 +269,6 @@ export function SummaryDisplay({
           ))}
         </div>
       )}
-    </div>;
+    </div>
+  );
 }
