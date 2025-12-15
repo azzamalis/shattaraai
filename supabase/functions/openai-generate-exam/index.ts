@@ -458,31 +458,27 @@ ${contentContext}
 
 Generate an intelligent, comprehensive exam that thoroughly assesses student understanding of the above materials.`;
 
-    // Define model configurations with proper parameter support - Using o4-mini and o3-mini
+    // Define model configurations - prioritizing reliable models that don't have reasoning token issues
+    // O4-mini and O3 use all tokens for internal reasoning, leaving no tokens for output
+    // Using GPT-4.1 and GPT-4o models instead which produce output reliably
     const modelConfigs = [
-      {
-        name: 'o4-mini-2025-04-16',
-        supportsTemperature: false,
-        maxTokens: 4000,
-        description: 'Primary O4 mini model for fast generation'
-      },
-      {
-        name: 'o3-2025-04-16', 
-        supportsTemperature: false,
-        maxTokens: 4000,
-        description: 'O3 reasoning model for complex exams'
-      },
       {
         name: 'gpt-4.1-2025-04-14',
         supportsTemperature: false,
-        maxTokens: 4000,
-        description: 'Fallback GPT-4.1 model'
+        maxTokens: 8000,
+        description: 'Primary GPT-4.1 model for reliable exam generation'
       },
       {
         name: 'gpt-4o-mini',
         supportsTemperature: true,
-        maxTokens: 4000,
-        description: 'Legacy fallback model'
+        maxTokens: 8000,
+        description: 'Fast and reliable fallback model'
+      },
+      {
+        name: 'gpt-4o',
+        supportsTemperature: true,
+        maxTokens: 8000,
+        description: 'Powerful fallback model'
       }
     ];
 
@@ -523,6 +519,14 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
 
         if (response.ok) {
           aiData = await response.json();
+          
+          // Check if we actually got content (reasoning models can return empty content)
+          const content = aiData.choices?.[0]?.message?.content;
+          if (!content || content.trim() === '') {
+            console.error(`${config.name} returned empty content, trying next model`);
+            continue;
+          }
+          
           modelUsed = config.name;
           console.log(`Successfully generated exam with ${config.name}`);
           break;
@@ -546,6 +550,14 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
 
             if (retryResponse.ok) {
               aiData = await retryResponse.json();
+              
+              // Check content again
+              const retryContent = aiData.choices?.[0]?.message?.content;
+              if (!retryContent || retryContent.trim() === '') {
+                console.error(`${config.name} returned empty content on retry, trying next model`);
+                continue;
+              }
+              
               modelUsed = config.name;
               console.log(`Successfully generated exam with ${config.name} (no temperature)`);
               response = retryResponse;
