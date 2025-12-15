@@ -23,6 +23,7 @@ interface SummaryDisplayProps {
     keyPoints: string[];
   } | null;
   summaryTemplate?: 'brief' | 'standard' | 'detailed';
+  onBack?: () => void;
 }
 
 // Transform AI-generated chapters to SummaryItem format
@@ -146,7 +147,8 @@ const formatReference = (item: SummaryItem, contentType: string) => {
 export function SummaryDisplay({
   contentData,
   summaryData,
-  summaryTemplate = 'detailed'
+  summaryTemplate = 'detailed',
+  onBack
 }: SummaryDisplayProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   
@@ -158,6 +160,7 @@ export function SummaryDisplay({
         <CheatSheetSummaryDisplay
           summaryContent={summaryData.summary}
           contentId={contentData.id}
+          onBack={onBack}
         />
       );
     }
@@ -168,6 +171,7 @@ export function SummaryDisplay({
         summary={summaryData.summary}
         keyPoints={summaryData.keyPoints}
         title={contentData.title}
+        onBack={onBack}
       />
     );
   }
@@ -184,6 +188,7 @@ export function SummaryDisplay({
         <CheatSheetSummaryDisplay
           summaryContent={contentData.ai_summary}
           contentId={contentData.id}
+          onBack={onBack}
         />
       );
     }
@@ -193,6 +198,7 @@ export function SummaryDisplay({
         summary={contentData.ai_summary}
         keyPoints={keyPoints as string[]}
         title={contentData.title}
+        onBack={onBack}
       />
     );
   }
