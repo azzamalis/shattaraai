@@ -458,6 +458,7 @@ export function ContentRightSidebar({
                     contentData={contentData} 
                     summaryData={summaryData}
                     summaryTemplate={summaryConfig.length}
+                    onBack={() => setSummaryData(null)}
                   />
                 </ScrollArea>
               )}

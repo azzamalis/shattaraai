@@ -56,18 +56,16 @@ export function DetailedSummaryDisplay({
       <div className="mx-auto w-full max-w-3xl">
         <div className="flex h-full flex-col">
           {/* Sticky Header with Back Button */}
-          {onBack && (
-            <div className="sticky top-0 z-10 shrink-0 bg-background px-4 pb-2">
-              <Button
-                variant="ghost"
-                onClick={onBack}
-                className="justify-center whitespace-nowrap text-sm font-medium mt-0 flex h-fit w-fit items-center gap-2 bg-transparent p-0 text-muted-foreground hover:bg-transparent hover:text-accent-foreground"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                <span className="text-sm">Back</span>
-              </Button>
-            </div>
-          )}
+          <div className="sticky top-0 z-10 shrink-0 bg-background px-4 pb-2">
+            <Button
+              variant="ghost"
+              onClick={onBack}
+              className="justify-center whitespace-nowrap text-sm font-medium mt-0 flex h-fit w-fit items-center gap-2 bg-transparent p-0 text-muted-foreground hover:bg-transparent hover:text-accent-foreground"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="text-sm">Back</span>
+            </Button>
+          </div>
 
           {/* Content Area */}
           <div className="relative flex-1 overflow-y-auto">
