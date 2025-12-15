@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Settings2, EllipsisVertical } from 'lucide-react';
+import { ChevronDown, SlidersHorizontal, EllipsisVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -60,25 +60,36 @@ export function SummaryTabPanel({
     <div className="h-[calc(100vh-165px)] overflow-y-auto md:h-[calc(100vh-120px)]">
       <div className="mx-auto mb-2 w-full max-w-3xl px-4">
         <div className="space-y-3">
-          {/* Create Summary Card */}
-          <div className="w-full rounded-2xl border border-primary/10 bg-card p-4 shadow-sm">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="min-w-0 flex-1 space-y-2">
-                <div className="flex min-w-0 items-center gap-2 text-base font-medium text-foreground">
-                  <span className="truncate">Create Summary</span>
-                </div>
-                <div className="line-clamp-2 text-xs text-muted-foreground">
+          {/* Create Summary Card - matching GenerationPrompt styling */}
+          <div className="bg-transparent rounded-2xl border-2 border-border p-6 shadow-sm px-4 py-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Create Summary
+                </h3>
+                <p className="text-sm text-muted-foreground">
                   Create summaries with custom prompts and ranges
-                </div>
+                </p>
               </div>
-              <div className="flex items-center justify-between gap-2 md:flex-shrink-0 md:flex-row-reverse md:justify-end">
-                <div className="flex w-full items-center md:w-auto">
+              
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={onConfigure} 
+                  disabled={isLoading} 
+                  className="rounded-full w-10 h-9"
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                </Button>
+                
+                <div className="flex items-center">
                   <Button
                     onClick={handleCreateSummary}
                     disabled={isLoading}
-                    className="flex-1 rounded-l-full rounded-r-none border-r border-primary-foreground/20 bg-primary px-4 pr-2 font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 md:flex-none"
+                    className="rounded-l-full rounded-r-none border-r border-background/20 bg-foreground text-background hover:bg-foreground/90 px-4 h-10"
                   >
-                    <span className="ml-1 max-w-32 truncate">
+                    <span className="max-w-32 truncate">
                       {isLoading ? 'Generating...' : summaryTypeLabels[selectedType]}
                     </span>
                   </Button>
@@ -86,7 +97,7 @@ export function SummaryTabPanel({
                     <DropdownMenuTrigger asChild>
                       <Button
                         disabled={isLoading}
-                        className="h-10 rounded-l-none rounded-r-full bg-primary px-2 font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="h-10 rounded-l-none rounded-r-full bg-foreground text-background hover:bg-foreground/90 px-2"
                       >
                         <ChevronDown className="h-4 w-4" />
                       </Button>
@@ -104,13 +115,6 @@ export function SummaryTabPanel({
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <Button
-                  variant="ghost"
-                  onClick={onConfigure}
-                  className="flex h-9 items-center gap-2 rounded-full px-3 font-medium text-primary/80 transition hover:bg-primary/10 hover:text-primary"
-                >
-                  <Settings2 className="h-4 w-4" />
-                </Button>
               </div>
             </div>
           </div>
