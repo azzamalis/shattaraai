@@ -142,6 +142,8 @@ serve(async (req) => {
     // Try to get context from multiple sources - exam, content, or room
     let examData = null;
     let questionsData = null;
+    let examAttemptData = null;
+    let examAnswersData = null;
     let contentData = null;
     let roomData = null;
     let contextSource = 'none';
@@ -186,6 +188,32 @@ serve(async (req) => {
 
         if (!questionsError && questionsResult) {
           questionsData = questionsResult;
+        }
+
+        // Get the user's most recent exam attempt and their answers
+        const { data: attemptResult, error: attemptError } = await supabase
+          .from('exam_attempts')
+          .select('*')
+          .eq('exam_id', examId)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!attemptError && attemptResult) {
+          examAttemptData = attemptResult;
+          console.log('Found exam attempt:', attemptResult.id, 'Status:', attemptResult.status);
+
+          // Get all answers for this attempt
+          const { data: answersResult, error: answersError } = await supabase
+            .from('exam_answers')
+            .select('*')
+            .eq('exam_attempt_id', attemptResult.id);
+
+          if (!answersError && answersResult) {
+            examAnswersData = answersResult;
+            console.log('Found', answersResult.length, 'exam answers');
+          }
         }
       } else {
         console.log('Exam not found, trying fallback methods');
@@ -281,6 +309,20 @@ serve(async (req) => {
 **Room:** ${examData.rooms?.name || 'Unknown Room'}
 **Total Questions:** ${questionsData?.length || 0}
 `;
+
+      // Add exam attempt results if available
+      if (examAttemptData) {
+        const scorePercentage = examAttemptData.max_score > 0 
+          ? Math.round((examAttemptData.total_score / examAttemptData.max_score) * 100) 
+          : 0;
+        contextInfo += `
+## Student's Exam Results:
+**Score:** ${examAttemptData.total_score}/${examAttemptData.max_score} (${scorePercentage}%)
+**Status:** ${examAttemptData.status}
+**Time Taken:** ${examAttemptData.time_taken_minutes || 0} minutes
+**Skipped Questions:** ${examAttemptData.skipped_questions || 0}
+`;
+      }
     } else if (contextSource === 'content' && contentData) {
       contextInfo = `## Content Information:
 **Content Title:** ${contentData.title}
@@ -314,6 +356,41 @@ ${specificQuestion.options.map((opt: string, idx: number) => `${String.fromCharC
         }
         if (specificQuestion.explanation) {
           contextInfo += `**Explanation:** ${specificQuestion.explanation}
+`;
+        }
+
+        // Add the student's answer for this specific question
+        if (examAnswersData && examAnswersData.length > 0) {
+          const studentAnswer = examAnswersData.find(a => a.question_id === specificQuestion.id);
+          if (studentAnswer) {
+            contextInfo += `
+## Student's Answer for This Question:
+**Student's Answer:** ${studentAnswer.user_answer || 'No answer submitted'}
+**Result:** ${studentAnswer.is_correct ? '✓ Correct' : '✗ Incorrect'}
+**Points Earned:** ${studentAnswer.points_earned}/${specificQuestion.points || 1}
+`;
+          }
+        }
+      }
+    } else if (examAnswersData && examAnswersData.length > 0 && questionsData && questionsData.length > 0) {
+      // If no specific question, provide a summary of all answers
+      contextInfo += `
+
+## Student's Answer Summary:
+`;
+      const correctCount = examAnswersData.filter(a => a.is_correct).length;
+      const incorrectCount = examAnswersData.filter(a => !a.is_correct).length;
+      contextInfo += `**Correct Answers:** ${correctCount}
+**Incorrect Answers:** ${incorrectCount}
+
+**Questions the student got wrong:**
+`;
+      for (const answer of examAnswersData.filter(a => !a.is_correct)) {
+        const question = questionsData.find(q => q.id === answer.question_id);
+        if (question) {
+          contextInfo += `- Q${question.order_index + 1}: "${question.question_text.substring(0, 100)}..."
+  - Student answered: ${answer.user_answer || 'No answer'}
+  - Correct answer: ${question.correct_answer}
 `;
         }
       }
@@ -384,10 +461,13 @@ ${contentData.text_content.length > 3000
     }
 
     // Create system prompt based on available context
-    const systemPrompt = `You are an AI tutor helping students learn and understand their study materials. You have access to ${contextSource === 'exam' ? 'exam questions, answers, and' : ''} study materials.
+    const hasExamResults = examAttemptData && examAnswersData && examAnswersData.length > 0;
+    const systemPrompt = `You are an AI tutor helping students learn and understand their study materials. You have access to ${contextSource === 'exam' ? 'exam questions, answers, ' : ''}${hasExamResults ? "the student's graded exam results, " : ''}and study materials.
 
 ## Your Role:
 - Help students understand ${contextSource === 'exam' ? 'exam questions and their correct answers' : 'concepts from their study materials'}
+${hasExamResults ? '- Explain why their answers were correct or incorrect' : ''}
+${hasExamResults ? '- Help them understand concepts they got wrong on the exam' : ''}
 - Explain concepts clearly and provide additional context
 - Answer follow-up questions about the material
 - Be encouraging and supportive while being educational
@@ -396,6 +476,7 @@ ${contentData.text_content.length > 3000
 ## Instructions:
 - Reference the available material when explaining concepts
 ${contextSource === 'exam' ? '- If discussing a specific question, explain why the correct answer is right and why wrong answers are incorrect' : ''}
+${hasExamResults ? '- When a student asks about a question they got wrong, acknowledge their answer, explain why it was incorrect, and clearly explain the correct answer' : ''}
 - Ask clarifying questions if you need to understand what the student wants to learn
 - Keep explanations clear and at an appropriate educational level
 - When referencing content, mention the source material by title
@@ -416,17 +497,17 @@ Current student question: ${message}`;
       }
     ];
 
-    console.log(`Calling OpenAI for ${contextSource} chat with model: o4-mini-2025-04-16`);
+    console.log(`Calling OpenAI for ${contextSource} chat`);
 
     let aiResponse: string | null = null;
-    let modelUsed = 'o4-mini-2025-04-16';
+    let modelUsed = 'gpt-4.1-2025-04-14';
 
-    // Try multiple models with fallback - Updated for correct parameter handling
+    // Try multiple models with fallback - Using reliable models that produce output
+    // Note: O4-mini and O3 reasoning models use all tokens for internal reasoning and return empty content
     const models = [
-      { name: 'o4-mini-2025-04-16', useMaxCompletionTokens: true, maxTokens: 2000, useTemperature: false },
-      { name: 'o3-2025-04-16', useMaxCompletionTokens: true, maxTokens: 3000, useTemperature: false },
       { name: 'gpt-4.1-2025-04-14', useMaxCompletionTokens: true, maxTokens: 3000, useTemperature: false },
-      { name: 'gpt-4o-mini', useMaxCompletionTokens: false, maxTokens: 3000, useTemperature: true }
+      { name: 'gpt-4o-mini', useMaxCompletionTokens: false, maxTokens: 3000, useTemperature: true },
+      { name: 'gpt-4o', useMaxCompletionTokens: false, maxTokens: 3000, useTemperature: true }
     ];
 
     for (const model of models) {
