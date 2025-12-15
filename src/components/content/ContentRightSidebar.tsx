@@ -454,7 +454,11 @@ export function ContentRightSidebar({
                 </div>
               ) : (
                 <ScrollArea className="h-full">
-                  <SummaryDisplay contentData={{ ...contentData, ai_summary: summaryData.summary, summary_key_points: summaryData.keyPoints }} />
+                  <SummaryDisplay 
+                    contentData={contentData} 
+                    summaryData={summaryData}
+                    summaryTemplate={summaryConfig.length}
+                  />
                 </ScrollArea>
               )}
             </div>
