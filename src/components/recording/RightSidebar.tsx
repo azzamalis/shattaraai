@@ -10,37 +10,49 @@ const RightSidebar = () => {
   const [activeTab, setActiveTab] = useState("chat");
   const [isRecording, setIsRecording] = useState(false);
 
-  return <div className="h-full flex flex-col bg-[#0F0F0F]">
-      <Tabs defaultValue="chat" onValueChange={setActiveTab} className="flex-1 flex flex-col h-full bg-black">
-        <TabsList className="w-full justify-start border-b border-[#2A2A2A] rounded-none gap-1 p-1 h-12 shrink-0 bg-black">
-          <TabsTrigger value="chat" className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100">
-            <MessageCircle className="h-4 w-4" />
-            Chat
-          </TabsTrigger>
-          <TabsTrigger value="flashcards" className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100">
-            <FileStack className="h-4 w-4" />
-            Flashcards
-          </TabsTrigger>
-          <TabsTrigger value="exams" className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100">
-            <Brain className="h-4 w-4" />
-            Exams
-          </TabsTrigger>
-          <TabsTrigger value="summary" className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100">
-            <BookOpen className="h-4 w-4" />
-            Summary
-          </TabsTrigger>
-          <TabsTrigger value="notes" className="flex-1 h-full rounded-md data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-white/10 flex items-center justify-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-[background-color,border-color] duration-100">
-            <FileText className="h-4 w-4" />
-            Notes
-          </TabsTrigger>
-        </TabsList>
+  return <div className="h-full flex flex-col bg-background">
+      <Tabs defaultValue="chat" onValueChange={setActiveTab} className="flex-1 flex flex-col h-full">
+        <div className="py-3 px-4 border-b border-border/50">
+          <TabsList className="w-fit mx-auto flex items-center gap-1 p-1.5 rounded-2xl border border-primary/10 bg-card">
+            <TabsTrigger value="chat" className="px-3 py-1.5 rounded-lg text-sm font-normal">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                Chat
+              </div>
+            </TabsTrigger>
+            <TabsTrigger value="flashcards" className="px-3 py-1.5 rounded-lg text-sm font-normal">
+              <div className="flex items-center gap-2">
+                <FileStack className="h-4 w-4" />
+                Flashcards
+              </div>
+            </TabsTrigger>
+            <TabsTrigger value="exams" className="px-3 py-1.5 rounded-lg text-sm font-normal">
+              <div className="flex items-center gap-2">
+                <Brain className="h-4 w-4" />
+                Exams
+              </div>
+            </TabsTrigger>
+            <TabsTrigger value="summary" className="px-3 py-1.5 rounded-lg text-sm font-normal">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Summary
+              </div>
+            </TabsTrigger>
+            <TabsTrigger value="notes" className="px-3 py-1.5 rounded-lg text-sm font-normal">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Notes
+              </div>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="chat" className="flex-1 overflow-hidden">
           <AIChat />
         </TabsContent>
         <TabsContent value="flashcards" className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
-            <div className="flex flex-col items-center justify-center h-full min-h-[screen] text-white/60 space-y-4 p-4">
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground space-y-4 p-4">
               <FileStack className="h-12 w-12 mb-2" />
               <p className="text-center max-w-md text-base">Ready to review the key concepts? I've got flashcards lined up to make memorization quick and easy.</p>
             </div>
@@ -48,14 +60,14 @@ const RightSidebar = () => {
         </TabsContent>
         <TabsContent value="exams" className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
-            <div className="flex flex-col items-center justify-center h-full min-h-[400px] bg-black">
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
               <QuizPreferences />
             </div>
           </ScrollArea>
         </TabsContent>
         <TabsContent value="summary" className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
-            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-white/60 space-y-4 p-4">
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground space-y-4 p-4">
               <BookOpen className="h-12 w-12 mb-2" />
               <p className="text-center max-w-md text-base">Want the short version before diving deep? I've prepped a crisp summary to save you time and focus your attention.</p>
             </div>
