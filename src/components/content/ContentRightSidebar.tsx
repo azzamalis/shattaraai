@@ -329,37 +329,51 @@ export function ContentRightSidebar({
   };
   return <div className="h-full flex flex-col content-right-sidebar bg-dashboard-card dark:bg-dashboard-card">
       {/* Header with TabsList */}
-      <div className="border-b border-border/10 bg-background py-0 px-0">
+      <div className="bg-background py-2 px-3">
         <Tabs defaultValue="chat" onValueChange={setActiveTab} className="w-full">
-          <TabsList className={cn("w-full justify-center gap-1 p-1 h-12 shrink-0", "bg-card dark:bg-card", "transition-colors duration-200", "rounded-xl")}>
-            <TabsTrigger value="chat" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <MessageCircle className="h-[14px] w-[14px]" />
-              <span className="text-sm">Chat</span>
+          <TabsList className="w-fit mx-auto flex items-center gap-1 p-1 h-auto rounded-2xl border border-primary/10 bg-white dark:bg-neutral-800/50 dark:border-primary/5 overflow-x-auto">
+            <TabsTrigger value="chat" className="px-3 py-1.5 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
+              <div className="flex items-center gap-2">
+                <div className="mx-1 h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                Chat
+              </div>
             </TabsTrigger>
             
-            <TabsTrigger value="flashcards" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <GalleryVerticalEnd className="h-[14px] w-[14px]" />
-              <span className="text-sm">Flashcards</span>
+            <TabsTrigger value="flashcards" className="px-3 py-1.5 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
+              <div className="flex items-center gap-2">
+                <GalleryVerticalEnd className="h-4 w-4" />
+                Flashcards
+              </div>
             </TabsTrigger>
             
-            <TabsTrigger value="exams" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <BookCheck className="h-[14px] w-[14px]" />
-              <span className="text-sm">Quizzes</span>
+            <TabsTrigger value="exams" className="px-3 py-1.5 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
+              <div className="flex items-center gap-2">
+                <BookCheck className="h-4 w-4" />
+                Quizzes
+              </div>
             </TabsTrigger>
             
-          {shouldShowChapters && <TabsTrigger value="chapters" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-                <ListTodo className="h-[14px] w-[14px]" />
-                <span className="text-sm">Chapters</span>
-              </TabsTrigger>}
+            {shouldShowChapters && (
+              <TabsTrigger value="chapters" className="px-3 py-1.5 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
+                <div className="flex items-center gap-2">
+                  <ListTodo className="h-4 w-4" />
+                  Chapters
+                </div>
+              </TabsTrigger>
+            )}
             
-            <TabsTrigger value="summary" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <ReceiptText className="h-[14px] w-[14px]" />
-              <span className="text-sm">Summary</span>
+            <TabsTrigger value="summary" className="px-3 py-1.5 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
+              <div className="flex items-center gap-2">
+                <ReceiptText className="h-4 w-4" />
+                Summary
+              </div>
             </TabsTrigger>
             
-            <TabsTrigger value="notes" className={cn("flex-1 h-full rounded-md flex items-center justify-center gap-2", "text-sm font-medium", "text-muted-foreground", "hover:text-foreground", "data-[state=active]:text-primary", "data-[state=active]:bg-primary/10", "data-[state=active]:hover:bg-primary/20", "transition-colors duration-200", "focus-visible:ring-0 focus-visible:ring-offset-0", "focus:ring-0 focus:ring-offset-0", "ring-0 ring-offset-0", "border-0 outline-none", "data-[state=active]:ring-0", "data-[state=active]:ring-offset-0", "data-[state=active]:border-0", "data-[state=active]:outline-none")}>
-              <StickyNote className="h-[14px] w-[14px]" />
-              <span className="text-sm">Notes</span>
+            <TabsTrigger value="notes" className="px-3 py-1.5 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
+              <div className="flex items-center gap-2">
+                <StickyNote className="h-4 w-4" />
+                Notes
+              </div>
             </TabsTrigger>
           </TabsList>
         </Tabs>
