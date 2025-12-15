@@ -475,7 +475,7 @@ export function ContentRightSidebar({
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
               <ScrollArea className="h-full">
                 <div className="h-full min-h-[400px] pt-12">
-                  <AIChat />
+                  <AIChat contentData={contentData} />
                 </div>
               </ScrollArea>
             </div>
