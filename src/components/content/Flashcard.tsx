@@ -104,11 +104,11 @@ export function Flashcard({
   const hasStarredCards = cards.some(card => card.isStarred);
   const currentCardData = cards[currentCard];
   if (!currentCardData) {
-    return <div className="flex flex-col items-center justify-center h-full px-4 py-6 space-y-6">
+    return <div className="flex flex-col items-center justify-center h-full px-4 pt-4 space-y-6">
         <p className="text-muted-foreground">No flashcards available</p>
       </div>;
   }
-  return <div className="flex flex-col items-center justify-center h-full px-4 py-6 space-y-6 bg-background ">
+  return <div className="flex flex-col items-center justify-start h-full px-4 pt-4 space-y-6 bg-background ">
       <FlashcardDisplay card={currentCardData} isFlipped={isFlipped} showHint={showHint} showExplanation={showExplanation} isStarred={starredCards.has(currentCardData.id)} isShuffled={isShuffled} onFlip={handleFlip} onToggleHint={() => setShowHint(prev => !prev)} onToggleExplanation={() => setShowExplanation(prev => !prev)} onToggleStar={handleToggleStar} onEdit={() => onEdit?.(currentCard, currentCardData)} />
 
       <FlashcardNavigation currentCard={currentCard} totalCards={cards.length} onPrevious={handlePrevious} onNext={handleNext} />
