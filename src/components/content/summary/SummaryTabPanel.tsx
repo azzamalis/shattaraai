@@ -120,15 +120,15 @@ export function SummaryTabPanel({
           </div>
 
           {/* Auto-generate Toggle Card */}
-          <div className="rounded-2xl border border-primary/10 bg-card p-4 shadow-sm">
+          <div className="bg-transparent rounded-2xl border-2 border-border p-6 shadow-sm px-4 py-4">
             <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <div className="flex-1">
+                <h3 className="text-base font-semibold text-foreground mb-1">
                   Auto-generate summary?
-                </div>
-                <div className="mr-6 text-xs text-muted-foreground">
+                </h3>
+                <p className="text-sm text-muted-foreground">
                   Automatically create a summary as soon as content is uploaded
-                </div>
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Switch
@@ -143,14 +143,14 @@ export function SummaryTabPanel({
           {summaries.length > 0 && (
             <div className="space-y-3 pt-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-primary/80">My Summaries</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">My Summaries</h3>
               </div>
               <div className="flex flex-col gap-3">
                 {summaries.map((summary) => (
                   <div
                     key={summary.id}
                     onClick={() => onViewSummary(summary)}
-                    className="group cursor-pointer rounded-2xl border border-primary/10 bg-card p-4 shadow-sm transition-all duration-200 hover:bg-accent/50"
+                    className="group cursor-pointer bg-transparent rounded-2xl border-2 border-border p-4 shadow-sm transition-all duration-200 hover:border-foreground/30 hover:bg-accent/30"
                   >
                     <div className="flex items-start justify-between gap-6">
                       <div className="min-w-0 flex-1 space-y-2">
