@@ -502,12 +502,10 @@ Current student question: ${message}`;
     let aiResponse: string | null = null;
     let modelUsed = 'gpt-4.1-2025-04-14';
 
-    // Try multiple models with fallback - Using reliable models that produce output
-    // Note: O4-mini and O3 reasoning models use all tokens for internal reasoning and return empty content
+    // Try multiple models with fallback - Using GPT-4.1 models for reliable exam chat
     const models = [
       { name: 'gpt-4.1-2025-04-14', useMaxCompletionTokens: true, maxTokens: 3000, useTemperature: false },
-      { name: 'gpt-4o-mini', useMaxCompletionTokens: false, maxTokens: 3000, useTemperature: true },
-      { name: 'gpt-4o', useMaxCompletionTokens: false, maxTokens: 3000, useTemperature: true }
+      { name: 'gpt-4.1-mini-2025-04-14', useMaxCompletionTokens: true, maxTokens: 3000, useTemperature: false }
     ];
 
     for (const model of models) {
