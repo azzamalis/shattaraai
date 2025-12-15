@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
 import { DetailedSummaryDisplay } from './summary/DetailedSummaryDisplay';
+import CheatSheetSummaryDisplay from './summary/CheatSheetSummaryDisplay';
 
 interface SummaryItem {
   id: string;
@@ -149,8 +150,19 @@ export function SummaryDisplay({
 }: SummaryDisplayProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   
-  // If we have AI-generated summary data, use the DetailedSummaryDisplay
+  // If we have AI-generated summary data, use the appropriate display based on template
   if (summaryData && summaryData.summary) {
+    // For 'standard' template, use CheatSheetSummaryDisplay
+    if (summaryTemplate === 'standard') {
+      return (
+        <CheatSheetSummaryDisplay
+          summaryContent={summaryData.summary}
+          contentId={contentData.id}
+        />
+      );
+    }
+    
+    // For 'detailed' template (default), use DetailedSummaryDisplay
     return (
       <DetailedSummaryDisplay
         summary={summaryData.summary}
@@ -165,6 +177,16 @@ export function SummaryDisplay({
     const keyPoints = Array.isArray(contentData.summary_key_points) 
       ? contentData.summary_key_points 
       : [];
+    
+    // For 'standard' template, use CheatSheetSummaryDisplay
+    if (summaryTemplate === 'standard') {
+      return (
+        <CheatSheetSummaryDisplay
+          summaryContent={contentData.ai_summary}
+          contentId={contentData.id}
+        />
+      );
+    }
     
     return (
       <DetailedSummaryDisplay
