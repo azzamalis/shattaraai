@@ -26,19 +26,25 @@ export function RoomPageActions({
   };
 
   return <div className="flex items-center gap-3">
-      <Button size="sm" onClick={onChatOpen} className="flex items-center gap-2 text-sm font-medium">
+      <button 
+        onClick={onChatOpen} 
+        className="flex items-center gap-2 px-3 py-2 h-10 rounded-lg text-sm font-medium whitespace-nowrap border border-border text-primary/80 bg-background dark:bg-muted/50 shadow-[0_4px_10px_rgba(0,0,0,0.02)] transition-colors hover:bg-transparent hover:text-primary hover:dark:border-border/40 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+      >
         <MessagesSquare className="h-4 w-4" />
-        Room Chat
-      </Button>
+        <span>Room Chat</span>
+      </button>
       
-      <Button size="sm" onClick={handleExamButtonClick} className="flex items-center gap-2 text-sm font-medium">
+      <button 
+        onClick={handleExamButtonClick} 
+        className="flex items-center gap-2 px-3 py-2 h-10 rounded-lg text-sm font-medium whitespace-nowrap border border-border text-primary/80 bg-background dark:bg-muted/50 shadow-[0_4px_10px_rgba(0,0,0,0.02)] transition-colors hover:bg-transparent hover:text-primary hover:dark:border-border/40 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+      >
         {isExamMode ? <>
             <X className="h-4 w-4" />
-            Close Exam
+            <span>Close Exam</span>
           </> : <>
             <BookCheck className="h-4 w-4" />
-            Create Exam
+            <span>Create Exam</span>
           </>}
-      </Button>
+      </button>
     </div>;
 }
