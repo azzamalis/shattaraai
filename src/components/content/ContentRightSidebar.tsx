@@ -400,7 +400,7 @@ export function ContentRightSidebar({
             <TabsTrigger value="chat" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
                 {activeTab === "chat" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <MessageCircle className="h-4 w-4" />
                 )}
@@ -411,7 +411,7 @@ export function ContentRightSidebar({
             <TabsTrigger value="flashcards" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
                 {activeTab === "flashcards" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <GalleryVerticalEnd className="h-4 w-4" />
                 )}
@@ -422,7 +422,7 @@ export function ContentRightSidebar({
             <TabsTrigger value="exams" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
                 {activeTab === "exams" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <BookCheck className="h-4 w-4" />
                 )}
@@ -434,7 +434,7 @@ export function ContentRightSidebar({
               <TabsTrigger value="chapters" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
                 <div className="flex items-center gap-2">
                   {activeTab === "chapters" ? (
-                    <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                    <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                   ) : (
                     <ListTodo className="h-4 w-4" />
                   )}
@@ -446,7 +446,7 @@ export function ContentRightSidebar({
             <TabsTrigger value="summary" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
                 {activeTab === "summary" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <ReceiptText className="h-4 w-4" />
                 )}
@@ -457,7 +457,7 @@ export function ContentRightSidebar({
             <TabsTrigger value="notes" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
                 {activeTab === "notes" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <StickyNote className="h-4 w-4" />
                 )}

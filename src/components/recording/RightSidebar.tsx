@@ -17,7 +17,7 @@ const RightSidebar = () => {
             <TabsTrigger value="chat" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
                 {activeTab === "chat" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <MessageCircle className="h-4 w-4" />
                 )}
@@ -27,7 +27,7 @@ const RightSidebar = () => {
             <TabsTrigger value="flashcards" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
                 {activeTab === "flashcards" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <FileStack className="h-4 w-4" />
                 )}
@@ -37,7 +37,7 @@ const RightSidebar = () => {
             <TabsTrigger value="exams" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
                 {activeTab === "exams" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <Brain className="h-4 w-4" />
                 )}
@@ -47,7 +47,7 @@ const RightSidebar = () => {
             <TabsTrigger value="summary" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
                 {activeTab === "summary" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <BookOpen className="h-4 w-4" />
                 )}
@@ -57,7 +57,7 @@ const RightSidebar = () => {
             <TabsTrigger value="notes" className="px-3 py-1.5 rounded-lg text-sm font-normal">
               <div className="flex items-center gap-2">
                 {activeTab === "notes" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
                 ) : (
                   <FileText className="h-4 w-4" />
                 )}
