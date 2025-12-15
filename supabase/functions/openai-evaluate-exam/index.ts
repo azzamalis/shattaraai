@@ -163,7 +163,7 @@ async function generateStructuredExplanation(prompt: string): Promise<{explanati
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'gpt-4.1-2025-04-14', // Primary model, fallback to gpt-4.1-mini-2025-04-14 if needed
         messages: [
           {
             role: 'system',

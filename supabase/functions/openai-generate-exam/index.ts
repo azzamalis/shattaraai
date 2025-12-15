@@ -458,9 +458,7 @@ ${contentContext}
 
 Generate an intelligent, comprehensive exam that thoroughly assesses student understanding of the above materials.`;
 
-    // Define model configurations - prioritizing reliable models that don't have reasoning token issues
-    // O4-mini and O3 use all tokens for internal reasoning, leaving no tokens for output
-    // Using GPT-4.1 and GPT-4o models instead which produce output reliably
+    // Define model configurations - Using GPT-4.1 models for reliable exam generation
     const modelConfigs = [
       {
         name: 'gpt-4.1-2025-04-14',
@@ -469,16 +467,10 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
         description: 'Primary GPT-4.1 model for reliable exam generation'
       },
       {
-        name: 'gpt-4o-mini',
-        supportsTemperature: true,
+        name: 'gpt-4.1-mini-2025-04-14',
+        supportsTemperature: false,
         maxTokens: 8000,
-        description: 'Fast and reliable fallback model'
-      },
-      {
-        name: 'gpt-4o',
-        supportsTemperature: true,
-        maxTokens: 8000,
-        description: 'Powerful fallback model'
+        description: 'Fast GPT-4.1 mini fallback model'
       }
     ];
 
