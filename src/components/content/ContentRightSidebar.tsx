@@ -6,6 +6,7 @@ import AIChat from "@/components/recording/AIChat";
 import Notes from '@/components/recording/Notes';
 import { FlashcardContainer } from './FlashcardContainer';
 import { SummaryDisplay } from './SummaryDisplay';
+import { SummaryTabPanel } from './summary/SummaryTabPanel';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
 import { FlashcardData } from './Flashcard';
@@ -66,6 +67,22 @@ export function ContentRightSidebar({
   const [flashcards, setFlashcards] = useState<FlashcardData[]>([]);
   const [quizData, setQuizData] = useState<any>(null);
   const [summaryData, setSummaryData] = useState<{ summary: string; keyPoints: string[] } | null>(null);
+  const [summariesList, setSummariesList] = useState<Array<{
+    id: string;
+    title: string;
+    type: 'brief' | 'standard' | 'detailed';
+    summary: string;
+    keyPoints: string[];
+    createdAt: Date;
+  }>>([]);
+  const [viewingSummary, setViewingSummary] = useState<{
+    id: string;
+    title: string;
+    type: 'brief' | 'standard' | 'detailed';
+    summary: string;
+    keyPoints: string[];
+  } | null>(null);
+  const [autoGenerateSummary, setAutoGenerateSummary] = useState(false);
   
   // Config modal states
   const [showFlashcardConfig, setShowFlashcardConfig] = useState(false);
@@ -189,6 +206,15 @@ export function ContentRightSidebar({
 
   const checkSummary = async () => {
     if (contentData.ai_summary && contentData.summary_key_points) {
+      const existingSummary = {
+        id: `summary-existing-${contentData.id}`,
+        title: 'Detailed Summary',
+        type: 'detailed' as const,
+        summary: contentData.ai_summary,
+        keyPoints: contentData.summary_key_points as string[],
+        createdAt: new Date(contentData.summary_generated_at || Date.now()),
+      };
+      setSummariesList([existingSummary]);
       setSummaryData({
         summary: contentData.ai_summary,
         keyPoints: contentData.summary_key_points as string[]
@@ -246,7 +272,8 @@ export function ContentRightSidebar({
     }
   };
 
-  const handleGenerateSummary = async () => {
+  const handleGenerateSummary = async (type?: 'brief' | 'standard' | 'detailed') => {
+    const summaryType = type || summaryConfig.length;
     setIsGenerating(true);
     setGenerationType('summary');
     
@@ -254,13 +281,35 @@ export function ContentRightSidebar({
       const { data, error } = await supabase.functions.invoke('generate-summary', {
         body: {
           contentId: contentData.id,
-          config: summaryConfig
+          config: { ...summaryConfig, length: summaryType }
         }
       });
       
       if (error) throw error;
       
+      // Add to summaries list
+      const typeLabels = {
+        brief: 'Short Summary',
+        standard: 'Cheat Sheet',
+        detailed: 'Detailed Summary',
+      };
+      
+      const newSummary = {
+        id: `summary-${Date.now()}`,
+        title: typeLabels[summaryType],
+        type: summaryType,
+        summary: data.summary,
+        keyPoints: data.keyPoints || [],
+        createdAt: new Date(),
+      };
+      
+      setSummariesList(prev => [...prev, newSummary]);
       setSummaryData(data);
+      
+      // Show the newly generated summary
+      setViewingSummary(newSummary);
+      setSummaryConfig(prev => ({ ...prev, length: summaryType }));
+      
       toast.success('Summary generated successfully!');
     } catch (error) {
       console.error('Summary generation error:', error);
@@ -442,25 +491,42 @@ export function ContentRightSidebar({
           
           <TabsContent value="summary" className="flex-1 overflow-hidden mx-4 mb-4">
             <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-              {!summaryData ? (
-                <div className="p-6">
-                  <GenerationPrompt
-                    type="summary"
-                    onGenerate={handleGenerateSummary}
-                    onConfigure={() => setShowSummaryConfig(true)}
-                    contentData={contentData}
-                    isLoading={isGenerating && generationType === 'summary'}
-                  />
-                </div>
-              ) : (
+              {viewingSummary ? (
                 <ScrollArea className="h-full">
                   <SummaryDisplay 
                     contentData={contentData} 
-                    summaryData={summaryData}
-                    summaryTemplate={summaryConfig.length}
-                    onBack={() => setSummaryData(null)}
+                    summaryData={{
+                      summary: viewingSummary.summary,
+                      keyPoints: viewingSummary.keyPoints
+                    }}
+                    summaryTemplate={viewingSummary.type}
+                    onBack={() => setViewingSummary(null)}
                   />
                 </ScrollArea>
+              ) : (
+                <SummaryTabPanel
+                  summaries={summariesList.map(s => ({
+                    id: s.id,
+                    title: s.title,
+                    type: s.type,
+                    createdAt: s.createdAt,
+                  }))}
+                  onCreateSummary={handleGenerateSummary}
+                  onViewSummary={(summary) => {
+                    const fullSummary = summariesList.find(s => s.id === summary.id);
+                    if (fullSummary) {
+                      setViewingSummary(fullSummary);
+                    }
+                  }}
+                  onDeleteSummary={(summaryId) => {
+                    setSummariesList(prev => prev.filter(s => s.id !== summaryId));
+                    toast.success('Summary deleted');
+                  }}
+                  onConfigure={() => setShowSummaryConfig(true)}
+                  isLoading={isGenerating && generationType === 'summary'}
+                  autoGenerate={autoGenerateSummary}
+                  onAutoGenerateChange={setAutoGenerateSummary}
+                />
               )}
             </div>
           </TabsContent>
