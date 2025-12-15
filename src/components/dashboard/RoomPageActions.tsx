@@ -68,8 +68,8 @@ export function RoomPageActions({
     }
   };
 
-  const handleTakeExam = (examId: string) => {
-    navigate(`/exam/${examId}`);
+  const handleViewExamSummary = (examId: string) => {
+    navigate(`/exam-summary/${examId}`);
   };
 
   const handleDeleteExam = async (examId: string) => {
@@ -125,7 +125,7 @@ export function RoomPageActions({
                 <DropdownMenuItem 
                   key={exam.id}
                   className="flex items-center justify-between gap-2 cursor-pointer"
-                  onClick={() => handleTakeExam(exam.id)}
+                  onClick={() => handleViewExamSummary(exam.id)}
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <Play className="h-4 w-4 flex-shrink-0" />
