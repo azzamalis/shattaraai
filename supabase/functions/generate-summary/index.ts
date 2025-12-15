@@ -63,21 +63,72 @@ serve(async (req) => {
     if (config.focusAreas?.definitions) focusAreas.push('definitions');
     if (config.focusAreas?.all) focusAreas.push('comprehensive coverage');
 
-    const lengthGuide = {
-      brief: '100-200 words',
-      standard: '300-500 words',
-      detailed: '500+ words'
+    // Template-specific prompts for meaningfully different outputs
+    const templatePrompts = {
+      detailed: `You are an academic content expert creating a comprehensive, in-depth summary.
+
+OUTPUT REQUIREMENTS:
+- Write 500-800 words in well-structured paragraphs
+- Include an introduction that frames the topic and its importance
+- Organize content into logical sections with clear transitions
+- Provide context, background information, and nuanced explanations
+- Include specific examples, case studies, or illustrations from the content
+- Explain relationships between concepts and their broader implications
+- Conclude with key takeaways and potential applications
+- Use academic language appropriate for deep study
+
+STRUCTURE:
+1. Introduction (context and importance)
+2. Main concepts (detailed explanations with examples)
+3. Supporting details and evidence
+4. Connections and implications
+5. Conclusion with actionable takeaways`,
+
+      standard: `You are creating a quick-reference cheat sheet for efficient studying.
+
+OUTPUT REQUIREMENTS:
+- Create a scannable, bullet-point format summary (200-350 words)
+- Use short, punchy bullet points (1-2 sentences max each)
+- Group related points under clear category headers
+- Highlight key terms in context (mention the term and its meaning together)
+- Include memory aids, mnemonics, or quick tips where helpful
+- Prioritize the most testable/important information
+- Use symbols like → for relationships, = for definitions, ★ for critical points
+- Format for rapid review before an exam
+
+STRUCTURE:
+★ KEY CONCEPTS
+• [Concept]: [One-line definition/explanation]
+
+→ MAIN RELATIONSHIPS
+• [How concepts connect]
+
+📝 QUICK FACTS
+• [Testable details]
+
+💡 REMEMBER
+• [Memory tips or common mistakes to avoid]`,
+
+      brief: `You are creating an executive summary for someone who needs the absolute essentials.
+
+OUTPUT REQUIREMENTS:
+- Write exactly 3-5 sentences (75-150 words maximum)
+- First sentence: What is the main topic/thesis?
+- Middle sentences: What are the 2-3 most critical points?
+- Final sentence: What is the key takeaway or action item?
+- No bullet points - flowing paragraph format
+- Every word must earn its place - remove all filler
+- Use clear, direct language anyone can understand
+- Think "elevator pitch" - what would you say in 30 seconds?
+
+This should be readable in under 30 seconds and give a complete picture of the essential content.`
     };
 
-    const systemPrompt = `You are an expert at creating clear, concise summaries of educational content.
+    const selectedTemplate = config.length || 'standard';
+    const systemPrompt = templatePrompts[selectedTemplate] + `
 
-Create a ${config.length || 'standard'} summary (${lengthGuide[config.length || 'standard']}).
-
-Focus on: ${focusAreas.join(', ') || 'all important aspects'}.
-
-Format: ${config.format === 'bullets' ? 'Use bullet points for clarity.' : 'Use well-structured paragraphs.'}
-
-Extract the most important information and present it in a way that helps understanding.`;
+${focusAreas.length > 0 ? `\nPrioritize these focus areas: ${focusAreas.join(', ')}.` : ''}
+${config.format === 'paragraphs' && selectedTemplate === 'standard' ? '\nNote: User prefers paragraph format over bullets.' : ''}`;
 
     const userPrompt = `Create a summary of the following content:\n\n${contentText.substring(0, 15000)}`;
 
