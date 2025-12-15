@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Copy, Check, Paperclip, ThumbsUp, ThumbsDown, Pencil, Trash } from 'lucide-react';
+import { Copy, Check, Paperclip, ThumbsUp, ThumbsDown, Pencil, Trash, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { ChatMessage } from '@/hooks/useChatConversation';
+import { ChatMessage, MessageStatus } from '@/hooks/useChatConversation';
 import { Message, MessageActions, MessageAction } from '@/components/prompt-kit/message';
 import { RichMessage } from '../RichMessage';
 import { Button } from '@/components/ui/button';
@@ -10,11 +10,13 @@ import { Button } from '@/components/ui/button';
 interface PromptKitMessageProps {
   message: ChatMessage;
   showTimestamp?: boolean;
+  onRetry?: (messageId: string) => void;
 }
 
 export function PromptKitMessage({
   message,
-  showTimestamp = true
+  showTimestamp = true,
+  onRetry
 }: PromptKitMessageProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -39,6 +41,8 @@ export function PromptKitMessage({
 
   const isUser = message.sender_type === 'user';
   const isSystem = message.sender_type === 'system';
+  const isSending = message.status === 'sending';
+  const isFailed = message.status === 'failed';
 
   // System messages - simple centered display
   if (isSystem) {
@@ -97,7 +101,9 @@ export function PromptKitMessage({
           <div
             className={cn(
               "rounded-lg px-4 py-3",
-              isUser && "bg-[#00A3FF] text-white"
+              isUser && "bg-[#00A3FF] text-white",
+              isSending && "opacity-70",
+              isFailed && "bg-destructive/80 border border-destructive"
             )}
           >
             {isUser ? (
@@ -112,74 +118,110 @@ export function PromptKitMessage({
             )}
           </div>
 
-          {/* Message Actions */}
-          <MessageActions
-            className={cn(
-              "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-              isUser ? "-mr-2.5 justify-end" : "-ml-2.5"
-            )}
-          >
-            <MessageAction tooltip="Copy" delayDuration={100}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full h-8 w-8"
-                onClick={() => copyToClipboard(message.content, message.id)}
-              >
-                {copiedId === message.id ? <Check className="h-4 w-4 text-[#00A3FF]" /> : <Copy className="h-4 w-4" />}
-              </Button>
-            </MessageAction>
+          {/* Status Indicator for User Messages */}
+          {isUser && (isSending || isFailed) && (
+            <div className={cn(
+              "flex items-center gap-2 mt-1",
+              isUser && "justify-end"
+            )}>
+              {isSending && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Sending...</span>
+                </div>
+              )}
+              {isFailed && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 text-xs text-destructive">
+                    <AlertCircle className="h-3 w-3" />
+                    <span>Failed to send</span>
+                  </div>
+                  {onRetry && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => onRetry(message.id)}
+                    >
+                      <RotateCcw className="h-3 w-3 mr-1" />
+                      Retry
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
-            {!isUser && (
-              <>
-                <MessageAction tooltip="Upvote" delayDuration={100}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full h-8 w-8"
-                  >
-                    <ThumbsUp className="h-4 w-4" />
-                  </Button>
-                </MessageAction>
-                <MessageAction tooltip="Downvote" delayDuration={100}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full h-8 w-8"
-                  >
-                    <ThumbsDown className="h-4 w-4" />
-                  </Button>
-                </MessageAction>
-              </>
-            )}
+          {/* Message Actions - Only show for sent messages */}
+          {!isSending && !isFailed && (
+            <MessageActions
+              className={cn(
+                "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+                isUser ? "-mr-2.5 justify-end" : "-ml-2.5"
+              )}
+            >
+              <MessageAction tooltip="Copy" delayDuration={100}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full h-8 w-8"
+                  onClick={() => copyToClipboard(message.content, message.id)}
+                >
+                  {copiedId === message.id ? <Check className="h-4 w-4 text-[#00A3FF]" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </MessageAction>
 
-            {isUser && (
-              <>
-                <MessageAction tooltip="Edit" delayDuration={100}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full h-8 w-8"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </MessageAction>
-                <MessageAction tooltip="Delete" delayDuration={100}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full h-8 w-8"
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </MessageAction>
-              </>
-            )}
-          </MessageActions>
+              {!isUser && (
+                <>
+                  <MessageAction tooltip="Upvote" delayDuration={100}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full h-8 w-8"
+                    >
+                      <ThumbsUp className="h-4 w-4" />
+                    </Button>
+                  </MessageAction>
+                  <MessageAction tooltip="Downvote" delayDuration={100}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full h-8 w-8"
+                    >
+                      <ThumbsDown className="h-4 w-4" />
+                    </Button>
+                  </MessageAction>
+                </>
+              )}
+
+              {isUser && (
+                <>
+                  <MessageAction tooltip="Edit" delayDuration={100}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full h-8 w-8"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </MessageAction>
+                  <MessageAction tooltip="Delete" delayDuration={100}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full h-8 w-8"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </MessageAction>
+                </>
+              )}
+            </MessageActions>
+          )}
         </div>
 
-        {/* Timestamp */}
-        {showTimestamp && (
+        {/* Timestamp - Only show for sent messages */}
+        {showTimestamp && !isSending && !isFailed && (
           <div className={cn(
             "text-xs text-muted-foreground px-1",
             isUser && "text-right"

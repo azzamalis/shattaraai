@@ -6,11 +6,14 @@ import { uploadFileToStorage } from '@/lib/storage';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
 
+export type MessageStatus = 'sending' | 'sent' | 'failed';
+
 export interface ChatMessage {
   id: string;
   content: string;
   sender_type: 'user' | 'ai' | 'system';
   created_at: string;
+  status?: MessageStatus;
   attachments?: Array<{
     name: string;
     type: string;
@@ -233,10 +236,22 @@ export function useChatConversation({
     isSendingRef.current = true;
     setIsSending(true);
     
+    const tempId = crypto.randomUUID();
+    const timestamp = new Date().toISOString();
+    
+    // Add optimistic message with 'sending' status
+    const optimisticMessage: ChatMessage = {
+      id: tempId,
+      content: content,
+      sender_type: 'user',
+      created_at: timestamp,
+      status: 'sending',
+      attachments: attachments
+    };
+    
+    setMessages(prevMessages => [...prevMessages, optimisticMessage]);
+    
     try {
-      const messageId = crypto.randomUUID();
-      const timestamp = new Date().toISOString();
-      
       // Check for duplicate using UUID and timestamp (within 5 seconds)
       const existingMessages = await supabase
         .from('chat_messages')
@@ -247,6 +262,8 @@ export function useChatConversation({
       
       if (existingMessages.data && existingMessages.data.length > 0) {
         console.log('Duplicate message detected (recent identical content), skipping...');
+        // Remove optimistic message
+        setMessages(prevMessages => prevMessages.filter(m => m.id !== tempId));
         return null;
       }
       
@@ -259,7 +276,7 @@ export function useChatConversation({
       const { data, error } = await supabase
         .from('chat_messages')
         .insert([{
-          id: messageId,
+          id: tempId,
           conversation_id: conversationId,
           sender_type: 'user',
           content: content,
@@ -280,20 +297,39 @@ export function useChatConversation({
         content: data.content,
         sender_type: data.sender_type as 'user' | 'ai' | 'system',
         created_at: data.created_at,
+        status: 'sent',
         attachments: attachments
       };
 
       console.log('Created new message with attachments:', newMessage);
-      setMessages(prevMessages => [...prevMessages, newMessage]);
+      // Replace optimistic message with real one
+      setMessages(prevMessages => 
+        prevMessages.map(m => m.id === tempId ? newMessage : m)
+      );
       return newMessage;
     } catch (error) {
       console.error('Error in sendMessage:', error);
+      // Update optimistic message to failed status
+      setMessages(prevMessages => 
+        prevMessages.map(m => m.id === tempId ? { ...m, status: 'failed' as MessageStatus } : m)
+      );
       toast.error('Failed to send message. Please try again.');
       return null;
     } finally {
       setIsSending(false);
       isSendingRef.current = false;
     }
+  };
+
+  const retryMessage = async (messageId: string): Promise<ChatMessage | null> => {
+    const failedMessage = messages.find(m => m.id === messageId && m.status === 'failed');
+    if (!failedMessage) return null;
+    
+    // Remove the failed message first
+    setMessages(prevMessages => prevMessages.filter(m => m.id !== messageId));
+    
+    // Retry sending with the same content
+    return sendMessage(failedMessage.content, failedMessage.attachments);
   };
 
   const addAIResponse = async (content: string, messageType?: string, metadata?: any) => {
@@ -388,6 +424,7 @@ export function useChatConversation({
     isLoading,
     isSending,
     sendMessage,
-    addAIResponse
+    addAIResponse,
+    retryMessage
   };
 }
