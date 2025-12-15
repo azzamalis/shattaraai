@@ -490,7 +490,10 @@ export function ContentRightSidebar({
               />
             </div>
           ) : (
-                <FlashcardContainer initialCards={flashcards} />
+                <FlashcardContainer 
+                  initialCards={flashcards} 
+                  onBack={() => setFlashcards([])}
+                />
               )}
             </div>
           </TabsContent>

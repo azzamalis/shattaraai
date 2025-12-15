@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { ChevronLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { FlashcardDisplay } from './FlashcardDisplay';
 import { FlashcardNavigation } from './FlashcardNavigation';
 import { FlashcardControls } from './FlashcardControls';
@@ -18,6 +20,7 @@ export interface FlashcardData {
 }
 interface FlashcardProps {
   cards: FlashcardData[];
+  onBack?: () => void;
   onStar?: (index: number) => void;
   onEdit?: (index: number, updatedCard: FlashcardData) => void;
   onManage?: () => void;
@@ -31,6 +34,7 @@ export interface FilterOptions {
 }
 export function Flashcard({
   cards,
+  onBack,
   onStar,
   onEdit,
   onManage,
@@ -108,12 +112,27 @@ export function Flashcard({
         <p className="text-muted-foreground">No flashcards available</p>
       </div>;
   }
-  return <div className="flex flex-col items-center justify-start h-full px-4 pt-4 space-y-6 bg-background ">
-      <FlashcardDisplay card={currentCardData} isFlipped={isFlipped} showHint={showHint} showExplanation={showExplanation} isStarred={starredCards.has(currentCardData.id)} isShuffled={isShuffled} onFlip={handleFlip} onToggleHint={() => setShowHint(prev => !prev)} onToggleExplanation={() => setShowExplanation(prev => !prev)} onToggleStar={handleToggleStar} onEdit={() => onEdit?.(currentCard, currentCardData)} />
+  return <div className="flex flex-col h-full px-4 pt-2 space-y-4 bg-background">
+      {onBack && (
+        <div className="flex justify-start w-full">
+          <Button
+            variant="ghost"
+            onClick={onBack}
+            className="text-primary items-center cursor-pointer text-sm font-medium justify-center py-1 px-3 h-9 rounded-xl"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back
+          </Button>
+        </div>
+      )}
+      
+      <div className="flex flex-col items-center justify-start flex-1 space-y-6">
+        <FlashcardDisplay card={currentCardData} isFlipped={isFlipped} showHint={showHint} showExplanation={showExplanation} isStarred={starredCards.has(currentCardData.id)} isShuffled={isShuffled} onFlip={handleFlip} onToggleHint={() => setShowHint(prev => !prev)} onToggleExplanation={() => setShowExplanation(prev => !prev)} onToggleStar={handleToggleStar} onEdit={() => onEdit?.(currentCard, currentCardData)} />
 
-      <FlashcardNavigation currentCard={currentCard} totalCards={cards.length} onPrevious={handlePrevious} onNext={handleNext} />
+        <FlashcardNavigation currentCard={currentCard} totalCards={cards.length} onPrevious={handlePrevious} onNext={handleNext} />
 
-      <FlashcardControls isShuffled={isShuffled} onManage={() => onManage?.()} onFilter={() => setShowFilterModal(true)} onShuffle={handleShuffle} />
+        <FlashcardControls isShuffled={isShuffled} onManage={() => onManage?.()} onFilter={() => setShowFilterModal(true)} onShuffle={handleShuffle} />
+      </div>
 
       <FilterModal open={showFilterModal} onOpenChange={setShowFilterModal} onFilter={handleFilter} hasStarredCards={hasStarredCards} availableConcepts={availableConcepts} />
     </div>;

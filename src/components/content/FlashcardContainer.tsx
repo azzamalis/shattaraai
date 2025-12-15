@@ -9,9 +9,10 @@ import { useFlashcardManagement } from '@/hooks/useFlashcardManagement';
 
 interface FlashcardContainerProps {
   initialCards: FlashcardData[];
+  onBack?: () => void;
 }
 
-export function FlashcardContainer({ initialCards }: FlashcardContainerProps) {
+export function FlashcardContainer({ initialCards, onBack }: FlashcardContainerProps) {
   const {
     cards,
     filteredCards,
@@ -56,7 +57,8 @@ export function FlashcardContainer({ initialCards }: FlashcardContainerProps) {
   return (
     <ScrollArea className="h-full">
       <Flashcard 
-        cards={filteredCards} 
+        cards={filteredCards}
+        onBack={onBack}
         onStar={handleStarCard} 
         onEdit={handleEditCard} 
         onManage={handleManageCards} 
