@@ -5,6 +5,7 @@ import { MessageCircle, StickyNote, ReceiptText, BookCheck, GalleryVerticalEnd, 
 import AIChat from "@/components/recording/AIChat";
 import Notes from '@/components/recording/Notes';
 import { FlashcardContainer } from './FlashcardContainer';
+import { FlashcardListDisplay } from './FlashcardListDisplay';
 import { SummaryDisplay } from './SummaryDisplay';
 import { SummaryTabPanel } from './summary/SummaryTabPanel';
 import { ContentData } from '@/pages/ContentPage';
@@ -91,6 +92,9 @@ export function ContentRightSidebar({
   
   // Quiz taking state
   const [showQuizTaking, setShowQuizTaking] = useState(false);
+  
+  // Flashcard viewing state
+  const [showFlashcardStudy, setShowFlashcardStudy] = useState(false);
   
   // Config states
   const [flashcardConfig, setFlashcardConfig] = useState({
@@ -478,24 +482,68 @@ export function ContentRightSidebar({
           </TabsContent>
           
           <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
-            <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-          {flashcards.length === 0 ? (
-            <div className="p-6">
-              <GenerationPrompt
-                type="flashcards"
-                onGenerate={handleGenerateFlashcards}
-                onConfigure={() => setShowFlashcardConfig(true)}
-                contentData={contentData}
-                isLoading={isGenerating && generationType === 'flashcards'}
-              />
-            </div>
-          ) : (
+            {showFlashcardStudy && flashcards.length > 0 ? (
+              <div className="h-full">
                 <FlashcardContainer 
                   initialCards={flashcards} 
-                  onBack={() => setFlashcards([])}
+                  onBack={() => setShowFlashcardStudy(false)}
                 />
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
+                {flashcards.length === 0 ? (
+                  <div className="p-6">
+                    <GenerationPrompt
+                      type="flashcards"
+                      onGenerate={handleGenerateFlashcards}
+                      onConfigure={() => setShowFlashcardConfig(true)}
+                      contentData={contentData}
+                      isLoading={isGenerating && generationType === 'flashcards'}
+                    />
+                  </div>
+                ) : (
+                  <ScrollArea className="h-full">
+                    <div className="flex flex-col space-y-6">
+                      <div className="px-6 pt-6">
+                        <FlashcardListDisplay
+                          flashcards={flashcards}
+                          onStartFlashcards={() => setShowFlashcardStudy(true)}
+                          onEditFlashcards={() => {
+                            setShowFlashcardConfig(true);
+                            toast.info('Edit flashcard configuration and regenerate');
+                          }}
+                          onDeleteFlashcards={async () => {
+                            try {
+                              const { error } = await supabase
+                                .from('flashcards')
+                                .delete()
+                                .eq('content_id', contentData.id);
+                              
+                              if (error) throw error;
+                              
+                              setFlashcards([]);
+                              toast.success('Flashcards deleted successfully');
+                            } catch (error) {
+                              console.error('Error deleting flashcards:', error);
+                              toast.error('Failed to delete flashcards');
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="px-6 pb-6">
+                        <GenerationPrompt
+                          type="flashcards"
+                          onGenerate={handleGenerateFlashcards}
+                          onConfigure={() => setShowFlashcardConfig(true)}
+                          contentData={contentData}
+                          isLoading={isGenerating && generationType === 'flashcards'}
+                        />
+                      </div>
+                    </div>
+                  </ScrollArea>
+                )}
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="exams" className="flex-1 overflow-hidden mx-4 mb-4">
