@@ -131,7 +131,7 @@ export function useChatConversation({
       }
 
       // Skip if we already have a conversation for this context
-      if (conversationId && conversation?.context_id === contextId) {
+      if (conversationId && (conversation?.context_id === contextId || (!contextId && conversation))) {
         console.log('Conversation already loaded for this context:', conversationId);
         return;
       }
@@ -199,6 +199,42 @@ export function useChatConversation({
                 .eq('id', contextId);
               
               console.log('New conversation created and linked:', newConversation.id);
+            }
+          }
+        } else if (autoCreate) {
+          // Handle general conversations without a contextId
+          console.log('Looking for existing general conversation');
+          
+          const { data: existingGeneral, error } = await supabase
+            .from('chat_conversations')
+            .select('*')
+            .eq('type', conversationType)
+            .is('context_id', null)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (error && error.code !== 'PGRST116') {
+            console.error('Error fetching general conversation:', error);
+            isCreatingRef.current = false;
+            return;
+          }
+
+          if (existingGeneral) {
+            console.log('Found existing general conversation:', existingGeneral.id);
+            setConversationId(existingGeneral.id);
+            setConversation(existingGeneral);
+            await fetchMessages(existingGeneral.id);
+          } else {
+            // Create new general conversation
+            console.log('Creating new general conversation');
+            const newConversation = await createConversation(conversationType);
+            
+            if (newConversation) {
+              setConversationId(newConversation.id);
+              setConversation(newConversation);
+              console.log('New general conversation created:', newConversation.id);
             }
           }
         }
