@@ -115,7 +115,9 @@ export function ContentRightSidebar({
       multipleChoice: true,
       trueFalse: true,
       shortAnswer: false
-    }
+    },
+    selectedTopics: [] as string[],
+    focusInstructions: ''
   });
   
   const [summaryConfig, setSummaryConfig] = useState({
@@ -282,7 +284,20 @@ export function ContentRightSidebar({
     }
   };
 
-  const handleGenerateQuiz = async () => {
+  const handleGenerateQuiz = async (config?: {
+    numberOfQuestions: number;
+    difficulty: 'easy' | 'medium' | 'hard';
+    includeExplanations: boolean;
+    questionTypes: {
+      multipleChoice: boolean;
+      trueFalse: boolean;
+      shortAnswer: boolean;
+      fillInBlank?: boolean;
+    };
+    selectedTopics?: string[];
+    focusInstructions?: string;
+  }) => {
+    const configToUse = config || quizConfig;
     setIsGenerating(true);
     setGenerationType('quizzes');
     
@@ -290,7 +305,7 @@ export function ContentRightSidebar({
       const { data, error } = await supabase.functions.invoke('generate-quiz', {
         body: {
           contentId: contentData.id,
-          config: quizConfig
+          config: configToUse
         }
       });
       
@@ -716,7 +731,11 @@ export function ContentRightSidebar({
         open={showQuizConfig}
         onOpenChange={setShowQuizConfig}
         config={quizConfig}
-        onSave={setQuizConfig}
+        onSave={(config) => setQuizConfig({
+          ...config,
+          selectedTopics: config.selectedTopics || [],
+          focusInstructions: config.focusInstructions || ''
+        })}
         onGenerate={handleGenerateQuiz}
         topics={availableTopics}
         isLoading={isGenerating && generationType === 'quizzes'}
