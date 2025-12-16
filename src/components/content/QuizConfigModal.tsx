@@ -20,6 +20,8 @@ interface QuizConfig {
     shortAnswer: boolean;
     fillInBlank?: boolean;
   };
+  selectedTopics?: string[];
+  focusInstructions?: string;
 }
 
 interface QuizConfigModalProps {
@@ -27,7 +29,7 @@ interface QuizConfigModalProps {
   onOpenChange: (open: boolean) => void;
   config: QuizConfig;
   onSave: (config: QuizConfig) => void;
-  onGenerate?: () => void;
+  onGenerate?: (config: QuizConfig) => void;
   topics?: string[];
   isLoading?: boolean;
 }
@@ -75,18 +77,18 @@ export function QuizConfigModal({ open, onOpenChange, config, onSave, onGenerate
       return;
     }
     
-    const updatedConfig = { 
+    const updatedConfig: QuizConfig = { 
       ...localConfig, 
       numberOfQuestions: questionsCount,
-      selectedTopics: selectedTopics,
-      focusInstructions: focusInstructions
+      selectedTopics: selectedTopics.length > 0 ? selectedTopics : undefined,
+      focusInstructions: focusInstructions.trim() || undefined
     };
     onSave(updatedConfig);
     onOpenChange(false);
     
-    // Trigger generation after saving config
+    // Trigger generation with the config directly (not relying on state)
     if (onGenerate) {
-      onGenerate();
+      onGenerate(updatedConfig);
     }
   };
 
