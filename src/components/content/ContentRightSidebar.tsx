@@ -102,7 +102,9 @@ export function ContentRightSidebar({
     difficulty: 'medium' as 'easy' | 'medium' | 'hard',
     includeHints: true,
     includeExplanations: true,
-    focusOnKeyConcepts: true
+    focusOnKeyConcepts: true,
+    selectedTopics: [] as string[],
+    focusInstructions: ''
   });
   
   const [quizConfig, setQuizConfig] = useState({
@@ -246,7 +248,16 @@ export function ContentRightSidebar({
     }
   };
 
-  const handleGenerateFlashcards = async () => {
+  const handleGenerateFlashcards = async (config?: {
+    numberOfCards: number;
+    difficulty: 'easy' | 'medium' | 'hard';
+    includeHints: boolean;
+    includeExplanations: boolean;
+    focusOnKeyConcepts: boolean;
+    selectedTopics?: string[];
+    focusInstructions?: string;
+  }) => {
+    const configToUse = config || flashcardConfig;
     setIsGenerating(true);
     setGenerationType('flashcards');
     
@@ -254,7 +265,7 @@ export function ContentRightSidebar({
       const { data, error } = await supabase.functions.invoke('generate-flashcards', {
         body: {
           contentId: contentData.id,
-          config: flashcardConfig
+          config: configToUse
         }
       });
       
@@ -691,7 +702,11 @@ export function ContentRightSidebar({
         open={showFlashcardConfig}
         onOpenChange={setShowFlashcardConfig}
         config={flashcardConfig}
-        onSave={setFlashcardConfig}
+        onSave={(config) => setFlashcardConfig({
+          ...config,
+          selectedTopics: config.selectedTopics || [],
+          focusInstructions: config.focusInstructions || ''
+        })}
         onGenerate={handleGenerateFlashcards}
         topics={availableTopics}
         isLoading={isGenerating && generationType === 'flashcards'}
