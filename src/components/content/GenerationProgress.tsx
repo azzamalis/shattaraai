@@ -44,9 +44,16 @@ export function GenerationProgress({ type, isActive }: GenerationProgressProps) 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ 
+        opacity: [0.7, 1, 0.7],
+        y: 0 
+      }}
       exit={{ opacity: 0, y: -10 }}
-      className="bg-card rounded-2xl border border-border p-6"
+      transition={{
+        opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+        y: { duration: 0.3 }
+      }}
+      className="p-6"
     >
       <TextShimmer 
         as="span" 
