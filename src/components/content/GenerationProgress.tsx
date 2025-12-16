@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TextShimmer } from '@/components/ui/text-shimmer';
 
 export type GenerationType = 'flashcards' | 'quizzes' | 'summary';
 
@@ -11,9 +11,9 @@ const generationMessages: Record<GenerationType, string[]> = {
 };
 
 const typeLabels: Record<GenerationType, string> = {
-  flashcards: 'Flashcard',
-  quizzes: 'Quiz',
-  summary: 'Summary',
+  flashcards: 'Generating Flashcard',
+  quizzes: 'Generating Quiz',
+  summary: 'Generating Summary',
 };
 
 interface GenerationProgressProps {
@@ -48,13 +48,14 @@ export function GenerationProgress({ type, isActive }: GenerationProgressProps) 
       exit={{ opacity: 0, y: -10 }}
       className="bg-card rounded-2xl border border-border p-6"
     >
-      <div className="flex items-center gap-3">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-        <span className="font-semibold text-foreground">
-          Generating {typeLabels[type]}
-        </span>
-      </div>
-      <div className="mt-2 ml-8 h-5 overflow-hidden">
+      <TextShimmer 
+        as="span" 
+        className="font-semibold text-base"
+        duration={1.5}
+      >
+        {typeLabels[type]}
+      </TextShimmer>
+      <div className="mt-2 h-5 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.p
             key={currentStep}
