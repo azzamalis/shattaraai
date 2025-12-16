@@ -5,9 +5,9 @@ import { TextShimmer } from '@/components/ui/text-shimmer';
 export type GenerationType = 'flashcards' | 'quizzes' | 'summary';
 
 const generationMessages: Record<GenerationType, string[]> = {
-  flashcards: ['Analyzing Content...', 'Generating Flashcards...', 'Saving...'],
-  quizzes: ['Analyzing Content...', 'Generating Quizzes...', 'Saving...'],
-  summary: ['Analyzing Content...', 'Generating Summary...', 'Saving...'],
+  flashcards: ['Analyzing Content...', 'Extracting Data...', 'Generating Flashcard...', 'Saving...', 'Almost Done...'],
+  quizzes: ['Analyzing Content...', 'Extracting Data...', 'Generating Quiz...', 'Saving...', 'Almost Done...'],
+  summary: ['Analyzing Content...', 'Extracting Data...', 'Generating Summary...', 'Saving...', 'Almost Done...'],
 };
 
 const typeLabels: Record<GenerationType, string> = {
