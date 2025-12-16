@@ -13,6 +13,8 @@ interface FlashcardConfig {
   includeHints: boolean;
   includeExplanations: boolean;
   focusOnKeyConcepts: boolean;
+  selectedTopics?: string[];
+  focusInstructions?: string;
 }
 
 interface FlashcardConfigModalProps {
@@ -20,7 +22,7 @@ interface FlashcardConfigModalProps {
   onOpenChange: (open: boolean) => void;
   config: FlashcardConfig;
   onSave: (config: FlashcardConfig) => void;
-  onGenerate?: () => void;
+  onGenerate?: (config: FlashcardConfig) => void;
   topics?: string[];
   isLoading?: boolean;
 }
@@ -44,18 +46,18 @@ export function FlashcardConfigModal({ open, onOpenChange, config, onSave, onGen
 
   const handleSave = () => {
     const cardsCount = parseInt(numberOfCards) || 10;
-    const updatedConfig = { 
+    const updatedConfig: FlashcardConfig = { 
       ...localConfig, 
       numberOfCards: cardsCount,
-      selectedTopics: selectedTopics,
-      focusInstructions: focusInstructions
+      selectedTopics: selectedTopics.length > 0 ? selectedTopics : undefined,
+      focusInstructions: focusInstructions.trim() || undefined
     };
     onSave(updatedConfig);
     onOpenChange(false);
     
-    // Trigger generation after saving config
+    // Trigger generation with the config directly (not relying on state)
     if (onGenerate) {
-      onGenerate();
+      onGenerate(updatedConfig);
     }
   };
 
