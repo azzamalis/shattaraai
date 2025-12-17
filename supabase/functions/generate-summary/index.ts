@@ -64,8 +64,17 @@ serve(async (req) => {
     if (config.focusAreas?.all) focusAreas.push('comprehensive coverage');
 
     // Template-specific prompts for meaningfully different outputs
+    // IMPORTANT: All outputs must use proper Markdown syntax for rendering
     const templatePrompts = {
       detailed: `You are an academic content expert creating a comprehensive, in-depth summary.
+
+FORMAT: Use proper Markdown syntax throughout:
+- Use ## for main section headers
+- Use ### for sub-section headers
+- Use **bold** for key terms and important concepts
+- Use - or * for bullet points
+- Use > for important quotes or highlights
+- Use proper paragraph breaks
 
 OUTPUT REQUIREMENTS:
 - Write 500-800 words in well-structured paragraphs
@@ -78,38 +87,64 @@ OUTPUT REQUIREMENTS:
 - Use academic language appropriate for deep study
 
 STRUCTURE:
-1. Introduction (context and importance)
-2. Main concepts (detailed explanations with examples)
-3. Supporting details and evidence
-4. Connections and implications
-5. Conclusion with actionable takeaways`,
+## Introduction
+[Context and importance]
+
+## Main Concepts
+[Detailed explanations with examples]
+
+## Key Details
+[Supporting details and evidence]
+
+## Connections & Implications
+[How concepts relate]
+
+## Conclusion
+[Key takeaways and applications]`,
 
       standard: `You are creating a quick-reference cheat sheet for efficient studying.
+
+FORMAT: Use proper Markdown syntax throughout:
+- Use ## for category headers (e.g., ## Key Concepts)
+- Use **bold** for key terms
+- Use - for bullet points (NOT • symbols)
+- Use > for important tips or warnings
+- Use --- for section dividers
 
 OUTPUT REQUIREMENTS:
 - Create a scannable, bullet-point format summary (200-350 words)
 - Use short, punchy bullet points (1-2 sentences max each)
 - Group related points under clear category headers
-- Highlight key terms in context (mention the term and its meaning together)
+- Highlight key terms using **bold** markdown
 - Include memory aids, mnemonics, or quick tips where helpful
 - Prioritize the most testable/important information
-- Use symbols like → for relationships, = for definitions, ★ for critical points
 - Format for rapid review before an exam
 
 STRUCTURE:
-★ KEY CONCEPTS
-• [Concept]: [One-line definition/explanation]
+## ★ Key Concepts
+- **[Term]**: [One-line definition/explanation]
 
-→ MAIN RELATIONSHIPS
-• [How concepts connect]
+---
 
-📝 QUICK FACTS
-• [Testable details]
+## → Main Relationships
+- [How concepts connect]
 
-💡 REMEMBER
-• [Memory tips or common mistakes to avoid]`,
+---
+
+## 📝 Quick Facts
+- [Testable details]
+
+---
+
+## 💡 Remember
+> [Memory tips or common mistakes to avoid]`,
 
       brief: `You are creating an executive summary for someone who needs the absolute essentials.
+
+FORMAT: Use proper Markdown syntax:
+- Use **bold** for the most critical terms
+- Write in flowing paragraph format
+- Use proper paragraph breaks between ideas
 
 OUTPUT REQUIREMENTS:
 - Write exactly 3-5 sentences (75-150 words maximum)
@@ -119,7 +154,6 @@ OUTPUT REQUIREMENTS:
 - No bullet points - flowing paragraph format
 - Every word must earn its place - remove all filler
 - Use clear, direct language anyone can understand
-- Think "elevator pitch" - what would you say in 30 seconds?
 
 This should be readable in under 30 seconds and give a complete picture of the essential content.`
     };
