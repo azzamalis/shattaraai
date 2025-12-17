@@ -1,35 +1,29 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Copy, Volume2, FileText, FileDown, FlaskConical } from 'lucide-react';
+import { ChevronLeft, Copy, Volume2, FileText, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { SAMPLE_MARKDOWN_CONTENT, SAMPLE_KEY_POINTS } from './sampleMarkdownContent';
 
 interface DetailedSummaryDisplayProps {
   summary: string;
   keyPoints?: string[];
   onBack?: () => void;
   title?: string;
-  testMode?: boolean;
 }
 
 export function DetailedSummaryDisplay({ 
   summary, 
   keyPoints = [], 
   onBack,
-  title,
-  testMode: initialTestMode = false
+  title 
 }: DetailedSummaryDisplayProps) {
-  const [isTestMode, setIsTestMode] = useState(initialTestMode);
-  const displaySummary = isTestMode ? SAMPLE_MARKDOWN_CONTENT : summary;
-  const displayKeyPoints = isTestMode ? SAMPLE_KEY_POINTS : keyPoints;
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(displaySummary);
+      await navigator.clipboard.writeText(summary);
       setIsCopied(true);
       toast.success('Summary copied to clipboard');
       setTimeout(() => setIsCopied(false), 2000);
@@ -40,7 +34,7 @@ export function DetailedSummaryDisplay({
 
   const handleTextToSpeech = () => {
     if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(displaySummary);
+      const utterance = new SpeechSynthesisUtterance(summary);
       utterance.rate = 0.9;
       window.speechSynthesis.speak(utterance);
       toast.success('Reading summary aloud...');
@@ -55,11 +49,6 @@ export function DetailedSummaryDisplay({
 
   const handleAddToNotes = () => {
     toast.info('Add to notes coming soon');
-  };
-
-  const toggleTestMode = () => {
-    setIsTestMode(!isTestMode);
-    toast.success(isTestMode ? 'Test mode disabled' : 'Test mode enabled - showing sample markdown');
   };
 
   return (
@@ -186,18 +175,18 @@ export function DetailedSummaryDisplay({
                           ),
                         }}
                       >
-                        {displaySummary}
+                        {summary}
                       </ReactMarkdown>
                     </div>
 
                     {/* Key Points Section */}
-                    {displayKeyPoints && displayKeyPoints.length > 0 && (
+                    {keyPoints && keyPoints.length > 0 && (
                       <div className="mt-8 p-4 rounded-xl bg-muted/30 border border-border/50">
                         <h3 className="text-lg font-semibold mb-3 text-foreground">
                           📌 Key Takeaways
                         </h3>
                         <ul className="space-y-2">
-                          {displayKeyPoints.map((point, index) => (
+                          {keyPoints.map((point, index) => (
                             <li 
                               key={index} 
                               className="flex items-start gap-2 text-foreground/90"
@@ -250,15 +239,6 @@ export function DetailedSummaryDisplay({
                       <FileDown className="h-4 w-4" />
                     </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleTestMode}
-                    className={`h-7 px-2 text-xs gap-1 ${isTestMode ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}
-                  >
-                    <FlaskConical className="h-3.5 w-3.5" />
-                    Test
-                  </Button>
                 </div>
               </div>
             </div>
