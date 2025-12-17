@@ -117,10 +117,10 @@ export function FlashcardConfigModal({ open, onOpenChange, config, onSave, onGen
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Creating...
+                Generating...
               </>
             ) : (
-              'Create Set'
+              'Generate'
             )}
           </Button>
         </DialogFooter>
