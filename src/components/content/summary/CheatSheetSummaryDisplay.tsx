@@ -1,26 +1,31 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Copy, Volume2, FileText, FileDown } from 'lucide-react';
+import { ChevronLeft, Copy, Volume2, FileText, FileDown, FlaskConical } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { SAMPLE_MARKDOWN_CONTENT } from './sampleMarkdownContent';
 
 interface CheatSheetSummaryDisplayProps {
   summaryContent: string;
   onBack?: () => void;
   contentId?: string;
+  testMode?: boolean;
 }
 
 const CheatSheetSummaryDisplay: React.FC<CheatSheetSummaryDisplayProps> = ({
   summaryContent,
   onBack,
-  contentId
+  contentId,
+  testMode: initialTestMode = false
 }) => {
+  const [isTestMode, setIsTestMode] = useState(initialTestMode);
+  const displayContent = isTestMode ? SAMPLE_MARKDOWN_CONTENT : summaryContent;
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(summaryContent);
+      await navigator.clipboard.writeText(displayContent);
       toast.success('Summary copied to clipboard');
     } catch (error) {
       toast.error('Failed to copy summary');
@@ -34,11 +39,16 @@ const CheatSheetSummaryDisplay: React.FC<CheatSheetSummaryDisplayProps> = ({
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(summaryContent);
+    const utterance = new SpeechSynthesisUtterance(displayContent);
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
     window.speechSynthesis.speak(utterance);
     setIsSpeaking(true);
+  };
+
+  const toggleTestMode = () => {
+    setIsTestMode(!isTestMode);
+    toast.success(isTestMode ? 'Test mode disabled' : 'Test mode enabled - showing sample markdown');
   };
 
   const handleExportPDF = () => {
@@ -171,7 +181,7 @@ const CheatSheetSummaryDisplay: React.FC<CheatSheetSummaryDisplayProps> = ({
                                 ),
                               }}
                             >
-                              {summaryContent}
+                              {displayContent}
                             </ReactMarkdown>
                           </div>
                         </div>
@@ -220,6 +230,15 @@ const CheatSheetSummaryDisplay: React.FC<CheatSheetSummaryDisplayProps> = ({
                       <FileDown className="h-4 w-4" />
                     </Button>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={toggleTestMode}
+                    className={`h-7 px-2 text-xs gap-1 ${isTestMode ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}
+                  >
+                    <FlaskConical className="h-3.5 w-3.5" />
+                    Test
+                  </Button>
                 </div>
               </div>
             </div>
