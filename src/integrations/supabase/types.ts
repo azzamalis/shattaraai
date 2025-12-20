@@ -219,6 +219,27 @@ export type Database = {
           },
         ]
       }
+      contact_rate_limits: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          ip_address: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          ip_address: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          ip_address?: string
+        }
+        Relationships: []
+      }
       content: {
         Row: {
           ai_summary: string | null
@@ -964,6 +985,7 @@ export type Database = {
         }[]
       }
       cleanup_expired_cache: { Args: never; Returns: undefined }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       generate_invite_code: { Args: never; Returns: string }
       get_user_plan_quotas: {
         Args: { user_uuid: string }
