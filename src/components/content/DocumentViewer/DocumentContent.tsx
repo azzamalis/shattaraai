@@ -5,6 +5,7 @@ import { Download, FileText, Loader2, AlertCircle } from 'lucide-react';
 import { useDocumentViewer } from './DocumentViewerContext';
 import { ContentData } from '@/pages/ContentPage';
 import mammoth from 'mammoth';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 interface DocumentContentProps {
   contentData: ContentData;
@@ -83,10 +84,12 @@ export function DocumentContent({
 
   const getHighlightedContent = () => {
     if (!documentHtml) return '';
-    if (!searchTerm.trim()) return documentHtml;
+    // Sanitize HTML content first to prevent XSS attacks
+    const sanitized = sanitizeHtml(documentHtml);
+    if (!searchTerm.trim()) return sanitized;
 
     const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return documentHtml.replace(regex, '<mark class="bg-yellow-300 dark:bg-yellow-700 dark:text-yellow-100">$1</mark>');
+    return sanitized.replace(regex, '<mark class="bg-yellow-300 dark:bg-yellow-700 dark:text-yellow-100">$1</mark>');
   };
 
   const isWordDocument = contentData.filename?.toLowerCase().endsWith('.docx') || contentData.filename?.toLowerCase().endsWith('.doc');

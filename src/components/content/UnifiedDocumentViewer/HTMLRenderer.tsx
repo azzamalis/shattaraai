@@ -3,6 +3,7 @@ import { Loader2, Globe, AlertTriangle, BookOpen, Type, Maximize2, Minimize2 } f
 import { useUnifiedDocument } from './UnifiedDocumentContext';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 interface HTMLRendererProps {
   htmlContent: string;
@@ -50,14 +51,8 @@ export function HTMLRenderer({ htmlContent, title }: HTMLRendererProps) {
   }, [htmlContent, setIsLoading, setError, setDocumentData, setTotalPages, setCurrentPage]);
 
   const cleanHtmlContent = (html: string): string => {
-    // Remove scripts and potentially dangerous elements
-    const cleanedHtml = html
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-      .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
-      .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '');
-
-    return cleanedHtml;
+    // Use DOMPurify for proper sanitization against XSS attacks
+    return sanitizeHtml(html);
   };
 
   // Handle search

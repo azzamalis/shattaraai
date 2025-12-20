@@ -3,6 +3,7 @@ import { FileText } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
+import { sanitizeHtml } from '@/lib/sanitize';
 interface TextRendererProps {
   content: string;
   title?: string;
@@ -90,9 +91,11 @@ export function TextRenderer({
   }, [currentSearchIndex, searchTerm]);
 
   const getHighlightedContent = (text: string) => {
-    if (!searchTerm) return text;
+    // Sanitize content first to prevent XSS attacks
+    const sanitized = sanitizeHtml(text);
+    if (!searchTerm) return sanitized;
     const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>');
+    return sanitized.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>');
   };
   if (!displayContent) {
     return <div className="flex items-center justify-center h-full bg-background">

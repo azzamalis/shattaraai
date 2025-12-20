@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Loader2, AlertTriangle, FileText } from 'lucide-react';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
 import mammoth from 'mammoth';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 interface DOCXRendererProps {
   url: string;
@@ -120,10 +121,12 @@ export function DOCXRenderer({ url }: DOCXRendererProps) {
   };
 
   const getHighlightedContent = () => {
-    if (!searchTerm || !htmlContent) return htmlContent;
+    // Sanitize HTML content first to prevent XSS attacks
+    const sanitized = sanitizeHtml(htmlContent);
+    if (!searchTerm || !sanitized) return sanitized;
 
     const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return htmlContent.replace(regex, '<mark class="search-highlight bg-yellow-200 dark:bg-yellow-800" data-search-index="$1">$1</mark>');
+    return sanitized.replace(regex, '<mark class="search-highlight bg-yellow-200 dark:bg-yellow-800" data-search-index="$1">$1</mark>');
   };
 
   // Update search results when search term changes
