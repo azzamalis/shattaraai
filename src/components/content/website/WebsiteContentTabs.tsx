@@ -3,6 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { 
   Newspaper, 
   ChartNoAxesGantt, 
@@ -187,12 +188,12 @@ export function WebsiteContentTabs({ contentData, onTextExpand, isProcessing }: 
           </div>
         </div>
 
-        {/* Article content - Render as HTML */}
+        {/* Article content - Render as HTML with sanitization */}
         <div className="prose prose-sm max-w-none dark:prose-invert">
           <div 
             className="reader-content text-sm leading-relaxed space-y-4"
             dangerouslySetInnerHTML={{ 
-              __html: contentData.text_content 
+              __html: sanitizeHtml(contentData.text_content || '') 
             }}
             style={{
               // Reader mode styling

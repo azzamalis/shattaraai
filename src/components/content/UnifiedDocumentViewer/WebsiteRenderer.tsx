@@ -3,6 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useUnifiedDocument } from './UnifiedDocumentContext';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { 
   ChartNoAxesGantt, 
   Info, 
@@ -148,10 +149,12 @@ export function WebsiteRenderer({ htmlContent, title, contentData }: WebsiteRend
   }, [currentSearchIndex, searchTerm]);
 
   const getHighlightedContent = (text: string) => {
-    if (!searchTerm) return text;
+    // Sanitize HTML content first to prevent XSS attacks
+    const sanitized = sanitizeHtml(text);
+    if (!searchTerm) return sanitized;
     
-    const regex = new RegExp(`(${searchTerm})`, 'gi');
-    return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>');
+    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return sanitized.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>');
   };
 
   const displayContent = getHighlightedContent(htmlContent);
