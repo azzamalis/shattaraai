@@ -112,11 +112,11 @@ const HeroContent = () => {
               <div className="flex flex-col items-center gap-2 md:flex-row md:gap-2">
                 <div key={1} className="bg-primary/20 rounded-[14px] border border-primary/30 p-0.5 shadow-[0_0_15px_hsl(var(--primary)/0.3)]">
                   <SmartCTA type="get-started" size="lg" className="rounded-xl px-5 text-base h-11 bg-primary text-primary-foreground hover:bg-primary/90">
-                    <span className="text-nowrap">Start with a file →</span>
+                    <span className="text-nowrap">Get Started Free →</span>
                   </SmartCTA>
                 </div>
               <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/10" onClick={handleFeatureClick}>
-                  <span className="text-nowrap">See how it works</span>
+                  <span className="text-nowrap">See How It Works</span>
                 </SmartCTA>
               </div>
               <p className="text-sm text-muted-foreground">Free • No credit card required</p>
