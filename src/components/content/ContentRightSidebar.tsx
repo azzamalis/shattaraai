@@ -432,7 +432,10 @@ export function ContentRightSidebar({
   };
 
   // Check if chapters should be shown for this content type
-  const shouldShowChapters = contentData.type === 'text' && (contentData.chapters?.length > 0 || contentData.text_content);
+  // Show for text, pdf, file (word docs), and website content types
+  const documentTypes = ['text', 'pdf', 'file', 'website'];
+  const isDocumentType = documentTypes.includes(contentData.type);
+  const shouldShowChapters = isDocumentType && (contentData.chapters?.length > 0 || contentData.text_content);
   const handleChapterClick = (startTime: number) => {
     // For text content, we don't have time-based navigation
     // This could be extended to scroll to specific sections
