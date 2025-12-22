@@ -479,6 +479,17 @@ export function ContentRightSidebar({
               </div>
             </TabsTrigger>
             
+            <TabsTrigger value="summary" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
+              <div className="flex items-center gap-2">
+                {activeTab === "summary" ? (
+                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
+                ) : (
+                  <ReceiptText className="h-4 w-4" />
+                )}
+                Summary
+              </div>
+            </TabsTrigger>
+            
             {shouldShowChapters && (
               <TabsTrigger value="chapters" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
                 <div className="flex items-center gap-2">
@@ -491,17 +502,6 @@ export function ContentRightSidebar({
                 </div>
               </TabsTrigger>
             )}
-            
-            <TabsTrigger value="summary" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
-              <div className="flex items-center gap-2">
-                {activeTab === "summary" ? (
-                  <div className="h-2 w-2 flex-shrink-0 rounded-full bg-success" />
-                ) : (
-                  <ReceiptText className="h-4 w-4" />
-                )}
-                Summary
-              </div>
-            </TabsTrigger>
             
             <TabsTrigger value="notes" className="px-4 py-2 rounded-lg text-sm font-normal text-primary/80 hover:bg-primary/5 hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10 transition-all">
               <div className="flex items-center gap-2">
