@@ -141,6 +141,13 @@ export function ContentRightSidebar({
     format: 'bullets' as 'bullets' | 'paragraphs'
   });
 
+  // Load flashcard title from content metadata
+  useEffect(() => {
+    if (contentData?.metadata?.flashcardTitle) {
+      setFlashcardTitle(contentData.metadata.flashcardTitle as string);
+    }
+  }, [contentData?.metadata]);
+
   // Fetch existing data on mount
   useEffect(() => {
     if (contentData?.id) {
@@ -553,9 +560,29 @@ export function ContentRightSidebar({
                           flashcards={flashcards}
                           title={flashcardTitle}
                           onStartFlashcards={() => setShowFlashcardStudy(true)}
-                          onRename={(newTitle) => {
-                            setFlashcardTitle(newTitle);
-                            toast.success('Flashcards renamed');
+                          onRename={async (newTitle) => {
+                            try {
+                              // Update local state
+                              setFlashcardTitle(newTitle);
+                              
+                              // Persist to database in content metadata
+                              const updatedMetadata = {
+                                ...(contentData.metadata || {}),
+                                flashcardTitle: newTitle
+                              };
+                              
+                              const { error } = await supabase
+                                .from('content')
+                                .update({ metadata: updatedMetadata })
+                                .eq('id', contentData.id);
+                              
+                              if (error) throw error;
+                              
+                              toast.success('Flashcards renamed');
+                            } catch (error) {
+                              console.error('Error renaming flashcards:', error);
+                              toast.error('Failed to save name');
+                            }
                           }}
                           onDeleteFlashcards={async () => {
                             try {
@@ -565,6 +592,17 @@ export function ContentRightSidebar({
                                 .eq('content_id', contentData.id);
                               
                               if (error) throw error;
+                              
+                              // Also clear the title from metadata
+                              const updatedMetadata = {
+                                ...(contentData.metadata || {}),
+                                flashcardTitle: undefined
+                              };
+                              
+                              await supabase
+                                .from('content')
+                                .update({ metadata: updatedMetadata })
+                                .eq('id', contentData.id);
                               
                               setFlashcards([]);
                               setFlashcardTitle('My Flashcards');
