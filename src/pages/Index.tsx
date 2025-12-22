@@ -13,8 +13,8 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <main className="flex-grow">
         <HeroSection />
-        <Features />
         <UseCases />
+        <Features />
         <Testimonials />
         <Pricing />
         <CTA />
