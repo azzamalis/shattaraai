@@ -90,34 +90,34 @@ export const FlashcardListDisplay = ({
   return (
     <div className="text-primary">
       <div className="flex items-center justify-between mb-4">
-        {isEditing ? (
-          <Input
-            ref={inputRef}
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleCancelRename}
-            className="text-base font-semibold h-8 w-full max-w-[200px]"
-            onClick={(e) => e.stopPropagation()}
-          />
-        ) : (
-          <h3 className="text-base font-semibold text-primary">{title}</h3>
-        )}
+        <h3 className="text-base font-semibold text-primary">My Flashcards</h3>
       </div>
       
       <div className="flex flex-col mb-4">
         <div
           className="cursor-pointer border-2 border-border rounded-2xl p-4"
-          onClick={onStartFlashcards}
+          onClick={isEditing ? undefined : onStartFlashcards}
         >
           <div className="flex-grow">
             {/* Header with title and menu */}
             <div className="flex items-center justify-between gap-6 mb-3">
               <div className="flex items-center gap-2">
                 <GalleryVerticalEnd className="w-5 h-5 text-primary" />
-                <span className="text-primary font-medium text-ellipsis">
-                  {flashcards.length} Flashcards
-                </span>
+                {isEditing ? (
+                  <Input
+                    ref={inputRef}
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    onBlur={handleCancelRename}
+                    className="text-primary font-medium h-7 w-full max-w-[160px] text-sm"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span className="text-primary font-medium text-ellipsis">
+                    {title}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-1">
                 <Circle className="text-muted w-5 h-5" fill="none" stroke="currentColor" />
