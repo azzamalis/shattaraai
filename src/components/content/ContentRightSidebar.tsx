@@ -98,7 +98,7 @@ export function ContentRightSidebar({
   
   // Config states
   const [flashcardConfig, setFlashcardConfig] = useState({
-    numberOfCards: 20,
+    numberOfCards: 10,
     difficulty: 'medium' as 'easy' | 'medium' | 'hard',
     includeHints: true,
     includeExplanations: true,
@@ -108,17 +108,25 @@ export function ContentRightSidebar({
   });
   
   const [quizConfig, setQuizConfig] = useState({
-    numberOfQuestions: 15,
+    numberOfQuestions: 10,
     difficulty: 'medium' as 'easy' | 'medium' | 'hard',
     includeExplanations: true,
     questionTypes: {
       multipleChoice: true,
-      trueFalse: true,
+      trueFalse: false,
       shortAnswer: false
     },
     selectedTopics: [] as string[],
     focusInstructions: ''
   });
+
+  // Auto-populate selectedTopics with all available topics
+  useEffect(() => {
+    if (availableTopics.length > 0) {
+      setFlashcardConfig(prev => ({ ...prev, selectedTopics: availableTopics }));
+      setQuizConfig(prev => ({ ...prev, selectedTopics: availableTopics }));
+    }
+  }, [availableTopics.length]);
   
   const [summaryConfig, setSummaryConfig] = useState({
     length: 'standard' as 'brief' | 'standard' | 'detailed',

@@ -102,7 +102,7 @@ serve(async (req) => {
 
     let systemPrompt = `You are an expert educator creating quiz questions from educational content.
 
-Create ${config.numberOfQuestions || 15} questions at ${config.difficulty || 'medium'} difficulty level.
+Create ${config.numberOfQuestions || 10} questions at ${config.difficulty || 'medium'} difficulty level.
 
 Use these question types: ${questionTypes.join(', ')}.
 
