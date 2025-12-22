@@ -103,21 +103,26 @@ export const FlashcardListDisplay = ({
             <div className="flex items-center justify-between gap-6 mb-3">
               <div className="flex items-center gap-2">
                 <GalleryVerticalEnd className="w-5 h-5 text-primary" />
-                {isEditing ? (
-                  <Input
-                    ref={inputRef}
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onBlur={handleCancelRename}
-                    className="text-primary font-medium h-7 w-full max-w-[160px] text-sm"
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                ) : (
-                  <span className="text-primary font-medium text-ellipsis">
-                    {title}
+                <div className="flex flex-col">
+                  {isEditing ? (
+                    <Input
+                      ref={inputRef}
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      onBlur={handleCancelRename}
+                      className="text-primary font-medium h-7 w-full max-w-[160px] text-sm"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <span className="text-primary font-medium text-ellipsis">
+                      {title}
+                    </span>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {flashcards.length} {flashcards.length === 1 ? 'card' : 'cards'}
                   </span>
-                )}
+                </div>
               </div>
               <div className="flex items-center gap-1">
                 <Circle className="text-muted w-5 h-5" fill="none" stroke="currentColor" />
