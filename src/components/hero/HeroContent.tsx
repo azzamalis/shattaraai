@@ -77,7 +77,7 @@ const HeroContent = () => {
               <HeroActionLink to="/signup" text="Study Smarter, Not Harder" />
   
               <h1 className="mt-4 max-w-4xl mx-auto text-4xl md:text-5xl lg:mt-6 bg-gradient-to-br from-[#FAFAFA] to-[#FAFAFA]/50 bg-clip-text text-primary xl:text-6xl">
-                Your Personal AI Tutor — Built for How You Actually Study
+                Turn your lectures, PDFs, and videos into answers — instantly.
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-balance text-lg text-[#9A9A9A]">Upload lectures, PDFs, videos, or notes. Shattara AI explains, summarizes, quizzes, and helps you master subjects — faster and with less stress.</p>
             </AnimatedGroup>
