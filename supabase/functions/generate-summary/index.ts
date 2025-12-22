@@ -11,6 +11,39 @@ const openAIApiKey = Deno.env.get('OPENAI_GENERATION_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+// Helper to update progress in content metadata
+async function updateProgress(supabase: any, contentId: string, step: string, progress: number, status: string = 'processing') {
+  try {
+    const { data: current } = await supabase
+      .from('content')
+      .select('metadata')
+      .eq('id', contentId)
+      .single();
+    
+    const existingMetadata = (current?.metadata || {}) as Record<string, any>;
+    
+    await supabase
+      .from('content')
+      .update({
+        processing_status: status,
+        metadata: {
+          ...existingMetadata,
+          generationProgress: {
+            type: 'summary',
+            step,
+            progress,
+            updatedAt: new Date().toISOString()
+          }
+        }
+      })
+      .eq('id', contentId);
+    
+    console.log(`Progress update: ${step} (${progress}%)`);
+  } catch (error) {
+    console.error('Error updating progress:', error);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -33,6 +66,9 @@ serve(async (req) => {
     const { contentId, config } = await req.json();
     console.log('Generating summary for content:', contentId, 'with config:', config);
 
+    // Step 1: Analyzing content
+    await updateProgress(supabase, contentId, 'analyzing', 10);
+
     // Fetch content from database
     const { data: content, error: contentError } = await supabase
       .from('content')
@@ -44,6 +80,9 @@ serve(async (req) => {
     if (contentError || !content) {
       throw new Error('Content not found');
     }
+    
+    // Step 2: Extracting data
+    await updateProgress(supabase, contentId, 'extracting', 25);
 
     // Prepare content for AI
     let contentText = content.text_content || '';
@@ -166,6 +205,9 @@ ${config.format === 'paragraphs' && selectedTemplate === 'standard' ? '\nNote: U
 
     const userPrompt = `Create a summary of the following content:\n\n${contentText.substring(0, 15000)}`;
 
+    // Step 3: Generating summary
+    await updateProgress(supabase, contentId, 'generating', 50);
+
     // Try models in order
     const models = ['gpt-4.1-2025-04-14', 'gpt-5-chat-latest'];
     let summaryData = null;
@@ -230,8 +272,21 @@ ${config.format === 'paragraphs' && selectedTemplate === 'standard' ? '\nNote: U
     }
 
     if (!summaryData) {
+      await updateProgress(supabase, contentId, 'failed', 0, 'failed');
       throw new Error('Failed to generate summary with all available models');
     }
+
+    // Step 4: Saving
+    await updateProgress(supabase, contentId, 'saving', 85);
+
+    // Get current metadata to preserve it
+    const { data: currentContent } = await supabase
+      .from('content')
+      .select('metadata')
+      .eq('id', contentId)
+      .single();
+    
+    const existingMetadata = (currentContent?.metadata || {}) as Record<string, any>;
 
     // Update content with summary
     const { error: updateError } = await supabase
@@ -239,7 +294,17 @@ ${config.format === 'paragraphs' && selectedTemplate === 'standard' ? '\nNote: U
       .update({
         ai_summary: summaryData.summary,
         summary_key_points: summaryData.keyPoints,
-        summary_generated_at: new Date().toISOString()
+        summary_generated_at: new Date().toISOString(),
+        processing_status: 'completed',
+        metadata: {
+          ...existingMetadata,
+          generationProgress: {
+            type: 'summary',
+            step: 'completed',
+            progress: 100,
+            updatedAt: new Date().toISOString()
+          }
+        }
       })
       .eq('id', contentId);
 
