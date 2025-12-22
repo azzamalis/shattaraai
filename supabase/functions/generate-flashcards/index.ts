@@ -107,7 +107,7 @@ ${difficultyInstructions[config.difficulty || 'medium']}
 
 ${config.focusOnKeyConcepts ? 'Focus on the most important concepts and key takeaways.' : 'Cover a broad range of topics from the content.'}
 
-Generate exactly ${config.numberOfCards || 20} flashcards.
+Generate exactly ${config.numberOfCards || 10} flashcards.
 
 ${config.includeHints ? 'Include helpful hints for each flashcard.' : ''}
 ${config.includeExplanations ? 'Include detailed explanations for each answer.' : ''}`;
