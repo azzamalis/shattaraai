@@ -115,9 +115,9 @@ const HeroContent = () => {
                     <span className="text-nowrap">Start with a file →</span>
                   </SmartCTA>
                 </div>
-              <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/10" onClick={handleFeatureClick}>
-                  <span className="text-nowrap">See how it works</span>
-                </SmartCTA>
+              <button onClick={handleFeatureClick} className="text-muted-foreground hover:text-foreground transition-colors text-base underline-offset-4 hover:underline">
+                  See how it works
+                </button>
               </div>
               <p className="text-sm text-muted-foreground">Free • No credit card required</p>
             </AnimatedGroup>
