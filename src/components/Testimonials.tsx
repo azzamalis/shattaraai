@@ -4,50 +4,50 @@ import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
 import GradientBackground from '@/components/ui/gradient-background';
 const Testimonials = () => {
   const testimonials = [{
-    text: "Shattara has completely changed how I study. The AI-generated notes are incredibly accurate and save me hours of work every week.",
+    text: "Shattara AI helped me finally understand my lectures instead of memorizing blindly.",
     image: "/placeholder.svg",
-    name: "Alex Thompson",
-    role: "Medical Student"
+    name: "Sarah M.",
+    role: "University Student"
   }, {
-    text: "As a teacher, I've recommended Shattara to all my students. It helps them grasp difficult concepts more quickly and engage more deeply with the material.",
+    text: "The quizzes feel like real exams — and the explanations actually help.",
     image: "/placeholder.svg",
-    name: "Dr. Sarah Chen",
-    role: "University Professor"
+    name: "Ahmed K.",
+    role: "High School Student"
   }, {
-    text: "The exam simulator is frighteningly accurate! It prepared me so well for my certification that the actual test felt familiar and less stressful.",
+    text: "I used to spend hours making flashcards. Now it takes seconds, and they're better than what I made myself.",
     image: "/placeholder.svg",
-    name: "Michael Rodriguez",
-    role: "IT Professional"
-  }, {
-    text: "The concept mapping feature helped me visualize connections between different topics. It's like having a personal tutor available 24/7!",
-    image: "/placeholder.svg",
-    name: "Jordan Kim",
-    role: "Computer Science Student"
-  }, {
-    text: "Shattara's AI has transformed my classroom. Students come to lectures better prepared and ask more insightful questions.",
-    image: "/placeholder.svg",
-    name: "Prof. James Wilson",
-    role: "Biology Department Chair"
-  }, {
-    text: "The personalized flashcards adapt to my learning pace perfectly. I finally feel confident going into exams.",
-    image: "/placeholder.svg",
-    name: "Fatima Al-Zahra",
+    name: "Fatima A.",
     role: "Engineering Student"
   }, {
-    text: "Using Shattara for professional development has been game-changing. The AI creates study materials that perfectly match my learning style.",
+    text: "The AI summaries helped me review an entire semester in one weekend.",
     image: "/placeholder.svg",
-    name: "Ahmed Hassan",
-    role: "Software Engineer"
+    name: "Omar H.",
+    role: "Medical Student"
   }, {
-    text: "The collaborative features make group study sessions so much more productive. We can share AI-generated summaries instantly.",
+    text: "My students come to class more prepared since I started recommending Shattara.",
     image: "/placeholder.svg",
-    name: "Noor Almansouri",
+    name: "Dr. Layla N.",
+    role: "University Professor"
+  }, {
+    text: "I finally feel confident going into exams. The practice tests are spot-on.",
+    image: "/placeholder.svg",
+    name: "Noor S.",
+    role: "Law Student"
+  }, {
+    text: "It's like having a tutor available 24/7 who actually knows my course material.",
+    image: "/placeholder.svg",
+    name: "Khalid R.",
+    role: "Computer Science Student"
+  }, {
+    text: "The study chat answered questions my textbook never could.",
+    image: "/placeholder.svg",
+    name: "Maha T.",
     role: "Business Student"
   }, {
-    text: "As a working professional, Shattara's flexibility allows me to learn efficiently during my limited free time.",
+    text: "I recommend Shattara to every student who struggles with exam prep.",
     image: "/placeholder.svg",
-    name: "Khalid Bin Rashid",
-    role: "Finance Manager"
+    name: "Prof. Saeed B.",
+    role: "Department Chair"
   }];
   const firstColumn = testimonials.slice(0, 3);
   const secondColumn = testimonials.slice(3, 6);
@@ -71,10 +71,10 @@ const Testimonials = () => {
           
 
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-foreground">
-            Trusted by students and educators
+            Trusted by Students and Educators
           </h2>
           <p className="text-center mt-5 text-muted-foreground">
-            Join thousands of students and teachers who are already transforming education with Shattara AI
+            Thousands of learners already use Shattara AI to study faster, understand better, and stress less.
           </p>
         </motion.div>
 
