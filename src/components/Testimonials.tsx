@@ -70,7 +70,7 @@ const Testimonials = () => {
       }} className="flex flex-col items-center justify-center max-w-[540px] mx-auto">
           
 
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-foreground">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-foreground whitespace-nowrap">
             Trusted by Students and Educators
           </h2>
           <p className="text-center mt-5 text-muted-foreground">
