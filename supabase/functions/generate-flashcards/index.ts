@@ -11,6 +11,39 @@ const openAIApiKey = Deno.env.get('OPENAI_GENERATION_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+// Helper to update progress in content metadata
+async function updateProgress(supabase: any, contentId: string, step: string, progress: number, status: string = 'processing') {
+  try {
+    const { data: current } = await supabase
+      .from('content')
+      .select('metadata')
+      .eq('id', contentId)
+      .single();
+    
+    const existingMetadata = (current?.metadata || {}) as Record<string, any>;
+    
+    await supabase
+      .from('content')
+      .update({
+        processing_status: status,
+        metadata: {
+          ...existingMetadata,
+          generationProgress: {
+            type: 'flashcards',
+            step,
+            progress,
+            updatedAt: new Date().toISOString()
+          }
+        }
+      })
+      .eq('id', contentId);
+    
+    console.log(`Progress update: ${step} (${progress}%)`);
+  } catch (error) {
+    console.error('Error updating progress:', error);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -33,6 +66,9 @@ serve(async (req) => {
     const { contentId, config } = await req.json();
     console.log('Generating flashcards for content:', contentId, 'with config:', config);
 
+    // Step 1: Analyzing content
+    await updateProgress(supabase, contentId, 'analyzing', 10);
+
     // Fetch content from database
     const { data: content, error: contentError } = await supabase
       .from('content')
@@ -44,6 +80,9 @@ serve(async (req) => {
     if (contentError || !content) {
       throw new Error('Content not found');
     }
+    
+    // Step 2: Extracting data
+    await updateProgress(supabase, contentId, 'extracting', 25);
 
     // Prepare content for AI
     let contentText = content.text_content || '';
@@ -90,6 +129,9 @@ ${config.includeExplanations ? 'Include detailed explanations for each answer.' 
 - Be appropriately challenging for the ${config.difficulty || 'medium'} difficulty level`;
 
     const userPrompt = `Create flashcards from the following content:\n\n${contentText.substring(0, 15000)}`;
+
+    // Step 3: Generating flashcards
+    await updateProgress(supabase, contentId, 'generating', 50);
 
     // Try models in order
     const models = ['gpt-4.1-2025-04-14', 'gpt-5-chat-latest'];
@@ -165,8 +207,12 @@ ${config.includeExplanations ? 'Include detailed explanations for each answer.' 
     }
 
     if (!flashcardsData || !flashcardsData.flashcards) {
+      await updateProgress(supabase, contentId, 'failed', 0, 'failed');
       throw new Error('Failed to generate flashcards with all available models');
     }
+
+    // Step 4: Saving
+    await updateProgress(supabase, contentId, 'saving', 85);
 
     // Store flashcards in database
     const flashcardsToInsert = flashcardsData.flashcards.map((card: any) => ({
@@ -190,8 +236,10 @@ ${config.includeExplanations ? 'Include detailed explanations for each answer.' 
       throw insertError;
     }
 
+    // Update progress to completed
+    await updateProgress(supabase, contentId, 'completed', 100, 'completed');
+
     // Track AI usage
-    const today = new Date().toISOString().split('T')[0];
     await supabase.rpc('check_rate_limit', {
       user_uuid: user.id,
       request_type: 'chat',
