@@ -115,9 +115,9 @@ const HeroContent = () => {
                     <span className="text-nowrap">Start with a file →</span>
                   </SmartCTA>
                 </div>
-                <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/10" onClick={handleFeatureClick}>
+              <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/10" onClick={handleFeatureClick}>
                   <Atom className="size-4 mr-1" />
-                  <span className="text-nowrap">See features</span>
+                  <span className="text-nowrap">See how it works</span>
                 </SmartCTA>
               </div>
               <p className="text-sm text-muted-foreground">Free • No credit card required</p>
