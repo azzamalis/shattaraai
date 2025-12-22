@@ -175,7 +175,7 @@ export const FlashcardListDisplay = ({
                         e.stopPropagation();
                         setShowAllConcepts(true);
                       }}
-                      className="text-muted items-center text-center flex h-6 p-1"
+                      className="text-muted-foreground hover:text-primary text-xs items-center text-center flex h-6 px-2 transition-colors"
                     >
                       Show {remainingConcepts} more
                     </button>
