@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { MoreVertical, Circle, Settings2, RotateCcw, Trash, GalleryVerticalEnd } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { MoreVertical, Circle, Pencil, Trash, GalleryVerticalEnd } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,22 +7,28 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { FlashcardData } from './Flashcard';
 
 interface FlashcardListDisplayProps {
   flashcards: FlashcardData[];
+  title?: string;
   onStartFlashcards: () => void;
-  onEditFlashcards: () => void;
+  onRename: (newTitle: string) => void;
   onDeleteFlashcards: () => void;
 }
 
 export const FlashcardListDisplay = ({
   flashcards,
+  title = 'My Flashcards',
   onStartFlashcards,
-  onEditFlashcards,
+  onRename,
   onDeleteFlashcards,
 }: FlashcardListDisplayProps) => {
   const [showAllConcepts, setShowAllConcepts] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(title);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Extract unique concepts from flashcards
   const concepts = [...new Set(flashcards.map(card => card.concept).filter(Boolean))] as string[];
@@ -39,10 +45,64 @@ export const FlashcardListDisplay = ({
     return 'bg-[#0E8345]';
   };
 
+  // Focus input when editing starts
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  // Reset edit title when title prop changes
+  useEffect(() => {
+    setEditTitle(title);
+  }, [title]);
+
+  const handleStartRename = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditTitle(title);
+    setIsEditing(true);
+  };
+
+  const handleSaveRename = () => {
+    const trimmedTitle = editTitle.trim();
+    if (trimmedTitle && trimmedTitle !== title) {
+      onRename(trimmedTitle);
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancelRename = () => {
+    setEditTitle(title);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveRename();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancelRename();
+    }
+  };
+
   return (
     <div className="text-primary">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-primary">My Flashcards</h3>
+        {isEditing ? (
+          <Input
+            ref={inputRef}
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleCancelRename}
+            className="text-base font-semibold h-8 w-full max-w-[200px]"
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <h3 className="text-base font-semibold text-primary">{title}</h3>
+        )}
       </div>
       
       <div className="flex flex-col mb-4">
@@ -71,34 +131,20 @@ export const FlashcardListDisplay = ({
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditFlashcards();
-                      }}
-                    >
-                      <Settings2 className="w-4 h-4 mr-2" />
-                      Edit Flashcards
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onStartFlashcards();
-                      }}
-                    >
-                      <RotateCcw className="w-4 h-4 mr-2" />
-                      Study Again
+                  <DropdownMenuContent align="end" className="bg-popover border border-border z-50">
+                    <DropdownMenuItem onClick={handleStartRename}>
+                      <Pencil className="w-4 h-4 mr-2" />
+                      Rename
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
                         onDeleteFlashcards();
                       }}
-                      className="text-destructive"
+                      className="text-destructive focus:text-destructive"
                     >
                       <Trash className="w-4 h-4 mr-2" />
-                      Delete Flashcards
+                      Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

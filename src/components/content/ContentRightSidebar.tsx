@@ -66,6 +66,7 @@ export function ContentRightSidebar({
   
   // Data states
   const [flashcards, setFlashcards] = useState<FlashcardData[]>([]);
+  const [flashcardTitle, setFlashcardTitle] = useState('My Flashcards');
   const [quizData, setQuizData] = useState<any>(null);
   const [summaryData, setSummaryData] = useState<{ summary: string; keyPoints: string[] } | null>(null);
   const [summariesList, setSummariesList] = useState<Array<{
@@ -550,10 +551,11 @@ export function ContentRightSidebar({
                       <div className="px-6 pb-6">
                         <FlashcardListDisplay
                           flashcards={flashcards}
+                          title={flashcardTitle}
                           onStartFlashcards={() => setShowFlashcardStudy(true)}
-                          onEditFlashcards={() => {
-                            setShowFlashcardConfig(true);
-                            toast.info('Edit flashcard configuration and regenerate');
+                          onRename={(newTitle) => {
+                            setFlashcardTitle(newTitle);
+                            toast.success('Flashcards renamed');
                           }}
                           onDeleteFlashcards={async () => {
                             try {
@@ -565,6 +567,7 @@ export function ContentRightSidebar({
                               if (error) throw error;
                               
                               setFlashcards([]);
+                              setFlashcardTitle('My Flashcards');
                               toast.success('Flashcards deleted successfully');
                             } catch (error) {
                               console.error('Error deleting flashcards:', error);
