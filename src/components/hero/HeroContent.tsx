@@ -76,8 +76,8 @@ const HeroContent = () => {
             <AnimatedGroup variants={transitionVariants}>
               <HeroActionLink to="/signup" text="Study Smarter, Not Harder" />
   
-              <h1 className="mt-4 max-w-4xl mx-auto text-4xl md:text-5xl lg:mt-6 xl:text-[4.5rem] bg-gradient-to-br from-[#FAFAFA] to-[#FAFAFA]/50 bg-clip-text text-primary">
-                Your personal AI tutor built for how you study
+              <h1 className="mt-4 max-w-4xl mx-auto text-4xl md:text-5xl lg:mt-6 bg-gradient-to-br from-[#FAFAFA] to-[#FAFAFA]/50 bg-clip-text text-primary xl:text-6xl">
+                Your Personal AI Tutor — Built for How You Actually Study
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-balance text-lg text-[#9A9A9A]">Upload PDFs, videos, or lectures — Shattara AI explains, quizzes, and teaches you in your own words.</p>
             </AnimatedGroup>
