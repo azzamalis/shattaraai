@@ -11,7 +11,7 @@ const CTA = () => {
             {' '}you deserve better tools!
           </h2>
           <SmartCTA type="get-started" className="text-lg px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90" size="lg">
-            Try It Now
+            Get Started Free
           </SmartCTA>
         </div>
       </div>
