@@ -79,7 +79,7 @@ const HeroContent = () => {
               <h1 className="mt-4 max-w-4xl mx-auto text-4xl md:text-5xl lg:mt-6 xl:text-[4.5rem] bg-gradient-to-br from-[#FAFAFA] to-[#FAFAFA]/50 bg-clip-text text-primary">
                 Your personal AI tutor built for how you study
               </h1>
-              <p className="mx-auto mt-4 max-w-2xl text-balance text-lg text-[#9A9A9A]">Upload PDFs, videos, or lectures — Shattara AI explains, quizzes, and teaches you in your own words.</p>
+              <p className="mx-auto mt-6 max-w-2xl text-balance text-lg text-[#9A9A9A]">Upload PDFs, videos, or lectures — Shattara AI explains, quizzes, and teaches you in your own words.</p>
             </AnimatedGroup>
 
             <AnimatedGroup variants={{
@@ -108,7 +108,7 @@ const HeroContent = () => {
                 }
               }
             }
-          }} className="mt-6 flex flex-col items-center justify-center gap-2 md:flex-row">
+          }} className="mt-8 flex flex-col items-center justify-center gap-2 md:flex-row">
               <div key={1} className="bg-primary/20 rounded-[14px] border border-primary/30 p-0.5 shadow-[0_0_15px_hsl(var(--primary)/0.3)]">
                 <SmartCTA type="get-started" size="lg" className="rounded-xl px-5 text-base h-11 bg-primary text-primary-foreground hover:bg-primary/90">
                   <Zap className="size-4 mr-1" />
