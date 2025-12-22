@@ -5,29 +5,29 @@ import React from "react";
 
 export function FeaturesSectionWithHoverEffects() {
   const features = [{
-    title: "AI-Generated Notes",
-    description: "Turn any content into comprehensive study notes with our advanced AI technology.",
+    title: "AI-Generated Summaries",
+    description: "Turn lectures, PDFs, and videos into clear, exam-ready notes.",
     icon: <NotebookPen className="w-6 h-6" />
   }, {
     title: "Smart Flashcards",
-    description: "Create effective flashcards that adapt to your learning progress for better retention.",
+    description: "Automatically generate flashcards that adapt to what you forget.",
     icon: <Layers className="w-6 h-6" />
   }, {
-    title: "Open Source Quizzes",
-    description: "Access a growing library of community-created quizzes or create your own to share.",
+    title: "Practice Exams & Quizzes",
+    description: "Simulate real exams with instant grading and explanations.",
     icon: <ListCheck className="w-6 h-6" />
   }, {
-    title: "Exam Preps",
-    description: "Practice with realistic exam scenarios tailored to your specific curriculum and goals.",
-    icon: <BookCheck className="w-6 h-6" />
-  }, {
-    title: "Shattara AI Chat",
-    description: "Get immediate answers and explanations from our specialized learning AI assistant.",
+    title: "AI Study Chat",
+    description: "Ask questions about your content and get answers that make sense.",
     icon: <MessageSquareText className="w-6 h-6" />
   }, {
     title: "Audio & Video Transcripts",
-    description: "Convert lectures and educational content into searchable, annotatable text.",
+    description: "Convert lectures into searchable, structured study material.",
     icon: <FileCode className="w-6 h-6" />
+  }, {
+    title: "Progress & Weakness Tracking",
+    description: "See what you understand — and what needs work.",
+    icon: <BookCheck className="w-6 h-6" />
   }];
 
   return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 relative z-10 py-10 max-w-7xl mx-auto">
