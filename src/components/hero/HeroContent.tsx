@@ -79,7 +79,7 @@ const HeroContent = () => {
               <h1 className="mt-8 max-w-4xl mx-auto text-4xl md:text-5xl lg:mt-16 xl:text-[4.5rem] bg-gradient-to-br from-[#FAFAFA] to-[#FAFAFA]/50 bg-clip-text text-primary my-[66px]">
                 Your personal AI tutor built for how you study
               </h1>
-              <p className="mx-auto mt-8 max-w-2xl text-balance text-lg text-[#9A9A9A]">Your AI tutor that understands PDFs, videos, and lectures— built for the way MENA students actually learn.</p>
+              <p className="mx-auto mt-8 max-w-2xl text-balance text-lg text-[#9A9A9A] my-[12px]">Upload PDFs, videos, or lectures — Shattara AI explains, quizzes, and teaches you in your own words.</p>
             </AnimatedGroup>
 
             <AnimatedGroup variants={{
