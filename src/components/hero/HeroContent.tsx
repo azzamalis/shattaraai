@@ -116,7 +116,6 @@ const HeroContent = () => {
                   </SmartCTA>
                 </div>
               <SmartCTA key={2} variant="outline" size="lg" className="h-11 rounded-xl px-5 border-border text-foreground hover:border-primary hover:bg-primary/10" onClick={handleFeatureClick}>
-                  <Atom className="size-4 mr-1" />
                   <span className="text-nowrap">See how it works</span>
                 </SmartCTA>
               </div>
