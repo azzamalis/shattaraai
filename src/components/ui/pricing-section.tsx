@@ -22,6 +22,7 @@ interface PricingTier {
   highlight?: boolean;
   badge?: string;
   icon: React.ReactNode;
+  cta?: string;
 }
 interface PricingSectionProps {
   tiers: PricingTier[];
@@ -42,19 +43,34 @@ function PricingSection({
   return <section className={cn("relative bg-background text-foreground", "py-20 px-4 md:py-28", "overflow-hidden", className)}>
       <div className="w-full max-w-5xl mx-auto">
         <div className="flex flex-col items-center gap-4 mb-12">
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-foreground">
-            Simple, transparent pricing
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-foreground whitespace-nowrap">
+            Simple, Transparent Pricing
           </h2>
           <div className="inline-flex items-center p-1.5 bg-card rounded-full border border-border shadow-sm">
-            {["Monthly", "Yearly"].map(period => <button key={period} onClick={() => setIsYearly(period === "Yearly")} className={cn("px-8 py-2.5 text-sm font-medium rounded-full transition-all duration-300", period === "Yearly" === isYearly ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:text-foreground")}>
-                {period}
-              </button>)}
+            {[
+              { label: "Monthly", value: false },
+              { label: "Yearly", value: true, badge: "Save 40%" }
+            ].map(period => (
+              <button 
+                key={period.label} 
+                onClick={() => setIsYearly(period.value)} 
+                className={cn(
+                  "px-8 py-2.5 text-sm font-medium rounded-full transition-all duration-300 flex items-center gap-2",
+                  period.value === isYearly ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {period.label}
+                {period.badge && (
+                  <span className={cn(
+                    "text-xs px-2 py-0.5 rounded-full",
+                    period.value === isYearly ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/10 text-primary"
+                  )}>
+                    {period.badge}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
-          {isYearly && <div className="mt-2 inline-flex items-center px-4 py-1.5 bg-[#00A3FF]/10 border border-[#00A3FF]/20 rounded-full">
-              <span className="text-sm font-medium text-[#00A3FF]">
-                Save 40% with annual billing
-              </span>
-            </div>}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -75,14 +91,14 @@ function PricingSection({
 
                 <div className="mb-6">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-foreground ">
-                      ${isYearly ? tier.price.yearly : tier.price.monthly}
+                    <span className="text-4xl font-bold text-foreground">
+                      SAR {isYearly ? tier.price.yearly : tier.price.monthly}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       /{isYearly ? "year" : "month"}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground ">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {tier.description}
                   </p>
                 </div>
@@ -108,12 +124,19 @@ function PricingSection({
                 <Link to="/signup">
                   <Button className={cn("w-full relative transition-all duration-300", tier.highlight ? buttonStyles.highlight : buttonStyles.default)}>
                     <span className="relative z-10 flex items-center justify-center gap-2">
-                      {tier.price.monthly === 0 ? "Get Started" : "Upgrade Now"}
+                      {tier.cta || (tier.price.monthly === 0 ? "Start Free" : "Upgrade to Pro")}
                     </span>
                   </Button>
                 </Link>
               </div>
             </div>)}
+        </div>
+
+        {/* Micro-trust */}
+        <div className="flex justify-center mt-8">
+          <p className="text-sm text-muted-foreground">
+            Cancel anytime • No hidden fees
+          </p>
         </div>
       </div>
     </section>;

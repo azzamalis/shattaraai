@@ -10,7 +10,7 @@ const Pricing = () => {
         monthly: 0,
         yearly: 0,
       },
-      description: "Perfect for students just getting started",
+      description: "Perfect for trying it out",
       icon: (
         <div className="relative">
           <Zap className="w-7 h-7" />
@@ -18,34 +18,30 @@ const Pricing = () => {
       ),
       features: [
         {
-          name: "Up to 3 courses",
-          description: "Create and study with up to 3 active courses",
+          name: "Limited uploads",
+          description: "Upload and process your study materials",
           included: true,
         },
         {
-          name: "Basic Flashcards",
-          description: "Create up to 100 flashcards per course",
+          name: "AI chat access",
+          description: "Get help from your AI study assistant",
           included: true,
         },
         {
-          name: "Limited Quiz Generator",
-          description: "Generate up to 5 quizzes per month",
-          included: true,
-        },
-        {
-          name: "Standard Support",
-          description: "Email support with 48hr response time",
+          name: "Flashcards & quizzes",
+          description: "Create and practice with study tools",
           included: true,
         },
       ],
+      cta: "Start Free",
     },
     {
       name: "Pro",
       price: {
-        monthly: 20,
-        yearly: 144, // $12/month when paid yearly
+        monthly: 75,
+        yearly: 540,
       },
-      description: "Unlimited access to all features",
+      description: "Everything you need to excel",
       highlight: true,
       badge: "Most Popular",
       icon: (
@@ -55,31 +51,27 @@ const Pricing = () => {
       ),
       features: [
         {
-          name: "Unlimited Courses",
-          description: "Create and manage an unlimited number of courses",
+          name: "Unlimited uploads & content",
+          description: "No limits on your study materials",
           included: true,
         },
         {
-          name: "Advanced Flashcards",
-          description: "Unlimited flashcards with spaced repetition",
+          name: "Advanced AI explanations",
+          description: "Deep, detailed answers to your questions",
           included: true,
         },
         {
-          name: "AI Quiz & Exam Simulator",
-          description: "Generate unlimited quizzes and practice exams",
+          name: "Unlimited quizzes & exams",
+          description: "Practice as much as you need",
           included: true,
         },
         {
-          name: "Priority Support",
-          description: "24/7 priority email and chat support",
-          included: true,
-        },
-        {
-          name: "Advanced Analytics",
-          description: "Track your progress and identify weak areas",
+          name: "Priority processing",
+          description: "Faster uploads and AI responses",
           included: true,
         },
       ],
+      cta: "Upgrade to Pro",
     },
   ];
 
