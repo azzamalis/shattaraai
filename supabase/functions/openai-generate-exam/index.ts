@@ -685,72 +685,91 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
     
     console.log(`Successfully generated exam with ${examData.questions?.length || 0} questions`);
 
-    // Store exam in database
-    try {
-      console.log('Storing exam in database...');
-      
-      // Create the exam record
-      const { data: examRecord, error: examError } = await supabase
-        .from('exams')
-        .insert({
-          title: examData.examTitle || 'Generated Exam',
-          description: examData.instructions || 'AI-generated exam',
-          user_id: user.id,
-          room_id: roomId,
-          total_questions: examData.questions?.length || 0,
-          time_limit_minutes: examConfig.timeLimit || null,
-          content_metadata: {
-            contentIds: roomContent.map(c => c.id),
-            generatedAt: new Date().toISOString(),
-            model: modelUsed,
-            config: examConfig
-          }
-        })
-        .select()
-        .single();
-
-      if (examError) {
-        console.error('Error creating exam record:', examError);
-        throw examError;
-      }
-
-      console.log('Created exam record:', examRecord.id);
-
-      // Store exam questions
-      const questionsToInsert = examData.questions?.map((question: any, index: number) => ({
-        exam_id: examRecord.id,
-        question_text: question.question,
-        question_type: question.type === 'mcq' ? 'multiple_choice' : 'open_ended',
-        options: question.type === 'mcq' ? question.options?.map((opt: any) => opt.text) : null,
-        correct_answer: question.type === 'mcq' 
-          ? question.options?.find((opt: any) => opt.isCorrect)?.text 
-          : question.sampleAnswer,
-        points: question.points || 1,
-        order_index: index,
-        reference_source: question.sourceContent || null,
-        reference_time: question.timeEstimate ? `${question.timeEstimate} min` : null
-      })) || [];
-
-      if (questionsToInsert.length > 0) {
-        const { error: questionsError } = await supabase
-          .from('exam_questions')
-          .insert(questionsToInsert);
-
-        if (questionsError) {
-          console.error('Error creating exam questions:', questionsError);
-          throw questionsError;
+    // Store exam in database - this is critical for the exam flow
+    console.log('Storing exam in database...');
+    
+    // Create the exam record
+    const { data: examRecord, error: examError } = await supabase
+      .from('exams')
+      .insert({
+        title: examData.examTitle || 'Generated Exam',
+        description: examData.instructions || 'AI-generated exam',
+        user_id: user.id,
+        room_id: roomId,
+        total_questions: examData.questions?.length || 0,
+        time_limit_minutes: examConfig.examLength || null,
+        content_metadata: {
+          contentIds: roomContent.map(c => c.id),
+          generatedAt: new Date().toISOString(),
+          model: modelUsed,
+          config: examConfig
         }
+      })
+      .select()
+      .single();
 
-        console.log(`Created ${questionsToInsert.length} exam questions`);
+    if (examError) {
+      console.error('Error creating exam record:', examError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Failed to save exam to database: ${examError.message}`,
+          details: examError
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log('Created exam record:', examRecord.id);
+
+    // Store exam questions - use correct enum value 'free_text' instead of 'open_ended'
+    const questionsToInsert = examData.questions?.map((question: any, index: number) => ({
+      exam_id: examRecord.id,
+      question_text: question.question,
+      question_type: question.type === 'mcq' ? 'multiple_choice' : 'free_text',
+      options: question.type === 'mcq' ? question.options : null,
+      correct_answer: question.type === 'mcq' 
+        ? question.options?.find((opt: any) => opt.isCorrect)?.text || ''
+        : question.sampleAnswer || '',
+      explanation: question.rubric ? question.rubric.join('\n') : null,
+      points: question.points || 1,
+      order_index: index,
+      reference_source: question.sourceContent || null,
+      reference_time: question.timeEstimate ? `${question.timeEstimate} min` : null
+    })) || [];
+
+    if (questionsToInsert.length > 0) {
+      const { error: questionsError } = await supabase
+        .from('exam_questions')
+        .insert(questionsToInsert);
+
+      if (questionsError) {
+        console.error('Error creating exam questions:', questionsError);
+        // Clean up the exam record if questions failed to insert
+        await supabase.from('exams').delete().eq('id', examRecord.id);
+        
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: `Failed to save exam questions: ${questionsError.message}`,
+            details: questionsError
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
       }
 
-      // Add exam ID to the response
-      examData.examId = examRecord.id;
-      
-    } catch (dbError) {
-      console.error('Database storage error:', dbError);
-      // Don't fail the request if database storage fails, but log it
+      console.log(`Created ${questionsToInsert.length} exam questions`);
     }
+
+    // Add exam ID to the response - this is critical for the client
+    examData.examId = examRecord.id;
+    console.log('Exam successfully stored with ID:', examRecord.id);
 
     // Cache the exam for future requests
     try {
