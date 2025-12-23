@@ -685,36 +685,69 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
     
     console.log(`Successfully generated exam with ${examData.questions?.length || 0} questions`);
 
-    // Store exam in database - this is critical for the exam flow
+    // Store exam in database with retry logic - this is critical for the exam flow
     console.log('Storing exam in database...');
     
-    // Create the exam record
-    const { data: examRecord, error: examError } = await supabase
-      .from('exams')
-      .insert({
-        title: examData.examTitle || 'Generated Exam',
-        description: examData.instructions || 'AI-generated exam',
-        user_id: user.id,
-        room_id: roomId,
-        total_questions: examData.questions?.length || 0,
-        time_limit_minutes: examConfig.examLength || null,
-        content_metadata: {
-          contentIds: roomContent.map(c => c.id),
-          generatedAt: new Date().toISOString(),
-          model: modelUsed,
-          config: examConfig
-        }
-      })
-      .select()
-      .single();
+    const MAX_DB_RETRIES = 3;
+    let examRecord = null;
+    let dbError = null;
+    
+    // Retry logic for exam record creation
+    for (let attempt = 1; attempt <= MAX_DB_RETRIES; attempt++) {
+      console.log(`Database save attempt ${attempt}/${MAX_DB_RETRIES}`);
+      
+      const { data: record, error: insertError } = await supabase
+        .from('exams')
+        .insert({
+          title: examData.examTitle || 'Generated Exam',
+          description: examData.instructions || 'AI-generated exam',
+          user_id: user.id,
+          room_id: roomId,
+          total_questions: examData.questions?.length || 0,
+          time_limit_minutes: examConfig.examLength || null,
+          content_metadata: {
+            contentIds: roomContent.map(c => c.id),
+            generatedAt: new Date().toISOString(),
+            model: modelUsed,
+            config: examConfig
+          }
+        })
+        .select()
+        .single();
 
-    if (examError) {
-      console.error('Error creating exam record:', examError);
+      if (!insertError && record) {
+        examRecord = record;
+        console.log(`Successfully created exam record on attempt ${attempt}:`, record.id);
+        break;
+      }
+      
+      dbError = insertError;
+      console.error(`Attempt ${attempt} failed:`, insertError?.message, insertError?.code, insertError?.details);
+      
+      if (attempt < MAX_DB_RETRIES) {
+        // Wait before retrying (exponential backoff: 500ms, 1000ms, 2000ms)
+        const waitTime = 500 * Math.pow(2, attempt - 1);
+        console.log(`Waiting ${waitTime}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+    }
+
+    if (!examRecord) {
+      console.error('All database save attempts failed:', dbError);
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Failed to save exam to database: ${examError.message}`,
-          details: examError
+          error: `Failed to save exam after ${MAX_DB_RETRIES} attempts: ${dbError?.message || 'Unknown database error'}`,
+          errorCode: 'DB_SAVE_FAILED',
+          errorDetails: {
+            code: dbError?.code,
+            message: dbError?.message,
+            details: dbError?.details,
+            hint: dbError?.hint
+          },
+          // Still return the exam data so the client can retry or use it
+          examData: examData,
+          retryable: true
         }),
         { 
           status: 500, 
@@ -725,7 +758,7 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
 
     console.log('Created exam record:', examRecord.id);
 
-    // Store exam questions - use correct enum value 'free_text' instead of 'open_ended'
+    // Store exam questions with retry logic
     const questionsToInsert = examData.questions?.map((question: any, index: number) => ({
       exam_id: examRecord.id,
       question_text: question.question,
@@ -742,20 +775,48 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
     })) || [];
 
     if (questionsToInsert.length > 0) {
-      const { error: questionsError } = await supabase
-        .from('exam_questions')
-        .insert(questionsToInsert);
+      let questionsError = null;
+      
+      for (let attempt = 1; attempt <= MAX_DB_RETRIES; attempt++) {
+        console.log(`Questions save attempt ${attempt}/${MAX_DB_RETRIES}`);
+        
+        const { error: insertQuestionsError } = await supabase
+          .from('exam_questions')
+          .insert(questionsToInsert);
+
+        if (!insertQuestionsError) {
+          console.log(`Successfully created ${questionsToInsert.length} exam questions on attempt ${attempt}`);
+          questionsError = null;
+          break;
+        }
+        
+        questionsError = insertQuestionsError;
+        console.error(`Questions attempt ${attempt} failed:`, insertQuestionsError?.message);
+        
+        if (attempt < MAX_DB_RETRIES) {
+          const waitTime = 500 * Math.pow(2, attempt - 1);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
 
       if (questionsError) {
-        console.error('Error creating exam questions:', questionsError);
+        console.error('All question save attempts failed:', questionsError);
         // Clean up the exam record if questions failed to insert
+        console.log('Cleaning up exam record due to question save failure...');
         await supabase.from('exams').delete().eq('id', examRecord.id);
         
         return new Response(
           JSON.stringify({ 
             success: false, 
-            error: `Failed to save exam questions: ${questionsError.message}`,
-            details: questionsError
+            error: `Failed to save exam questions after ${MAX_DB_RETRIES} attempts: ${questionsError.message}`,
+            errorCode: 'QUESTIONS_SAVE_FAILED',
+            errorDetails: {
+              code: questionsError?.code,
+              message: questionsError?.message,
+              details: questionsError?.details
+            },
+            examData: examData,
+            retryable: true
           }),
           { 
             status: 500, 
@@ -763,8 +824,6 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
           }
         );
       }
-
-      console.log(`Created ${questionsToInsert.length} exam questions`);
     }
 
     // Add exam ID to the response - this is critical for the client
@@ -828,10 +887,25 @@ Generate an intelligent, comprehensive exam that thoroughly assesses student und
   } catch (error) {
     console.error('Unexpected error in openai-generate-exam:', error);
     
+    // Determine error type for better client handling
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const isNetworkError = errorMessage.includes('fetch') || errorMessage.includes('network');
+    const isTimeoutError = errorMessage.includes('timeout') || errorMessage.includes('TIMEOUT');
+    
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: 'Internal server error'
+        error: isTimeoutError 
+          ? 'Request timed out. The content may be too large.' 
+          : isNetworkError 
+            ? 'Network error occurred. Please check your connection.'
+            : 'An unexpected error occurred during exam generation.',
+        errorCode: isTimeoutError ? 'TIMEOUT' : isNetworkError ? 'NETWORK_ERROR' : 'INTERNAL_ERROR',
+        errorDetails: {
+          message: errorMessage,
+          timestamp: new Date().toISOString()
+        },
+        retryable: true
       }),
       { 
         status: 500, 
