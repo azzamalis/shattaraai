@@ -11,25 +11,25 @@ function AITutorAnimation() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setScale((prev) => (prev === 1 ? 1.2 : 1));
+      setScale((prev) => (prev === 1 ? 1.15 : 1));
     }, 1500);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center">
+    <div className="flex items-center justify-center h-full">
       <motion.div
         animate={{ scale }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
         className="relative"
       >
-        <div className="text-6xl font-bold text-primary">
-          <Brain className="w-16 h-16" />
+        <div className="text-primary/80">
+          <Brain className="w-20 h-20 lg:w-24 lg:h-24" strokeWidth={1.5} />
         </div>
         <motion.div
-          animate={{ opacity: [0.3, 1, 0.3] }}
+          animate={{ opacity: [0.4, 1, 0.4] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="absolute -top-2 -right-2 w-4 h-4 bg-primary rounded-full"
+          className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"
         />
       </motion.div>
     </div>
@@ -40,19 +40,14 @@ function AITutorAnimation() {
 function SummariesAnimation() {
   const layouts = [
     [
-      { w: "100%", h: "20%" },
-      { w: "100%", h: "35%" },
-      { w: "100%", h: "35%" },
+      { w: "100%", h: "28%" },
+      { w: "100%", h: "28%" },
+      { w: "100%", h: "28%" },
     ],
     [
       { w: "48%", h: "45%" },
       { w: "48%", h: "45%" },
       { w: "100%", h: "45%" },
-    ],
-    [
-      { w: "100%", h: "30%" },
-      { w: "65%", h: "30%" },
-      { w: "30%", h: "30%" },
     ],
   ];
 
@@ -61,12 +56,12 @@ function SummariesAnimation() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentLayout((prev) => (prev + 1) % layouts.length);
-    }, 2000);
+    }, 2500);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="absolute inset-4 flex flex-wrap gap-2 content-start">
+    <div className="flex flex-wrap gap-2 content-start h-full p-1">
       {layouts[currentLayout].map((item, i) => (
         <motion.div
           key={i}
@@ -74,7 +69,7 @@ function SummariesAnimation() {
           initial={false}
           animate={{ width: item.w, height: item.h }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="bg-primary/20 rounded-lg border border-primary/30"
+          className="bg-primary/20 rounded-md border border-primary/30"
         />
       ))}
     </div>
@@ -84,25 +79,25 @@ function SummariesAnimation() {
 // Global Network Animation - Bilingual reach
 function GlobalNetworkAnimation() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center">
+    <div className="flex items-center justify-center h-full">
       <div className="relative">
         <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 3, repeat: Infinity }}
           className="absolute inset-0 bg-primary/20 rounded-full blur-xl"
-          style={{ width: 120, height: 120, margin: -20 }}
+          style={{ width: 100, height: 100, margin: -10 }}
         />
-        <Globe className="w-20 h-20 text-primary" />
+        <Globe className="w-20 h-20 lg:w-24 lg:h-24 text-primary/80" strokeWidth={1.5} />
         
         {/* Orbiting dots representing languages */}
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
           className="absolute inset-0"
-          style={{ width: 120, height: 120, margin: -20 }}
+          style={{ width: 100, height: 100, margin: -10 }}
         >
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-primary rounded-full" />
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-accent rounded-full" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-primary rounded-full" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-primary/60 rounded-full" />
         </motion.div>
       </div>
     </div>
@@ -114,34 +109,35 @@ function SpeedAnimation() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const runAnimation = () => {
       setProgress(0);
-      const animate = () => {
-        setProgress((prev) => {
-          if (prev >= 100) return 100;
-          return prev + 5;
-        });
-      };
-      const animInterval = setInterval(animate, 30);
-      setTimeout(() => clearInterval(animInterval), 700);
-    }, 2500);
+      let current = 0;
+      const animInterval = setInterval(() => {
+        current += 8;
+        if (current >= 100) {
+          setProgress(100);
+          clearInterval(animInterval);
+        } else {
+          setProgress(current);
+        }
+      }, 40);
+    };
 
+    runAnimation();
+    const interval = setInterval(runAnimation, 3000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="absolute inset-4 flex flex-col items-center justify-center gap-3">
-      <Zap className="w-10 h-10 text-primary" />
-      <div className="w-full max-w-[120px] h-2 bg-muted rounded-full overflow-hidden">
+    <div className="flex flex-col items-center justify-center h-full gap-3">
+      <Zap className="w-10 h-10 text-primary/80" strokeWidth={1.5} />
+      <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
         <motion.div
           className="h-full bg-primary rounded-full"
           animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.1 }}
+          transition={{ duration: 0.08 }}
         />
       </div>
-      <span className="text-xs text-muted-foreground font-mono">
-        {progress < 100 ? "Processing..." : "Done!"}
-      </span>
     </div>
   );
 }
@@ -153,27 +149,27 @@ function SecurityAnimation() {
   useEffect(() => {
     const interval = setInterval(() => {
       setIsLocked((prev) => !prev);
-    }, 2000);
+    }, 2500);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center">
+    <div className="flex items-center justify-center h-full">
       <motion.div
-        animate={{ scale: isLocked ? 1 : 1.1 }}
+        animate={{ scale: isLocked ? 1 : 1.08 }}
         transition={{ duration: 0.3 }}
         className="relative"
       >
-        <Lock className="w-12 h-12 text-primary" />
+        <Lock className="w-12 h-12 text-primary/80" strokeWidth={1.5} />
         <AnimatePresence>
           {isLocked && (
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center"
+              className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-500 rounded-full flex items-center justify-center"
             >
-              <span className="text-[8px] text-white">✓</span>
+              <span className="text-[8px] text-white font-bold">✓</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -185,62 +181,75 @@ function SecurityAnimation() {
 // Mobile Animation - Study anywhere
 function MobileAnimation() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center gap-4">
+    <div className="flex items-center justify-center h-full gap-3">
       <motion.div
-        animate={{ y: [0, -5, 0] }}
+        animate={{ y: [0, -4, 0] }}
         transition={{ duration: 2, repeat: Infinity, delay: 0 }}
       >
-        <div className="w-8 h-12 bg-card border-2 border-primary/50 rounded-lg flex items-center justify-center">
-          <Smartphone className="w-4 h-4 text-primary" />
+        <div className="w-7 h-11 bg-background border-2 border-primary/40 rounded-lg flex items-center justify-center">
+          <Smartphone className="w-3.5 h-3.5 text-primary/70" />
         </div>
       </motion.div>
       <motion.div
-        animate={{ y: [0, -5, 0] }}
-        transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+        animate={{ y: [0, -4, 0] }}
+        transition={{ duration: 2, repeat: Infinity, delay: 0.25 }}
       >
-        <div className="w-12 h-10 bg-card border-2 border-primary/50 rounded-lg flex items-center justify-center">
-          <BookOpen className="w-5 h-5 text-primary" />
+        <div className="w-10 h-8 bg-background border-2 border-primary/40 rounded-lg flex items-center justify-center">
+          <BookOpen className="w-4 h-4 text-primary/70" />
         </div>
       </motion.div>
       <motion.div
-        animate={{ y: [0, -5, 0] }}
-        transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
+        animate={{ y: [0, -4, 0] }}
+        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
       >
-        <div className="w-16 h-10 bg-card border-2 border-primary/50 rounded-lg flex items-center justify-center">
-          <span className="text-xs text-primary font-medium">Desktop</span>
+        <div className="w-14 h-9 bg-background border-2 border-primary/40 rounded-lg flex items-center justify-center">
+          <span className="text-[10px] text-primary/70 font-medium">Desktop</span>
         </div>
       </motion.div>
     </div>
   );
 }
 
-// Bento Card Component
+// Bento Card Component - Clean separation between animation and text
 interface BentoCardProps {
   title: string;
   description: string;
   className?: string;
+  animationHeight?: string;
   children: React.ReactNode;
   icon?: React.ReactNode;
 }
 
-function BentoCard({ title, description, className = "", children, icon }: BentoCardProps) {
+function BentoCard({ 
+  title, 
+  description, 
+  className = "", 
+  animationHeight = "h-32",
+  children, 
+  icon 
+}: BentoCardProps) {
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ scale: 1.02, y: -2 }}
       transition={{ duration: 0.2 }}
-      className={`relative overflow-hidden rounded-2xl bg-card border border-border hover:border-primary/50 transition-colors ${className}`}
+      className={`relative overflow-hidden rounded-2xl bg-card border border-border hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all ${className}`}
     >
-      <div className="absolute inset-0 opacity-50">
-        {children}
-      </div>
-      <div className="relative z-10 p-6 h-full flex flex-col justify-end">
-        <h3 className="font-jakarta text-xl text-foreground font-semibold flex items-center gap-2">
-          {icon}
-          {title}
-        </h3>
-        <p className="text-muted-foreground text-sm mt-2">
-          {description}
-        </p>
+      <div className="h-full flex flex-col">
+        {/* Animation Area - Fixed height, centered content */}
+        <div className={`${animationHeight} flex-shrink-0 p-4`}>
+          {children}
+        </div>
+        
+        {/* Text Content Area - Bottom aligned */}
+        <div className="p-5 pt-2 mt-auto">
+          <h3 className="font-jakarta text-lg text-foreground font-semibold flex items-center gap-2">
+            {icon}
+            {title}
+          </h3>
+          <p className="text-muted-foreground text-sm mt-1.5 leading-relaxed">
+            {description}
+          </p>
+        </div>
       </div>
     </motion.div>
   );
@@ -248,7 +257,7 @@ function BentoCard({ title, description, className = "", children, icon }: Bento
 
 export function BentoFeatures() {
   return (
-    <section className="py-20 md:py-24 lg:py-32 bg-background relative">
+    <section id="features" className="py-20 md:py-24 lg:py-32 bg-background relative">
       <div className="container mx-auto px-4 md:px-6">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
@@ -261,60 +270,70 @@ export function BentoFeatures() {
         </div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 max-w-6xl mx-auto">
-          {/* AI Tutor - Tall card spanning 2 columns and 2 rows */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+          {/* Row 1: AI Tutor, Smart Summaries + Instant Understanding, Arabic & English */}
+          
+          {/* AI Tutor - Tall card */}
           <BentoCard
             title="AI Tutor"
             description="Chat with an AI tutor that understands your material and explains it your way."
-            className="md:col-span-1 lg:col-span-2 lg:row-span-2 min-h-[280px] lg:min-h-[400px]"
+            className="lg:row-span-2"
+            animationHeight="h-40 lg:h-64"
             icon={<Brain className="w-5 h-5 text-primary" />}
           >
             <AITutorAnimation />
           </BentoCard>
 
-          {/* Smart Summaries - Standard card */}
-          <BentoCard
-            title="Smart Summaries"
-            description="Turn PDFs, videos, and notes into clear, structured summaries instantly."
-            className="md:col-span-1 lg:col-span-2 min-h-[180px]"
-          >
-            <SummariesAnimation />
-          </BentoCard>
+          {/* Middle column - stacked */}
+          <div className="flex flex-col gap-4">
+            {/* Smart Summaries */}
+            <BentoCard
+              title="Smart Summaries"
+              description="Turn PDFs, videos, and notes into clear, structured summaries instantly."
+              animationHeight="h-24"
+            >
+              <SummariesAnimation />
+            </BentoCard>
+
+            {/* Instant Understanding */}
+            <BentoCard
+              title="Instant Understanding"
+              description="Get explanations, flashcards, and quizzes in seconds."
+              animationHeight="h-20"
+              icon={<Zap className="w-5 h-5 text-primary" />}
+            >
+              <SpeedAnimation />
+            </BentoCard>
+          </div>
 
           {/* Arabic & English - Tall card */}
           <BentoCard
             title="Arabic & English"
             description="Built for Saudi students, fully bilingual and culturally aware."
-            className="md:col-span-1 lg:col-span-2 lg:row-span-2 min-h-[280px] lg:min-h-[400px]"
+            className="lg:row-span-2"
+            animationHeight="h-40 lg:h-64"
             icon={<Globe className="w-5 h-5 text-primary" />}
           >
             <GlobalNetworkAnimation />
           </BentoCard>
 
-          {/* Instant Understanding - Standard card */}
-          <BentoCard
-            title="Instant Understanding"
-            description="Get explanations, flashcards, and quizzes in seconds."
-            className="md:col-span-1 lg:col-span-2 min-h-[180px]"
-          >
-            <SpeedAnimation />
-          </BentoCard>
-
-          {/* Private Study Space - Wide card */}
+          {/* Row 2: Private Study Space, Study Anywhere (spans middle) */}
+          
+          {/* Private Study Space */}
           <BentoCard
             title="Private Study Space"
             description="Your files, recordings, and progress stay private and secure."
-            className="md:col-span-2 lg:col-span-3 min-h-[160px]"
+            animationHeight="h-20"
             icon={<Lock className="w-5 h-5 text-primary" />}
           >
             <SecurityAnimation />
           </BentoCard>
 
-          {/* Study Anywhere - Wide card */}
+          {/* Study Anywhere */}
           <BentoCard
             title="Study Anywhere"
             description="Learn on desktop, tablet, or phone — anytime you need."
-            className="md:col-span-2 lg:col-span-3 min-h-[160px]"
+            animationHeight="h-20"
             icon={<Smartphone className="w-5 h-5 text-primary" />}
           >
             <MobileAnimation />
