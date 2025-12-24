@@ -20,10 +20,14 @@ interface ExamData {
 interface ChapterBreakdownProps {
   chapters: ChapterData[];
   examData: ExamData;
+  contentTitle?: string;
 }
 
-export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) {
+export function ChapterBreakdown({ chapters, examData, contentTitle }: ChapterBreakdownProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+
+  // Use content title or fallback
+  const displayTitle = contentTitle || 'Content Overview';
 
   return (
     <div className="mb-8 flex flex-col gap-6 rounded-2xl border border-border p-6 pb-2 dark:bg-neutral-950/20 md:max-w-[900px] md:mx-auto">
@@ -41,7 +45,7 @@ export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) 
                   isExpanded && "rotate-180"
                 )} />
                 <span className="text-base truncate max-w-[130px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[400px]">
-                  Social-NCERT-Chapter-1
+                  {displayTitle}
                 </span>
               </h3>
               <div className="flex items-center gap-4">
@@ -57,22 +61,22 @@ export function ChapterBreakdown({ chapters, examData }: ChapterBreakdownProps) 
           </h3>
 
           {/* Expanded Content */}
-          {isExpanded && (
+          {isExpanded && chapters.length > 0 && (
             <div className="flex flex-col overflow-hidden text-sm sm:pl-3 animate-in fade-in duration-300 gap-4 space-y-1">
               <div className="flex flex-col gap-4 pb-4 pl-3">
                 {chapters.map((chapter, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-foreground">
-                      <span className="overflow-hidden text-ellipsis">{chapter.title}</span>
+                      <span className="overflow-hidden text-ellipsis line-clamp-1 max-w-[200px] sm:max-w-[350px]">{chapter.title}</span>
                       <span className="text-foreground">•</span>
-                      <span className="text-muted-foreground/80">{chapter.timeRange}</span>
+                      <span className="text-muted-foreground/80 whitespace-nowrap">{chapter.timeRange}</span>
                     </div>
                     <div className="flex items-center gap-4 text-muted-foreground">
                       <button className="flex h-6 w-auto items-center justify-center rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-3 py-1 text-xs text-yellow-500 hover:bg-yellow-500/20 gap-1.5">
                         Review
                         <ArrowUpRight className="h-3 w-3 text-yellow-500 flex-shrink-0" />
                       </button>
-                      <span className="font-medium text-muted-foreground">
+                      <span className="font-medium text-muted-foreground whitespace-nowrap">
                         {chapter.correct}/{chapter.total}
                       </span>
                     </div>

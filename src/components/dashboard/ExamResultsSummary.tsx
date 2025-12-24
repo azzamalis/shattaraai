@@ -5,12 +5,14 @@ import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { CircularProgress } from './exam-results/CircularProgress';
 import { ChapterBreakdown } from './exam-results/ChapterBreakdown';
 import { supabase } from '@/integrations/supabase/client';
+
 interface ChapterData {
   title: string;
   timeRange: string;
   correct: number;
   total: number;
 }
+
 interface ExamData {
   score: number;
   skipped: number;
@@ -18,6 +20,7 @@ interface ExamData {
   totalQuestions: number;
   correctAnswers: number;
 }
+
 interface ExamAttemptData {
   id: string;
   total_score: number;
@@ -25,101 +28,98 @@ interface ExamAttemptData {
   skipped_questions: number;
   time_taken_minutes: number;
   status: string;
+  exam_id: string | null;
   exams: {
     title: string;
     total_questions: number;
-  };
+    content_metadata: Record<string, unknown> | null;
+  } | null;
 }
+
+interface ContentData {
+  id: string;
+  title: string;
+  chapters: {
+    id: string;
+    title: string;
+    startTime: number;
+    endTime: number;
+  }[] | null;
+}
+
 export function ExamResultsSummary() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [examData, setExamData] = useState<ExamData | null>(null);
   const [examAttempt, setExamAttempt] = useState<ExamAttemptData | null>(null);
+  const [chapterBreakdown, setChapterBreakdown] = useState<ChapterData[]>([]);
+  const [contentTitle, setContentTitle] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const {
-    contentId
-  } = useParams<{
-    contentId: string;
-  }>();
+  const { contentId } = useParams<{ contentId: string }>();
 
-  // Get the room ID from localStorage or state management
   const roomId = localStorage.getItem('currentRoomId') || '';
+
   useEffect(() => {
     const fetchExamResults = async () => {
       try {
         setLoading(true);
 
-        // First try to get the exam attempt ID from localStorage
         const storedAttemptId = localStorage.getItem('currentExamAttemptId');
-        console.log('DEBUG: Stored attempt ID:', storedAttemptId);
-        console.log('DEBUG: Content ID from URL:', contentId);
         if (!storedAttemptId && !contentId) {
           console.error('No exam attempt ID found');
           return;
         }
         const attemptId = storedAttemptId || contentId;
-        console.log('DEBUG: Using attempt ID:', attemptId);
 
         // Fetch exam attempt data with exam details
-        console.log('DEBUG: Querying exam_attempts table...');
-        const {
-          data: attemptData,
-          error
-        } = await supabase.from('exam_attempts').select(`
+        const { data: attemptData, error } = await supabase
+          .from('exam_attempts')
+          .select(`
             *,
             exams (
               title,
-              total_questions
+              total_questions,
+              content_metadata
             )
-          `).eq('id', attemptId).maybeSingle();
-        console.log('DEBUG: Query result:', {
-          attemptData,
-          error
-        });
+          `)
+          .eq('id', attemptId)
+          .maybeSingle();
+
         if (error) {
           console.error('Error fetching exam attempt:', error);
-          // Let's also try to fetch by exam_id if the attempt ID doesn't work
-          console.log('DEBUG: Trying to fetch by exam_id...');
-          const {
-            data: examData
-          } = await supabase.from('exams').select('id').eq('id', attemptId).maybeSingle();
-          if (examData) {
-            console.log('DEBUG: Found exam, now looking for attempts...');
-            const {
-              data: attempts
-            } = await supabase.from('exam_attempts').select('*').eq('exam_id', examData.id).order('created_at', {
-              ascending: false
-            }).limit(1);
-            console.log('DEBUG: Found attempts:', attempts);
-          }
           return;
         }
-        console.log('DEBUG: Attempt data found:', attemptData);
+
         if (attemptData) {
-          setExamAttempt(attemptData);
+          setExamAttempt(attemptData as unknown as ExamAttemptData);
 
           // Calculate percentage score
-          const percentage = attemptData.max_score > 0 ? attemptData.total_score / attemptData.max_score * 100 : 0;
+          const percentage = attemptData.max_score > 0 
+            ? (attemptData.total_score / attemptData.max_score) * 100 
+            : 0;
 
           // Format time taken
           const formatTime = (minutes: number) => {
             const hours = Math.floor(minutes / 60);
             const mins = Math.floor(minutes % 60);
-            const secs = Math.floor(minutes % 1 * 60);
+            const secs = Math.floor((minutes % 1) * 60);
             if (hours > 0) {
               return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
             return `${mins}:${secs.toString().padStart(2, '0')}`;
           };
+
           const processedExamData: ExamData = {
             score: Math.round(percentage * 10) / 10,
-            // Round to 1 decimal place
             skipped: attemptData.skipped_questions || 0,
             timeTaken: formatTime(attemptData.time_taken_minutes || 0),
             totalQuestions: attemptData.exams?.total_questions || attemptData.max_score || 0,
-            correctAnswers: attemptData.total_score || 0
+            correctAnswers: attemptData.total_score || 0,
           };
           setExamData(processedExamData);
+
+          // Fetch chapter breakdown data
+          await fetchChapterBreakdown(attemptId, attemptData as unknown as ExamAttemptData);
         }
       } catch (error) {
         console.error('Error processing exam results:', error);
@@ -127,6 +127,136 @@ export function ExamResultsSummary() {
         setLoading(false);
       }
     };
+
+    const fetchChapterBreakdown = async (attemptId: string, attemptData: ExamAttemptData) => {
+      try {
+        // Fetch exam answers with question details
+        const { data: answersData, error: answersError } = await supabase
+          .from('exam_answers')
+          .select(`
+            id,
+            is_correct,
+            question_id,
+            exam_questions (
+              id,
+              reference_source,
+              reference_time
+            )
+          `)
+          .eq('exam_attempt_id', attemptId);
+
+        if (answersError) {
+          console.error('Error fetching exam answers:', answersError);
+          return;
+        }
+
+        // Get content IDs from exam metadata
+        const contentMetadata = attemptData.exams?.content_metadata as { contentIds?: string[]; config?: { selectedTopics?: string[] } } | null;
+        const contentIds = contentMetadata?.contentIds || [];
+        const selectedTopics = contentMetadata?.config?.selectedTopics || [];
+
+        // Fetch content data for chapters
+        let contentData: ContentData[] = [];
+        if (contentIds.length > 0) {
+          const { data: contents, error: contentError } = await supabase
+            .from('content')
+            .select('id, title, chapters')
+            .in('id', contentIds);
+
+          if (!contentError && contents) {
+            contentData = contents as ContentData[];
+          }
+        }
+
+        // Set content title from first content or selected topics
+        if (contentData.length > 0) {
+          setContentTitle(contentData[0].title);
+        } else if (selectedTopics.length > 0) {
+          setContentTitle(selectedTopics[0]);
+        }
+
+        // Group answers by reference_source to create chapter breakdown
+        const chapterMap = new Map<string, { correct: number; total: number; timeRange: string }>();
+
+        if (answersData) {
+          answersData.forEach((answer: any) => {
+            const question = answer.exam_questions;
+            if (!question) return;
+
+            const source = question.reference_source || 'General Questions';
+            const time = question.reference_time || '';
+
+            if (!chapterMap.has(source)) {
+              chapterMap.set(source, { correct: 0, total: 0, timeRange: time });
+            }
+
+            const chapter = chapterMap.get(source)!;
+            chapter.total += 1;
+            if (answer.is_correct) {
+              chapter.correct += 1;
+            }
+          });
+        }
+
+        // If we have content chapters, try to match them
+        const allChapters = contentData.flatMap(c => c.chapters || []);
+        
+        // Convert map to array for ChapterBreakdown
+        const breakdown: ChapterData[] = [];
+        
+        if (chapterMap.size > 0) {
+          chapterMap.forEach((stats, source) => {
+            // Try to find matching content chapter for page range
+            const matchingChapter = allChapters.find(ch => 
+              source.toLowerCase().includes(ch.title.toLowerCase()) ||
+              ch.title.toLowerCase().includes(source.toLowerCase().split(' ').slice(0, 3).join(' '))
+            );
+
+            let timeRange = stats.timeRange;
+            if (matchingChapter) {
+              // Convert times to page numbers (approximate)
+              const startPage = Math.floor(matchingChapter.startTime / 60) + 1;
+              const endPage = Math.floor(matchingChapter.endTime / 60) + 1;
+              timeRange = `Page ${startPage} - ${endPage}`;
+            } else if (timeRange && !timeRange.includes('Page')) {
+              // Format time reference as page if it's just a number
+              const timeNum = parseInt(timeRange.replace(/\D/g, ''));
+              if (!isNaN(timeNum)) {
+                timeRange = `Page ${timeNum}`;
+              }
+            }
+
+            breakdown.push({
+              title: source,
+              timeRange: timeRange || 'N/A',
+              correct: stats.correct,
+              total: stats.total,
+            });
+          });
+        } else if (allChapters.length > 0) {
+          // Fallback: distribute questions across chapters if no reference_source
+          const totalQuestions = attemptData.max_score || 0;
+          const questionsPerChapter = Math.ceil(totalQuestions / allChapters.length);
+          
+          allChapters.forEach((chapter, index) => {
+            const startPage = Math.floor(chapter.startTime / 60) + 1;
+            const endPage = Math.floor(chapter.endTime / 60) + 1;
+            
+            breakdown.push({
+              title: chapter.title,
+              timeRange: `Page ${startPage} - ${endPage}`,
+              correct: 0,
+              total: questionsPerChapter,
+            });
+          });
+        }
+
+        setChapterBreakdown(breakdown);
+      } catch (error) {
+        console.error('Error fetching chapter breakdown:', error);
+      }
+    };
+
     fetchExamResults();
   }, [contentId]);
   const handleTryAgain = () => {
@@ -228,32 +358,13 @@ export function ExamResultsSummary() {
               </div>
 
               {/* Chapter Breakdown */}
-              <ChapterBreakdown chapters={[{
-              title: 'A Map and Its Components',
-              timeRange: 'Page 3 - 5',
-              correct: 1,
-              total: 2
-            }, {
-              title: 'Understanding Coordinates',
-              timeRange: 'Page 7 - 8',
-              correct: 1,
-              total: 6
-            }, {
-              title: 'Greenwich Meridian',
-              timeRange: 'Page 11 - 14',
-              correct: 0,
-              total: 1
-            }, {
-              title: 'Understanding Time Zones',
-              timeRange: 'Page 14 - 17',
-              correct: 1,
-              total: 2
-            }, {
-              title: 'Locating Places on the Earth',
-              timeRange: 'Page 1 - 3',
-              correct: 0,
-              total: 1
-            }]} examData={examData} />
+              {chapterBreakdown.length > 0 && (
+                <ChapterBreakdown 
+                  chapters={chapterBreakdown} 
+                  examData={examData}
+                  contentTitle={contentTitle}
+                />
+              )}
 
               {/* Middle Action Buttons */}
               <div className="flex flex-col justify-center gap-4 text-sm font-medium sm:flex-row">
