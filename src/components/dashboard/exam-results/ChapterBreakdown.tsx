@@ -61,27 +61,33 @@ export function ChapterBreakdown({ chapters, examData, contentTitle }: ChapterBr
           </h3>
 
           {/* Expanded Content */}
-          {isExpanded && chapters.length > 0 && (
+          {isExpanded && (
             <div className="flex flex-col overflow-hidden text-sm sm:pl-3 animate-in fade-in duration-300 gap-4 space-y-1">
               <div className="flex flex-col gap-4 pb-4 pl-3">
-                {chapters.map((chapter, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-foreground">
-                      <span className="overflow-hidden text-ellipsis line-clamp-1 max-w-[200px] sm:max-w-[350px]">{chapter.title}</span>
-                      <span className="text-foreground">•</span>
-                      <span className="text-muted-foreground/80 whitespace-nowrap">{chapter.timeRange}</span>
+                {chapters.length > 0 ? (
+                  chapters.map((chapter, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-foreground">
+                        <span className="overflow-hidden text-ellipsis line-clamp-1 max-w-[200px] sm:max-w-[350px]">{chapter.title}</span>
+                        <span className="text-foreground">•</span>
+                        <span className="text-muted-foreground/80 whitespace-nowrap">{chapter.timeRange}</span>
+                      </div>
+                      <div className="flex items-center gap-4 text-muted-foreground">
+                        <button className="flex h-6 w-auto items-center justify-center rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-3 py-1 text-xs text-yellow-500 hover:bg-yellow-500/20 gap-1.5">
+                          Review
+                          <ArrowUpRight className="h-3 w-3 text-yellow-500 flex-shrink-0" />
+                        </button>
+                        <span className="font-medium text-muted-foreground whitespace-nowrap">
+                          {chapter.correct}/{chapter.total}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4 text-muted-foreground">
-                      <button className="flex h-6 w-auto items-center justify-center rounded-xl border-2 border-yellow-500/20 bg-yellow-500/10 px-3 py-1 text-xs text-yellow-500 hover:bg-yellow-500/20 gap-1.5">
-                        Review
-                        <ArrowUpRight className="h-3 w-3 text-yellow-500 flex-shrink-0" />
-                      </button>
-                      <span className="font-medium text-muted-foreground whitespace-nowrap">
-                        {chapter.correct}/{chapter.total}
-                      </span>
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-muted-foreground text-sm py-2">
+                    No detailed chapter breakdown available for this exam.
                   </div>
-                ))}
+                )}
               </div>
             </div>
           )}
