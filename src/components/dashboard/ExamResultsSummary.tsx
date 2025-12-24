@@ -358,13 +358,11 @@ export function ExamResultsSummary() {
               </div>
 
               {/* Chapter Breakdown */}
-              {chapterBreakdown.length > 0 && (
-                <ChapterBreakdown 
-                  chapters={chapterBreakdown} 
-                  examData={examData}
-                  contentTitle={contentTitle}
-                />
-              )}
+              <ChapterBreakdown 
+                chapters={chapterBreakdown} 
+                examData={examData}
+                contentTitle={contentTitle || examAttempt?.exams?.title || 'Exam Content'}
+              />
 
               {/* Middle Action Buttons */}
               <div className="flex flex-col justify-center gap-4 text-sm font-medium sm:flex-row">
