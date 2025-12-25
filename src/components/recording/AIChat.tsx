@@ -188,22 +188,6 @@ const AIChat = ({
                                 <ThumbsDown className="h-4 w-4" />
                               </button>
                             </MessageAction>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-                                  <MoreVertical className="h-4 w-4" />
-                                </button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="start">
-                                <DropdownMenuItem onClick={() => handleCopy(message.content)}>
-                                  <Copy className="h-4 w-4 mr-2" />
-                                  Copy text
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  Share
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
                           </MessageActions>
                         </div>
                       </div>
