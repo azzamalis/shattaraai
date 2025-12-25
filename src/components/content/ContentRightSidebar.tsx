@@ -97,7 +97,31 @@ export function ContentRightSidebar({
   // Flashcard viewing state
   const [showFlashcardStudy, setShowFlashcardStudy] = useState(false);
   
-  // Config states
+  // Hardcoded safe defaults for Quick Generate (never depends on state)
+  const QUICK_GENERATE_FLASHCARD_CONFIG = {
+    numberOfCards: 10,
+    difficulty: 'medium' as const,
+    includeHints: true,
+    includeExplanations: true,
+    focusOnKeyConcepts: true,
+    selectedTopics: [] as string[],
+    focusInstructions: ''
+  };
+
+  const QUICK_GENERATE_QUIZ_CONFIG = {
+    numberOfQuestions: 10,
+    difficulty: 'medium' as const,
+    includeExplanations: true,
+    questionTypes: {
+      multipleChoice: true,
+      trueFalse: false,
+      shortAnswer: false
+    },
+    selectedTopics: [] as string[],
+    focusInstructions: ''
+  };
+  
+  // Config states (for modal customization)
   const [flashcardConfig, setFlashcardConfig] = useState({
     numberOfCards: 10,
     difficulty: 'medium' as 'easy' | 'medium' | 'hard',
@@ -380,7 +404,8 @@ export function ContentRightSidebar({
     selectedTopics?: string[];
     focusInstructions?: string;
   }) => {
-    const configToUse = config || flashcardConfig;
+    // Use provided config (from modal) or hardcoded safe defaults for Quick Generate
+    const configToUse = config || QUICK_GENERATE_FLASHCARD_CONFIG;
     setIsGenerating(true);
     setGenerationType('flashcards');
     
@@ -430,7 +455,8 @@ export function ContentRightSidebar({
     selectedTopics?: string[];
     focusInstructions?: string;
   }) => {
-    const configToUse = config || quizConfig;
+    // Use provided config (from modal) or hardcoded safe defaults for Quick Generate
+    const configToUse = config || QUICK_GENERATE_QUIZ_CONFIG;
     setIsGenerating(true);
     setGenerationType('quizzes');
     
