@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, RotateCcw, Brain, ThumbsUp, ThumbsDown, Pencil, Trash } from 'lucide-react';
+import { Copy, Brain, ThumbsUp, ThumbsDown, Pen, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { PromptInputChatBox } from '@/components/chat/shared/PromptInputChatBox';
@@ -11,7 +11,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
 import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from '@/components/prompt-kit/chat-container';
-import { Message, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
+import { Message, MessageActions, MessageAction } from '@/components/prompt-kit/message';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 interface AIChatProps {
   contentData?: ContentData;
 }
@@ -145,60 +151,81 @@ const AIChat = ({
   };
   return <div className="flex flex-col h-full gap-4">
       <ChatContainerRoot className="flex-1 min-h-0 px-4">
-        <ChatContainerContent>
+        <ChatContainerContent className="space-y-8">
           {messages.length === 0 ? <div className="flex flex-col items-center justify-center h-full text-center p-8">
               <Brain className="h-16 w-16 text-primary/60 mb-4" />
-              <h3 className="text-lg font-semibold text-dashboard-text dark:text-dashboard-text mb-2">Learn with Shattara AI</h3>
-              <p className="text-sm text-dashboard-text-secondary/70 dark:text-dashboard-text-secondary/70 max-w-sm">
+              <h3 className="text-lg font-semibold text-foreground mb-2">Learn with Shattara AI</h3>
+              <p className="text-sm text-muted-foreground max-w-sm">
                 Ask questions, request summaries, generate quizzes, or create flashcards from this content.
               </p>
             </div> : <>
               {messages.map((message, index) => {
             const isAssistant = message.sender_type === 'ai';
             const isLastMessage = index === messages.length - 1;
-            return <Message key={message.id} className={cn("mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6", isAssistant ? "items-start" : "items-end")}>
-                    {isAssistant ? <div className="group flex w-full flex-col gap-0">
-                        <RichMessage content={message.content} className="w-full bg-transparent p-0" />
-                        <MessageActions className={cn("-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100", isLastMessage && "opacity-100")}>
-                          <MessageAction tooltip="Copy" delayDuration={100}>
-                            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => handleCopy(message.content)}>
-                              <Copy />
-                            </Button>
-                          </MessageAction>
-                          <MessageAction tooltip="Upvote" delayDuration={100}>
-                            <Button variant="ghost" size="icon" className="rounded-full">
-                              <ThumbsUp />
-                            </Button>
-                          </MessageAction>
-                          <MessageAction tooltip="Downvote" delayDuration={100}>
-                            <Button variant="ghost" size="icon" className="rounded-full">
-                              <ThumbsDown />
-                            </Button>
-                          </MessageAction>
-                        </MessageActions>
-                      </div> : <div className="group flex flex-col items-end gap-1">
-                        <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 sm:max-w-[75%]">
-                          {message.content}
-                        </MessageContent>
-                        <MessageActions className={cn("flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100")}>
+            return <div key={message.id} className={cn("flex w-full", isAssistant ? "justify-start" : "justify-end")}>
+                    {isAssistant ? (
+                      <div className="group/message flex w-full flex-col items-start gap-1">
+                        <div className="relative w-full rounded-3xl text-left leading-relaxed text-primary/95 bg-transparent p-0 pt-1">
+                          <RichMessage content={message.content} className="w-full" />
+                        </div>
+                        <div className="py-3">
+                          <MessageActions className={cn("flex items-center gap-1 opacity-0 transition-opacity duration-200 lg:group-hover/message:opacity-100", isLastMessage && "opacity-100")}>
+                            <MessageAction tooltip="Copy" delayDuration={100}>
+                              <button 
+                                className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                                onClick={() => handleCopy(message.content)}
+                              >
+                                <Copy className="h-4 w-4" />
+                              </button>
+                            </MessageAction>
+                            <MessageAction tooltip="Upvote" delayDuration={100}>
+                              <button className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                                <ThumbsUp className="h-4 w-4" />
+                              </button>
+                            </MessageAction>
+                            <MessageAction tooltip="Downvote" delayDuration={100}>
+                              <button className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                                <ThumbsDown className="h-4 w-4" />
+                              </button>
+                            </MessageAction>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                                  <MoreVertical className="h-4 w-4" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="start">
+                                <DropdownMenuItem onClick={() => handleCopy(message.content)}>
+                                  <Copy className="h-4 w-4 mr-2" />
+                                  Copy text
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  Share
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </MessageActions>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="group/message flex w-full flex-col items-end gap-1">
+                        <div className="flex w-full justify-end">
+                          <div className="relative w-fit max-w-[85%] sm:max-w-[75%] rounded-3xl p-3 text-left leading-relaxed text-primary/95 border border-primary/5 bg-primary/5 dark:bg-neutral-800">
+                            <div className="prose prose-neutral dark:prose-invert max-w-none">
+                              <p className="text-base leading-7 mb-0">{message.content}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <MessageActions className="flex items-center gap-1 opacity-100 transition-opacity duration-200 lg:opacity-0 lg:group-hover/message:opacity-100">
                           <MessageAction tooltip="Edit" delayDuration={100}>
-                            <Button variant="ghost" size="icon" className="rounded-full">
-                              <Pencil />
-                            </Button>
-                          </MessageAction>
-                          <MessageAction tooltip="Delete" delayDuration={100}>
-                            <Button variant="ghost" size="icon" className="rounded-full">
-                              <Trash />
-                            </Button>
-                          </MessageAction>
-                          <MessageAction tooltip="Copy" delayDuration={100}>
-                            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => handleCopy(message.content)}>
-                              <Copy />
-                            </Button>
+                            <button className="rounded-full p-1 transition-colors hover:bg-primary/10">
+                              <Pen className="h-3 w-3 text-primary/60" />
+                            </button>
                           </MessageAction>
                         </MessageActions>
-                      </div>}
-                  </Message>;
+                      </div>
+                    )}
+                  </div>;
           })}
               
               {/* Loading indicators */}

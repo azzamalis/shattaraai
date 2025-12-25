@@ -96,31 +96,34 @@ const markdownComponents: Partial<Components> = {
     return <>{children}</>;
   },
   h1: ({ node, ...props }) => (
-    <h1 className="text-base font-bold text-foreground mb-2" {...props} />
+    <h1 className="text-lg font-bold text-foreground mb-3" {...props} />
   ),
   h2: ({ node, ...props }) => (
     <h2 className="text-base font-semibold text-foreground mb-2" {...props} />
   ),
   h3: ({ node, ...props }) => (
-    <h3 className="text-sm font-semibold text-foreground mb-1" {...props} />
+    <h3 className="text-base font-semibold text-foreground mb-2" {...props} />
   ),
   p: ({ node, ...props }) => (
-    <p className="text-sm leading-relaxed text-foreground mb-1" {...props} />
+    <p className="text-base leading-7 last:mb-0 mb-2" {...props} />
   ),
   ul: ({ node, ...props }) => (
-    <ul className="list-disc pl-5 mb-1 text-foreground/90" {...props} />
+    <ul className="list-outside list-disc pl-5 mb-2" {...props} />
   ),
   ol: ({ node, ...props }) => (
-    <ol className="list-decimal pl-5 mb-1 text-foreground/90" {...props} />
+    <ol className="list-outside list-decimal pl-5 mb-2" {...props} />
   ),
-  li: ({ node, ...props }) => <li className="text-sm mb-1" {...props} />,
+  li: ({ node, ...props }) => <li className="leading-7 mb-1" {...props} />,
   blockquote: ({ node, ...props }) => (
-    <blockquote className="border-l-2 border-border pl-3 italic text-muted-foreground mb-2" {...props} />
+    <blockquote className="border-l-2 border-border pl-4 italic text-muted-foreground my-4" {...props} />
   ),
   a: ({ node, ...props }) => (
-    <a className="text-primary underline underline-offset-2" target="_blank" rel="noreferrer" {...props} />
+    <a className="text-primary underline underline-offset-2 hover:text-primary/80" target="_blank" rel="noreferrer" {...props} />
   ),
-  hr: (props) => <hr className="my-3 border-border" {...props} />
+  hr: (props) => <hr className="my-8 border-t border-border/50 dark:border-primary/10" {...props} />,
+  strong: ({ node, ...props }) => (
+    <strong className="font-semibold" {...props} />
+  )
 };
 
 // Memoized markdown block for better performance
@@ -147,13 +150,15 @@ function RichMessageComponent({ content, className }: RichMessageProps) {
   const blocks = useMemo(() => parseMarkdownIntoBlocks(normalizedContent), [normalizedContent]);
 
   return (
-    <div className={cn("prose prose-sm dark:prose-invert max-w-none", className)}>
-      {blocks.map((block, index) => (
-        <MemoizedMarkdownBlock
-          key={`block-${index}`}
-          content={block}
-        />
-      ))}
+    <div className={cn("markdown-body prose prose-neutral dark:prose-invert max-w-none", className)}>
+      <div className="space-y-4">
+        {blocks.map((block, index) => (
+          <MemoizedMarkdownBlock
+            key={`block-${index}`}
+            content={block}
+          />
+        ))}
+      </div>
     </div>
   );
 }
