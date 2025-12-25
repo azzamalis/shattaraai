@@ -142,12 +142,18 @@ export const RealtimeChaptersDisplay = ({
               onSeekToTimestamp?.(chapter.startTime);
             }}
           >
-            {/* Timestamp Badge */}
+            {/* Page/Timestamp Badge */}
             <div className="mb-2 flex items-start">
               <span className="inline-flex items-center border px-2.5 py-0.5 text-xs transition-colors border-transparent cursor-pointer rounded-md bg-neutral-100 font-medium text-primary/80 hover:bg-foreground/10 hover:text-foreground dark:bg-neutral-800">
-                {formatTime(chapter.startTime)}
-                {chapter.endTime && chapter.endTime > chapter.startTime && (
-                  <span> - {formatTime(chapter.endTime)}</span>
+                {contentType === 'pdf' ? (
+                  `Page ${Math.floor(chapter.startTime) || index + 1}`
+                ) : (
+                  <>
+                    {formatTime(chapter.startTime)}
+                    {chapter.endTime && chapter.endTime > chapter.startTime && (
+                      <span> - {formatTime(chapter.endTime)}</span>
+                    )}
+                  </>
                 )}
               </span>
             </div>
