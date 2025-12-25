@@ -11,6 +11,8 @@ interface ChapterData {
   summary: string;
   startTime: number;
   endTime: number;
+  pageNumber?: number;
+  endPage?: number;
 }
 
 interface RealtimeChaptersDisplayProps {
@@ -146,7 +148,15 @@ export const RealtimeChaptersDisplay = ({
             <div className="mb-2 flex items-start">
               <span className="inline-flex items-center border px-2.5 py-0.5 text-xs transition-colors border-transparent cursor-pointer rounded-md bg-neutral-100 font-medium text-primary/80 hover:bg-foreground/10 hover:text-foreground dark:bg-neutral-800">
                 {contentType === 'pdf' ? (
-                  `Page ${Math.floor(chapter.startTime) || index + 1}`
+                  chapter.pageNumber ? (
+                    chapter.endPage && chapter.endPage > chapter.pageNumber ? (
+                      `Pages ${chapter.pageNumber} - ${chapter.endPage}`
+                    ) : (
+                      `Page ${chapter.pageNumber}`
+                    )
+                  ) : (
+                    `Page ${index + 1}`
+                  )
                 ) : (
                   <>
                     {formatTime(chapter.startTime)}
