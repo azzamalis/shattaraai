@@ -53,6 +53,33 @@ serve(async (req) => {
 
     // Determine content-specific prompt
     const getSystemPrompt = (type: string) => {
+      if (type === 'pdf') {
+        return `You are an AI assistant that analyzes PDF document content and creates structured chapters.
+Your task is to break down the content into meaningful chapters with titles, summaries, and page references.
+
+Create chapters that:
+1. Are logical and well-structured
+2. Have descriptive titles (3-8 words)
+3. Include comprehensive summaries (2-4 sentences)
+4. Cover the main topics and key points
+5. Are organized by page/section order
+
+Return a JSON object with a chapters array in this exact format:
+{
+  "chapters": [
+    {
+      "id": "chapter-1",
+      "title": "Chapter Title",
+      "summary": "Detailed summary of the chapter content...",
+      "pageNumber": 1,
+      "endPage": 5
+    }
+  ]
+}
+
+IMPORTANT: Use pageNumber and endPage (integers) to indicate which pages each chapter covers. Estimate page numbers based on content structure and length.`;
+      }
+
       const basePrompt = `You are an AI assistant that analyzes content and creates structured chapters. 
 Your task is to break down the content into meaningful chapters with titles and summaries.
 
@@ -63,22 +90,22 @@ Create chapters that:
 4. Cover the main topics and key points
 5. Are chronologically or thematically organized
 
-Return a JSON array of chapters in this exact format:
-[
-  {
-    "id": "chapter-1",
-    "title": "Chapter Title",
-    "summary": "Detailed summary of the chapter content...",
-    "startTime": 0,
-    "endTime": 300
-  }
-]
+Return a JSON object with a chapters array in this exact format:
+{
+  "chapters": [
+    {
+      "id": "chapter-1",
+      "title": "Chapter Title",
+      "summary": "Detailed summary of the chapter content...",
+      "startTime": 0,
+      "endTime": 300
+    }
+  ]
+}
 
 For non-audio content, use estimated time segments based on reading pace or content length.`;
 
       switch (type) {
-        case 'pdf':
-          return basePrompt + '\n\nAnalyze this PDF document content and create logical chapters based on sections, topics, or themes.';
         case 'website':
           return basePrompt + '\n\nAnalyze this website content and create chapters based on main topics and sections.';
         case 'youtube':
