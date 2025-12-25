@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, StickyNote, ReceiptText, BookCheck, GalleryVerticalEnd, ListTodo } from "lucide-react";
@@ -157,7 +157,102 @@ export function ContentRightSidebar({
     }
   }, [contentData?.id]);
 
-  const fetchFlashcards = async () => {
+  // Real-time subscription for flashcards
+  useEffect(() => {
+    if (!contentData?.id) return;
+
+    console.log('Setting up real-time subscription for flashcards:', contentData.id);
+
+    const channel = supabase
+      .channel(`flashcards-${contentData.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'flashcards',
+          filter: `content_id=eq.${contentData.id}`
+        },
+        (payload) => {
+          console.log('Real-time flashcard event:', payload.eventType);
+          fetchFlashcards();
+        }
+      )
+      .subscribe((status) => {
+        console.log('Flashcard subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up flashcard subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [contentData?.id]);
+
+  // Real-time subscription for quizzes
+  useEffect(() => {
+    if (!contentData?.id) return;
+
+    console.log('Setting up real-time subscription for quizzes:', contentData.id);
+
+    const channel = supabase
+      .channel(`quizzes-${contentData.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'quizzes',
+          filter: `content_id=eq.${contentData.id}`
+        },
+        (payload) => {
+          console.log('Real-time quiz event:', payload.eventType);
+          fetchQuizzes();
+        }
+      )
+      .subscribe((status) => {
+        console.log('Quiz subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up quiz subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [contentData?.id]);
+
+  // Real-time subscription for summaries
+  useEffect(() => {
+    if (!contentData?.id) return;
+
+    console.log('Setting up real-time subscription for summaries:', contentData.id);
+
+    const channel = supabase
+      .channel(`summaries-${contentData.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'summaries',
+          filter: `content_id=eq.${contentData.id}`
+        },
+        (payload) => {
+          console.log('Real-time summary event:', payload.eventType);
+          checkSummary();
+        }
+      )
+      .subscribe((status) => {
+        console.log('Summary subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up summary subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [contentData?.id]);
+
+  const fetchFlashcards = useCallback(async () => {
+    if (!contentData?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('flashcards')
@@ -180,11 +275,13 @@ export function ContentRightSidebar({
           isStarred: false
         }));
         setFlashcards(formattedCards);
+      } else {
+        setFlashcards([]);
       }
     } catch (error) {
       console.error('Error fetching flashcards:', error);
     }
-  };
+  }, [contentData?.id]);
 
   // Helper function to normalize question types from database format to component format
   const normalizeQuestionType = (type: string): 'multiple-choice' | 'true-false' | 'short-answer' => {
@@ -199,7 +296,9 @@ export function ContentRightSidebar({
     return typeMap[type] || 'multiple-choice';
   };
 
-  const fetchQuizzes = async () => {
+  const fetchQuizzes = useCallback(async () => {
+    if (!contentData?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('quizzes')
@@ -222,13 +321,17 @@ export function ContentRightSidebar({
           }))
         };
         setQuizData(normalizedData);
+      } else {
+        setQuizData(null);
       }
     } catch (error) {
       console.error('Error fetching quizzes:', error);
     }
-  };
+  }, [contentData?.id]);
 
-  const checkSummary = async () => {
+  const checkSummary = useCallback(async () => {
+    if (!contentData?.id) return;
+    
     try {
       // Fetch summaries from the database
       const { data: summaries, error } = await supabase
@@ -260,11 +363,13 @@ export function ContentRightSidebar({
           createdAt: new Date(contentData.summary_generated_at || Date.now()),
         };
         setSummariesList([existingSummary]);
+      } else {
+        setSummariesList([]);
       }
     } catch (error) {
       console.error('Error fetching summaries:', error);
     }
-  };
+  }, [contentData?.id, contentData?.ai_summary, contentData?.summary_key_points, contentData?.summary_generated_at]);
 
   const handleGenerateFlashcards = async (config?: {
     numberOfCards: number;

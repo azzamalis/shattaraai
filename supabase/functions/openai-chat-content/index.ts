@@ -15,6 +15,94 @@ interface ChatRequest {
     content: string;
     sender_type: 'user' | 'ai';
   }>;
+  contentData?: {
+    id?: string;
+    title?: string;
+    type?: string;
+    text_content?: string;
+    chapters?: any[];
+  };
+  attachments?: Array<{
+    name: string;
+    type: string;
+    content?: string;
+  }>;
+}
+
+// Smart chunking function to extract relevant content
+function createSmartChunks(text: string, contentType: string, maxChunkSize: number = 2500): string[] {
+  if (!text || text.length <= maxChunkSize) {
+    return text ? [text] : [];
+  }
+
+  const chunks: string[] = [];
+  
+  // For different content types, use different splitting strategies
+  if (contentType === 'pdf' || contentType === 'file') {
+    // Split by paragraphs or sections
+    const sections = text.split(/\n\n+/);
+    let currentChunk = '';
+    
+    for (const section of sections) {
+      if ((currentChunk + section).length > maxChunkSize) {
+        if (currentChunk) chunks.push(currentChunk.trim());
+        currentChunk = section;
+      } else {
+        currentChunk += '\n\n' + section;
+      }
+    }
+    if (currentChunk) chunks.push(currentChunk.trim());
+  } else {
+    // Generic splitting for other content types
+    let remaining = text;
+    while (remaining.length > maxChunkSize) {
+      // Find a good break point (end of sentence, paragraph, etc.)
+      let breakPoint = remaining.lastIndexOf('. ', maxChunkSize);
+      if (breakPoint === -1 || breakPoint < maxChunkSize * 0.5) {
+        breakPoint = remaining.lastIndexOf(' ', maxChunkSize);
+      }
+      if (breakPoint === -1) {
+        breakPoint = maxChunkSize;
+      }
+      chunks.push(remaining.substring(0, breakPoint + 1).trim());
+      remaining = remaining.substring(breakPoint + 1);
+    }
+    if (remaining.trim()) chunks.push(remaining.trim());
+  }
+  
+  return chunks;
+}
+
+// Create a summary of content for the AI context
+function createContentSummary(chunks: string[], maxLength: number = 4000): string {
+  if (chunks.length === 0) return '';
+  
+  // Take beginning, middle, and end portions for a representative summary
+  const totalChunks = chunks.length;
+  const selectedChunks: string[] = [];
+  
+  // Always include first chunk (intro/overview)
+  if (chunks[0]) selectedChunks.push(chunks[0]);
+  
+  // Add middle chunks if available
+  if (totalChunks > 2) {
+    const midIndex = Math.floor(totalChunks / 2);
+    selectedChunks.push(chunks[midIndex]);
+  }
+  
+  // Add last chunk if different from first
+  if (totalChunks > 1) {
+    selectedChunks.push(chunks[totalChunks - 1]);
+  }
+  
+  let summary = selectedChunks.join('\n\n---\n\n');
+  
+  // Truncate if still too long
+  if (summary.length > maxLength) {
+    summary = summary.substring(0, maxLength) + '...';
+  }
+  
+  return summary;
 }
 
 serve(async (req) => {
@@ -28,7 +116,22 @@ serve(async (req) => {
   try {
     // Parse request
     const requestData: ChatRequest = await req.json();
-    const { message, conversationId, contextId, conversationHistory = [] } = requestData;
+    const { 
+      message, 
+      conversationId, 
+      contextId, 
+      conversationHistory = [],
+      contentData,
+      attachments = []
+    } = requestData;
+
+    console.log('Request data:', { 
+      message: message?.substring(0, 100), 
+      conversationId, 
+      contextId,
+      hasContentData: !!contentData,
+      attachmentCount: attachments?.length || 0
+    });
 
     if (!message?.trim()) {
       return new Response(
@@ -105,6 +208,83 @@ serve(async (req) => {
       );
     }
 
+    // Fetch content from database if contextId is provided
+    let contentContext = '';
+    let contentTitle = '';
+    let contentType = '';
+
+    // First, try to use contentData passed directly from client
+    if (contentData?.text_content) {
+      console.log('Using contentData from request');
+      contentTitle = contentData.title || 'Study Material';
+      contentType = contentData.type || 'content';
+      
+      // Apply smart chunking
+      const chunks = createSmartChunks(contentData.text_content, contentType, 2500);
+      const summary = createContentSummary(chunks, 4000);
+      
+      contentContext = summary;
+      
+      // Add chapters if available
+      if (contentData.chapters && Array.isArray(contentData.chapters) && contentData.chapters.length > 0) {
+        const chaptersText = contentData.chapters
+          .map((ch: any, i: number) => `${i + 1}. ${ch.title}${ch.summary ? ': ' + ch.summary : ''}`)
+          .join('\n');
+        contentContext += `\n\n## Document Structure:\n${chaptersText}`;
+      }
+    } 
+    // Fallback: fetch from database using contextId
+    else if (contextId) {
+      console.log('Fetching content from database with contextId:', contextId);
+      
+      const { data: content, error: contentError } = await supabase
+        .from('content')
+        .select('id, title, type, text_content, chapters')
+        .eq('id', contextId)
+        .single();
+
+      if (contentError) {
+        console.error('Error fetching content:', contentError);
+      } else if (content) {
+        console.log('Found content:', { 
+          id: content.id, 
+          title: content.title, 
+          type: content.type,
+          hasTextContent: !!content.text_content,
+          textLength: content.text_content?.length || 0
+        });
+        
+        contentTitle = content.title || 'Study Material';
+        contentType = content.type || 'content';
+        
+        if (content.text_content) {
+          // Apply smart chunking
+          const chunks = createSmartChunks(content.text_content, contentType, 2500);
+          const summary = createContentSummary(chunks, 4000);
+          
+          contentContext = summary;
+          
+          // Add chapters if available
+          if (content.chapters && Array.isArray(content.chapters) && content.chapters.length > 0) {
+            const chaptersText = content.chapters
+              .map((ch: any, i: number) => `${i + 1}. ${ch.title}${ch.summary ? ': ' + ch.summary : ''}`)
+              .join('\n');
+            contentContext += `\n\n## Document Structure:\n${chaptersText}`;
+          }
+        }
+      }
+    }
+
+    // Process attachments if any
+    let attachmentContext = '';
+    if (attachments && attachments.length > 0) {
+      console.log('Processing attachments:', attachments.length);
+      attachmentContext = attachments
+        .filter(att => att.content)
+        .map(att => `### Attachment: ${att.name}\n${att.content}`)
+        .join('\n\n');
+    }
+
     // Build conversation context for better AI responses
     const conversationContext = conversationHistory
       .slice(-10) // Keep last 10 messages for context
@@ -113,8 +293,8 @@ serve(async (req) => {
         content: msg.content
       }));
 
-    // Create optimized system prompt for educational chat
-    const systemPrompt = `You are an intelligent AI tutor assistant designed to help students learn effectively. Your role is to:
+    // Create optimized system prompt for educational chat with content context
+    let systemPrompt = `You are an intelligent AI tutor assistant designed to help students learn effectively. Your role is to:
 
 1. **Educational Support**: Provide clear, helpful explanations on academic topics
 2. **Learning Guidance**: Help students understand concepts step-by-step
@@ -135,10 +315,40 @@ serve(async (req) => {
 - Friendly and approachable
 - Clear and concise
 - Age-appropriate language
-- Encouraging and positive tone
+- Encouraging and positive tone`;
 
-**IMPORTANT - File Attachments:**
-When users attach files (PDFs, documents, images, etc.), the file content is automatically extracted and included directly in their message. You have direct access to this content - it's already provided to you inline. Analyze the provided content and respond based on what's given. Never say you cannot access attachments.
+    // Add content context if available
+    if (contentContext) {
+      systemPrompt += `
+
+## Study Material Context: "${contentTitle}" (${contentType})
+
+You have access to the following study material that the student is learning from. Use this content to provide accurate, relevant answers and help the student understand the material better.
+
+<study_material>
+${contentContext}
+</study_material>
+
+When answering questions:
+- Reference specific parts of the study material when relevant
+- Help explain concepts from the material in simpler terms
+- Connect the student's questions to the material's content
+- If the question is outside the material's scope, acknowledge this and still try to help`;
+    }
+
+    // Add attachment context if available  
+    if (attachmentContext) {
+      systemPrompt += `
+
+## Uploaded Files
+The student has shared the following files for context:
+
+${attachmentContext}
+
+Analyze these files and use their content to provide relevant assistance.`;
+    }
+
+    systemPrompt += `
 
 **IMPORTANT - Response Formatting:**
 Please format your responses using proper Markdown syntax:
@@ -147,7 +357,7 @@ Please format your responses using proper Markdown syntax:
 - Use bullet points with - or * for lists
 - Use 1. 2. 3. for numbered lists
 - Use > for blockquotes
-- Use \`code\` for inline code and \`\`\`language\ncode\n\`\`\` for code blocks
+- Use \`code\` for inline code and \`\`\`language\\ncode\\n\`\`\` for code blocks
 - Use proper paragraphs separated by line breaks
 - Structure your response to be clear, well-organized, and easy to read
 
@@ -159,6 +369,9 @@ Respond to the student's question or message below:`;
       ...conversationContext,
       { role: 'user', content: message }
     ];
+
+    console.log('System prompt length:', systemPrompt.length);
+    console.log('Content context length:', contentContext.length);
 
     // Define model hierarchy for chat content
     const models = [
@@ -185,7 +398,7 @@ Respond to the student's question or message below:`;
           body: JSON.stringify({
             model: model,
             messages: messages,
-            max_completion_tokens: 1000,
+            max_completion_tokens: 1500,
             // Note: temperature not included for newer models
           }),
         });
@@ -219,9 +432,6 @@ Respond to the student's question or message below:`;
       usedModel = 'fallback';
     }
 
-    // Note: Message storage is handled by the client-side addAIResponse function
-    // to prevent duplicate entries. The edge function only generates the AI response.
-
     // Track AI usage
     try {
       await supabase
@@ -244,7 +454,8 @@ Respond to the student's question or message below:`;
         success: true,
         response: aiResponse,
         model_used: usedModel,
-        context_id: contextId
+        context_id: contextId,
+        content_used: !!contentContext
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
