@@ -541,6 +541,71 @@ export function useChatConversation({
     }
   };
 
+  // Add streaming AI response - creates message immediately and returns update function
+  const addStreamingAIResponse = useCallback(async (): Promise<{
+    messageId: string;
+    updateContent: (content: string) => void;
+    finalize: (finalContent: string) => Promise<void>;
+  } | null> => {
+    if (!conversationId || !user) return null;
+
+    try {
+      // Create placeholder message
+      const { data: newMessage, error } = await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: conversationId,
+          user_id: user.id,
+          content: '',
+          sender_type: 'ai',
+          message_type: 'ai_response' as any,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const messageId = newMessage.id;
+
+      // Update local state with placeholder
+      setMessages(prev => [...prev, formatMessage(newMessage)]);
+
+      return {
+        messageId,
+        updateContent: (content: string) => {
+          setMessages(prev => 
+            prev.map(msg => 
+              msg.id === messageId ? { ...msg, content } : msg
+            )
+          );
+        },
+        finalize: async (finalContent: string) => {
+          // Update database with final content
+          await supabase
+            .from('chat_messages')
+            .update({ content: finalContent })
+            .eq('id', messageId);
+          
+          // Update local state
+          setMessages(prev => 
+            prev.map(msg => 
+              msg.id === messageId ? { ...msg, content: finalContent } : msg
+            )
+          );
+        }
+      };
+    } catch (error) {
+      console.error('Error creating streaming message:', error);
+      return null;
+    }
+  }, [conversationId, user, formatMessage]);
+
+  const refreshMessages = useCallback(async () => {
+    if (conversationId) {
+      await fetchMessages(conversationId);
+    }
+  }, [conversationId, fetchMessages]);
+
   return {
     conversation,
     messages,
@@ -548,6 +613,8 @@ export function useChatConversation({
     isSending,
     sendMessage,
     addAIResponse,
-    retryMessage
+    addStreamingAIResponse,
+    retryMessage,
+    refreshMessages
   };
 }
