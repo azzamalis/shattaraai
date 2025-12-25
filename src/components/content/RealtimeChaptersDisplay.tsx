@@ -131,35 +131,38 @@ export const RealtimeChaptersDisplay = ({
   }
 
   return (
-    <div className="space-y-8">
-      {/* Chapters List */}
-      <div className="space-y-8">
+    <div className="h-full w-full flex-grow overflow-y-auto overscroll-y-none rounded-lg bg-background">
+      <div>
         {chapters.map((chapter, index) => (
           <div 
             key={index}
-            className="group cursor-pointer hover:bg-muted/20 rounded-lg p-3 transition-colors"
+            className="group cursor-pointer rounded-2xl border border-transparent p-3 pb-4 hover:bg-primary/5 transition-colors"
             onClick={() => {
               onChapterClick?.(chapter.startTime);
               onSeekToTimestamp?.(chapter.startTime);
             }}
           >
-            {/* Timestamp */}
-            <div className="inline-flex items-center px-2 py-1 bg-muted/50 rounded text-xs text-muted-foreground font-mono mb-2">
-              {formatTime(chapter.startTime)}
-              {chapter.endTime && chapter.endTime > chapter.startTime && (
-                <span> - {formatTime(chapter.endTime)}</span>
-              )}
+            {/* Timestamp Badge */}
+            <div className="mb-2 flex items-start">
+              <span className="inline-flex items-center border px-2.5 py-0.5 text-xs transition-colors border-transparent cursor-pointer rounded-md bg-neutral-100 font-medium text-primary/80 hover:bg-foreground/10 hover:text-foreground dark:bg-neutral-800">
+                {formatTime(chapter.startTime)}
+                {chapter.endTime && chapter.endTime > chapter.startTime && (
+                  <span> - {formatTime(chapter.endTime)}</span>
+                )}
+              </span>
             </div>
             
-            {/* Title */}
-            <h3 className="text-base font-bold text-foreground mb-3 group-hover:text-primary transition-colors leading-tight">
-              {chapter.title}
-            </h3>
-            
-            {/* Summary */}
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {chapter.summary}
-            </p>
+            {/* Title & Summary */}
+            <div className="w-full">
+              <h3 className="mb-2 line-clamp-1 text-lg text-current">
+                <div>{chapter.title}</div>
+              </h3>
+              <div className="mt-2 text-sm leading-relaxed">
+                <div className="markdown-body">
+                  {chapter.summary}
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>
