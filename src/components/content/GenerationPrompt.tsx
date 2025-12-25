@@ -72,7 +72,7 @@ export function GenerationPrompt({
                 </Button>
                 
                 <Button 
-                  onClick={onGenerate} 
+                  onClick={() => onGenerate()} 
                   disabled={isLoading} 
                   className="rounded-full w-24 h-10 bg-foreground text-background hover:bg-foreground/90"
                 >
