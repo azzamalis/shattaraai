@@ -385,6 +385,8 @@ export function ContentRightSidebar({
     setGenerationType('flashcards');
     
     try {
+      console.log('Generating flashcards with config:', configToUse);
+      
       const { data, error } = await supabase.functions.invoke('generate-flashcards', {
         body: {
           contentId: contentData.id,
@@ -392,9 +394,19 @@ export function ContentRightSidebar({
         }
       });
       
-      if (error) throw error;
+      console.log('Flashcard generation response:', { data, error });
       
-      toast.success(`Generated ${data.count} flashcards!`);
+      if (error) {
+        console.error('Flashcard generation error response:', error);
+        throw error;
+      }
+      
+      if (!data || data.error) {
+        console.error('Flashcard generation failed:', data?.error);
+        throw new Error(data?.error || 'Failed to generate flashcards');
+      }
+      
+      toast.success(`Generated ${data.count || 0} flashcards!`);
       await fetchFlashcards();
     } catch (error) {
       console.error('Flashcard generation error:', error);
@@ -423,6 +435,8 @@ export function ContentRightSidebar({
     setGenerationType('quizzes');
     
     try {
+      console.log('Generating quiz with config:', configToUse);
+      
       const { data, error } = await supabase.functions.invoke('generate-quiz', {
         body: {
           contentId: contentData.id,
@@ -430,9 +444,19 @@ export function ContentRightSidebar({
         }
       });
       
-      if (error) throw error;
+      console.log('Quiz generation response:', { data, error });
       
-      toast.success(`Generated quiz with ${data.questionCount} questions!`);
+      if (error) {
+        console.error('Quiz generation error response:', error);
+        throw error;
+      }
+      
+      if (!data || data.error) {
+        console.error('Quiz generation failed:', data?.error);
+        throw new Error(data?.error || 'Failed to generate quiz');
+      }
+      
+      toast.success(`Generated quiz with ${data.questionCount || 0} questions!`);
       await fetchQuizzes();
     } catch (error) {
       console.error('Quiz generation error:', error);
