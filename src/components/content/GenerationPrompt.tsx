@@ -15,7 +15,7 @@ interface GenerationPromptProps {
 const contentConfig = {
   flashcards: {
     title: 'Create Flashcards',
-    description: 'Create a flashcard set with preferred number of cards, types of topics, and more.'
+    description: 'Create flashcards with preferred number of cards and types of topics.'
   },
   quizzes: {
     title: 'Generate Quiz',
