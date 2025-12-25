@@ -52,17 +52,25 @@ serve(async (req) => {
     console.log('Generating AI enhancement for content...');
 
     // Determine content-specific prompt
-    const getSystemPrompt = (type: string) => {
+    const getSystemPrompt = (type: string, totalPages?: number) => {
       if (type === 'pdf') {
+        const pageInfo = totalPages ? `The document has ${totalPages} pages total.` : '';
         return `You are an AI assistant that analyzes PDF document content and creates structured chapters.
 Your task is to break down the content into meaningful chapters with titles, summaries, and page references.
 
+${pageInfo}
+
+CRITICAL REQUIREMENTS:
+1. Each chapter MUST cover exactly 1-2 pages (no more, no less)
+2. You MUST create enough chapters to cover ALL pages of the document
+3. Chapters must be sequential and not skip any pages
+4. Every page must belong to exactly one chapter
+
 Create chapters that:
-1. Are logical and well-structured
-2. Have descriptive titles (3-8 words)
-3. Include comprehensive summaries (2-4 sentences)
-4. Cover the main topics and key points
-5. Are organized by page/section order
+1. Have descriptive titles (3-8 words) that capture the main topic of those pages
+2. Include comprehensive summaries (2-4 sentences) of the content on those pages
+3. Cover exactly 1-2 consecutive pages each
+4. Are organized in page order from start to finish
 
 Return a JSON object with a chapters array in this exact format:
 {
@@ -72,12 +80,23 @@ Return a JSON object with a chapters array in this exact format:
       "title": "Chapter Title",
       "summary": "Detailed summary of the chapter content...",
       "pageNumber": 1,
-      "endPage": 5
+      "endPage": 2
+    },
+    {
+      "id": "chapter-2",
+      "title": "Next Chapter Title",
+      "summary": "Summary of pages 3-4...",
+      "pageNumber": 3,
+      "endPage": 4
     }
   ]
 }
 
-IMPORTANT: Use pageNumber and endPage (integers) to indicate which pages each chapter covers. Estimate page numbers based on content structure and length.`;
+IMPORTANT: 
+- pageNumber is the starting page (1-indexed)
+- endPage is the ending page (can be same as pageNumber for single-page chapters)
+- For single page chapters, set endPage equal to pageNumber
+- Ensure the last chapter's endPage equals the total number of pages`;
       }
 
       const basePrompt = `You are an AI assistant that analyzes content and creates structured chapters. 
@@ -119,8 +138,23 @@ For non-audio content, use estimated time segments based on reading pace or cont
       }
     };
 
+    // Extract total pages from metadata if available (for PDFs)
+    const { data: contentMeta } = await supabase
+      .from('content')
+      .select('metadata')
+      .eq('id', contentId)
+      .single();
+    
+    const totalPages = contentMeta?.metadata?.totalPages || contentMeta?.metadata?.pageCount || null;
+    console.log('PDF total pages:', totalPages);
+
     let response;
     let model = 'gpt-4.1-2025-04-14';
+
+    // Build user prompt with page info for PDFs
+    const userPrompt = contentType === 'pdf' && totalPages
+      ? `This PDF document has ${totalPages} pages. Please analyze the following content and create chapters that cover ALL ${totalPages} pages, with each chapter covering exactly 1-2 pages:\n\n${textContent.slice(0, 15000)}`
+      : `Please analyze the following content and create chapters:\n\n${textContent.slice(0, 12000)}`;
 
     try {
       // Primary attempt with GPT-4.1
@@ -135,14 +169,14 @@ For non-audio content, use estimated time segments based on reading pace or cont
           messages: [
             {
               role: 'system',
-              content: getSystemPrompt(contentType || 'text')
+              content: getSystemPrompt(contentType || 'text', totalPages)
             },
             {
               role: 'user',
-              content: `Please analyze the following content and create chapters:\n\n${textContent.slice(0, 12000)}`
+              content: userPrompt
             }
           ],
-          max_completion_tokens: 2000,
+          max_completion_tokens: 4000, // Increased for more chapters
           response_format: { type: "json_object" }
         }),
       });
@@ -167,14 +201,14 @@ For non-audio content, use estimated time segments based on reading pace or cont
           messages: [
             {
               role: 'system',
-              content: getSystemPrompt(contentType || 'text')
+              content: getSystemPrompt(contentType || 'text', totalPages)
             },
             {
               role: 'user',
-              content: `Please analyze the following content and create chapters:\n\n${textContent.slice(0, 8000)}`
+              content: userPrompt
             }
           ],
-          max_completion_tokens: 1500,
+          max_completion_tokens: 3000,
           response_format: { type: "json_object" }
         }),
       });
