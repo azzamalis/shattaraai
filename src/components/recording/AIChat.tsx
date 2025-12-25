@@ -31,7 +31,7 @@ const AIChat = ({
     isLoading,
     isSending,
     sendMessage,
-    addAIResponse
+    addStreamingAIResponse
   } = useChatConversation({
     conversationType: contentData ? 'content_discussion' : 'general',
     contextId: contentData?.id,
@@ -45,9 +45,9 @@ const AIChat = ({
     sender_type: msg.sender_type as 'user' | 'ai'
   }));
 
-  // AI hook with content context
+  // AI hook with content context and streaming
   const {
-    sendMessageToAI
+    streamMessageToAI
   } = useOpenAIChatContent({
     conversationId: conversation?.id,
     contextId: contentData?.id,
@@ -56,9 +56,7 @@ const AIChat = ({
       title: contentData.title,
       type: contentData.type,
       text_content: contentData.text_content?.slice(0, 15000) || contentData.text?.slice(0, 15000),
-      // Limit to avoid token overflow
       summary: '',
-      // Summary field not in ContentData type
       chapters: contentData.chapters
     } : undefined
   });
@@ -102,15 +100,26 @@ const AIChat = ({
       // 2. Send user message with attachment URLs
       const userMessage = await sendMessage(content, uploadedAttachments);
       if (userMessage) {
-        // 3. Get AI response using real OpenAI integration with content context
+        // 3. Get streaming AI response
         setIsProcessingAI(true);
         try {
-          const aiResponse = await sendMessageToAI(content);
-          await addAIResponse(aiResponse);
+          const streamHandler = await addStreamingAIResponse();
+          if (streamHandler) {
+            let fullResponse = '';
+            await streamMessageToAI(
+              content,
+              (delta) => {
+                fullResponse += delta;
+                streamHandler.updateContent(fullResponse);
+              },
+              async () => {
+                await streamHandler.finalize(fullResponse);
+                setIsProcessingAI(false);
+              }
+            );
+          }
         } catch (error) {
           console.error('Error getting AI response:', error);
-          await addAIResponse('I apologize, but I\'m having trouble processing your request right now. Please try again.');
-        } finally {
           setIsProcessingAI(false);
         }
       }
