@@ -19,7 +19,7 @@ const contentConfig = {
   },
   quizzes: {
     title: 'Generate Quiz',
-    description: 'Generate a quiz with preferred difficulty, question types, and topic coverage.'
+    description: 'Create quizzes with preferred question types, difficulty, and more.'
   },
   summary: {
     title: 'Generate Summary',
