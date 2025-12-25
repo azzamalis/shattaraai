@@ -48,6 +48,22 @@ export function useChatConversation({
   const isSendingRef = useRef(false);
   const isAddingAIResponseRef = useRef(false);
 
+  // Helper to format message from DB row
+  const formatMessage = useCallback((dbMessage: any): ChatMessage => {
+    let attachments: any[] = [];
+    if (dbMessage.metadata && typeof dbMessage.metadata === 'object' && dbMessage.metadata !== null) {
+      const metadata = dbMessage.metadata as any;
+      attachments = Array.isArray(metadata.attachments) ? metadata.attachments : [];
+    }
+    return {
+      id: dbMessage.id,
+      content: dbMessage.content,
+      sender_type: dbMessage.sender_type as 'user' | 'ai' | 'system',
+      created_at: dbMessage.created_at,
+      attachments: attachments
+    };
+  }, []);
+
   const fetchMessages = useCallback(async (conversationId: string) => {
     setIsLoading(true);
     try {
@@ -247,7 +263,78 @@ export function useChatConversation({
     };
 
     loadConversation();
-  }, [conversationType, contextId, contextType, user?.id]);
+  }, [conversationType, contextId, contextType, user?.id, autoCreate, conversationId, conversation, fetchMessages, createConversation]);
+
+  // Real-time subscription for chat messages
+  useEffect(() => {
+    if (!conversationId) return;
+
+    console.log('Setting up real-time subscription for conversation:', conversationId);
+
+    const channel = supabase
+      .channel(`chat-messages-${conversationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: `conversation_id=eq.${conversationId}`
+        },
+        (payload) => {
+          console.log('Real-time message received:', payload);
+          const newMessage = payload.new as any;
+          
+          // Avoid duplicates - check if message already exists
+          setMessages(prev => {
+            if (prev.some(m => m.id === newMessage.id)) {
+              console.log('Duplicate message, skipping:', newMessage.id);
+              return prev;
+            }
+            console.log('Adding new message from real-time:', newMessage.id);
+            return [...prev, formatMessage(newMessage)];
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: `conversation_id=eq.${conversationId}`
+        },
+        (payload) => {
+          console.log('Real-time message update:', payload);
+          const updatedMessage = payload.new as any;
+          setMessages(prev => 
+            prev.map(m => m.id === updatedMessage.id ? formatMessage(updatedMessage) : m)
+          );
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: `conversation_id=eq.${conversationId}`
+        },
+        (payload) => {
+          console.log('Real-time message delete:', payload);
+          const deletedMessage = payload.old as any;
+          setMessages(prev => prev.filter(m => m.id !== deletedMessage.id));
+        }
+      )
+      .subscribe((status) => {
+        console.log('Real-time subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up real-time subscription for conversation:', conversationId);
+      supabase.removeChannel(channel);
+    };
+  }, [conversationId, formatMessage]);
 
   const sendMessage = async (
     content: string, 
