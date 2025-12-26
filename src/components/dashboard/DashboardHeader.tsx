@@ -110,7 +110,7 @@ export function DashboardHeader({
             <span className="sr-only">Toggle menu</span>
           </Button>
           
-          <Logo className="h-8 w-auto shrink-0" textColor="text-foreground" />
+          <Logo className="h-8 w-auto shrink-0" textColor="text-foreground" linkTo="/dashboard" />
           
           {/* Content Title */}
           {isContentPage && contentData && <div className="flex items-center gap-2 ml-4 group min-w-0 flex-1">
