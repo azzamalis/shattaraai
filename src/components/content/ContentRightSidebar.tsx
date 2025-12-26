@@ -681,7 +681,7 @@ export function ContentRightSidebar({
             </div>
           </TabsContent>
           
-          <TabsContent value="flashcards" className="flex-1 overflow-hidden mx-4 mb-4">
+          <TabsContent value="flashcards" className="flex-1 overflow-hidden">
             {showFlashcardStudy && flashcards.length > 0 ? (
               <div className="h-full">
                 <FlashcardContainer 
@@ -690,9 +690,10 @@ export function ContentRightSidebar({
                 />
               </div>
             ) : (
-              <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-                {flashcards.length === 0 ? (
-                  <div className="p-6">
+              <div className="h-[calc(100vh-165px)] overflow-y-auto md:h-[calc(100vh-120px)]">
+                <div className="mx-auto mb-2 w-full max-w-3xl px-4">
+                  <div className="space-y-3">
+                    {/* Generation Card */}
                     <GenerationPrompt
                       type="flashcards"
                       onGenerate={handleGenerateFlashcards}
@@ -700,86 +701,70 @@ export function ContentRightSidebar({
                       contentData={contentData}
                       isLoading={isGenerating && generationType === 'flashcards'}
                     />
+                    
+                    {/* My Flashcards Section */}
+                    {flashcards.length > 0 && (
+                      <div className="space-y-3 pt-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-medium text-muted-foreground">My Flashcards</h3>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <FlashcardListDisplay
+                            flashcards={flashcards}
+                            title={flashcardTitle}
+                            onStartFlashcards={() => setShowFlashcardStudy(true)}
+                            onRename={async (newTitle) => {
+                              try {
+                                setFlashcardTitle(newTitle);
+                                const updatedMetadata = {
+                                  ...(contentData.metadata || {}),
+                                  flashcardTitle: newTitle
+                                };
+                                const { error } = await supabase
+                                  .from('content')
+                                  .update({ metadata: updatedMetadata })
+                                  .eq('id', contentData.id);
+                                if (error) throw error;
+                                toast.success('Flashcards renamed');
+                              } catch (error) {
+                                console.error('Error renaming flashcards:', error);
+                                toast.error('Failed to save name');
+                              }
+                            }}
+                            onDeleteFlashcards={async () => {
+                              try {
+                                const { error } = await supabase
+                                  .from('flashcards')
+                                  .delete()
+                                  .eq('content_id', contentData.id);
+                                if (error) throw error;
+                                const updatedMetadata = {
+                                  ...(contentData.metadata || {}),
+                                  flashcardTitle: undefined
+                                };
+                                await supabase
+                                  .from('content')
+                                  .update({ metadata: updatedMetadata })
+                                  .eq('id', contentData.id);
+                                setFlashcards([]);
+                                setFlashcardTitle('My Flashcards');
+                                toast.success('Flashcards deleted successfully');
+                              } catch (error) {
+                                console.error('Error deleting flashcards:', error);
+                                toast.error('Failed to delete flashcards');
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <ScrollArea className="h-full">
-                    <div className="flex flex-col space-y-6">
-                      <div className="px-6 pt-6">
-                        <GenerationPrompt
-                          type="flashcards"
-                          onGenerate={handleGenerateFlashcards}
-                          onConfigure={() => setShowFlashcardConfig(true)}
-                          contentData={contentData}
-                          isLoading={isGenerating && generationType === 'flashcards'}
-                        />
-                      </div>
-                      <div className="px-6 pb-6">
-                        <FlashcardListDisplay
-                          flashcards={flashcards}
-                          title={flashcardTitle}
-                          onStartFlashcards={() => setShowFlashcardStudy(true)}
-                          onRename={async (newTitle) => {
-                            try {
-                              // Update local state
-                              setFlashcardTitle(newTitle);
-                              
-                              // Persist to database in content metadata
-                              const updatedMetadata = {
-                                ...(contentData.metadata || {}),
-                                flashcardTitle: newTitle
-                              };
-                              
-                              const { error } = await supabase
-                                .from('content')
-                                .update({ metadata: updatedMetadata })
-                                .eq('id', contentData.id);
-                              
-                              if (error) throw error;
-                              
-                              toast.success('Flashcards renamed');
-                            } catch (error) {
-                              console.error('Error renaming flashcards:', error);
-                              toast.error('Failed to save name');
-                            }
-                          }}
-                          onDeleteFlashcards={async () => {
-                            try {
-                              const { error } = await supabase
-                                .from('flashcards')
-                                .delete()
-                                .eq('content_id', contentData.id);
-                              
-                              if (error) throw error;
-                              
-                              // Also clear the title from metadata
-                              const updatedMetadata = {
-                                ...(contentData.metadata || {}),
-                                flashcardTitle: undefined
-                              };
-                              
-                              await supabase
-                                .from('content')
-                                .update({ metadata: updatedMetadata })
-                                .eq('id', contentData.id);
-                              
-                              setFlashcards([]);
-                              setFlashcardTitle('My Flashcards');
-                              toast.success('Flashcards deleted successfully');
-                            } catch (error) {
-                              console.error('Error deleting flashcards:', error);
-                              toast.error('Failed to delete flashcards');
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </ScrollArea>
-                )}
+                </div>
               </div>
             )}
           </TabsContent>
           
-          <TabsContent value="exams" className="flex-1 overflow-hidden mx-4 mb-4">
+          <TabsContent value="exams" className="flex-1 overflow-hidden">
             {showQuizTaking && quizData ? (
               <div className="h-full">
                 <QuizTakingComponent
@@ -796,9 +781,10 @@ export function ContentRightSidebar({
                 />
               </div>
             ) : (
-              <div className="h-full bg-dashboard-bg dark:bg-dashboard-bg rounded-xl">
-                {!quizData ? (
-                  <div className="p-6">
+              <div className="h-[calc(100vh-165px)] overflow-y-auto md:h-[calc(100vh-120px)]">
+                <div className="mx-auto mb-2 w-full max-w-3xl px-4">
+                  <div className="space-y-3">
+                    {/* Generation Card */}
                     <GenerationPrompt
                       type="quizzes"
                       onGenerate={handleGenerateQuiz}
@@ -806,53 +792,45 @@ export function ContentRightSidebar({
                       contentData={contentData}
                       isLoading={isGenerating && generationType === 'quizzes'}
                     />
+                    
+                    {/* My Quizzes Section */}
+                    {quizData && (
+                      <div className="space-y-3 pt-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-medium text-muted-foreground">My Quizzes</h3>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <QuizDisplay
+                            quiz={quizData}
+                            onStartQuiz={(quizId) => setShowQuizTaking(true)}
+                            onEditQuiz={(quizId) => {
+                              setShowQuizConfig(true);
+                              toast.info('Edit quiz configuration and regenerate');
+                            }}
+                            onRestartQuiz={(quizId) => {
+                              toast.info('Quiz restarted! Good luck!');
+                              setShowQuizTaking(true);
+                            }}
+                            onDeleteQuiz={async (quizId) => {
+                              try {
+                                const { error } = await supabase
+                                  .from('quizzes')
+                                  .delete()
+                                  .eq('id', quizId);
+                                if (error) throw error;
+                                setQuizData(null);
+                                toast.success('Quiz deleted successfully');
+                              } catch (error) {
+                                console.error('Error deleting quiz:', error);
+                                toast.error('Failed to delete quiz');
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <ScrollArea className="h-full">
-                    <div className="flex flex-col space-y-6">
-                      <div className="px-6 pt-6">
-                        <GenerationPrompt
-                          type="quizzes"
-                          onGenerate={handleGenerateQuiz}
-                          onConfigure={() => setShowQuizConfig(true)}
-                          contentData={contentData}
-                          isLoading={isGenerating && generationType === 'quizzes'}
-                        />
-                      </div>
-                      
-                      <div className="px-6 pb-6">
-                        <QuizDisplay
-                          quiz={quizData}
-                          onStartQuiz={(quizId) => setShowQuizTaking(true)}
-                          onEditQuiz={(quizId) => {
-                            setShowQuizConfig(true);
-                            toast.info('Edit quiz configuration and regenerate');
-                          }}
-                          onRestartQuiz={(quizId) => {
-                            toast.info('Quiz restarted! Good luck!');
-                            setShowQuizTaking(true);
-                          }}
-                          onDeleteQuiz={async (quizId) => {
-                            try {
-                              const { error } = await supabase
-                                .from('quizzes')
-                                .delete()
-                                .eq('id', quizId);
-                              
-                              if (error) throw error;
-                              
-                              setQuizData(null);
-                              toast.success('Quiz deleted successfully');
-                            } catch (error) {
-                              console.error('Error deleting quiz:', error);
-                              toast.error('Failed to delete quiz');
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </ScrollArea>
-                )}
+                </div>
               </div>
             )}
           </TabsContent>
