@@ -5,6 +5,7 @@ import { FlashcardDisplay } from './FlashcardDisplay';
 import { FlashcardNavigation } from './FlashcardNavigation';
 import { FlashcardControls } from './FlashcardControls';
 import { FilterModal } from './FilterModal';
+
 export interface FlashcardData {
   id: string;
   question: string;
