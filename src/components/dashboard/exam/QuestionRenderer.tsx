@@ -1,6 +1,7 @@
 import React from 'react';
 import { SkipForward, Undo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
 interface Question {
   id: number;
   type: 'multiple-choice' | 'free-text';
@@ -12,6 +13,7 @@ interface Question {
   difficulty?: string;
   topic?: string;
 }
+
 interface QuestionRendererProps {
   question: Question;
   isSkipped: boolean;
@@ -24,6 +26,7 @@ interface QuestionRendererProps {
   onMultipleChoiceAnswer: (answerIndex: number) => void;
   onFreeTextChange: (value: string) => void;
 }
+
 export function QuestionRenderer({
   question,
   isSkipped,
@@ -37,41 +40,126 @@ export function QuestionRenderer({
   onFreeTextChange
 }: QuestionRendererProps) {
   if (isSkipped) {
-    return <div className={cn("mb-8 rounded-lg p-6", "bg-card border-border")}>
-        <div className="mb-2 text-lg font-medium">{question.id}.</div>
-        <h2 className="mb-8 text-xl leading-relaxed text-muted-foreground">{question.question}</h2>
-        <div className="flex justify-center">
-          <button onClick={onUndoSkip} className="flex items-center gap-2 rounded-md bg-accent px-4 py-2 hover:bg-accent/80">
+    return (
+      <div className="p-2">
+        <div className="mb-2 flex items-start justify-between gap-2">
+          <div className="text-md flex flex-1 space-x-2 font-normal leading-relaxed">
+            <span className="flex-shrink-0 text-muted-foreground">{question.id}.</span>
+            <div className="flex-1">
+              <p className="text-base leading-7 text-muted-foreground">{question.question}</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-center py-4">
+          <button 
+            onClick={onUndoSkip} 
+            className={cn(
+              "inline-flex items-center justify-center gap-2 rounded-lg",
+              "h-10 px-4 py-2 text-sm font-medium",
+              "bg-accent text-accent-foreground",
+              "hover:bg-accent/80 transition-colors"
+            )}
+          >
             <Undo2 className="h-4 w-4" />
-            Undo Skip
+            <span>Undo Skip</span>
           </button>
         </div>
-      </div>;
+      </div>
+    );
   }
-  return <div className={cn("mb-8 rounded-lg p-6", "bg-card border-border")}>
-      <div className="mb-8 flex items-start justify-between">
-        <div>
-          <div className="mb-2 text-lg font-medium">{question.id}.</div>
-          <h2 className="leading-relaxed font-medium text-lg">{question.question}</h2>
+
+  return (
+    <div className="p-2">
+      {/* Question Header */}
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div className="text-md flex flex-1 space-x-2 font-normal leading-relaxed">
+          <span className="flex-shrink-0">{question.id}.</span>
+          <div className="flex-1">
+            <p className="text-base leading-7">{question.question}</p>
+          </div>
         </div>
-        <button onClick={onSkip} className={cn("flex items-center gap-1 text-sm", "text-muted-foreground", "hover:text-foreground")}>
-          <SkipForward className="h-4 w-4" />
-          Skip
-        </button>
+        
+        {/* Desktop Skip Button */}
+        <div className="hidden sm:block">
+          <button 
+            onClick={onSkip}
+            className={cn(
+              "inline-flex items-center justify-center whitespace-nowrap rounded-lg",
+              "text-sm font-medium ring-offset-background transition-colors",
+              "focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+              "hover:bg-accent hover:text-accent-foreground",
+              "h-10 px-4 py-2 space-x-2 text-muted-foreground"
+            )}
+          >
+            <SkipForward className="h-4 w-4" />
+            <span>Skip</span>
+          </button>
+        </div>
       </div>
 
-      {question.type === 'multiple-choice' && question.options && <div className="space-y-3">
-          {question.options.map((option: string, index: number) => <button key={index} onClick={() => onMultipleChoiceAnswer(index)} className={cn("w-full rounded-lg border p-4 text-left transition-colors", answer === index ? "border-primary bg-primary/10" : "border-border bg-card hover:border-muted-foreground/50")}>
-              <span className="mr-3 font-medium">{String.fromCharCode(65 + index)}.</span>
-              {option}
-            </button>)}
-        </div>}
+      {/* Multiple Choice Options */}
+      {question.type === 'multiple-choice' && question.options && (
+        <div className="space-y-2">
+          {question.options.map((option: string, index: number) => (
+            <button
+              key={index}
+              onClick={() => onMultipleChoiceAnswer(index)}
+              className={cn(
+                "w-full rounded-2xl p-2.5 text-left transition-all",
+                "flex items-start gap-2 border-[1.5px]",
+                "text-primary/90 hover:text-primary hover:bg-accent/50",
+                answer === index
+                  ? "border-primary bg-primary/10"
+                  : "border-border"
+              )}
+            >
+              <span className="ml-1 pt-0.5 text-sm font-semibold text-muted-foreground">
+                {String.fromCharCode(65 + index)}.
+              </span>
+              <p className="text-base leading-7 flex-1">{option}</p>
+            </button>
+          ))}
+        </div>
+      )}
 
-      {question.type === 'free-text' && <div className="relative">
-          <textarea value={answer || ''} onChange={e => onFreeTextChange(e.target.value)} placeholder="Type your answer here..." className={cn("min-h-32 w-full resize-none rounded-lg p-4", "border border-border", "bg-background", "text-foreground", "placeholder-muted-foreground", "focus:border-primary focus:ring-1 focus:ring-primary")} />
-          {isSaving && savingQuestionId === question.id && <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+      {/* Free Text Answer */}
+      {question.type === 'free-text' && (
+        <div className="relative">
+          <textarea
+            value={answer || ''}
+            onChange={(e) => onFreeTextChange(e.target.value)}
+            placeholder="Type your answer here..."
+            className={cn(
+              "min-h-[60px] max-h-[150px] w-full resize-none overflow-hidden",
+              "rounded-2xl border-[1.5px] border-neutral-200 dark:border-neutral-700",
+              "bg-background px-4 py-3 text-base",
+              "placeholder:text-muted-foreground",
+              "focus-visible:outline-none"
+            )}
+          />
+          {isSaving && savingQuestionId === question.id && (
+            <div className="absolute bottom-2 right-3 text-xs text-muted-foreground">
               <span className="animate-pulse">Saving...</span>
-            </div>}
-        </div>}
-    </div>;
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Mobile Skip Button */}
+      <div className="mt-2 block text-left sm:hidden">
+        <button 
+          onClick={onSkip}
+          className={cn(
+            "inline-flex items-center justify-center whitespace-nowrap rounded-lg",
+            "text-sm font-medium ring-offset-background transition-colors",
+            "focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+            "hover:bg-accent hover:text-accent-foreground",
+            "h-10 py-2 space-x-2 px-0 text-muted-foreground underline"
+          )}
+        >
+          <span>Skip Question?</span>
+        </button>
+      </div>
+    </div>
+  );
 }
