@@ -317,8 +317,8 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
 
       <main className="flex-1 overflow-hidden">
         <ScrollArea className="h-[calc(100vh-180px)]">
-          <div className="px-6 py-8 pb-4">
-            <div className="mx-auto max-w-4xl">
+          <div className="mx-auto mt-16 w-full flex-grow px-4 pb-24 lg:w-3/5 2xl:w-1/2">
+            <div className="flex flex-col gap-24">
               {questions.map(question => (
                 <QuestionRenderer
                   key={question.id}
