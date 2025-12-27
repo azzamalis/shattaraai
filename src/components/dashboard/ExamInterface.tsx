@@ -299,18 +299,25 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
     }
   };
 
+  const handleClose = () => {
+    // Clear exam start time when closing
+    localStorage.removeItem(`examStartTime_${contentId}`);
+    navigate('/dashboard');
+  };
+
   return (
-    <div className="h-full bg-background text-foreground">
+    <div className="flex h-full flex-col bg-background text-foreground">
       <ExamHeader
         totalCompletedQuestions={totalCompletedQuestions}
         totalQuestions={questions.length}
         timeRemaining={timeRemaining}
         progressPercentage={progressPercentage}
+        onClose={handleClose}
       />
 
-      <main className="pb-0">
-        <ScrollArea className="h-[calc(100vh-140px)]">
-          <div className="px-6 py-8">
+      <main className="flex-1 overflow-hidden">
+        <ScrollArea className="h-[calc(100vh-180px)]">
+          <div className="px-6 py-8 pb-4">
             <div className="mx-auto max-w-4xl">
               {questions.map(question => (
                 <QuestionRenderer
@@ -327,35 +334,38 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
                   onFreeTextChange={(value) => handleFreeTextChange(question.id, value)}
                 />
               ))}
-              
-              <div className="mt-12 relative">
-                <div className="absolute inset-0 -bottom-8 bg-background" />
-                <button 
-                  onClick={handleSubmitExam}
-                  disabled={isSubmitting}
-                  className={cn(
-                    "relative z-10",
-                    "w-full rounded-lg py-4 px-8 text-lg font-medium",
-                    "bg-primary text-primary-foreground",
-                    "hover:bg-primary/90 transition-colors",
-                    "disabled:opacity-50 disabled:cursor-not-allowed",
-                    "flex items-center justify-center gap-3"
-                  )}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                      <span>{submissionProgress || 'Submitting...'}</span>
-                    </>
-                  ) : (
-                    'Submit Exam'
-                  )}
-                </button>
-              </div>
             </div>
           </div>
         </ScrollArea>
       </main>
+
+      {/* Sticky bottom bar */}
+      <div className="sticky bottom-0 z-10">
+        <div className="border-t-[1.5px] border-border bg-background px-4 py-8 md:py-[clamp(1rem,2.5vh,2.5rem)]">
+          <div className="mx-auto flex max-w-4xl justify-center gap-4">
+            <button 
+              onClick={handleSubmitExam}
+              disabled={isSubmitting}
+              className={cn(
+                "inline-flex items-center justify-center gap-3",
+                "h-12 w-full rounded-full px-8 text-base font-medium md:w-96",
+                "bg-primary text-primary-foreground",
+                "hover:bg-primary/90 transition-colors",
+                "disabled:pointer-events-none disabled:opacity-50"
+              )}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  <span>{submissionProgress || 'Submitting...'}</span>
+                </>
+              ) : (
+                'Submit Exam'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
