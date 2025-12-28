@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ExamResultsHeader } from './exam-results-interface/ExamResultsHeader';
 import { ExamResultsFooter } from './exam-results-interface/ExamResultsFooter';
 import { ChatDrawer } from './exam-results-interface/ChatDrawer';
 import { AnswerBreakdown } from './exam-results-interface/AnswerBreakdown';
-
 interface Question {
   id: number;
   type: 'multiple-choice' | 'free-text';
@@ -19,7 +18,6 @@ interface Question {
   referenceSource?: string;
   isSkipped?: boolean;
 }
-
 interface ExamResults {
   questions: Question[];
   answers: {
@@ -33,7 +31,6 @@ interface ExamResults {
     total: number;
   };
 }
-
 const DUMMY_EXAM_DATA = {
   questions: [{
     id: 1,
@@ -96,7 +93,6 @@ const DUMMY_EXAM_DATA = {
     total: 5
   }
 };
-
 const ExamResultsInterface: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentChatQuestion, setCurrentChatQuestion] = useState<number | null>(null);
@@ -120,7 +116,7 @@ const ExamResultsInterface: React.FC = () => {
       }
     }
     return {
-      examId: contentId,
+      examId: contentId, // fallback to contentId if no generatedExam
       roomId: null,
       contentId: contentId
     };
@@ -159,80 +155,45 @@ const ExamResultsInterface: React.FC = () => {
     navigate('/exam');
     return null;
   })();
-
   const openChatForQuestion = (questionId: number) => {
     setCurrentChatQuestion(questionId);
     setChatType('question');
     setIsChatOpen(true);
   };
-
-  const handleClose = () => {
-    navigate('/dashboard');
-  };
-
   if (!examResults) {
     return null;
   }
+  return <div className="h-full bg-background text-foreground">
+      <ExamResultsHeader totalQuestions={examResults.score.total} onOpenChat={() => {
+        setCurrentChatQuestion(null); // Clear question context for space chat
+        setChatType('space');
+        setIsChatOpen(true);
+      }} />
 
-  return (
-    <div className="flex h-screen flex-col bg-background text-foreground">
-      <ExamResultsHeader 
-        totalQuestions={examResults.score.total} 
-        onOpenChat={() => {
-          setCurrentChatQuestion(null);
-          setChatType('space');
-          setIsChatOpen(true);
-        }}
-        onClose={handleClose}
-      />
-
-      {/* Scrollable Content - Main Scrolling Div */}
-      <div className="mx-auto mt-16 w-full flex-grow overflow-y-auto px-4 pb-24 lg:w-3/5 2xl:w-1/2">
-        <div className="flex flex-col gap-24">
-          {examResults.questions.map((question, index) => (
-            <div key={question.id} className="h-full w-full overflow-y-auto rounded-lg" role="region" aria-roledescription="carousel">
-              <div className="p-2">
-                {/* Question Header */}
-                <div className="mb-2 flex items-start justify-between gap-2">
-                  <div className="text-md flex flex-1 space-x-2 font-normal leading-relaxed">
-                    <span className="flex-shrink-0">{index + 1}.</span>
-                    <div className="flex-1">
-                      <div className="prose prose-neutral dark:prose-invert max-w-none">
-                        <div className="space-y-4">
-                          <p className="text-base leading-7 last:mb-0">
-                            {question.question}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="items-end">
-                    <button 
-                      onClick={() => openChatForQuestion(question.id)}
-                      className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-2xl px-3 gap-x-2"
-                    >
-                      <span>Ask chat</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
-                  </div>
+      {/* Main Content Area */}
+      <main className="pb-24 pt-8">
+        <div className="mx-auto max-w-4xl px-6">
+          <h1 className="mb-8 text-center text-2xl font-semibold">Answer Breakdown</h1>
+          
+          {examResults.questions.map(question => <div key={question.id} className="mb-8 rounded-lg bg-card p-6">
+              <div className="mb-4 flex items-start justify-between">
+                <div>
+                  <div className="mb-2 text-lg font-medium">{question.id}.</div>
+                  <h3 className="leading-relaxed text-lg">{question.question}</h3>
                 </div>
-
-                {/* Answer Section */}
-                <AnswerBreakdown question={question} contentId={contentId} />
+                <button onClick={() => openChatForQuestion(question.id)} className="flex items-center whitespace-nowrap gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
+                  <span>Ask chat</span>
+                  <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
-            </div>
-          ))}
+              
+              <AnswerBreakdown question={question} />
+            </div>)}
         </div>
-      </div>
+      </main>
 
       <ExamResultsFooter 
-        onTryAgain={() => {
-          if (examMetadata.roomId) {
-            navigate(`/room/${examMetadata.roomId}`);
-          } else {
-            navigate('/dashboard');
-          }
-        }} 
+        onTryAgain={() => navigate(`/exam/${contentId}`)} 
         onViewResults={() => navigate(`/exam-summary/${contentId}`)} 
       />
 
@@ -245,8 +206,6 @@ const ExamResultsInterface: React.FC = () => {
         roomId={examMetadata.roomId}
         chatType={chatType}
       />
-    </div>
-  );
+    </div>;
 };
-
 export default ExamResultsInterface;
