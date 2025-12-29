@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ExamResultsHeader } from './exam-results-interface/ExamResultsHeader';
 import { ExamResultsFooter } from './exam-results-interface/ExamResultsFooter';
@@ -172,23 +171,17 @@ const ExamResultsInterface: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="pb-24 pt-8">
-        <div className="mx-auto max-w-4xl px-6">
-          <h1 className="mb-8 text-center text-2xl font-semibold">Answer Breakdown</h1>
-          
-          {examResults.questions.map(question => <div key={question.id} className="mb-8 rounded-lg bg-card p-6">
-              <div className="mb-4 flex items-start justify-between">
-                <div>
-                  <div className="mb-2 text-lg font-medium">{question.id}.</div>
-                  <h3 className="leading-relaxed text-lg">{question.question}</h3>
-                </div>
-                <button onClick={() => openChatForQuestion(question.id)} className="flex items-center whitespace-nowrap gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
-                  <span>Ask chat</span>
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-              
-              <AnswerBreakdown question={question} />
-            </div>)}
+        <div className="mx-auto mt-16 w-full flex-grow overflow-y-auto px-4 pb-24 lg:w-3/5 2xl:w-1/2">
+          <div className="flex flex-col gap-24">
+            {examResults.questions.map(question => (
+              <AnswerBreakdown 
+                key={question.id} 
+                question={question} 
+                contentId={examMetadata.contentId}
+                onAskChat={openChatForQuestion}
+              />
+            ))}
+          </div>
         </div>
       </main>
 

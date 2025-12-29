@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Check, X, HelpCircle } from 'lucide-react';
+import { Check, X, CircleHelp, CircleCheck, CircleX, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 
@@ -21,99 +21,160 @@ interface Question {
 interface AnswerBreakdownProps {
   question: Question;
   contentId?: string;
+  onAskChat?: (questionId: number) => void;
 }
 
-export function AnswerBreakdown({ question, contentId }: AnswerBreakdownProps) {
+export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakdownProps) {
   const getStatusConfig = () => {
     if (question.isSkipped) {
       return {
-        icon: HelpCircle,
+        icon: CircleHelp,
         bgColor: 'bg-muted',
-        borderColor: 'border-muted-foreground/30',
         textColor: 'text-muted-foreground',
-        badgeVariant: 'secondary' as const,
-        badgeClassName: 'bg-muted text-muted-foreground',
-        status: 'Skipped'
+        badgeClassName: 'bg-muted border-foreground-muted text-muted-foreground',
+        status: 'Skipped',
+        showScore: true
       };
     }
     
     const isCorrect = question.type === 'multiple-choice' 
       ? question.userAnswer === question.correctAnswer
-      : !question.feedback?.toLowerCase().startsWith('incorrect'); // Free-text: check if feedback starts with "incorrect"
+      : !question.feedback?.toLowerCase().startsWith('incorrect');
     
     if (isCorrect && question.type === 'multiple-choice') {
       return {
-        icon: Check,
-        bgColor: 'bg-green-50 dark:bg-green-950',
-        borderColor: 'border-green-200 dark:border-green-800',
-        textColor: 'text-green-700 dark:text-green-400',
-        badgeVariant: 'default' as const,
-        badgeClassName: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-        status: 'Correct'
+        icon: CircleCheck,
+        bgColor: 'bg-green-500/10',
+        textColor: 'text-green-600 dark:text-green-400',
+        badgeClassName: 'bg-green-500/10 border-green-500/10 text-green-600 dark:text-green-400',
+        status: 'Correct',
+        showScore: false
       };
     }
     
     return {
-      icon: X,
-      bgColor: 'bg-red-50 dark:bg-red-950',
-      borderColor: 'border-red-200 dark:border-red-800',
-      textColor: 'text-red-700 dark:text-red-400',
-      badgeVariant: 'destructive' as const,
-      badgeClassName: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
-      status: 'Incorrect'
+      icon: CircleX,
+      bgColor: 'bg-red-500/10',
+      textColor: 'text-red-600 dark:text-red-400',
+      badgeClassName: 'bg-red-500/10 border-red-500/10 text-red-600 dark:text-red-400',
+      status: 'Incorrect',
+      showScore: false
     };
   };
 
+  const renderQuestionHeader = () => (
+    <div className="mb-2 flex items-start justify-between gap-2">
+      <div className="text-md flex flex-1 space-x-2 font-normal leading-relaxed">
+        <span className="flex-shrink-0">{question.id}.</span>
+        <div className="flex-1">
+          <div className="prose prose-neutral dark:prose-invert max-w-none">
+            <p className="text-base leading-7 last:mb-0">{question.question}</p>
+          </div>
+        </div>
+      </div>
+      <div className="items-end">
+        <button 
+          onClick={() => onAskChat?.(question.id)}
+          className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-lg px-3 gap-x-2"
+        >
+          <span>Ask chat</span>
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderFeedbackBox = (statusConfig: ReturnType<typeof getStatusConfig>, feedbackText?: string) => (
+    <div className={`mt-4 rounded-lg p-4 ${statusConfig.bgColor}`}>
+      <div className="flex flex-col">
+        <div className="flex items-center gap-2">
+          <h3 className={`flex items-center gap-2 font-medium ${statusConfig.textColor}`}>
+            <statusConfig.icon className="h-5 w-5" />
+            {statusConfig.status}
+          </h3>
+        </div>
+        {statusConfig.showScore && (
+          <div className="mt-2 flex items-center gap-4">
+            <div className="text-base font-medium text-muted-foreground">Score: 0/4</div>
+          </div>
+        )}
+        <div className={`mt-2 text-sm font-normal leading-relaxed ${statusConfig.textColor}`}>
+          <div className="prose prose-neutral dark:prose-invert max-w-none">
+            <p className="text-base leading-7 last:mb-0">
+              {feedbackText || 'Explanation not available for this question.'}
+            </p>
+          </div>
+          {question.referenceTime && question.referenceSource && (
+            <span className="items-center">
+              {contentId ? (
+                <Link to={`/content/${contentId}`}>
+                  <Badge className={`mt-2 cursor-pointer space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName} border`}>
+                    <span>Page {question.referenceTime}</span>
+                    <span>:</span>
+                    <span className="max-w-[10rem] truncate">{question.referenceSource}</span>
+                  </Badge>
+                </Link>
+              ) : (
+                <Badge className={`mt-2 space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName} border`}>
+                  <span>Page {question.referenceTime}</span>
+                  <span>:</span>
+                  <span className="max-w-[10rem] truncate">{question.referenceSource}</span>
+                </Badge>
+              )}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   const renderMultipleChoiceAnswer = () => {
     const statusConfig = getStatusConfig();
-    const StatusIcon = statusConfig.icon;
 
     return (
-      <div className="space-y-3">
-        {question.options?.map((option, index) => {
-          let borderColor = 'border-border';
-          let bgColor = 'bg-card';
+      <div className="h-full w-full overflow-y-auto rounded-lg" role="region" aria-roledescription="carousel">
+        <div className="p-2">
+          {renderQuestionHeader()}
           
-          if (index === question.correctAnswer) {
-            borderColor = 'border-green-500/30';
-            bgColor = 'bg-green-500/10';
-          } else if (index === question.userAnswer && index !== question.correctAnswer) {
-            borderColor = 'border-red-500/30';
-            bgColor = 'bg-red-500/10';
-          }
+          <div className="space-y-2">
+            {question.options?.map((option, index) => {
+              const isUserAnswer = index === question.userAnswer;
+              const isCorrectAnswer = index === question.correctAnswer;
+              const isWrongSelection = isUserAnswer && !isCorrectAnswer;
+              
+              let borderClass = 'border-[1.5px]';
+              
+              if (isCorrectAnswer && !isUserAnswer) {
+                // Correct answer that user didn't select - show dashed green border
+                borderClass = 'border-[1.5px] border-dashed border-green-500';
+              } else if (isCorrectAnswer && isUserAnswer) {
+                // Correct answer that user selected - solid green border
+                borderClass = 'border-[1.5px] border-green-500';
+              } else if (isWrongSelection) {
+                // Wrong answer that user selected - solid red border
+                borderClass = 'border-[1.5px] border-red-500';
+              }
 
-          return (
-            <div
-              key={index}
-              className={`w-full rounded-lg border p-4 ${borderColor} ${bgColor}`}
-            >
-              <span className="mr-3 font-medium">{String.fromCharCode(65 + index)}.</span>
-              {option}
-            </div>
-          );
-        })}
-        
-        <div className={`mt-4 rounded-lg border p-4 ${statusConfig.borderColor} ${statusConfig.bgColor}`}>
-          <div className={`mb-3 flex items-center gap-2 font-medium ${statusConfig.textColor}`}>
-            <StatusIcon className="h-4 w-4" />
-            {statusConfig.status}
+              return (
+                <button
+                  key={index}
+                  disabled
+                  className={`w-full rounded-2xl p-2.5 text-left text-primary/90 transition-all flex items-start gap-2 cursor-default ${borderClass}`}
+                >
+                  <span className="ml-1 pt-1 text-sm font-semibold text-muted-foreground">
+                    {String.fromCharCode(65 + index)}.
+                  </span>
+                  <div className="prose prose-neutral dark:prose-invert max-w-none">
+                    <div className="space-y-4 flex-1">
+                      <p className="text-base leading-7 last:mb-0">{option}</p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
-          <p className="text-sm text-foreground leading-relaxed mb-3">
-            {question.explanation || 'Explanation not available for this question.'}
-          </p>
-          {question.referenceTime && question.referenceSource && (
-            contentId ? (
-              <Link to={`/content/${contentId}`} className="inline-block">
-                <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent cursor-pointer transition-opacity hover:opacity-80`}>
-                  {question.referenceSource} - {question.referenceTime}
-                </Badge>
-              </Link>
-            ) : (
-              <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent`}>
-                {question.referenceSource} - {question.referenceTime}
-              </Badge>
-            )
-          )}
+          
+          {renderFeedbackBox(statusConfig, question.explanation)}
         </div>
       </div>
     );
@@ -121,74 +182,22 @@ export function AnswerBreakdown({ question, contentId }: AnswerBreakdownProps) {
 
   const renderFreeTextAnswer = () => {
     const statusConfig = getStatusConfig();
-    const StatusIcon = statusConfig.icon;
-    
-    // Determine if the answer is incorrect based on feedback
-    const isIncorrectAnswer = question.feedback?.toLowerCase().startsWith('incorrect');
-    const feedbackColor = isIncorrectAnswer ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950' : 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950';
-    const feedbackTextColor = isIncorrectAnswer ? 'text-red-700 dark:text-red-400' : 'text-green-700 dark:text-green-400';
-    const feedbackBadgeClass = isIncorrectAnswer ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 shadow-sm border-0 hover:bg-transparent' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 shadow-sm border-0 hover:bg-transparent';
-    const FeedbackIcon = isIncorrectAnswer ? X : Check;
-
-    if (question.isSkipped) {
-      return (
-        <div>
-          <div className="mb-4 rounded-lg border border-border bg-card p-4">
-            <div className="text-muted-foreground italic">Question was skipped</div>
-          </div>
-          <div className={`rounded-lg border p-4 ${statusConfig.borderColor} ${statusConfig.bgColor}`}>
-            <div className={`mb-3 flex items-center gap-2 font-medium ${statusConfig.textColor}`}>
-              <StatusIcon className="h-4 w-4" />
-              {statusConfig.status}
-            </div>
-            <p className="text-sm text-foreground leading-relaxed mb-3">
-              {question.feedback || 'Sample answer not available for this question.'}
-            </p>
-            {question.referenceTime && question.referenceSource && (
-              contentId ? (
-                <Link to={`/content/${contentId}`} className="inline-block">
-                  <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent cursor-pointer transition-opacity hover:opacity-80`}>
-                    {question.referenceSource} - {question.referenceTime}
-                  </Badge>
-                </Link>
-              ) : (
-                <Badge className={`text-xs ${statusConfig.badgeClassName} shadow-sm border-0 hover:bg-transparent`}>
-                  {question.referenceSource} - {question.referenceTime}
-                </Badge>
-              )
-            )}
-          </div>
-        </div>
-      );
-    }
 
     return (
-      <div>
-        <div className="mb-4 rounded-lg border border-border bg-card p-4">
-          <div className="mb-2 text-sm text-muted-foreground">Your Answer:</div>
-          <div className="text-foreground">{question.userAnswer || 'No answer provided'}</div>
-        </div>
-        <div className={`rounded-lg border p-4 ${feedbackColor}`}>
-          <div className={`mb-3 flex items-center gap-2 font-medium ${feedbackTextColor}`}>
-            <FeedbackIcon className="h-4 w-4" />
-            AI Feedback
+      <div className="h-full w-full overflow-y-auto rounded-lg" role="region" aria-roledescription="carousel">
+        <div className="p-2">
+          {renderQuestionHeader()}
+          
+          <div className="relative">
+            <textarea
+              className="flex max-h-[150px] min-h-[60px] w-full resize-none overflow-hidden rounded-2xl border-[1.5px] border-neutral-200 bg-background px-4 py-3 text-base placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700"
+              placeholder="Type your answer here..."
+              disabled
+              value={question.isSkipped ? '' : (question.userAnswer as string || '')}
+            />
           </div>
-          <p className="text-sm text-foreground leading-relaxed mb-3">
-            {question.feedback || 'Good effort! This type of question requires detailed explanation of the concepts involved.'}
-          </p>
-          {question.referenceTime && question.referenceSource && (
-            contentId ? (
-              <Link to={`/content/${contentId}`} className="inline-block">
-                <Badge className={`text-xs ${feedbackBadgeClass} cursor-pointer transition-opacity hover:opacity-80`}>
-                  {question.referenceSource} - {question.referenceTime}
-                </Badge>
-              </Link>
-            ) : (
-              <Badge className={`text-xs ${feedbackBadgeClass}`}>
-                {question.referenceSource} - {question.referenceTime}
-              </Badge>
-            )
-          )}
+          
+          {renderFeedbackBox(statusConfig, question.feedback)}
         </div>
       </div>
     );
