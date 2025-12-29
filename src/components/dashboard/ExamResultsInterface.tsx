@@ -194,7 +194,8 @@ const ExamResultsInterface: React.FC = () => {
 
       <ExamResultsFooter 
         onTryAgain={() => navigate(`/exam/${contentId}`)} 
-        onViewResults={() => navigate(`/exam-summary/${contentId}`)} 
+        onViewResults={() => navigate(`/exam-summary/${contentId}`)}
+        roomId={examMetadata.roomId}
       />
 
       <ChatDrawer 

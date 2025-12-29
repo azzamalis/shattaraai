@@ -1,31 +1,41 @@
 
 import React from 'react';
-import { RotateCcw, BarChart3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface ExamResultsFooterProps {
   onTryAgain: () => void;
   onViewResults: () => void;
+  roomId?: string | null;
 }
 
-export function ExamResultsFooter({ onTryAgain, onViewResults }: ExamResultsFooterProps) {
+export function ExamResultsFooter({ onTryAgain, onViewResults, roomId }: ExamResultsFooterProps) {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 border-t border-border bg-card px-6 py-4">
-      <div className="mx-auto flex max-w-4xl gap-4">
-        <button 
-          onClick={onTryAgain}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent py-3 font-medium hover:bg-accent/80"
-        >
-          <RotateCcw className="h-5 w-5" />
-          Try Again
-        </button>
-        <button 
-          onClick={onViewResults}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-3 font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          <BarChart3 className="h-5 w-5" />
-          View Results
-        </button>
+    <div className="sticky bottom-0 z-10">
+      <div className="border-t border-border bg-background px-4 py-8 md:py-[clamp(1rem,2.5vh,2.5rem)]">
+        <div className="mx-auto flex max-w-4xl justify-center gap-4">
+          {roomId ? (
+            <Link
+              to={`/room/${roomId}`}
+              className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground px-8 h-12 w-full rounded-full text-base md:w-96"
+            >
+              Go to Space
+            </Link>
+          ) : (
+            <button 
+              onClick={onTryAgain}
+              className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground px-8 h-12 w-full rounded-full text-base md:w-96"
+            >
+              Go to Space
+            </button>
+          )}
+          <button 
+            onClick={onViewResults}
+            className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 px-8 h-12 w-full rounded-full text-base md:w-96"
+          >
+            View Results
+          </button>
+        </div>
       </div>
-    </footer>
+    </div>
   );
 }
