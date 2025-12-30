@@ -2,6 +2,7 @@
 import React from 'react';
 import { CircleHelp, CircleCheck, CircleX, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 
 interface Question {
   id: number;
@@ -66,15 +67,17 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
       <div className="text-md flex flex-1 space-x-2 font-normal leading-relaxed">
         <span className="flex-shrink-0">{question.id}.</span>
         <div className="flex-1">
-          <div className="prose prose-neutral dark:prose-invert max-w-none">
-            <p className="text-base leading-7 last:mb-0">{question.question}</p>
+          <div className="markdown-body prose prose-neutral dark:prose-invert max-w-none">
+            <div className="space-y-4">
+              <p className="text-base leading-7 last:mb-0">{question.question}</p>
+            </div>
           </div>
         </div>
       </div>
       <div className="items-end">
         <button 
           onClick={() => onAskChat?.(question.id)}
-          className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-lg px-3 gap-x-2"
+          className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-lg px-3 gap-x-2"
         >
           <span>Ask chat</span>
           <ArrowRight className="h-4 w-4" />
@@ -104,22 +107,43 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
             <div className="text-base font-medium text-muted-foreground">Score: 0/4</div>
           )}
           <div className={`mt-2 text-sm font-normal leading-relaxed ${statusConfig.textColor}`}>
-            <p className="text-base leading-7">
-              {cleanFeedbackText}
-            </p>
+            <div className="markdown-body prose prose-neutral dark:prose-invert max-w-none">
+              <div className="space-y-4 text-sm leading-normal">
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => (
+                      <p className="text-base leading-7 last:mb-0 m-0">{children}</p>
+                    ),
+                    strong: ({ children }) => (
+                      <strong className="font-semibold">{children}</strong>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className="list-disc pl-5 space-y-1 mt-2">{children}</ul>
+                    ),
+                    li: ({ children }) => (
+                      <li className="text-base leading-7">{children}</li>
+                    ),
+                  }}
+                >
+                  {cleanFeedbackText}
+                </ReactMarkdown>
+              </div>
+            </div>
             {question.referenceTime && question.referenceSource && (
-              <span className="inline-block mt-2">
+              <span className="items-center">
                 {contentId ? (
                   <Link to={`/content/${contentId}`}>
-                    <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors cursor-pointer gap-1 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
-                      <span>Page {question.referenceTime}:</span>
-                      <span className="max-w-[12rem] truncate">{question.referenceSource}</span>
+                    <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors mt-2 cursor-pointer space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
+                      <span>Page {question.referenceTime}</span>
+                      :
+                      <span className="max-w-[10rem] truncate">{question.referenceSource}</span>
                     </span>
                   </Link>
                 ) : (
-                  <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors gap-1 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
-                    <span>Page {question.referenceTime}:</span>
-                    <span className="max-w-[12rem] truncate">{question.referenceSource}</span>
+                  <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors mt-2 space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
+                    <span>Page {question.referenceTime}</span>
+                    :
+                    <span className="max-w-[10rem] truncate">{question.referenceSource}</span>
                   </span>
                 )}
               </span>
