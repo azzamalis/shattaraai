@@ -89,7 +89,7 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
   const renderFeedbackBox = (statusConfig: ReturnType<typeof getStatusConfig>, feedbackText?: string) => {
     const StatusIcon = statusConfig.icon;
     
-    // Clean feedback text - remove status prefix if present (e.g., "INCORRECT: ..." or "Incorrect: ...")
+    // Clean feedback text - remove status prefix if present
     const cleanFeedbackText = feedbackText 
       ? feedbackText.replace(/^(INCORRECT|CORRECT|SKIPPED):\s*/i, '')
       : 'Explanation not available for this question.';
@@ -99,7 +99,7 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <h3 className={`flex items-center gap-2 font-medium ${statusConfig.textColor}`}>
-              <StatusIcon className="h-5 w-5" />
+              <StatusIcon className="h-5 w-5" aria-hidden="true" />
               {statusConfig.status}
             </h3>
           </div>
@@ -133,7 +133,7 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
               <span className="items-center">
                 {contentId ? (
                   <Link to={`/content/${contentId}`}>
-                    <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors mt-2 cursor-pointer space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
+                    <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 mt-2 cursor-pointer space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
                       <span>Page {question.referenceTime}</span>
                       :
                       <span className="max-w-[10rem] truncate">{question.referenceSource}</span>
