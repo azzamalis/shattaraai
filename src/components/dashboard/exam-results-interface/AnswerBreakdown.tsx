@@ -106,9 +106,9 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
           {statusConfig.showScore && (
             <div className="text-base font-medium text-muted-foreground">Score: 0/4</div>
           )}
-          <div className={`mt-2 text-sm font-normal leading-relaxed ${statusConfig.textColor}`}>
+          <div className={`mt-2 font-normal leading-relaxed ${statusConfig.textColor}`}>
             <div className="markdown-body prose prose-neutral dark:prose-invert max-w-none">
-              <div className="space-y-4 text-sm leading-normal">
+              <div className="space-y-4 leading-normal">
                 <ReactMarkdown
                   components={{
                     p: ({ children }) => (
@@ -118,7 +118,7 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
                       <strong className="font-semibold">{children}</strong>
                     ),
                     ul: ({ children }) => (
-                      <ul className="list-disc pl-5 space-y-1 mt-2">{children}</ul>
+                      <ul className="list-disc pl-5 space-y-1 mt-2 text-base">{children}</ul>
                     ),
                     li: ({ children }) => (
                       <li className="text-base leading-7">{children}</li>
