@@ -86,6 +86,11 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
   const renderFeedbackBox = (statusConfig: ReturnType<typeof getStatusConfig>, feedbackText?: string) => {
     const StatusIcon = statusConfig.icon;
     
+    // Clean feedback text - remove status prefix if present (e.g., "INCORRECT: ..." or "Incorrect: ...")
+    const cleanFeedbackText = feedbackText 
+      ? feedbackText.replace(/^(INCORRECT|CORRECT|SKIPPED):\s*/i, '')
+      : 'Explanation not available for this question.';
+    
     return (
       <div className={`mt-4 rounded-lg p-4 ${statusConfig.bgColor}`}>
         <div className="flex flex-col">
@@ -96,33 +101,25 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
             </h3>
           </div>
           {statusConfig.showScore && (
-            <div className="mt-2 flex items-center gap-4">
-              <div className="text-base font-medium text-muted-foreground">Score: 0/4</div>
-            </div>
+            <div className="text-base font-medium text-muted-foreground">Score: 0/4</div>
           )}
           <div className={`mt-2 text-sm font-normal leading-relaxed ${statusConfig.textColor}`}>
-            <div className="markdown-body prose prose-neutral dark:prose-invert max-w-none">
-              <div className="space-y-4 text-sm leading-normal">
-                <p className="text-base leading-7 last:mb-0">
-                  {feedbackText || 'Explanation not available for this question.'}
-                </p>
-              </div>
-            </div>
+            <p className="text-base leading-7">
+              {cleanFeedbackText}
+            </p>
             {question.referenceTime && question.referenceSource && (
-              <span className="items-center">
+              <span className="inline-block mt-2">
                 {contentId ? (
                   <Link to={`/content/${contentId}`}>
-                    <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors mt-2 cursor-pointer space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
-                      <span>Page {question.referenceTime}</span>
-                      <span>:</span>
-                      <span className="max-w-[10rem] truncate">{question.referenceSource}</span>
+                    <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors cursor-pointer gap-1 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
+                      <span>Page {question.referenceTime}:</span>
+                      <span className="max-w-[12rem] truncate">{question.referenceSource}</span>
                     </span>
                   </Link>
                 ) : (
-                  <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors mt-2 space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
-                    <span>Page {question.referenceTime}</span>
-                    <span>:</span>
-                    <span className="max-w-[10rem] truncate">{question.referenceSource}</span>
+                  <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors gap-1 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
+                    <span>Page {question.referenceTime}:</span>
+                    <span className="max-w-[12rem] truncate">{question.referenceSource}</span>
                   </span>
                 )}
               </span>
