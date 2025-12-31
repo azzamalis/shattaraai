@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, AlignLeft } from 'lucide-react';
+import { ChevronDown, ChevronRight, Text } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -7,7 +7,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Progress } from '@/components/ui/progress';
 
 interface ChapterData {
   title: string;
@@ -62,7 +61,7 @@ export function ChapterBreakdown({ chapters, examData, contentTitle }: ChapterBr
         <AccordionItem value="chapter-breakdown" className="border-b last:mb-0 last:border-b-0">
           <AccordionTrigger className="group mb-4 flex cursor-pointer items-center justify-between p-0 font-medium transition-all [&[data-state=open]>svg]:rotate-[-90deg] hover:no-underline [&>svg:last-child]:hidden">
             <h3 className="flex items-center gap-2 text-base font-medium">
-              <AlignLeft 
+              <Text 
                 className="block h-4 w-4 flex-shrink-0 text-neutral-800 group-hover:hidden dark:text-neutral-200" 
                 aria-hidden="true" 
               />
