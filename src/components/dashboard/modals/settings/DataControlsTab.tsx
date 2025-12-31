@@ -63,48 +63,45 @@ export const DataControlsTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="border border-border rounded-lg p-4">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h4 className="text-sm font-medium mb-1">Export Your Data</h4>
-            <p className="text-sm text-primary/70">
+    <div className="pb-8">
+      <div className="space-y-0">
+        <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium">Export Your Data</span>
+            <span className="text-xs text-primary/70">
               Download all your content, notes, and learning data
-            </p>
+            </span>
           </div>
-          <Button variant="outline" onClick={handleExportData} className="flex-shrink-0">
+          <Button variant="outline" size="sm" onClick={handleExportData} className="h-8 px-3">
             Export
           </Button>
         </div>
-      </div>
 
-      <div className="border border-border rounded-lg p-4">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h4 className="text-sm font-medium mb-1">Reset Onboarding Tutorial</h4>
-            <p className="text-sm text-primary/70">
+        <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium">Reset Onboarding Tutorial</span>
+            <span className="text-xs text-primary/70">
               Replay the getting started checklist to discover features you may have missed
-            </p>
+            </span>
           </div>
-          <Button variant="outline" onClick={handleResetOnboarding} className="flex-shrink-0">
-            <RotateCcw className="w-4 h-4 mr-2" />
+          <Button variant="outline" size="sm" onClick={handleResetOnboarding} className="h-8 px-3">
+            <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
             Reset
           </Button>
         </div>
-      </div>
 
-      <div className="border border-destructive rounded-lg p-4 bg-destructive/5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h4 className="text-sm font-medium text-destructive mb-1">Delete Account</h4>
-            <p className="text-sm text-primary/70">
-              Permanently delete your account and all associated data. This action cannot be undone.
-            </p>
+        <div className="flex items-center justify-between py-3 border-b border-destructive/30">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium text-destructive">Delete Account</span>
+            <span className="text-xs text-primary/70">
+              Permanently delete your account and all associated data
+            </span>
           </div>
           <Button
             variant="destructive"
+            size="sm"
             onClick={() => setShowDeleteDialog(true)}
-            className="flex-shrink-0"
+            className="h-8 px-3"
           >
             Delete
           </Button>
