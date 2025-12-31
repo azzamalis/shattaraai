@@ -72,7 +72,7 @@ export const DataControlsTab: React.FC = () => {
               Download all your content, notes, and learning data
             </span>
           </div>
-          <Button variant="outline" size="sm" onClick={handleExportData} className="h-8 px-3">
+          <Button variant="ghost" size="sm" onClick={handleExportData} className="h-8 px-3">
             Export
           </Button>
         </div>
@@ -84,7 +84,7 @@ export const DataControlsTab: React.FC = () => {
               Replay the getting started checklist to discover features you may have missed
             </span>
           </div>
-          <Button variant="outline" size="sm" onClick={handleResetOnboarding} className="h-8 px-3">
+          <Button variant="ghost" size="sm" onClick={handleResetOnboarding} className="h-8 px-3">
             Reset
           </Button>
         </div>
