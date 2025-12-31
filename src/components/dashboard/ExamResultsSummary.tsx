@@ -695,7 +695,7 @@ export function ExamResultsSummary() {
               onClick={handleGoToSpace} 
               className="inline-flex h-12 w-full items-center justify-center whitespace-nowrap rounded-full border border-input bg-background px-8 text-base font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 md:w-96"
             >
-              Go to Space
+              Go to Room
             </button>
             <button 
               onClick={handleCreateNew} 

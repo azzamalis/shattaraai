@@ -43,7 +43,7 @@ export function ExamResultsHeader({ totalQuestions, onOpenChat }: ExamResultsHea
               className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 gap-x-2"
             >
               <MessageCircle className="h-4 w-4" />
-              <span className="hidden xl:inline">Space Chat</span>
+              <span className="hidden xl:inline">Room Chat</span>
             </button>
           </div>
         </div>
