@@ -165,11 +165,10 @@ export function OnboardingProvider({
   
   const shouldShow = useMemo(() => {
     if (!isAuthenticated) return false;
-    if (!userCompletedOnboardingForm) return false;
     if (isDismissed) return false;
     if (isCompleted && !showCompletedMessage) return false;
     return isOnboardingVisibleOnRoute(location.pathname);
-  }, [isAuthenticated, userCompletedOnboardingForm, isDismissed, isCompleted, showCompletedMessage, location.pathname]);
+  }, [isAuthenticated, isDismissed, isCompleted, showCompletedMessage, location.pathname]);
   
   const progress = (state.completedTasks.length / ONBOARDING_TASKS.length) * 100;
   
