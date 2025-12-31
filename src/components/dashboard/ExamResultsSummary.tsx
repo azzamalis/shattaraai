@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Share2, X, RotateCcw, Repeat, BookCheck, Check } from 'lucide-react';
+import { ChevronDown, Share2, X, RotateCcw, Repeat, BookCheck, Check, Trash } from 'lucide-react';
+import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { CircularProgress } from './exam-results/CircularProgress';
@@ -459,6 +460,47 @@ export function ExamResultsSummary() {
     setDropdownOpen(false);
   };
 
+  const handleDeleteExam = async (e: React.MouseEvent, attemptId: string) => {
+    e.stopPropagation();
+    
+    try {
+      // Delete exam answers first
+      await supabase
+        .from('exam_answers')
+        .delete()
+        .eq('exam_attempt_id', attemptId);
+      
+      // Delete the exam attempt
+      const { error } = await supabase
+        .from('exam_attempts')
+        .delete()
+        .eq('id', attemptId);
+
+      if (error) {
+        toast.error('Failed to delete exam');
+        return;
+      }
+
+      // Update the local state
+      setAllExamAttempts(prev => prev.filter(a => a.id !== attemptId));
+      toast.success('Exam deleted successfully');
+
+      // If the deleted exam is the current one, navigate to the next available
+      const currentAttemptId = contentId || localStorage.getItem('currentExamAttemptId');
+      if (attemptId === currentAttemptId) {
+        const remaining = allExamAttempts.filter(a => a.id !== attemptId);
+        if (remaining.length > 0) {
+          handleExamSelect(remaining[0].id);
+        } else {
+          navigate(`/rooms/${roomId}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting exam:', error);
+      toast.error('Failed to delete exam');
+    }
+  };
+
   const formatAttemptDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
@@ -543,6 +585,12 @@ export function ExamResultsSummary() {
                               Exam {examNumber}
                             </span>
                           </div>
+                          <button
+                            onClick={(e) => handleDeleteExam(e, attempt.id)}
+                            className="flex h-6 w-6 items-center justify-center rounded-sm p-0 transition-opacity duration-200 hover:bg-red-100 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100"
+                          >
+                            <Trash className="h-4 w-4 text-red-500" aria-hidden="true" />
+                          </button>
                         </DropdownMenuItem>
                       );
                     });
