@@ -4,6 +4,7 @@ import { Upload, FileText, Mic, Link2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useContentContext } from '@/contexts/ContentContext';
+import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
 interface ActionCardsProps {
   onPasteClick: () => void;
 }
@@ -103,6 +104,8 @@ export function ActionCards({
             description: 'You\'ll be notified when it\'s ready',
             duration: 5000
           });
+          // Emit onboarding event for content upload
+          emitOnboardingEvent('content_added');
           // Don't navigate - let user continue working on dashboard
         } else {
           console.error('DEBUG: ActionCards - Upload failed: No content ID returned');

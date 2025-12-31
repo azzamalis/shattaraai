@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Copy, Brain, ThumbsUp, ThumbsDown, Pen, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ import { ContentData } from '@/pages/ContentPage';
 import { cn } from '@/lib/utils';
 import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from '@/components/prompt-kit/chat-container';
 import { Message, MessageActions, MessageAction } from '@/components/prompt-kit/message';
+import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,7 @@ const AIChat = ({
 }: AIChatProps) => {
   const [isProcessingFiles, setIsProcessingFiles] = useState(false);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
+  const hasSentFirstMessage = useRef(false);
   const {
     user
   } = useAuth();
@@ -106,6 +108,11 @@ const AIChat = ({
       // 2. Send user message with attachment URLs
       const userMessage = await sendMessage(content, uploadedAttachments);
       if (userMessage) {
+        // Emit onboarding event on first chat message
+        if (!hasSentFirstMessage.current) {
+          hasSentFirstMessage.current = true;
+          emitOnboardingEvent('chat_message_sent');
+        }
         // 3. Get streaming AI response
         setIsProcessingAI(true);
         try {

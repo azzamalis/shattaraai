@@ -8,6 +8,7 @@ import { useContent } from '@/contexts/ContentContext';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
+import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
 interface DashboardHeroProps {
   onPasteClick: () => void;
 }
@@ -112,6 +113,8 @@ export function DashboardHero({
         searchParams.set('query', value);
         if (uploadedFiles.length > 0) {
           searchParams.set('hasFiles', 'true');
+          // Emit onboarding event for content upload with files
+          emitOnboardingEvent('content_added');
         }
         
         navigate(`/chat/${contentId}?${searchParams.toString()}`);
