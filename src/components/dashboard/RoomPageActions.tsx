@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { MessagesSquare, BookCheck, X, ChevronDown, Play, Trash2 } from 'lucide-react';
+import { MessagesSquare, BookCheck, X, ChevronDown, Trash } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,7 @@ interface RoomPageActionsProps {
 interface ExistingExam {
   id: string;
   title: string;
+  created_at: string;
 }
 
 export function RoomPageActions({
@@ -46,9 +48,9 @@ export function RoomPageActions({
     try {
       const { data, error } = await supabase
         .from('exams')
-        .select('id, title')
+        .select('id, title, created_at')
         .eq('room_id', roomId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
 
       if (!error && data) {
         setExistingExams(data);
@@ -68,16 +70,23 @@ export function RoomPageActions({
     }
   };
 
-  const handleViewExamSummary = (examId: string) => {
-    navigate(`/exam-summary/${examId}`);
+  const handleViewExamResults = (examId: string) => {
+    navigate(`/exam-results/${examId}`);
   };
 
-  const handleDeleteExam = async (examId: string) => {
+  const handleDeleteExam = async (e: React.MouseEvent, examId: string) => {
+    e.stopPropagation();
     try {
-      await supabase.from('exams').delete().eq('id', examId);
+      const { error } = await supabase.from('exams').delete().eq('id', examId);
+      if (error) {
+        toast.error('Failed to delete exam');
+        return;
+      }
       setExistingExams(prev => prev.filter(exam => exam.id !== examId));
+      toast.success('Exam deleted successfully');
     } catch (err) {
       console.error('Error deleting exam:', err);
+      toast.error('Failed to delete exam');
     }
   };
 
@@ -120,25 +129,23 @@ export function RoomPageActions({
                 <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-background border border-border z-50">
-              {existingExams.map((exam) => (
+            <DropdownMenuContent align="end" className="w-48 space-y-1 rounded-2xl">
+              {existingExams.map((exam, index) => (
                 <DropdownMenuItem 
                   key={exam.id}
-                  className="flex items-center justify-between gap-2 cursor-pointer"
-                  onClick={() => handleViewExamSummary(exam.id)}
+                  className="group flex items-center justify-between rounded-xl px-3 py-2 cursor-pointer"
+                  onClick={() => handleViewExamResults(exam.id)}
                 >
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <Play className="h-4 w-4 flex-shrink-0" />
-                    <span className="truncate">{exam.title}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                      Exam {index + 1}
+                    </span>
                   </div>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteExam(exam.id);
-                    }}
-                    className="p-1 hover:bg-destructive/10 rounded text-muted-foreground hover:text-destructive"
+                    onClick={(e) => handleDeleteExam(e, exam.id)}
+                    className="flex h-6 w-6 items-center justify-center rounded-sm p-0 transition-opacity duration-200 hover:bg-red-100 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100"
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <Trash className="h-4 w-4 text-red-500" aria-hidden="true" />
                   </button>
                 </DropdownMenuItem>
               ))}
