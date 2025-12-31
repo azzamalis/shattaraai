@@ -496,53 +496,57 @@ export function ExamResultsSummary() {
                   type="button"
                 >
                   <span className="text-base font-medium text-neutral-600 dark:text-neutral-300">
-                    {examAttempt?.exams?.title || 'Exam 1'}
+                    {(() => {
+                      // Sort by creation date ascending to get exam numbers
+                      const sortedAttempts = [...allExamAttempts].sort(
+                        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                      );
+                      const currentAttemptId = contentId || localStorage.getItem('currentExamAttemptId');
+                      const examIndex = sortedAttempts.findIndex(a => a.id === currentAttemptId);
+                      return examIndex >= 0 ? `Exam ${examIndex + 1}` : 'Exam 1';
+                    })()}
                   </span>
                   <ChevronDown className="h-4 w-4 text-neutral-400 dark:text-neutral-500" aria-hidden="true" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
                 align="center" 
-                className="z-50 w-72 max-h-80 overflow-y-auto bg-background border border-border shadow-lg"
+                className="z-50 w-48 space-y-1 overflow-hidden rounded-2xl border bg-background p-1 text-popover-foreground shadow-md"
               >
                 {allExamAttempts.length === 0 ? (
                   <div className="px-4 py-3 text-sm text-muted-foreground text-center">
                     No exam attempts found
                   </div>
                 ) : (
-                  allExamAttempts.map((attempt) => {
-                    const isSelected = attempt.id === (contentId || localStorage.getItem('currentExamAttemptId'));
-                    const score = getAttemptScore(attempt);
-                    
-                    return (
-                      <DropdownMenuItem
-                        key={attempt.id}
-                        onClick={() => handleExamSelect(attempt.id)}
-                        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-accent focus:bg-accent"
-                      >
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-sm font-medium">
-                            {attempt.exams?.title || 'Exam'}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {formatAttemptDate(attempt.created_at)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-sm font-medium ${
-                            score >= 75 ? 'text-green-600 dark:text-green-400' :
-                            score >= 50 ? 'text-yellow-600 dark:text-yellow-400' :
-                            'text-red-600 dark:text-red-400'
-                          }`}>
-                            {score}%
-                          </span>
-                          {isSelected && (
-                            <Check className="h-4 w-4 text-primary" aria-hidden="true" />
-                          )}
-                        </div>
-                      </DropdownMenuItem>
+                  (() => {
+                    // Sort by creation date ascending to assign exam numbers
+                    const sortedAttempts = [...allExamAttempts].sort(
+                      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
                     );
-                  })
+                    const currentAttemptId = contentId || localStorage.getItem('currentExamAttemptId');
+                    
+                    // Display in reverse order (newest first) but with correct numbering
+                    return [...sortedAttempts].reverse().map((attempt) => {
+                      const examNumber = sortedAttempts.findIndex(a => a.id === attempt.id) + 1;
+                      const isSelected = attempt.id === currentAttemptId;
+                      
+                      return (
+                        <DropdownMenuItem
+                          key={attempt.id}
+                          onClick={() => handleExamSelect(attempt.id)}
+                          className={`group flex cursor-pointer items-center justify-between rounded-xl px-3 py-2 ${
+                            isSelected ? 'bg-primary/5 dark:bg-primary/10' : ''
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                              Exam {examNumber}
+                            </span>
+                          </div>
+                        </DropdownMenuItem>
+                      );
+                    });
+                  })()
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
