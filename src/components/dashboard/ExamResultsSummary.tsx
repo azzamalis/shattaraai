@@ -491,7 +491,7 @@ export function ExamResultsSummary() {
 
               {/* Preview Link */}
               <div className="mb-8 flex justify-center">
-                <button className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-semibold text-primary/60 underline underline-offset-4 ring-offset-background transition-colors hover:text-primary hover:underline focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-primary/60 dark:hover:text-primary">
+                <button className="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 h-10 text-sm font-semibold text-primary/60 underline underline-offset-4 ring-offset-background transition-colors hover:underline hover:text-primary focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-primary/60 dark:hover:text-primary">
                   Preview {examAttempt?.exams?.title || 'Exam 1'}
                 </button>
               </div>
