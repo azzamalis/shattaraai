@@ -10,8 +10,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { RotateCcw } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -20,12 +22,18 @@ export const DataControlsTab: React.FC = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { user, signOut } = useAuth();
+  const { resetOnboarding } = useOnboarding();
   const navigate = useNavigate();
 
   const handleExportData = async () => {
     toast.info('Preparing your data export...');
     // This would trigger an export process
     toast.success('Export started. You will receive an email when ready.');
+  };
+
+  const handleResetOnboarding = () => {
+    resetOnboarding();
+    toast.success('Onboarding tutorial has been reset. You can now replay the checklist.');
   };
 
   const handleDeleteAccount = async () => {
@@ -66,6 +74,21 @@ export const DataControlsTab: React.FC = () => {
           </div>
           <Button variant="outline" onClick={handleExportData} className="flex-shrink-0">
             Export
+          </Button>
+        </div>
+      </div>
+
+      <div className="border border-border rounded-lg p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h4 className="text-sm font-medium mb-1">Reset Onboarding Tutorial</h4>
+            <p className="text-sm text-primary/70">
+              Replay the getting started checklist to discover features you may have missed
+            </p>
+          </div>
+          <Button variant="outline" onClick={handleResetOnboarding} className="flex-shrink-0">
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Reset
           </Button>
         </div>
       </div>
