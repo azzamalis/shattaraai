@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
+import { Users, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const MembersTab: React.FC = () => {
@@ -11,20 +11,46 @@ export const MembersTab: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-        <Users className="h-8 w-8 text-muted-foreground" />
+    <div className="pb-8">
+      <div className="space-y-0">
+        <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium">Team Members</span>
+            <span className="text-xs text-primary/70">
+              No team members yet
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-primary/50">
+            <Users className="h-4 w-4" />
+            <span className="text-sm">0</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium">Pending Invites</span>
+            <span className="text-xs text-primary/70">
+              You'll receive an email when invited to a team
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-primary/50">
+            <Mail className="h-4 w-4" />
+            <span className="text-sm">0</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium">Team Plan</span>
+            <span className="text-xs text-primary/70">
+              Upgrade to share spaces and learning features
+            </span>
+          </div>
+          <Button size="sm" onClick={handleViewTeamPlans} className="h-8 px-3">
+            View Plans
+          </Button>
+        </div>
       </div>
-      <h3 className="text-lg font-semibold mb-2">No Teams</h3>
-      <p className="text-sm text-primary/70 mb-1 max-w-md">
-        Upgrade to a team plan to share spaces and learning features.
-      </p>
-      <p className="text-xs text-muted-foreground mb-6 max-w-md">
-        If someone invites you to their team, you'll receive an email notification with instructions to join.
-      </p>
-      <Button onClick={handleViewTeamPlans}>
-        View Team Plans
-      </Button>
     </div>
   );
 };

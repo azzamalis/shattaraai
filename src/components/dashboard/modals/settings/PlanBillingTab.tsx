@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-
+import { Crown, Sparkles, HeadphonesIcon, Users, Palette } from 'lucide-react';
 
 export const PlanBillingTab: React.FC = () => {
   const { profile } = useAuth();
@@ -14,34 +14,48 @@ export const PlanBillingTab: React.FC = () => {
     navigate('/pricing');
   };
 
+  const features = [
+    { icon: Sparkles, label: 'Unlimited AI generations' },
+    { icon: Crown, label: 'Advanced study tools' },
+    { icon: HeadphonesIcon, label: 'Priority support' },
+    { icon: Users, label: 'Team collaboration' },
+    { icon: Palette, label: 'Custom branding' },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-medium">Current Plan</h3>
-          <p className="text-sm text-primary/70 mt-1">
-            You are currently on the <span className="font-semibold capitalize">{planType}</span> plan
-          </p>
+    <div className="pb-8">
+      <div className="space-y-0">
+        <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium">Current Plan</span>
+            <span className="text-xs text-primary/70">
+              You are on the <span className="font-semibold capitalize">{planType}</span> plan
+            </span>
+          </div>
+          {planType === 'free' && (
+            <Button size="sm" onClick={handleUpgrade} className="h-8 px-3">
+              Upgrade
+            </Button>
+          )}
         </div>
+
         {planType === 'free' && (
-          <Button onClick={handleUpgrade}>
-            Upgrade Plan
-          </Button>
+          <>
+            <div className="py-3 border-b border-border">
+              <span className="text-sm font-medium">Upgrade to unlock</span>
+            </div>
+            {features.map((feature, index) => (
+              <div 
+                key={index} 
+                className="flex items-center gap-3 py-2.5 border-b border-border last:border-b-0"
+              >
+                <feature.icon className="h-4 w-4 text-primary/50" />
+                <span className="text-sm text-primary/70">{feature.label}</span>
+              </div>
+            ))}
+          </>
         )}
       </div>
-
-      {planType === 'free' && (
-        <div className="border border-border rounded-lg p-4 bg-muted/20">
-          <h4 className="text-sm font-medium mb-2">Upgrade to unlock:</h4>
-          <ul className="text-sm text-primary/70 space-y-2">
-            <li>• Unlimited AI generations</li>
-            <li>• Advanced study tools</li>
-            <li>• Priority support</li>
-            <li>• Team collaboration</li>
-            <li>• Custom branding</li>
-          </ul>
-        </div>
-      )}
     </div>
   );
 };
