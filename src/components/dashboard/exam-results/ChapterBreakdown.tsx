@@ -60,7 +60,7 @@ export function ChapterBreakdown({ chapters, examData, contentTitle }: ChapterBr
     <div className="mb-8 flex flex-col gap-6 rounded-2xl border p-6 pb-2 dark:bg-neutral-950/20">
       <Accordion type="single" collapsible defaultValue="chapter-breakdown" className="flex flex-col gap-6">
         <AccordionItem value="chapter-breakdown" className="border-b last:mb-0 last:border-b-0">
-          <AccordionTrigger className="group mb-4 flex cursor-pointer items-center justify-between p-0 font-medium transition-all [&[data-state=open]>svg]:rotate-[-90deg] hover:no-underline">
+          <AccordionTrigger className="group mb-4 flex cursor-pointer items-center justify-between p-0 font-medium transition-all [&[data-state=open]>svg]:rotate-[-90deg] hover:no-underline [&>svg:last-child]:hidden">
             <h3 className="flex items-center gap-2 text-base font-medium">
               <AlignLeft 
                 className="block h-4 w-4 flex-shrink-0 text-neutral-800 group-hover:hidden dark:text-neutral-200" 
