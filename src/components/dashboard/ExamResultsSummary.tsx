@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Share2, X, RotateCcw, Repeat, BookCheck } from 'lucide-react';
+import { ChevronDown, Share2, X, RotateCcw, Repeat, BookCheck, Check } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { CircularProgress } from './exam-results/CircularProgress';
 import { ChapterBreakdown } from './exam-results/ChapterBreakdown';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface ChapterData {
   title: string;
@@ -29,10 +35,23 @@ interface ExamAttemptData {
   time_taken_minutes: number;
   status: string;
   exam_id: string | null;
+  created_at: string;
   exams: {
     title: string;
     total_questions: number;
     content_metadata: Record<string, unknown> | null;
+  } | null;
+}
+
+interface ExamAttemptListItem {
+  id: string;
+  total_score: number;
+  max_score: number;
+  status: string;
+  created_at: string;
+  exam_id: string | null;
+  exams: {
+    title: string;
   } | null;
 }
 
@@ -51,13 +70,52 @@ export function ExamResultsSummary() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [examData, setExamData] = useState<ExamData | null>(null);
   const [examAttempt, setExamAttempt] = useState<ExamAttemptData | null>(null);
+  const [allExamAttempts, setAllExamAttempts] = useState<ExamAttemptListItem[]>([]);
   const [chapterBreakdown, setChapterBreakdown] = useState<ChapterData[]>([]);
   const [contentTitle, setContentTitle] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { contentId } = useParams<{ contentId: string }>();
 
   const roomId = localStorage.getItem('currentRoomId') || '';
+
+  // Fetch all exam attempts for the dropdown
+  useEffect(() => {
+    const fetchAllExamAttempts = async () => {
+      try {
+        const { data: attempts, error } = await supabase
+          .from('exam_attempts')
+          .select(`
+            id,
+            total_score,
+            max_score,
+            status,
+            created_at,
+            exam_id,
+            exams (
+              title
+            )
+          `)
+          .eq('status', 'completed')
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (error) {
+          console.error('Error fetching exam attempts:', error);
+          return;
+        }
+
+        if (attempts) {
+          setAllExamAttempts(attempts as unknown as ExamAttemptListItem[]);
+        }
+      } catch (error) {
+        console.error('Error fetching all exam attempts:', error);
+      }
+    };
+
+    fetchAllExamAttempts();
+  }, []);
 
   useEffect(() => {
     const fetchExamResults = async () => {
@@ -294,6 +352,26 @@ export function ExamResultsSummary() {
   const handleGoToSpace = () => {
     navigate(`/rooms/${roomId}`);
   };
+  const handleExamSelect = (attemptId: string) => {
+    localStorage.setItem('currentExamAttemptId', attemptId);
+    navigate(`/exam-summary/${attemptId}`);
+    setDropdownOpen(false);
+  };
+
+  const formatAttemptDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getAttemptScore = (attempt: ExamAttemptListItem) => {
+    if (attempt.max_score === 0) return 0;
+    return Math.round((attempt.total_score / attempt.max_score) * 100);
+  };
   return <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* Sticky Header */}
       <header className="sticky top-0 z-10 w-full border-b bg-background/95 px-4 py-4 shadow-lg shadow-neutral-800/5 backdrop-blur-sm dark:border-b dark:border-border dark:shadow-white/5">
@@ -310,18 +388,63 @@ export function ExamResultsSummary() {
 
           {/* Center: Exam Title Dropdown */}
           <div className="flex flex-1 items-center justify-center">
-            <button 
-              className="flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-              type="button"
-              aria-haspopup="menu"
-              aria-expanded="false"
-              data-state="closed"
-            >
-              <span className="text-base font-medium text-neutral-600 dark:text-neutral-300">
-                {examAttempt?.exams?.title || 'Exam 1'}
-              </span>
-              <ChevronDown className="h-4 w-4 text-neutral-400 dark:text-neutral-500" aria-hidden="true" />
-            </button>
+            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <button 
+                  className="flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                  type="button"
+                >
+                  <span className="text-base font-medium text-neutral-600 dark:text-neutral-300">
+                    {examAttempt?.exams?.title || 'Exam 1'}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-neutral-400 dark:text-neutral-500" aria-hidden="true" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="center" 
+                className="z-50 w-72 max-h-80 overflow-y-auto bg-background border border-border shadow-lg"
+              >
+                {allExamAttempts.length === 0 ? (
+                  <div className="px-4 py-3 text-sm text-muted-foreground text-center">
+                    No exam attempts found
+                  </div>
+                ) : (
+                  allExamAttempts.map((attempt) => {
+                    const isSelected = attempt.id === (contentId || localStorage.getItem('currentExamAttemptId'));
+                    const score = getAttemptScore(attempt);
+                    
+                    return (
+                      <DropdownMenuItem
+                        key={attempt.id}
+                        onClick={() => handleExamSelect(attempt.id)}
+                        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-accent focus:bg-accent"
+                      >
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-sm font-medium">
+                            {attempt.exams?.title || 'Exam'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {formatAttemptDate(attempt.created_at)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-sm font-medium ${
+                            score >= 75 ? 'text-green-600 dark:text-green-400' :
+                            score >= 50 ? 'text-yellow-600 dark:text-yellow-400' :
+                            'text-red-600 dark:text-red-400'
+                          }`}>
+                            {score}%
+                          </span>
+                          {isSelected && (
+                            <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+                          )}
+                        </div>
+                      </DropdownMenuItem>
+                    );
+                  })
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Right: Share Button */}
