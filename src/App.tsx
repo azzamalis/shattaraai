@@ -45,6 +45,7 @@ function AppRoutes() {
     <OnboardingProvider
       isAuthenticated={!!user}
       userCompletedOnboardingForm={profile?.onboarding_completed ?? false}
+      userId={user?.id}
     >
       <OnboardingChecklist />
       <Routes>

@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ONBOARDING_TASKS, isOnboardingVisibleOnRoute, OnboardingTask } from '@/config/onboardingTasks';
+import { supabase } from '@/integrations/supabase/client';
 
 const STORAGE_KEY = 'shattara_onboarding';
 
@@ -36,14 +37,18 @@ interface OnboardingProviderProps {
   children: React.ReactNode;
   isAuthenticated: boolean;
   userCompletedOnboardingForm: boolean;
+  userId?: string;
 }
 
 export function OnboardingProvider({
   children,
   isAuthenticated,
   userCompletedOnboardingForm,
+  userId,
 }: OnboardingProviderProps) {
   const location = useLocation();
+  const isSyncingRef = useRef(false);
+  const initialLoadDoneRef = useRef(false);
   
   // Load initial state from localStorage
   const [state, setState] = useState<OnboardingState>(() => {
@@ -66,7 +71,86 @@ export function OnboardingProvider({
   const [isExpanded, setIsExpanded] = useState(true);
   const [showCompletedMessage, setShowCompletedMessage] = useState(false);
   
-  // Persist state to localStorage
+  // Load state from Supabase when authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !userId || initialLoadDoneRef.current) return;
+    
+    const loadFromSupabase = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('onboarding_checklist_tasks, onboarding_checklist_dismissed_at, onboarding_checklist_completed_at')
+          .eq('id', userId)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Failed to load onboarding from Supabase:', error);
+          return;
+        }
+        
+        if (data) {
+          const supabaseState: OnboardingState = {
+            completedTasks: data.onboarding_checklist_tasks || [],
+            dismissed: !!data.onboarding_checklist_dismissed_at,
+            completedAt: data.onboarding_checklist_completed_at || null,
+          };
+          
+          // Merge with localStorage - take the more complete state
+          setState(prev => {
+            const mergedTasks = [...new Set([...prev.completedTasks, ...supabaseState.completedTasks])];
+            return {
+              completedTasks: mergedTasks,
+              dismissed: prev.dismissed || supabaseState.dismissed,
+              completedAt: prev.completedAt || supabaseState.completedAt,
+            };
+          });
+        }
+        
+        initialLoadDoneRef.current = true;
+      } catch (e) {
+        console.error('Failed to load onboarding from Supabase:', e);
+      }
+    };
+    
+    loadFromSupabase();
+  }, [isAuthenticated, userId]);
+  
+  // Sync state to Supabase when it changes
+  useEffect(() => {
+    if (!isAuthenticated || !userId || isSyncingRef.current) return;
+    
+    const syncToSupabase = async () => {
+      isSyncingRef.current = true;
+      try {
+        const updateData: Record<string, unknown> = {
+          onboarding_checklist_tasks: state.completedTasks,
+        };
+        
+        if (state.dismissed) {
+          updateData.onboarding_checklist_dismissed_at = new Date().toISOString();
+        }
+        
+        if (state.completedAt) {
+          updateData.onboarding_checklist_completed_at = state.completedAt;
+        }
+        
+        await supabase
+          .from('profiles')
+          .update(updateData)
+          .eq('id', userId);
+      } catch (e) {
+        console.error('Failed to sync onboarding to Supabase:', e);
+      } finally {
+        isSyncingRef.current = false;
+      }
+    };
+    
+    // Debounce sync to avoid too many requests
+    const timeoutId = setTimeout(syncToSupabase, 500);
+    return () => clearTimeout(timeoutId);
+  }, [state, isAuthenticated, userId]);
+  
+  // Persist state to localStorage as fallback
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
