@@ -20,6 +20,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { QuizDisplay } from './QuizDisplay';
 import { QuizTakingComponent } from './QuizTakingComponent';
+import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
+import { registerTabSetter, unregisterTabSetter } from '@/hooks/useOnboardingNavigation';
 
 interface ContentRightSidebarProps {
   contentData: ContentData;
@@ -29,6 +31,12 @@ export function ContentRightSidebar({
 }: ContentRightSidebarProps) {
   const [activeTab, setActiveTab] = useState("chat");
   const [isRecording, setIsRecording] = useState(false);
+
+  // Register tab setter for onboarding navigation
+  useEffect(() => {
+    registerTabSetter(setActiveTab);
+    return () => unregisterTabSetter();
+  }, []);
 
   // Extract topics from content metadata
   const extractTopics = (): string[] => {
@@ -432,6 +440,8 @@ export function ContentRightSidebar({
       }
       
       toast.success(`Generated ${data.count || 0} flashcards!`);
+      // Emit onboarding event for flashcard creation
+      emitOnboardingEvent('flashcards_created');
       await fetchFlashcards();
     } catch (error) {
       console.error('Flashcard generation error:', error);
@@ -483,6 +493,8 @@ export function ContentRightSidebar({
       }
       
       toast.success(`Generated quiz with ${data.questionCount || 0} questions!`);
+      // Emit onboarding event for quiz generation
+      emitOnboardingEvent('quiz_generated');
       await fetchQuizzes();
     } catch (error) {
       console.error('Quiz generation error:', error);
@@ -553,6 +565,8 @@ export function ContentRightSidebar({
       setSummaryConfig(prev => ({ ...prev, length: summaryType }));
       
       toast.success('Summary generated successfully!');
+      // Emit onboarding event for summary generation
+      emitOnboardingEvent('summary_generated');
     } catch (error) {
       console.error('Summary generation error:', error);
       toast.error('Failed to generate summary. Please try again.');
@@ -700,6 +714,7 @@ export function ContentRightSidebar({
                       onConfigure={() => setShowFlashcardConfig(true)}
                       contentData={contentData}
                       isLoading={isGenerating && generationType === 'flashcards'}
+                      targetId="flashcards-generate-btn"
                     />
                     
                     {/* My Flashcards Section */}
@@ -791,6 +806,7 @@ export function ContentRightSidebar({
                       onConfigure={() => setShowQuizConfig(true)}
                       contentData={contentData}
                       isLoading={isGenerating && generationType === 'quizzes'}
+                      targetId="quiz-generate-btn"
                     />
                     
                     {/* My Quizzes Section */}

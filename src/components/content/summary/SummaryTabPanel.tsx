@@ -85,6 +85,7 @@ export function SummaryTabPanel({
                 
                 <div className="flex items-center">
                   <Button
+                    id="summary-generate-btn"
                     onClick={handleCreateSummary}
                     disabled={isLoading}
                     className="rounded-l-full rounded-r-none border-r border-background/20 bg-foreground text-background hover:bg-foreground/90 px-4 h-10"

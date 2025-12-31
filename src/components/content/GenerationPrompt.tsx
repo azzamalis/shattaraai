@@ -10,6 +10,7 @@ interface GenerationPromptProps {
   onConfigure: () => void;
   contentData: any;
   isLoading: boolean;
+  targetId?: string;
 }
 
 const contentConfig = {
@@ -32,7 +33,8 @@ export function GenerationPrompt({
   onGenerate,
   onConfigure,
   contentData,
-  isLoading
+  isLoading,
+  targetId
 }: GenerationPromptProps) {
   const config = contentConfig[type];
   
@@ -72,6 +74,7 @@ export function GenerationPrompt({
                 </Button>
                 
                 <Button 
+                  id={targetId}
                   onClick={() => onGenerate()} 
                   disabled={isLoading} 
                   className="rounded-full w-24 h-10 bg-foreground text-background hover:bg-foreground/90"

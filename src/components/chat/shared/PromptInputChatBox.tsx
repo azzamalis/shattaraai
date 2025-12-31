@@ -130,6 +130,7 @@ export function PromptInputChatBox({
 
           {/* Submit Button - Absolutely Positioned */}
           <Button
+            id="chat-send-btn"
             size="icon"
             disabled={disabled || (!inputValue.trim() && attachments.length === 0)}
             onClick={handleSubmit}
