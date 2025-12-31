@@ -9,6 +9,7 @@ import { DeleteItem } from '@/lib/types';
 import { ContentItem } from '@/hooks/useContent';
 import { useContentContext } from '@/contexts/ContentContext';
 import { generateSmartTitle } from '@/utils/textProcessing';
+import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
 
 interface DashboardModalsProps {
   isPasteModalOpen: boolean;
@@ -72,6 +73,9 @@ export function DashboardModals({
     const contentId = await onAddContentWithMetadata(contentData, metadata);
 
     if (contentId) {
+      // Emit onboarding event for content added
+      emitOnboardingEvent('content_added');
+      
       // Navigate to content page
       const searchParams = new URLSearchParams({
         type: contentType,
