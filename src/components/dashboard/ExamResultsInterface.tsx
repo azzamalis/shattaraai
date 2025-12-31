@@ -95,7 +95,7 @@ const DUMMY_EXAM_DATA = {
 const ExamResultsInterface: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentChatQuestion, setCurrentChatQuestion] = useState<number | null>(null);
-  const [chatType, setChatType] = useState<'question' | 'space'>('question');
+  const [chatType, setChatType] = useState<'question' | 'room'>('question');
   const navigate = useNavigate();
   const { contentId } = useParams<{ contentId: string }>();
 
@@ -164,8 +164,8 @@ const ExamResultsInterface: React.FC = () => {
   }
   return <div className="h-full bg-background text-foreground">
       <ExamResultsHeader totalQuestions={examResults.score.total} onOpenChat={() => {
-        setCurrentChatQuestion(null); // Clear question context for space chat
-        setChatType('space');
+        setCurrentChatQuestion(null); // Clear question context for room chat
+        setChatType('room');
         setIsChatOpen(true);
       }} />
 
