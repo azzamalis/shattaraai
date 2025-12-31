@@ -123,14 +123,18 @@ export function ExamResultsSummary() {
         setLoading(true);
 
         const storedAttemptId = localStorage.getItem('currentExamAttemptId');
-        if (!storedAttemptId && !contentId) {
-          console.error('No exam attempt ID found');
+        const idToUse = contentId || storedAttemptId;
+        
+        if (!idToUse) {
+          console.error('No exam ID found');
           return;
         }
-        const attemptId = storedAttemptId || contentId;
 
-        // Fetch exam attempt data with exam details
-        const { data: attemptData, error } = await supabase
+        // First try to fetch as exam_attempt
+        let attemptData: ExamAttemptData | null = null;
+        let examData: any = null;
+        
+        const { data: attemptResult, error: attemptError } = await supabase
           .from('exam_attempts')
           .select(`
             *,
@@ -140,16 +144,72 @@ export function ExamResultsSummary() {
               content_metadata
             )
           `)
-          .eq('id', attemptId)
+          .eq('id', idToUse)
           .maybeSingle();
 
-        if (error) {
-          console.error('Error fetching exam attempt:', error);
-          return;
+        if (attemptResult) {
+          attemptData = attemptResult as unknown as ExamAttemptData;
+          
+          // If attempt has linked exam, use that
+          if (attemptData.exams) {
+            examData = attemptData.exams;
+          }
+        }
+        
+        // If no exam data yet, try to fetch directly from exams table (idToUse might be an exam ID)
+        if (!examData) {
+          const { data: directExamData, error: examError } = await supabase
+            .from('exams')
+            .select('id, title, total_questions, content_metadata')
+            .eq('id', idToUse)
+            .maybeSingle();
+            
+          if (directExamData) {
+            examData = directExamData;
+            
+            // Also try to find the most recent attempt for this exam
+            const { data: latestAttempt } = await supabase
+              .from('exam_attempts')
+              .select('*')
+              .eq('exam_id', directExamData.id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+              
+            if (latestAttempt) {
+              attemptData = {
+                ...latestAttempt,
+                exams: examData
+              } as unknown as ExamAttemptData;
+            }
+          }
+        }
+
+        // If we still have no data, try to get latest completed attempt for the user
+        if (!attemptData && !examData) {
+          const { data: latestUserAttempt } = await supabase
+            .from('exam_attempts')
+            .select(`
+              *,
+              exams (
+                title,
+                total_questions,
+                content_metadata
+              )
+            `)
+            .eq('status', 'completed')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+            
+          if (latestUserAttempt) {
+            attemptData = latestUserAttempt as unknown as ExamAttemptData;
+            examData = attemptData.exams;
+          }
         }
 
         if (attemptData) {
-          setExamAttempt(attemptData as unknown as ExamAttemptData);
+          setExamAttempt(attemptData);
 
           // Calculate percentage score
           const percentage = attemptData.max_score > 0 
@@ -171,13 +231,36 @@ export function ExamResultsSummary() {
             score: Math.round(percentage * 10) / 10,
             skipped: attemptData.skipped_questions || 0,
             timeTaken: formatTime(attemptData.time_taken_minutes || 0),
-            totalQuestions: attemptData.exams?.total_questions || attemptData.max_score || 0,
+            totalQuestions: examData?.total_questions || attemptData.max_score || 0,
             correctAnswers: attemptData.total_score || 0,
           };
           setExamData(processedExamData);
 
-          // Fetch chapter breakdown data
-          await fetchChapterBreakdown(attemptId, attemptData as unknown as ExamAttemptData);
+          // Fetch chapter breakdown data using exam data
+          await fetchChapterBreakdown(attemptData.id, attemptData, examData);
+        } else if (examData) {
+          // We have exam but no attempt - show exam structure without scores
+          setExamAttempt({
+            id: examData.id,
+            total_score: 0,
+            max_score: examData.total_questions || 0,
+            skipped_questions: 0,
+            time_taken_minutes: 0,
+            status: 'pending',
+            exam_id: examData.id,
+            created_at: new Date().toISOString(),
+            exams: examData
+          } as unknown as ExamAttemptData);
+          
+          setExamData({
+            score: 0,
+            skipped: 0,
+            timeTaken: '0:00',
+            totalQuestions: examData.total_questions || 0,
+            correctAnswers: 0,
+          });
+          
+          await fetchChapterBreakdown(idToUse, null, examData);
         }
       } catch (error) {
         console.error('Error processing exam results:', error);
@@ -186,30 +269,10 @@ export function ExamResultsSummary() {
       }
     };
 
-    const fetchChapterBreakdown = async (attemptId: string, attemptData: ExamAttemptData) => {
+    const fetchChapterBreakdown = async (attemptId: string, attemptData: ExamAttemptData | null, examData: any) => {
       try {
-        // Fetch exam answers with question details
-        const { data: answersData, error: answersError } = await supabase
-          .from('exam_answers')
-          .select(`
-            id,
-            is_correct,
-            question_id,
-            exam_questions (
-              id,
-              reference_source,
-              reference_time
-            )
-          `)
-          .eq('exam_attempt_id', attemptId);
-
-        if (answersError) {
-          console.error('Error fetching exam answers:', answersError);
-          return;
-        }
-
         // Get content IDs from exam metadata
-        const contentMetadata = attemptData.exams?.content_metadata as { contentIds?: string[]; config?: { selectedTopics?: string[] } } | null;
+        const contentMetadata = examData?.content_metadata as { contentIds?: string[]; config?: { selectedTopics?: string[] } } | null;
         const contentIds = contentMetadata?.contentIds || [];
         const selectedTopics = contentMetadata?.config?.selectedTopics || [];
 
@@ -231,80 +294,118 @@ export function ExamResultsSummary() {
           setContentTitle(contentData[0].title);
         } else if (selectedTopics.length > 0) {
           setContentTitle(selectedTopics[0]);
+        } else if (examData?.title) {
+          setContentTitle(examData.title);
         }
 
-        // Group answers by reference_source to create chapter breakdown
-        const chapterMap = new Map<string, { correct: number; total: number; timeRange: string }>();
-
-        if (answersData) {
-          answersData.forEach((answer: any) => {
-            const question = answer.exam_questions;
-            if (!question) return;
-
-            const source = question.reference_source || 'General Questions';
-            const time = question.reference_time || '';
-
-            if (!chapterMap.has(source)) {
-              chapterMap.set(source, { correct: 0, total: 0, timeRange: time });
-            }
-
-            const chapter = chapterMap.get(source)!;
-            chapter.total += 1;
-            if (answer.is_correct) {
-              chapter.correct += 1;
-            }
-          });
+        // Fetch exam questions with reference info
+        const examId = examData?.id || attemptData?.exam_id;
+        let questionsWithSources: any[] = [];
+        
+        if (examId) {
+          const { data: questions, error: questionsError } = await supabase
+            .from('exam_questions')
+            .select('id, reference_source, reference_time, order_index')
+            .eq('exam_id', examId)
+            .order('order_index');
+            
+          if (!questionsError && questions) {
+            questionsWithSources = questions;
+          }
         }
 
-        // If we have content chapters, try to match them
+        // Fetch exam answers if we have an attempt
+        let answersMap = new Map<string, boolean>();
+        if (attemptData?.id) {
+          const { data: answersData, error: answersError } = await supabase
+            .from('exam_answers')
+            .select('question_id, is_correct')
+            .eq('exam_attempt_id', attemptData.id);
+            
+          if (!answersError && answersData) {
+            answersData.forEach((answer: any) => {
+              answersMap.set(answer.question_id, answer.is_correct);
+            });
+          }
+        }
+
+        // Get all chapters from content
         const allChapters = contentData.flatMap(c => c.chapters || []);
         
-        // Convert map to array for ChapterBreakdown
+        // Build chapter breakdown from content chapters
         const breakdown: ChapterData[] = [];
         
-        if (chapterMap.size > 0) {
-          chapterMap.forEach((stats, source) => {
-            // Try to find matching content chapter for page range
-            const matchingChapter = allChapters.find(ch => 
-              source.toLowerCase().includes(ch.title.toLowerCase()) ||
-              ch.title.toLowerCase().includes(source.toLowerCase().split(' ').slice(0, 3).join(' '))
-            );
-
-            let timeRange = stats.timeRange;
-            if (matchingChapter) {
-              // Convert times to page numbers (approximate)
-              const startPage = Math.floor(matchingChapter.startTime / 60) + 1;
-              const endPage = Math.floor(matchingChapter.endTime / 60) + 1;
-              timeRange = `Page ${startPage} - ${endPage}`;
-            } else if (timeRange && !timeRange.includes('Page')) {
-              // Format time reference as page if it's just a number
-              const timeNum = parseInt(timeRange.replace(/\D/g, ''));
-              if (!isNaN(timeNum)) {
-                timeRange = `Page ${timeNum}`;
-              }
-            }
-
-            breakdown.push({
-              title: source,
-              timeRange: timeRange || 'N/A',
-              correct: stats.correct,
-              total: stats.total,
-            });
-          });
-        } else if (allChapters.length > 0) {
-          // Fallback: distribute questions across chapters if no reference_source
-          const totalQuestions = attemptData.max_score || 0;
-          const questionsPerChapter = Math.ceil(totalQuestions / allChapters.length);
+        if (allChapters.length > 0) {
+          // Group questions by matching them to chapters based on reference_source
+          const chapterQuestionMap = new Map<string, { correct: number; total: number }>();
           
-          allChapters.forEach((chapter, index) => {
-            const startPage = Math.floor(chapter.startTime / 60) + 1;
-            const endPage = Math.floor(chapter.endTime / 60) + 1;
+          // Initialize all chapters
+          allChapters.forEach(chapter => {
+            chapterQuestionMap.set(chapter.id, { correct: 0, total: 0 });
+          });
+          
+          // Match questions to chapters
+          questionsWithSources.forEach(question => {
+            const source = question.reference_source || '';
+            const isCorrect = answersMap.get(question.id) || false;
+            
+            // Try to match to a chapter by title similarity
+            let matchedChapter = allChapters.find(ch => 
+              source.toLowerCase().includes(ch.title.toLowerCase().split(' ').slice(0, 3).join(' ')) ||
+              ch.title.toLowerCase().includes(source.toLowerCase().split(':')[0].trim().split(' ').slice(0, 3).join(' '))
+            );
+            
+            // If no match, assign to first chapter or create "Other" category
+            if (!matchedChapter && allChapters.length > 0) {
+              // Distribute evenly across chapters based on question index
+              const chapterIndex = questionsWithSources.indexOf(question) % allChapters.length;
+              matchedChapter = allChapters[chapterIndex];
+            }
+            
+            if (matchedChapter) {
+              const stats = chapterQuestionMap.get(matchedChapter.id)!;
+              stats.total += 1;
+              if (isCorrect) stats.correct += 1;
+            }
+          });
+          
+          // Convert to breakdown array
+          allChapters.forEach(chapter => {
+            const stats = chapterQuestionMap.get(chapter.id) || { correct: 0, total: 0 };
+            const pageStart = (chapter as any).pageNumber || (chapter as any).startPage || Math.floor(chapter.startTime / 60) + 1;
+            const pageEnd = (chapter as any).endPage || Math.ceil(chapter.endTime / 60) + 1;
             
             breakdown.push({
               title: chapter.title,
-              timeRange: `Page ${startPage} - ${endPage}`,
-              correct: 0,
-              total: questionsPerChapter,
+              timeRange: `Page ${pageStart} - ${pageEnd}`,
+              correct: stats.correct,
+              total: stats.total > 0 ? stats.total : Math.ceil(questionsWithSources.length / allChapters.length),
+            });
+          });
+        } else if (questionsWithSources.length > 0) {
+          // Fallback: group by reference_source if no chapters
+          const sourceMap = new Map<string, { correct: number; total: number; time: string }>();
+          
+          questionsWithSources.forEach(question => {
+            const source = question.reference_source || 'General Questions';
+            const time = question.reference_time || '';
+            const isCorrect = answersMap.get(question.id) || false;
+            
+            if (!sourceMap.has(source)) {
+              sourceMap.set(source, { correct: 0, total: 0, time });
+            }
+            
+            const stats = sourceMap.get(source)!;
+            stats.total += 1;
+            if (isCorrect) stats.correct += 1;
+          });
+          
+          sourceMap.forEach((stats, source) => {
+            breakdown.push({
+              title: source,
+              timeRange: stats.time || 'N/A',
+              correct: stats.correct,
+              total: stats.total,
             });
           });
         }
