@@ -33,48 +33,56 @@ export const PersonalizationTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-0">
-      <div className="flex items-center justify-between py-3 border-b border-border">
-        <div className="flex items-center gap-2">
-          <Globe className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium">Language</span>
+    <div className="pb-8">
+      <div className="space-y-0">
+        <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium">Language</span>
+            <span className="text-xs text-primary/70">
+              Choose your preferred display language
+            </span>
+          </div>
+          <Select value={language} onValueChange={handleLanguageChange}>
+            <SelectTrigger className="w-[140px] h-8 text-sm">
+              <Globe className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+              <SelectValue placeholder="Select language">
+                {languages.find(l => l.value === language)?.label || 'Select'}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent className="z-[110]">
+              {languages.map((lang) => (
+                <SelectItem key={lang.value} value={lang.value}>
+                  {lang.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={language} onValueChange={handleLanguageChange}>
-          <SelectTrigger className="w-[180px] h-9 border-0 bg-transparent hover:bg-accent hover:text-accent-foreground">
-            <SelectValue placeholder="Select language">
-              {languages.find(l => l.value === language)?.label || 'Select language'}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="z-[110]">
-            {languages.map((lang) => (
-              <SelectItem key={lang.value} value={lang.value}>
-                {lang.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
 
-      <div className="flex items-center justify-between py-3 border-b border-border">
-        <div className="flex items-center gap-2">
-          {theme === 'light' ? (
-            <Sun className="h-4 w-4 text-muted-foreground" />
-          ) : (
-            <Moon className="h-4 w-4 text-muted-foreground" />
-          )}
-          <span className="text-sm font-medium">Theme</span>
+        <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium">Theme</span>
+            <span className="text-xs text-primary/70">
+              Switch between light and dark mode
+            </span>
+          </div>
+          <Select value={theme} onValueChange={handleThemeChange}>
+            <SelectTrigger className="w-[140px] h-8 text-sm">
+              {theme === 'light' ? (
+                <Sun className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+              ) : (
+                <Moon className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+              )}
+              <SelectValue placeholder="Select theme">
+                {theme === 'light' ? 'Light' : 'Dark'}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent className="z-[110]">
+              <SelectItem value="light">Light</SelectItem>
+              <SelectItem value="dark">Dark</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={theme} onValueChange={handleThemeChange}>
-          <SelectTrigger className="w-[180px] h-9 border-0 bg-transparent hover:bg-accent hover:text-accent-foreground">
-            <SelectValue placeholder="Select theme">
-              {theme === 'light' ? 'Light' : 'Dark'}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="z-[110]">
-            <SelectItem value="light">Light</SelectItem>
-            <SelectItem value="dark">Dark</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );
