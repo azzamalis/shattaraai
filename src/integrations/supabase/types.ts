@@ -639,6 +639,9 @@ export type Database = {
           goal: Database["public"]["Enums"]["user_goal"] | null
           id: string
           language: string
+          onboarding_checklist_completed_at: string | null
+          onboarding_checklist_dismissed_at: string | null
+          onboarding_checklist_tasks: string[] | null
           onboarding_completed: boolean | null
           plan_type: Database["public"]["Enums"]["user_plan"]
           purpose: Database["public"]["Enums"]["user_purpose"] | null
@@ -653,6 +656,9 @@ export type Database = {
           goal?: Database["public"]["Enums"]["user_goal"] | null
           id: string
           language?: string
+          onboarding_checklist_completed_at?: string | null
+          onboarding_checklist_dismissed_at?: string | null
+          onboarding_checklist_tasks?: string[] | null
           onboarding_completed?: boolean | null
           plan_type?: Database["public"]["Enums"]["user_plan"]
           purpose?: Database["public"]["Enums"]["user_purpose"] | null
@@ -667,6 +673,9 @@ export type Database = {
           goal?: Database["public"]["Enums"]["user_goal"] | null
           id?: string
           language?: string
+          onboarding_checklist_completed_at?: string | null
+          onboarding_checklist_dismissed_at?: string | null
+          onboarding_checklist_tasks?: string[] | null
           onboarding_completed?: boolean | null
           plan_type?: Database["public"]["Enums"]["user_plan"]
           purpose?: Database["public"]["Enums"]["user_purpose"] | null
