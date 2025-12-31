@@ -296,27 +296,42 @@ export function ExamResultsSummary() {
   };
   return <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-10 border-b-2 border-border bg-background/95 backdrop-blur-sm">
-        <div className="flex items-center p-4">
+      <header className="sticky top-0 z-10 w-full border-b bg-background/95 px-4 py-4 shadow-lg shadow-neutral-800/5 backdrop-blur-sm dark:border-b dark:border-border dark:shadow-white/5">
+        <div className="relative mx-auto flex w-full items-center">
           {/* Left: Close Button */}
-          <div className="flex items-center">
-            <button onClick={handleClose} className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent">
-              <X className="h-4 w-4" />
+          <div className="flex w-20 flex-shrink-0 items-center gap-2 xl:w-40">
+            <button 
+              onClick={handleClose} 
+              className="inline-flex h-10 w-10 items-center justify-center whitespace-nowrap rounded-full text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
 
           {/* Center: Exam Title Dropdown */}
-          <div className="flex flex-grow items-center justify-center text-sm font-medium">
-            <button className="flex h-10 w-28 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-center hover:text-primary hover:bg-primary/5 transition-all">
-              <span className="text-muted-foreground">Exam 1</span>
-              <ChevronDown className="h-4 w-4 text-muted-foreground/60" />
+          <div className="flex flex-1 items-center justify-center">
+            <button 
+              className="flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              data-state="closed"
+            >
+              <span className="text-base font-medium text-neutral-600 dark:text-neutral-300">
+                {examAttempt?.exams?.title || 'Exam 1'}
+              </span>
+              <ChevronDown className="h-4 w-4 text-neutral-400 dark:text-neutral-500" aria-hidden="true" />
             </button>
           </div>
 
           {/* Right: Share Button */}
-          <div className="flex items-center justify-end text-sm font-medium">
-            <button onClick={handleShare} className="flex h-10 w-28 items-center justify-center rounded-xl border border-border bg-card px-4 py-2 text-center hover:text-primary hover:bg-primary/5 transition-all">
-              Share exam
+          <div className="flex w-20 flex-shrink-0 items-center justify-end gap-2 xl:w-40">
+            <button 
+              onClick={handleShare} 
+              className="relative inline-flex h-10 items-center justify-center gap-x-2 whitespace-nowrap rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-primary/5 hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:hover:bg-primary/10 xl:px-4"
+            >
+              <Share2 className="inline h-4 w-4 scale-x-[-1] xl:hidden" aria-hidden="true" />
+              <span className="hidden xl:inline">Share exam</span>
             </button>
           </div>
         </div>
@@ -382,12 +397,21 @@ export function ExamResultsSummary() {
       </main>
 
       {/* Sticky Footer */}
-      <footer className="sticky bottom-0 z-10 border-t-2 border-border bg-background px-4 py-10 font-medium">
-        <div className="flex justify-center">
-          <div className="flex w-full max-w-4xl flex-col justify-center gap-3 sm:flex-row">
-            <button onClick={handleGoToSpace} className="flex h-12 w-full items-center justify-center rounded-full border border-border px-8 hover:text-primary hover:bg-primary/5 transition-all sm:w-96">Go to Room</button>
-            <button onClick={handleCreateNew} className="flex h-12 w-full items-center justify-center gap-x-2 rounded-full bg-foreground px-8 text-background hover:bg-foreground/90 sm:w-96">
-              <BookCheck className="h-4 w-4" />
+      <footer className="sticky bottom-0 z-10 border-t border-border bg-background px-4 py-8 md:py-[clamp(1rem,2.5vh,2.5rem)]">
+        <div className="mx-auto flex max-w-4xl justify-center gap-4">
+          <div className="flex w-full justify-center gap-3">
+            <button 
+              onClick={handleGoToSpace} 
+              className="inline-flex h-12 w-full items-center justify-center whitespace-nowrap rounded-full border border-input bg-background px-8 text-base font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 md:w-96"
+            >
+              Go to Space
+            </button>
+            <button 
+              onClick={handleCreateNew} 
+              className="inline-flex h-12 w-full items-center justify-center gap-x-2 whitespace-nowrap rounded-full bg-primary px-8 text-base font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 md:w-96"
+              data-state="closed"
+            >
+              <BookCheck className="h-4 w-4" aria-hidden="true" />
               Create Exam
             </button>
           </div>
