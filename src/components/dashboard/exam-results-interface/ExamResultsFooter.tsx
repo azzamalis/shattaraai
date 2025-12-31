@@ -18,14 +18,14 @@ export function ExamResultsFooter({ onTryAgain, onViewResults, roomId }: ExamRes
               to={`/room/${roomId}`}
               className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground px-8 h-12 w-full rounded-full text-base md:w-96"
             >
-              Go to Space
+              Go to Room
             </Link>
           ) : (
             <button 
               onClick={onTryAgain}
               className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground px-8 h-12 w-full rounded-full text-base md:w-96"
             >
-              Go to Space
+              Go to Room
             </button>
           )}
           <button 
