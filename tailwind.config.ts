@@ -73,6 +73,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				onboarding: {
+					gradient: {
+						start: 'hsl(var(--onboarding-gradient-start))',
+						end: 'hsl(var(--onboarding-gradient-end))',
+					},
+					glow: 'hsl(var(--onboarding-glow))',
+					success: 'hsl(var(--onboarding-success))',
+					progress: 'hsl(var(--onboarding-progress-bg))',
+					highlight: 'hsl(var(--onboarding-highlight))',
 				}
 			},
 			maxWidth: {

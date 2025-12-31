@@ -157,7 +157,7 @@ export function ActionCards({
       display: 'none'
     }} />
       
-      <div className="sm:justify-center sm:items-center gap-3 sm:flex grid grid-cols-1 w-full">
+      <div id="onboarding-upload-zone" className="sm:justify-center sm:items-center gap-3 sm:flex grid grid-cols-1 w-full">
         {/* Upload Card */}
         <div className="flex-1 w-full sm:w-1/3">
           <TooltipProvider>
