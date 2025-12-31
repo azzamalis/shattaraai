@@ -9,6 +9,7 @@ interface OnboardingState {
   completedTasks: string[];
   dismissed: boolean;
   completedAt: string | null;
+  isExpanded: boolean;
 }
 
 interface OnboardingContextType {
@@ -55,7 +56,13 @@ export function OnboardingProvider({
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return {
+          completedTasks: parsed.completedTasks || [],
+          dismissed: parsed.dismissed || false,
+          completedAt: parsed.completedAt || null,
+          isExpanded: parsed.isExpanded !== undefined ? parsed.isExpanded : true,
+        };
       }
     } catch (e) {
       console.error('Failed to load onboarding state:', e);
@@ -64,11 +71,11 @@ export function OnboardingProvider({
       completedTasks: [],
       dismissed: false,
       completedAt: null,
+      isExpanded: true,
     };
   });
   
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
-  const [isExpanded, setIsExpanded] = useState(true);
   const [showCompletedMessage, setShowCompletedMessage] = useState(false);
   
   // Load state from Supabase when authenticated
@@ -93,6 +100,7 @@ export function OnboardingProvider({
             completedTasks: data.onboarding_checklist_tasks || [],
             dismissed: !!data.onboarding_checklist_dismissed_at,
             completedAt: data.onboarding_checklist_completed_at || null,
+            isExpanded: true, // Default to expanded, localStorage will have the user preference
           };
           
           // Merge with localStorage - take the more complete state
@@ -102,6 +110,7 @@ export function OnboardingProvider({
               completedTasks: mergedTasks,
               dismissed: prev.dismissed || supabaseState.dismissed,
               completedAt: prev.completedAt || supabaseState.completedAt,
+              isExpanded: prev.isExpanded, // Keep localStorage preference
             };
           });
         }
@@ -162,6 +171,7 @@ export function OnboardingProvider({
   // Computed values
   const isCompleted = state.completedTasks.length === ONBOARDING_TASKS.length;
   const isDismissed = state.dismissed;
+  const isExpanded = state.isExpanded;
   
   const shouldShow = useMemo(() => {
     if (!isAuthenticated) return false;
@@ -221,7 +231,10 @@ export function OnboardingProvider({
   }, []);
   
   const toggleExpanded = useCallback(() => {
-    setIsExpanded((prev) => !prev);
+    setState((prev) => ({
+      ...prev,
+      isExpanded: !prev.isExpanded,
+    }));
   }, []);
   
   const dismissOnboarding = useCallback(() => {
@@ -236,9 +249,9 @@ export function OnboardingProvider({
       completedTasks: [],
       dismissed: false,
       completedAt: null,
+      isExpanded: true,
     });
     setActiveTaskId(null);
-    setIsExpanded(true);
     setShowCompletedMessage(false);
   }, []);
   
