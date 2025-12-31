@@ -84,7 +84,7 @@ export const PersonalizationTab: React.FC = () => {
                 </div>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-48 p-1" align="end">
+            <PopoverContent className="z-[110] w-48 bg-popover p-1 shadow-md" align="end">
               {languages.map((lang) => (
                 <button
                   key={lang.value}
@@ -121,7 +121,7 @@ export const PersonalizationTab: React.FC = () => {
                 </div>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-36 p-1" align="end">
+            <PopoverContent className="z-[110] w-36 bg-popover p-1 shadow-md" align="end">
               <button
                 onClick={() => handleThemeChange('light')}
                 className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent"
@@ -157,7 +157,7 @@ export const PersonalizationTab: React.FC = () => {
                 </div>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-36 p-1" align="end">
+            <PopoverContent className="z-[110] w-36 bg-popover p-1 shadow-md" align="end">
               {chatModels.map((model) => (
                 <button
                   key={model.value}
