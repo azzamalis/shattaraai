@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { RotateCcw } from 'lucide-react';
+
 
 import { useAuth } from '@/hooks/useAuth';
 import { useOnboarding } from '@/contexts/OnboardingContext';
@@ -85,7 +85,6 @@ export const DataControlsTab: React.FC = () => {
             </span>
           </div>
           <Button variant="outline" size="sm" onClick={handleResetOnboarding} className="h-8 px-3">
-            <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
             Reset
           </Button>
         </div>
