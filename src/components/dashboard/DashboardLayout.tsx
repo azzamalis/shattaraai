@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRooms } from '@/hooks/useRooms';
 import { useContent } from '@/hooks/useContent';
 import { ContentData } from '@/pages/ContentPage';
+import { useAutoCompleteOnboarding } from '@/hooks/useAutoCompleteOnboarding';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -28,6 +29,9 @@ export function DashboardLayout({
   const { content } = useContent();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  // Listen for onboarding events and auto-complete tasks
+  useAutoCompleteOnboarding();
 
   // Handle screen resize
   useEffect(() => {
