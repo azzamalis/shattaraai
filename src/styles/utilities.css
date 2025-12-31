@@ -50,17 +50,22 @@
   /* Onboarding highlight pulse animation */
   @keyframes onboarding-pulse {
     0%, 100% {
-      box-shadow: 0 0 0 0 hsl(var(--onboarding-gradient-start) / 0.4);
+      box-shadow: 0 0 0 0 hsl(var(--onboarding-gradient-start) / 0.4),
+                  0 0 0 2px hsl(var(--onboarding-gradient-start) / 0.6);
     }
     50% {
-      box-shadow: 0 0 0 8px hsl(var(--onboarding-gradient-start) / 0);
+      box-shadow: 0 0 0 12px hsl(var(--onboarding-gradient-start) / 0),
+                  0 0 0 2px hsl(var(--onboarding-gradient-start) / 0.8);
     }
   }
 
   .onboarding-highlight-pulse {
-    animation: onboarding-pulse 1s ease-in-out 2;
+    animation: onboarding-pulse 1s ease-in-out 3;
     position: relative;
-    z-index: 10;
+    z-index: 50;
+    outline: 2px solid hsl(var(--onboarding-gradient-start) / 0.6);
+    outline-offset: 2px;
+    border-radius: inherit;
   }
 }
 
