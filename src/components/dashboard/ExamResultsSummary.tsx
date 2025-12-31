@@ -461,38 +461,39 @@ export function ExamResultsSummary() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow px-6">
-        <div className="px-6 py-8">
-          {loading ? <div className="flex justify-center pt-8">
+      <main className="flex-grow overflow-y-auto">
+        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+          {loading ? (
+            <div className="flex justify-center pt-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div> : examData ? <>
-              {/* Title */}
-              <div className="text-center">
-                <h2 className="mb-4 text-2xl font-medium text-foreground/80">
-                  Keep up the momentum!
+            </div>
+          ) : examData ? (
+            <>
+              {/* Header Section */}
+              <div className="mb-8 text-center">
+                <h2 className="my-10 text-xl font-medium text-primary/80 dark:text-primary sm:my-12 sm:text-2xl">
+                  You're doing well, keep it up!
                 </h2>
 
                 {/* Stats Row */}
-                <div className="mb-4 flex items-center justify-center gap-x-24">
-                  <div>
-                    <div className="text-2xl font-medium">{examData.skipped}</div>
-                    <div className="text-sm text-muted-foreground/80">Skipped</div>
+                <div className="mb-8 flex items-center justify-center gap-x-12 sm:gap-x-24">
+                  <div className="text-center">
+                    <div className="text-xl font-medium sm:text-2xl">{examData.skipped}</div>
+                    <div className="text-xs text-muted-foreground/80 dark:text-muted-foreground/80 sm:text-sm">Skipped</div>
                   </div>
-                  <div className="relative flex flex-col items-center justify-center">
-                    <CircularProgress percentage={examData.score} />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-medium">{examData.timeTaken}</div>
-                    <div className="text-sm text-muted-foreground/80">Time Taken</div>
+                  <CircularProgress percentage={examData.score} />
+                  <div className="text-center">
+                    <div className="text-xl font-medium sm:text-2xl">{examData.timeTaken}</div>
+                    <div className="text-xs text-muted-foreground/80 dark:text-muted-foreground/80 sm:text-sm">Time Taken</div>
                   </div>
                 </div>
               </div>
 
               {/* Preview Link */}
-              <div className="mb-6 flex justify-center text-sm font-semibold text-foreground/60">
-              <button className="flex h-10 w-32 items-center justify-center rounded-xl px-4 py-2 text-center underline hover:text-foreground whitespace-nowrap">
-                Preview {examAttempt?.exams?.title || 'Exam 1'}
-              </button>
+              <div className="mb-8 flex justify-center">
+                <button className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-semibold text-primary/60 underline underline-offset-4 ring-offset-background transition-colors hover:text-primary hover:underline focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-primary/60 dark:hover:text-primary">
+                  Preview {examAttempt?.exams?.title || 'Exam 1'}
+                </button>
               </div>
 
               {/* Chapter Breakdown */}
@@ -502,20 +503,31 @@ export function ExamResultsSummary() {
                 contentTitle={contentTitle || examAttempt?.exams?.title || 'Exam Content'}
               />
 
-              {/* Middle Action Buttons */}
-              <div className="flex flex-col justify-center gap-4 text-sm font-medium sm:flex-row">
-                <button onClick={handleTryAgain} className="inline-flex h-11 w-28 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border border-border px-4 text-sm font-medium hover:bg-accent transition-colors">
-                  <RotateCcw className="h-4 w-4 flex-shrink-0" />
+              {/* Action Buttons */}
+              <div className="mb-24 flex flex-col justify-center gap-2 sm:flex-row sm:gap-4">
+                <button 
+                  onClick={handleTryAgain} 
+                  className="inline-flex h-11 items-center justify-center gap-x-2 whitespace-nowrap rounded-full border border-input bg-background px-4 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                  data-state="closed"
+                >
+                  <RotateCcw className="h-4 w-4" aria-hidden="true" />
                   Try Again
                 </button>
-                <button onClick={handleRetake} className="inline-flex h-11 w-48 items-center justify-center gap-x-2 overflow-visible whitespace-nowrap rounded-full border border-border px-4 text-sm font-medium hover:bg-accent transition-colors">
-                  <Repeat className="h-4 w-4 flex-shrink-0" />
+                <button 
+                  onClick={handleRetake} 
+                  className="inline-flex h-11 items-center justify-center gap-x-2 whitespace-nowrap rounded-full border border-input bg-background px-4 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                  data-state="closed"
+                >
+                  <Repeat className="h-4 w-4" aria-hidden="true" />
                   New-Question Retake
                 </button>
               </div>
-            </> : <div className="text-center pt-8">
+            </>
+          ) : (
+            <div className="text-center pt-8">
               <p className="text-muted-foreground">No exam results found.</p>
-            </div>}
+            </div>
+          )}
         </div>
       </main>
 
