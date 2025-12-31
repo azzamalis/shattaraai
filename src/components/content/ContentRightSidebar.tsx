@@ -25,11 +25,14 @@ import { registerTabSetter, unregisterTabSetter } from '@/hooks/useOnboardingNav
 
 interface ContentRightSidebarProps {
   contentData: ContentData;
+  initialTab?: string;
 }
+
 export function ContentRightSidebar({
-  contentData
+  contentData,
+  initialTab
 }: ContentRightSidebarProps) {
-  const [activeTab, setActiveTab] = useState("chat");
+  const [activeTab, setActiveTab] = useState(initialTab || "chat");
   const [isRecording, setIsRecording] = useState(false);
 
   // Register tab setter for onboarding navigation
@@ -37,6 +40,13 @@ export function ContentRightSidebar({
     registerTabSetter(setActiveTab);
     return () => unregisterTabSetter();
   }, []);
+
+  // Update active tab when initialTab changes (from URL parameter)
+  useEffect(() => {
+    if (initialTab && initialTab !== activeTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   // Extract topics from content metadata
   const extractTopics = (): string[] => {

@@ -274,7 +274,7 @@ export default function ContentPage() {
             </ResizableHandle>
             
             <ResizablePanel defaultSize={50} minSize={40} className="bg-card rounded-lg">
-              <ContentRightSidebar contentData={contentData} />
+              <ContentRightSidebar contentData={contentData} initialTab={searchParams.get('tab') || undefined} />
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
