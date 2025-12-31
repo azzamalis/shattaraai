@@ -46,6 +46,22 @@
       transform: translateX(100%);
     }
   }
+
+  /* Onboarding highlight pulse animation */
+  @keyframes onboarding-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 hsl(var(--onboarding-gradient-start) / 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px hsl(var(--onboarding-gradient-start) / 0);
+    }
+  }
+
+  .onboarding-highlight-pulse {
+    animation: onboarding-pulse 1s ease-in-out 2;
+    position: relative;
+    z-index: 10;
+  }
 }
 
 /* Improved scrollbar for dark theme */

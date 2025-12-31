@@ -49,6 +49,14 @@
     --sidebar-border: 0 0% 90%; /* #E5E5E5 */
     --sidebar-ring: 210 100% 42%; /* Adjusted for contrast #0069D6 */
 
+    /* Onboarding Checklist Colors */
+    --onboarding-gradient-start: 217 91% 60%;
+    --onboarding-gradient-end: 262 83% 58%;
+    --onboarding-glow: 217 91% 60% / 0.2;
+    --onboarding-success: 142 71% 45%;
+    --onboarding-progress-bg: 210 40% 96.1%;
+    --onboarding-highlight: 217 91% 95%;
+
     --radius: 0.5rem;
   }
 
@@ -95,6 +103,14 @@
     --sidebar-accent-foreground: 0 0% 98%; /* #FAFAFA */
     --sidebar-border: 0 0% 15%; /* #262626 */
     --sidebar-ring: 0 0% 89%; /* #E3E3E3 */
+
+    /* Onboarding Checklist Colors - Dark Mode */
+    --onboarding-gradient-start: 217 91% 60%;
+    --onboarding-gradient-end: 262 83% 58%;
+    --onboarding-glow: 217 91% 60% / 0.3;
+    --onboarding-success: 142 71% 45%;
+    --onboarding-progress-bg: 0 0% 20%;
+    --onboarding-highlight: 217 91% 20%;
   }
 
   * {
