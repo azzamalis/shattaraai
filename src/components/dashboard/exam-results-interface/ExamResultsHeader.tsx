@@ -35,7 +35,7 @@ export function ExamResultsHeader({ totalQuestions, onOpenChat }: ExamResultsHea
           <span className="text-sm text-muted-foreground">{totalQuestions}</span>
         </div>
         
-        {/* Right: Space Chat Button */}
+        {/* Right: Room Chat Button */}
         <div className="flex w-20 flex-shrink-0 items-center justify-end gap-2 xl:w-40">
           <div className="z-10 flex justify-end bg-background p-2 pr-0 md:p-4 md:pr-0">
             <button 

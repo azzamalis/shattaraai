@@ -26,7 +26,7 @@ interface ChatDrawerProps {
   examId?: string;
   contentId?: string;
   roomId?: string | null;
-  chatType?: 'question' | 'space';
+  chatType?: 'question' | 'room';
 }
 
 export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, contentId, roomId, chatType = 'question' }: ChatDrawerProps) {
