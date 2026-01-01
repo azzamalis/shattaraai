@@ -50,7 +50,7 @@ export function SummaryTabPanel({
   autoGenerate = false,
   onAutoGenerateChange,
 }: SummaryTabPanelProps) {
-  const [selectedType, setSelectedType] = useState<'brief' | 'standard' | 'detailed'>('brief');
+  const [selectedType, setSelectedType] = useState<'brief' | 'standard' | 'detailed'>('detailed');
 
   const handleCreateSummary = () => {
     onCreateSummary(selectedType);
