@@ -54,7 +54,7 @@ export function RoomPageContent({
   const isAllSelected = selectedCount === totalCount && totalCount > 0;
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex-1 flex flex-col overflow-hidden pt-6 sm:pt-8">
       <div className="px-4 sm:px-6 lg:px-12 2xl:px-36 bg-background">
         <div className="w-full">
           <div className="group/header relative">
