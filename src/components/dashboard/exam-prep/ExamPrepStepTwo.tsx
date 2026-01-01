@@ -1,9 +1,8 @@
-
-import React, { useState, useRef } from 'react';
-import { Upload, Link, ClipboardPaste, ArrowLeft, ArrowRight, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { PasteContentModal } from '../PasteContentModal';
-import { toast } from 'sonner';
+import React, { useState, useRef } from "react";
+import { Upload, Link2, ClipboardPaste, ArrowLeft, ArrowRight, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PasteContentModal } from "../PasteContentModal";
+import { toast } from "sonner";
 
 interface ExamPrepStepTwoProps {
   currentStep?: number;
@@ -17,7 +16,7 @@ interface ExamPrepStepTwoProps {
 export interface ContentItem {
   id: string;
   title: string;
-  type: 'file' | 'url' | 'text';
+  type: "file" | "url" | "text";
   file?: File;
   url?: string;
   text?: string;
@@ -30,11 +29,11 @@ function ExamProgressBar({ currentStep, totalSteps }: { currentStep: number; tot
       <div className="flex w-1/4 max-w-md gap-2">
         {Array.from({ length: totalSteps }).map((_, index) => (
           <div key={index} className="h-1.5 flex-1 rounded-full bg-muted">
-            <div 
+            <div
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                index < currentStep ? 'bg-green-500' : 'bg-muted-foreground/20'
+                index < currentStep ? "bg-green-500" : "bg-muted-foreground/20"
               }`}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </div>
         ))}
@@ -43,13 +42,13 @@ function ExamProgressBar({ currentStep, totalSteps }: { currentStep: number; tot
   );
 }
 
-export function ExamPrepStepTwo({ 
-  currentStep = 2, 
-  totalSteps = 3, 
-  onBack, 
-  onNext, 
-  onSkip, 
-  onAdditionalResourcesChange 
+export function ExamPrepStepTwo({
+  currentStep = 2,
+  totalSteps = 3,
+  onBack,
+  onNext,
+  onSkip,
+  onAdditionalResourcesChange,
 }: ExamPrepStepTwoProps) {
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
@@ -70,10 +69,10 @@ export function ExamPrepStepTwo({
       const newItem: ContentItem = {
         id: Math.random().toString(36).substr(2, 9),
         title: file.name,
-        type: 'file',
-        file
+        type: "file",
+        file,
       };
-      setContentItems(prev => [...prev, newItem]);
+      setContentItems((prev) => [...prev, newItem]);
       toast.success(`File "${file.name}" added successfully`);
     }
   };
@@ -83,47 +82,47 @@ export function ExamPrepStepTwo({
       const newItem: ContentItem = {
         id: Math.random().toString(36).substr(2, 9),
         title: data.url,
-        type: 'url',
-        url: data.url
+        type: "url",
+        url: data.url,
       };
-      setContentItems(prev => [...prev, newItem]);
+      setContentItems((prev) => [...prev, newItem]);
       toast.success("URL content added successfully");
     } else if (data.text) {
       const newItem: ContentItem = {
         id: Math.random().toString(36).substr(2, 9),
-        title: 'Text Content',
-        type: 'text',
-        text: data.text
+        title: "Text Content",
+        type: "text",
+        text: data.text,
       };
-      setContentItems(prev => [...prev, newItem]);
+      setContentItems((prev) => [...prev, newItem]);
       toast.success("Text content added successfully");
     }
     setIsPasteModalOpen(false);
   };
 
   const handleRemoveItem = (id: string) => {
-    setContentItems(prev => prev.filter(item => item.id !== id));
+    setContentItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const actionCards = [
     {
       icon: Upload,
-      title: 'Upload',
-      subtitle: 'File, Audio, Video',
-      onClick: handleUploadClick
+      title: "Upload",
+      subtitle: "File, Audio, Video",
+      onClick: handleUploadClick,
     },
     {
-      icon: Link,
-      title: 'Link',
-      subtitle: 'YouTube, Website',
-      onClick: () => setIsPasteModalOpen(true)
+      icon: Link2,
+      title: "Link2",
+      subtitle: "YouTube, Website, Text",
+      onClick: () => setIsPasteModalOpen(true),
     },
     {
       icon: ClipboardPaste,
-      title: 'Paste',
-      subtitle: 'Copied Text',
-      onClick: () => setIsPasteModalOpen(true)
-    }
+      title: "Paste",
+      subtitle: "Copied Text",
+      onClick: () => setIsPasteModalOpen(true),
+    },
   ];
 
   return (
@@ -132,7 +131,7 @@ export function ExamPrepStepTwo({
         <div className="w-full max-w-3xl">
           {/* Progress Bar */}
           <ExamProgressBar currentStep={currentStep} totalSteps={totalSteps} />
-          
+
           <div className="mt-6 flex flex-col items-center gap-4 sm:mt-0">
             {/* Title and Subtitle */}
             <h2 className="text-center text-lg font-normal leading-relaxed sm:text-2xl 2xl:text-3xl text-foreground">
@@ -141,14 +140,14 @@ export function ExamPrepStepTwo({
             <p className="mb-2 text-center text-sm text-muted-foreground sm:text-base 2xl:text-lg">
               We will use this to make the exam as accurate as possible
             </p>
-            
+
             {/* Action Cards */}
             <div className="flex w-full flex-col items-center justify-center sm:w-3/4">
               <div className="z-30 flex flex-col text-center w-full md:max-w-[640px] xl:max-w-[672px]">
                 <div className="grid w-full grid-cols-2 gap-3 sm:flex sm:items-center sm:justify-center">
                   {actionCards.map((card) => (
                     <div key={card.title} className="w-full min-w-0 sm:flex-1">
-                      <div 
+                      <div
                         onClick={card.onClick}
                         className="text-card-foreground group relative cursor-pointer rounded-3xl border border-border bg-background shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition-colors duration-200 focus-within:border hover:border-muted-foreground/30 hover:bg-muted/40 dark:border-border dark:bg-card dark:shadow-[0_4px_10px_rgba(0,0,0,0.06)] dark:hover:border-border/50 dark:hover:bg-muted/50"
                       >
@@ -177,14 +176,14 @@ export function ExamPrepStepTwo({
               <div className="w-full max-w-2xl mt-4">
                 <div className="space-y-2">
                   {contentItems.map((item) => (
-                    <div 
+                    <div
                       key={item.id}
                       className="flex items-center justify-between p-3 bg-card border border-border rounded-xl"
                     >
                       <div className="flex items-center gap-2">
-                        {item.type === 'file' && <Upload className="h-4 w-4 text-muted-foreground" />}
-                        {item.type === 'url' && <Link className="h-4 w-4 text-muted-foreground" />}
-                        {item.type === 'text' && <ClipboardPaste className="h-4 w-4 text-muted-foreground" />}
+                        {item.type === "file" && <Upload className="h-4 w-4 text-muted-foreground" />}
+                        {item.type === "url" && <Link2 className="h-4 w-4 text-muted-foreground" />}
+                        {item.type === "text" && <ClipboardPaste className="h-4 w-4 text-muted-foreground" />}
                         <span className="text-sm text-foreground truncate">{item.title}</span>
                       </div>
                       <Button
@@ -203,25 +202,13 @@ export function ExamPrepStepTwo({
 
             {/* Navigation Buttons */}
             <div className="mb-6 mt-4 flex flex-row gap-3">
-              <Button 
-                onClick={onBack}
-                variant="outline" 
-                size="icon"
-                className="h-10 w-10"
-              >
+              <Button onClick={onBack} variant="outline" size="icon" className="h-10 w-10">
                 <ArrowLeft className="h-4 w-4" strokeWidth={2.5} />
               </Button>
-              <Button 
-                onClick={onSkip}
-                variant="ghost" 
-                className="gap-1"
-              >
+              <Button onClick={onSkip} variant="ghost" className="gap-1">
                 Skip
               </Button>
-              <Button 
-                onClick={onNext}
-                className="gap-1"
-              >
+              <Button onClick={onNext} className="gap-1">
                 Continue
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Button>
@@ -229,19 +216,19 @@ export function ExamPrepStepTwo({
           </div>
         </div>
       </div>
-      
-      <input 
-        ref={fileInputRef} 
-        type="file" 
-        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,audio/*,video/*" 
-        onChange={handleFileSelect} 
-        style={{ display: 'none' }} 
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,audio/*,video/*"
+        onChange={handleFileSelect}
+        style={{ display: "none" }}
       />
 
-      <PasteContentModal 
-        isOpen={isPasteModalOpen} 
-        onClose={() => setIsPasteModalOpen(false)} 
-        onSubmit={handlePasteSubmit} 
+      <PasteContentModal
+        isOpen={isPasteModalOpen}
+        onClose={() => setIsPasteModalOpen(false)}
+        onSubmit={handlePasteSubmit}
       />
     </div>
   );
