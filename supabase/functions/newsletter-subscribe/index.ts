@@ -197,11 +197,13 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   } catch (error: any) {
+    // Log full error details server-side only
     console.error("Error in newsletter-subscribe function:", error);
+    
+    // Return safe generic error to client (no internal details exposed)
     return new Response(
       JSON.stringify({ 
-        error: "Failed to subscribe to newsletter. Please try again later.",
-        details: error.message 
+        error: "Failed to subscribe to newsletter. Please try again later."
       }),
       {
         status: 500,
