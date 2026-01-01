@@ -113,7 +113,7 @@ export function ExamPrepStepTwo({
     },
     {
       icon: Link2,
-      title: "Link2",
+      title: "Paste",
       subtitle: "YouTube, Website, Text",
       onClick: () => setIsPasteModalOpen(true),
     },
