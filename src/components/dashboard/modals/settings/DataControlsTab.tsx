@@ -73,9 +73,7 @@ export const DataControlsTab: React.FC = () => {
         <div className="flex items-center justify-between py-3 border-b border-destructive/30">
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-medium text-destructive">Delete Account</span>
-            <span className="text-xs text-primary/70">
-              Permanently delete your account and all associated data
-            </span>
+            
           </div>
           <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)} className="h-8 px-3">
             Delete
