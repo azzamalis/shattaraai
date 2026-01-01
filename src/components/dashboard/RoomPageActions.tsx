@@ -1,16 +1,15 @@
-
-import React, { useEffect, useState } from 'react';
-import { MessagesSquare, BookCheck, X, ChevronDown, Trash, Plus, Sparkles } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import React, { useEffect, useState } from "react";
+import { MessagesSquare, BookCheck, X, ChevronDown, Trash, Plus, MessageCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface RoomPageActionsProps {
   onChatOpen: () => void;
@@ -35,7 +34,7 @@ export function RoomPageActions({
   roomId,
   isExamMode = false,
   onAddContent,
-  isAddContentActive = false
+  isAddContentActive = false,
 }: RoomPageActionsProps) {
   const navigate = useNavigate();
   const [existingExams, setExistingExams] = useState<ExistingExam[]>([]);
@@ -49,20 +48,20 @@ export function RoomPageActions({
 
   const fetchExistingExams = async () => {
     if (!roomId) return;
-    
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('exams')
-        .select('id, title, created_at')
-        .eq('room_id', roomId)
-        .order('created_at', { ascending: true });
+        .from("exams")
+        .select("id, title, created_at")
+        .eq("room_id", roomId)
+        .order("created_at", { ascending: true });
 
       if (!error && data) {
         setExistingExams(data);
       }
     } catch (err) {
-      console.error('Error fetching exams:', err);
+      console.error("Error fetching exams:", err);
     } finally {
       setIsLoading(false);
     }
@@ -83,30 +82,28 @@ export function RoomPageActions({
   const handleDeleteExam = async (e: React.MouseEvent, examId: string) => {
     e.stopPropagation();
     try {
-      const { error } = await supabase.from('exams').delete().eq('id', examId);
+      const { error } = await supabase.from("exams").delete().eq("id", examId);
       if (error) {
-        toast.error('Failed to delete exam');
+        toast.error("Failed to delete exam");
         return;
       }
-      setExistingExams(prev => prev.filter(exam => exam.id !== examId));
-      toast.success('Exam deleted successfully');
+      setExistingExams((prev) => prev.filter((exam) => exam.id !== examId));
+      toast.success("Exam deleted successfully");
     } catch (err) {
-      console.error('Error deleting exam:', err);
-      toast.error('Failed to delete exam');
+      console.error("Error deleting exam:", err);
+      toast.error("Failed to delete exam");
     }
   };
 
   const hasExistingExams = existingExams.length > 0;
 
-  const buttonBaseClasses = "flex items-center gap-2 px-3 py-2 h-10 text-sm font-medium whitespace-nowrap border border-border text-primary/80 bg-background dark:bg-muted/50 shadow-[0_4px_10px_rgba(0,0,0,0.02)] transition-colors hover:bg-transparent hover:text-primary hover:dark:border-border/40 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50";
+  const buttonBaseClasses =
+    "flex items-center gap-2 px-3 py-2 h-10 text-sm font-medium whitespace-nowrap border border-border text-primary/80 bg-background dark:bg-muted/50 shadow-[0_4px_10px_rgba(0,0,0,0.02)] transition-colors hover:bg-transparent hover:text-primary hover:dark:border-border/40 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50";
 
   const ExamButton = () => {
     if (isExamMode) {
       return (
-        <button 
-          onClick={handleExamButtonClick} 
-          className={`${buttonBaseClasses} rounded-lg`}
-        >
+        <button onClick={handleExamButtonClick} className={`${buttonBaseClasses} rounded-lg`}>
           <X className="h-4 w-4" />
           <span className="hidden sm:inline">Close Exam</span>
         </button>
@@ -116,32 +113,25 @@ export function RoomPageActions({
     if (hasExistingExams) {
       return (
         <div className="flex flex-shrink-0 items-center">
-          <button 
-            onClick={handleExamButtonClick} 
-            className={`${buttonBaseClasses} rounded-l-full rounded-r-none`}
-          >
+          <button onClick={handleExamButtonClick} className={`${buttonBaseClasses} rounded-l-full rounded-r-none`}>
             <BookCheck className="h-4 w-4" />
             <span className="hidden sm:inline">Create Exam</span>
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button 
-                className={`${buttonBaseClasses} rounded-l-none rounded-r-full border-l-0 px-2`}
-              >
+              <button className={`${buttonBaseClasses} rounded-l-none rounded-r-full border-l-0 px-2`}>
                 <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 space-y-1 rounded-2xl">
               {existingExams.map((exam, index) => (
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   key={exam.id}
                   className="group flex items-center justify-between rounded-xl px-3 py-2 cursor-pointer"
                   onClick={() => handleViewExamResults(exam.id)}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                      Exam {index + 1}
-                    </span>
+                    <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Exam {index + 1}</span>
                   </div>
                   <button
                     onClick={(e) => handleDeleteExam(e, exam.id)}
@@ -158,10 +148,7 @@ export function RoomPageActions({
     }
 
     return (
-      <button 
-        onClick={handleExamButtonClick} 
-        className={`${buttonBaseClasses} rounded-lg`}
-      >
+      <button onClick={handleExamButtonClick} className={`${buttonBaseClasses} rounded-lg`}>
         <BookCheck className="h-4 w-4" />
         <span className="hidden sm:inline">Create Exam</span>
       </button>
@@ -172,45 +159,39 @@ export function RoomPageActions({
     <div className="flex flex-shrink-0 flex-col gap-2 xl:gap-0">
       {/* Desktop layout - horizontal */}
       <div className="hidden xl:flex flex-row flex-wrap justify-start gap-3">
-        <button 
-          onClick={onChatOpen} 
-          className={`${buttonBaseClasses} rounded-lg`}
-        >
-          <Sparkles className="h-4 w-4 mr-0 sm:mr-2" />
-          <span className="hidden sm:inline">Learn Tabs</span>
+        <button onClick={onChatOpen} className={`${buttonBaseClasses} rounded-lg`}>
+          <MessageCircle className="h-4 w-4 mr-0 sm:mr-2" />
+          <span className="hidden sm:inline">Room Chat</span>
         </button>
-        
+
         <ExamButton />
 
-        <Button 
+        <Button
           onClick={onAddContent}
           variant={isAddContentActive ? "default" : "default"}
-          className={`gap-1.5 rounded-xl px-3 ${isAddContentActive ? 'bg-primary/90' : ''}`}
+          className={`gap-1.5 rounded-xl px-3 ${isAddContentActive ? "bg-primary/90" : ""}`}
         >
           {isAddContentActive ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          <span>{isAddContentActive ? 'Close' : 'Add Content'}</span>
+          <span>{isAddContentActive ? "Close" : "Add Content"}</span>
         </Button>
       </div>
 
       {/* Mobile layout - reversed order so Add Content appears first visually */}
       <div className="flex xl:hidden flex-row-reverse flex-wrap justify-end gap-3">
-        <Button 
+        <Button
           onClick={onAddContent}
           variant={isAddContentActive ? "default" : "default"}
-          className={`gap-1.5 rounded-xl px-3 ${isAddContentActive ? 'bg-primary/90' : ''}`}
+          className={`gap-1.5 rounded-xl px-3 ${isAddContentActive ? "bg-primary/90" : ""}`}
         >
           {isAddContentActive ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          <span>{isAddContentActive ? 'Close' : 'Add Content'}</span>
+          <span>{isAddContentActive ? "Close" : "Add Content"}</span>
         </Button>
 
-        <button 
-          onClick={onChatOpen} 
-          className={`${buttonBaseClasses} rounded-lg`}
-        >
-          <Sparkles className="h-4 w-4 mr-0 sm:mr-2" />
-          <span className="hidden sm:inline">Learn Tabs</span>
+        <button onClick={onChatOpen} className={`${buttonBaseClasses} rounded-lg`}>
+          <MessageCircle className="h-4 w-4 mr-0 sm:mr-2" />
+          <span className="hidden sm:inline">Room Chat</span>
         </button>
-        
+
         <ExamButton />
       </div>
     </div>
