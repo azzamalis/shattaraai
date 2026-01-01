@@ -66,30 +66,32 @@ export default function RoomPage() {
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full bg-background">
-        {/* Hero Section - Default or Exam Mode */}
-        <div className="py-6 sm:py-12">
-        <RoomPageExamSteps
-          examStep={examStep}
-          currentRoom={currentRoom}
-          isExamMode={isExamMode}
-          selectedContentIds={selectedContentIds}
-          roomContent={roomContent}
-          numQuestions={numQuestions}
-          setNumQuestions={setNumQuestions}
-          questionType={questionType}
-          setQuestionType={setQuestionType}
-          examLength={examLength}
-          setExamLength={setExamLength}
-          additionalResources={additionalResources}
-          setAdditionalResources={setAdditionalResources}
-          handleToggleSelectAll={handleToggleSelectAll}
-          handleExamNext={handleExamNext}
-          handleExamBack={handleExamBack}
-          handleExamSkip={handleExamSkip}
-          handleStartExam={handleStartExam}
-          handleExamCancel={handleExamCancel}
-        />
-        </div>
+        {/* Exam Steps 2 and 3 - Hero Section for step 1 is now in RoomPageContent */}
+        {isExamMode && examStep > 1 && (
+          <div className="py-6 sm:py-12">
+            <RoomPageExamSteps 
+              examStep={examStep}
+              currentRoom={currentRoom}
+              isExamMode={isExamMode}
+              selectedContentIds={selectedContentIds}
+              roomContent={roomContent}
+              numQuestions={numQuestions}
+              setNumQuestions={setNumQuestions}
+              questionType={questionType}
+              setQuestionType={setQuestionType}
+              examLength={examLength}
+              setExamLength={setExamLength}
+              additionalResources={additionalResources}
+              setAdditionalResources={setAdditionalResources}
+              handleToggleSelectAll={handleToggleSelectAll}
+              handleExamNext={handleExamNext}
+              handleExamBack={handleExamBack}
+              handleExamSkip={handleExamSkip}
+              handleStartExam={handleStartExam}
+              handleExamCancel={handleExamCancel}
+            />
+          </div>
+        )}
         
         <RoomPageContent
           currentRoom={currentRoom}
@@ -104,6 +106,8 @@ export default function RoomPage() {
           setIsChatOpen={setIsChatOpen}
           setIsExamMode={setIsExamMode}
           handleExamCancel={handleExamCancel}
+          handleToggleSelectAll={handleToggleSelectAll}
+          handleExamNext={handleExamNext}
         />
         
         <AITutorChatDrawer 
