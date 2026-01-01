@@ -4,6 +4,8 @@ import { RoomView } from '@/components/dashboard/RoomView';
 import { RoomPageHeader } from '@/components/dashboard/RoomPageHeader';
 import { RoomPageActions } from '@/components/dashboard/RoomPageActions';
 import { RoomHeroSection } from '@/components/dashboard/RoomHeroSection';
+import { ExamPrepStepTwo, ContentItem } from '@/components/dashboard/exam-prep/ExamPrepStepTwo';
+import { ExamPrepStepThree } from '@/components/dashboard/exam-prep/ExamPrepStepThree';
 
 interface RoomPageContentProps {
   currentRoom: any;
@@ -20,6 +22,17 @@ interface RoomPageContentProps {
   handleExamCancel: () => void;
   handleToggleSelectAll: () => void;
   handleExamNext: () => void;
+  handleExamBack: () => void;
+  handleExamSkip: () => void;
+  handleStartExam: () => void;
+  numQuestions: string;
+  setNumQuestions: (value: string) => void;
+  questionType: string;
+  setQuestionType: (value: string) => void;
+  examLength: string;
+  setExamLength: (value: string) => void;
+  additionalResources: ContentItem[];
+  setAdditionalResources: (resources: ContentItem[]) => void;
 }
 
 export function RoomPageContent({
@@ -36,7 +49,18 @@ export function RoomPageContent({
   setIsExamMode,
   handleExamCancel,
   handleToggleSelectAll,
-  handleExamNext
+  handleExamNext,
+  handleExamBack,
+  handleExamSkip,
+  handleStartExam,
+  numQuestions,
+  setNumQuestions,
+  questionType,
+  setQuestionType,
+  examLength,
+  setExamLength,
+  additionalResources,
+  setAdditionalResources
 }: RoomPageContentProps) {
   const [showHeroSection, setShowHeroSection] = useState(false);
 
@@ -52,6 +76,68 @@ export function RoomPageContent({
   const selectedCount = selectedContentIds.length;
   const totalCount = roomContent.length;
   const isAllSelected = selectedCount === totalCount && totalCount > 0;
+
+  // Render exam step content based on current step
+  const renderExamStepContent = () => {
+    if (!isExamMode) return null;
+
+    if (examStep === 1) {
+      return (
+        <div className="py-6 sm:py-8">
+          <RoomHeroSection 
+            title={currentRoom.name} 
+            description={currentRoom.description || ''} 
+            isExamMode={isExamMode}
+            examStep={examStep}
+            examModeData={{
+              selectedCount,
+              totalCount,
+              isAllSelected,
+              onToggleSelectAll: handleToggleSelectAll,
+              onNext: handleExamNext,
+              onCancel: handleExamCancel
+            }}
+          />
+        </div>
+      );
+    }
+
+    if (examStep === 2) {
+      return (
+        <div className="py-6 sm:py-8">
+          <ExamPrepStepTwo
+            currentStep={2}
+            totalSteps={3}
+            onBack={handleExamBack}
+            onNext={handleExamNext}
+            onSkip={handleExamSkip}
+            onAdditionalResourcesChange={setAdditionalResources}
+          />
+        </div>
+      );
+    }
+
+    if (examStep === 3) {
+      return (
+        <div className="py-6 sm:py-8">
+          <ExamPrepStepThree
+            currentStep={3}
+            totalSteps={3}
+            numQuestions={numQuestions}
+            setNumQuestions={setNumQuestions}
+            questionType={questionType}
+            setQuestionType={setQuestionType}
+            examLength={examLength}
+            setExamLength={setExamLength}
+            onBack={handleExamBack}
+            onStartExam={handleStartExam}
+          />
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden pt-6 sm:pt-8">
@@ -83,25 +169,20 @@ export function RoomPageContent({
               <div className="w-full h-px bg-border" />
             </div>
 
-            {/* Hero Section - conditionally rendered */}
-            {(showHeroSection || (isExamMode && examStep === 1)) && (
+            {/* Hero Section - shown when Add Content is clicked (non-exam mode) */}
+            {showHeroSection && !isExamMode && (
               <div className="py-6 sm:py-8">
                 <RoomHeroSection 
                   title={currentRoom.name} 
                   description={currentRoom.description || ''} 
-                  isExamMode={isExamMode}
-                  examStep={examStep}
-                  examModeData={isExamMode ? {
-                    selectedCount,
-                    totalCount,
-                    isAllSelected,
-                    onToggleSelectAll: handleToggleSelectAll,
-                    onNext: handleExamNext,
-                    onCancel: handleExamCancel
-                  } : undefined}
+                  isExamMode={false}
+                  examStep={0}
                 />
               </div>
             )}
+
+            {/* Exam Step Content - all steps rendered here */}
+            {renderExamStepContent()}
           </div>
         </div>
       </div>
