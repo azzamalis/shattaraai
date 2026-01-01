@@ -130,7 +130,7 @@ export function LearningCard({
         "shadow-[0_4px_10px_rgba(0,0,0,0.02)]",
         "bg-card",
         isProcessing && "opacity-70",
-        "cursor-pointer transition-all duration-200 rounded-2xl border border-border",
+        "cursor-pointer transition-all duration-200 rounded-3xl border border-border",
         "group relative",
         "hover:shadow-md dark:hover:border-border/40",
         // Selection mode styles
@@ -140,7 +140,7 @@ export function LearningCard({
     >
       {/* Selection overlay */}
       {isExamSelectionMode && isSelected && (
-        <div className="absolute inset-0 bg-primary/10 rounded-2xl flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-primary/10 rounded-3xl flex items-center justify-center z-10">
           <div className="bg-primary text-primary-foreground rounded-full p-2">
             <Check className="h-6 w-6" />
           </div>

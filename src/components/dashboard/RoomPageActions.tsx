@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
-import { MessagesSquare, BookCheck, X, ChevronDown, Trash } from 'lucide-react';
+import { MessagesSquare, BookCheck, X, ChevronDown, Trash, Plus, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -9,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 interface RoomPageActionsProps {
   onChatOpen: () => void;
@@ -16,6 +18,7 @@ interface RoomPageActionsProps {
   onExamModalClose?: () => void;
   roomId?: string;
   isExamMode?: boolean;
+  onAddContent?: () => void;
 }
 
 interface ExistingExam {
@@ -29,7 +32,8 @@ export function RoomPageActions({
   onExamModalOpen,
   onExamModalClose,
   roomId,
-  isExamMode = false
+  isExamMode = false,
+  onAddContent
 }: RoomPageActionsProps) {
   const navigate = useNavigate();
   const [existingExams, setExistingExams] = useState<ExistingExam[]>([]);
@@ -94,25 +98,21 @@ export function RoomPageActions({
 
   const buttonBaseClasses = "flex items-center gap-2 px-3 py-2 h-10 text-sm font-medium whitespace-nowrap border border-border text-primary/80 bg-background dark:bg-muted/50 shadow-[0_4px_10px_rgba(0,0,0,0.02)] transition-colors hover:bg-transparent hover:text-primary hover:dark:border-border/40 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50";
 
-  return (
-    <div className="flex items-center gap-3">
-      <button 
-        onClick={onChatOpen} 
-        className={`${buttonBaseClasses} rounded-lg`}
-      >
-        <MessagesSquare className="h-4 w-4" />
-        <span>Room Chat</span>
-      </button>
-      
-      {isExamMode ? (
+  const ExamButton = () => {
+    if (isExamMode) {
+      return (
         <button 
           onClick={handleExamButtonClick} 
           className={`${buttonBaseClasses} rounded-lg`}
         >
           <X className="h-4 w-4" />
-          <span>Close Exam</span>
+          <span className="hidden sm:inline">Close Exam</span>
         </button>
-      ) : hasExistingExams ? (
+      );
+    }
+
+    if (hasExistingExams) {
+      return (
         <div className="flex flex-shrink-0 items-center">
           <button 
             onClick={handleExamButtonClick} 
@@ -152,15 +152,63 @@ export function RoomPageActions({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      ) : (
+      );
+    }
+
+    return (
+      <button 
+        onClick={handleExamButtonClick} 
+        className={`${buttonBaseClasses} rounded-lg`}
+      >
+        <BookCheck className="h-4 w-4" />
+        <span className="hidden sm:inline">Create Exam</span>
+      </button>
+    );
+  };
+
+  return (
+    <div className="flex flex-shrink-0 flex-col gap-2 xl:gap-0">
+      {/* Desktop layout - horizontal */}
+      <div className="hidden xl:flex flex-row flex-wrap justify-start gap-3">
         <button 
-          onClick={handleExamButtonClick} 
+          onClick={onChatOpen} 
           className={`${buttonBaseClasses} rounded-lg`}
         >
-          <BookCheck className="h-4 w-4" />
-          <span>Create Exam</span>
+          <Sparkles className="h-4 w-4 mr-0 sm:mr-2" />
+          <span className="hidden sm:inline">Learn Tabs</span>
         </button>
-      )}
+        
+        <ExamButton />
+
+        <Button 
+          onClick={onAddContent}
+          className="gap-1.5 rounded-xl px-3"
+        >
+          <Plus className="h-4 w-4" />
+          <span>Add Content</span>
+        </Button>
+      </div>
+
+      {/* Mobile layout - reversed order so Add Content appears first visually */}
+      <div className="flex xl:hidden flex-row-reverse flex-wrap justify-end gap-3">
+        <Button 
+          onClick={onAddContent}
+          className="gap-1.5 rounded-xl px-3"
+        >
+          <Plus className="h-4 w-4" />
+          <span>Add Content</span>
+        </Button>
+
+        <button 
+          onClick={onChatOpen} 
+          className={`${buttonBaseClasses} rounded-lg`}
+        >
+          <Sparkles className="h-4 w-4 mr-0 sm:mr-2" />
+          <span className="hidden sm:inline">Learn Tabs</span>
+        </button>
+        
+        <ExamButton />
+      </div>
     </div>
   );
 }

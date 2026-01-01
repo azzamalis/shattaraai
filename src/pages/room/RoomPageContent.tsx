@@ -39,10 +39,11 @@ export function RoomPageContent({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="px-4 bg-background">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col gap-6">
-            <div className="flex items-center justify-between">
+      <div className="px-4 sm:px-6 lg:px-12 2xl:px-36 bg-background">
+        <div className="w-full">
+          <div className="group/header relative">
+            {/* Header and Actions - Stack on mobile, side-by-side on xl */}
+            <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4 xl:gap-6">
               <RoomPageHeader 
                 room={currentRoom}
                 onTitleEdit={handleTitleEdit}
@@ -59,7 +60,10 @@ export function RoomPageContent({
               />
             </div>
 
-            <div className="w-full h-px bg-border" />
+            {/* Divider */}
+            <div className="relative mt-4 md:mt-8">
+              <div className="w-full h-px bg-border" />
+            </div>
           </div>
         </div>
       </div>

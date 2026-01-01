@@ -67,8 +67,8 @@ export default function RoomPage() {
     <DashboardLayout>
       <div className="flex flex-col h-full bg-background">
         {/* Hero Section - Default or Exam Mode */}
-        <div className="py-12">
-        <RoomPageExamSteps 
+        <div className="py-6 sm:py-12">
+        <RoomPageExamSteps
           examStep={examStep}
           currentRoom={currentRoom}
           isExamMode={isExamMode}

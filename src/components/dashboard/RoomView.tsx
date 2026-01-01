@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useContent } from '@/contexts/ContentContext';
@@ -8,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useRooms } from '@/hooks/useRooms';
 import { ContentItem } from '@/hooks/useContent';
+import { LayoutGrid, Menu } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface RoomViewProps {
   title: string;
@@ -40,6 +43,7 @@ export function RoomView({
   } = useContent();
   const { rooms } = useRooms();
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Filter content to only show items that belong to this specific room
   const roomContent = content.filter(item => item.room_id === roomId);
@@ -142,8 +146,12 @@ export function RoomView({
       );
     }
 
+    const gridClasses = viewMode === 'grid' 
+      ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 min-[1920px]:grid-cols-6 gap-4 sm:gap-8"
+      : "flex flex-col gap-4";
+
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className={gridClasses}>
         {roomContent.map(item => (
           <LearningCard
             key={item.id}
@@ -188,10 +196,33 @@ export function RoomView({
     );
   }
 
-  // When hideHeader is true, show content grid without any overlay
+  // When hideHeader is true, show content grid with view toggle
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      {renderContent()}
+    <div className="w-full px-4 sm:px-6 lg:px-12 2xl:px-36 py-4">
+      {/* View toggle aligned to the right */}
+      <div className="flex w-full items-center justify-end mb-4 mt-4">
+        <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'grid' | 'list')}>
+          <TabsList className="rounded-full px-2 bg-muted">
+            <TabsTrigger 
+              value="grid" 
+              className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-3 py-1.5"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </TabsTrigger>
+            <TabsTrigger 
+              value="list" 
+              className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-3 py-1.5"
+            >
+              <Menu className="h-4 w-4" />
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {/* Content grid */}
+      <div className="h-full w-full mb-10">
+        {renderContent()}
+      </div>
     </div>
   );
 }
