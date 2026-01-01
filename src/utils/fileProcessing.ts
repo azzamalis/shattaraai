@@ -30,12 +30,18 @@ export async function processAndUploadFiles(files: File[], userId: string): Prom
         throw uploadError;
       }
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      // Get signed URL for secure access (1 hour expiry)
+      const { data: signedUrlData, error: signedError } = await supabase.storage
         .from(bucket)
-        .getPublicUrl(uploadData.path);
+        .createSignedUrl(uploadData.path, 3600);
 
-      console.log(`File ${file.name} uploaded successfully. Public URL: ${publicUrl}`);
+      if (signedError) {
+        console.error(`Signed URL error for ${file.name}:`, signedError);
+        throw signedError;
+      }
+
+      const signedUrl = signedUrlData.signedUrl;
+      console.log(`File ${file.name} uploaded successfully with signed URL`);
 
       // Process file content
       let content = '';
@@ -52,7 +58,7 @@ export async function processAndUploadFiles(files: File[], userId: string): Prom
 
       processedFiles.push({
         name: file.name,
-        url: publicUrl,
+        url: signedUrl,
         type: file.type,
         content,
         size: file.size

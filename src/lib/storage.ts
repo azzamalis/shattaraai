@@ -49,7 +49,7 @@ const sanitizeFileName = (fileName: string): string => {
   return sanitizedName + extension;
 };
 
-// Upload file to appropriate storage bucket
+// Upload file to appropriate storage bucket - returns the storage path (not URL)
 export const uploadFileToStorage = async (
   file: File, 
   contentType: StorageContentType, 
@@ -93,13 +93,18 @@ export const uploadFileToStorage = async (
 
     console.log('DEBUG: storage - Upload successful:', data.path);
     
-    // Get the public URL
-    const { data: publicUrlData } = supabase.storage
+    // Create a signed URL for secure access (1 hour expiry)
+    const { data: signedUrlData, error: signedError } = await supabase.storage
       .from(bucket)
-      .getPublicUrl(data.path);
+      .createSignedUrl(data.path, 3600);
     
-    console.log('DEBUG: storage - Public URL generated:', publicUrlData.publicUrl);
-    return publicUrlData.publicUrl;
+    if (signedError) {
+      console.error('DEBUG: storage - Signed URL error:', signedError);
+      throw new Error(`Failed to create signed URL: ${signedError.message}`);
+    }
+    
+    console.log('DEBUG: storage - Signed URL generated');
+    return signedUrlData.signedUrl;
   } catch (error) {
     console.error('DEBUG: storage - Upload exception:', error);
     throw error;
@@ -132,12 +137,16 @@ export const uploadPastedContentMetadata = async (
       throw new Error(`Failed to upload metadata: ${error.message}`);
     }
 
-    // Get the public URL
-    const { data: publicUrlData } = supabase.storage
+    // Create a signed URL for secure access (1 hour expiry)
+    const { data: signedUrlData, error: signedError } = await supabase.storage
       .from(bucket)
-      .getPublicUrl(data.path);
+      .createSignedUrl(data.path, 3600);
     
-    return publicUrlData.publicUrl;
+    if (signedError) {
+      throw new Error(`Failed to create signed URL: ${signedError.message}`);
+    }
+    
+    return signedUrlData.signedUrl;
   } catch (error) {
     console.error('Error uploading pasted content metadata:', error);
     throw error;
@@ -173,9 +182,32 @@ export const deleteFileFromStorage = async (
   }
 };
 
-// Check if URL is a Supabase storage URL
+// Check if URL is a Supabase storage URL (public or signed)
 export const isStorageUrl = (url: string): boolean => {
-  return url.includes('/storage/v1/object/public/');
+  return url.includes('/storage/v1/object/public/') || url.includes('/storage/v1/object/sign/');
+};
+
+// Get a signed URL for a file (for refreshing expired URLs)
+export const getSignedUrl = async (
+  bucket: string,
+  path: string,
+  expiresIn: number = 3600
+): Promise<string | null> => {
+  try {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(path, expiresIn);
+    
+    if (error) {
+      console.error('Error creating signed URL:', error);
+      return null;
+    }
+    
+    return data.signedUrl;
+  } catch (error) {
+    console.error('Error creating signed URL:', error);
+    return null;
+  }
 };
 
 // Get file info from storage URL
