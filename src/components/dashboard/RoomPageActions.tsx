@@ -19,6 +19,7 @@ interface RoomPageActionsProps {
   roomId?: string;
   isExamMode?: boolean;
   onAddContent?: () => void;
+  isAddContentActive?: boolean;
 }
 
 interface ExistingExam {
@@ -33,7 +34,8 @@ export function RoomPageActions({
   onExamModalClose,
   roomId,
   isExamMode = false,
-  onAddContent
+  onAddContent,
+  isAddContentActive = false
 }: RoomPageActionsProps) {
   const navigate = useNavigate();
   const [existingExams, setExistingExams] = useState<ExistingExam[]>([]);
@@ -182,10 +184,11 @@ export function RoomPageActions({
 
         <Button 
           onClick={onAddContent}
-          className="gap-1.5 rounded-xl px-3"
+          variant={isAddContentActive ? "default" : "default"}
+          className={`gap-1.5 rounded-xl px-3 ${isAddContentActive ? 'bg-primary/90' : ''}`}
         >
-          <Plus className="h-4 w-4" />
-          <span>Add Content</span>
+          {isAddContentActive ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          <span>{isAddContentActive ? 'Close' : 'Add Content'}</span>
         </Button>
       </div>
 
@@ -193,10 +196,11 @@ export function RoomPageActions({
       <div className="flex xl:hidden flex-row-reverse flex-wrap justify-end gap-3">
         <Button 
           onClick={onAddContent}
-          className="gap-1.5 rounded-xl px-3"
+          variant={isAddContentActive ? "default" : "default"}
+          className={`gap-1.5 rounded-xl px-3 ${isAddContentActive ? 'bg-primary/90' : ''}`}
         >
-          <Plus className="h-4 w-4" />
-          <span>Add Content</span>
+          {isAddContentActive ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          <span>{isAddContentActive ? 'Close' : 'Add Content'}</span>
         </Button>
 
         <button 
