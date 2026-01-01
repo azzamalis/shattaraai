@@ -217,6 +217,12 @@ export function ContentRightSidebar({
         },
         (payload) => {
           console.log('Real-time flashcard event:', payload.eventType);
+          // Clear flashcard generation loading state when new flashcards are received
+          if (payload.eventType === 'INSERT' && isGenerating && generationType === 'flashcards') {
+            console.log('Flashcards generated via real-time, clearing loading state');
+            setIsGenerating(false);
+            setGenerationType(null);
+          }
           fetchFlashcards();
         }
       )
@@ -228,7 +234,7 @@ export function ContentRightSidebar({
       console.log('Cleaning up flashcard subscription');
       supabase.removeChannel(channel);
     };
-  }, [contentData?.id]);
+  }, [contentData?.id, isGenerating, generationType]);
 
   // Real-time subscription for quizzes
   useEffect(() => {
@@ -248,6 +254,12 @@ export function ContentRightSidebar({
         },
         (payload) => {
           console.log('Real-time quiz event:', payload.eventType);
+          // Clear quiz generation loading state when new quiz is received
+          if (payload.eventType === 'INSERT' && isGenerating && generationType === 'quizzes') {
+            console.log('Quiz generated via real-time, clearing loading state');
+            setIsGenerating(false);
+            setGenerationType(null);
+          }
           fetchQuizzes();
         }
       )
@@ -259,7 +271,7 @@ export function ContentRightSidebar({
       console.log('Cleaning up quiz subscription');
       supabase.removeChannel(channel);
     };
-  }, [contentData?.id]);
+  }, [contentData?.id, isGenerating, generationType]);
 
   // Real-time subscription for summaries
   useEffect(() => {
