@@ -196,31 +196,11 @@ export function RoomView({
     );
   }
 
-  // When hideHeader is true, show content grid with view toggle
+  // When hideHeader is true, show content grid
   return (
     <div className="w-full px-4 sm:px-6 lg:px-12 2xl:px-36 py-4">
-      {/* View toggle aligned to the right */}
-      <div className="flex w-full items-center justify-end mb-4 mt-4">
-        <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'grid' | 'list')}>
-          <TabsList className="rounded-full px-2 bg-muted">
-            <TabsTrigger 
-              value="grid" 
-              className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-3 py-1.5"
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </TabsTrigger>
-            <TabsTrigger 
-              value="list" 
-              className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-3 py-1.5"
-            >
-              <Menu className="h-4 w-4" />
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
       {/* Content grid */}
-      <div className="h-full w-full mb-10">
+      <div className="h-full w-full mb-10 mt-4">
         {renderContent()}
       </div>
     </div>
