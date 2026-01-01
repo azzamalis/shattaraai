@@ -61,14 +61,15 @@ export function NewPDFViewer({
       } = await supabase.storage.from('user-uploads').upload(fileName, file);
       if (error) throw error;
 
-      // Get public URL
-      const {
-        data: {
-          publicUrl
-        }
-      } = supabase.storage.from('user-uploads').getPublicUrl(data.path);
-      setPdfUrl(publicUrl);
-      onFileUploaded?.(publicUrl);
+      // Get signed URL for secure access (1 hour expiry)
+      const { data: signedUrlData, error: signedError } = await supabase.storage
+        .from('user-uploads')
+        .createSignedUrl(data.path, 3600);
+      
+      if (signedError) throw signedError;
+      
+      setPdfUrl(signedUrlData.signedUrl);
+      onFileUploaded?.(signedUrlData.signedUrl);
       toast.success("Your PDF has been uploaded and is ready to view");
     } catch (error) {
       console.error('Upload error:', error);
