@@ -22,7 +22,7 @@ interface ExamPrepStepThreeProps {
 // Shared progress bar component
 function ExamProgressBar({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
   return (
-    <div className="mb-10 flex justify-center">
+    <div className="mb-6 flex justify-center">
       <div className="flex w-1/4 max-w-md gap-2">
         {Array.from({ length: totalSteps }).map((_, index) => (
           <div key={index} className="h-1.5 flex-1 rounded-full bg-muted">
@@ -74,7 +74,7 @@ export function ExamPrepStepThree({
           
           <div className="flex flex-col gap-4">
             {/* Title */}
-            <h2 className="mt-6 text-center text-xl font-normal leading-relaxed sm:mt-10 sm:text-2xl 2xl:text-3xl text-foreground">
+            <h2 className="mt-4 text-center text-xl font-normal leading-relaxed sm:mt-6 sm:text-2xl 2xl:text-3xl text-foreground">
               Choose your preference
             </h2>
             

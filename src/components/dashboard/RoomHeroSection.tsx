@@ -175,7 +175,7 @@ export function RoomHeroSection({
   if (isExamMode && examModeData) {
     return (
       <div className="w-full bg-background">
-        <div className="max-w-[800px] mx-auto">
+        <div className="w-full">
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
