@@ -117,12 +117,6 @@ export function ExamPrepStepTwo({
       subtitle: "YouTube, Website, Text",
       onClick: () => setIsPasteModalOpen(true),
     },
-    {
-      icon: ClipboardPaste,
-      title: "Paste",
-      subtitle: "Copied Text",
-      onClick: () => setIsPasteModalOpen(true),
-    },
   ];
 
   return (
