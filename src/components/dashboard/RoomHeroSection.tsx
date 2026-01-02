@@ -4,7 +4,6 @@ import { ActionCards } from './ActionCards';
 import { EnhancedPromptInput } from '@/components/ui/enhanced-prompt-input';
 import { PasteContentModal } from './PasteContentModal';
 import { ExamPrepStepOneRedesigned } from './exam-prep/ExamPrepStepOneRedesigned';
-import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { useContent } from '@/contexts/ContentContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -174,30 +173,27 @@ export function RoomHeroSection({
 
   // Render exam prep mode
   if (isExamMode && examModeData) {
-    return <div className="w-full bg-background">
-        <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-12 bg-dashboard-secondary-card rounded-lg shadow-sm">
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.5
-        }}>
-            {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-muted-foreground">Step {examStep} of 3</span>
-                <span className="text-sm text-muted-foreground">{getStepLabel()}</span>
-              </div>
-              <Progress value={getProgressValue()} className="h-2" />
-            </div>
-
-            <ExamPrepStepOneRedesigned selectedCount={examModeData.selectedCount} totalCount={examModeData.totalCount} isAllSelected={examModeData.isAllSelected} onToggleSelectAll={examModeData.onToggleSelectAll} onNext={examModeData.onNext} />
+    return (
+      <div className="w-full bg-background">
+        <div className="max-w-[800px] mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.5 }}
+          >
+            <ExamPrepStepOneRedesigned 
+              selectedCount={examModeData.selectedCount} 
+              totalCount={examModeData.totalCount} 
+              isAllSelected={examModeData.isAllSelected} 
+              onToggleSelectAll={examModeData.onToggleSelectAll} 
+              onNext={examModeData.onNext}
+              currentStep={examStep}
+              totalSteps={3}
+            />
           </motion.div>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   // Render default hero content
