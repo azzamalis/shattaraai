@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Upload, Link2, ClipboardPaste, ArrowLeft, ArrowRight, X } from "lucide-react";
+import { Upload, Link2, ArrowLeft, ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PasteContentModal } from "../PasteContentModal";
 import { toast } from "sonner";
@@ -22,7 +22,7 @@ export interface ContentItem {
   text?: string;
 }
 
-// Progress bar component
+// Shared progress bar component
 function ExamProgressBar({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
   return (
     <div className="mb-10 flex justify-center">
@@ -31,7 +31,7 @@ function ExamProgressBar({ currentStep, totalSteps }: { currentStep: number; tot
           <div key={index} className="h-1.5 flex-1 rounded-full bg-muted">
             <div
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                index < currentStep ? "bg-green-500" : "bg-muted-foreground/20"
+                index < currentStep ? "bg-green-500" : "bg-neutral-200 dark:bg-neutral-800"
               }`}
               style={{ width: "100%" }}
             />
@@ -120,30 +120,32 @@ export function ExamPrepStepTwo({
   ];
 
   return (
-    <div className="flex min-h-[460px] w-full flex-col items-center gap-6 rounded-3xl border-2 border-secondary bg-background px-6 sm:px-10 pt-6 shadow-md duration-300 animate-in zoom-in-95 dark:bg-card dark:shadow-[0_0_8px_rgba(255,255,255,0.1)] sm:min-h-[420px] sm:gap-6 lg:px-24">
+    <div className="flex min-h-[460px] w-full flex-col items-center gap-6 rounded-3xl border-2 border-secondary bg-white px-10 pt-6 shadow-md duration-300 animate-in zoom-in-95 dark:bg-neutral-900/80 dark:shadow-[0_0_8px_rgba(255,255,255,0.1)] sm:min-h-[420px] sm:gap-6 lg:px-24">
       <div className="flex w-full items-center justify-center">
         <div className="w-full max-w-3xl">
           {/* Progress Bar */}
           <ExamProgressBar currentStep={currentStep} totalSteps={totalSteps} />
 
-          <div className="mt-6 flex flex-col items-center gap-4 sm:mt-0">
-            {/* Title and Subtitle */}
-            <h2 className="text-center text-lg font-normal leading-relaxed sm:text-2xl 2xl:text-3xl text-foreground">
+          <div className="flex flex-col gap-4">
+            {/* Title */}
+            <h2 className="mt-6 text-center text-xl font-normal leading-relaxed sm:mt-10 sm:text-2xl 2xl:text-3xl text-foreground">
               Have a practice exam or cheatsheet for reference?
             </h2>
-            <p className="mb-2 text-center text-sm text-muted-foreground sm:text-base 2xl:text-lg">
+            
+            {/* Subtitle */}
+            <p className="mb-4 text-center text-base text-muted-foreground sm:text-base 2xl:text-lg">
               We will use this to make the exam as accurate as possible
             </p>
 
             {/* Action Cards */}
-            <div className="flex w-full flex-col items-center justify-center sm:w-3/4">
+            <div className="flex w-full flex-col items-center justify-center">
               <div className="z-30 flex flex-col text-center w-full md:max-w-[640px] xl:max-w-[672px]">
                 <div className="grid w-full grid-cols-2 gap-3 sm:flex sm:items-center sm:justify-center">
                   {actionCards.map((card) => (
-                    <div key={card.title} className="w-full min-w-0 sm:flex-1">
+                    <div key={card.title + card.subtitle} className="w-full min-w-0 sm:flex-1">
                       <div
                         onClick={card.onClick}
-                        className="text-card-foreground group relative cursor-pointer rounded-3xl border border-border bg-background shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition-colors duration-200 focus-within:border hover:border-muted-foreground/30 hover:bg-muted/40 dark:border-border dark:bg-card dark:shadow-[0_4px_10px_rgba(0,0,0,0.06)] dark:hover:border-border/50 dark:hover:bg-muted/50"
+                        className="text-card-foreground group relative cursor-pointer rounded-3xl border border-neutral-200 bg-white shadow-[0_4px_10px_rgba(0,0,0,0.04)] transition-colors duration-200 focus-within:border hover:border-neutral-300/50 hover:bg-neutral-200/40 dark:border-neutral-800 dark:bg-neutral-800/50 dark:shadow-[0_4px_10px_rgba(0,0,0,0.06)] dark:hover:border-neutral-700/20 dark:hover:bg-neutral-700/50"
                       >
                         <div className="flex flex-col items-start justify-center gap-y-2 p-4 sm:h-[108px] sm:flex-col">
                           <div className="flex flex-row items-center gap-2.5 sm:block sm:space-y-2">
@@ -167,17 +169,16 @@ export function ExamPrepStepTwo({
 
             {/* Content Items List */}
             {contentItems.length > 0 && (
-              <div className="w-full max-w-2xl mt-4">
+              <div className="w-full max-w-2xl mx-auto mt-4">
                 <div className="space-y-2">
                   {contentItems.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between p-3 bg-card border border-border rounded-xl"
+                      className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl"
                     >
                       <div className="flex items-center gap-2">
                         {item.type === "file" && <Upload className="h-4 w-4 text-muted-foreground" />}
                         {item.type === "url" && <Link2 className="h-4 w-4 text-muted-foreground" />}
-                        {item.type === "text" && <ClipboardPaste className="h-4 w-4 text-muted-foreground" />}
                         <span className="text-sm text-foreground truncate">{item.title}</span>
                       </div>
                       <Button
@@ -195,15 +196,15 @@ export function ExamPrepStepTwo({
             )}
 
             {/* Navigation Buttons */}
-            <div className="mb-6 mt-4 flex flex-row gap-3">
-              <Button onClick={onBack} variant="outline" size="icon" className="h-10 w-10">
+            <div className="mb-6 mt-4 flex flex-row justify-center gap-3">
+              <Button onClick={onBack} variant="outline" size="icon" className="h-10 w-10 rounded-lg">
                 <ArrowLeft className="h-4 w-4" strokeWidth={2.5} />
               </Button>
-              <Button onClick={onSkip} variant="ghost" className="gap-1">
+              <Button onClick={onSkip} variant="ghost" className="gap-1 rounded-lg">
                 Skip
               </Button>
-              <Button onClick={onNext} className="gap-1">
-                Continue
+              <Button onClick={onNext} className="gap-1 rounded-lg">
+                <span>Continue</span>
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Button>
             </div>

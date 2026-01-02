@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 
 interface ExamPrepStepThreeProps {
   currentStep?: number;
@@ -20,7 +19,7 @@ interface ExamPrepStepThreeProps {
   onStartExam: () => void;
 }
 
-// Progress bar component
+// Shared progress bar component
 function ExamProgressBar({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
   return (
     <div className="mb-10 flex justify-center">
@@ -29,7 +28,7 @@ function ExamProgressBar({ currentStep, totalSteps }: { currentStep: number; tot
           <div key={index} className="h-1.5 flex-1 rounded-full bg-muted">
             <div 
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                index < currentStep ? 'bg-green-500' : 'bg-muted-foreground/20'
+                index < currentStep ? 'bg-green-500' : 'bg-neutral-200 dark:bg-neutral-800'
               }`}
               style={{ width: '100%' }}
             />
@@ -54,19 +53,12 @@ export function ExamPrepStepThree({
 }: ExamPrepStepThreeProps) {
   // Validation function to check if all required fields are valid
   const isFormValid = () => {
-    // Check if number of questions is a valid positive number
     const numQuestionsValid = /^\d+$/.test(numQuestions) && parseInt(numQuestions) > 0;
-    
-    // Check if question type is selected
     const questionTypeValid = questionType !== '';
-    
-    // Check if exam length is a valid positive number
     const examLengthValid = /^\d+$/.test(examLength) && parseInt(examLength) > 0;
-    
     return numQuestionsValid && questionTypeValid && examLengthValid;
   };
 
-  // Define valid question type options
   const questionTypeOptions = [
     { value: 'Both', label: 'Both' },
     { value: 'Multiple Choice', label: 'Multiple Choice' },
@@ -74,20 +66,25 @@ export function ExamPrepStepThree({
   ];
 
   return (
-    <div className="flex min-h-[460px] w-full flex-col items-center gap-6 rounded-3xl border-2 border-secondary bg-background px-6 sm:px-10 pt-6 shadow-md duration-300 animate-in zoom-in-95 dark:bg-card dark:shadow-[0_0_8px_rgba(255,255,255,0.1)] sm:min-h-[420px] sm:gap-6 lg:px-24">
+    <div className="flex min-h-[460px] w-full flex-col items-center gap-6 rounded-3xl border-2 border-secondary bg-white px-10 pt-6 shadow-md duration-300 animate-in zoom-in-95 dark:bg-neutral-900/80 dark:shadow-[0_0_8px_rgba(255,255,255,0.1)] sm:min-h-[420px] sm:gap-6 lg:px-24">
       <div className="flex w-full items-center justify-center">
         <div className="w-full max-w-3xl">
           {/* Progress Bar */}
           <ExamProgressBar currentStep={currentStep} totalSteps={totalSteps} />
           
-          <div className="mt-6 flex flex-col items-center gap-4 sm:mt-0">
+          <div className="flex flex-col gap-4">
             {/* Title */}
-            <h2 className="text-center text-lg font-normal leading-relaxed sm:text-2xl 2xl:text-3xl text-foreground mb-4">
+            <h2 className="mt-6 text-center text-xl font-normal leading-relaxed sm:mt-10 sm:text-2xl 2xl:text-3xl text-foreground">
               Choose your preference
             </h2>
             
+            {/* Subtitle */}
+            <p className="mb-4 text-center text-base text-muted-foreground sm:text-base 2xl:text-lg">
+              Configure your exam settings below
+            </p>
+            
             {/* Form Fields */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl mx-auto">
               <div className="space-y-2">
                 <Label htmlFor="numQuestions" className="text-foreground flex items-center text-sm">
                   Number of Questions <span className="text-red-500 ml-1">*</span>
@@ -96,7 +93,7 @@ export function ExamPrepStepThree({
                   id="numQuestions" 
                   value={numQuestions} 
                   onChange={(e) => setNumQuestions(e.target.value)} 
-                  className="bg-background border-border text-foreground h-12 rounded-xl"
+                  className="bg-white dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700 text-foreground h-12 rounded-xl"
                   placeholder="Enter number of questions"
                 />
               </div>
@@ -106,15 +103,15 @@ export function ExamPrepStepThree({
                   Question Type <span className="text-red-500 ml-1">*</span>
                 </Label>
                 <Select value={questionType} onValueChange={setQuestionType}>
-                  <SelectTrigger className="bg-background border-border text-foreground h-12 rounded-xl">
+                  <SelectTrigger className="bg-white dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700 text-foreground h-12 rounded-xl">
                     <SelectValue placeholder="Select question type" />
                   </SelectTrigger>
-                  <SelectContent className="bg-popover border-border z-[200] rounded-xl">
+                  <SelectContent className="bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 z-[200] rounded-xl">
                     {questionTypeOptions.map((option) => (
                       <SelectItem 
                         key={option.value} 
                         value={option.value} 
-                        className="text-foreground hover:bg-accent/50 rounded-lg"
+                        className="text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-700/50 rounded-lg"
                       >
                         {option.label}
                       </SelectItem>
@@ -132,28 +129,25 @@ export function ExamPrepStepThree({
                   value={examLength} 
                   onChange={(e) => setExamLength(e.target.value)} 
                   placeholder="Enter exam length in minutes" 
-                  className="bg-background border-border text-foreground h-12 rounded-xl"
+                  className="bg-white dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700 text-foreground h-12 rounded-xl"
                 />
               </div>
             </div>
             
             {/* Navigation Buttons */}
-            <div className="mb-6 mt-8 flex flex-row gap-3">
+            <div className="mb-6 mt-8 flex flex-row justify-center gap-3">
               <Button 
                 onClick={onBack}
                 variant="outline" 
                 size="icon"
-                className="h-10 w-10"
+                className="h-10 w-10 rounded-lg"
               >
                 <ArrowLeft className="h-4 w-4" strokeWidth={2.5} />
               </Button>
               <Button 
                 onClick={onStartExam}
                 disabled={!isFormValid()}
-                className={cn(
-                  "px-6",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
+                className="px-6 rounded-lg"
               >
                 Start Exam
               </Button>
