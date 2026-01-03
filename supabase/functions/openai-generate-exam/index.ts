@@ -139,6 +139,9 @@ interface ExamGenerationRequest {
     title: string;
     type: 'file' | 'url' | 'text';
     content?: string;
+    storageUrl?: string;
+    hasExtractedContent?: boolean;
+    processingError?: string;
   }>;
   examConfig: {
     numQuestions: number;
@@ -357,11 +360,26 @@ serve(async (req) => {
       
       for (const resource of additionalResources) {
         contentContext += `\n### ${resource.title} (${resource.type})\n`;
-        if (resource.content) {
-          // Process additional resources with same smart chunking
-          const chunks = createExamContentChunks(resource.content, resource.type, 2500);
-          const prioritizedContent = prioritizeExamContent(chunks, 1500);
-          contentContext += `${prioritizedContent}\n`;
+        
+        // Log resource details for debugging
+        console.log(`Resource: ${resource.title}, type: ${resource.type}, hasContent: ${!!resource.content}, contentLength: ${resource.content?.length || 0}, hasExtractedContent: ${resource.hasExtractedContent}`);
+        
+        if (resource.content && resource.content.length > 0) {
+          // Only process if we have actual content (not just placeholder text)
+          const isPlaceholder = resource.content.startsWith('[') && resource.content.includes('extraction failed');
+          
+          if (!isPlaceholder) {
+            // Process additional resources with same smart chunking
+            const chunks = createExamContentChunks(resource.content, resource.type, 2500);
+            const prioritizedContent = prioritizeExamContent(chunks, 1500);
+            contentContext += `**Extracted Content:** ${prioritizedContent}\n`;
+            console.log(`Added ${prioritizedContent.length} chars of extracted content from ${resource.title}`);
+          } else {
+            contentContext += `*Note: ${resource.content}*\n`;
+            console.log(`Skipping placeholder content for ${resource.title}`);
+          }
+        } else if (resource.processingError) {
+          contentContext += `*Note: File could not be processed - ${resource.processingError}*\n`;
         }
       }
     } else {
