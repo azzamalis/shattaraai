@@ -4,7 +4,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useRooms } from '@/hooks/useRooms';
 import { useContent } from '@/hooks/useContent';
-import { ContentItem } from '@/components/dashboard/exam-prep/ExamPrepStepTwo';
+import { ProcessedExamResource } from '@/hooks/useExamResourceUpload';
 
 export const useRoomPageLogic = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -17,7 +17,7 @@ export const useRoomPageLogic = () => {
   const [isExamMode, setIsExamMode] = useState(false);
   const [examStep, setExamStep] = useState(1);
   const [selectedContentIds, setSelectedContentIds] = useState<string[]>([]);
-  const [additionalResources, setAdditionalResources] = useState<ContentItem[]>([]);
+  const [additionalResources, setAdditionalResources] = useState<ProcessedExamResource[]>([]);
   
   // Exam step 3 state
   const [numQuestions, setNumQuestions] = useState('25');
@@ -113,6 +113,19 @@ export const useRoomPageLogic = () => {
 
   const handleStartExam = () => {
     const selectedItems = roomContent.filter(item => selectedContentIds.includes(item.id));
+    
+    // Build additional resources with extracted content
+    const processedResources = additionalResources.map(resource => ({
+      id: resource.id,
+      title: resource.title,
+      type: resource.type,
+      // Use extractedContent (from file upload/URL extraction) or fallback to text/url
+      content: resource.extractedContent || resource.text || resource.url || '',
+      storageUrl: resource.storageUrl,
+      hasExtractedContent: !!resource.extractedContent,
+      processingError: resource.processingError
+    }));
+
     const examConfig = {
       selectedTopics: selectedItems.map(item => item.title),
       numQuestions,
@@ -120,13 +133,13 @@ export const useRoomPageLogic = () => {
       examLength,
       roomId,
       selectedContentIds,
-      additionalResources: additionalResources.map(resource => ({
-        id: resource.id,
-        title: resource.title,
-        type: resource.type,
-        content: resource.text || resource.url || resource.file?.name || ''
-      }))
+      additionalResources: processedResources
     };
+    
+    console.log(`Starting exam with ${processedResources.length} additional resources:`, 
+      processedResources.map(r => ({ title: r.title, hasContent: !!r.content, contentLength: r.content?.length || 0 }))
+    );
+    
     localStorage.setItem('examConfig', JSON.stringify(examConfig));
     
     setIsExamMode(false);

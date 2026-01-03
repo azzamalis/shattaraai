@@ -1,8 +1,9 @@
-import React, { useState, useRef } from "react";
-import { Upload, Link2, ArrowLeft, ArrowRight, X } from "lucide-react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Upload, Link2, ArrowLeft, ArrowRight, X, Loader2, FileText, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PasteContentModal } from "../PasteContentModal";
 import { toast } from "sonner";
+import { useExamResourceUpload, ProcessedExamResource } from "@/hooks/useExamResourceUpload";
 
 interface ExamPrepStepTwoProps {
   currentStep?: number;
@@ -10,17 +11,11 @@ interface ExamPrepStepTwoProps {
   onBack: () => void;
   onNext: () => void;
   onSkip: () => void;
-  onAdditionalResourcesChange?: (resources: ContentItem[]) => void;
+  onAdditionalResourcesChange?: (resources: ProcessedExamResource[]) => void;
 }
 
-export interface ContentItem {
-  id: string;
-  title: string;
-  type: "file" | "url" | "text";
-  file?: File;
-  url?: string;
-  text?: string;
-}
+// Re-export the type for backward compatibility
+export type ContentItem = ProcessedExamResource;
 
 // Shared progress bar component
 function ExamProgressBar({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
@@ -51,11 +46,12 @@ export function ExamPrepStepTwo({
   onAdditionalResourcesChange,
 }: ExamPrepStepTwoProps) {
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
-  const [contentItems, setContentItems] = useState<ContentItem[]>([]);
+  const [contentItems, setContentItems] = useState<ProcessedExamResource[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploadAndExtractFile, extractWebsiteContent, isUploading } = useExamResourceUpload();
 
   // Notify parent component when content items change
-  React.useEffect(() => {
+  useEffect(() => {
     onAdditionalResourcesChange?.(contentItems);
   }, [contentItems, onAdditionalResourcesChange]);
 
@@ -63,45 +59,169 @@ export function ExamPrepStepTwo({
     fileInputRef.current?.click();
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const newItem: ContentItem = {
-        id: Math.random().toString(36).substr(2, 9),
-        title: file.name,
-        type: "file",
-        file,
-      };
-      setContentItems((prev) => [...prev, newItem]);
-      toast.success(`File "${file.name}" added successfully`);
-    }
-  };
+    if (!file) return;
 
-  const handlePasteSubmit = (data: { url?: string; text?: string }) => {
+    const resourceId = Math.random().toString(36).substr(2, 9);
+    
+    // Add item immediately with processing state
+    const newItem: ProcessedExamResource = {
+      id: resourceId,
+      title: file.name,
+      type: "file",
+      file,
+      isProcessing: true,
+    };
+    
+    setContentItems((prev) => [...prev, newItem]);
+    toast.info(`Processing "${file.name}"...`);
+
+    // Upload and extract text
+    const result = await uploadAndExtractFile(file, resourceId);
+    
+    if (result) {
+      // Update item with extracted content
+      setContentItems((prev) => 
+        prev.map(item => 
+          item.id === resourceId 
+            ? { 
+                ...item, 
+                storageUrl: result.storageUrl, 
+                extractedContent: result.extractedContent,
+                isProcessing: false 
+              }
+            : item
+        )
+      );
+      toast.success(`"${file.name}" processed successfully`);
+    } else {
+      // Mark as failed but keep the item
+      setContentItems((prev) => 
+        prev.map(item => 
+          item.id === resourceId 
+            ? { 
+                ...item, 
+                isProcessing: false,
+                processingError: 'Failed to process file'
+              }
+            : item
+        )
+      );
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [uploadAndExtractFile]);
+
+  const handlePasteSubmit = useCallback(async (data: { url?: string; text?: string }) => {
     if (data.url) {
-      const newItem: ContentItem = {
-        id: Math.random().toString(36).substr(2, 9),
+      const resourceId = Math.random().toString(36).substr(2, 9);
+      
+      // Check if it's a YouTube URL
+      const isYouTube = data.url.includes('youtube.com') || data.url.includes('youtu.be');
+      
+      // Add item with processing state
+      const newItem: ProcessedExamResource = {
+        id: resourceId,
         title: data.url,
         type: "url",
         url: data.url,
+        isProcessing: !isYouTube, // Only process non-YouTube URLs
       };
+      
       setContentItems((prev) => [...prev, newItem]);
-      toast.success("URL content added successfully");
+      setIsPasteModalOpen(false);
+
+      if (isYouTube) {
+        // For YouTube, we'd need special handling - just store the URL for now
+        setContentItems((prev) => 
+          prev.map(item => 
+            item.id === resourceId 
+              ? { 
+                  ...item, 
+                  extractedContent: `[YouTube video: ${data.url} - transcript extraction available through content page]`,
+                  isProcessing: false 
+                }
+              : item
+          )
+        );
+        toast.success("YouTube URL added");
+      } else {
+        // Extract website content
+        toast.info("Extracting content from website...");
+        const extractedContent = await extractWebsiteContent(data.url);
+        
+        setContentItems((prev) => 
+          prev.map(item => 
+            item.id === resourceId 
+              ? { 
+                  ...item, 
+                  extractedContent: extractedContent || `[Website: ${data.url} - content extraction failed]`,
+                  isProcessing: false,
+                  processingError: extractedContent ? undefined : 'Failed to extract content'
+                }
+              : item
+          )
+        );
+        
+        if (extractedContent) {
+          toast.success("Website content extracted successfully");
+        } else {
+          toast.warning("Could not extract website content - URL will still be used as reference");
+        }
+      }
     } else if (data.text) {
-      const newItem: ContentItem = {
+      const newItem: ProcessedExamResource = {
         id: Math.random().toString(36).substr(2, 9),
         title: "Text Content",
         type: "text",
         text: data.text,
+        extractedContent: data.text, // Text is already the content
+        isProcessing: false,
       };
       setContentItems((prev) => [...prev, newItem]);
+      setIsPasteModalOpen(false);
       toast.success("Text content added successfully");
     }
-    setIsPasteModalOpen(false);
-  };
+  }, [extractWebsiteContent]);
 
   const handleRemoveItem = (id: string) => {
     setContentItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // Check if any items are still processing
+  const hasProcessingItems = contentItems.some(item => item.isProcessing);
+
+  // Get icon based on item type and state
+  const getItemIcon = (item: ProcessedExamResource) => {
+    if (item.isProcessing) {
+      return <Loader2 className="h-4 w-4 text-primary animate-spin" />;
+    }
+    if (item.type === "file") {
+      return <FileText className="h-4 w-4 text-muted-foreground" />;
+    }
+    if (item.type === "url") {
+      return <Globe className="h-4 w-4 text-muted-foreground" />;
+    }
+    return <FileText className="h-4 w-4 text-muted-foreground" />;
+  };
+
+  // Get status text for item
+  const getItemStatus = (item: ProcessedExamResource) => {
+    if (item.isProcessing) {
+      return <span className="text-xs text-primary">Processing...</span>;
+    }
+    if (item.processingError) {
+      return <span className="text-xs text-destructive">{item.processingError}</span>;
+    }
+    if (item.extractedContent) {
+      const charCount = item.extractedContent.length;
+      return <span className="text-xs text-muted-foreground">{charCount > 1000 ? `${Math.round(charCount / 1000)}k chars` : `${charCount} chars`}</span>;
+    }
+    return null;
   };
 
   const actionCards = [
@@ -174,18 +294,27 @@ export function ExamPrepStepTwo({
                   {contentItems.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl"
+                      className={`flex items-center justify-between p-3 border rounded-xl transition-colors ${
+                        item.isProcessing 
+                          ? 'bg-primary/5 border-primary/20 dark:bg-primary/10' 
+                          : item.processingError
+                            ? 'bg-destructive/5 border-destructive/20'
+                            : 'bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700'
+                      }`}
                     >
-                      <div className="flex items-center gap-2">
-                        {item.type === "file" && <Upload className="h-4 w-4 text-muted-foreground" />}
-                        {item.type === "url" && <Link2 className="h-4 w-4 text-muted-foreground" />}
-                        <span className="text-sm text-foreground truncate">{item.title}</span>
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        {getItemIcon(item)}
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm text-foreground truncate">{item.title}</span>
+                          {getItemStatus(item)}
+                        </div>
                       </div>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemoveItem(item.id)}
-                        className="h-8 w-8 p-0 hover:bg-accent"
+                        disabled={item.isProcessing}
+                        className="h-8 w-8 p-0 hover:bg-accent shrink-0"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -203,9 +332,14 @@ export function ExamPrepStepTwo({
               <Button onClick={onSkip} variant="ghost" className="gap-1 rounded-lg">
                 Skip
               </Button>
-              <Button onClick={onNext} className="gap-1 rounded-lg">
+              <Button 
+                onClick={onNext} 
+                className="gap-1 rounded-lg"
+                disabled={hasProcessingItems}
+              >
+                {hasProcessingItems && <Loader2 className="h-4 w-4 animate-spin" />}
                 <span>Continue</span>
-                <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+                {!hasProcessingItems && <ArrowRight className="h-4 w-4" strokeWidth={2.5} />}
               </Button>
             </div>
           </div>

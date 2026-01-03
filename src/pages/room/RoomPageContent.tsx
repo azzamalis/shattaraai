@@ -4,8 +4,9 @@ import { RoomView } from '@/components/dashboard/RoomView';
 import { RoomPageHeader } from '@/components/dashboard/RoomPageHeader';
 import { RoomPageActions } from '@/components/dashboard/RoomPageActions';
 import { RoomHeroSection } from '@/components/dashboard/RoomHeroSection';
-import { ExamPrepStepTwo, ContentItem } from '@/components/dashboard/exam-prep/ExamPrepStepTwo';
+import { ExamPrepStepTwo } from '@/components/dashboard/exam-prep/ExamPrepStepTwo';
 import { ExamPrepStepThree } from '@/components/dashboard/exam-prep/ExamPrepStepThree';
+import { ProcessedExamResource } from '@/hooks/useExamResourceUpload';
 
 interface RoomPageContentProps {
   currentRoom: any;
@@ -31,8 +32,8 @@ interface RoomPageContentProps {
   setQuestionType: (value: string) => void;
   examLength: string;
   setExamLength: (value: string) => void;
-  additionalResources: ContentItem[];
-  setAdditionalResources: (resources: ContentItem[]) => void;
+  additionalResources: ProcessedExamResource[];
+  setAdditionalResources: (resources: ProcessedExamResource[]) => void;
 }
 
 export function RoomPageContent({
