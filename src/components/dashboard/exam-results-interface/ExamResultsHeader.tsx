@@ -13,7 +13,7 @@ export function ExamResultsHeader({ totalQuestions, onOpenChat }: ExamResultsHea
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-10 w-full border-b bg-background/95 px-4 shadow-lg shadow-neutral-800/5 backdrop-blur-sm dark:border-border dark:shadow-white/5 py-4 sm:py-6">
+    <header className="sticky top-0 z-10 w-full border-b bg-background/95 px-4 shadow-lg shadow-neutral-800/5 backdrop-blur-sm dark:border-border dark:shadow-white/5 py-4">
       <div className="relative mx-auto flex w-full items-center">
         {/* Left: Close button */}
         <div className="flex w-20 flex-shrink-0 items-center gap-2 xl:w-40">
