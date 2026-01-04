@@ -21,6 +21,7 @@ interface UseExamResourceUploadReturn {
   isUploading: boolean;
 }
 
+
 export function useExamResourceUpload(): UseExamResourceUploadReturn {
   const [isUploading, setIsUploading] = useState(false);
 
@@ -129,8 +130,40 @@ export function useExamResourceUpload(): UseExamResourceUploadReturn {
           extractedContent = `[Text file: ${file.name} - read failed]`;
         }
       } else if (mimeType.includes('audio') || mimeType.includes('video')) {
-        // For audio/video, we'd need transcription - mark as pending
-        extractedContent = `[${mimeType.includes('audio') ? 'Audio' : 'Video'} file: ${file.name} - transcription not yet supported for exam resources]`;
+        // Transcribe audio/video files using the audio-transcription edge function
+        console.log(`Transcribing ${mimeType.includes('video') ? 'video' : 'audio'} file: ${file.name}`);
+        
+        try {
+          // Get public URL for the uploaded file
+          const { data: publicUrlData } = supabase.storage
+            .from(bucket)
+            .getPublicUrl(filePath);
+          
+          const publicUrl = publicUrlData?.publicUrl || storageUrl;
+          
+          // Call the audio-transcription edge function in synchronous mode
+          const { data: transcriptionData, error: transcriptionError } = await supabase.functions.invoke('audio-transcription', {
+            body: { 
+              audioFileUrl: publicUrl,
+              originalFileName: file.name,
+              isVideoContent: mimeType.includes('video'),
+              synchronous: true  // Use synchronous mode for exam resources
+            }
+          });
+
+          if (transcriptionError) {
+            console.error('Transcription error:', transcriptionError);
+            extractedContent = `[${mimeType.includes('audio') ? 'Audio' : 'Video'} file: ${file.name} - transcription failed: ${transcriptionError.message}]`;
+          } else if (transcriptionData?.text) {
+            extractedContent = transcriptionData.text;
+            console.log(`Transcribed ${extractedContent.length} characters from ${mimeType.includes('video') ? 'video' : 'audio'}`);
+          } else {
+            extractedContent = `[${mimeType.includes('audio') ? 'Audio' : 'Video'} file: ${file.name} - no transcription returned]`;
+          }
+        } catch (transcriptionErr) {
+          console.error('Error during transcription:', transcriptionErr);
+          extractedContent = `[${mimeType.includes('audio') ? 'Audio' : 'Video'} file: ${file.name} - transcription error]`;
+        }
       } else {
         extractedContent = `[File: ${file.name} - content type not supported for text extraction]`;
       }

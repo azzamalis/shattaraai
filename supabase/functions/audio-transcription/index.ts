@@ -460,6 +460,89 @@ async function processInBackground(
   }
 }
 
+// Synchronous transcription for exam resources (no database updates)
+async function transcribeSynchronously(
+  audioFileUrl: string,
+  originalFileName: string,
+  isVideoContent: boolean
+): Promise<{ text: string; duration?: number }> {
+  console.log('Synchronous transcription for exam resource:', audioFileUrl);
+  
+  // Download audio file
+  const audioResponse = await fetch(audioFileUrl);
+  if (!audioResponse.ok) {
+    throw new Error(`Failed to download audio file: ${audioResponse.statusText}`);
+  }
+  
+  const audioBuffer = await audioResponse.arrayBuffer();
+  console.log('Audio file downloaded, size:', audioBuffer.byteLength, 'bytes');
+  
+  // Determine file type and MIME type
+  const fileExtension = originalFileName.split('.').pop()?.toLowerCase() || 'wav';
+  let mimeType = 'audio/wav';
+  let fileName = `audio_file.${fileExtension}`;
+  
+  if (isVideoContent) {
+    mimeType = fileExtension === 'mp4' ? 'video/mp4' : 'video/quicktime';
+    fileName = `video_file.${fileExtension}`;
+  } else {
+    switch (fileExtension) {
+      case 'mp3':
+        mimeType = 'audio/mpeg';
+        break;
+      case 'm4a':
+        mimeType = 'audio/mp4';
+        break;
+      case 'wav':
+        mimeType = 'audio/wav';
+        break;
+      case 'flac':
+        mimeType = 'audio/flac';
+        break;
+      case 'webm':
+        mimeType = 'audio/webm';
+        break;
+      case 'ogg':
+        mimeType = 'audio/ogg';
+        break;
+    }
+  }
+  
+  console.log(`Processing ${isVideoContent ? 'video' : 'audio'} file: ${fileName} with MIME type: ${mimeType}`);
+  
+  // Call OpenAI Whisper API
+  const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!openaiApiKey) {
+    throw new Error('OpenAI API key not found');
+  }
+  
+  const formData = new FormData();
+  formData.append('file', new Blob([audioBuffer], { type: mimeType }), fileName);
+  formData.append('model', 'whisper-1');
+  formData.append('response_format', 'verbose_json');
+  
+  const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openaiApiKey}`,
+    },
+    body: formData,
+  });
+  
+  if (!whisperResponse.ok) {
+    const errorText = await whisperResponse.text();
+    throw new Error(`Whisper API error: ${whisperResponse.status} - ${errorText}`);
+  }
+  
+  const transcriptionResult = await whisperResponse.json();
+  console.log('Synchronous transcription completed, text length:', transcriptionResult.text?.length || 0);
+  
+  return {
+    text: transcriptionResult.text || '',
+    duration: transcriptionResult.duration
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -477,17 +560,37 @@ serve(async (req) => {
       originalFileName = 'audio_chunk_0.wav',
       isVideoContent = false,
       videoDuration = 0,
-      requestWordTimestamps = false
+      requestWordTimestamps = false,
+      synchronous = false  // New flag for exam resource transcription
     } = await req.json();
 
-    console.log('Processing audio transcription for recording', recordingId, ', chunk', chunkIndex, ', file:', originalFileName, { isVideoContent });
-
-    if (!recordingId && !contentId) {
-      throw new Error('Missing required parameter: recordingId or contentId');
-    }
+    console.log('Processing audio transcription', { recordingId, contentId, synchronous, isVideoContent, originalFileName });
 
     if (!audioData && !audioFileUrl) {
       throw new Error('Missing required parameter: audioData or audioFileUrl');
+    }
+
+    // Synchronous mode for exam resources - transcribe and return immediately
+    if (synchronous && audioFileUrl) {
+      console.log('Using synchronous transcription mode for exam resource');
+      const result = await transcribeSynchronously(audioFileUrl, originalFileName, isVideoContent);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          text: result.text,
+          duration: result.duration,
+          message: 'Audio transcription completed'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Require recordingId or contentId for background processing
+    if (!recordingId && !contentId) {
+      throw new Error('Missing required parameter: recordingId or contentId (or use synchronous=true)');
     }
 
     // Handle new improved pipeline with audio file URL
