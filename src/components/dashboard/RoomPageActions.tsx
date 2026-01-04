@@ -123,24 +123,33 @@ export function RoomPageActions({
                 <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 space-y-1 rounded-2xl">
-              {existingExams.map((exam, index) => (
-                <DropdownMenuItem
-                  key={exam.id}
-                  className="group flex items-center justify-between rounded-xl px-3 py-2 cursor-pointer"
-                  onClick={() => handleViewExamResults(exam.id)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Exam {index + 1}</span>
-                  </div>
-                  <button
-                    onClick={(e) => handleDeleteExam(e, exam.id)}
-                    className="flex h-6 w-6 items-center justify-center rounded-sm p-0 transition-opacity duration-200 hover:bg-red-100 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100"
+            <DropdownMenuContent align="end" className="w-56 space-y-1 rounded-2xl">
+              {existingExams.map((exam) => {
+                const formattedDate = new Date(exam.created_at).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                });
+                const displayTitle = exam.title || 'Untitled Exam';
+                
+                return (
+                  <DropdownMenuItem
+                    key={exam.id}
+                    className="group flex items-center justify-between rounded-xl px-3 py-2 cursor-pointer"
+                    onClick={() => handleViewExamResults(exam.id)}
                   >
-                    <Trash className="h-4 w-4 text-red-500" aria-hidden="true" />
-                  </button>
-                </DropdownMenuItem>
-              ))}
+                    <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                      <span className="text-sm font-medium text-foreground truncate">{displayTitle}</span>
+                      <span className="text-xs text-muted-foreground">{formattedDate}</span>
+                    </div>
+                    <button
+                      onClick={(e) => handleDeleteExam(e, exam.id)}
+                      className="flex h-6 w-6 items-center justify-center rounded-sm p-0 transition-opacity duration-200 hover:bg-red-100 dark:hover:bg-red-900/20 sm:opacity-0 sm:group-hover:opacity-100 ml-2 shrink-0"
+                    >
+                      <Trash className="h-4 w-4 text-red-500" aria-hidden="true" />
+                    </button>
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

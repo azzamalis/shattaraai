@@ -126,7 +126,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
       const savedStartTime = localStorage.getItem(examStartTimeKey);
       const startTime = savedStartTime ? parseInt(savedStartTime) : Date.now();
       const endTime = Date.now();
-      const timeTakenMinutes = Math.round((endTime - startTime) / (1000 * 60)); // Convert to minutes
+      const timeTakenMinutes = Math.round((endTime - startTime) / (1000 * 60));
       
       // Calculate scores
       const correctAnswers = questions.filter((q) => 
@@ -145,7 +145,7 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
         contentId
       });
       
-      // Prepare basic exam data
+      // Prepare exam data for evaluation
       const examData = {
         questions,
         answers,
@@ -161,10 +161,8 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
         originalContent: generatedExam?.originalContent || null
       };
 
-      // Start AI evaluation with progress tracking
       setSubmissionProgress(`Processing question 1 of ${questions.length}...`);
       
-      // Simulate progress updates while AI processes questions
       const progressInterval = setInterval(() => {
         setSubmissionProgress(prev => {
           const match = prev.match(/Processing question (\d+) of (\d+)/);
@@ -177,59 +175,92 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
           }
           return prev;
         });
-      }, 1500); // Update progress every 1.5 seconds
+      }, 1500);
       
       try {
         const { supabase } = await import('@/integrations/supabase/client');
         
-        // First, create or update exam attempt in database
         setSubmissionProgress('Saving exam attempt...');
         
-        // Get current user
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           throw new Error('User not authenticated');
         }
         
-        // Get the current exam ID from localStorage
-        const examConfigStr = localStorage.getItem('examConfig');
-        let examId = null;
+        // Get exam ID from generatedExam (set during generation) or localStorage
+        const examId = generatedExam?.examId || localStorage.getItem('currentExamId');
         
-        if (examConfigStr) {
-          const config = JSON.parse(examConfigStr);
-          examId = config.examId;
-        }
+        console.log('DEBUG: Using examId:', examId);
         
-        // If no exam ID, try to find/create one based on content
-        if (!examId) {
-          console.log('DEBUG: No exam ID found, looking for existing exam...');
-          // For now, we'll create the exam attempt without linking to a specific exam
-          // This is a temporary solution - ideally should be linked to the actual exam
-        }
-        
-        // Create exam attempt record
+        // Create exam attempt record with proper exam_id linkage
         const { data: attemptData, error: attemptError } = await supabase
           .from('exam_attempts')
-        .insert({
-          user_id: user.id,
-          exam_id: examId || null, // Allow null for now
-          total_score: totalScore,
-          max_score: maxScore,
-          skipped_questions: skippedCount,
-          time_taken_minutes: timeTakenMinutes,
-          status: 'completed' as const,
-          completed_at: new Date().toISOString(),
-          started_at: new Date(startTime).toISOString()
-        })
-        .select()
-        .single();
+          .insert({
+            user_id: user.id,
+            exam_id: examId || null,
+            total_score: totalScore,
+            max_score: maxScore,
+            skipped_questions: skippedCount,
+            time_taken_minutes: timeTakenMinutes,
+            status: 'completed' as const,
+            completed_at: new Date().toISOString(),
+            started_at: new Date(startTime).toISOString()
+          })
+          .select()
+          .single();
           
         if (attemptError) {
           console.error('Error creating exam attempt:', attemptError);
         } else {
           console.log('DEBUG: Exam attempt created:', attemptData);
-          // Store attempt ID for the summary page
           localStorage.setItem('currentExamAttemptId', attemptData.id);
+          
+          // Store individual answers in exam_answers table
+          if (examId && generatedExam?.questions) {
+            setSubmissionProgress('Saving individual answers...');
+            
+            // Fetch exam questions to get their IDs
+            const { data: examQuestions, error: questionsError } = await supabase
+              .from('exam_questions')
+              .select('id, order_index')
+              .eq('exam_id', examId)
+              .order('order_index');
+            
+            if (!questionsError && examQuestions && examQuestions.length > 0) {
+              const answersToInsert = examQuestions.map((eq) => {
+                const questionIndex = eq.order_index;
+                const localQuestion = questions[questionIndex - 1]; // order_index is 1-based
+                const userAnswer = answers[localQuestion?.id];
+                const isSkipped = skippedQuestions.has(localQuestion?.id);
+                
+                // Determine if answer is correct
+                let isCorrect = false;
+                if (!isSkipped && userAnswer !== undefined && localQuestion) {
+                  if (localQuestion.type === 'multiple-choice') {
+                    isCorrect = userAnswer === localQuestion.correctAnswer;
+                  }
+                }
+                
+                return {
+                  exam_attempt_id: attemptData.id,
+                  question_id: eq.id,
+                  user_answer: isSkipped ? null : String(userAnswer ?? ''),
+                  is_correct: isCorrect,
+                  points_earned: isCorrect ? (localQuestion?.points || 1) : 0
+                };
+              });
+              
+              const { error: answersError } = await supabase
+                .from('exam_answers')
+                .insert(answersToInsert);
+                
+              if (answersError) {
+                console.error('Error saving exam answers:', answersError);
+              } else {
+                console.log('DEBUG: Saved', answersToInsert.length, 'exam answers');
+              }
+            }
+          }
         }
         
         setSubmissionProgress('Evaluating answers with AI...');
@@ -250,11 +281,12 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
         }
 
         if (data?.success && data?.evaluatedQuestions) {
-          // Save evaluated results
           const evaluatedResults = {
             ...examData,
             questions: data.evaluatedQuestions,
-            evaluated: true
+            evaluated: true,
+            examId: examId,
+            attemptId: attemptData?.id
           };
           localStorage.setItem('examResults', JSON.stringify(evaluatedResults));
           setSubmissionProgress('Evaluation complete! Redirecting...');
@@ -265,14 +297,14 @@ const ExamInterface: React.FC<ExamInterfaceProps> = ({ examConfig, generatedExam
       } catch (aiError) {
         clearInterval(progressInterval);
         console.error('AI evaluation failed:', aiError);
-        // Fall back to basic results if AI evaluation fails
         localStorage.setItem('examResults', JSON.stringify(examData));
         setSubmissionProgress('Preparing results...');
       }
 
-        // Navigate to exam results page for AI evaluation display
-        localStorage.removeItem(`examStartTime_${contentId}`);
-        navigate(`/exam-results/${contentId}`);
+      // Navigate using attemptId for proper database-backed results
+      const attemptId = localStorage.getItem('currentExamAttemptId');
+      localStorage.removeItem(`examStartTime_${contentId}`);
+      navigate(`/exam-results/${attemptId || contentId}`);
       
     } catch (error) {
       console.error('Error submitting exam:', error);
