@@ -4,6 +4,8 @@ import { ExamResultsHeader } from './exam-results-interface/ExamResultsHeader';
 import { ExamResultsFooter } from './exam-results-interface/ExamResultsFooter';
 import { ChatDrawer } from './exam-results-interface/ChatDrawer';
 import { AnswerBreakdown } from './exam-results-interface/AnswerBreakdown';
+import { supabase } from '@/integrations/supabase/client';
+
 interface Question {
   id: number;
   type: 'multiple-choice' | 'free-text';
@@ -17,6 +19,7 @@ interface Question {
   referenceSource?: string;
   isSkipped?: boolean;
 }
+
 interface ExamResults {
   questions: Question[];
   answers: {
@@ -29,145 +32,232 @@ interface ExamResults {
     skipped: number;
     total: number;
   };
+  examId?: string;
+  attemptId?: string;
 }
-const DUMMY_EXAM_DATA = {
-  questions: [{
-    id: 1,
-    type: 'multiple-choice',
-    question: 'What is the primary force responsible for the formation of stars?',
-    options: ['Electromagnetic force', 'Gravitational force', 'Nuclear force', 'Centrifugal force'],
-    correctAnswer: 1,
-    userAnswer: 0,
-    explanation: 'Gravitational force is the primary force responsible for star formation. It causes clouds of gas and dust in space to collapse, leading to the formation of protostars and eventually stars. The intense pressure and temperature at the core, also a result of gravitational compression, enables nuclear fusion to begin.',
-    referenceTime: '2:15',
-    referenceSource: 'Stellar Formation Basics'
-  }, {
-    id: 2,
-    type: 'free-text',
-    question: 'Explain how scientists can detect and study black holes despite them not emitting light.',
-    userAnswer: 'asdfasasdf',
-    feedback: 'While your answer needs more detail, here\'s a comprehensive explanation: Scientists detect black holes through indirect methods such as: 1) Observing the gravitational effects on nearby stars and gas, 2) Detecting X-ray emissions from heated material falling into the black hole, 3) Gravitational lensing effects, and 4) Recently, through gravitational wave detection when black holes merge.',
-    referenceTime: '5:30',
-    referenceSource: 'Black Hole Detection Methods'
-  }, {
-    id: 3,
-    type: 'multiple-choice',
-    question: 'How does the size of a black hole affect the experience of traveling inside it?',
-    options: ['Supermassive black holes kill instantly upon crossing the event horizon.', 'Larger black holes have stronger tidal forces that cause immediate death.', 'Smaller black holes kill before the event horizon; supermassive ones allow longer survival.', 'Smaller black holes allow for longer survival due to weaker gravity effects.'],
-    correctAnswer: 2,
-    userAnswer: 2,
-    explanation: 'Correct! In smaller black holes, tidal forces are much stronger near the event horizon, leading to "spaghettification" before reaching it. In supermassive black holes, these forces are relatively weaker at the event horizon, theoretically allowing for longer survival past this point, though eventual destruction is still certain.',
-    referenceTime: '8:45',
-    referenceSource: 'Black Hole Physics'
-  }, {
-    id: 4,
-    type: 'free-text',
-    question: 'Describe the process of nuclear fusion in stars and its role in stellar evolution.',
-    isSkipped: true,
-    feedback: 'Nuclear fusion in stars primarily involves the fusion of hydrogen nuclei into helium through the proton-proton chain reaction or CNO cycle. This process releases enormous energy, providing the outward pressure that balances the star\'s gravitational collapse. As stars age, they can fuse heavier elements, leading to different evolutionary stages. The type of fusion occurring in a star\'s core determines its position on the main sequence and its eventual fate.',
-    referenceTime: '12:20',
-    referenceSource: 'Stellar Evolution'
-  }, {
-    id: 5,
-    type: 'multiple-choice',
-    question: 'Which of the following best describes the relationship between a star\'s mass and its lifespan?',
-    options: ['More massive stars live longer than less massive stars', 'A star\'s mass has no effect on its lifespan', 'Less massive stars live longer than more massive stars', 'All stars have approximately the same lifespan'],
-    correctAnswer: 2,
-    userAnswer: 1,
-    explanation: 'Incorrect. Less massive stars actually live longer than more massive stars. This is because massive stars burn through their nuclear fuel much more quickly due to the intense gravitational pressure and higher core temperatures. A low-mass red dwarf might live for trillions of years, while a very massive star might only live for a few million years.',
-    referenceTime: '15:10',
-    referenceSource: 'Stellar Lifespans'
-  }],
-  answers: {
-    1: 0,
-    2: 'asdfasasdf',
-    3: 2,
-    5: 1
-  },
-  skippedQuestions: [4],
-  score: {
-    correct: 1,
-    incorrect: 2,
-    skipped: 1,
-    total: 5
-  }
-};
+
+interface ExamMetadata {
+  examId: string | null;
+  attemptId: string | null;
+  roomId: string | null;
+  contentId: string | null;
+}
+
 const ExamResultsInterface: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentChatQuestion, setCurrentChatQuestion] = useState<number | null>(null);
   const [chatType, setChatType] = useState<'question' | 'room'>('question');
+  const [examResults, setExamResults] = useState<ExamResults | null>(null);
+  const [examMetadata, setExamMetadata] = useState<ExamMetadata>({
+    examId: null,
+    attemptId: null,
+    roomId: null,
+    contentId: null
+  });
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { contentId } = useParams<{ contentId: string }>();
 
-  // Get exam data from localStorage to get correct examId and roomId
-  const examMetadata = (() => {
-    const generatedExam = localStorage.getItem('generatedExam');
-    if (generatedExam) {
-      try {
-        const parsed = JSON.parse(generatedExam);
-        return {
-          examId: parsed.examId,
-          roomId: parsed.roomId,
-          contentId: parsed.contentId || contentId
-        };
-      } catch (error) {
-        console.warn('Failed to parse generatedExam from localStorage:', error);
-      }
-    }
-    return {
-      examId: contentId, // fallback to contentId if no generatedExam
-      roomId: null,
-      contentId: contentId
-    };
-  })();
-
-  // Add dummy data when component mounts if no exam results exist
   useEffect(() => {
-    if (!localStorage.getItem('examResults')) {
-      localStorage.setItem('examResults', JSON.stringify(DUMMY_EXAM_DATA));
-    }
-  }, []);
-
-  // Get exam results from localStorage
-  const examResults = (() => {
-    const savedResults = localStorage.getItem('examResults');
-    if (savedResults) {
-      const parsed = JSON.parse(savedResults);
-      return {
-        ...parsed,
-        skippedQuestions: new Set(parsed.skippedQuestions),
-        score: {
-          ...parsed.score,
-          correct: Object.entries(parsed.answers).filter(([id, answer]) => {
-            const question = parsed.questions.find(q => q.id === parseInt(id));
-            return question?.type === 'multiple-choice' && answer === question.correctAnswer;
-          }).length,
-          incorrect: Object.entries(parsed.answers).filter(([id, answer]) => {
-            const question = parsed.questions.find(q => q.id === parseInt(id));
-            return question?.type === 'multiple-choice' && answer !== question.correctAnswer;
-          }).length,
-          skipped: parsed.skippedQuestions.length,
-          total: parsed.questions.length
-        }
+    const loadExamResults = async () => {
+      setLoading(true);
+      
+      // First check localStorage for recent results (from just-completed exam)
+      const savedResults = localStorage.getItem('examResults');
+      const savedAttemptId = localStorage.getItem('currentExamAttemptId');
+      const generatedExam = localStorage.getItem('generatedExam');
+      
+      let metadata: ExamMetadata = {
+        examId: null,
+        attemptId: contentId || savedAttemptId,
+        roomId: null,
+        contentId: null
       };
-    }
-    navigate('/exam');
-    return null;
-  })();
+      
+      // Parse generatedExam for metadata
+      if (generatedExam) {
+        try {
+          const parsed = JSON.parse(generatedExam);
+          metadata.examId = parsed.examId || metadata.examId;
+          metadata.roomId = parsed.roomId || metadata.roomId;
+          metadata.contentId = parsed.contentId || metadata.contentId;
+        } catch (e) {
+          console.warn('Failed to parse generatedExam:', e);
+        }
+      }
+      
+      // If we have localStorage results, use them (freshest data from just-completed exam)
+      if (savedResults) {
+        try {
+          const parsed = JSON.parse(savedResults);
+          const results: ExamResults = {
+            ...parsed,
+            skippedQuestions: new Set(parsed.skippedQuestions || []),
+            score: {
+              correct: 0,
+              incorrect: 0,
+              skipped: parsed.skippedQuestions?.length || 0,
+              total: parsed.questions?.length || 0
+            }
+          };
+          
+          // Calculate scores properly
+          if (parsed.questions && parsed.answers) {
+            results.score.correct = Object.entries(parsed.answers).filter(([id, answer]) => {
+              const question = parsed.questions.find((q: Question) => q.id === parseInt(id));
+              return question?.type === 'multiple-choice' && answer === question.correctAnswer;
+            }).length;
+            
+            results.score.incorrect = Object.entries(parsed.answers).filter(([id, answer]) => {
+              const question = parsed.questions.find((q: Question) => q.id === parseInt(id));
+              return question?.type === 'multiple-choice' && answer !== question.correctAnswer;
+            }).length;
+          }
+          
+          // Update metadata from parsed results
+          if (parsed.examId) metadata.examId = parsed.examId;
+          if (parsed.attemptId) metadata.attemptId = parsed.attemptId;
+          
+          setExamResults(results);
+          setExamMetadata(metadata);
+          setLoading(false);
+          return;
+        } catch (e) {
+          console.error('Failed to parse localStorage results:', e);
+        }
+      }
+      
+      // If no localStorage data, try to fetch from database
+      const idToFetch = contentId || savedAttemptId;
+      if (idToFetch) {
+        try {
+          // Try to fetch as exam_attempt first
+          const { data: attemptData, error: attemptError } = await supabase
+            .from('exam_attempts')
+            .select(`
+              *,
+              exams (
+                id,
+                title,
+                room_id,
+                content_metadata
+              )
+            `)
+            .eq('id', idToFetch)
+            .maybeSingle();
+          
+          if (attemptData) {
+            metadata.attemptId = attemptData.id;
+            metadata.examId = attemptData.exam_id;
+            metadata.roomId = (attemptData.exams as any)?.room_id || null;
+            
+            // Fetch questions and answers for this attempt
+            if (attemptData.exam_id) {
+              const { data: questions } = await supabase
+                .from('exam_questions')
+                .select('*')
+                .eq('exam_id', attemptData.exam_id)
+                .order('order_index');
+              
+              const { data: answers } = await supabase
+                .from('exam_answers')
+                .select('*')
+                .eq('exam_attempt_id', attemptData.id);
+              
+              if (questions) {
+                const formattedQuestions: Question[] = questions.map((q, idx) => {
+                  const answer = answers?.find(a => a.question_id === q.id);
+                  return {
+                    id: idx + 1,
+                    type: q.question_type === 'multiple_choice' ? 'multiple-choice' : 'free-text',
+                    question: q.question_text,
+                    options: Array.isArray(q.options) ? q.options.map((opt: any) => opt.text || opt) : undefined,
+                    correctAnswer: q.question_type === 'multiple_choice' 
+                      ? parseInt(q.correct_answer) 
+                      : undefined,
+                    userAnswer: answer?.user_answer ? 
+                      (q.question_type === 'multiple_choice' ? parseInt(answer.user_answer) : answer.user_answer) 
+                      : undefined,
+                    explanation: q.explanation,
+                    feedback: q.feedback,
+                    referenceTime: q.reference_time,
+                    referenceSource: q.reference_source,
+                    isSkipped: answer === undefined || answer.user_answer === null
+                  };
+                });
+                
+                const answersMap: { [key: number]: any } = {};
+                const skippedSet = new Set<number>();
+                
+                formattedQuestions.forEach(q => {
+                  if (q.userAnswer !== undefined) {
+                    answersMap[q.id] = q.userAnswer;
+                  }
+                  if (q.isSkipped) {
+                    skippedSet.add(q.id);
+                  }
+                });
+                
+                setExamResults({
+                  questions: formattedQuestions,
+                  answers: answersMap,
+                  skippedQuestions: skippedSet,
+                  score: {
+                    correct: attemptData.total_score || 0,
+                    incorrect: (attemptData.max_score || 0) - (attemptData.total_score || 0) - (attemptData.skipped_questions || 0),
+                    skipped: attemptData.skipped_questions || 0,
+                    total: attemptData.max_score || questions.length
+                  },
+                  examId: attemptData.exam_id,
+                  attemptId: attemptData.id
+                });
+                
+                setExamMetadata(metadata);
+                setLoading(false);
+                return;
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Failed to fetch from database:', e);
+        }
+      }
+      
+      // No data available
+      setLoading(false);
+      navigate('/dashboard');
+    };
+    
+    loadExamResults();
+  }, [contentId, navigate]);
+
   const openChatForQuestion = (questionId: number) => {
     setCurrentChatQuestion(questionId);
     setChatType('question');
     setIsChatOpen(true);
   };
+
+  if (loading) {
+    return (
+      <div className="h-full bg-background text-foreground flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading exam results...</div>
+      </div>
+    );
+  }
+
   if (!examResults) {
     return null;
   }
-  return <div className="h-full bg-background text-foreground">
-      <ExamResultsHeader totalQuestions={examResults.score.total} onOpenChat={() => {
-        setCurrentChatQuestion(null); // Clear question context for room chat
-        setChatType('room');
-        setIsChatOpen(true);
-      }} />
+  return (
+    <div className="h-full bg-background text-foreground">
+      <ExamResultsHeader 
+        totalQuestions={examResults.score.total} 
+        onOpenChat={() => {
+          setCurrentChatQuestion(null);
+          setChatType('room');
+          setIsChatOpen(true);
+        }} 
+      />
 
       {/* Main Content Area */}
       <main className="pb-24 pt-8">
@@ -186,8 +276,8 @@ const ExamResultsInterface: React.FC = () => {
       </main>
 
       <ExamResultsFooter 
-        onTryAgain={() => navigate(`/exam/${contentId}`)} 
-        onViewResults={() => navigate(`/exam-summary/${contentId}`)}
+        onTryAgain={() => navigate(`/exam/${examMetadata.attemptId || contentId}`)} 
+        onViewResults={() => navigate(`/exam-summary/${examMetadata.attemptId || contentId}`)}
         roomId={examMetadata.roomId}
       />
 
@@ -200,6 +290,8 @@ const ExamResultsInterface: React.FC = () => {
         roomId={examMetadata.roomId}
         chatType={chatType}
       />
-    </div>;
+    </div>
+  );
 };
+
 export default ExamResultsInterface;
