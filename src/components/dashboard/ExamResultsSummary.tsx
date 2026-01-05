@@ -706,7 +706,7 @@ export function ExamResultsSummary() {
                   onClick={() => navigate(`/exam-results/${contentId}`)}
                   className="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 h-10 text-sm font-semibold text-primary/60 underline underline-offset-4 ring-offset-background transition-colors hover:underline hover:text-primary focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-primary/60 dark:hover:text-primary"
                 >
-                  Preview Exam - {examAttempt?.exams?.title || 'Exam 1'}
+                  Preview Exam {allExamAttempts.findIndex(a => a.id === examAttempt?.id) + 1 || 1} - {contentTitle || 'Exam'}
                 </button>
               </div>
 
