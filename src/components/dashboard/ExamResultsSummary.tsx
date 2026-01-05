@@ -316,7 +316,7 @@ export function ExamResultsSummary() {
         }
 
         // Fetch exam answers if we have an attempt
-        let answersMap = new Map<string, boolean>();
+        const answersMap = new Map<string, boolean>();
         if (attemptData?.id) {
           const { data: answersData, error: answersError } = await supabase
             .from('exam_answers')
@@ -333,11 +333,11 @@ export function ExamResultsSummary() {
         // Get all chapters from content
         const allChapters = contentData.flatMap(c => c.chapters || []);
         
-        // Build chapter breakdown from content chapters
+        // Build chapter breakdown
         const breakdown: ChapterData[] = [];
         
-        if (allChapters.length > 0) {
-          // Group questions by matching them to chapters based on reference_source
+        if (allChapters.length > 0 && questionsWithSources.length > 0) {
+          // Map questions to chapters using reference_time or reference_source
           const chapterQuestionMap = new Map<string, { correct: number; total: number }>();
           
           // Initialize all chapters
@@ -347,20 +347,38 @@ export function ExamResultsSummary() {
           
           // Match questions to chapters
           questionsWithSources.forEach(question => {
-            const source = question.reference_source || '';
+            const refSource = question.reference_source || '';
+            const refTime = question.reference_time || '';
             const isCorrect = answersMap.get(question.id) || false;
             
-            // Try to match to a chapter by title similarity
-            let matchedChapter = allChapters.find(ch => 
-              source.toLowerCase().includes(ch.title.toLowerCase().split(' ').slice(0, 3).join(' ')) ||
-              ch.title.toLowerCase().includes(source.toLowerCase().split(':')[0].trim().split(' ').slice(0, 3).join(' '))
-            );
+            // Try to match by time range first (for audio/video content)
+            let matchedChapter = null;
+            if (refTime) {
+              const timeInSeconds = parseTimeToSeconds(refTime);
+              matchedChapter = allChapters.find(ch => 
+                timeInSeconds >= ch.startTime && timeInSeconds <= ch.endTime
+              );
+            }
             
-            // If no match, assign to first chapter or create "Other" category
+            // If no time match, try to match by source text similarity
+            if (!matchedChapter && refSource) {
+              const normalizedSource = refSource.toLowerCase().trim();
+              
+              // Exact or partial title match
+              matchedChapter = allChapters.find(ch => {
+                const normalizedTitle = ch.title.toLowerCase().trim();
+                return normalizedSource.includes(normalizedTitle) || 
+                       normalizedTitle.includes(normalizedSource) ||
+                       normalizedSource.split(':')[0].trim() === normalizedTitle ||
+                       calculateSimilarity(normalizedSource, normalizedTitle) > 0.5;
+              });
+            }
+            
+            // Fallback: distribute based on question order
             if (!matchedChapter && allChapters.length > 0) {
-              // Distribute evenly across chapters based on question index
-              const chapterIndex = questionsWithSources.indexOf(question) % allChapters.length;
-              matchedChapter = allChapters[chapterIndex];
+              const questionIndex = questionsWithSources.indexOf(question);
+              const chapterIndex = Math.floor((questionIndex / questionsWithSources.length) * allChapters.length);
+              matchedChapter = allChapters[Math.min(chapterIndex, allChapters.length - 1)];
             }
             
             if (matchedChapter) {
@@ -370,25 +388,44 @@ export function ExamResultsSummary() {
             }
           });
           
-          // Convert to breakdown array
+          // Convert to breakdown array - only include chapters with questions
           allChapters.forEach(chapter => {
             const stats = chapterQuestionMap.get(chapter.id) || { correct: 0, total: 0 };
-            const pageStart = (chapter as any).pageNumber || (chapter as any).startPage || Math.floor(chapter.startTime / 60) + 1;
-            const pageEnd = (chapter as any).endPage || Math.ceil(chapter.endTime / 60) + 1;
-            
-            breakdown.push({
-              title: chapter.title,
-              timeRange: `Page ${pageStart} - ${pageEnd}`,
-              correct: stats.correct,
-              total: stats.total > 0 ? stats.total : Math.ceil(questionsWithSources.length / allChapters.length),
-            });
+            if (stats.total > 0) {
+              const formatTimeRange = (start: number, end: number) => {
+                const formatSec = (s: number) => {
+                  const mins = Math.floor(s / 60);
+                  const secs = Math.floor(s % 60);
+                  return `${mins}:${secs.toString().padStart(2, '0')}`;
+                };
+                return `${formatSec(start)} - ${formatSec(end)}`;
+              };
+              
+              breakdown.push({
+                title: chapter.title,
+                timeRange: formatTimeRange(chapter.startTime, chapter.endTime),
+                correct: stats.correct,
+                total: stats.total,
+              });
+            }
           });
         } else if (questionsWithSources.length > 0) {
-          // Fallback: group by reference_source if no chapters
+          // No chapters available - group by reference_source
           const sourceMap = new Map<string, { correct: number; total: number; time: string }>();
           
           questionsWithSources.forEach(question => {
-            const source = question.reference_source || 'General Questions';
+            // Use reference_source or create a topic group
+            let source = question.reference_source || '';
+            if (!source) {
+              source = 'General Questions';
+            } else {
+              // Clean up the source name - take first meaningful part
+              source = source.split(':')[0].trim();
+              if (source.length > 50) {
+                source = source.substring(0, 47) + '...';
+              }
+            }
+            
             const time = question.reference_time || '';
             const isCorrect = answersMap.get(question.id) || false;
             
@@ -415,6 +452,27 @@ export function ExamResultsSummary() {
       } catch (error) {
         console.error('Error fetching chapter breakdown:', error);
       }
+    };
+    
+    // Helper: parse time string (e.g., "1:30" or "90") to seconds
+    const parseTimeToSeconds = (time: string): number => {
+      if (!time) return 0;
+      const parts = time.split(':').map(Number);
+      if (parts.length === 2) {
+        return parts[0] * 60 + parts[1];
+      } else if (parts.length === 3) {
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+      return parseInt(time, 10) || 0;
+    };
+    
+    // Helper: calculate string similarity (Jaccard-like)
+    const calculateSimilarity = (str1: string, str2: string): number => {
+      const words1 = new Set(str1.split(/\s+/).filter(w => w.length > 2));
+      const words2 = new Set(str2.split(/\s+/).filter(w => w.length > 2));
+      const intersection = [...words1].filter(w => words2.has(w)).length;
+      const union = new Set([...words1, ...words2]).size;
+      return union > 0 ? intersection / union : 0;
     };
 
     fetchExamResults();
