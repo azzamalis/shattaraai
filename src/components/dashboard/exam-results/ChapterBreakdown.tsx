@@ -98,10 +98,6 @@ export function ChapterBreakdown({ chapters, examData, contentTitle }: ChapterBr
                         <span className="max-w-[160px] truncate text-xs sm:max-w-[260px] sm:text-sm md:max-w-[280px] lg:max-w-[500px]">
                           {chapter.title}
                         </span>
-                        <span className="hidden text-xs text-primary sm:text-sm md:block">•</span>
-                        <span className="hidden text-xs text-muted-foreground/80 sm:text-sm md:block">
-                          {chapter.timeRange}
-                        </span>
                       </div>
                       <div className="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400 sm:text-sm">
                         {complete ? (
