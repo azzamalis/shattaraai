@@ -74,6 +74,7 @@ export function ExamResultsSummary() {
   const [allExamAttempts, setAllExamAttempts] = useState<ExamAttemptListItem[]>([]);
   const [chapterBreakdown, setChapterBreakdown] = useState<ChapterData[]>([]);
   const [contentTitle, setContentTitle] = useState<string>('');
+  const [firstContentId, setFirstContentId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -290,9 +291,10 @@ export function ExamResultsSummary() {
           }
         }
 
-        // Set content title from first content or selected topics
+        // Set content title and ID from first content or selected topics
         if (contentData.length > 0) {
           setContentTitle(contentData[0].title);
+          setFirstContentId(contentData[0].id);
         } else if (selectedTopics.length > 0) {
           setContentTitle(selectedTopics[0]);
         } else if (examData?.title) {
@@ -715,6 +717,7 @@ export function ExamResultsSummary() {
                 chapters={chapterBreakdown} 
                 examData={examData}
                 contentTitle={contentTitle || examAttempt?.exams?.title || 'Exam Content'}
+                contentId={firstContentId}
               />
 
               {/* Action Buttons */}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronDown, ChevronRight, Text } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 import {
   Accordion,
   AccordionContent,
@@ -27,11 +28,20 @@ interface ChapterBreakdownProps {
   chapters: ChapterData[];
   examData: ExamData;
   contentTitle?: string;
+  contentId?: string;
 }
 
-export function ChapterBreakdown({ chapters, examData, contentTitle }: ChapterBreakdownProps) {
+export function ChapterBreakdown({ chapters, examData, contentTitle, contentId }: ChapterBreakdownProps) {
+  const navigate = useNavigate();
+  
   // Use content title or fallback
   const displayTitle = contentTitle || 'Content Overview';
+  
+  const handleReviewClick = () => {
+    if (contentId) {
+      navigate(`/content/${contentId}`);
+    }
+  };
 
   // Calculate performance color based on percentage
   const getPerformanceColor = (correct: number, total: number) => {
@@ -105,7 +115,10 @@ export function ChapterBreakdown({ chapters, examData, contentTitle }: ChapterBr
                             <span>Complete</span>
                           </button>
                         ) : (
-                          <button className="flex h-6 items-center gap-1 justify-center whitespace-nowrap rounded-md border border-yellow-500/20 bg-yellow-500/10 px-2 py-1 text-xs font-normal text-yellow-500 ring-offset-background transition-colors hover:bg-yellow-500/20 hover:text-yellow-600 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:bg-yellow-500/30 dark:text-yellow-400">
+                          <button 
+                            onClick={handleReviewClick}
+                            className="flex h-6 items-center gap-1 justify-center whitespace-nowrap rounded-md border border-yellow-500/20 bg-yellow-500/10 px-2 py-1 text-xs font-normal text-yellow-500 ring-offset-background transition-colors hover:bg-yellow-500/20 hover:text-yellow-600 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:bg-yellow-500/30 dark:text-yellow-400"
+                          >
                             Review
                             <ChevronRight className="h-3 w-3" aria-hidden="true" />
                           </button>
