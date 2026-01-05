@@ -76,7 +76,8 @@ export function RoomPageActions({
   };
 
   const handleViewExamResults = (examId: string) => {
-    navigate(`/exam-results/${examId}`);
+    // Navigate to exam summary page
+    navigate(`/exam-summary/${examId}`);
   };
 
   const handleDeleteExam = async (e: React.MouseEvent, examId: string) => {
@@ -124,12 +125,13 @@ export function RoomPageActions({
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 space-y-1 rounded-2xl">
-              {existingExams.map((exam) => {
+              {existingExams.map((exam, index) => {
                 const formattedDate = new Date(exam.created_at).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                 });
-                const displayTitle = exam.title || 'Untitled Exam';
+                // Number exams based on creation order (1, 2, 3...)
+                const examNumber = index + 1;
                 
                 return (
                   <DropdownMenuItem
@@ -138,7 +140,7 @@ export function RoomPageActions({
                     onClick={() => handleViewExamResults(exam.id)}
                   >
                     <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                      <span className="text-sm font-medium text-foreground truncate">{displayTitle}</span>
+                      <span className="text-sm font-medium text-foreground truncate">Exam {examNumber}</span>
                       <span className="text-xs text-muted-foreground">{formattedDate}</span>
                     </div>
                     <button
