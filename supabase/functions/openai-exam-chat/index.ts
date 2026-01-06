@@ -11,6 +11,7 @@ interface ExamChatRequest {
   message: string;
   examId?: string;
   questionId?: number;
+  questionText?: string;
   contentId?: string;
   roomId?: string;
   conversationHistory?: Array<{
@@ -30,6 +31,7 @@ serve(async (req) => {
       message,
       examId,
       questionId,
+      questionText,
       contentId,
       roomId,
       conversationHistory = []
@@ -372,6 +374,15 @@ ${specificQuestion.options.map((opt: string, idx: number) => `${String.fromCharC
           }
         }
       }
+    } else if (questionId && questionText) {
+      // Use the question text passed directly from the frontend
+      contextInfo += `
+
+## Current Question Context:
+**Question ${questionId}:** ${questionText}
+
+The student is asking about this specific question from their exam. Help them understand the topic.
+`;
     } else if (examAnswersData && examAnswersData.length > 0 && questionsData && questionsData.length > 0) {
       // If no specific question, provide a summary of all answers
       contextInfo += `
