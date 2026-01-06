@@ -95,33 +95,33 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
       : 'Explanation not available for this question.';
     
     return (
-      <div className={`mt-4 rounded-lg p-4 ${statusConfig.bgColor}`}>
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <h3 className={`flex items-center gap-2 text-base font-medium ${statusConfig.textColor}`}>
-              <StatusIcon className="h-4 w-4" aria-hidden="true" />
+      <div className={`mt-6 rounded-xl p-5 ${statusConfig.bgColor}`}>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <h3 className={`flex items-center gap-2 text-lg font-medium ${statusConfig.textColor}`}>
+              <StatusIcon className="h-5 w-5" aria-hidden="true" />
               {statusConfig.status}
             </h3>
+            {statusConfig.showScore && (
+              <span className="text-sm font-medium text-muted-foreground">Score: 0/4</span>
+            )}
           </div>
-          {statusConfig.showScore && (
-            <div className="text-base font-medium text-muted-foreground">Score: 0/4</div>
-          )}
-          <div className={`mt-2 font-normal leading-relaxed ${statusConfig.textColor}`}>
+          <div className={`font-normal leading-relaxed text-muted-foreground`}>
             <div className="markdown-body prose prose-neutral dark:prose-invert max-w-none">
-              <div className="space-y-4 leading-normal">
+              <div className="space-y-3">
                 <ReactMarkdown
                   components={{
                     p: ({ children }) => (
-                      <p className="text-base leading-7 last:mb-0 m-0">{children}</p>
+                      <p className="text-sm leading-6 last:mb-0 m-0">{children}</p>
                     ),
                     strong: ({ children }) => (
                       <strong className="font-semibold">{children}</strong>
                     ),
                     ul: ({ children }) => (
-                      <ul className="list-disc pl-5 space-y-1 mt-2 text-base">{children}</ul>
+                      <ul className="list-disc pl-5 space-y-1 mt-2 text-sm">{children}</ul>
                     ),
                     li: ({ children }) => (
-                      <li className="text-base leading-7">{children}</li>
+                      <li className="text-sm leading-6">{children}</li>
                     ),
                   }}
                 >
