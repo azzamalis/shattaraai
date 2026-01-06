@@ -155,22 +155,19 @@ export function ChatDrawer({
           timestamp: new Date(msg.timestamp)
         })));
       } else {
-        // Add appropriate welcome AI message
-        let welcomeContent: string;
-        if (chatType === 'question' && currentQuestionId) {
-          welcomeContent = `You are asking me about Question ${currentQuestionId}, how can I help?`;
+        // Only add welcome message for room chat, not question chat
+        if (chatType !== 'question') {
+          const welcomeMessage: ChatMessage = {
+            id: `welcome-${chatType}-${Date.now()}`,
+            isUser: false,
+            content: `Hi ${userName}, I am Shattara AI tutor and I'm here to help you study!`,
+            timestamp: new Date(),
+            status: 'delivered'
+          };
+          setChatMessages([welcomeMessage]);
         } else {
-          welcomeContent = `Hi ${userName}, I am Shattara AI tutor and I'm here to help you study!`;
+          setChatMessages([]);
         }
-        
-        const welcomeMessage: ChatMessage = {
-          id: `welcome-${chatType}-${Date.now()}`,
-          isUser: false,
-          content: welcomeContent,
-          timestamp: new Date(),
-          status: 'delivered'
-        };
-        setChatMessages([welcomeMessage]);
       }
     }
   }, [isOpen, currentQuestionId, examId, chatType, roomId, userName]);
@@ -226,12 +223,13 @@ export function ChatDrawer({
         sender_type: msg.isUser ? 'user' : 'ai'
       }));
 
-      // Call the exam chat AI function
+      // Call the exam chat AI function with question context
       const { data, error } = await supabase.functions.invoke('openai-exam-chat', {
         body: {
           message: currentMessage,
           examId,
           questionId: currentQuestionId,
+          questionText: currentQuestionText,
           contentId,
           roomId,
           conversationHistory
