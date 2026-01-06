@@ -98,8 +98,8 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
       <div className={`mt-4 rounded-lg p-4 ${statusConfig.bgColor}`}>
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <h3 className={`flex items-center gap-2 font-medium ${statusConfig.textColor}`}>
-              <StatusIcon className="h-5 w-5" aria-hidden="true" />
+            <h3 className={`flex items-center gap-2 text-base font-medium ${statusConfig.textColor}`}>
+              <StatusIcon className="h-4 w-4" aria-hidden="true" />
               {statusConfig.status}
             </h3>
           </div>
@@ -134,14 +134,14 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
                 {contentId ? (
                   <Link to={`/content/${contentId}`}>
                     <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 mt-2 cursor-pointer space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
-                      <span>Page {question.referenceTime}</span>
+                      <span>{question.referenceTime}</span>
                       :
                       <span className="max-w-[10rem] truncate">{question.referenceSource}</span>
                     </span>
                   </Link>
                 ) : (
                   <span className={`inline-flex items-center border px-2.5 py-0.5 transition-colors mt-2 space-x-2 rounded-sm text-xs font-medium ${statusConfig.badgeClassName}`}>
-                    <span>Page {question.referenceTime}</span>
+                    <span>{question.referenceTime}</span>
                     :
                     <span className="max-w-[10rem] truncate">{question.referenceSource}</span>
                   </span>
