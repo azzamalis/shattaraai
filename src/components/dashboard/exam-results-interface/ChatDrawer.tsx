@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2, Square, GripVertical } from 'lucide-react';
+import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2, Square, GripVertical, CornerDownRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from '@/components/prompt-kit/chat-container';
 import { Message, MessageAvatar, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
@@ -23,13 +23,25 @@ interface ChatDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   currentQuestionId: number | null;
+  currentQuestionText?: string | null;
+  onClearQuestionReference?: () => void;
   examId?: string;
   contentId?: string;
   roomId?: string | null;
   chatType?: 'question' | 'room';
 }
 
-export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, contentId, roomId, chatType = 'question' }: ChatDrawerProps) {
+export function ChatDrawer({ 
+  isOpen, 
+  onClose, 
+  currentQuestionId, 
+  currentQuestionText,
+  onClearQuestionReference,
+  examId, 
+  contentId, 
+  roomId, 
+  chatType = 'question' 
+}: ChatDrawerProps) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -479,6 +491,23 @@ export function ChatDrawer({ isOpen, onClose, currentQuestionId, examId, content
         
         {/* Input Area */}
         <div className="p-4">
+          {/* Question Reference Box */}
+          {currentQuestionText && (
+            <div className="mb-3 flex w-full items-center justify-between rounded-lg bg-muted/70 p-3 text-primary/70">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <CornerDownRight className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                <div className="line-clamp-3 text-sm flex-1 min-w-0">
+                  <p className="text-sm leading-relaxed">{currentQuestionText}</p>
+                </div>
+              </div>
+              <button 
+                onClick={onClearQuestionReference}
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none hover:bg-accent hover:text-accent-foreground h-6 w-6 p-0.5 flex-shrink-0 ml-2"
+              >
+                <X className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+              </button>
+            </div>
+          )}
           <PromptInput
             value={chatInput}
             onValueChange={setChatInput}

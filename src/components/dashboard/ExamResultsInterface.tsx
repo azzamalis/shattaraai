@@ -46,6 +46,7 @@ interface ExamMetadata {
 const ExamResultsInterface: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentChatQuestion, setCurrentChatQuestion] = useState<number | null>(null);
+  const [currentQuestionText, setCurrentQuestionText] = useState<string | null>(null);
   const [chatType, setChatType] = useState<'question' | 'room'>('question');
   const [examResults, setExamResults] = useState<ExamResults | null>(null);
   const [examMetadata, setExamMetadata] = useState<ExamMetadata>({
@@ -232,7 +233,9 @@ const ExamResultsInterface: React.FC = () => {
   }, [contentId, navigate]);
 
   const openChatForQuestion = (questionId: number) => {
+    const question = examResults?.questions.find(q => q.id === questionId);
     setCurrentChatQuestion(questionId);
+    setCurrentQuestionText(question?.question || null);
     setChatType('question');
     setIsChatOpen(true);
   };
@@ -285,6 +288,8 @@ const ExamResultsInterface: React.FC = () => {
         isOpen={isChatOpen} 
         onClose={() => setIsChatOpen(false)} 
         currentQuestionId={currentChatQuestion}
+        currentQuestionText={currentQuestionText}
+        onClearQuestionReference={() => setCurrentQuestionText(null)}
         examId={examMetadata.examId}
         contentId={examMetadata.contentId}
         roomId={examMetadata.roomId}
