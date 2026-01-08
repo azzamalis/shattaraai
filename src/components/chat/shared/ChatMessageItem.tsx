@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, memo, useCallback, useMemo } from 'react';
 import { Copy, Check, Paperclip } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -11,36 +11,44 @@ interface ChatMessageItemProps {
   showTimestamp?: boolean;
 }
 
-export function ChatMessageItem({
+const ChatMessageItemComponent = ({
   message,
   showTimestamp = true
-}: ChatMessageItemProps) {
+}: ChatMessageItemProps) => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const copyToClipboard = async (content: string, messageId: string) => {
+  // Memoize copy handler
+  const copyToClipboard = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(content);
-      setCopiedId(messageId);
+      await navigator.clipboard.writeText(message.content);
+      setCopiedId(message.id);
       toast.success('Message copied to clipboard');
       setTimeout(() => setCopiedId(null), 2000);
     } catch (error) {
       toast.error('Failed to copy message');
     }
-  };
+  }, [message.content, message.id]);
 
-  const formatFileSize = (bytes: number) => {
+  // Memoize file size formatter (pure function, could be outside but kept for consistency)
+  const formatFileSize = useCallback((bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+  }, []);
 
+  // Memoize derived values
   const isUser = message.sender_type === 'user';
   const isSystem = message.sender_type === 'system';
 
-  // Log for debugging
-  console.log('ChatMessageItem - Rendering message:', message.id, 'attachments:', message.attachments);
+  // Memoize formatted timestamp
+  const formattedTimestamp = useMemo(() => {
+    return new Date(message.created_at).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }, [message.created_at]);
 
   return (
     <div className={cn(
@@ -107,7 +115,7 @@ export function ChatMessageItem({
 
             {/* Copy Button */}
             <button
-              onClick={() => copyToClipboard(message.content, message.id)}
+              onClick={copyToClipboard}
               className={cn(
                 "absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded",
                 "hover:bg-dashboard-card-hover dark:hover:bg-dashboard-card-hover"
@@ -129,10 +137,7 @@ export function ChatMessageItem({
                   ? "text-white/70" 
                   : "text-dashboard-text-secondary/60 dark:text-dashboard-text-secondary/60"
               )}>
-                {new Date(message.created_at).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
+                {formattedTimestamp}
               </div>
             )}
           </div>
@@ -147,4 +152,7 @@ export function ChatMessageItem({
       </div>
     </div>
   );
-}
+};
+
+// Memoize the component - only re-render when message or showTimestamp changes
+export const ChatMessageItem = memo(ChatMessageItemComponent);
