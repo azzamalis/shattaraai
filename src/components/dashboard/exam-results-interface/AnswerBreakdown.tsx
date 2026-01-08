@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import { CircleHelp, CircleCheck, CircleX, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -24,8 +24,9 @@ interface AnswerBreakdownProps {
   onAskChat?: (questionId: number) => void;
 }
 
-export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakdownProps) {
-  const getStatusConfig = () => {
+const AnswerBreakdownComponent = ({ question, contentId, onAskChat }: AnswerBreakdownProps) => {
+  // Memoize the status configuration to avoid recalculation on every render
+  const statusConfig = useMemo(() => {
     if (question.isSkipped) {
       return {
         icon: CircleHelp,
@@ -60,9 +61,22 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
       status: 'Incorrect',
       showScore: false
     };
-  };
+  }, [question.isSkipped, question.type, question.userAnswer, question.correctAnswer, question.feedback]);
 
-  const renderQuestionHeader = () => (
+  // Memoize the ask chat handler
+  const handleAskChat = useCallback(() => {
+    onAskChat?.(question.id);
+  }, [onAskChat, question.id]);
+  // Memoize cleaned feedback text
+  const cleanFeedbackText = useMemo(() => {
+    const text = question.type === 'multiple-choice' ? question.explanation : question.feedback;
+    return text 
+      ? text.replace(/^(INCORRECT|CORRECT|SKIPPED):\s*/i, '')
+      : 'Explanation not available for this question.';
+  }, [question.type, question.explanation, question.feedback]);
+
+  // Memoize question header to prevent re-renders
+  const questionHeader = useMemo(() => (
     <div className="mb-2 flex items-start justify-between gap-2">
       <div className="text-md flex flex-1 space-x-2 font-normal leading-relaxed">
         <span className="flex-shrink-0">{question.id}.</span>
@@ -76,7 +90,7 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
       </div>
       <div className="items-end">
         <button 
-          onClick={() => onAskChat?.(question.id)}
+          onClick={handleAskChat}
           className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-lg px-3 gap-x-2"
         >
           <span>Ask chat</span>
@@ -84,15 +98,11 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
         </button>
       </div>
     </div>
-  );
+  ), [question.id, question.question, handleAskChat]);
 
-  const renderFeedbackBox = (statusConfig: ReturnType<typeof getStatusConfig>, feedbackText?: string) => {
+  // Memoize feedback box
+  const feedbackBox = useMemo(() => {
     const StatusIcon = statusConfig.icon;
-    
-    // Clean feedback text - remove status prefix if present
-    const cleanFeedbackText = feedbackText 
-      ? feedbackText.replace(/^(INCORRECT|CORRECT|SKIPPED):\s*/i, '')
-      : 'Explanation not available for this question.';
     
     return (
       <div className={`mt-6 rounded-xl p-5 ${statusConfig.bgColor}`}>
@@ -152,15 +162,13 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
         </div>
       </div>
     );
-  };
+  }, [statusConfig, cleanFeedbackText, question.referenceTime, question.referenceSource, contentId]);
 
-  const renderMultipleChoiceAnswer = () => {
-    const statusConfig = getStatusConfig();
-
+  if (question.type === 'multiple-choice') {
     return (
       <div className="h-full w-full overflow-y-auto rounded-lg" role="region" aria-roledescription="carousel">
         <div className="p-2">
-          {renderQuestionHeader()}
+          {questionHeader}
           
           <div className="space-y-2">
             {question.options?.map((option, index) => {
@@ -171,13 +179,10 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
               let borderClass = 'border-[1.5px]';
               
               if (isCorrectAnswer && !isUserAnswer) {
-                // Correct answer that user didn't select - show dashed green border
                 borderClass = 'border-[1.5px] border-dashed border-green-500';
               } else if (isCorrectAnswer && isUserAnswer) {
-                // Correct answer that user selected - solid green border
                 borderClass = 'border-[1.5px] border-green-500';
               } else if (isWrongSelection) {
-                // Wrong answer that user selected - solid red border
                 borderClass = 'border-[1.5px] border-red-500';
               }
 
@@ -200,38 +205,31 @@ export function AnswerBreakdown({ question, contentId, onAskChat }: AnswerBreakd
             })}
           </div>
           
-          {renderFeedbackBox(statusConfig, question.explanation)}
+          {feedbackBox}
         </div>
       </div>
     );
-  };
-
-  const renderFreeTextAnswer = () => {
-    const statusConfig = getStatusConfig();
-
-    return (
-      <div className="h-full w-full overflow-y-auto rounded-lg" role="region" aria-roledescription="carousel">
-        <div className="p-2">
-          {renderQuestionHeader()}
-          
-          <div className="relative">
-            <textarea
-              className="flex max-h-[150px] min-h-[60px] w-full resize-none overflow-hidden rounded-2xl border-[1.5px] border-neutral-200 bg-background px-4 py-3 text-base placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700"
-              placeholder="Type your answer here..."
-              disabled
-              value={question.isSkipped ? '' : (question.userAnswer as string || '')}
-            />
-          </div>
-          
-          {renderFeedbackBox(statusConfig, question.feedback)}
-        </div>
-      </div>
-    );
-  };
-
-  if (question.type === 'multiple-choice') {
-    return renderMultipleChoiceAnswer();
-  } else {
-    return renderFreeTextAnswer();
   }
-}
+
+  return (
+    <div className="h-full w-full overflow-y-auto rounded-lg" role="region" aria-roledescription="carousel">
+      <div className="p-2">
+        {questionHeader}
+        
+        <div className="relative">
+          <textarea
+            className="flex max-h-[150px] min-h-[60px] w-full resize-none overflow-hidden rounded-2xl border-[1.5px] border-neutral-200 bg-background px-4 py-3 text-base placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700"
+            placeholder="Type your answer here..."
+            disabled
+            value={question.isSkipped ? '' : (question.userAnswer as string || '')}
+          />
+        </div>
+        
+        {feedbackBox}
+      </div>
+    </div>
+  );
+};
+
+// Memoize the component to prevent unnecessary re-renders
+export const AnswerBreakdown = memo(AnswerBreakdownComponent);

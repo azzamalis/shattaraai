@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ContentItem } from '@/hooks/useContent';
@@ -28,7 +28,7 @@ interface LearningCardProps {
   onToggleSelection?: (contentId: string) => void;
 }
 
-export function LearningCard({
+const LearningCardComponent = ({
   content,
   onDelete,
   onShare,
@@ -38,7 +38,7 @@ export function LearningCard({
   isExamSelectionMode = false,
   isSelected = false,
   onToggleSelection
-}: LearningCardProps) {
+}: LearningCardProps) => {
   const navigate = useNavigate();
   const { onUpdateContent } = useContentContext();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -47,22 +47,26 @@ export function LearningCard({
   
   // Track real-time processing status
   const processingStatus = useRealtimeContentStatus(content.id, true);
-  const isProcessing = processingStatus.status === 'processing' || processingStatus.status === 'pending';
+  const isProcessing = useMemo(() => 
+    processingStatus.status === 'processing' || processingStatus.status === 'pending',
+    [processingStatus.status]
+  );
 
-  const handleCardClick = () => {
+  // Memoize card click handler
+  const handleCardClick = useCallback(() => {
     if (isExamSelectionMode && onToggleSelection) {
       onToggleSelection(content.id);
     } else {
-      // Route to chat page for chat content types, otherwise to content page
       if (content.type === 'chat') {
         navigate(`/chat/${content.id}`);
       } else {
         navigate(`/content/${content.id}?type=${content.type}`);
       }
     }
-  };
+  }, [isExamSelectionMode, onToggleSelection, content.id, content.type, navigate]);
 
-  const handleAddToRoom = async (roomId: string) => {
+  // Memoize add to room handler
+  const handleAddToRoom = useCallback(async (roomId: string) => {
     try {
       await onUpdateContent(content.id, { room_id: roomId });
       
@@ -78,17 +82,19 @@ export function LearningCard({
       console.error('Error adding content to room:', error);
       toast.error('Failed to add content to room');
     }
-  };
+  }, [content.id, availableRooms, onAddToRoom, onUpdateContent]);
 
-  const handleTitleEdit = (e: React.MouseEvent) => {
+  // Memoize title edit handler
+  const handleTitleEdit = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isExamSelectionMode) {
       setIsEditingTitle(true);
       setEditValue(content.title);
     }
-  };
+  }, [isExamSelectionMode, content.title]);
 
-  const handleTitleSave = async (e: React.MouseEvent) => {
+  // Memoize title save handler
+  const handleTitleSave = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (editValue.trim() === '' || editValue === content.title) {
       setIsEditingTitle(false);
@@ -105,22 +111,30 @@ export function LearningCard({
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [editValue, content.title, content.id, onUpdateContent]);
 
-  const handleTitleCancel = (e: React.MouseEvent) => {
+  // Memoize title cancel handler
+  const handleTitleCancel = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditingTitle(false);
     setEditValue(content.title);
-  };
+  }, [content.title]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  // Memoize key down handler
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleTitleSave(e as any);
     } else if (e.key === 'Escape') {
       handleTitleCancel(e as any);
     }
-  };
+  }, [handleTitleSave, handleTitleCancel]);
+
+  // Memoize formatted time
+  const formattedTime = useMemo(() => 
+    formatRelativeTime(content.created_at),
+    [content.created_at]
+  );
 
   return (
     <a 
@@ -227,11 +241,14 @@ export function LearningCard({
             
             {/* Timestamp */}
             <div className="text-xs text-muted-foreground/70">
-              {formatRelativeTime(content.created_at)}
+              {formattedTime}
             </div>
           </div>
         </div>
       </div>
     </a>
   );
-}
+};
+
+// Memoize the component to prevent unnecessary re-renders when parent updates
+export const LearningCard = memo(LearningCardComponent);

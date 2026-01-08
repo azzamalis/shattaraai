@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Lightbulb, Star, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FlashcardData } from './Flashcard';
@@ -18,7 +18,7 @@ interface FlashcardDisplayProps {
   onEdit: () => void;
 }
 
-export function FlashcardDisplay({
+const FlashcardDisplayComponent = ({
   card,
   isFlipped,
   showHint,
@@ -30,7 +30,33 @@ export function FlashcardDisplay({
   onToggleExplanation,
   onToggleStar,
   onEdit
-}: FlashcardDisplayProps) {
+}: FlashcardDisplayProps) => {
+  // Memoize event handlers to prevent unnecessary re-renders of child elements
+  const handleHintClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleHint();
+  }, [onToggleHint]);
+
+  const handleStarClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleStar();
+  }, [onToggleStar]);
+
+  const handleEditClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEdit();
+  }, [onEdit]);
+
+  const handleExplanationClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleExplanation();
+  }, [onToggleExplanation]);
+
+  // Memoize transform style
+  const cardTransformStyle = useMemo(() => ({
+    transformStyle: 'preserve-3d' as const,
+    transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
+  }), [isFlipped]);
   return (
     <div 
       className="w-full max-w-2xl aspect-[4/3] cursor-pointer relative"
@@ -39,10 +65,7 @@ export function FlashcardDisplay({
     >
       <div 
         className="relative w-full h-full transition-transform duration-500"
-        style={{
-          transformStyle: 'preserve-3d',
-          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
-        }}
+        style={cardTransformStyle}
       >
         {/* Front of card */}
         <div 
@@ -58,10 +81,7 @@ export function FlashcardDisplay({
             <div className="flex justify-between items-center mb-4">
               <button 
                 className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleHint();
-                }}
+                onClick={handleHintClick}
               >
                 <Lightbulb className={cn(
                   "w-4 h-4",
@@ -71,10 +91,7 @@ export function FlashcardDisplay({
               <div className="flex gap-2">
                 <button 
                   className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleStar();
-                  }}
+                  onClick={handleStarClick}
                 >
                   <Star className={cn(
                     "w-4 h-4",
@@ -85,10 +102,7 @@ export function FlashcardDisplay({
                 </button>
                 <button 
                   className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit();
-                  }}
+                  onClick={handleEditClick}
                 >
                   <Pencil className="w-4 h-4 text-muted-foreground" />
                 </button>
@@ -128,10 +142,7 @@ export function FlashcardDisplay({
               <div className="flex gap-2">
                 <button 
                   className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleStar();
-                  }}
+                  onClick={handleStarClick}
                 >
                   <Star className={cn(
                     "w-4 h-4",
@@ -142,10 +153,7 @@ export function FlashcardDisplay({
                 </button>
                 <button 
                   className="p-2 hover:bg-card-hover dark:hover:bg-card-hover rounded-lg transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit();
-                  }}
+                  onClick={handleEditClick}
                 >
                   <Pencil className="w-4 h-4 text-muted-foreground" />
                 </button>
@@ -158,10 +166,7 @@ export function FlashcardDisplay({
               {card.explanation && (
                 <button 
                   className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm hover:bg-secondary/80 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleExplanation();
-                  }}
+                  onClick={handleExplanationClick}
                 >
                   {showExplanation ? 'Hide Explanation' : 'Show Explanation'}
                 </button>
@@ -186,4 +191,7 @@ export function FlashcardDisplay({
       )}
     </div>
   );
-}
+};
+
+// Memoize the component to prevent re-renders when parent state changes
+export const FlashcardDisplay = memo(FlashcardDisplayComponent);
