@@ -1,15 +1,10 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import { X, Loader2, AlertCircle, Clock, GripVertical, SquarePen, Copy, ThumbsUp, ThumbsDown, Pencil, Trash, ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import {
-  ChatContainerContent,
-  ChatContainerRoot,
-  ChatContainerScrollAnchor,
-} from "@/components/prompt-kit/chat-container";
 import {
   Message,
   MessageAction,
@@ -22,10 +17,11 @@ import {
   PromptInputTextarea,
 } from "@/components/prompt-kit/prompt-input";
 import { cn } from "@/lib/utils";
-import { useChatConversation } from '@/hooks/useChatConversation';
+import { useChatConversation, ChatMessage } from '@/hooks/useChatConversation';
 import { useOpenAIChat } from '@/hooks/useOpenAIChat';
 import { useAIUsageTracking } from '@/hooks/useAIUsageTracking';
 import { useWindowSize } from '@/hooks/use-window-size';
+import { VirtualizedMessageList } from '@/components/chat/shared/VirtualizedMessageList';
 
 interface AITutorChatDrawerProps {
   open: boolean;
@@ -242,27 +238,28 @@ export function AITutorChatDrawer({
     }
   };
 
-  // Message action handlers
-  const handleCopyMessage = (content: string) => {
+  // Memoized message action handlers
+  const handleCopyMessage = useCallback((content: string) => {
     navigator.clipboard.writeText(content);
-  };
+    toast.success('Copied to clipboard');
+  }, []);
 
-  const handleEditMessage = (messageId: string) => {
+  const handleEditMessage = useCallback((messageId: string) => {
     console.log('Edit message:', messageId);
-  };
+  }, []);
 
-  const handleDeleteMessage = (messageId: string) => {
+  const handleDeleteMessage = useCallback((messageId: string) => {
     // TODO: Implement delete in database via hook
     console.log('Delete message:', messageId);
-  };
+  }, []);
 
-  const handleUpvote = (messageId: string) => {
+  const handleUpvote = useCallback((messageId: string) => {
     console.log('Upvote:', messageId);
-  };
+  }, []);
 
-  const handleDownvote = (messageId: string) => {
+  const handleDownvote = useCallback((messageId: string) => {
     console.log('Downvote:', messageId);
-  };
+  }, []);
 
   // Handle keyboard resize
   const handleKeyboardResize = useCallback((e: React.KeyboardEvent) => {
@@ -405,128 +402,123 @@ export function AITutorChatDrawer({
             </Alert>
           )}
           
-          {/* Messages Container */}
-          <ChatContainerRoot className="flex-1 px-4">
-            <ChatContainerContent className="space-y-6 py-6">
-              {messages.map((message, index) => {
-                const isAssistant = message.sender_type === 'ai';
-                const isLastMessage = index === messages.length - 1;
+          {/* Messages Container with Virtualization */}
+          <VirtualizedMessageList
+            messages={messages}
+            className="flex-1 px-4"
+            virtualizationThreshold={30}
+            renderMessage={(message: ChatMessage, index: number) => {
+              const isAssistant = message.sender_type === 'ai';
+              const isLastMessage = index === messages.length - 1;
 
-                return (
-                  <Message
-                    key={message.id}
-                    className={cn(
-                      "mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6",
-                      isAssistant ? "items-start" : "items-end"
-                    )}
-                  >
-                    {isAssistant ? (
-                      <div className="group flex w-full flex-col gap-0">
-                        <MessageContent
-                          className="text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0"
-                          markdown
-                        >
-                          {message.content}
-                        </MessageContent>
-                        <MessageActions
-                          className={cn(
-                            "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                            isLastMessage && "opacity-100"
-                          )}
-                        >
-                          <MessageAction tooltip="Copy" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                              onClick={() => handleCopyMessage(message.content)}
-                            >
-                              <Copy />
-                            </Button>
-                          </MessageAction>
-                          <MessageAction tooltip="Upvote" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                              onClick={() => handleUpvote(message.id)}
-                            >
-                              <ThumbsUp />
-                            </Button>
-                          </MessageAction>
-                          <MessageAction tooltip="Downvote" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                              onClick={() => handleDownvote(message.id)}
-                            >
-                              <ThumbsDown />
-                            </Button>
-                          </MessageAction>
-                        </MessageActions>
-                      </div>
-                    ) : (
-                      <div className="group flex flex-col items-end gap-1">
-                        <MessageContent className="bg-muted text-primary w-full rounded-3xl px-5 py-2.5">
-                          {message.content}
-                        </MessageContent>
-                        <MessageActions
-                          className={cn(
-                            "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-                          )}
-                        >
-                          <MessageAction tooltip="Edit" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                              onClick={() => handleEditMessage(message.id)}
-                            >
-                              <Pencil />
-                            </Button>
-                          </MessageAction>
-                          <MessageAction tooltip="Delete" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                              onClick={() => handleDeleteMessage(message.id)}
-                            >
-                              <Trash />
-                            </Button>
-                          </MessageAction>
-                          <MessageAction tooltip="Copy" delayDuration={100}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full"
-                              onClick={() => handleCopyMessage(message.content)}
-                            >
-                              <Copy />
-                            </Button>
-                          </MessageAction>
-                        </MessageActions>
-                      </div>
-                    )}
-                  </Message>
-                );
-              })}
-              
-              {/* AI Typing Indicator */}
-              {isAITyping && (
+              return (
                 <Message
-                  className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 items-start"
+                  className={cn(
+                    "mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6",
+                    isAssistant ? "items-start" : "items-end"
+                  )}
                 >
-                  <div className="flex items-center gap-2 py-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span className="text-sm text-muted-foreground">Shattara AI is thinking...</span>
-                  </div>
+                  {isAssistant ? (
+                    <div className="group flex w-full flex-col gap-0">
+                      <MessageContent
+                        className="text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0"
+                        markdown
+                      >
+                        {message.content}
+                      </MessageContent>
+                      <MessageActions
+                        className={cn(
+                          "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+                          isLastMessage && "opacity-100"
+                        )}
+                      >
+                        <MessageAction tooltip="Copy" delayDuration={100}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={() => handleCopyMessage(message.content)}
+                          >
+                            <Copy />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction tooltip="Upvote" delayDuration={100}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={() => handleUpvote(message.id)}
+                          >
+                            <ThumbsUp />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction tooltip="Downvote" delayDuration={100}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={() => handleDownvote(message.id)}
+                          >
+                            <ThumbsDown />
+                          </Button>
+                        </MessageAction>
+                      </MessageActions>
+                    </div>
+                  ) : (
+                    <div className="group flex flex-col items-end gap-1">
+                      <MessageContent className="bg-muted text-primary w-full rounded-3xl px-5 py-2.5">
+                        {message.content}
+                      </MessageContent>
+                      <MessageActions
+                        className={cn(
+                          "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                        )}
+                      >
+                        <MessageAction tooltip="Edit" delayDuration={100}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={() => handleEditMessage(message.id)}
+                          >
+                            <Pencil />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction tooltip="Delete" delayDuration={100}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={() => handleDeleteMessage(message.id)}
+                          >
+                            <Trash />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction tooltip="Copy" delayDuration={100}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={() => handleCopyMessage(message.content)}
+                          >
+                            <Copy />
+                          </Button>
+                        </MessageAction>
+                      </MessageActions>
+                    </div>
+                  )}
                 </Message>
-              )}
-              <ChatContainerScrollAnchor />
-            </ChatContainerContent>
-          </ChatContainerRoot>
+              );
+            }}
+            footerContent={isAITyping ? (
+              <Message className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 items-start">
+                <div className="flex items-center gap-2 py-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm text-muted-foreground">Shattara AI is thinking...</span>
+                </div>
+              </Message>
+            ) : undefined}
+          />
           
           {/* Input Area */}
           <div className="inset-x-0 bottom-0 mx-auto w-full shrink-0 px-6 pb-6">
