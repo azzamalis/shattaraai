@@ -1,15 +1,14 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2, Square, GripVertical, CornerDownRight } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
+import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2, GripVertical, CornerDownRight, Square } from 'lucide-react';
 import { toast } from 'sonner';
-import { ChatContainerRoot, ChatContainerContent, ChatContainerScrollAnchor } from '@/components/prompt-kit/chat-container';
-import { Message, MessageAvatar, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
+import { Message, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
 import { PromptInput, PromptInputTextarea, PromptInputActions, PromptInputAction } from '@/components/prompt-kit/prompt-input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Markdown } from '@/components/prompt-kit/markdown';
 import { supabase } from '@/integrations/supabase/client';
 import { useWindowSize } from '@/hooks/use-window-size';
+import { VirtualizedMessageList } from '@/components/chat/shared/VirtualizedMessageList';
 
 interface ChatMessage {
   id: string;
@@ -275,42 +274,40 @@ export function ChatDrawer({
     }
   };
 
-  const handleCopyMessage = async (content: string) => {
+  // Memoized handlers
+  const handleCopyMessage = useCallback(async (content: string) => {
     try {
       await navigator.clipboard.writeText(content);
       toast.success('Message copied to clipboard');
     } catch (error) {
       toast.error('Failed to copy message');
     }
-  };
+  }, []);
 
-  const handleEditMessage = (messageId: string) => {
-    // TODO: Implement edit functionality
+  const handleEditMessage = useCallback((messageId: string) => {
     toast.info('Edit functionality coming soon');
-  };
+  }, []);
 
-  const handleDeleteMessage = (messageId: string) => {
+  const handleDeleteMessage = useCallback((messageId: string) => {
     setChatMessages(prev => prev.filter(msg => msg.id !== messageId));
     toast.success('Message deleted');
-  };
+  }, []);
 
-  const handleUpvote = (messageId: string) => {
-    // TODO: Implement upvote functionality
+  const handleUpvote = useCallback((messageId: string) => {
     toast.success('Thanks for the feedback!');
-  };
+  }, []);
 
-  const handleDownvote = (messageId: string) => {
-    // TODO: Implement downvote functionality
+  const handleDownvote = useCallback((messageId: string) => {
     toast.info('Thanks for the feedback!');
-  };
+  }, []);
 
-  const formatTimestamp = (date: Date) => {
+  const formatTimestamp = useCallback((date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       hour: 'numeric',
       minute: 'numeric',
       hour12: true
     }).format(date);
-  };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -371,121 +368,116 @@ export function ChatDrawer({
           </button>
         </div>
         
-        {/* Messages Area */}
-        <ChatContainerRoot className="flex-1 px-4">
-          <ChatContainerContent className="space-y-4 py-4">
-            {chatMessages.map((message) => (
-              <Message 
-                key={message.id}
-                className={cn(
-                  "group",
-                  message.isUser ? "justify-end" : "justify-start"
-                )}
-              >
+        {/* Messages Area with Virtualization */}
+        <VirtualizedMessageList
+          messages={chatMessages}
+          className="flex-1 px-4"
+          virtualizationThreshold={30}
+          renderMessage={(message, index) => (
+            <Message 
+              className={cn(
+                "group",
+                message.isUser ? "justify-end" : "justify-start"
+              )}
+            >
+              <div className="flex flex-col gap-1 max-w-[80%]">
+                <MessageContent
+                  markdown={true}
+                  className={cn(
+                    "text-sm p-3",
+                    message.isUser 
+                      ? "bg-[#00A3FF] text-white rounded-2xl rounded-br-md" 
+                      : "bg-muted/50 text-foreground rounded-2xl rounded-bl-md"
+                  )}
+                >
+                  {message.content}
+                </MessageContent>
                 
-                <div className="flex flex-col gap-1 max-w-[80%]">
-                  <MessageContent
-                    markdown={true}
-                    className={cn(
-                      "text-sm p-3",
-                      message.isUser 
-                        ? "bg-[#00A3FF] text-white rounded-2xl rounded-br-md" 
-                        : "bg-muted/50 text-foreground rounded-2xl rounded-bl-md"
-                    )}
-                  >
-                    {message.content}
-                  </MessageContent>
-                  
-                  <MessageActions className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    {message.isUser ? (
-                      <>
-                        <MessageAction tooltip="Edit">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => handleEditMessage(message.id)}
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction tooltip="Delete">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => handleDeleteMessage(message.id)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction tooltip="Copy">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => handleCopyMessage(message.content)}
-                          >
-                            <Copy className="h-3 w-3" />
-                          </Button>
-                        </MessageAction>
-                      </>
-                    ) : (
-                      <>
-                        <MessageAction tooltip="Copy">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => handleCopyMessage(message.content)}
-                          >
-                            <Copy className="h-3 w-3" />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction tooltip="Upvote">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => handleUpvote(message.id)}
-                          >
-                            <ThumbsUp className="h-3 w-3" />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction tooltip="Downvote">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => handleDownvote(message.id)}
-                          >
-                            <ThumbsDown className="h-3 w-3" />
-                          </Button>
-                        </MessageAction>
-                      </>
-                    )}
-                  </MessageActions>
-                  
-                  <span className="text-xs text-muted-foreground px-3">
-                    {formatTimestamp(message.timestamp)}
-                  </span>
-                </div>
-              </Message>
-            ))}
-            
-            {/* Typing Indicator */}
-            {isTyping && (
-              <Message className="justify-start">
-                <div className="flex items-center gap-2 bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3">
-                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Thinking...</span>
-                </div>
-              </Message>
-            )}
-            
-            <ChatContainerScrollAnchor />
-          </ChatContainerContent>
-        </ChatContainerRoot>
+                <MessageActions className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  {message.isUser ? (
+                    <>
+                      <MessageAction tooltip="Edit">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleEditMessage(message.id)}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                      </MessageAction>
+                      <MessageAction tooltip="Delete">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleDeleteMessage(message.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </MessageAction>
+                      <MessageAction tooltip="Copy">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleCopyMessage(message.content)}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </MessageAction>
+                    </>
+                  ) : (
+                    <>
+                      <MessageAction tooltip="Copy">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleCopyMessage(message.content)}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </MessageAction>
+                      <MessageAction tooltip="Upvote">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleUpvote(message.id)}
+                        >
+                          <ThumbsUp className="h-3 w-3" />
+                        </Button>
+                      </MessageAction>
+                      <MessageAction tooltip="Downvote">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleDownvote(message.id)}
+                        >
+                          <ThumbsDown className="h-3 w-3" />
+                        </Button>
+                      </MessageAction>
+                    </>
+                  )}
+                </MessageActions>
+                
+                <span className="text-xs text-muted-foreground px-3">
+                  {formatTimestamp(message.timestamp)}
+                </span>
+              </div>
+            </Message>
+          )}
+          footerContent={isTyping ? (
+            <Message className="justify-start">
+              <div className="flex items-center gap-2 bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Thinking...</span>
+              </div>
+            </Message>
+          ) : undefined}
+        />
         
         {/* Input Area */}
         <div className="p-4">
