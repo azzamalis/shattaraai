@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ExamInterface from '@/components/dashboard/ExamInterface';
+import { ExamInterfaceSkeleton } from '@/components/ui/document-skeleton';
+
+// Lazy load heavy ExamInterface component
+const ExamInterface = lazy(() => import('@/components/dashboard/ExamInterface'));
 
 export default function ExamPage() {
   const navigate = useNavigate();
@@ -67,10 +70,12 @@ export default function ExamPage() {
   };
 
   return (
-    <ExamInterface 
-      examConfig={examConfig}
-      generatedExam={generatedExam}
-      onSubmitExam={handleSubmitExam}
-    />
+    <Suspense fallback={<ExamInterfaceSkeleton />}>
+      <ExamInterface 
+        examConfig={examConfig}
+        generatedExam={generatedExam}
+        onSubmitExam={handleSubmitExam}
+      />
+    </Suspense>
   );
 }

@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import React, { useEffect, Suspense, lazy } from 'react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { UnifiedDocumentProvider, useUnifiedDocument, DocumentType } from './UnifiedDocumentContext';
 import { EnhancedDocumentToolbar } from './EnhancedDocumentToolbar';
-import { PDFRenderer } from './PDFRenderer';
-import { DOCXRenderer } from './DOCXRenderer';
-import { HTMLRenderer } from './HTMLRenderer';
-import { TextRenderer } from './TextRenderer';
 import { ThumbnailView } from './ThumbnailView';
-import { WebsiteRenderer } from './WebsiteRenderer';
+
+// Lazy load heavy document renderers
+const PDFRenderer = lazy(() => import('./PDFRenderer').then(m => ({ default: m.PDFRenderer })));
+const DOCXRenderer = lazy(() => import('./DOCXRenderer').then(m => ({ default: m.DOCXRenderer })));
+const HTMLRenderer = lazy(() => import('./HTMLRenderer').then(m => ({ default: m.HTMLRenderer })));
+const TextRenderer = lazy(() => import('./TextRenderer').then(m => ({ default: m.TextRenderer })));
+const WebsiteRenderer = lazy(() => import('./WebsiteRenderer').then(m => ({ default: m.WebsiteRenderer })));
 
 interface ContentData {
   id?: string;
@@ -71,6 +73,15 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
       return <ThumbnailView />;
     }
 
+    const LoadingFallback = () => (
+      <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary/60" />
+          <p className="text-sm text-muted-foreground">Loading document...</p>
+        </div>
+      </div>
+    );
+
     switch (documentType) {
       case 'pdf':
         if (!contentData.url) {
@@ -83,7 +94,11 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
             </div>
           );
         }
-        return <PDFRenderer url={contentData.url} />;
+        return (
+          <Suspense fallback={<LoadingFallback />}>
+            <PDFRenderer url={contentData.url} />
+          </Suspense>
+        );
 
       case 'docx':
         if (!contentData.url) {
@@ -96,7 +111,11 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
             </div>
           );
         }
-        return <DOCXRenderer url={contentData.url} />;
+        return (
+          <Suspense fallback={<LoadingFallback />}>
+            <DOCXRenderer url={contentData.url} />
+          </Suspense>
+        );
 
       case 'html':
         if (!contentData.text_content) {
@@ -110,10 +129,12 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
           );
         }
         return (
-          <HTMLRenderer 
-            htmlContent={contentData.text_content} 
-            title={contentData.title || contentData.filename}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <HTMLRenderer 
+              htmlContent={contentData.text_content} 
+              title={contentData.title || contentData.filename}
+            />
+          </Suspense>
         );
 
       case 'text':
@@ -128,11 +149,13 @@ function UnifiedDocumentViewerContent({ contentData, onUpdateContent }: UnifiedD
           );
         }
         return (
-          <TextRenderer 
-            content={contentData.text_content}
-            title={contentData.title || contentData.filename}
-            isMarkdown={contentData.type === 'text' && contentData.filename?.endsWith('.md')}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <TextRenderer 
+              content={contentData.text_content}
+              title={contentData.title || contentData.filename}
+              isMarkdown={contentData.type === 'text' && contentData.filename?.endsWith('.md')}
+            />
+          </Suspense>
         );
 
       default:
