@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { MessageActions, MessageAction } from '@/components/prompt-kit/message';
 import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
 import { VirtualizedMessageList } from '@/components/chat/shared/VirtualizedMessageList';
+import { TypingIndicator } from '@/components/chat/shared/StreamingText';
 
 interface AIChatProps {
   contentData?: ContentData;
@@ -22,6 +23,7 @@ const AIChat = memo(({
 }: AIChatProps) => {
   const [isProcessingFiles, setIsProcessingFiles] = useState(false);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const hasSentFirstMessage = useRef(false);
   const {
     user
@@ -113,6 +115,7 @@ const AIChat = memo(({
         try {
           const streamHandler = await addStreamingAIResponse();
           if (streamHandler) {
+            setStreamingMessageId(streamHandler.messageId);
             let fullResponse = '';
             await streamMessageToAI(
               content,
@@ -122,12 +125,14 @@ const AIChat = memo(({
               },
               async () => {
                 await streamHandler.finalize(fullResponse);
+                setStreamingMessageId(null);
                 setIsProcessingAI(false);
               }
             );
           }
         } catch (error) {
           console.error('Error getting AI response:', error);
+          setStreamingMessageId(null);
           setIsProcessingAI(false);
         }
       }
@@ -157,31 +162,49 @@ const AIChat = memo(({
   const renderMessage = useCallback((message: ChatMessage, index: number) => {
     const isAssistant = message.sender_type === 'ai';
     const isLastMessage = index === messages.length - 1;
+    const isStreaming = message.id === streamingMessageId;
 
     return (
       <div className={cn("flex w-full", isAssistant ? "justify-start" : "justify-end")}>
         {isAssistant ? (
           <div className="group/message flex w-full flex-col items-start gap-1">
-            <div className="relative w-full rounded-3xl text-left leading-relaxed text-primary/95 bg-transparent p-0 pt-1">
+            <div className={cn(
+              "relative w-full rounded-3xl text-left leading-relaxed text-primary/95 bg-transparent p-0 pt-1",
+              isStreaming && "animate-fade-in"
+            )}>
               <RichMessage content={message.content} className="w-full" />
+              {/* Streaming cursor indicator */}
+              {isStreaming && message.content.length > 0 && (
+                <span 
+                  className="inline-block w-1.5 h-4 bg-primary/70 ml-1 animate-pulse rounded-sm align-baseline"
+                  aria-label="AI is typing"
+                />
+              )}
             </div>
             <div className="py-3">
-              <MessageActions className={cn("flex items-center gap-1 opacity-0 transition-opacity duration-200 lg:group-hover/message:opacity-100", isLastMessage && "opacity-100")}>
+              <MessageActions className={cn("flex items-center gap-1 opacity-0 transition-opacity duration-200 lg:group-hover/message:opacity-100", isLastMessage && !isStreaming && "opacity-100")}>
                 <MessageAction tooltip="Copy" delayDuration={100}>
                   <button 
                     className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                     onClick={() => handleCopy(message.content)}
+                    disabled={isStreaming}
                   >
                     <Copy className="h-4 w-4" />
                   </button>
                 </MessageAction>
                 <MessageAction tooltip="Upvote" delayDuration={100}>
-                  <button className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                  <button 
+                    className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                    disabled={isStreaming}
+                  >
                     <ThumbsUp className="h-4 w-4" />
                   </button>
                 </MessageAction>
                 <MessageAction tooltip="Downvote" delayDuration={100}>
-                  <button className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                  <button 
+                    className="inline-flex items-center justify-center rounded-lg h-7 w-7 p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                    disabled={isStreaming}
+                  >
                     <ThumbsDown className="h-4 w-4" />
                   </button>
                 </MessageAction>
@@ -208,7 +231,7 @@ const AIChat = memo(({
         )}
       </div>
     );
-  }, [messages.length, handleCopy]);
+  }, [messages.length, handleCopy, streamingMessageId]);
 
   // Empty state content
   const emptyContent = (
@@ -225,7 +248,7 @@ const AIChat = memo(({
   const footerContent = (
     <>
       {isProcessingFiles && <LoadingIndicator type="files" message="Processing and uploading attachments..." />}
-      {isProcessingAI && !isProcessingFiles && <LoadingIndicator type="ai" />}
+      {isProcessingAI && !isProcessingFiles && !streamingMessageId && <TypingIndicator className="px-4" />}
     </>
   );
 
@@ -236,7 +259,7 @@ const AIChat = memo(({
         renderMessage={renderMessage}
         className="flex-1 min-h-0 px-4"
         emptyContent={emptyContent}
-        footerContent={(isProcessingFiles || isProcessingAI) ? footerContent : undefined}
+        footerContent={(isProcessingFiles || (isProcessingAI && !streamingMessageId)) ? footerContent : undefined}
         virtualizationThreshold={30}
       />
 
