@@ -23,6 +23,7 @@ export function useOpenAIChat({
   roomContent = [],
   conversationHistory = []
 }: UseOpenAIChatOptions) {
+  // Non-streaming message (for backward compatibility)
   const sendMessageToAI = useCallback(async (message: string) => {
     try {
       const { data, error } = await supabase.functions.invoke('openai-room-chat', {
@@ -31,7 +32,8 @@ export function useOpenAIChat({
           conversationId,
           roomId,
           roomContent,
-          conversationHistory
+          conversationHistory,
+          stream: false
         }
       });
 
@@ -72,5 +74,99 @@ export function useOpenAIChat({
     }
   }, [conversationId, roomId, roomContent, conversationHistory]);
 
-  return { sendMessageToAI };
+  // Streaming message handler
+  const streamMessageToAI = useCallback(async (
+    message: string,
+    onDelta: (text: string) => void,
+    onDone: () => void
+  ) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('Please sign in to continue');
+        onDone();
+        return;
+      }
+
+      const response = await fetch(
+        `https://trvuidenkjqqlwadlosh.supabase.co/functions/v1/openai-room-chat`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydnVpZGVua2pxcWx3YWRsb3NoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc1NTMzNzIsImV4cCI6MjA2MzEyOTM3Mn0.V72-VE9VMW8a7XWiRxEbHznEBMn70yB6AvgqRc7yWFo'
+          },
+          body: JSON.stringify({
+            message,
+            conversationId,
+            roomId,
+            roomContent,
+            conversationHistory,
+            stream: true
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Streaming request failed:', errorText);
+        toast.error('Failed to get AI response');
+        onDone();
+        return;
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        console.error('No reader available');
+        onDone();
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+          if (!trimmedLine || !trimmedLine.startsWith('data: ')) continue;
+
+          try {
+            const json = JSON.parse(trimmedLine.slice(6));
+            
+            if (json.error) {
+              console.error('Stream error:', json.error);
+              toast.error('AI response error');
+              break;
+            }
+            
+            if (json.delta) {
+              onDelta(json.delta);
+            }
+            
+            if (json.done) {
+              break;
+            }
+          } catch (parseError) {
+            // Skip malformed JSON chunks
+          }
+        }
+      }
+
+      onDone();
+    } catch (error) {
+      console.error('Streaming error:', error);
+      toast.error('Failed to stream AI response');
+      onDone();
+    }
+  }, [conversationId, roomId, roomContent, conversationHistory]);
+
+  return { sendMessageToAI, streamMessageToAI };
 }
