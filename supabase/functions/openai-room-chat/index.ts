@@ -82,7 +82,7 @@ const createContentSummary = (chunks: any[], maxSummaryLength: number = 800): st
 };
 
 const generateContentTypePrompt = (contentType: string): string => {
-  const prompts = {
+  const prompts: Record<string, string> = {
     pdf: 'Focus on structured content, formulas, and key terms that may be highlighted.',
     youtube: 'Pay attention to timestamps, speaker transitions, and repeated key concepts.',
     audio: 'Consider speaker emphasis, repeated concepts, and topic transitions.',
@@ -93,7 +93,7 @@ const generateContentTypePrompt = (contentType: string): string => {
 };
 
 const getMultiModalHints = (contentType: string): string => {
-  const hints = {
+  const hints: Record<string, string> = {
     pdf: 'This PDF may contain images, diagrams, tables, and visual elements not captured in text.',
     youtube: 'This video may include visual demonstrations, charts, or slides shown on screen.',
     audio: 'This audio may feature tone, emphasis, and context from multiple speakers.'
@@ -110,6 +110,7 @@ interface ChatRequest {
   message: string;
   conversationId: string;
   roomId: string;
+  stream?: boolean; // New: Enable streaming response
   roomContent?: Array<{
     id: string;
     title: string;
@@ -120,6 +121,18 @@ interface ChatRequest {
     content: string;
     sender_type: 'user' | 'ai';
   }>;
+}
+
+// Helper function to create SSE stream
+function createStreamResponse(stream: ReadableStream): Response {
+  return new Response(stream, {
+    headers: {
+      ...corsHeaders,
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  });
 }
 
 serve(async (req) => {
@@ -133,6 +146,7 @@ serve(async (req) => {
       message,
       conversationId,
       roomId,
+      stream = false, // Default to non-streaming for backward compatibility
       roomContent = [],
       conversationHistory = []
     }: ChatRequest = await req.json();
@@ -207,7 +221,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Processing chat request for user:', user.id);
+    console.log('Processing chat request for user:', user.id, 'streaming:', stream);
 
     // Check rate limits before processing
     const { data: rateLimitData, error: rateLimitError } = await supabase
@@ -240,40 +254,43 @@ serve(async (req) => {
       }
     }
 
-    // Create more specific cache key for this request
-    const messageHash = message.substring(0, 20).replace(/[^a-zA-Z0-9]/g, ''); // Clean message for uniqueness
-    const cacheKey = `chat_${user.id}_${roomId}_${messageHash}`;
-    const contentHash = JSON.stringify({ roomContent, conversationHistory, message });
-    
-    // Check cache first
-    const { data: cachedResponse, error: cacheError } = await supabase
-      .from('ai_cache')
-      .select('response_data, hit_count, id')
-      .eq('user_id', user.id)
-      .eq('cache_key', cacheKey)
-      .eq('content_hash', contentHash)
-      .gt('expires_at', new Date().toISOString())
-      .limit(1);
-
-    if (!cacheError && cachedResponse && cachedResponse.length > 0) {
-      console.log('Cache hit for chat request');
+    // Skip cache for streaming requests to ensure real-time experience
+    if (!stream) {
+      // Create more specific cache key for this request
+      const messageHash = message.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '');
+      const cacheKey = `chat_${user.id}_${roomId}_${messageHash}`;
+      const contentHash = JSON.stringify({ roomContent, conversationHistory, message });
       
-      // Update hit count
-      await supabase
+      // Check cache first
+      const { data: cachedResponse, error: cacheError } = await supabase
         .from('ai_cache')
-        .update({ hit_count: cachedResponse[0].hit_count + 1 })
-        .eq('id', cachedResponse[0].id);
+        .select('response_data, hit_count, id')
+        .eq('user_id', user.id)
+        .eq('cache_key', cacheKey)
+        .eq('content_hash', contentHash)
+        .gt('expires_at', new Date().toISOString())
+        .limit(1);
 
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          response: cachedResponse[0].response_data.response,
-          cached: true
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      if (!cacheError && cachedResponse && cachedResponse.length > 0) {
+        console.log('Cache hit for chat request');
+        
+        // Update hit count
+        await supabase
+          .from('ai_cache')
+          .update({ hit_count: cachedResponse[0].hit_count + 1 })
+          .eq('id', cachedResponse[0].id);
+
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            response: cachedResponse[0].response_data.response,
+            cached: true
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
     }
 
     // Build enhanced room context with smart chunking
@@ -318,7 +335,7 @@ serve(async (req) => {
       if (allChunks.length > 0) {
         const topChunks = allChunks
           .sort((a, b) => b.relevanceScore - a.relevanceScore)
-          .slice(0, 8); // Limit to top 8 chunks to manage context
+          .slice(0, 8);
           
         if (topChunks.length < allChunks.length) {
           roomContext += `\n**Note:** Showing most relevant content sections (${topChunks.length} of ${allChunks.length} sections). Ask for specific topics if you need more details.\n`;
@@ -330,7 +347,6 @@ serve(async (req) => {
     let conversationContext = '';
     if (conversationHistory.length > 0) {
       conversationContext = '\n\n## Recent Conversation:\n';
-      // Take last 10 messages to stay within context limits
       const recentHistory = conversationHistory.slice(-10);
       
       for (const msg of recentHistory) {
@@ -339,7 +355,7 @@ serve(async (req) => {
       }
     }
 
-    // Create enhanced system prompt with content understanding
+    // Create enhanced system prompt
     const systemPrompt = `You are an AI tutor helping students learn from their study materials. You have access to processed content with smart chunking and format-specific analysis.
 
 ## Instructions:
@@ -374,13 +390,106 @@ Current student question: ${message}`;
       }
     ];
 
+    // Streaming mode
+    if (stream) {
+      console.log('Starting streaming response');
+      
+      const encoder = new TextEncoder();
+      let fullResponse = '';
+      let modelUsed = 'gpt-4o-mini';
+      
+      const readableStream = new ReadableStream({
+        async start(controller) {
+          try {
+            // Try streaming with gpt-4o-mini first (best for streaming)
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${openaiApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: 'gpt-4o-mini',
+                messages,
+                max_completion_tokens: 4000,
+                temperature: 0.7,
+                stream: true,
+              }),
+            });
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error('Streaming API error:', errorText);
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'API error' })}\n\n`));
+              controller.close();
+              return;
+            }
+
+            const reader = response.body?.getReader();
+            if (!reader) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'No reader' })}\n\n`));
+              controller.close();
+              return;
+            }
+
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || '';
+
+              for (const line of lines) {
+                const trimmedLine = line.trim();
+                if (!trimmedLine || trimmedLine === 'data: [DONE]') continue;
+                
+                if (trimmedLine.startsWith('data: ')) {
+                  try {
+                    const json = JSON.parse(trimmedLine.slice(6));
+                    const content = json.choices?.[0]?.delta?.content;
+                    
+                    if (content) {
+                      fullResponse += content;
+                      // Send delta to client
+                      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: content })}\n\n`));
+                    }
+                  } catch (parseError) {
+                    // Skip malformed JSON chunks
+                    console.error('Parse error:', parseError);
+                  }
+                }
+              }
+            }
+
+            // Send done signal
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
+            controller.close();
+
+            // Store complete response in database (async, don't wait)
+            storeResponseAndUpdateUsage(supabase, user.id, conversationId, roomId, fullResponse, modelUsed, roomContent);
+            
+          } catch (streamError) {
+            console.error('Streaming error:', streamError);
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Stream error' })}\n\n`));
+            controller.close();
+          }
+        }
+      });
+
+      return createStreamResponse(readableStream);
+    }
+
+    // Non-streaming mode (original logic)
     console.log('Calling OpenAI with primary model: o4-mini-2025-04-16');
 
     let aiResponse: string | null = null;
     let modelUsed = 'o4-mini-2025-04-16';
     let aiData: any = null;
 
-    // Primary model attempt with robust fallback system
     const models = [
       { name: 'o4-mini-2025-04-16', maxTokens: 2000 },
       { name: 'gpt-4.1-2025-04-14', maxTokens: 4000 },
@@ -408,30 +517,29 @@ Current student question: ${message}`;
         if (!response.ok) {
           const errorData = await response.text();
           console.error(`Model ${model.name} failed with status ${response.status}:`, errorData);
-          continue; // Try next model
+          continue;
         }
 
         aiData = await response.json();
         const responseContent = aiData.choices?.[0]?.message?.content;
 
-        // Check if response has actual content
         if (responseContent && responseContent.trim().length > 0) {
           aiResponse = responseContent.trim();
           modelUsed = model.name;
           console.log(`Successfully got response from model: ${model.name}`);
-          break; // Success, exit loop
+          break;
         } else {
           console.error(`Model ${model.name} returned empty content:`, aiData);
-          continue; // Try next model
+          continue;
         }
 
       } catch (error) {
         console.error(`Error with model ${model.name}:`, error);
-        continue; // Try next model
+        continue;
       }
     }
 
-    // If all models failed, provide fallback response
+    // Fallback response if all models failed
     if (!aiResponse) {
       console.error('All models failed to provide a response');
       aiResponse = `I apologize, but I'm having technical difficulties right now. Here's what I can help you with:
@@ -457,7 +565,7 @@ Please try asking your question again, or feel free to ask about any of the topi
         .from('chat_messages')
         .insert({
           conversation_id: conversationId,
-          user_id: user.id, // Fix: Add user_id to prevent constraint violation
+          user_id: user.id,
           content: aiResponse,
           sender_type: 'ai',
           metadata: {
@@ -472,17 +580,19 @@ Please try asking your question again, or feel free to ask about any of the topi
 
       if (insertError) {
         console.error('Error storing AI response:', insertError);
-        // Don't fail the request if database storage fails
       } else {
         console.log('Successfully stored AI response in database');
       }
     } catch (dbError) {
       console.error('Database storage error:', dbError);
-      // Don't fail the request if database storage fails
     }
 
     // Cache the response for future requests
     try {
+      const messageHash = message.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '');
+      const cacheKey = `chat_${user.id}_${roomId}_${messageHash}`;
+      const contentHash = JSON.stringify({ roomContent, conversationHistory, message });
+      
       const { data: planData } = await supabase
         .rpc('get_user_plan_quotas', { user_uuid: user.id });
       
@@ -507,7 +617,7 @@ Please try asking your question again, or feel free to ask about any of the topi
     // Update usage tracking
     try {
       const tokensUsed = aiData.usage?.total_tokens || 1000;
-      const estimatedCost = (tokensUsed / 1000000) * 0.15; // Rough estimate for o4-mini
+      const estimatedCost = (tokensUsed / 1000000) * 0.15;
 
       await supabase
         .from('ai_usage_counters')
@@ -551,3 +661,53 @@ Please try asking your question again, or feel free to ask about any of the topi
     );
   }
 });
+
+// Helper function to store response and update usage after streaming completes
+async function storeResponseAndUpdateUsage(
+  supabase: any,
+  userId: string,
+  conversationId: string,
+  roomId: string,
+  response: string,
+  modelUsed: string,
+  roomContent: any[]
+) {
+  try {
+    // Store AI response
+    await supabase
+      .from('chat_messages')
+      .insert({
+        conversation_id: conversationId,
+        user_id: userId,
+        content: response,
+        sender_type: 'ai',
+        metadata: {
+          model: modelUsed,
+          room_id: roomId,
+          generated_at: new Date().toISOString(),
+          streamed: true
+        }
+      });
+
+    // Update usage tracking
+    const estimatedTokens = Math.ceil(response.length / 4); // Rough token estimate
+    const estimatedCost = (estimatedTokens / 1000000) * 0.15;
+
+    await supabase
+      .from('ai_usage_counters')
+      .upsert({
+        user_id: userId,
+        date: new Date().toISOString().split('T')[0],
+        chat_requests: 1,
+        total_tokens_used: estimatedTokens,
+        total_cost_usd: estimatedCost
+      }, {
+        onConflict: 'user_id,date',
+        ignoreDuplicates: false
+      });
+
+    console.log('Successfully stored streaming response and updated usage');
+  } catch (error) {
+    console.error('Error storing streaming response:', error);
+  }
+}
