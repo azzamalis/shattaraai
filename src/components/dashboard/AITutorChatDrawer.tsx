@@ -22,6 +22,7 @@ import { useOpenAIChat } from '@/hooks/useOpenAIChat';
 import { useAIUsageTracking } from '@/hooks/useAIUsageTracking';
 import { useWindowSize } from '@/hooks/use-window-size';
 import { VirtualizedMessageList } from '@/components/chat/shared/VirtualizedMessageList';
+import { TypingIndicator } from '@/components/chat/shared/StreamingText';
 
 interface AITutorChatDrawerProps {
   open: boolean;
@@ -43,11 +44,11 @@ export function AITutorChatDrawer({
 }: AITutorChatDrawerProps) {
   const [input, setInput] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [welcomeMessageSent, setWelcomeMessageSent] = useState(false);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
   const [isNearLimit, setIsNearLimit] = useState(false);
   const [panelWidth, setPanelWidth] = useState(() => {
-    // Load saved width or default to 400px
     if (typeof window !== 'undefined') {
       return parseInt(localStorage.getItem('aiChatDrawerWidth') || '400', 10);
     }
@@ -60,33 +61,30 @@ export function AITutorChatDrawer({
   const { checkRateLimit, usageStats, planLimits } = useAIUsageTracking();
 
   // Initialize chat conversation for room collaboration
-  // Only auto-create when drawer is opened
   const {
     conversation,
     messages: persistedMessages,
     isLoading,
     isSending,
     sendMessage,
-    addAIResponse
+    addStreamingAIResponse
   } = useChatConversation({
     conversationType: 'room_collaboration',
     contextId: roomId,
     contextType: 'room',
-    autoCreate: open  // Only create when drawer is actually opened
+    autoCreate: open
   });
 
-  // Use persistedMessages directly instead of maintaining separate local state
-  // This ensures messages are always in sync with the database
   const messages = persistedMessages;
 
-  // Prepare conversation history for AI context (use persisted messages)
+  // Prepare conversation history for AI context
   const conversationHistory = persistedMessages.slice(-10).map(msg => ({
     content: msg.content,
     sender_type: msg.sender_type as 'user' | 'ai'
   }));
 
-  // Initialize OpenAI chat hook
-  const { sendMessageToAI } = useOpenAIChat({
+  // Initialize OpenAI chat hook with streaming support
+  const { streamMessageToAI } = useOpenAIChat({
     conversationId: conversation?.id || '',
     roomId: roomId || '',
     roomContent,
@@ -135,18 +133,16 @@ export function AITutorChatDrawer({
     }
   }, [isResizing, handleResize, handleResizeEnd]);
 
-  // Show welcome message when drawer opens if no messages exist
+  // Show welcome message when drawer opens
   useEffect(() => {
     if (open && conversation && persistedMessages.length === 0 && !welcomeMessageSent) {
       setRateLimitError(null);
       
-      // Check usage when opening chat
       if (usageStats && planLimits) {
         const usagePercent = (usageStats.chatRequests / planLimits.dailyChatLimit) * 100;
         setIsNearLimit(usagePercent > 80);
       }
       
-      // Mark welcome as sent (we'll rely on the hook's empty state)
       setWelcomeMessageSent(true);
     }
   }, [open, conversation, persistedMessages.length, welcomeMessageSent, usageStats, planLimits]);
@@ -168,34 +164,45 @@ export function AITutorChatDrawer({
     setRateLimitError(null);
 
     try {
-      // Send user message to database (hook will update messages state)
+      // Send user message to database
       await sendMessage(userMessage);
       
-      // Show AI typing indicator
+      // Start streaming AI response
       setIsAITyping(true);
 
-      // Get AI response
-      const aiResponse = await sendMessageToAI(userMessage);
+      // Create streaming message placeholder
+      const streamHandler = await addStreamingAIResponse();
       
-      // Add AI response to database (hook will update messages state)
-      await addAIResponse(aiResponse, 'ai_response', {
-        model: 'o4-mini-2025-04-16',
-        room_id: roomId,
-        responded_to: userMessage
-      });
+      if (streamHandler) {
+        setStreamingMessageId(streamHandler.messageId);
+        let fullResponse = '';
+
+        await streamMessageToAI(
+          userMessage,
+          (delta) => {
+            fullResponse += delta;
+            streamHandler.updateContent(fullResponse);
+          },
+          async () => {
+            await streamHandler.finalize(fullResponse);
+            setStreamingMessageId(null);
+            setIsAITyping(false);
+          }
+        );
+      } else {
+        setIsAITyping(false);
+      }
 
     } catch (error) {
       console.error('Error handling message:', error);
-    } finally {
       setIsAITyping(false);
+      setStreamingMessageId(null);
     }
   };
 
   const handleNewChat = async () => {
     try {
-      // Delete the current conversation and all its messages from Supabase
       if (conversation?.id) {
-        // First delete all messages in the conversation
         const { error: messagesError } = await supabase
           .from('chat_messages')
           .delete()
@@ -205,7 +212,6 @@ export function AITutorChatDrawer({
           console.error('Error deleting messages:', messagesError);
         }
 
-        // Then delete the conversation itself
         const { error: conversationError } = await supabase
           .from('chat_conversations')
           .delete()
@@ -216,20 +222,17 @@ export function AITutorChatDrawer({
         }
       }
 
-      // Reset all local state
       setWelcomeMessageSent(false);
       setInput('');
       setRateLimitError(null);
       setIsAITyping(false);
+      setStreamingMessageId(null);
       
       toast.success('Started a new chat');
       
-      // Force a complete refresh by closing and reopening the drawer
-      // This will trigger the useChatConversation hook to create a new conversation
       const wasOpen = open;
       onOpenChange(false);
       if (wasOpen) {
-        // Small delay to ensure the drawer fully closes before reopening
         setTimeout(() => onOpenChange(true), 150);
       }
     } catch (error) {
@@ -249,7 +252,6 @@ export function AITutorChatDrawer({
   }, []);
 
   const handleDeleteMessage = useCallback((messageId: string) => {
-    // TODO: Implement delete in database via hook
     console.log('Delete message:', messageId);
   }, []);
 
@@ -278,7 +280,6 @@ export function AITutorChatDrawer({
     }
   }, [open, panelWidth, windowWidth, persistWidth]);
 
-  // Add keyboard event listener
   useEffect(() => {
     if (open) {
       document.addEventListener('keydown', handleKeyboardResize as any);
@@ -410,6 +411,7 @@ export function AITutorChatDrawer({
             renderMessage={(message: ChatMessage, index: number) => {
               const isAssistant = message.sender_type === 'ai';
               const isLastMessage = index === messages.length - 1;
+              const isStreaming = message.id === streamingMessageId;
 
               return (
                 <Message
@@ -421,15 +423,25 @@ export function AITutorChatDrawer({
                   {isAssistant ? (
                     <div className="group flex w-full flex-col gap-0">
                       <MessageContent
-                        className="text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0"
+                        className={cn(
+                          "text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0",
+                          isStreaming && "animate-fade-in"
+                        )}
                         markdown
                       >
                         {message.content}
                       </MessageContent>
+                      {/* Streaming cursor indicator */}
+                      {isStreaming && message.content.length > 0 && (
+                        <span 
+                          className="inline-block w-1.5 h-4 bg-primary/70 ml-1 animate-pulse rounded-sm"
+                          aria-label="AI is typing"
+                        />
+                      )}
                       <MessageActions
                         className={cn(
                           "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                          isLastMessage && "opacity-100"
+                          isLastMessage && !isStreaming && "opacity-100"
                         )}
                       >
                         <MessageAction tooltip="Copy" delayDuration={100}>
@@ -438,6 +450,7 @@ export function AITutorChatDrawer({
                             size="icon"
                             className="rounded-full"
                             onClick={() => handleCopyMessage(message.content)}
+                            disabled={isStreaming}
                           >
                             <Copy />
                           </Button>
@@ -448,6 +461,7 @@ export function AITutorChatDrawer({
                             size="icon"
                             className="rounded-full"
                             onClick={() => handleUpvote(message.id)}
+                            disabled={isStreaming}
                           >
                             <ThumbsUp />
                           </Button>
@@ -458,6 +472,7 @@ export function AITutorChatDrawer({
                             size="icon"
                             className="rounded-full"
                             onClick={() => handleDownvote(message.id)}
+                            disabled={isStreaming}
                           >
                             <ThumbsDown />
                           </Button>
@@ -510,12 +525,9 @@ export function AITutorChatDrawer({
                 </Message>
               );
             }}
-            footerContent={isAITyping ? (
+            footerContent={isAITyping && !streamingMessageId ? (
               <Message className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 items-start">
-                <div className="flex items-center gap-2 py-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm text-muted-foreground">Shattara AI is thinking...</span>
-                </div>
+                <TypingIndicator />
               </Message>
             ) : undefined}
           />
@@ -539,18 +551,7 @@ export function AITutorChatDrawer({
                   <Button
                     size="icon"
                     disabled={!input.trim() || isSending || isAITyping || !conversation || !!rateLimitError}
-                    onClick={() => {
-                      console.log('Send button clicked', {
-                        input: input,
-                        inputTrimmed: input.trim(),
-                        isEmpty: !input.trim(),
-                        isSending,
-                        isAITyping,
-                        hasConversation: !!conversation,
-                        rateLimitError
-                      });
-                      handleSendMessage();
-                    }}
+                    onClick={handleSendMessage}
                     className="size-9 rounded-full"
                   >
                     {isSending || isAITyping ? (
