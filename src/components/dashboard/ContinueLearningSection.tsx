@@ -41,7 +41,7 @@ export function ContinueLearningSection({
   // This allows users to see and manage all their content from the main dashboard
   if (content.length === 0) {
     return <section className="w-full py-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 text-lg font-medium">
           <h2 className="font-semibold text-foreground text-lg">Continue Learning</h2>
         </div>
         <div className="text-muted-foreground text-center py-12 rounded-xl border border-border/5 bg-transparent">
