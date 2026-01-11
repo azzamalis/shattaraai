@@ -62,7 +62,7 @@ export const RoomsSection: React.FC<RoomsSectionProps> = ({
     await onEditRoom(id, editedRoomName);
   };
   return <div>
-      <h2 className="ml-2 mb-2 text-foreground text-sm font-semibold">Rooms</h2>
+      <h2 className="ml-2 mb-2 text-foreground text-sm font-medium">Rooms</h2>
       <div className="flex w-full flex-col space-y-1 text-muted-foreground font-medium">
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
             bg-accent text-accent-foreground 

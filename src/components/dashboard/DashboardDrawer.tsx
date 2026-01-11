@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,6 @@ import { HelpTools } from './drawer/HelpTools';
 import { NavUser } from './drawer/NavUser';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
 import { Room } from '@/lib/types';
-
 interface DashboardDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -25,7 +23,6 @@ interface DashboardDrawerProps {
   onEditRoom: (id: string, newName: string) => Promise<void>;
   onDeleteRoom: (id: string) => Promise<void>;
 }
-
 export function DashboardDrawer({
   open,
   onOpenChange,
@@ -46,7 +43,6 @@ export function DashboardDrawer({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
   const [roomToDeleteName, setRoomToDeleteName] = useState<string>("");
-
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -54,36 +50,30 @@ export function DashboardDrawer({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   useEffect(() => {
     if (!tutorialModalOpen) {
       setHasSeenTutorial(localStorage.getItem('hasSeenTutorial') === 'true');
     }
   }, [tutorialModalOpen]);
-
   const handleFeedbackClick = () => {
     console.log("Feedback button clicked");
     // This function is kept for compatibility but no longer opens a modal
   };
-
   const handleTutorialClick = () => {
     console.log("Tutorial button clicked");
     setTutorialModalOpen(true);
     setHasSeenTutorial(true);
     localStorage.setItem('hasSeenTutorial', 'true');
   };
-
   const handleInviteEarnClick = () => {
     console.log("Invite & Earn button clicked");
     setInviteEarnModalOpen(true);
   };
-
   const getDrawerWidth = () => {
     if (windowWidth < 640) return 'w-[85vw]';
     if (windowWidth < 768) return 'w-[350px]';
     return 'w-[300px]';
   };
-
   const handleDeleteConfirm = () => {
     if (roomToDelete) {
       onDeleteRoom(roomToDelete);
@@ -91,9 +81,7 @@ export function DashboardDrawer({
       setDeleteModalOpen(false);
     }
   };
-
-  return (
-    <>
+  return <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="left" className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r-2 border-border`} closeButton={false}>
           {/* Header with Logo */}
@@ -123,7 +111,7 @@ export function DashboardDrawer({
               
               {/* History Section */}
               <div className="w-full">
-                <h3 className="ml-2 mb-2 text-foreground text-sm font-semibold">Recents</h3>
+                <h3 className="ml-2 mb-2 text-foreground text-sm font-medium">Recents</h3>
                 <HistorySection rooms={rooms} />
               </div>
               
@@ -134,12 +122,7 @@ export function DashboardDrawer({
               
               {/* Help Tools Section */}
               <div className="w-full">
-                <HelpTools 
-                  onTutorialClick={handleTutorialClick} 
-                  onFeedbackClick={handleFeedbackClick} 
-                  onCalculatorClick={() => setCalculatorModalOpen(true)}
-                  onInviteEarnClick={handleInviteEarnClick}
-                />
+                <HelpTools onTutorialClick={handleTutorialClick} onFeedbackClick={handleFeedbackClick} onCalculatorClick={() => setCalculatorModalOpen(true)} onInviteEarnClick={handleInviteEarnClick} />
               </div>
             </div>
           </ScrollArea>
@@ -161,6 +144,5 @@ export function DashboardDrawer({
       id: roomToDelete || '',
       title: roomToDeleteName
     }} onConfirm={handleDeleteConfirm} />
-    </>
-  );
+    </>;
 }
