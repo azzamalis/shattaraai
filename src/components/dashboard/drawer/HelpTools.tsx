@@ -45,7 +45,7 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
             transition-all duration-200 rounded-xl py-2 px-2" disabled>
           <BarChart className="h-4 w-4" />
           <span className="text-sm font-medium">Reports</span>
-          <span className="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#0E8345]/10 text-[#0E8345] border border-[#0E8345]/20">
+          <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-[#0E8345]/10 text-[#0E8345] border border-[#0E8345]/20 font-semibold">
             Coming Soon
           </span>
         </Button>
