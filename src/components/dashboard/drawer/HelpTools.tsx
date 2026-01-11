@@ -1,27 +1,34 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Book, MessageCircle, Calculator, BarChart, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FeedbackPopover } from '@/components/dashboard/FeedbackPopover';
+
 interface HelpToolsProps {
   onTutorialClick: () => void;
   onFeedbackClick: () => void;
   onCalculatorClick: () => void;
   onInviteEarnClick: () => void;
 }
+
 export const HelpTools: React.FC<HelpToolsProps> = ({
   onTutorialClick,
   onFeedbackClick,
   onCalculatorClick,
   onInviteEarnClick
 }) => {
-  return <div>
-      <h2 className="ml-2 mb-2 text-foreground text-sm font-medium">Help & Tools</h2>
+  return (
+    <div>
+      <h2 className="ml-2 mb-2 text-foreground text-sm font-semibold">Help & Tools</h2>
       <div className="flex flex-col space-y-1 text-muted-foreground font-medium">
         <FeedbackPopover>
-          <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
+          <Button 
+            variant="ghost" 
+            className="w-full flex items-center justify-start gap-2 
               bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary
-              transition-all duration-200 rounded-xl py-2 px-2">
+              transition-all duration-200 rounded-xl py-2 px-2"
+          >
             <MessageCircle className="h-4 w-4" />
             <span className="text-sm font-medium">Feedback</span>
           </Button>
@@ -40,12 +47,16 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
           </span>
         </Button>
 
-        <Button variant="ghost" className="w-full flex items-center justify-start gap-2 
+        <Button 
+          variant="ghost" 
+          className="w-full flex items-center justify-start gap-2 
             bg-transparent text-muted-foreground/50 cursor-not-allowed
-            transition-all duration-200 rounded-xl py-2 px-2" disabled>
+            transition-all duration-200 rounded-xl py-2 px-2"
+          disabled
+        >
           <BarChart className="h-4 w-4" />
           <span className="text-sm font-medium">Reports</span>
-          <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-[#0E8345]/10 text-[#0E8345] border border-[#0E8345]/20 font-semibold">
+          <span className="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#0E8345]/10 text-[#0E8345] border border-[#0E8345]/20">
             Coming Soon
           </span>
         </Button>
@@ -64,5 +75,6 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
           <span className="text-sm font-medium">Invite & Earn</span>
         </Button>
       </div>
-    </div>;
+    </div>
+  );
 };
