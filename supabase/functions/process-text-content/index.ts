@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { chunkContent, selectChunksForContext } from '../_shared/contentChunking.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -49,6 +50,22 @@ serve(async (req) => {
       throw new Error('Rate limit exceeded');
     }
 
+    // Smart chunking for optimal AI context
+    console.log('Applying smart chunking for text content...');
+    const contentType = content.type || 'text';
+    const chunkedContent = chunkContent(textContent, contentType, {
+      maxChunkSize: 4000,
+      overlapSize: 250,
+      preserveStructure: true,
+      prioritizeRelevance: true,
+    });
+    
+    console.log(`Created ${chunkedContent.chunks.length} chunks, key topics:`, chunkedContent.keyTopics.slice(0, 5));
+
+    // Select optimal chunks for AI context
+    const optimizedContent = selectChunksForContext(chunkedContent, 10000, true);
+    console.log(`Optimized content: ${optimizedContent.length} chars (from ${textContent.length} original)`);
+
     console.log('Analyzing text content with AI...');
 
     const systemPrompt = `You are an AI assistant that analyzes text content and creates structured chapters and summaries.
@@ -89,7 +106,7 @@ Create meaningful chapters that break down the content logically. Use estimated 
           'Authorization': `Bearer ${openaiApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
+      body: JSON.stringify({
           model: model,
           messages: [
             {
@@ -98,7 +115,7 @@ Create meaningful chapters that break down the content logically. Use estimated 
             },
             {
               role: 'user',
-              content: `Please analyze the following text content:\n\n${textContent.slice(0, 12000)}`
+              content: `Please analyze the following content (smart-chunked for relevance):\n\n${optimizedContent}`
             }
           ],
           max_completion_tokens: 2500,
@@ -121,7 +138,7 @@ Create meaningful chapters that break down the content logically. Use estimated 
           'Authorization': `Bearer ${openaiApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
+      body: JSON.stringify({
           model: model,
           messages: [
             {
@@ -130,7 +147,7 @@ Create meaningful chapters that break down the content logically. Use estimated 
             },
             {
               role: 'user',
-              content: `Please analyze the following text content:\n\n${textContent.slice(0, 8000)}`
+              content: `Please analyze the following content (smart-chunked for relevance):\n\n${selectChunksForContext(chunkedContent, 6000, true)}`
             }
           ],
           max_completion_tokens: 2000,
@@ -171,14 +188,19 @@ Create meaningful chapters that break down the content logically. Use estimated 
       updated_at: new Date().toISOString()
     };
 
-    // Add metadata if available
+    // Add metadata including chunking info
     if (analysis.summary || analysis.keyTopics || analysis.insights) {
       updateData.metadata = {
         ...content.metadata,
         summary: analysis.summary,
         keyTopics: analysis.keyTopics,
         insights: analysis.insights,
-        aiAnalysis: true
+        aiAnalysis: true,
+        chunking: {
+          totalChunks: chunkedContent.chunks.length,
+          keyTopics: chunkedContent.keyTopics,
+          optimalContextWindow: chunkedContent.optimalContextWindow,
+        },
       };
     }
 
