@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { chunkContent, selectChunksForContext } from '../_shared/contentChunking.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -49,7 +50,20 @@ serve(async (req) => {
       throw new Error('Rate limit exceeded');
     }
 
-    console.log('Generating AI enhancement for content...');
+    // Smart chunking for optimal AI context
+    console.log('Applying smart chunking for content type:', contentType);
+    const chunkedContent = chunkContent(textContent, contentType || 'text', {
+      maxChunkSize: 4000,
+      overlapSize: 300,
+      preserveStructure: true,
+      prioritizeRelevance: true,
+    });
+    
+    console.log(`Created ${chunkedContent.chunks.length} chunks, key topics:`, chunkedContent.keyTopics.slice(0, 5));
+
+    // Select optimal chunks for AI context (using 12k tokens for chapter generation)
+    const optimizedContent = selectChunksForContext(chunkedContent, 12000, true);
+    console.log(`Optimized content length: ${optimizedContent.length} chars (from ${textContent.length} original)`);
 
     // Determine content-specific prompt
     const getSystemPrompt = (type: string, totalPages?: number) => {
@@ -151,10 +165,10 @@ For non-audio content, use estimated time segments based on reading pace or cont
     let response;
     let model = 'gpt-4.1-2025-04-14';
 
-    // Build user prompt with page info for PDFs
+    // Build user prompt with optimized chunked content
     const userPrompt = contentType === 'pdf' && totalPages
-      ? `This PDF document has ${totalPages} pages. Please analyze the following content and create chapters that cover ALL ${totalPages} pages, with each chapter covering exactly 1-2 pages:\n\n${textContent.slice(0, 15000)}`
-      : `Please analyze the following content and create chapters:\n\n${textContent.slice(0, 12000)}`;
+      ? `This PDF document has ${totalPages} pages. Please analyze the following content (smart-chunked for relevance) and create chapters that cover ALL ${totalPages} pages, with each chapter covering exactly 1-2 pages:\n\n${optimizedContent}`
+      : `Please analyze the following content (smart-chunked for relevance):\n\n${optimizedContent}`;
 
     try {
       // Primary attempt with GPT-4.1
@@ -240,12 +254,19 @@ For non-audio content, use estimated time segments based on reading pace or cont
       throw new Error('Failed to parse AI-generated chapters');
     }
 
-    // Update content with AI enhancements
+    // Update content with AI enhancements and chunking metadata
     await supabase
       .from('content')
       .update({
         chapters: chapters,
         processing_status: 'completed',
+        metadata: {
+          chunking: {
+            totalChunks: chunkedContent.chunks.length,
+            keyTopics: chunkedContent.keyTopics,
+            optimalContextWindow: chunkedContent.optimalContextWindow,
+          },
+        },
         updated_at: new Date().toISOString()
       })
       .eq('id', contentId);
