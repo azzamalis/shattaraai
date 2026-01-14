@@ -33,11 +33,35 @@ serve(async (req) => {
       }
     )
 
+    // Helper function to update processing progress
+    const updateProgress = async (step: string, progress: number, message: string) => {
+      if (contentId) {
+        const { data: existing } = await supabase
+          .from('content')
+          .select('metadata')
+          .eq('id', contentId)
+          .single();
+        
+        await supabase
+          .from('content')
+          .update({
+            metadata: {
+              ...(existing?.metadata || {}),
+              processingStep: step,
+              processingProgress: progress,
+              processingMessage: message
+            }
+          })
+          .eq('id', contentId);
+      }
+    };
+
     let fileData: Blob | null = null;
 
     // Handle fileUrl (new API for chat attachments)
     if (fileUrl) {
       console.log(`Fetching PDF from URL: ${fileUrl}`)
+      await updateProgress('extracting', 30, 'Extracting text from PDF...');
       
       // Extract bucket and path from public URL
       // Format: https://{project}.supabase.co/storage/v1/object/public/{bucket}/{path}
@@ -64,6 +88,7 @@ serve(async (req) => {
     } else {
       // Handle old API (contentId + storagePath)
       console.log(`Processing PDF extraction for contentId: ${contentId}, storagePath: ${storagePath}`)
+      await updateProgress('extracting', 30, 'Extracting text from PDF...');
       
       const { data, error: downloadError } = await supabase.storage
         .from('pdfs')
@@ -82,6 +107,7 @@ serve(async (req) => {
     }
 
     console.log('PDF downloaded successfully, extracting text...')
+    await updateProgress('extracting', 50, 'Processing document pages...');
 
     // Convert blob to buffer for pdf-parse
     const arrayBuffer = await fileData.arrayBuffer()
@@ -96,12 +122,29 @@ serve(async (req) => {
     }
 
     console.log(`Extracted ${extractedText.length} characters from PDF`)
+    await updateProgress('chunking', 70, 'Chunking content for AI analysis...');
 
     // Update the content table if contentId provided (old API)
     if (contentId) {
+      const { data: existing } = await supabase
+        .from('content')
+        .select('metadata')
+        .eq('id', contentId)
+        .single();
+
       const { error: updateError } = await supabase
         .from('content')
-        .update({ text_content: extractedText })
+        .update({ 
+          text_content: extractedText,
+          metadata: {
+            ...(existing?.metadata || {}),
+            processingStep: 'analyzing',
+            processingProgress: 80,
+            processingMessage: 'Analyzing content with AI...',
+            textExtracted: true,
+            textLength: extractedText.length
+          }
+        })
         .eq('id', contentId)
 
       if (updateError) {
