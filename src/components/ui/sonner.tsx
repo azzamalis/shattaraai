@@ -25,8 +25,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           success: "group-[.toaster]:bg-primary group-[.toaster]:text-primary-foreground",
         },
       }}
-      visibleToasts={3}
-      gap={8}
+      visibleToasts={1}
       {...props}
     />
   )

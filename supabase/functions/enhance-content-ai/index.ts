@@ -50,30 +50,6 @@ serve(async (req) => {
       throw new Error('Rate limit exceeded');
     }
 
-    // Helper function to update processing progress
-    const updateProgress = async (step: string, progress: number, message: string) => {
-      const { data: existingContent } = await supabase
-        .from('content')
-        .select('metadata')
-        .eq('id', contentId)
-        .single();
-      
-      await supabase
-        .from('content')
-        .update({
-          metadata: {
-            ...(existingContent?.metadata || {}),
-            processingStep: step,
-            processingProgress: progress,
-            processingMessage: message
-          }
-        })
-        .eq('id', contentId);
-    };
-
-    // Update progress: chunking
-    await updateProgress('chunking', 50, 'Chunking content for AI analysis...');
-
     // Smart chunking for optimal AI context
     console.log('Applying smart chunking for content type:', contentType);
     const chunkedContent = chunkContent(textContent, contentType || 'text', {

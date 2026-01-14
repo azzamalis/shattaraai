@@ -221,35 +221,8 @@ serve(async (req) => {
     if (!videoId) {
       throw new Error('Invalid YouTube URL');
     }
-
-    // Helper function to update processing progress
-    const updateProgress = async (step: string, progress: number, message: string) => {
-      const { data: existing } = await supabase
-        .from('content')
-        .select('metadata')
-        .eq('id', contentId)
-        .single();
-      
-      await supabase
-        .from('content')
-        .update({
-          metadata: {
-            ...(existing?.metadata || {}),
-            processingStep: step,
-            processingProgress: progress,
-            processingMessage: message
-          }
-        })
-        .eq('id', contentId);
-    };
-
-    // Update progress: fetching video data
-    await updateProgress('fetching', 25, 'Fetching video information...');
     
     const youtubeData = await getYouTubeData(videoId);
-    
-    // Update progress: extracting transcript
-    await updateProgress('extracting', 50, 'Extracting video transcript...');
     
     // Store YouTube URL in the youtube-content bucket
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -265,16 +238,6 @@ serve(async (req) => {
 
     const storagePath = uploadData?.path || url;
 
-    // Update progress: analyzing
-    await updateProgress('analyzing', 75, 'Analyzing video content...');
-
-    // Get existing metadata to preserve
-    const { data: existing } = await supabase
-      .from('content')
-      .select('metadata')
-      .eq('id', contentId)
-      .single();
-
     // Update content with extracted data and storage path
     const { error: contentError } = await supabase
       .from('content')
@@ -286,11 +249,7 @@ serve(async (req) => {
         chapters: youtubeData.chapters,
         processing_status: 'completed',
         metadata: {
-          ...(existing?.metadata || {}),
           ...youtubeData.metadata,
-          processingStep: 'completed',
-          processingProgress: 100,
-          processingMessage: 'Ready!',
           chapters: youtubeData.chapters,
           extractedAt: new Date().toISOString(),
           hasTranscript: youtubeData.transcript.length > 0,

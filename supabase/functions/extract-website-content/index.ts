@@ -322,30 +322,6 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Helper function to update processing progress
-    const updateProgress = async (step: string, progress: number, message: string) => {
-      const { data: existing } = await supabase
-        .from('content')
-        .select('metadata')
-        .eq('id', contentId)
-        .single();
-      
-      await supabase
-        .from('content')
-        .update({
-          metadata: {
-            ...(existing?.metadata || {}),
-            processingStep: step,
-            processingProgress: progress,
-            processingMessage: message
-          }
-        })
-        .eq('id', contentId);
-    };
-
-    // Update progress: fetching
-    await updateProgress('fetching', 30, 'Fetching website content...');
-
     // Fetch the website content
     const response = await fetch(url, {
       headers: {
@@ -358,10 +334,6 @@ serve(async (req) => {
     }
 
     const html = await response.text();
-    
-    // Update progress: extracting
-    await updateProgress('extracting', 50, 'Extracting page content...');
-    
     const extractedHtml = extractCleanHTML(html);
     const extractedText = extractTextFromHTML(html);
     const websiteMetadata = extractMetadata(html, url);
@@ -372,31 +344,17 @@ serve(async (req) => {
 
     console.log(`Extracted ${extractedText.length} characters from website`);
 
-    // Update progress: analyzing
-    await updateProgress('analyzing', 75, 'Analyzing website content...');
-
     // Prepare content update data
     const contentTitle = websiteMetadata.title || websiteMetadata.ogTitle || 'Website Content';
     
     // Update content with extracted data
-    const { data: existing } = await supabase
-      .from('content')
-      .select('metadata')
-      .eq('id', contentId)
-      .single();
-
     const { error: contentError } = await supabase
       .from('content')
       .update({
         title: contentTitle,
         text_content: extractedHtml, // Store structured HTML for reader mode
-        processing_status: 'completed',
         metadata: {
-          ...(existing?.metadata || {}),
           ...websiteMetadata,
-          processingStep: 'completed',
-          processingProgress: 100,
-          processingMessage: 'Ready!',
           extractedAt: new Date().toISOString(),
           contentLength: extractedText.length,
           hasContent: extractedText.length > 0,
