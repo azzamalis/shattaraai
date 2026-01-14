@@ -9,9 +9,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
 import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
+import { useProcessingToast } from '@/hooks/useProcessingToast';
+
 interface DashboardHeroProps {
   onPasteClick: () => void;
 }
+
 export function DashboardHero({
   onPasteClick
 }: DashboardHeroProps) {
@@ -22,6 +25,8 @@ export function DashboardHero({
     addContentWithFile,
     onAddContentWithMetadata
   } = useContent();
+  const { showProcessingToast } = useProcessingToast();
+
   const handleAISubmit = async (value: string, files?: File[]) => {
     try {
       // Upload files to storage first if present
@@ -103,11 +108,25 @@ export function DashboardHero({
           hasAttachments: uploadedFiles.length > 0,
           attachmentCount: uploadedFiles.length,
           attachments: uploadedFiles,
-          createdFrom: 'dashboard_hero'
+          createdFrom: 'dashboard_hero',
+          processingStep: 'processing',
+          processingProgress: 20
         }
       });
 
       if (contentId) {
+        // Show processing toast for chat with attachments
+        if (uploadedFiles.length > 0) {
+          showProcessingToast({
+            contentId,
+            title: title,
+            contentType: 'chat',
+            onComplete: () => {
+              console.log('DashboardHero - Chat content processing completed');
+            }
+          });
+        }
+        
         // Emit onboarding event for content added
         emitOnboardingEvent('content_added');
         

@@ -5,9 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useContentContext } from '@/contexts/ContentContext';
 import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
+import { useProcessingToast } from '@/hooks/useProcessingToast';
+import { ContentType } from '@/components/ui/processing-toast';
+
 interface ActionCardsProps {
   onPasteClick: () => void;
 }
+
 export function ActionCards({
   onPasteClick
 }: ActionCardsProps) {
@@ -17,10 +21,13 @@ export function ActionCards({
     addContentWithFile
   } = useContentContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { showProcessingToast } = useProcessingToast();
+
   const handleUploadClick = () => {
     console.log('DEBUG: ActionCards - Upload button clicked');
     fileInputRef.current?.click();
   };
+
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     console.log('DEBUG: ActionCards - File selected:', file ? {
@@ -29,18 +36,21 @@ export function ActionCards({
       size: file.size,
       lastModified: file.lastModified
     } : 'No file selected');
+    
     if (file) {
       try {
         // Determine content type based on file type and extension
-        let contentType = 'upload';
+        let contentType: ContentType = 'upload';
         const fileType = file.type.toLowerCase();
         const fileName = file.name.toLowerCase();
+        
         console.log('DEBUG: ActionCards - File type analysis:', {
           originalFileType: file.type,
           lowerCaseFileType: fileType,
           originalFileName: file.name,
           lowerCaseFileName: fileName
         });
+        
         if (fileType.includes('pdf') || fileName.endsWith('.pdf')) {
           contentType = 'pdf';
         } else if (fileType.includes('audio') || ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'].some(ext => fileName.endsWith(ext))) {
@@ -50,6 +60,7 @@ export function ActionCards({
         } else if (['.doc', '.docx', '.txt', '.rtf', '.xls', '.xlsx', '.ppt', '.pptx'].some(ext => fileName.endsWith(ext))) {
           contentType = 'file';
         }
+        
         console.log('DEBUG: ActionCards - Determined content type:', contentType);
         console.log('DEBUG: ActionCards - Starting file upload process with data:', {
           fileName: file.name,
@@ -58,10 +69,6 @@ export function ActionCards({
           determinedContentType: contentType,
           timestamp: new Date().toISOString()
         });
-
-        // Show loading toast
-        const loadingToast = toast.loading(`Uploading ${file.name}...`);
-        console.log('DEBUG: ActionCards - Loading toast shown for file upload');
 
         // Use addContentWithFile for ALL file uploads to ensure proper storage handling
         console.log('DEBUG: ActionCards - Calling addContentWithFile with parameters:', {
@@ -74,12 +81,15 @@ export function ActionCards({
               fileType: file.type,
               isUploadedFile: true,
               uploadedAt: new Date().toISOString(),
-              originalFileName: file.name
+              originalFileName: file.name,
+              processingStep: 'uploading',
+              processingProgress: 10
             },
             filename: file.name
           },
           fileSize: file.size
         });
+        
         const contentId = await addContentWithFile({
           title: file.name,
           type: contentType as any,
@@ -89,24 +99,38 @@ export function ActionCards({
             fileType: file.type,
             isUploadedFile: true,
             uploadedAt: new Date().toISOString(),
-            originalFileName: file.name
+            originalFileName: file.name,
+            processingStep: 'uploading',
+            processingProgress: 10
           },
           filename: file.name
         }, file);
 
-        // Dismiss loading toast
-        toast.dismiss(loadingToast);
         console.log('DEBUG: ActionCards - Upload completed, content ID received:', contentId);
+        
         if (contentId) {
-          console.log('DEBUG: ActionCards - Content uploaded, processing in background');
-          // Keep user on dashboard, show success with background processing indicator
-          toast.success(`${file.name} uploaded! Processing in background...`, {
-            description: 'You\'ll be notified when it\'s ready',
-            duration: 5000
+          console.log('DEBUG: ActionCards - Content uploaded, showing processing toast');
+          
+          // Show processing toast with real-time updates
+          showProcessingToast({
+            contentId,
+            title: file.name,
+            contentType,
+            onComplete: () => {
+              console.log('DEBUG: ActionCards - Processing completed for:', contentId);
+            },
+            onError: (error) => {
+              console.error('DEBUG: ActionCards - Processing failed:', error);
+            }
           });
+          
           // Emit onboarding event for content upload
           emitOnboardingEvent('content_added');
-          // Don't navigate - let user continue working on dashboard
+          
+          // Reset file input
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
         } else {
           console.error('DEBUG: ActionCards - Upload failed: No content ID returned');
           throw new Error('Failed to create content - no ID returned');
