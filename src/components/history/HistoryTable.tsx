@@ -1,38 +1,20 @@
-import React from 'react';
-import { format } from 'date-fns';
+import React, { useCallback } from 'react';
 import { 
   Table, 
   TableBody, 
-  TableCell, 
   TableHead, 
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger
-} from '@/components/ui/dropdown-menu';
-import { FileText, Play, Youtube, Mic, Globe, MessageSquare, MoreHorizontal, Type, AudioLines, Text } from 'lucide-react';
+import { HistoryEmptyState } from './HistoryEmptyState';
+import { HistoryTableRow, HistoryItem } from './HistoryTableRow';
 import { ShareModal } from '@/components/dashboard/modals/share-modal';
 import { DeleteModal } from '@/components/dashboard/modals/delete-modal';
-import { HistoryEmptyState } from './HistoryEmptyState';
 import { Room } from '@/lib/types';
 import { toast } from 'sonner';
 
-export interface HistoryItem {
-  id: string;
-  title: string;
-  room: string;
-  date: Date;
-  type: string;
-  url?: string;
-}
+// Re-export HistoryItem for backwards compatibility
+export type { HistoryItem } from './HistoryTableRow';
 
 interface HistoryTableProps {
   items: HistoryItem[];
@@ -43,64 +25,6 @@ interface HistoryTableProps {
   searchQuery?: string;
   onClearFilters?: () => void;
 }
-
-// Helper function to get content type icon
-const getContentTypeIcon = (type: string) => {
-  switch (type) {
-    case 'video':
-      return <Play className="h-4 w-4 text-primary" />;
-    case 'pdf':
-      return <Text className="h-4 w-4 text-primary" />;
-    case 'file':
-    case 'upload':
-      return <FileText className="h-4 w-4 text-primary" />;
-    case 'recording':
-    case 'live_recording':
-      return <Mic className="h-4 w-4 text-primary" />;
-    case 'audio_file':
-      return <AudioLines className="h-4 w-4 text-primary" />;
-    case 'youtube':
-      return <Youtube className="h-4 w-4 text-primary" />;
-    case 'website':
-      return <Globe className="h-4 w-4 text-primary" />;
-    case 'text':
-      return <Type className="h-4 w-4 text-primary" />;
-    case 'chat':
-      return <MessageSquare className="h-4 w-4 text-primary" />;
-    default:
-      return <FileText className="h-4 w-4 text-primary" />;
-  }
-};
-
-// Helper function to format content type for display
-const formatContentType = (type: string): string => {
-  switch (type) {
-    case 'video':
-      return 'Video';
-    case 'pdf':
-      return 'PDF';
-    case 'file':
-      return 'File';
-    case 'upload':
-      return 'Upload';
-    case 'recording':
-      return 'Recording';
-    case 'live_recording':
-      return 'Live Recording';
-    case 'audio_file':
-      return 'Audio File';
-    case 'youtube':
-      return 'YouTube';
-    case 'website':
-      return 'Website';
-    case 'text':
-      return 'Text';
-    case 'chat':
-      return 'Chat';
-    default:
-      return 'File';
-  }
-};
 
 export function HistoryTable({ 
   items, 
@@ -116,41 +40,45 @@ export function HistoryTable({
   const [selectedItem, setSelectedItem] = React.useState<HistoryItem | null>(null);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
 
-  const handleShareClick = (item: HistoryItem) => {
+  const handleShareClick = useCallback((item: HistoryItem) => {
     setSelectedItem(item);
     setOpenDropdown(null);
     setShareModalOpen(true);
-  };
+  }, []);
 
-  const handleDeleteClick = (item: HistoryItem) => {
+  const handleDeleteClick = useCallback((item: HistoryItem) => {
     setSelectedItem(item);
     setOpenDropdown(null);
     setDeleteModalOpen(true);
-  };
+  }, []);
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = useCallback(() => {
     if (selectedItem && onDelete) {
       onDelete(selectedItem.id);
       setSelectedItem(null);
       setDeleteModalOpen(false);
     }
-  };
+  }, [selectedItem, onDelete]);
 
-  const handleShareModalClose = (open: boolean) => {
+  const handleShareModalClose = useCallback((open: boolean) => {
     setShareModalOpen(open);
     if (!open) {
       setSelectedItem(null);
     }
-  };
+  }, []);
 
-  const handleDeleteModalClose = (open: boolean) => {
+  const handleDeleteModalClose = useCallback((open: boolean) => {
     setDeleteModalOpen(open);
     if (!open) {
       setSelectedItem(null);
     }
-  };
+  }, []);
 
-  const handleAddToRoom = async (contentId: string, roomId: string) => {
+  const handleDropdownChange = useCallback((open: boolean, itemId: string) => {
+    setOpenDropdown(open ? itemId : null);
+  }, []);
+
+  const handleAddToRoom = useCallback(async (contentId: string, roomId: string) => {
     try {
       if (onAddToRoom) {
         await onAddToRoom(contentId, roomId);
@@ -164,7 +92,7 @@ export function HistoryTable({
       console.error('Error adding content to room:', error);
       toast.error('Failed to add content to room');
     }
-  };
+  }, [onAddToRoom, rooms]);
 
   if (items.length === 0) {
     return (
@@ -190,85 +118,17 @@ export function HistoryTable({
         </TableHeader>
         <TableBody>
           {items.map((item) => (
-            <TableRow 
-              key={item.id} 
-              className="border-border hover:bg-accent cursor-pointer"
-              onClick={() => onItemClick(item.id)}
-            >
-              <TableCell className="font-medium">
-                <span className="text-foreground">{item.title}</span>
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {item.room || '-'}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  {getContentTypeIcon(item.type)}
-                  <span className="text-muted-foreground">{formatContentType(item.type)}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {format(item.date, 'dd/MM/yyyy')}
-              </TableCell>
-              <TableCell>
-                <DropdownMenu
-                  open={openDropdown === item.id}
-                  onOpenChange={(open) => setOpenDropdown(open ? item.id : null)}
-                >
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className="h-8 w-8 p-0"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <span className="sr-only">Open menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-card border-border">
-                    {rooms.length > 0 && (
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger className="text-foreground">
-                          Add to Room
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent className="bg-card border-border">
-                          {rooms.map((room) => (
-                            <DropdownMenuItem
-                              key={room.id}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleAddToRoom(item.id, room.id);
-                              }}
-                              className="text-foreground hover:bg-accent"
-                            >
-                              {room.name}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                    )}
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleShareClick(item);
-                      }}
-                      className="text-foreground hover:bg-accent"
-                    >
-                      Share
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(item);
-                      }}
-                      className="text-foreground hover:bg-accent"
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
+            <HistoryTableRow
+              key={item.id}
+              item={item}
+              rooms={rooms}
+              isDropdownOpen={openDropdown === item.id}
+              onItemClick={onItemClick}
+              onDropdownChange={handleDropdownChange}
+              onShareClick={handleShareClick}
+              onDeleteClick={handleDeleteClick}
+              onAddToRoom={handleAddToRoom}
+            />
           ))}
         </TableBody>
       </Table>

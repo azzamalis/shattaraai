@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Pencil, Trash, Plus, Check, X, Box } from 'lucide-react';
+import React, { useState, useCallback, memo } from 'react';
+import { Trash, Plus, Box } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -15,7 +15,7 @@ interface RoomCardProps {
   onAdd?: () => Promise<string | null>;
 }
 
-export const RoomCard: React.FC<RoomCardProps> = ({
+const RoomCardComponent: React.FC<RoomCardProps> = ({
   id,
   name,
   contentCount = 0,
@@ -26,27 +26,45 @@ export const RoomCard: React.FC<RoomCardProps> = ({
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
 
-  if (isAddButton) {
-    const handleAddRoom = async () => {
-      if (!onAdd) return;
-      
-      setIsCreating(true);
-      try {
-        const roomId = await onAdd();
-        if (roomId) {
-          // Add delay before navigation to ensure room is created in Supabase
-          setTimeout(() => {
-            navigate(`/rooms/${roomId}`);
-          }, 800);
-        }
-      } catch (error) {
-        console.error('Error creating room:', error);
-        toast.error('Failed to create room');
-      } finally {
-        setIsCreating(false);
+  const handleAddRoom = useCallback(async () => {
+    if (!onAdd) return;
+    
+    setIsCreating(true);
+    try {
+      const roomId = await onAdd();
+      if (roomId) {
+        setTimeout(() => {
+          navigate(`/rooms/${roomId}`);
+        }, 800);
       }
-    };
+    } catch (error) {
+      console.error('Error creating room:', error);
+      toast.error('Failed to create room');
+    } finally {
+      setIsCreating(false);
+    }
+  }, [onAdd, navigate]);
 
+  const handleCardClick = useCallback(() => {
+    if (id) {
+      navigate(`/rooms/${id}`);
+    }
+  }, [id, navigate]);
+
+  const handleDeleteClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete && id) {
+      onDelete(id);
+    }
+  }, [onDelete, id]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      handleCardClick();
+    }
+  }, [handleCardClick]);
+
+  if (isAddButton) {
     return (
       <TooltipProvider>
         <Tooltip>
@@ -81,29 +99,12 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     );
   }
 
-  const handleCardClick = () => {
-    if (id) {
-      navigate(`/rooms/${id}`);
-    }
-  };
-
-  const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onDelete && id) {
-      onDelete(id);
-    }
-  };
-
   return (
     <div 
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          handleCardClick();
-        }
-      }}
+      onKeyDown={handleKeyDown}
       className={cn(
         "relative flex items-center justify-between",
         "p-4",
@@ -136,3 +137,15 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     </div>
   );
 };
+
+// Memoize with custom comparison
+export const RoomCard = memo(RoomCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.name === nextProps.name &&
+    prevProps.contentCount === nextProps.contentCount &&
+    prevProps.isAddButton === nextProps.isAddButton &&
+    prevProps.onDelete === nextProps.onDelete &&
+    prevProps.onAdd === nextProps.onAdd
+  );
+});
