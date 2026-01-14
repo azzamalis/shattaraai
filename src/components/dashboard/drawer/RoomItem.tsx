@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Room } from '@/hooks/useRooms';
-import { MoreHorizontal, Check, X, Pencil, Trash2, Box } from 'lucide-react';
+import { MoreHorizontal, Check, Pencil, Trash2, Box } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 interface RoomItemProps {
   room: Room;
   editingRoomId: string | null;
@@ -15,7 +16,8 @@ interface RoomItemProps {
   onCancelRename: (e: React.MouseEvent) => void;
   onDeleteClick: (e: React.MouseEvent, id: string, name: string) => void;
 }
-export const RoomItem: React.FC<RoomItemProps> = ({
+
+const RoomItemComponent: React.FC<RoomItemProps> = ({
   room,
   editingRoomId,
   editedRoomName,
@@ -26,32 +28,71 @@ export const RoomItem: React.FC<RoomItemProps> = ({
   onCancelRename,
   onDeleteClick
 }) => {
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const isEditing = editingRoomId === room.id;
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      // Create a mock mouse event for the save handler
       const mockMouseEvent = {
         preventDefault: () => {},
         stopPropagation: () => {}
       } as React.MouseEvent;
       onSaveRename(mockMouseEvent, room.id);
     } else if (e.key === 'Escape') {
-      // Create a mock mouse event for the cancel handler
       const mockMouseEvent = {
         preventDefault: () => {},
         stopPropagation: () => {}
       } as React.MouseEvent;
       onCancelRename(mockMouseEvent);
     }
-  };
-  return <div className="flex items-center justify-between gap-2">
-      {editingRoomId === room.id ? <div className="flex items-center gap-2 flex-1">
-          <Input value={editedRoomName} onChange={e => setEditedRoomName(e.target.value)} className="flex-1 h-8" autoFocus onKeyDown={handleKeyDown} />
-          <Button size="sm" onClick={e => onSaveRename(e, room.id)} className="h-8 w-8 p-0" variant="ghost">
+  }, [onSaveRename, onCancelRename, room.id]);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditedRoomName(e.target.value);
+  }, [setEditedRoomName]);
+
+  const handleRoomClick = useCallback((e: React.MouseEvent) => {
+    onRoomClick(e, room.id);
+  }, [onRoomClick, room.id]);
+
+  const handleRenameClick = useCallback((e: React.MouseEvent) => {
+    onRenameClick(e, room.id, room.name);
+  }, [onRenameClick, room.id, room.name]);
+
+  const handleSaveRename = useCallback((e: React.MouseEvent) => {
+    onSaveRename(e, room.id);
+  }, [onSaveRename, room.id]);
+
+  const handleDeleteClick = useCallback((e: React.MouseEvent) => {
+    onDeleteClick(e, room.id, room.name);
+  }, [onDeleteClick, room.id, room.name]);
+
+  return (
+    <div className="flex items-center justify-between gap-2">
+      {isEditing ? (
+        <div className="flex items-center gap-2 flex-1">
+          <Input 
+            value={editedRoomName} 
+            onChange={handleInputChange} 
+            className="flex-1 h-8" 
+            autoFocus 
+            onKeyDown={handleKeyDown} 
+          />
+          <Button 
+            size="sm" 
+            onClick={handleSaveRename} 
+            className="h-8 w-8 p-0" 
+            variant="ghost"
+          >
             <Check className="h-4 w-4" />
           </Button>
-          
-        </div> : <>
-          <Button variant="ghost" className="flex-1 justify-start text-left h-8 px-2 min-w-0 rounded-xl hover:bg-primary/5 hover:text-primary transition-all" onClick={e => onRoomClick(e, room.id)}>
+        </div>
+      ) : (
+        <>
+          <Button 
+            variant="ghost" 
+            className="flex-1 justify-start text-left h-8 px-2 min-w-0 rounded-xl hover:bg-primary/5 hover:text-primary transition-all" 
+            onClick={handleRoomClick}
+          >
             <div className="flex items-center gap-2 min-w-0">
               <div className="flex-shrink-0 w-4 h-4">
                 <Box className="h-4 w-4" />
@@ -66,16 +107,38 @@ export const RoomItem: React.FC<RoomItemProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[200px] p-1">
-              <DropdownMenuItem onClick={e => onRenameClick(e, room.id, room.name)} className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal">
+              <DropdownMenuItem 
+                onClick={handleRenameClick} 
+                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+              >
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={e => onDeleteClick(e, room.id, room.name)} className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal">
+              <DropdownMenuItem 
+                onClick={handleDeleteClick} 
+                className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-normal"
+              >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </>}
-    </div>;
+        </>
+      )}
+    </div>
+  );
 };
+
+// Memoize with custom comparison for performance
+export const RoomItem = memo(RoomItemComponent, (prevProps, nextProps) => {
+  // Only re-render if this specific room's editing state or data changed
+  const prevIsEditing = prevProps.editingRoomId === prevProps.room.id;
+  const nextIsEditing = nextProps.editingRoomId === nextProps.room.id;
+  
+  return (
+    prevProps.room.id === nextProps.room.id &&
+    prevProps.room.name === nextProps.room.name &&
+    prevIsEditing === nextIsEditing &&
+    (prevIsEditing ? prevProps.editedRoomName === nextProps.editedRoomName : true)
+  );
+});
