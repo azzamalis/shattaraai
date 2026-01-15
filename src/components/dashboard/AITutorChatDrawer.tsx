@@ -632,8 +632,6 @@ export function AITutorChatDrawer({
               isLoading={isSending || isAITyping}
               placeholder="Learn anything"
               hideAttachments={false}
-              showMicrophone
-              showContextButton
               className="border-input bg-white dark:bg-neutral-800/50 relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-[0_4px_10px_rgba(0,0,0,0.02)]"
             />
           </div>
