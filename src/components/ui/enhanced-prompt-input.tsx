@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  AtSign,
+  Globe,
   Paperclip,
   Mic,
   AudioLines,
@@ -101,6 +101,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState("auto");
+  const [deepSearchActive, setDeepSearchActive] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -256,10 +257,11 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Add Context Button */}
+              {/* Search Button */}
               <div className="flex items-center gap-0.5">
                 <button
                   type="button"
+                  onClick={() => setDeepSearchActive(!deepSearchActive)}
                   className={cn(
                     "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium",
                     "ring-offset-background transition-colors focus-visible:outline-none",
@@ -267,11 +269,12 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
                     "group mb-1 h-7 w-fit gap-1 rounded-full border p-1.5",
                     "text-primary/60 hover:bg-primary/5 hover:text-primary/70",
                     "focus:outline-none focus:ring-0 focus:ring-offset-0",
-                    "dark:border-neutral-700/80 dark:hover:bg-primary/10"
+                    "dark:border-neutral-700/80 dark:hover:bg-primary/10",
+                    deepSearchActive && "bg-primary/10 text-primary border-primary/20"
                   )}
                 >
-                  <AtSign className="h-4 w-4 flex-shrink-0" />
-                  <span className="ml-0.5 mr-0.5 truncate text-xs capitalize">Add Context</span>
+                  <Globe className="h-4 w-4 flex-shrink-0" />
+                  <span className="ml-0.5 mr-0.5 truncate text-xs capitalize">Search</span>
                 </button>
               </div>
             </div>
