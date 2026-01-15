@@ -111,14 +111,16 @@ export function useChatConversation({
 
     console.log('Creating conversation with params:', { type, contextId, contextType });
 
-    // For general conversations without a valid contextId, don't set context_id
-    // to avoid FK constraint issues with non-existent content entries
+    // For general conversations or room collaborations, don't set context_id
+    // to avoid FK constraint issues (context_id references content table, not rooms)
+    const shouldSetContextId = contextId && contextType !== 'general' && contextType !== 'room';
+    
     const conversationData = {
       user_id: user.id,
       type,
-      context_id: (contextId && contextType !== 'general') ? contextId : null,
+      context_id: shouldSetContextId ? contextId : null,
       context_type: contextType || 'content',
-      metadata: type === 'room_collaboration' ? { room_id: contextId } : {}
+      metadata: type === 'room_collaboration' || contextType === 'room' ? { room_id: contextId } : {}
     };
 
     const { data, error } = await supabase
@@ -156,17 +158,24 @@ export function useChatConversation({
       setIsLoading(true);
       
       try {
-        // If we have a contextId (content ID), try to find existing conversation first
+        // If we have a contextId, try to find existing conversation first
         if (contextId) {
-          console.log('Looking for conversation with contextId:', contextId);
+          console.log('Looking for conversation with contextId:', contextId, 'contextType:', contextType);
           
-          const { data: existingConversation, error } = await supabase
+          let query = supabase
             .from('chat_conversations')
             .select('*')
-            .eq('context_id', contextId)
             .eq('context_type', contextType || 'content')
-            .eq('user_id', user.id)
-            .maybeSingle();
+            .eq('user_id', user.id);
+
+          // For room context, search by metadata.room_id since context_id is null for rooms
+          if (contextType === 'room') {
+            query = query.contains('metadata', { room_id: contextId });
+          } else {
+            query = query.eq('context_id', contextId);
+          }
+
+          const { data: existingConversation, error } = await query.maybeSingle();
 
           if (error && error.code !== 'PGRST116') {
             console.error('Error fetching conversation:', error);
@@ -180,17 +189,32 @@ export function useChatConversation({
             setConversation(existingConversation);
             await fetchMessages(existingConversation.id);
           } else if (autoCreate) {
-            // Verify content exists before creating conversation (prevent FK constraint violations)
-            const { data: contentExists } = await supabase
-              .from('content')
-              .select('id')
-              .eq('id', contextId)
-              .single();
+            // For room context type, verify room exists; for content, verify content exists
+            if (contextType === 'room') {
+              const { data: roomExists } = await supabase
+                .from('rooms')
+                .select('id')
+                .eq('id', contextId)
+                .single();
 
-            if (!contentExists) {
-              console.error('Cannot create conversation: content does not exist', contextId);
-              isCreatingRef.current = false;
-              return;
+              if (!roomExists) {
+                console.error('Cannot create conversation: room does not exist', contextId);
+                isCreatingRef.current = false;
+                return;
+              }
+            } else {
+              // Verify content exists before creating conversation (prevent FK constraint violations)
+              const { data: contentExists } = await supabase
+                .from('content')
+                .select('id')
+                .eq('id', contextId)
+                .single();
+
+              if (!contentExists) {
+                console.error('Cannot create conversation: content does not exist', contextId);
+                isCreatingRef.current = false;
+                return;
+              }
             }
 
             // Create new conversation linked to existing content
