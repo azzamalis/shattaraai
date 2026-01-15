@@ -267,6 +267,7 @@ const AIChat = memo(({
         <EnhancedPromptInput 
           onSubmit={(value, files) => handleSendMessage(value, files)} 
           isLoading={isSending || isProcessingAI || isProcessingFiles}
+          placeholder="Ask about this content..."
         />
       </div>
     </div>

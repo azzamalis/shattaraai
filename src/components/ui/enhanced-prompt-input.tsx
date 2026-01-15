@@ -37,6 +37,7 @@ interface EnhancedPromptInputProps {
   className?: string;
   userPlan?: 'free' | 'pro';
   isLoading?: boolean;
+  placeholder?: string;
 }
 
 const filePreviewVariants = {
@@ -98,7 +99,7 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
   );
 }
 
-export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', isLoading = false }: EnhancedPromptInputProps) {
+export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', isLoading = false, placeholder = "Ask Shattara AI anything" }: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState("auto");
@@ -191,7 +192,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', is
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask Shattara AI anything"
+                placeholder={placeholder}
                 rows={1}
                 className={cn(
                   "outline-none mx-1.5 mb-1.5 max-h-48 w-full resize-none overflow-y-auto",
