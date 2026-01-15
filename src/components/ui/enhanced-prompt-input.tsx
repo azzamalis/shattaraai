@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Globe,
   Paperclip,
-  Mic,
   ArrowUp,
   X,
   FileText,
@@ -190,7 +189,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Learn anything"
+                placeholder="Ask Shattara AI anything"
                 rows={1}
                 className={cn(
                   "outline-none mx-1.5 mb-1.5 max-h-48 w-full resize-none overflow-y-auto",
@@ -296,14 +295,6 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
                 onChange={handleFileChange}
                 style={{ display: 'none' }}
               />
-
-              {/* Mic Button */}
-              <button
-                type="button"
-                className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 hover:text-accent-foreground h-8 w-8 mb-1 mr-1 rounded-md p-2 text-primary/50 opacity-100 hover:bg-muted"
-              >
-                <Mic className="h-5 w-5" />
-              </button>
 
               {/* Submit Button */}
               <button
