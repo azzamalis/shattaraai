@@ -492,7 +492,7 @@ export function AITutorChatDrawer({
                   ) : (
                     <VirtualizedMessageList
                       messages={messages}
-                      className="flex-1 px-4"
+                      className="flex-1 px-4 pt-8"
                       virtualizationThreshold={30}
                       renderMessage={(message: ChatMessage, index: number) => {
                         const isAssistant = message.sender_type === 'ai';
