@@ -1,10 +1,10 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Plus,
-  Globe,
-  ArrowUp,
-  MoreHorizontal,
+  AtSign,
+  Paperclip,
+  Mic,
+  AudioLines,
   X,
   FileText,
   Image as ImageIcon,
@@ -18,31 +18,24 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import {
-  PromptInput,
-  PromptInputTextarea,
-  PromptInputActions,
-  PromptInputAction,
-} from "@/components/prompt-kit/prompt-input";
 import { Dialog } from "@/components/ui/dialog";
 import { UpgradeModal } from "@/components/dashboard/UpgradeModal";
+import { cn } from "@/lib/utils";
 
 const AI_MODELS = [
   { value: "auto", label: "Auto", isPremium: false },
-  { value: "openai/gpt-5-mini", label: "GPT-5 Mini", isPremium: false },
-  { value: "anthropic/claude-sonnet-4-5", label: "Claude 4.5", isPremium: true },
-  { value: "openai/gpt-5", label: "GPT-5", isPremium: true },
-  { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro", isPremium: true },
-  { value: "xai/grok-4", label: "Grok 4", isPremium: true },
+  { value: "google/gemini-3-flash", label: "Gemini 3 Flash", isPremium: false },
+  { value: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet 4.5", isPremium: true },
+  { value: "openai/gpt-5-2", label: "GPT-5.2", isPremium: true },
+  { value: "google/gemini-3-pro", label: "Gemini 3 Pro", isPremium: true },
+  { value: "xai/grok-4-1", label: "Grok 4.1", isPremium: true },
 ];
 
 interface EnhancedPromptInputProps {
   onSubmit?: (value: string, files?: File[]) => void;
   className?: string;
-  userPlan?: 'free' | 'pro'; // Default to 'free' if not provided
+  userPlan?: 'free' | 'pro';
 }
 
 const filePreviewVariants = {
@@ -107,10 +100,10 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
 export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [selectedModel, setSelectedModel] = useState("openai/gpt-5-mini");
-  const [deepSearchActive, setDeepSearchActive] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("auto");
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const hasContent = inputValue.trim().length > 0 || attachedFiles.length > 0;
 
@@ -120,17 +113,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const validFiles = files.filter((file) => {
-      const isPDF = file.type === "application/pdf";
-      const isImage = file.type.startsWith("image/");
-      return isPDF || isImage;
-    });
-
-    if (validFiles.length !== files.length) {
-      console.warn("Some files were filtered out. Only PDF and image files are allowed.");
-    }
-
-    setAttachedFiles((prev) => [...prev, ...validFiles]);
+    setAttachedFiles((prev) => [...prev, ...files]);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -140,7 +123,8 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
     setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (hasContent) {
       onSubmit?.(inputValue, attachedFiles.length > 0 ? attachedFiles : undefined);
       setInputValue("");
@@ -148,9 +132,23 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   const handleModelSelect = (modelValue: string) => {
+    const model = AI_MODELS.find(m => m.value === modelValue);
+    if (model?.isPremium && userPlan === 'free') {
+      setUpgradeModalOpen(true);
+      return;
+    }
     setSelectedModel(modelValue);
   };
+
+  const selectedModelLabel = AI_MODELS.find((model) => model.value === selectedModel)?.label || "Auto";
 
   return (
     <>
@@ -161,7 +159,7 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mb-3 space-y-2"
+            className="mb-3 space-y-2 px-6 sm:px-3"
           >
             {attachedFiles.map((file, index) => (
               <FilePreviewCard key={`${file.name}-${index}`} file={file} onRemove={() => removeFile(index)} />
@@ -170,70 +168,79 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
         )}
       </AnimatePresence>
 
-      {/* Main Input */}
-      <PromptInput
-        value={inputValue}
-        onValueChange={setInputValue}
+      {/* Main Form */}
+      <form
         onSubmit={handleSubmit}
-        className={className || "border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"}
+        className={cn(
+          "relative mx-auto mt-0 flex w-full flex-col items-end justify-center space-y-1",
+          "rounded-3xl border bg-white px-6 sm:px-3",
+          "shadow-[0_4px_10px_rgba(0,0,0,0.02)] transition-all duration-150",
+          "focus-within:border dark:border-primary/10 dark:bg-neutral-800/50",
+          "hover:dark:border-neutral-700/40",
+          className
+        )}
       >
-        <div className="flex flex-col relative">
-          <PromptInputTextarea
-            placeholder="Ask Shattara AI anything"
-            className="min-h-[44px] pt-3 pl-4 pr-12 text-base leading-[1.3]"
-          />
-
-          {/* Submit Button - Absolutely Positioned */}
-          <Button 
-            size="icon" 
-            disabled={!hasContent} 
-            onClick={handleSubmit} 
-            className="absolute right-2 top-2 size-9 rounded-full z-10"
-          >
-            <ArrowUp size={18} />
-          </Button>
-
-          <PromptInputActions className="mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3">
-            <div className="flex items-center gap-2">
-              <PromptInputAction tooltip="Attach files">
-                <Button variant="outline" size="icon" onClick={handleFileAttach} className="size-9 rounded-full">
-                  <Plus size={18} />
-                </Button>
-              </PromptInputAction>
-
-              <PromptInputAction tooltip="Search the web">
-                <Button
-                  variant="ghost"
-                  onClick={() => setDeepSearchActive(!deepSearchActive)}
-                  className={`rounded-full ${deepSearchActive ? "bg-primary/5 text-primary hover:bg-primary/5 hover:text-primary" : ""}`}
-                >
-                  <Globe size={18} />
-                  Search
-                </Button>
-              </PromptInputAction>
+        <div className="flex w-full flex-col">
+          {/* Textarea Row */}
+          <div className="mt-3 flex w-full items-center">
+            <div className="relative w-full text-sm focus-within:ring-none focus-within:outline-none">
+              <textarea
+                ref={textareaRef}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Learn anything"
+                rows={1}
+                className={cn(
+                  "outline-none mx-1.5 mb-1.5 max-h-48 w-full resize-none overflow-y-auto",
+                  "overscroll-y-none text-base border-transparent bg-transparent",
+                  "focus-within:ring-0 placeholder:text-primary/50",
+                  "text-foreground"
+                )}
+                style={{ 
+                  minHeight: '24px',
+                  height: 'auto'
+                }}
+              />
             </div>
+          </div>
 
-            <div className="flex items-center gap-2">
+          {/* Bottom Actions Row */}
+          <div className="flex flex-row items-end justify-between transition-all opacity-70 hover:opacity-100">
+            {/* Left Actions */}
+            <div className="mb-0.5 flex flex-wrap items-center space-x-0.5">
+              {/* Model Selector */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-9 w-fit px-2 gap-1 rounded-full text-primary/60 hover:text-primary/80 hover:bg-transparent"
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex items-center justify-between border-none text-sm",
+                      "h-7 p-1.5 w-fit focus:border-none focus:ring-0 focus:outline-none",
+                      "mb-1 rounded-full bg-transparent text-primary/60",
+                      "transition-all hover:bg-primary/5 dark:hover:bg-primary/10"
+                    )}
                   >
-                    <Sparkles className="h-4 w-4 flex-shrink-0 block md:hidden" />
-                    <span className="text-xs capitalize md:block hidden">
-                      {AI_MODELS.find((model) => model.value === selectedModel)?.label}
-                    </span>
-                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                  </Button>
+                    <div className="mr-1 flex items-center pl-0.5 text-xs">
+                      <Sparkles className="block h-4 w-4 flex-shrink-0 md:hidden" />
+                      <span className="hidden capitalize md:block">{selectedModelLabel}</span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" className="w-auto rounded-2xl p-2 space-y-1.5 bg-popover z-50">
+                <DropdownMenuContent 
+                  align="start" 
+                  side="top" 
+                  className="w-auto rounded-2xl p-2 space-y-1 bg-popover z-50"
+                >
                   {AI_MODELS.map((model) => (
                     <DropdownMenuItem
                       key={model.value}
                       onClick={() => handleModelSelect(model.value)}
-                      className={`flex items-center justify-between rounded-xl ${selectedModel === model.value ? "bg-accent" : ""}`}
+                      className={cn(
+                        "flex items-center justify-between rounded-xl gap-4",
+                        selectedModel === model.value && "bg-accent"
+                      )}
                     >
                       <div className="flex items-center gap-2">
                         {selectedModel === model.value && <Check className="h-4 w-4 text-primary" />}
@@ -248,20 +255,79 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
-          </PromptInputActions>
-        </div>
-      </PromptInput>
 
-      {/* Hidden File Input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept=".pdf,image/*"
-        onChange={handleFileChange}
-        className="hidden"
-      />
+              {/* Add Context Button */}
+              <div className="flex items-center gap-0.5">
+                <button
+                  type="button"
+                  className={cn(
+                    "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium",
+                    "ring-offset-background transition-colors focus-visible:outline-none",
+                    "disabled:pointer-events-none disabled:opacity-50",
+                    "group mb-1 h-7 w-fit gap-1 rounded-full border p-1.5",
+                    "text-primary/60 hover:bg-primary/5 hover:text-primary/70",
+                    "focus:outline-none focus:ring-0 focus:ring-offset-0",
+                    "dark:border-neutral-700/80 dark:hover:bg-primary/10"
+                  )}
+                >
+                  <AtSign className="h-4 w-4 flex-shrink-0" />
+                  <span className="ml-0.5 mr-0.5 truncate text-xs capitalize">Add Context</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Right Actions */}
+            <div className="flex items-center">
+              {/* File Upload */}
+              <label htmlFor="file-upload" className="cursor-pointer">
+                <div className="mb-1 rounded-md p-2 text-primary/50 opacity-100 hover:bg-muted">
+                  <Paperclip className="h-4 w-4 flex-shrink-0 -rotate-45" />
+                </div>
+              </label>
+              <input
+                id="file-upload"
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,audio/mpeg,audio/wav,audio/ogg,audio/mp4,audio/m4a,audio/x-m4a,audio/webm,audio/mov,audio/*,video/mp4,video/webm,video/mpeg,video/avi,video/mov,image/jpeg,image/jpeg,image/png,image/bmp,image/webp,image/svg+xml,image/heic,image/heif,.pdf,.ppt,.pptx,.doc,.docx,.txt,.mp3,.wav,.ogg,.m4a,.webm,.mov,.mp4,.webm,.mpeg,.avi,.mov,.jpg,.jpeg,.png,.bmp,.webp,.svg,.heic,.heif,image/*"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+
+              {/* Mic Button */}
+              <button
+                type="button"
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium",
+                  "ring-offset-background transition-colors focus-visible:outline-none",
+                  "disabled:pointer-events-none disabled:opacity-50",
+                  "hover:text-accent-foreground h-8 w-8 mb-1 mr-1 rounded-md p-2",
+                  "text-primary/50 opacity-100 hover:bg-muted"
+                )}
+              >
+                <Mic className="h-5 w-5" />
+              </button>
+
+              {/* Voice Button */}
+              <button
+                type="button"
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium",
+                  "ring-offset-background transition-colors focus-visible:outline-none",
+                  "disabled:pointer-events-none disabled:opacity-50",
+                  "bg-primary text-primary-foreground hover:bg-primary/90",
+                  "relative mb-2 h-fit space-x-1 rounded-full p-1.5 px-2"
+                )}
+                title="Voice Mode"
+                aria-label="Voice Mode"
+              >
+                <AudioLines className="h-5 w-5" />
+                <span className="text-sm">Voice</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
 
       {/* Upgrade Modal */}
       <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
