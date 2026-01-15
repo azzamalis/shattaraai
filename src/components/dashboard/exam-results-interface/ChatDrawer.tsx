@@ -177,7 +177,7 @@ export function ChatDrawer({
         setChatMessages([]);
       }
     }
-  }, [isOpen, currentQuestionId, examId, chatType, roomId, userName]);
+  }, [isOpen, currentQuestionId, examId, chatType, roomId]);
 
   // Save chat history to localStorage
   useEffect(() => {
