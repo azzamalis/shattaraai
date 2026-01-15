@@ -65,34 +65,36 @@ export default function RoomPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full bg-background">
-        <RoomPageContent
-          currentRoom={currentRoom}
-          roomContent={roomContent}
-          roomId={roomId}
-          isExamMode={isExamMode}
-          examStep={examStep}
-          selectedContentIds={selectedContentIds}
-          handleTitleEdit={handleTitleEdit}
-          handleDescriptionEdit={handleDescriptionEdit}
-          handleContentToggle={handleContentToggle}
-          setIsChatOpen={setIsChatOpen}
-          setIsExamMode={setIsExamMode}
-          handleExamCancel={handleExamCancel}
-          handleToggleSelectAll={handleToggleSelectAll}
-          handleExamNext={handleExamNext}
-          handleExamBack={handleExamBack}
-          handleExamSkip={handleExamSkip}
-          handleStartExam={handleStartExam}
-          numQuestions={numQuestions}
-          setNumQuestions={setNumQuestions}
-          questionType={questionType}
-          setQuestionType={setQuestionType}
-          examLength={examLength}
-          setExamLength={setExamLength}
-          additionalResources={additionalResources}
-          setAdditionalResources={setAdditionalResources}
-        />
+      <div className="flex h-full bg-background">
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
+          <RoomPageContent
+            currentRoom={currentRoom}
+            roomContent={roomContent}
+            roomId={roomId}
+            isExamMode={isExamMode}
+            examStep={examStep}
+            selectedContentIds={selectedContentIds}
+            handleTitleEdit={handleTitleEdit}
+            handleDescriptionEdit={handleDescriptionEdit}
+            handleContentToggle={handleContentToggle}
+            setIsChatOpen={setIsChatOpen}
+            setIsExamMode={setIsExamMode}
+            handleExamCancel={handleExamCancel}
+            handleToggleSelectAll={handleToggleSelectAll}
+            handleExamNext={handleExamNext}
+            handleExamBack={handleExamBack}
+            handleExamSkip={handleExamSkip}
+            handleStartExam={handleStartExam}
+            numQuestions={numQuestions}
+            setNumQuestions={setNumQuestions}
+            questionType={questionType}
+            setQuestionType={setQuestionType}
+            examLength={examLength}
+            setExamLength={setExamLength}
+            additionalResources={additionalResources}
+            setAdditionalResources={setAdditionalResources}
+          />
+        </div>
         
         <AITutorChatDrawer 
           open={isChatOpen} 
