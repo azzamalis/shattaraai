@@ -405,14 +405,6 @@ export function AITutorChatDrawer({
             </TabsList>
           </Tabs>
 
-          {/* Maximize Button - Right */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 rounded-lg px-3 gap-2 text-muted-foreground transition-opacity duration-300 ease-in-out hover:text-foreground hover:bg-transparent"
-          >
-            <Maximize2 className="h-4 w-4" />
-          </Button>
         </div>
 
         {/* Content Area */}
