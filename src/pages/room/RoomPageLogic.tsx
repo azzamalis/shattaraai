@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useRooms } from '@/hooks/useRooms';
@@ -24,11 +24,17 @@ export const useRoomPageLogic = () => {
   const [examLength, setExamLength] = useState('60');
   const [questionType, setQuestionType] = useState('Both');
 
-  // Find the current room from the database
-  const currentRoom = rooms.find(room => room.id === roomId);
+  // Memoized room lookup - prevents recalculation on every render
+  const currentRoom = useMemo(() => 
+    rooms.find(room => room.id === roomId),
+    [rooms, roomId]
+  );
   
-  // Filter content for this room
-  const roomContent = content.filter(item => item.room_id === roomId);
+  // Memoized content filtering - prevents recalculation on every render
+  const roomContent = useMemo(() => 
+    content.filter(item => item.room_id === roomId),
+    [content, roomId]
+  );
 
   // Handle exam modal trigger from exam summary
   useEffect(() => {
@@ -56,7 +62,8 @@ export const useRoomPageLogic = () => {
     }
   }, [isExamMode]);
 
-  const handleTitleEdit = async (newTitle: string) => {
+  // Memoized callback handlers to prevent child re-renders
+  const handleTitleEdit = useCallback(async (newTitle: string) => {
     if (currentRoom) {
       try {
         await editRoom(currentRoom.id, newTitle, currentRoom.description);
@@ -65,9 +72,9 @@ export const useRoomPageLogic = () => {
         toast.error('Failed to update room title');
       }
     }
-  };
+  }, [currentRoom, editRoom]);
 
-  const handleDescriptionEdit = async (newDescription: string) => {
+  const handleDescriptionEdit = useCallback(async (newDescription: string) => {
     if (currentRoom) {
       try {
         await editRoom(currentRoom.id, currentRoom.name, newDescription);
@@ -76,42 +83,39 @@ export const useRoomPageLogic = () => {
         toast.error('Failed to update room description');
       }
     }
-  };
+  }, [currentRoom, editRoom]);
 
-  const handleContentToggle = (contentId: string) => {
+  const handleContentToggle = useCallback((contentId: string) => {
     setSelectedContentIds(prev => 
       prev.includes(contentId) 
         ? prev.filter(id => id !== contentId)
         : [...prev, contentId]
     );
-  };
+  }, []);
 
-  const handleToggleSelectAll = () => {
-    const allSelected = selectedContentIds.length === roomContent.length;
-    setSelectedContentIds(allSelected ? [] : roomContent.map(item => item.id));
-  };
+  const handleToggleSelectAll = useCallback(() => {
+    setSelectedContentIds(prev => {
+      const allSelected = prev.length === roomContent.length;
+      return allSelected ? [] : roomContent.map(item => item.id);
+    });
+  }, [roomContent]);
 
-  const handleExamNext = () => {
-    if (examStep < 3) {
-      setExamStep(examStep + 1);
-    } else {
-      handleStartExam();
-    }
-  };
+  const handleExamNext = useCallback(() => {
+    setExamStep(prev => {
+      if (prev < 3) return prev + 1;
+      return prev;
+    });
+  }, []);
 
-  const handleExamBack = () => {
-    if (examStep > 1) {
-      setExamStep(examStep - 1);
-    }
-  };
+  const handleExamBack = useCallback(() => {
+    setExamStep(prev => (prev > 1 ? prev - 1 : prev));
+  }, []);
 
-  const handleExamSkip = () => {
-    if (examStep < 3) {
-      setExamStep(examStep + 1);
-    }
-  };
+  const handleExamSkip = useCallback(() => {
+    setExamStep(prev => (prev < 3 ? prev + 1 : prev));
+  }, []);
 
-  const handleStartExam = () => {
+  const handleStartExam = useCallback(() => {
     const selectedItems = roomContent.filter(item => selectedContentIds.includes(item.id));
     
     // Build additional resources with extracted content
@@ -119,7 +123,6 @@ export const useRoomPageLogic = () => {
       id: resource.id,
       title: resource.title,
       type: resource.type,
-      // Use extractedContent (from file upload/URL extraction) or fallback to text/url
       content: resource.extractedContent || resource.text || resource.url || '',
       storageUrl: resource.storageUrl,
       hasExtractedContent: !!resource.extractedContent,
@@ -143,13 +146,22 @@ export const useRoomPageLogic = () => {
     localStorage.setItem('examConfig', JSON.stringify(examConfig));
     
     setIsExamMode(false);
-    // Navigate to exam loading page with room ID as parameter
     navigate(`/exam-loading/${roomId}`);
-  };
+  }, [roomContent, selectedContentIds, additionalResources, numQuestions, questionType, examLength, roomId, navigate]);
 
-  const handleExamCancel = () => {
+  const handleExamCancel = useCallback(() => {
     setIsExamMode(false);
-  };
+  }, []);
+
+  // Memoize setters for stable references
+  const stableSetters = useMemo(() => ({
+    setIsChatOpen,
+    setIsExamMode,
+    setAdditionalResources,
+    setNumQuestions,
+    setExamLength,
+    setQuestionType,
+  }), []);
 
   return {
     roomId,
@@ -158,19 +170,14 @@ export const useRoomPageLogic = () => {
     roomsLoading,
     contentLoading,
     isChatOpen,
-    setIsChatOpen,
+    ...stableSetters,
     isExamMode,
-    setIsExamMode,
     examStep,
     selectedContentIds,
     additionalResources,
-    setAdditionalResources,
     numQuestions,
-    setNumQuestions,
     examLength,
-    setExamLength,
     questionType,
-    setQuestionType,
     handleTitleEdit,
     handleDescriptionEdit,
     handleContentToggle,

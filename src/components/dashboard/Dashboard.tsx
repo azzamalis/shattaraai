@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Room, useRooms } from '@/hooks/useRooms';
 import { ContentItem } from '@/hooks/useContent';
 import { DeleteItem } from '@/lib/types';
@@ -27,8 +27,8 @@ export function Dashboard(props: DashboardProps = {}) {
   const [itemToDelete, setItemToDelete] = useState<DeleteItem | null>(null);
   const [itemToShare, setItemToShare] = useState<ContentItem | null>(null);
 
-  // Get current room from URL if we're in a room
-  const currentRoom = React.useMemo(() => {
+  // Get current room from URL if we're in a room - memoized
+  const currentRoom = useMemo(() => {
     const roomId = location.pathname.split('/').pop();
     if (roomId && roomId !== 'dashboard') {
       const room = rooms.find(r => r.id === roomId);
@@ -37,7 +37,8 @@ export function Dashboard(props: DashboardProps = {}) {
     return undefined;
   }, [location.pathname, rooms]);
 
-  const handleDeleteClick = async (roomId: string) => {
+  // Memoized callback handlers to prevent child re-renders
+  const handleDeleteClick = useCallback(async (roomId: string) => {
     const room = rooms.find(r => r.id === roomId);
     if (room) {
       setItemToDelete({
@@ -47,45 +48,56 @@ export function Dashboard(props: DashboardProps = {}) {
       });
       setDeleteModalOpen(true);
     }
-  };
+  }, [rooms]);
 
-  const handleCardDelete = (item: ContentItem) => {
+  const handleCardDelete = useCallback((item: ContentItem) => {
     setItemToDelete({
       id: item.id,
       type: 'card',
       name: item.title
     });
     setDeleteModalOpen(true);
-  };
+  }, []);
 
-  const handleCardShare = (item: ContentItem) => {
+  const handleCardShare = useCallback((item: ContentItem) => {
     setItemToShare(item);
     setShareModalOpen(true);
-  };
+  }, []);
 
-  const handleExploreCardDelete = (item: ContentItem) => {
+  const handleExploreCardDelete = useCallback((item: ContentItem) => {
     setItemToDelete({
       id: item.id,
       type: 'card',
       name: item.title
     });
     setDeleteModalOpen(true);
-  };
+  }, []);
 
-  const handleExploreCardShare = (item: ContentItem) => {
+  const handleExploreCardShare = useCallback((item: ContentItem) => {
     setItemToShare(item);
     setShareModalOpen(true);
-  };
+  }, []);
 
-  const handleUpdateContent = (content: ContentItem) => {
-    // Adapt the single parameter call to the two-parameter function
+  const handleUpdateContent = useCallback((content: ContentItem) => {
     onUpdateContent(content.id, content);
-  };
+  }, [onUpdateContent]);
+
+  const handlePasteClick = useCallback(() => {
+    setIsPasteModalOpen(true);
+  }, []);
+
+  // Memoize modal handlers
+  const modalHandlers = useMemo(() => ({
+    setIsPasteModalOpen,
+    setShareModalOpen,
+    setDeleteModalOpen,
+    setItemToDelete,
+  }), []);
 
   return (
     <div className="flex flex-col h-full">
       <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-background transition-colors duration-300">
-        <DashboardHero onPasteClick={() => setIsPasteModalOpen(true)} />
+        <DashboardHero onPasteClick={handlePasteClick} />
 
         <DashboardSections
           rooms={rooms}
@@ -102,13 +114,13 @@ export function Dashboard(props: DashboardProps = {}) {
 
         <DashboardModals
           isPasteModalOpen={isPasteModalOpen}
-          setIsPasteModalOpen={setIsPasteModalOpen}
+          setIsPasteModalOpen={modalHandlers.setIsPasteModalOpen}
           shareModalOpen={shareModalOpen}
-          setShareModalOpen={setShareModalOpen}
+          setShareModalOpen={modalHandlers.setShareModalOpen}
           deleteModalOpen={deleteModalOpen}
-          setDeleteModalOpen={setDeleteModalOpen}
+          setDeleteModalOpen={modalHandlers.setDeleteModalOpen}
           itemToDelete={itemToDelete}
-          setItemToDelete={setItemToDelete}
+          setItemToDelete={modalHandlers.setItemToDelete}
           itemToShare={itemToShare}
           onDeleteRoom={deleteRoom}
         />
