@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Sparkles,
   Check,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,7 @@ interface EnhancedPromptInputProps {
   onSubmit?: (value: string, files?: File[]) => void;
   className?: string;
   userPlan?: 'free' | 'pro';
+  isLoading?: boolean;
 }
 
 const filePreviewVariants = {
@@ -96,7 +98,7 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
   );
 }
 
-export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: EnhancedPromptInputProps) {
+export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', isLoading = false }: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState("auto");
@@ -299,10 +301,14 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={!hasContent}
+                disabled={!hasContent || isLoading}
                 className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 mb-2 rounded-full"
               >
-                <ArrowUp className="h-5 w-5" />
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <ArrowUp className="h-5 w-5" />
+                )}
               </button>
             </div>
           </div>
