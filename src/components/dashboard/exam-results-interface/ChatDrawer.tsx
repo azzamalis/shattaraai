@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Copy, ThumbsUp, ThumbsDown, Pen, GripVertical, Plus, Sparkles } from 'lucide-react';
+import { X, Copy, ThumbsUp, ThumbsDown, Pen, GripVertical, Plus, Sparkles, CornerDownRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { MessageContent } from '@/components/prompt-kit/message';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ interface ChatMessage {
   content: string;
   timestamp: Date;
   status?: 'sending' | 'sent' | 'delivered';
+  questionReference?: string | null;
 }
 
 interface ChatDrawerProps {
@@ -198,10 +199,16 @@ export function ChatDrawer({
       isUser: true,
       content: content.trim(),
       timestamp: new Date(),
-      status: 'sending'
+      status: 'sending',
+      questionReference: currentQuestionText || null
     };
     
     setChatMessages(prev => [...prev, userMessage]);
+    
+    // Clear the question reference after sending
+    if (onClearQuestionReference) {
+      onClearQuestionReference();
+    }
     
     // Update message status to delivered
     setTimeout(() => {
@@ -491,6 +498,19 @@ export function ChatDrawer({
                             ) : (
                               /* User Message */
                               <div className="flex flex-col gap-2">
+                                {/* Question Reference */}
+                                {message.questionReference && (
+                                  <div className="flex justify-end rounded rounded-t-sm text-primary/50">
+                                    <div className="flex w-full max-w-xs justify-end gap-2">
+                                      <CornerDownRight className="h-4 w-4 flex-shrink-0" />
+                                      <div className="prose prose-neutral dark:prose-invert max-w-none">
+                                        <div className="space-y-4 line-clamp-3 overflow-hidden overflow-ellipsis text-sm">
+                                          <p className="text-base leading-7 last:mb-0">{message.questionReference}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
                                 <div className="flex w-full justify-end">
                                   <div className="group/message flex w-full flex-col items-end gap-1">
                                     <div className="flex w-full justify-end">
