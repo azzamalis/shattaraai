@@ -1,14 +1,17 @@
 
 import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
-import { X, Copy, Trash2, ThumbsUp, ThumbsDown, Pencil, ArrowUp, Loader2, GripVertical, CornerDownRight, Square } from 'lucide-react';
+import { X, Copy, Trash, ThumbsUp, ThumbsDown, Pencil, Loader2, GripVertical, CornerDownRight, Plus, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Message, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
-import { PromptInput, PromptInputTextarea, PromptInputActions, PromptInputAction } from '@/components/prompt-kit/prompt-input';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useWindowSize } from '@/hooks/use-window-size';
 import { VirtualizedMessageList } from '@/components/chat/shared/VirtualizedMessageList';
+import { EnhancedPromptInput } from '@/components/ui/enhanced-prompt-input';
+import { TypingIndicator } from '@/components/chat/shared/StreamingText';
 
 interface ChatMessage {
   id: string;
@@ -30,6 +33,25 @@ interface ChatDrawerProps {
   chatType?: 'question' | 'room';
 }
 
+const TABS = [
+  { id: 'chat', label: 'Chat', hasIndicator: true },
+];
+
+function EmptyState() {
+  return (
+    <div className="mb-[72px] flex flex-col items-center justify-center p-4 text-center text-primary/40 dark:text-primary/60">
+      <div className="mb-4 opacity-20">
+        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <Sparkles className="h-6 w-6 text-primary" />
+        </div>
+      </div>
+      <p className="mb-1 text-base font-medium text-primary/40 dark:text-primary/60">
+        Learn with Shattara AI
+      </p>
+    </div>
+  );
+}
+
 export function ChatDrawer({ 
   isOpen, 
   onClose, 
@@ -42,15 +64,14 @@ export function ChatDrawer({
   chatType = 'question' 
 }: ChatDrawerProps) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [userName, setUserName] = useState<string>('');
+  const [activeTab, setActiveTab] = useState('chat');
   const [panelWidth, setPanelWidth] = useState(() => {
-    // Load saved width or default to 420px
     if (typeof window !== 'undefined') {
-      return parseInt(localStorage.getItem('examChatDrawerWidth') || '420', 10);
+      return parseInt(localStorage.getItem('examChatDrawerWidth') || '576', 10);
     }
-    return 420;
+    return 576;
   });
   const [isResizing, setIsResizing] = useState(false);
   const { isMobile, width: windowWidth } = useWindowSize();
@@ -67,7 +88,7 @@ export function ChatDrawer({
   const handleResize = useCallback((e: MouseEvent) => {
     if (!isResizing) return;
     
-    const newWidth = Math.max(320, Math.min(windowWidth * 0.8, windowWidth - e.clientX));
+    const newWidth = Math.max(400, Math.min(windowWidth * 0.8, windowWidth - e.clientX));
     setPanelWidth(newWidth);
     persistWidth(newWidth);
   }, [isResizing, windowWidth, persistWidth]);
@@ -104,7 +125,7 @@ export function ChatDrawer({
     
     if (e.key === 'ArrowLeft' && e.altKey) {
       e.preventDefault();
-      const newWidth = Math.max(320, panelWidth - 20);
+      const newWidth = Math.max(400, panelWidth - 20);
       setPanelWidth(newWidth);
       persistWidth(newWidth);
     } else if (e.key === 'ArrowRight' && e.altKey) {
@@ -130,7 +151,6 @@ export function ChatDrawer({
       if (session?.user?.user_metadata?.full_name) {
         setUserName(session.user.user_metadata.full_name);
       } else if (session?.user?.email) {
-        // Extract first name from email if no full name
         const firstName = session.user.email.split('@')[0];
         setUserName(firstName);
       } else {
@@ -154,19 +174,7 @@ export function ChatDrawer({
           timestamp: new Date(msg.timestamp)
         })));
       } else {
-        // Only add welcome message for room chat, not question chat
-        if (chatType !== 'question') {
-          const welcomeMessage: ChatMessage = {
-            id: `welcome-${chatType}-${Date.now()}`,
-            isUser: false,
-            content: `Hi ${userName}, I am Shattara AI tutor and I'm here to help you study!`,
-            timestamp: new Date(),
-            status: 'delivered'
-          };
-          setChatMessages([welcomeMessage]);
-        } else {
-          setChatMessages([]);
-        }
+        setChatMessages([]);
       }
     }
   }, [isOpen, currentQuestionId, examId, chatType, roomId, userName]);
@@ -182,20 +190,18 @@ export function ChatDrawer({
     }
   }, [chatMessages, currentQuestionId, examId, chatType, roomId]);
 
-  const sendMessage = async () => {
-    if (!chatInput.trim() || !examId) return;
+  const handleSendMessage = async (content?: string) => {
+    if (!content?.trim() || !examId) return;
     
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       isUser: true,
-      content: chatInput,
+      content: content.trim(),
       timestamp: new Date(),
       status: 'sending'
     };
     
     setChatMessages(prev => [...prev, userMessage]);
-    const currentMessage = chatInput;
-    setChatInput('');
     
     // Update message status to delivered
     setTimeout(() => {
@@ -210,7 +216,6 @@ export function ChatDrawer({
     setIsTyping(true);
     
     try {
-      // Get auth token
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Not authenticated');
@@ -222,10 +227,9 @@ export function ChatDrawer({
         sender_type: msg.isUser ? 'user' : 'ai'
       }));
 
-      // Call the exam chat AI function with question context
       const { data, error } = await supabase.functions.invoke('openai-exam-chat', {
         body: {
-          message: currentMessage,
+          message: content.trim(),
           examId,
           questionId: currentQuestionId,
           questionText: currentQuestionText,
@@ -274,6 +278,17 @@ export function ChatDrawer({
     }
   };
 
+  const handleNewChat = useCallback(() => {
+    const chatKey = chatType === 'question' && currentQuestionId && examId 
+      ? `chat-history-${examId}-${currentQuestionId}`
+      : `space-chat-history-${examId || roomId || 'default'}`;
+    
+    localStorage.removeItem(chatKey);
+    setChatMessages([]);
+    setIsTyping(false);
+    toast.success('Started a new chat');
+  }, [chatType, currentQuestionId, examId, roomId]);
+
   // Memoized handlers
   const handleCopyMessage = useCallback(async (content: string) => {
     try {
@@ -301,234 +316,277 @@ export function ChatDrawer({
     toast.info('Thanks for the feedback!');
   }, []);
 
-  const formatTimestamp = useCallback((date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true
-    }).format(date);
-  }, []);
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex">
-      <div 
-        className="flex-1 bg-black/50" 
-        onClick={onClose}
-      />
-      
-      {/* Resizable Chat Panel */}
-      <div className="h-full flex">
-        {/* Resize Handle */}
-        {!isMobile && (
-          <div
-            ref={resizeRef}
-            className="w-1 bg-border hover:bg-primary/50 cursor-col-resize transition-colors relative group"
-            onMouseDown={handleResizeStart}
-            role="separator"
-            aria-label="Resize chat panel"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                const newWidth = Math.max(320, panelWidth - 20);
-                setPanelWidth(newWidth);
-                persistWidth(newWidth);
-              } else if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                const newWidth = Math.min(windowWidth * 0.8, panelWidth + 20);
-                setPanelWidth(newWidth);
-                persistWidth(newWidth);
-              }
-            }}
-          >
-            <div className="absolute inset-y-0 -left-1 -right-1 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <GripVertical className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </div>
-        )}
-
-        {/* Chat Content */}
-        <div 
-          style={{ 
-            width: isMobile ? '100vw' : panelWidth,
-            maxWidth: isMobile ? '100vw' : '80vw'
+    <aside 
+      className={cn(
+        "fixed right-0 top-0 z-50 h-screen border-l border-primary/5",
+        "transition-all duration-200 ease-in-out bg-background pointer-events-auto",
+        "translate-x-0"
+      )}
+      aria-hidden="false"
+      style={{ width: isMobile ? '100%' : panelWidth }}
+    >
+      {/* Resize Handle */}
+      {!isMobile && (
+        <div
+          ref={resizeRef}
+          className="absolute left-0 top-0 h-full w-1 hover:bg-primary/20 cursor-col-resize transition-colors z-10 group"
+          onMouseDown={handleResizeStart}
+          role="separator"
+          aria-label="Resize chat panel"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              const newWidth = Math.max(400, panelWidth - 20);
+              setPanelWidth(newWidth);
+              persistWidth(newWidth);
+            } else if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              const newWidth = Math.min(windowWidth * 0.8, panelWidth + 20);
+              setPanelWidth(newWidth);
+              persistWidth(newWidth);
+            }
           }}
-          className="bg-card shadow-xl flex flex-col"
         >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-border p-4">
-          <h2 className="text-lg font-semibold">Exam Chat</h2>
-          <button 
-            onClick={onClose}
-            className="rounded-md p-1 hover:bg-accent"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <div className="absolute inset-y-0 -left-1 -right-1 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <GripVertical className="h-4 w-4 text-muted-foreground" />
+          </div>
         </div>
-        
-        {/* Messages Area with Virtualization */}
-        <VirtualizedMessageList
-          messages={chatMessages}
-          className="flex-1 px-4"
-          virtualizationThreshold={30}
-          renderMessage={(message, index) => (
-            <Message 
-              className={cn(
-                "group",
-                message.isUser ? "justify-end" : "justify-start"
-              )}
-            >
-              <div className="flex flex-col gap-1 max-w-[80%]">
-                <MessageContent
-                  markdown={true}
-                  className={cn(
-                    "text-sm p-3",
-                    message.isUser 
-                      ? "bg-[#00A3FF] text-white rounded-2xl rounded-br-md" 
-                      : "bg-muted/50 text-foreground rounded-2xl rounded-bl-md"
-                  )}
-                >
-                  {message.content}
-                </MessageContent>
-                
-                <MessageActions className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  {message.isUser ? (
-                    <>
-                      <MessageAction tooltip="Edit">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleEditMessage(message.id)}
-                        >
-                          <Pencil className="h-3 w-3" />
-                        </Button>
-                      </MessageAction>
-                      <MessageAction tooltip="Delete">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleDeleteMessage(message.id)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </MessageAction>
-                      <MessageAction tooltip="Copy">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleCopyMessage(message.content)}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </MessageAction>
-                    </>
-                  ) : (
-                    <>
-                      <MessageAction tooltip="Copy">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleCopyMessage(message.content)}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </MessageAction>
-                      <MessageAction tooltip="Upvote">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleUpvote(message.id)}
-                        >
-                          <ThumbsUp className="h-3 w-3" />
-                        </Button>
-                      </MessageAction>
-                      <MessageAction tooltip="Downvote">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleDownvote(message.id)}
-                        >
-                          <ThumbsDown className="h-3 w-3" />
-                        </Button>
-                      </MessageAction>
-                    </>
-                  )}
-                </MessageActions>
-                
-                <span className="text-xs text-muted-foreground px-3">
-                  {formatTimestamp(message.timestamp)}
-                </span>
+      )}
+
+      <div className="relative flex h-full flex-col overflow-y-auto px-1 pb-1 pt-4">
+        {/* Header */}
+        <div className="mb-4 ml-4 mr-4 flex items-center justify-between">
+          {/* Close Button - Left */}
+          <button
+            onClick={onClose}
+            className="text-muted-foreground transition-opacity duration-300 ease-in-out hover:text-foreground w-9"
+          >
+            <X className="h-5 w-5 cursor-pointer" />
+          </button>
+
+          {/* Tabs - Center */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex justify-center">
+            <TabsList className="inline-flex p-1 text-muted-foreground relative h-auto w-fit items-center justify-center overflow-x-auto rounded-2xl border border-primary/10 bg-white px-[3px] dark:border-primary/5 dark:bg-neutral-800/50">
+              <div className="flex items-center gap-1 overflow-x-auto overscroll-x-none scrollbar-hide">
+                {TABS.map((tab) => (
+                  <TabsTrigger
+                    key={tab.id}
+                    value={tab.id}
+                    className={cn(
+                      "justify-center whitespace-nowrap px-3 text-sm transition-all",
+                      "focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                      "rounded-lg font-normal hover:bg-primary/5 flex items-center gap-2",
+                      "text-primary/80 data-[state=active]:text-primary hover:text-primary",
+                      "data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10",
+                      "dark:border-primary/10 data-[state=active]:border-transparent",
+                      "dark:data-[state=active]:border-transparent py-1.5"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      {tab.hasIndicator && (
+                        <div className="mx-1 h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                      )}
+                      {tab.label}
+                    </div>
+                  </TabsTrigger>
+                ))}
               </div>
-            </Message>
-          )}
-          footerContent={isTyping ? (
-            <Message className="justify-start">
-              <div className="flex items-center gap-2 bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3">
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Thinking...</span>
-              </div>
-            </Message>
-          ) : undefined}
-        />
-        
-        {/* Input Area */}
-        <div className="p-4">
-          {/* Question Reference Box */}
-          {currentQuestionText && (
-            <div className="mb-3 flex w-full items-center justify-between rounded-lg bg-muted/70 p-3 text-primary/70">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <CornerDownRight className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-                <div className="line-clamp-3 text-sm flex-1 min-w-0">
-                  <p className="text-sm leading-relaxed">{currentQuestionText}</p>
+            </TabsList>
+          </Tabs>
+
+          {/* Spacer for centering */}
+          <div className="w-9" />
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-grow overflow-y-auto overscroll-y-none scrollbar-hide">
+          <div className="flex h-full w-full flex-col">
+            <div className="relative flex h-full w-full flex-col md:h-[calc(100vh-84px)] px-0">
+              {/* Floating Action Buttons */}
+              <div className="absolute right-0 top-0 z-40 mt-1 xl:-mt-2">
+                <div className="flex items-center">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleNewChat}
+                          className="h-9 w-9 rounded-xl text-primary/60 hover:bg-primary/5"
+                          aria-label="New conversation"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>New conversation</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
-              <button 
-                onClick={onClearQuestionReference}
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none hover:bg-accent hover:text-accent-foreground h-6 w-6 p-0.5 flex-shrink-0 ml-2"
-              >
-                <X className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-              </button>
+
+              {/* Question Reference Box */}
+              {currentQuestionText && (
+                <div className="mx-4 mb-3 flex w-auto items-center justify-between rounded-lg bg-muted/70 p-3 text-primary/70">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <CornerDownRight className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                    <div className="line-clamp-3 text-sm flex-1 min-w-0">
+                      <p className="text-sm leading-relaxed">{currentQuestionText}</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={onClearQuestionReference}
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none hover:bg-accent hover:text-accent-foreground h-6 w-6 p-0.5 flex-shrink-0 ml-2"
+                  >
+                    <X className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                  </button>
+                </div>
+              )}
+
+              {/* Messages or Empty State */}
+              {chatMessages.length === 0 ? (
+                <div className="flex flex-1 flex-col items-center justify-center">
+                  <EmptyState />
+                </div>
+              ) : (
+                <VirtualizedMessageList
+                  messages={chatMessages}
+                  className="flex-1 px-4 pt-8"
+                  virtualizationThreshold={30}
+                  renderMessage={(message, index) => {
+                    const isAssistant = !message.isUser;
+                    const isLastMessage = index === chatMessages.length - 1;
+
+                    return (
+                      <Message
+                        className={cn(
+                          "mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6",
+                          isAssistant ? "items-start" : "items-end"
+                        )}
+                      >
+                        {isAssistant ? (
+                          <div className="group flex w-full flex-col gap-0">
+                            <MessageContent
+                              className={cn(
+                                "text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0"
+                              )}
+                              markdown
+                            >
+                              {message.content}
+                            </MessageContent>
+                            <MessageActions
+                              className={cn(
+                                "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+                                isLastMessage && "opacity-100"
+                              )}
+                            >
+                              <MessageAction tooltip="Copy" delayDuration={100}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="rounded-full"
+                                  onClick={() => handleCopyMessage(message.content)}
+                                >
+                                  <Copy />
+                                </Button>
+                              </MessageAction>
+                              <MessageAction tooltip="Upvote" delayDuration={100}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="rounded-full"
+                                  onClick={() => handleUpvote(message.id)}
+                                >
+                                  <ThumbsUp />
+                                </Button>
+                              </MessageAction>
+                              <MessageAction tooltip="Downvote" delayDuration={100}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="rounded-full"
+                                  onClick={() => handleDownvote(message.id)}
+                                >
+                                  <ThumbsDown />
+                                </Button>
+                              </MessageAction>
+                            </MessageActions>
+                          </div>
+                        ) : (
+                          <div className="group flex flex-col items-end gap-1">
+                            <MessageContent className="bg-muted text-primary w-full rounded-3xl px-5 py-2.5">
+                              {message.content}
+                            </MessageContent>
+                            <MessageActions
+                              className={cn(
+                                "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                              )}
+                            >
+                              <MessageAction tooltip="Edit" delayDuration={100}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="rounded-full"
+                                  onClick={() => handleEditMessage(message.id)}
+                                >
+                                  <Pencil />
+                                </Button>
+                              </MessageAction>
+                              <MessageAction tooltip="Delete" delayDuration={100}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="rounded-full"
+                                  onClick={() => handleDeleteMessage(message.id)}
+                                >
+                                  <Trash />
+                                </Button>
+                              </MessageAction>
+                              <MessageAction tooltip="Copy" delayDuration={100}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="rounded-full"
+                                  onClick={() => handleCopyMessage(message.content)}
+                                >
+                                  <Copy />
+                                </Button>
+                              </MessageAction>
+                            </MessageActions>
+                          </div>
+                        )}
+                      </Message>
+                    );
+                  }}
+                  footerContent={isTyping ? (
+                    <Message className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 items-start">
+                      <TypingIndicator />
+                    </Message>
+                  ) : undefined}
+                />
+              )}
             </div>
-          )}
-          <PromptInput
-            value={chatInput}
-            onValueChange={setChatInput}
-            isLoading={isTyping}
-            onSubmit={sendMessage}
-            className="w-full"
-          >
-            <PromptInputTextarea placeholder="Ask a question..." />
-            <PromptInputActions className="justify-end pt-2">
-              <PromptInputAction
-                tooltip={isTyping ? "Stop generation" : "Send message"}
-              >
-                <Button
-                  variant="default"
-                  size="icon"
-                  className="h-8 w-8 rounded-full"
-                  onClick={sendMessage}
-                  disabled={!chatInput.trim() || !examId || isTyping}
-                >
-                  {isTyping ? (
-                    <Square className="size-5 fill-current" />
-                  ) : (
-                    <ArrowUp className="size-5" />
-                  )}
-                </Button>
-              </PromptInputAction>
-            </PromptInputActions>
-          </PromptInput>
+          </div>
         </div>
+
+        {/* Input Area */}
+        <div className="mx-auto mt-0 w-full max-w-3xl px-2 sm:px-0">
+          <EnhancedPromptInput
+            onSubmit={handleSendMessage}
+            isLoading={isTyping}
+            placeholder="Learn anything"
+            hideAttachments={false}
+            showMicrophone={false}
+            showContextButton={false}
+            className="border-input bg-white dark:bg-neutral-800/50 relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-[0_4px_10px_rgba(0,0,0,0.02)]"
+          />
         </div>
       </div>
-    </div>
+    </aside>
   );
 }
