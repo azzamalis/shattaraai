@@ -630,6 +630,46 @@ export function useChatConversation({
     }
   }, [conversationId, fetchMessages]);
 
+  // Clear conversation - deletes all messages and the conversation from Supabase
+  const clearConversation = useCallback(async (): Promise<boolean> => {
+    if (!conversationId || !user) return false;
+
+    try {
+      // First delete all messages in the conversation
+      const { error: messagesError } = await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('conversation_id', conversationId);
+
+      if (messagesError) {
+        console.error('Error deleting messages:', messagesError);
+        throw messagesError;
+      }
+
+      // Then delete the conversation itself
+      const { error: conversationError } = await supabase
+        .from('chat_conversations')
+        .delete()
+        .eq('id', conversationId);
+
+      if (conversationError) {
+        console.error('Error deleting conversation:', conversationError);
+        throw conversationError;
+      }
+
+      // Clear local state
+      setMessages([]);
+      setConversation(null);
+      setConversationId(null);
+      isCreatingRef.current = false;
+
+      return true;
+    } catch (error) {
+      console.error('Error clearing conversation:', error);
+      return false;
+    }
+  }, [conversationId, user]);
+
   return {
     conversation,
     messages,
@@ -639,6 +679,7 @@ export function useChatConversation({
     addAIResponse,
     addStreamingAIResponse,
     retryMessage,
-    refreshMessages
+    refreshMessages,
+    clearConversation
   };
 }
