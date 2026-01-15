@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Globe,
@@ -13,6 +13,7 @@ import {
   Loader2,
   Mic,
   AtSign,
+  CornerDownRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +44,10 @@ interface EnhancedPromptInputProps {
   hideAttachments?: boolean;
   showMicrophone?: boolean;
   showContextButton?: boolean;
+  contextReference?: {
+    text: string;
+    onClear?: () => void;
+  } | null;
 }
 
 const filePreviewVariants = {
@@ -112,7 +117,8 @@ export function EnhancedPromptInput({
   placeholder = "Ask Shattara AI anything", 
   hideAttachments = false,
   showMicrophone = false,
-  showContextButton = false 
+  showContextButton = false,
+  contextReference = null
 }: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
@@ -197,6 +203,25 @@ export function EnhancedPromptInput({
           className
         )}
       >
+        {/* Context Reference Box - Inside Form */}
+        {contextReference && (
+          <div className="mt-3 flex w-full items-center justify-between rounded rounded-t-md bg-muted/70 p-2 text-primary/70">
+            <div className="flex items-center gap-2">
+              <CornerDownRight className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+              <span className="line-clamp-3 text-sm">{contextReference.text}</span>
+            </div>
+            {contextReference.onClear && (
+              <button 
+                type="button"
+                onClick={contextReference.onClear}
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none hover:bg-accent hover:text-accent-foreground h-6 w-6 p-0.5"
+              >
+                <X className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="flex w-full flex-col">
           {/* Textarea Row */}
           <div className="mt-3 flex w-full items-center">
