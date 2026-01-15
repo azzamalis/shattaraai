@@ -4,7 +4,7 @@ import {
   Globe,
   Paperclip,
   Mic,
-  AudioLines,
+  ArrowUp,
   X,
   FileText,
   Image as ImageIcon,
@@ -300,32 +300,18 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free' }: 
               {/* Mic Button */}
               <button
                 type="button"
-                className={cn(
-                  "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium",
-                  "ring-offset-background transition-colors focus-visible:outline-none",
-                  "disabled:pointer-events-none disabled:opacity-50",
-                  "hover:text-accent-foreground h-8 w-8 mb-1 mr-1 rounded-md p-2",
-                  "text-primary/50 opacity-100 hover:bg-muted"
-                )}
+                className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 hover:text-accent-foreground h-8 w-8 mb-1 mr-1 rounded-md p-2 text-primary/50 opacity-100 hover:bg-muted"
               >
                 <Mic className="h-5 w-5" />
               </button>
 
-              {/* Voice Button */}
+              {/* Submit Button */}
               <button
-                type="button"
-                className={cn(
-                  "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium",
-                  "ring-offset-background transition-colors focus-visible:outline-none",
-                  "disabled:pointer-events-none disabled:opacity-50",
-                  "bg-primary text-primary-foreground hover:bg-primary/90",
-                  "relative mb-2 h-fit space-x-1 rounded-full p-1.5 px-2"
-                )}
-                title="Voice Mode"
-                aria-label="Voice Mode"
+                type="submit"
+                disabled={!hasContent}
+                className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 mb-2 rounded-full"
               >
-                <AudioLines className="h-5 w-5" />
-                <span className="text-sm">Voice</span>
+                <ArrowUp className="h-5 w-5" />
               </button>
             </div>
           </div>
