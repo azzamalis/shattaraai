@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
-import { X, Loader2, AlertCircle, Clock, GripVertical, SquarePen, Copy, ThumbsUp, ThumbsDown, Pencil, Trash } from 'lucide-react';
+import { X, Loader2, AlertCircle, Clock, GripVertical, SquarePen, Copy, ThumbsUp, ThumbsDown, Pencil, Trash, Plus, History, Maximize2, Sparkles, Layers, FileQuestion, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -32,12 +33,35 @@ interface AITutorChatDrawerProps {
   }>;
 }
 
+const TABS = [
+  { id: 'chat', label: 'Chat', icon: null, hasIndicator: true },
+  { id: 'flashcards', label: 'Flashcards', icon: Layers },
+  { id: 'quizzes', label: 'Quizzes', icon: FileQuestion },
+  { id: 'summary', label: 'Summary', icon: FileText },
+];
+
+function EmptyState() {
+  return (
+    <div className="mb-[72px] flex flex-col items-center justify-center p-4 text-center text-primary/40 dark:text-primary/60">
+      <div className="mb-4 opacity-20">
+        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <Sparkles className="h-6 w-6 text-primary" />
+        </div>
+      </div>
+      <p className="mb-1 text-base font-medium text-primary/40 dark:text-primary/60">
+        Learn with Shattara AI
+      </p>
+    </div>
+  );
+}
+
 export function AITutorChatDrawer({
   open,
   onOpenChange,
   roomId,
   roomContent = []
 }: AITutorChatDrawerProps) {
+  const [activeTab, setActiveTab] = useState('chat');
   const [isAITyping, setIsAITyping] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [welcomeMessageSent, setWelcomeMessageSent] = useState(false);
@@ -45,9 +69,9 @@ export function AITutorChatDrawer({
   const [isNearLimit, setIsNearLimit] = useState(false);
   const [panelWidth, setPanelWidth] = useState(() => {
     if (typeof window !== 'undefined') {
-      return parseInt(localStorage.getItem('aiChatDrawerWidth') || '400', 10);
+      return parseInt(localStorage.getItem('aiChatDrawerWidth') || '576', 10);
     }
-    return 400;
+    return 576;
   });
   const [isResizing, setIsResizing] = useState(false);
   const { isMobile, width: windowWidth } = useWindowSize();
@@ -97,7 +121,7 @@ export function AITutorChatDrawer({
   const handleResize = useCallback((e: MouseEvent) => {
     if (!isResizing) return;
     
-    const newWidth = Math.max(320, Math.min(windowWidth * 0.8, windowWidth - e.clientX));
+    const newWidth = Math.max(400, Math.min(windowWidth * 0.8, windowWidth - e.clientX));
     setPanelWidth(newWidth);
     persistWidth(newWidth);
   }, [isResizing, windowWidth, persistWidth]);
@@ -261,7 +285,7 @@ export function AITutorChatDrawer({
     
     if (e.key === 'ArrowLeft' && e.altKey) {
       e.preventDefault();
-      const newWidth = Math.max(320, panelWidth - 20);
+      const newWidth = Math.max(400, panelWidth - 20);
       setPanelWidth(newWidth);
       persistWidth(newWidth);
     } else if (e.key === 'ArrowRight' && e.altKey) {
@@ -283,259 +307,362 @@ export function AITutorChatDrawer({
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-end">
-        <div 
-          style={{ width: isMobile ? '100%' : panelWidth }}
-          className="h-full bg-background border-l border-border flex items-center justify-center"
-        >
+      <aside 
+        className={cn(
+          "fixed right-0 top-0 z-50 h-screen border-l border-primary/5",
+          "transition-all duration-200 ease-in-out bg-background pointer-events-auto"
+        )}
+        style={{ width: isMobile ? '100%' : panelWidth }}
+      >
+        <div className="flex h-full items-center justify-center">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             <span>Loading chat...</span>
           </div>
         </div>
-      </div>
+      </aside>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-end">
-      {/* Resizable Chat Panel */}
-      <div className="h-full flex">
-        {/* Resize Handle */}
-        {!isMobile && (
-          <div
-            ref={resizeRef}
-            className="w-1 bg-border hover:bg-primary/50 cursor-col-resize transition-colors relative group"
-            onMouseDown={handleResizeStart}
-            role="separator"
-            aria-label="Resize chat panel"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                const newWidth = Math.max(320, panelWidth - 20);
-                setPanelWidth(newWidth);
-                persistWidth(newWidth);
-              } else if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                const newWidth = Math.min(windowWidth * 0.8, panelWidth + 20);
-                setPanelWidth(newWidth);
-                persistWidth(newWidth);
-              }
-            }}
-          >
-            <div className="absolute inset-y-0 -left-1 -right-1 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <GripVertical className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </div>
-        )}
-
-        {/* Chat Content */}
-        <div 
-          style={{ 
-            width: isMobile ? '100vw' : panelWidth,
-            maxWidth: isMobile ? '100vw' : '80vw'
+    <aside 
+      className={cn(
+        "fixed right-0 top-0 z-50 h-screen border-l border-primary/5",
+        "transition-all duration-200 ease-in-out bg-background pointer-events-auto",
+        "translate-x-0"
+      )}
+      aria-hidden="false"
+      style={{ width: isMobile ? '100%' : panelWidth }}
+    >
+      {/* Resize Handle */}
+      {!isMobile && (
+        <div
+          ref={resizeRef}
+          className="absolute left-0 top-0 h-full w-1 hover:bg-primary/20 cursor-col-resize transition-colors z-10 group"
+          onMouseDown={handleResizeStart}
+          role="separator"
+          aria-label="Resize chat panel"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              const newWidth = Math.max(400, panelWidth - 20);
+              setPanelWidth(newWidth);
+              persistWidth(newWidth);
+            } else if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              const newWidth = Math.min(windowWidth * 0.8, panelWidth + 20);
+              setPanelWidth(newWidth);
+              persistWidth(newWidth);
+            }
           }}
-          className="h-full bg-background border-l border-border flex flex-col"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background shrink-0">
-            <h3 className="text-lg font-semibold text-foreground truncate">Learn with Shattara AI Tutor</h3>
-            <TooltipProvider>
-              <div className="flex items-center gap-2 shrink-0">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={handleNewChat}
-                      className="text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200"
-                    >
-                      <SquarePen className="h-4 w-4" />
-                      <span className="sr-only">New Chat</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>New Chat</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => onOpenChange(false)}
-                  className="text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200"
-                >
-                  <X className="h-4 w-4" />
-                  <span className="sr-only">Close</span>
-                </Button>
-              </div>
-            </TooltipProvider>
+          <div className="absolute inset-y-0 -left-1 -right-1 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
-          
-          {/* Usage Warning */}
-          {isNearLimit && (
-            <Alert className="mx-6 my-4 shrink-0">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm break-words">
-                You're approaching your daily chat limit. 
-                {usageStats && planLimits && (
-                  <span className="ml-1">
-                    {usageStats.chatRequests}/{planLimits.dailyChatLimit} requests used
-                  </span>
-                )}
-              </AlertDescription>
-            </Alert>
-          )}
+        </div>
+      )}
 
-          {/* Rate Limit Error */}
-          {rateLimitError && (
-            <Alert variant="destructive" className="mx-6 my-4 shrink-0">
-              <Clock className="h-4 w-4" />
-              <AlertDescription className="text-sm break-words">{rateLimitError}</AlertDescription>
-            </Alert>
-          )}
-          
-          {/* Messages Container with Virtualization */}
-          <VirtualizedMessageList
-            messages={messages}
-            className="flex-1 px-4"
-            virtualizationThreshold={30}
-            renderMessage={(message: ChatMessage, index: number) => {
-              const isAssistant = message.sender_type === 'ai';
-              const isLastMessage = index === messages.length - 1;
-              const isStreaming = message.id === streamingMessageId;
+      <div className="relative flex h-full flex-col overflow-y-auto px-1 pb-1 pt-4">
+        {/* Header */}
+        <div className="mb-4 ml-4 mr-2 flex items-center justify-between">
+          {/* Close Button - Left */}
+          <button
+            onClick={() => onOpenChange(false)}
+            className="text-muted-foreground transition-opacity duration-300 ease-in-out hover:text-foreground"
+          >
+            <X className="h-5 w-5 cursor-pointer" />
+          </button>
 
-              return (
-                <Message
-                  className={cn(
-                    "mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6",
-                    isAssistant ? "items-start" : "items-end"
-                  )}
-                >
-                  {isAssistant ? (
-                    <div className="group flex w-full flex-col gap-0">
-                      <MessageContent
-                        className={cn(
-                          "text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0",
-                          isStreaming && "animate-fade-in"
-                        )}
-                        markdown
-                      >
-                        {message.content}
-                      </MessageContent>
-                      {/* Streaming cursor indicator */}
-                      {isStreaming && message.content.length > 0 && (
-                        <span 
-                          className="inline-block w-1.5 h-4 bg-primary/70 ml-1 animate-pulse rounded-sm"
-                          aria-label="AI is typing"
-                        />
+          {/* Tabs - Center */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 mx-4">
+            <TabsList className="inline-flex p-1 text-muted-foreground relative mx-auto h-auto w-fit items-center justify-center overflow-x-auto rounded-2xl border border-primary/10 bg-white px-[3px] dark:border-primary/5 dark:bg-neutral-800/50">
+              <div className="flex items-center gap-1 overflow-x-auto overscroll-x-none scrollbar-hide">
+                {TABS.map((tab) => (
+                  <TabsTrigger
+                    key={tab.id}
+                    value={tab.id}
+                    className={cn(
+                      "justify-center whitespace-nowrap px-3 text-sm transition-all",
+                      "focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                      "rounded-lg font-normal hover:bg-primary/5 flex items-center gap-2",
+                      "text-primary/80 data-[state=active]:text-primary hover:text-primary",
+                      "data-[state=active]:bg-primary/5 dark:data-[state=active]:bg-primary/10",
+                      "dark:border-primary/10 data-[state=active]:border-transparent",
+                      "dark:data-[state=active]:border-transparent py-1.5"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      {tab.hasIndicator && (
+                        <div className="mx-1 h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
                       )}
-                      <MessageActions
-                        className={cn(
-                          "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                          isLastMessage && !isStreaming && "opacity-100"
+                      {tab.icon && <tab.icon className="h-4 w-4" />}
+                      {tab.label}
+                    </div>
+                  </TabsTrigger>
+                ))}
+              </div>
+            </TabsList>
+          </Tabs>
+
+          {/* Maximize Button - Right */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 rounded-lg px-3 gap-2 text-muted-foreground transition-opacity duration-300 ease-in-out hover:text-foreground hover:bg-transparent"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-grow overflow-y-auto overscroll-y-none scrollbar-hide">
+          <div className="flex h-full w-full flex-col">
+            <div className="relative flex h-full w-full flex-col md:h-[calc(100vh-84px)] px-0">
+              {/* Floating Action Buttons */}
+              <div className="absolute right-0 top-0 z-40 mt-1 xl:-mt-2">
+                <div className="flex items-center">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleNewChat}
+                          className="h-9 w-9 rounded-xl text-primary/60 hover:bg-primary/5"
+                          aria-label="New conversation"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>New conversation</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 rounded-xl text-primary/60 hover:bg-primary/5"
+                          aria-label="Chat history"
+                        >
+                          <History className="h-3.5 w-3.5 shrink-0" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Chat history</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </div>
+
+              {/* Chat Tab Content */}
+              {activeTab === 'chat' && (
+                <>
+                  {/* Usage Warning */}
+                  {isNearLimit && (
+                    <Alert className="mx-4 my-2 shrink-0">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription className="text-sm break-words">
+                        You're approaching your daily chat limit. 
+                        {usageStats && planLimits && (
+                          <span className="ml-1">
+                            {usageStats.chatRequests}/{planLimits.dailyChatLimit} requests used
+                          </span>
                         )}
-                      >
-                        <MessageAction tooltip="Copy" delayDuration={100}>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={() => handleCopyMessage(message.content)}
-                            disabled={isStreaming}
-                          >
-                            <Copy />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction tooltip="Upvote" delayDuration={100}>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={() => handleUpvote(message.id)}
-                            disabled={isStreaming}
-                          >
-                            <ThumbsUp />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction tooltip="Downvote" delayDuration={100}>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={() => handleDownvote(message.id)}
-                            disabled={isStreaming}
-                          >
-                            <ThumbsDown />
-                          </Button>
-                        </MessageAction>
-                      </MessageActions>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Rate Limit Error */}
+                  {rateLimitError && (
+                    <Alert variant="destructive" className="mx-4 my-2 shrink-0">
+                      <Clock className="h-4 w-4" />
+                      <AlertDescription className="text-sm break-words">{rateLimitError}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Messages or Empty State */}
+                  {messages.length === 0 ? (
+                    <div className="flex flex-1 flex-col items-center justify-center">
+                      <EmptyState />
                     </div>
                   ) : (
-                    <div className="group flex flex-col items-end gap-1">
-                      <MessageContent className="bg-muted text-primary w-full rounded-3xl px-5 py-2.5">
-                        {message.content}
-                      </MessageContent>
-                      <MessageActions
-                        className={cn(
-                          "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-                        )}
-                      >
-                        <MessageAction tooltip="Edit" delayDuration={100}>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={() => handleEditMessage(message.id)}
+                    <VirtualizedMessageList
+                      messages={messages}
+                      className="flex-1 px-4"
+                      virtualizationThreshold={30}
+                      renderMessage={(message: ChatMessage, index: number) => {
+                        const isAssistant = message.sender_type === 'ai';
+                        const isLastMessage = index === messages.length - 1;
+                        const isStreaming = message.id === streamingMessageId;
+
+                        return (
+                          <Message
+                            className={cn(
+                              "mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6",
+                              isAssistant ? "items-start" : "items-end"
+                            )}
                           >
-                            <Pencil />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction tooltip="Delete" delayDuration={100}>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={() => handleDeleteMessage(message.id)}
-                          >
-                            <Trash />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction tooltip="Copy" delayDuration={100}>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={() => handleCopyMessage(message.content)}
-                          >
-                            <Copy />
-                          </Button>
-                        </MessageAction>
-                      </MessageActions>
-                    </div>
+                            {isAssistant ? (
+                              <div className="group flex w-full flex-col gap-0">
+                                <MessageContent
+                                  className={cn(
+                                    "text-foreground prose w-full flex-1 rounded-lg bg-transparent p-0",
+                                    isStreaming && "animate-fade-in"
+                                  )}
+                                  markdown
+                                >
+                                  {message.content}
+                                </MessageContent>
+                                {/* Streaming cursor indicator */}
+                                {isStreaming && message.content.length > 0 && (
+                                  <span 
+                                    className="inline-block w-1.5 h-4 bg-primary/70 ml-1 animate-pulse rounded-sm"
+                                    aria-label="AI is typing"
+                                  />
+                                )}
+                                <MessageActions
+                                  className={cn(
+                                    "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+                                    isLastMessage && !isStreaming && "opacity-100"
+                                  )}
+                                >
+                                  <MessageAction tooltip="Copy" delayDuration={100}>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="rounded-full"
+                                      onClick={() => handleCopyMessage(message.content)}
+                                      disabled={isStreaming}
+                                    >
+                                      <Copy />
+                                    </Button>
+                                  </MessageAction>
+                                  <MessageAction tooltip="Upvote" delayDuration={100}>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="rounded-full"
+                                      onClick={() => handleUpvote(message.id)}
+                                      disabled={isStreaming}
+                                    >
+                                      <ThumbsUp />
+                                    </Button>
+                                  </MessageAction>
+                                  <MessageAction tooltip="Downvote" delayDuration={100}>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="rounded-full"
+                                      onClick={() => handleDownvote(message.id)}
+                                      disabled={isStreaming}
+                                    >
+                                      <ThumbsDown />
+                                    </Button>
+                                  </MessageAction>
+                                </MessageActions>
+                              </div>
+                            ) : (
+                              <div className="group flex flex-col items-end gap-1">
+                                <MessageContent className="bg-muted text-primary w-full rounded-3xl px-5 py-2.5">
+                                  {message.content}
+                                </MessageContent>
+                                <MessageActions
+                                  className={cn(
+                                    "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                                  )}
+                                >
+                                  <MessageAction tooltip="Edit" delayDuration={100}>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="rounded-full"
+                                      onClick={() => handleEditMessage(message.id)}
+                                    >
+                                      <Pencil />
+                                    </Button>
+                                  </MessageAction>
+                                  <MessageAction tooltip="Delete" delayDuration={100}>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="rounded-full"
+                                      onClick={() => handleDeleteMessage(message.id)}
+                                    >
+                                      <Trash />
+                                    </Button>
+                                  </MessageAction>
+                                  <MessageAction tooltip="Copy" delayDuration={100}>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="rounded-full"
+                                      onClick={() => handleCopyMessage(message.content)}
+                                    >
+                                      <Copy />
+                                    </Button>
+                                  </MessageAction>
+                                </MessageActions>
+                              </div>
+                            )}
+                          </Message>
+                        );
+                      }}
+                      footerContent={isAITyping && !streamingMessageId ? (
+                        <Message className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 items-start">
+                          <TypingIndicator />
+                        </Message>
+                      ) : undefined}
+                    />
                   )}
-                </Message>
-              );
-            }}
-            footerContent={isAITyping && !streamingMessageId ? (
-              <Message className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-0 md:px-6 items-start">
-                <TypingIndicator />
-              </Message>
-            ) : undefined}
-          />
-          
-          {/* Input Area */}
-          <div className="inset-x-0 bottom-0 mx-auto w-full shrink-0 px-6 pb-6">
+                </>
+              )}
+
+              {/* Flashcards Tab Content */}
+              {activeTab === 'flashcards' && (
+                <div className="flex flex-1 flex-col items-center justify-center text-center p-8">
+                  <Layers className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                  <p className="text-muted-foreground">Flashcards coming soon</p>
+                </div>
+              )}
+
+              {/* Quizzes Tab Content */}
+              {activeTab === 'quizzes' && (
+                <div className="flex flex-1 flex-col items-center justify-center text-center p-8">
+                  <FileQuestion className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                  <p className="text-muted-foreground">Quizzes coming soon</p>
+                </div>
+              )}
+
+              {/* Summary Tab Content */}
+              {activeTab === 'summary' && (
+                <div className="flex flex-1 flex-col items-center justify-center text-center p-8">
+                  <FileText className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                  <p className="text-muted-foreground">Summary coming soon</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Input Area - Only show for chat tab */}
+        {activeTab === 'chat' && (
+          <div className="mx-auto mt-0 w-full max-w-3xl px-2 sm:px-0">
             <EnhancedPromptInput
               onSubmit={handleSendMessage}
               isLoading={isSending || isAITyping}
-              placeholder="Ask about your study materials..."
-              hideAttachments
-              className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
+              placeholder="Learn anything"
+              hideAttachments={false}
+              showMicrophone
+              showContextButton
+              className="border-input bg-white dark:bg-neutral-800/50 relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-[0_4px_10px_rgba(0,0,0,0.02)]"
             />
           </div>
-        </div>
+        )}
       </div>
-    </div>
+    </aside>
   );
 }
