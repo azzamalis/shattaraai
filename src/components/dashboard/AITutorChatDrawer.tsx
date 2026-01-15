@@ -362,18 +362,18 @@ export function AITutorChatDrawer({
 
       <div className="relative flex h-full flex-col overflow-y-auto px-1 pb-1 pt-4">
         {/* Header */}
-        <div className="mb-4 ml-4 mr-2 flex items-center justify-between">
+        <div className="mb-4 ml-4 mr-4 flex items-center justify-between">
           {/* Close Button - Left */}
           <button
             onClick={() => onOpenChange(false)}
-            className="text-muted-foreground transition-opacity duration-300 ease-in-out hover:text-foreground"
+            className="text-muted-foreground transition-opacity duration-300 ease-in-out hover:text-foreground w-9"
           >
             <X className="h-5 w-5 cursor-pointer" />
           </button>
 
           {/* Tabs - Center */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 mx-4">
-            <TabsList className="inline-flex p-1 text-muted-foreground relative mx-auto h-auto w-fit items-center justify-center overflow-x-auto rounded-2xl border border-primary/10 bg-white px-[3px] dark:border-primary/5 dark:bg-neutral-800/50">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex justify-center">
+            <TabsList className="inline-flex p-1 text-muted-foreground relative h-auto w-fit items-center justify-center overflow-x-auto rounded-2xl border border-primary/10 bg-white px-[3px] dark:border-primary/5 dark:bg-neutral-800/50">
               <div className="flex items-center gap-1 overflow-x-auto overscroll-x-none scrollbar-hide">
                 {TABS.map((tab) => (
                   <TabsTrigger
@@ -402,6 +402,8 @@ export function AITutorChatDrawer({
             </TabsList>
           </Tabs>
 
+          {/* Spacer for centering */}
+          <div className="w-9" />
         </div>
 
         {/* Content Area */}
