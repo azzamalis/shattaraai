@@ -38,6 +38,7 @@ interface EnhancedPromptInputProps {
   userPlan?: 'free' | 'pro';
   isLoading?: boolean;
   placeholder?: string;
+  hideAttachments?: boolean;
 }
 
 const filePreviewVariants = {
@@ -99,7 +100,7 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
   );
 }
 
-export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', isLoading = false, placeholder = "Ask Shattara AI anything" }: EnhancedPromptInputProps) {
+export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', isLoading = false, placeholder = "Ask Shattara AI anything", hideAttachments = false }: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState("auto");
@@ -284,20 +285,24 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', is
             {/* Right Actions */}
             <div className="flex items-center">
               {/* File Upload */}
-              <label htmlFor="file-upload" className="cursor-pointer">
-                <div className="mb-1 rounded-md p-2 text-primary/50 opacity-100 hover:bg-muted">
-                  <Paperclip className="h-4 w-4 flex-shrink-0 -rotate-45" />
-                </div>
-              </label>
-              <input
-                id="file-upload"
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,audio/mpeg,audio/wav,audio/ogg,audio/mp4,audio/m4a,audio/x-m4a,audio/webm,audio/mov,audio/*,video/mp4,video/webm,video/mpeg,video/avi,video/mov,image/jpeg,image/jpeg,image/png,image/bmp,image/webp,image/svg+xml,image/heic,image/heif,.pdf,.ppt,.pptx,.doc,.docx,.txt,.mp3,.wav,.ogg,.m4a,.webm,.mov,.mp4,.webm,.mpeg,.avi,.mov,.jpg,.jpeg,.png,.bmp,.webp,.svg,.heic,.heif,image/*"
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
-              />
+              {!hideAttachments && (
+                <>
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <div className="mb-1 rounded-md p-2 text-primary/50 opacity-100 hover:bg-muted">
+                      <Paperclip className="h-4 w-4 flex-shrink-0 -rotate-45" />
+                    </div>
+                  </label>
+                  <input
+                    id="file-upload"
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,audio/mpeg,audio/wav,audio/ogg,audio/mp4,audio/m4a,audio/x-m4a,audio/webm,audio/mov,audio/*,video/mp4,video/webm,video/mpeg,video/avi,video/mov,image/jpeg,image/jpeg,image/png,image/bmp,image/webp,image/svg+xml,image/heic,image/heif,.pdf,.ppt,.pptx,.doc,.docx,.txt,.mp3,.wav,.ogg,.m4a,.webm,.mov,.mp4,.webm,.mpeg,.avi,.mov,.jpg,.jpeg,.png,.bmp,.webp,.svg,.heic,.heif,image/*"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                </>
+              )}
 
               {/* Submit Button */}
               <button
