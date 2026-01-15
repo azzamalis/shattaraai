@@ -12,6 +12,7 @@ import { useChatConversation } from '@/hooks/useChatConversation';
 import { useOpenAIChatContent } from '@/hooks/useOpenAIChatContent';
 import { ChatTitleGenerator } from './shared/ChatTitleGenerator';
 import { LoadingIndicator } from './LoadingIndicator';
+import { TypingIndicator } from './shared/StreamingText';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,6 +44,7 @@ export function ChatInterface({
   const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
   const [isProcessingFiles, setIsProcessingFiles] = useState(false);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const { user } = useAuth();
   
   const {
@@ -51,7 +53,8 @@ export function ChatInterface({
     isLoading,
     isSending,
     sendMessage,
-    addAIResponse
+    addAIResponse,
+    addStreamingAIResponse
   } = useChatConversation({
     conversationType: roomId ? 'room_collaboration' : 'general',
     contextId: roomId || contentId,
@@ -72,7 +75,7 @@ export function ChatInterface({
     .filter(m => m.attachments && m.attachments.length > 0)
     .flatMap(m => m.attachments || []);
 
-  const { sendMessageToAI } = useOpenAIChatContent({
+  const { sendMessageToAI, streamMessageToAI } = useOpenAIChatContent({
     conversationId: conversation?.id,
     contextId: contentId,
     conversationHistory,
@@ -189,7 +192,7 @@ export function ChatInterface({
       const userMessage = await sendMessage(content, uploadedAttachments.length > 0 ? uploadedAttachments : undefined);
       
       if (userMessage) {
-        // 3. Generate AI response with attachment content
+        // 3. Generate streaming AI response with attachment content
         setIsProcessingAI(true);
         try {
           // Build message with attachment content inline
@@ -205,12 +208,27 @@ export function ChatInterface({
             }
           }
           
-          const aiResponse = await sendMessageToAI(messageWithAttachments);
-          await addAIResponse(aiResponse);
+          // Use streaming for AI response
+          const streamHandler = await addStreamingAIResponse();
+          if (streamHandler) {
+            setStreamingMessageId(streamHandler.messageId);
+            let fullResponse = '';
+            await streamMessageToAI(
+              messageWithAttachments,
+              (delta) => {
+                fullResponse += delta;
+                streamHandler.updateContent(fullResponse);
+              },
+              async () => {
+                await streamHandler.finalize(fullResponse);
+                setStreamingMessageId(null);
+                setIsProcessingAI(false);
+              }
+            );
+          }
         } catch (error) {
           console.error('Error getting AI response:', error);
-          await addAIResponse('I apologize, but I\'m having trouble processing your request right now. Please try again.');
-        } finally {
+          setStreamingMessageId(null);
           setIsProcessingAI(false);
         }
 
@@ -260,6 +278,7 @@ export function ChatInterface({
             onSendMessage={handleSendMessage} 
             isLoading={isLoading} 
             isSending={isSending || isProcessingAI || isProcessingFiles}
+            streamingMessageId={streamingMessageId}
             inputPlaceholder="Ask me anything..." 
             emptyStateContent={
               <div className="text-center">
@@ -277,8 +296,8 @@ export function ChatInterface({
                 {isProcessingFiles && (
                   <LoadingIndicator type="files" message="Processing and uploading attachments..." />
                 )}
-                {isProcessingAI && !isProcessingFiles && (
-                  <LoadingIndicator type="ai" />
+                {isProcessingAI && !isProcessingFiles && !streamingMessageId && (
+                  <TypingIndicator className="px-4" />
                 )}
               </>
             }
