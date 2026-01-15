@@ -11,6 +11,7 @@ interface ChatContainerProps {
   onSendMessage: (content: string, attachments?: File[]) => void;
   isLoading?: boolean;
   isSending?: boolean;
+  streamingMessageId?: string | null;
   emptyStateContent?: React.ReactNode;
   className?: string;
   showTimestamps?: boolean;
@@ -23,6 +24,7 @@ export function ChatContainer({
   onSendMessage,
   isLoading = false,
   isSending = false,
+  streamingMessageId = null,
   emptyStateContent,
   className,
   showTimestamps = false,
@@ -58,12 +60,14 @@ export function ChatContainer({
             <div className="w-full">
               <div className="space-y-8">
                 {messages.map((message) => {
-                  console.log('ChatContainer - Rendering message:', message.id, 'with attachments:', message.attachments);
+                  const isStreaming = message.id === streamingMessageId;
+                  console.log('ChatContainer - Rendering message:', message.id, 'with attachments:', message.attachments, 'isStreaming:', isStreaming);
                   return (
                     <PromptKitMessage
                       key={message.id}
                       message={message}
                       showTimestamp={showTimestamps}
+                      isStreaming={isStreaming}
                     />
                   );
                 })}

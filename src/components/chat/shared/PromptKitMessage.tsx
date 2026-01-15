@@ -9,12 +9,14 @@ import { Button } from '@/components/ui/button';
 interface PromptKitMessageProps {
   message: ChatMessage;
   showTimestamp?: boolean;
+  isStreaming?: boolean;
   onRetry?: (messageId: string) => void;
 }
 
 export function PromptKitMessage({
   message,
   showTimestamp = false,
+  isStreaming = false,
   onRetry
 }: PromptKitMessageProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -165,12 +167,22 @@ export function PromptKitMessage({
         <div className="w-full">
           <div className="flex w-full justify-start">
             <div className="w-full" style={{ position: 'relative' }}>
-              <div className="relative rounded-3xl text-left leading-relaxed text-primary/95 w-full group bg-transparent p-0 pt-1">
+              <div className={cn(
+                "relative rounded-3xl text-left leading-relaxed text-primary/95 w-full group bg-transparent p-0 pt-1",
+                isStreaming && "animate-fade-in"
+              )}>
                 <div className="prose prose-neutral dark:prose-invert max-w-none">
                   <RichMessage 
                     content={message.content}
                     className="text-primary/95"
                   />
+                  {/* Streaming cursor indicator */}
+                  {isStreaming && message.content.length > 0 && (
+                    <span 
+                      className="inline-block w-1.5 h-4 bg-primary/70 ml-1 animate-pulse rounded-sm align-baseline"
+                      aria-label="AI is typing"
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -178,7 +190,7 @@ export function PromptKitMessage({
         </div>
 
         {/* AI Message Actions */}
-        {!isSending && !isFailed && (
+        {!isSending && !isFailed && !isStreaming && (
           <div className="py-3">
             <div className="flex flex-row items-center justify-between space-x-1">
               <div className="flex flex-row items-center space-x-1">
