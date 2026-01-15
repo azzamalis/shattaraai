@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
-import { X, Copy, Trash, ThumbsUp, ThumbsDown, Pencil, Loader2, GripVertical, CornerDownRight, Plus, Sparkles } from 'lucide-react';
+import { X, Copy, Trash, ThumbsUp, ThumbsDown, Pencil, Loader2, GripVertical, Plus, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Message, MessageContent, MessageActions, MessageAction } from '@/components/prompt-kit/message';
 import { Button } from '@/components/ui/button';
@@ -430,24 +430,6 @@ export function ChatDrawer({
                 </div>
               </div>
 
-              {/* Question Reference Box */}
-              {currentQuestionText && (
-                <div className="mx-4 mb-3 flex w-auto items-center justify-between rounded-lg bg-muted/70 p-3 text-primary/70">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <CornerDownRight className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-                    <div className="line-clamp-3 text-sm flex-1 min-w-0">
-                      <p className="text-sm leading-relaxed">{currentQuestionText}</p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={onClearQuestionReference}
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none hover:bg-accent hover:text-accent-foreground h-6 w-6 p-0.5 flex-shrink-0 ml-2"
-                  >
-                    <X className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                  </button>
-                </div>
-              )}
-
               {/* Messages or Empty State */}
               {chatMessages.length === 0 ? (
                 <div className="flex flex-1 flex-col items-center justify-center">
@@ -583,6 +565,10 @@ export function ChatDrawer({
             hideAttachments={false}
             showMicrophone={false}
             showContextButton={false}
+            contextReference={currentQuestionText ? {
+              text: currentQuestionText,
+              onClear: onClearQuestionReference
+            } : null}
             className="border-input bg-white dark:bg-neutral-800/50 relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-[0_4px_10px_rgba(0,0,0,0.02)]"
           />
         </div>
