@@ -459,14 +459,21 @@ export function ChatDrawer({
                               <div className="flex flex-col gap-2">
                                 <div className="w-full">
                                   <div className="flex w-full justify-start">
-                                    <div className="w-full">
+                                    <div className="w-full" style={{ position: 'relative' }}>
                                       <div className="relative rounded-3xl text-left leading-relaxed text-primary/95 w-full group bg-transparent p-0 pt-1">
-                                        <MessageContent
-                                          className="prose prose-neutral dark:prose-invert max-w-none text-foreground"
-                                          markdown
-                                        >
-                                          {message.content}
-                                        </MessageContent>
+                                        <div className="markdown-body prose prose-neutral dark:prose-invert max-w-none 
+                                          prose-p:text-base prose-p:leading-7 prose-p:last:mb-0
+                                          prose-h2:mb-3 prose-h2:mt-6 prose-h2:text-xl prose-h2:font-semibold prose-h2:first:mt-0
+                                          prose-ul:list-outside prose-ul:list-disc prose-ul:pl-5
+                                          prose-li:leading-7
+                                          prose-strong:font-semibold
+                                          prose-hr:my-8 prose-hr:border-t prose-hr:border-border/50 dark:prose-hr:border-primary/10
+                                          prose-blockquote:my-6 prose-blockquote:rounded-r-md prose-blockquote:border-l-4 prose-blockquote:border-border/50 prose-blockquote:bg-muted/30 prose-blockquote:px-6 prose-blockquote:py-3 dark:prose-blockquote:border-primary/10
+                                        ">
+                                          <MessageContent markdown>
+                                            {message.content}
+                                          </MessageContent>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
