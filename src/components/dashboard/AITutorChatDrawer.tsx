@@ -288,8 +288,8 @@ export function AITutorChatDrawer({
     return (
       <aside 
         className={cn(
-          "h-full border-l border-primary/5 flex-shrink-0",
-          "transition-all duration-200 ease-in-out bg-background"
+          "fixed right-0 top-0 z-50 h-screen border-l border-primary/5",
+          "transition-all duration-200 ease-in-out bg-background pointer-events-auto"
         )}
         style={{ width: isMobile ? '100%' : panelWidth }}
       >
@@ -306,8 +306,9 @@ export function AITutorChatDrawer({
   return (
     <aside 
       className={cn(
-        "h-full border-l border-primary/5 flex-shrink-0",
-        "transition-all duration-200 ease-in-out bg-background"
+        "fixed right-0 top-0 z-50 h-screen border-l border-primary/5",
+        "transition-all duration-200 ease-in-out bg-background pointer-events-auto",
+        "translate-x-0"
       )}
       aria-hidden="false"
       style={{ width: isMobile ? '100%' : panelWidth }}
