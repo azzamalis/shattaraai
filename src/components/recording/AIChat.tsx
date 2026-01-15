@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, memo } from 'react';
 import { Copy, Brain, ThumbsUp, ThumbsDown, Pen } from 'lucide-react';
 import { toast } from 'sonner';
-import { PromptInputChatBox } from '@/components/chat/shared/PromptInputChatBox';
+import { EnhancedPromptInput } from '@/components/ui/enhanced-prompt-input';
 import { RichMessage } from '@/components/chat/RichMessage';
 import { LoadingIndicator } from '@/components/chat/LoadingIndicator';
 import { useChatConversation, ChatMessage } from '@/hooks/useChatConversation';
@@ -264,10 +264,9 @@ const AIChat = memo(({
       />
 
       <div className="px-4 pb-4">
-        <PromptInputChatBox 
-          onSendMessage={handleSendMessage} 
-          disabled={isSending || isProcessingAI || isProcessingFiles} 
-          placeholder="Ask anything about this content..." 
+        <EnhancedPromptInput 
+          onSubmit={(value, files) => handleSendMessage(value, files)} 
+          isLoading={isSending || isProcessingAI || isProcessingFiles}
         />
       </div>
     </div>
