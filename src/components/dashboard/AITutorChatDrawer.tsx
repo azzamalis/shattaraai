@@ -530,6 +530,7 @@ export function AITutorChatDrawer({
               onSubmit={handleSendMessage}
               isLoading={isSending || isAITyping}
               placeholder="Ask about your study materials..."
+              hideAttachments
               className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
             />
           </div>
