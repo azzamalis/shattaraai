@@ -364,7 +364,7 @@ export function ChatDrawer({
         </div>
       )}
 
-      <div className="relative flex h-full flex-col overflow-y-auto px-1 pb-1 pt-4">
+      <div className="relative flex h-full flex-col overflow-hidden px-1 pb-1 pt-4">
         {/* Header */}
         <div className="mb-4 ml-4 mr-4 flex items-center justify-between">
           {/* Close Button - Left */}
@@ -409,13 +409,12 @@ export function ChatDrawer({
           <div className="w-9" />
         </div>
 
-        {/* Content Area */}
-        <div className="flex-grow overflow-y-auto overscroll-y-none scrollbar-hide">
-          <div className="flex h-full w-full flex-col">
-            <div className="relative flex h-full w-full flex-col md:h-[calc(100vh-84px)] px-0">
-              {/* Floating Action Buttons */}
-              <div className="absolute right-0 top-0 z-40 mt-1 xl:-mt-2">
-                <div className="flex items-center">
+        {/* Content Area (only the message list scrolls) */}
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <div className="relative flex flex-1 flex-col px-0">
+            {/* Floating Action Buttons */}
+            <div className="absolute right-0 top-0 z-40 mt-1 xl:-mt-2">
+              <div className="flex items-center">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -461,19 +460,22 @@ export function ChatDrawer({
                                   <div className="flex w-full justify-start">
                                     <div className="w-full" style={{ position: 'relative' }}>
                                       <div className="relative rounded-3xl text-left leading-relaxed text-primary/95 w-full group bg-transparent p-0 pt-1">
-                                        <div className="markdown-body prose prose-neutral dark:prose-invert max-w-none 
-                                          prose-p:text-base prose-p:leading-7 prose-p:last:mb-0
-                                          prose-h2:mb-3 prose-h2:mt-6 prose-h2:text-xl prose-h2:font-semibold prose-h2:first:mt-0
-                                          prose-ul:list-outside prose-ul:list-disc prose-ul:pl-5
-                                          prose-li:leading-7
-                                          prose-strong:font-semibold
-                                          prose-hr:my-8 prose-hr:border-t prose-hr:border-border/50 dark:prose-hr:border-primary/10
-                                          prose-blockquote:my-6 prose-blockquote:rounded-r-md prose-blockquote:border-l-4 prose-blockquote:border-border/50 prose-blockquote:bg-muted/30 prose-blockquote:px-6 prose-blockquote:py-3 dark:prose-blockquote:border-primary/10
-                                        ">
-                                          <MessageContent markdown>
-                                            {message.content}
-                                          </MessageContent>
-                                        </div>
+                                        <MessageContent
+                                          markdown
+                                          className={cn(
+                                            "bg-transparent p-0 rounded-none",
+                                            "prose prose-neutral dark:prose-invert max-w-none",
+                                            "prose-p:text-base prose-p:leading-7 prose-p:last:mb-0",
+                                            "prose-h2:mb-3 prose-h2:mt-6 prose-h2:text-xl prose-h2:font-semibold prose-h2:first:mt-0",
+                                            "prose-ul:list-outside prose-ul:list-disc prose-ul:pl-5",
+                                            "prose-li:leading-7",
+                                            "prose-strong:font-semibold",
+                                            "prose-hr:my-8 prose-hr:border-t prose-hr:border-border/50 dark:prose-hr:border-primary/10",
+                                            "prose-blockquote:my-6 prose-blockquote:rounded-r-md prose-blockquote:border-l-4 prose-blockquote:border-border/50 prose-blockquote:bg-muted/30 prose-blockquote:px-6 prose-blockquote:py-3 dark:prose-blockquote:border-primary/10"
+                                          )}
+                                        >
+                                          {message.content}
+                                        </MessageContent>
                                       </div>
                                     </div>
                                   </div>
@@ -558,9 +560,8 @@ export function ChatDrawer({
               )}
             </div>
           </div>
-        </div>
 
-        {/* Input Area */}
+          {/* Input Area */}
         <div className="mx-auto mt-0 w-full max-w-3xl px-2 sm:px-0">
           <EnhancedPromptInput
             onSubmit={handleSendMessage}
