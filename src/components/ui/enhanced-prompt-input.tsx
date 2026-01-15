@@ -11,6 +11,8 @@ import {
   Sparkles,
   Check,
   Loader2,
+  Mic,
+  AtSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +41,8 @@ interface EnhancedPromptInputProps {
   isLoading?: boolean;
   placeholder?: string;
   hideAttachments?: boolean;
+  showMicrophone?: boolean;
+  showContextButton?: boolean;
 }
 
 const filePreviewVariants = {
@@ -100,7 +104,16 @@ function FilePreviewCard({ file, onRemove }: { file: File; onRemove: () => void 
   );
 }
 
-export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', isLoading = false, placeholder = "Ask Shattara AI anything", hideAttachments = false }: EnhancedPromptInputProps) {
+export function EnhancedPromptInput({ 
+  onSubmit, 
+  className, 
+  userPlan = 'free', 
+  isLoading = false, 
+  placeholder = "Ask Shattara AI anything", 
+  hideAttachments = false,
+  showMicrophone = false,
+  showContextButton = false 
+}: EnhancedPromptInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [selectedModel, setSelectedModel] = useState("auto");
@@ -260,6 +273,25 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', is
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              {/* Context Button */}
+              {showContextButton && (
+                <button
+                  type="button"
+                  className={cn(
+                    "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium",
+                    "ring-offset-background transition-colors focus-visible:outline-none",
+                    "disabled:pointer-events-none disabled:opacity-50",
+                    "group mb-1 h-7 w-fit gap-1 rounded-full border p-1.5",
+                    "text-primary/60 hover:bg-primary/5 hover:text-primary/70",
+                    "focus:outline-none focus:ring-0 focus:ring-offset-0",
+                    "dark:border-neutral-700/80 dark:hover:bg-primary/10"
+                  )}
+                >
+                  <AtSign className="h-4 w-4 flex-shrink-0" />
+                  <span className="ml-0.5 mr-0.5 truncate text-xs capitalize">Add Context</span>
+                </button>
+              )}
+
               {/* Search Button */}
               <div className="flex items-center gap-0.5">
                 <button
@@ -302,6 +334,18 @@ export function EnhancedPromptInput({ onSubmit, className, userPlan = 'free', is
                     style={{ display: 'none' }}
                   />
                 </>
+              )}
+
+              {/* Microphone Button */}
+              {showMicrophone && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="mb-1 mr-1 h-8 w-8 rounded-md p-2 text-primary/50 opacity-100 hover:bg-muted"
+                >
+                  <Mic className="h-5 w-5" />
+                </Button>
               )}
 
               {/* Submit Button */}
