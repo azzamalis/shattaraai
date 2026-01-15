@@ -431,21 +431,6 @@ export function AITutorChatDrawer({
                         <p>New conversation</p>
                       </TooltipContent>
                     </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-9 w-9 rounded-xl text-primary/60 hover:bg-primary/5"
-                          aria-label="Chat history"
-                        >
-                          <History className="h-3.5 w-3.5 shrink-0" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Chat history</p>
-                      </TooltipContent>
-                    </Tooltip>
                   </TooltipProvider>
                 </div>
               </div>
