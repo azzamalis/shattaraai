@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { RoomView } from '@/components/dashboard/RoomView';
 import { RoomPageHeader } from '@/components/dashboard/RoomPageHeader';
 import { RoomPageActions } from '@/components/dashboard/RoomPageActions';
@@ -36,7 +36,94 @@ interface RoomPageContentProps {
   setAdditionalResources: (resources: ProcessedExamResource[]) => void;
 }
 
-export function RoomPageContent({
+// Memoized exam step content components to prevent re-renders
+const ExamStepOne = memo(function ExamStepOne({ 
+  currentRoom, 
+  isExamMode, 
+  examStep, 
+  examModeData 
+}: { 
+  currentRoom: any; 
+  isExamMode: boolean; 
+  examStep: number; 
+  examModeData: any;
+}) {
+  return (
+    <div className="py-6 sm:py-8">
+      <RoomHeroSection 
+        title={currentRoom.name} 
+        description={currentRoom.description || ''} 
+        isExamMode={isExamMode}
+        examStep={examStep}
+        examModeData={examModeData}
+      />
+    </div>
+  );
+});
+
+const ExamStepTwoContent = memo(function ExamStepTwoContent({
+  onBack,
+  onNext,
+  onSkip,
+  onAdditionalResourcesChange
+}: {
+  onBack: () => void;
+  onNext: () => void;
+  onSkip: () => void;
+  onAdditionalResourcesChange: (resources: ProcessedExamResource[]) => void;
+}) {
+  return (
+    <div className="py-6 sm:py-8">
+      <ExamPrepStepTwo
+        currentStep={2}
+        totalSteps={3}
+        onBack={onBack}
+        onNext={onNext}
+        onSkip={onSkip}
+        onAdditionalResourcesChange={onAdditionalResourcesChange}
+      />
+    </div>
+  );
+});
+
+const ExamStepThreeContent = memo(function ExamStepThreeContent({
+  numQuestions,
+  setNumQuestions,
+  questionType,
+  setQuestionType,
+  examLength,
+  setExamLength,
+  onBack,
+  onStartExam
+}: {
+  numQuestions: string;
+  setNumQuestions: (value: string) => void;
+  questionType: string;
+  setQuestionType: (value: string) => void;
+  examLength: string;
+  setExamLength: (value: string) => void;
+  onBack: () => void;
+  onStartExam: () => void;
+}) {
+  return (
+    <div className="py-6 sm:py-8">
+      <ExamPrepStepThree
+        currentStep={3}
+        totalSteps={3}
+        numQuestions={numQuestions}
+        setNumQuestions={setNumQuestions}
+        questionType={questionType}
+        setQuestionType={setQuestionType}
+        examLength={examLength}
+        setExamLength={setExamLength}
+        onBack={onBack}
+        onStartExam={onStartExam}
+      />
+    </div>
+  );
+});
+
+export const RoomPageContent = memo(function RoomPageContent({
   currentRoom,
   roomContent,
   roomId,
@@ -65,80 +152,108 @@ export function RoomPageContent({
 }: RoomPageContentProps) {
   const [showHeroSection, setShowHeroSection] = useState(false);
 
-  const handleClickOutside = () => {
+  // Memoized click handler
+  const handleClickOutside = useCallback(() => {
     // This function is passed to header for click outside handling
-  };
+  }, []);
 
-  const handleAddContentClick = () => {
+  const handleAddContentClick = useCallback(() => {
     setShowHeroSection(prev => !prev);
-  };
+  }, []);
 
-  // Calculate exam mode data
-  const selectedCount = selectedContentIds.length;
-  const totalCount = roomContent.length;
-  const isAllSelected = selectedCount === totalCount && totalCount > 0;
+  const handleChatOpen = useCallback(() => {
+    setIsChatOpen(true);
+  }, [setIsChatOpen]);
 
-  // Render exam step content based on current step
-  const renderExamStepContent = () => {
+  const handleExamModalOpen = useCallback(() => {
+    setIsExamMode(true);
+  }, [setIsExamMode]);
+
+  // Memoized exam mode data to prevent child re-renders
+  const examModeData = useMemo(() => ({
+    selectedCount: selectedContentIds.length,
+    totalCount: roomContent.length,
+    isAllSelected: selectedContentIds.length === roomContent.length && roomContent.length > 0,
+    onToggleSelectAll: handleToggleSelectAll,
+    onNext: handleExamNext,
+    onCancel: handleExamCancel
+  }), [selectedContentIds.length, roomContent.length, handleToggleSelectAll, handleExamNext, handleExamCancel]);
+
+  // Memoized exam step content renderer
+  const examStepContent = useMemo(() => {
     if (!isExamMode) return null;
 
     if (examStep === 1) {
       return (
-        <div className="py-6 sm:py-8">
-          <RoomHeroSection 
-            title={currentRoom.name} 
-            description={currentRoom.description || ''} 
-            isExamMode={isExamMode}
-            examStep={examStep}
-            examModeData={{
-              selectedCount,
-              totalCount,
-              isAllSelected,
-              onToggleSelectAll: handleToggleSelectAll,
-              onNext: handleExamNext,
-              onCancel: handleExamCancel
-            }}
-          />
-        </div>
+        <ExamStepOne
+          currentRoom={currentRoom}
+          isExamMode={isExamMode}
+          examStep={examStep}
+          examModeData={examModeData}
+        />
       );
     }
 
     if (examStep === 2) {
       return (
-        <div className="py-6 sm:py-8">
-          <ExamPrepStepTwo
-            currentStep={2}
-            totalSteps={3}
-            onBack={handleExamBack}
-            onNext={handleExamNext}
-            onSkip={handleExamSkip}
-            onAdditionalResourcesChange={setAdditionalResources}
-          />
-        </div>
+        <ExamStepTwoContent
+          onBack={handleExamBack}
+          onNext={handleExamNext}
+          onSkip={handleExamSkip}
+          onAdditionalResourcesChange={setAdditionalResources}
+        />
       );
     }
 
     if (examStep === 3) {
       return (
-        <div className="py-6 sm:py-8">
-          <ExamPrepStepThree
-            currentStep={3}
-            totalSteps={3}
-            numQuestions={numQuestions}
-            setNumQuestions={setNumQuestions}
-            questionType={questionType}
-            setQuestionType={setQuestionType}
-            examLength={examLength}
-            setExamLength={setExamLength}
-            onBack={handleExamBack}
-            onStartExam={handleStartExam}
-          />
-        </div>
+        <ExamStepThreeContent
+          numQuestions={numQuestions}
+          setNumQuestions={setNumQuestions}
+          questionType={questionType}
+          setQuestionType={setQuestionType}
+          examLength={examLength}
+          setExamLength={setExamLength}
+          onBack={handleExamBack}
+          onStartExam={handleStartExam}
+        />
       );
     }
 
     return null;
-  };
+  }, [
+    isExamMode, examStep, currentRoom, examModeData,
+    handleExamBack, handleExamNext, handleExamSkip, setAdditionalResources,
+    numQuestions, setNumQuestions, questionType, setQuestionType,
+    examLength, setExamLength, handleStartExam
+  ]);
+
+  // Memoized hero section for non-exam mode
+  const heroSection = useMemo(() => {
+    if (!showHeroSection || isExamMode) return null;
+    
+    return (
+      <div className="py-6 sm:py-8">
+        <RoomHeroSection 
+          title={currentRoom.name} 
+          description={currentRoom.description || ''} 
+          isExamMode={false}
+          examStep={0}
+        />
+      </div>
+    );
+  }, [showHeroSection, isExamMode, currentRoom?.name, currentRoom?.description]);
+
+  // Memoized room view props
+  const roomViewProps = useMemo(() => ({
+    title: currentRoom.name,
+    description: currentRoom.description || '',
+    isEmpty: roomContent.length === 0,
+    hideHeader: true,
+    isExamSelectionMode: isExamMode && examStep === 1,
+    selectedContentIds,
+    onContentSelectionChange: handleContentToggle
+  }), [currentRoom.name, currentRoom.description, roomContent.length, isExamMode, examStep, selectedContentIds, handleContentToggle]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden pt-6 sm:pt-8">
@@ -155,8 +270,8 @@ export function RoomPageContent({
               />
 
               <RoomPageActions 
-                onChatOpen={() => setIsChatOpen(true)}
-                onExamModalOpen={() => setIsExamMode(true)}
+                onChatOpen={handleChatOpen}
+                onExamModalOpen={handleExamModalOpen}
                 onExamModalClose={handleExamCancel}
                 roomId={roomId}
                 isExamMode={isExamMode}
@@ -171,34 +286,17 @@ export function RoomPageContent({
             </div>
 
             {/* Hero Section - shown when Add Content is clicked (non-exam mode) */}
-            {showHeroSection && !isExamMode && (
-              <div className="py-6 sm:py-8">
-                <RoomHeroSection 
-                  title={currentRoom.name} 
-                  description={currentRoom.description || ''} 
-                  isExamMode={false}
-                  examStep={0}
-                />
-              </div>
-            )}
+            {heroSection}
 
             {/* Exam Step Content - all steps rendered here */}
-            {renderExamStepContent()}
+            {examStepContent}
           </div>
         </div>
       </div>
       
       <div className="flex-1 overflow-auto">
-        <RoomView 
-          title={currentRoom.name} 
-          description={currentRoom.description || ''} 
-          isEmpty={roomContent.length === 0} 
-          hideHeader={true}
-          isExamSelectionMode={isExamMode && examStep === 1}
-          selectedContentIds={selectedContentIds}
-          onContentSelectionChange={handleContentToggle}
-        />
+        <RoomView {...roomViewProps} />
       </div>
     </div>
   );
-}
+});
