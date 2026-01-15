@@ -83,7 +83,8 @@ export function AITutorChatDrawer({
     isLoading,
     isSending,
     sendMessage,
-    addStreamingAIResponse
+    addStreamingAIResponse,
+    clearConversation
   } = useChatConversation({
     conversationType: 'room_collaboration',
     contextId: roomId,
@@ -216,37 +217,18 @@ export function AITutorChatDrawer({
 
   const handleNewChat = async () => {
     try {
-      if (conversation?.id) {
-        const { error: messagesError } = await supabase
-          .from('chat_messages')
-          .delete()
-          .eq('conversation_id', conversation.id);
-
-        if (messagesError) {
-          console.error('Error deleting messages:', messagesError);
-        }
-
-        const { error: conversationError } = await supabase
-          .from('chat_conversations')
-          .delete()
-          .eq('id', conversation.id);
-
-        if (conversationError) {
-          console.error('Error deleting conversation:', conversationError);
-        }
-      }
-
-      setWelcomeMessageSent(false);
-      setRateLimitError(null);
-      setIsAITyping(false);
-      setStreamingMessageId(null);
+      // Use the clearConversation function from the hook
+      const success = await clearConversation();
       
-      toast.success('Started a new chat');
-      
-      const wasOpen = open;
-      onOpenChange(false);
-      if (wasOpen) {
-        setTimeout(() => onOpenChange(true), 150);
+      if (success) {
+        setWelcomeMessageSent(false);
+        setRateLimitError(null);
+        setIsAITyping(false);
+        setStreamingMessageId(null);
+        
+        toast.success('Started a new chat');
+      } else {
+        toast.error('Failed to clear chat');
       }
     } catch (error) {
       console.error('Error starting new chat:', error);
