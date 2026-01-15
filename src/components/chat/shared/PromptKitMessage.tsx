@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Copy, Check, Paperclip, ThumbsUp, ThumbsDown, Pencil, Trash, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
+import { Copy, Check, Paperclip, ThumbsUp, ThumbsDown, Pen, MoreVertical, Loader2, AlertCircle, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatMessage, MessageStatus } from '@/hooks/useChatConversation';
-import { Message, MessageActions, MessageAction } from '@/components/prompt-kit/message';
 import { RichMessage } from '../RichMessage';
 import { Button } from '@/components/ui/button';
 
@@ -15,7 +14,7 @@ interface PromptKitMessageProps {
 
 export function PromptKitMessage({
   message,
-  showTimestamp = true,
+  showTimestamp = false,
   onRetry
 }: PromptKitMessageProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -55,184 +54,164 @@ export function PromptKitMessage({
     );
   }
 
-  // User and AI messages using Prompt-Kit Message
-  return (
-    <Message className={cn(
-      "px-4 py-2 justify-start",
-      isUser && "justify-end"
-    )}>
-      {/* Content Container */}
-      <div className={cn(
-        "flex flex-col gap-2 max-w-[80%]",
-        isUser && "items-end"
-      )}>
+  // User messages - right aligned with rounded bubble
+  if (isUser) {
+    return (
+      <div className="flex flex-col gap-2">
         {/* File Attachments */}
         {message.attachments && message.attachments.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {message.attachments.map((attachment, index) => (
-              <div
-                key={`${attachment.name}-${index}`}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm border",
-                  "bg-[#00A3FF]/10 border-[#00A3FF]/20 text-[#00A3FF]",
-                  "hover:bg-[#00A3FF]/20 transition-colors cursor-pointer"
-                )}
-              >
-                <div className="p-1 rounded bg-[#00A3FF]/20">
-                  <Paperclip className="h-3 w-3" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="truncate max-w-40 font-medium text-xs">
-                    {attachment.name}
-                  </span>
-                  {attachment.size && (
-                    <span className="text-xs opacity-70">
-                      {formatFileSize(attachment.size)}
-                    </span>
+          <div className="flex justify-end">
+            <div className="flex flex-wrap gap-2 justify-end max-w-[80%]">
+              {message.attachments.map((attachment, index) => (
+                <div
+                  key={`${attachment.name}-${index}`}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-lg text-sm border",
+                    "bg-primary/10 border-primary/20 text-primary",
+                    "hover:bg-primary/20 transition-colors cursor-pointer"
                   )}
+                >
+                  <div className="p-1 rounded bg-primary/20">
+                    <Paperclip className="h-3 w-3" />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="truncate max-w-40 font-medium text-xs">
+                      {attachment.name}
+                    </span>
+                    {attachment.size && (
+                      <span className="text-xs opacity-70">
+                        {formatFileSize(attachment.size)}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Message Bubble with Actions */}
-        <div className="group flex w-full flex-col gap-0">
-          <div
-            className={cn(
-              "rounded-lg px-4 py-3",
-              isUser && "bg-[#00A3FF] text-white",
-              isSending && "opacity-70",
-              isFailed && "bg-destructive/80 border border-destructive"
-            )}
-          >
-            {isUser ? (
-              <div className="whitespace-pre-wrap break-words">
-                {message.content}
+        {/* User Message Bubble */}
+        <div className="flex w-full justify-end">
+          <div className="group/message flex w-full flex-col items-end gap-1">
+            <div className="flex w-full justify-end">
+              <div
+                className={cn(
+                  "relative w-fit rounded-3xl p-3 text-left leading-relaxed",
+                  "text-primary/95 border border-primary/5 bg-primary/5 dark:bg-neutral-800",
+                  isSending && "opacity-70",
+                  isFailed && "bg-destructive/10 border-destructive/20"
+                )}
+              >
+                <div className="prose prose-neutral dark:prose-invert max-w-none">
+                  <p className="text-base leading-7 last:mb-0 whitespace-pre-wrap">
+                    {message.content}
+                  </p>
+                </div>
               </div>
-            ) : (
-              <RichMessage 
-                content={message.content}
-                className="text-foreground"
-              />
+            </div>
+
+            {/* Status Indicator */}
+            {(isSending || isFailed) && (
+              <div className="flex items-center gap-2 mt-1">
+                {isSending && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span>Sending...</span>
+                  </div>
+                )}
+                {isFailed && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 text-xs text-destructive">
+                      <AlertCircle className="h-3 w-3" />
+                      <span>Failed to send</span>
+                    </div>
+                    {onRetry && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => onRetry(message.id)}
+                      >
+                        <RotateCcw className="h-3 w-3 mr-1" />
+                        Retry
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Edit Action - shown on hover */}
+            {!isSending && !isFailed && (
+              <div className="flex items-center gap-1 opacity-100 transition-opacity duration-200 lg:opacity-0 lg:group-hover/message:opacity-100">
+                <button
+                  className="rounded-full p-1 transition-colors hover:bg-primary/10"
+                  aria-label="Edit message"
+                >
+                  <Pen className="h-3 w-3 text-primary/60" />
+                </button>
+              </div>
             )}
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          {/* Status Indicator for User Messages */}
-          {isUser && (isSending || isFailed) && (
-            <div className={cn(
-              "flex items-center gap-2 mt-1",
-              isUser && "justify-end"
-            )}>
-              {isSending && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  <span>Sending...</span>
+  // AI messages - left aligned, transparent background
+  return (
+    <div className="overflow-x-auto">
+      <div className="flex w-full flex-col">
+        <div className="w-full">
+          <div className="flex w-full justify-start">
+            <div className="w-full" style={{ position: 'relative' }}>
+              <div className="relative rounded-3xl text-left leading-relaxed text-primary/95 w-full group bg-transparent p-0 pt-1">
+                <div className="prose prose-neutral dark:prose-invert max-w-none">
+                  <RichMessage 
+                    content={message.content}
+                    className="text-primary/95"
+                  />
                 </div>
-              )}
-              {isFailed && (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 text-xs text-destructive">
-                    <AlertCircle className="h-3 w-3" />
-                    <span>Failed to send</span>
-                  </div>
-                  {onRetry && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => onRetry(message.id)}
-                    >
-                      <RotateCcw className="h-3 w-3 mr-1" />
-                      Retry
-                    </Button>
-                  )}
-                </div>
-              )}
+              </div>
             </div>
-          )}
-
-          {/* Message Actions - Only show for sent messages */}
-          {!isSending && !isFailed && (
-            <MessageActions
-              className={cn(
-                "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                isUser ? "-mr-2.5 justify-end" : "-ml-2.5"
-              )}
-            >
-              <MessageAction tooltip="Copy" delayDuration={100}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full h-8 w-8"
-                  onClick={() => copyToClipboard(message.content, message.id)}
-                >
-                  {copiedId === message.id ? <Check className="h-4 w-4 text-[#00A3FF]" /> : <Copy className="h-4 w-4" />}
-                </Button>
-              </MessageAction>
-
-              {!isUser && (
-                <>
-                  <MessageAction tooltip="Upvote" delayDuration={100}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full h-8 w-8"
-                    >
-                      <ThumbsUp className="h-4 w-4" />
-                    </Button>
-                  </MessageAction>
-                  <MessageAction tooltip="Downvote" delayDuration={100}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full h-8 w-8"
-                    >
-                      <ThumbsDown className="h-4 w-4" />
-                    </Button>
-                  </MessageAction>
-                </>
-              )}
-
-              {isUser && (
-                <>
-                  <MessageAction tooltip="Edit" delayDuration={100}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full h-8 w-8"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </MessageAction>
-                  <MessageAction tooltip="Delete" delayDuration={100}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full h-8 w-8"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </MessageAction>
-                </>
-              )}
-            </MessageActions>
-          )}
+          </div>
         </div>
 
-        {/* Timestamp - Only show for sent messages */}
-        {showTimestamp && !isSending && !isFailed && (
-          <div className={cn(
-            "text-xs text-muted-foreground px-1",
-            isUser && "text-right"
-          )}>
-            {new Date(message.created_at).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
+        {/* AI Message Actions */}
+        {!isSending && !isFailed && (
+          <div className="py-3">
+            <div className="flex flex-row items-center justify-between space-x-1">
+              <div className="flex flex-row items-center space-x-1">
+                <button
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-7 w-7 p-1.5 text-muted-foreground"
+                  onClick={() => copyToClipboard(message.content, message.id)}
+                >
+                  {copiedId === message.id ? (
+                    <Check className="h-4 w-4 text-primary" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </button>
+                <button
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-7 w-7 p-1.5 text-muted-foreground"
+                >
+                  <ThumbsUp className="h-4 w-4" />
+                </button>
+                <button
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-7 w-7 p-1.5 text-muted-foreground"
+                >
+                  <ThumbsDown className="h-4 w-4" />
+                </button>
+                <button
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-7 w-7 p-1.5 text-muted-foreground"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
-    </Message>
+    </div>
   );
 }
