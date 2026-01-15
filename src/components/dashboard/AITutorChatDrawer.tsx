@@ -35,9 +35,6 @@ interface AITutorChatDrawerProps {
 
 const TABS = [
   { id: 'chat', label: 'Chat', icon: null, hasIndicator: true },
-  { id: 'flashcards', label: 'Flashcards', icon: Layers },
-  { id: 'quizzes', label: 'Quizzes', icon: FileQuestion },
-  { id: 'summary', label: 'Summary', icon: FileText },
 ];
 
 function EmptyState() {
