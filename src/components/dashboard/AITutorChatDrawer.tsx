@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
-import { X, Loader2, AlertCircle, Clock, GripVertical, SquarePen, Copy, ThumbsUp, ThumbsDown, Pencil, Trash, ArrowUp } from 'lucide-react';
+import { X, Loader2, AlertCircle, Clock, GripVertical, SquarePen, Copy, ThumbsUp, ThumbsDown, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -11,11 +11,7 @@ import {
   MessageActions,
   MessageContent,
 } from "@/components/prompt-kit/message";
-import {
-  PromptInput,
-  PromptInputActions,
-  PromptInputTextarea,
-} from "@/components/prompt-kit/prompt-input";
+import { EnhancedPromptInput } from '@/components/ui/enhanced-prompt-input';
 import { cn } from "@/lib/utils";
 import { useChatConversation, ChatMessage } from '@/hooks/useChatConversation';
 import { useOpenAIChat } from '@/hooks/useOpenAIChat';
@@ -42,7 +38,6 @@ export function AITutorChatDrawer({
   roomId,
   roomContent = []
 }: AITutorChatDrawerProps) {
-  const [input, setInput] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [welcomeMessageSent, setWelcomeMessageSent] = useState(false);
@@ -147,8 +142,8 @@ export function AITutorChatDrawer({
     }
   }, [open, conversation, persistedMessages.length, welcomeMessageSent, usageStats, planLimits]);
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || !conversation) return;
+  const handleSendMessage = async (content?: string, files?: File[]) => {
+    if (!content?.trim() || !conversation) return;
 
     // Check rate limits before sending
     const rateLimitInfo = await checkRateLimit('chat');
@@ -159,13 +154,11 @@ export function AITutorChatDrawer({
       return;
     }
 
-    const userMessage = input.trim();
-    setInput('');
     setRateLimitError(null);
 
     try {
       // Send user message to database
-      await sendMessage(userMessage);
+      await sendMessage(content.trim());
       
       // Start streaming AI response
       setIsAITyping(true);
@@ -178,7 +171,7 @@ export function AITutorChatDrawer({
         let fullResponse = '';
 
         await streamMessageToAI(
-          userMessage,
+          content.trim(),
           (delta) => {
             fullResponse += delta;
             streamHandler.updateContent(fullResponse);
@@ -223,7 +216,6 @@ export function AITutorChatDrawer({
       }
 
       setWelcomeMessageSent(false);
-      setInput('');
       setRateLimitError(null);
       setIsAITyping(false);
       setStreamingMessageId(null);
@@ -534,35 +526,12 @@ export function AITutorChatDrawer({
           
           {/* Input Area */}
           <div className="inset-x-0 bottom-0 mx-auto w-full shrink-0 px-6 pb-6">
-            <PromptInput
-              isLoading={isSending || isAITyping}
-              value={input}
-              onValueChange={setInput}
+            <EnhancedPromptInput
               onSubmit={handleSendMessage}
+              isLoading={isSending || isAITyping}
+              placeholder="Ask about your study materials..."
               className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
-            >
-              <div className="flex flex-col">
-                <PromptInputTextarea
-                  placeholder="Ask about your study materials..."
-                  className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3]"
-                />
-
-                <PromptInputActions className="mt-3 flex w-full items-center justify-end gap-2 px-3 pb-3">
-                  <Button
-                    size="icon"
-                    disabled={!input.trim() || isSending || isAITyping || !conversation || !!rateLimitError}
-                    onClick={handleSendMessage}
-                    className="size-9 rounded-full"
-                  >
-                    {isSending || isAITyping ? (
-                      <Loader2 size={18} className="animate-spin" />
-                    ) : (
-                      <ArrowUp size={18} />
-                    )}
-                  </Button>
-                </PromptInputActions>
-              </div>
-            </PromptInput>
+            />
           </div>
         </div>
       </div>
