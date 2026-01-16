@@ -18,6 +18,7 @@ interface UnifiedTabNavigationProps {
   onTabChange: (tab: UnifiedTabType) => void;
   variant?: 'content' | 'chat';
   className?: string;
+  excludeTabs?: UnifiedTabType[];
 }
 
 // Flashcards icon from the reference design
@@ -86,7 +87,8 @@ export function UnifiedTabNavigation({
   activeTab,
   onTabChange,
   variant = 'chat',
-  className
+  className,
+  excludeTabs = []
 }: UnifiedTabNavigationProps) {
   const containerClassName = variant === 'content' 
     ? "border-b border-border/10 bg-background px-2 py-2"
@@ -120,7 +122,7 @@ export function UnifiedTabNavigation({
       <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as UnifiedTabType)} className="w-fit">
         <TabsList className={tabsListClassName}>
           <div className="flex items-center gap-1 overflow-x-auto overscroll-x-none scrollbar-hide">
-            {tabs.map((tab) => {
+            {tabs.filter(tab => !excludeTabs.includes(tab.id)).map((tab) => {
               const Icon = tab.icon;
               return (
                 <TabsTrigger 

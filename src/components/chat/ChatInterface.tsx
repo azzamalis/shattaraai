@@ -268,6 +268,7 @@ export function ChatInterface({
         activeTab={activeTab} 
         onTabChange={onTabChange} 
         variant="chat"
+        excludeTabs={['summary']}
       />
       
       <Tabs value={activeTab} onValueChange={onTabChange} className="flex-1 flex flex-col min-h-0">
