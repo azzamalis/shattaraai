@@ -7,39 +7,101 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-);
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // ========== SECURITY: JWT Authentication ==========
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.error('Missing or invalid Authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', success: false }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    // Create client with user's auth token to verify JWT
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+
+    if (claimsError || !claimsData?.claims) {
+      console.error('JWT validation failed:', claimsError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', success: false }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = claimsData.claims.sub as string;
+    console.log('Authenticated user:', userId);
+
+    // Create service client for database operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // ========== RATE LIMITING ==========
+    const { data: rateCheck, error: rateError } = await supabase.rpc('check_rate_limit', {
+      user_uuid: userId,
+      request_type: 'chat',
+      estimated_tokens: 1000
+    });
+
+    if (rateError) {
+      console.error('Rate limit check error:', rateError);
+    } else if (rateCheck && rateCheck.length > 0 && !rateCheck[0].allowed) {
+      console.log('Rate limit exceeded for user:', userId);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          success: false,
+          reset_time: rateCheck[0].reset_time
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ========== Parse Request ==========
     const { contentId, transcript, duration } = await req.json();
 
     if (!contentId || !transcript) {
       throw new Error('Missing content ID or transcript');
     }
 
-    // Get content data to check for duration if not provided
+    // Verify user owns the content
     const { data: contentData, error: contentError } = await supabase
       .from('content')
-      .select('metadata')
+      .select('metadata, user_id')
       .eq('id', contentId)
       .single();
 
     if (contentError) {
       console.error('Error fetching content data:', contentError);
+      throw new Error('Content not found');
+    }
+
+    if (contentData.user_id !== userId) {
+      console.error('User does not own content:', { userId, contentUserId: contentData.user_id });
+      return new Response(
+        JSON.stringify({ error: 'Forbidden', success: false }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Extract duration from metadata if available
     const actualDuration = duration || contentData?.metadata?.duration;
     const durationText = actualDuration ? ` (Total duration: ${Math.floor(actualDuration / 60)}:${String(Math.floor(actualDuration % 60)).padStart(2, '0')})` : '';
 
-    console.log(`Generating chapters for content ${contentId}`);
+    console.log(`Generating chapters for content ${contentId} by user ${userId}`);
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
@@ -127,22 +189,22 @@ serve(async (req) => {
     } catch (parseError) {
       console.error('Error parsing chapters JSON:', parseError);
       throw new Error('Failed to parse generated chapters');
-      }
+    }
 
-      // Validate and fix timestamps to ensure they don't exceed the actual duration
-      if (actualDuration) {
-        chapters = chapters.map((chapter, index) => {
-          const maxEndTime = actualDuration;
-          const adjustedStartTime = Math.min(chapter.startTime || 0, maxEndTime);
-          const adjustedEndTime = Math.min(chapter.endTime || maxEndTime, maxEndTime);
-          
-          return {
-            ...chapter,
-            startTime: adjustedStartTime,
-            endTime: adjustedEndTime > adjustedStartTime ? adjustedEndTime : maxEndTime
-          };
-        });
-      }
+    // Validate and fix timestamps to ensure they don't exceed the actual duration
+    if (actualDuration) {
+      chapters = chapters.map((chapter, index) => {
+        const maxEndTime = actualDuration;
+        const adjustedStartTime = Math.min(chapter.startTime || 0, maxEndTime);
+        const adjustedEndTime = Math.min(chapter.endTime || maxEndTime, maxEndTime);
+        
+        return {
+          ...chapter,
+          startTime: adjustedStartTime,
+          endTime: adjustedEndTime > adjustedStartTime ? adjustedEndTime : maxEndTime
+        };
+      });
+    }
 
     // Update content with generated chapters
     const { error: updateError } = await supabase
@@ -159,7 +221,7 @@ serve(async (req) => {
       throw new Error('Failed to update content with chapters');
     }
 
-    console.log(`Successfully generated ${chapters.length} chapters for content ${contentId}`);
+    console.log(`Successfully generated ${chapters.length} chapters for content ${contentId} by user ${userId}`);
 
     return new Response(
       JSON.stringify({ 

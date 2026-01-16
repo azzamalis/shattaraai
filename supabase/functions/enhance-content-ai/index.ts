@@ -8,46 +8,95 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const openaiApiKey = Deno.env.get('OPENAI_API_KEY')!;
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // ========== SECURITY: JWT Authentication ==========
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.error('Missing or invalid Authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY')!;
+
+    // Create client with user's auth token to verify JWT
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+
+    if (claimsError || !claimsData?.claims) {
+      console.error('JWT validation failed:', claimsError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = claimsData.claims.sub as string;
+    console.log('Authenticated user:', userId);
+
+    // Create service client for database operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // ========== Parse Request ==========
     const { contentId, textContent, contentType } = await req.json();
-    console.log('Enhancing content with AI for:', contentId, 'Type:', contentType);
+    console.log('Enhancing content with AI for:', contentId, 'Type:', contentType, 'User:', userId);
 
     if (!contentId || !textContent) {
       throw new Error('Missing contentId or textContent');
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Rate limiting check
-    const { data: content } = await supabase
+    // ========== Verify User Owns Content ==========
+    const { data: content, error: contentError } = await supabase
       .from('content')
-      .select('user_id')
+      .select('user_id, metadata')
       .eq('id', contentId)
       .single();
 
-    if (!content) {
+    if (contentError || !content) {
       throw new Error('Content not found');
     }
 
-    // Check rate limits
-    const { data: rateLimitData } = await supabase
+    if (content.user_id !== userId) {
+      console.error('User does not own content:', { userId, contentUserId: content.user_id });
+      return new Response(
+        JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ========== RATE LIMITING ==========
+    const { data: rateLimitData, error: rateError } = await supabase
       .rpc('check_rate_limit', {
-        user_uuid: content.user_id,
+        user_uuid: userId,
         request_type: 'chat',
         estimated_tokens: 2000
       });
 
-    if (rateLimitData && !rateLimitData[0]?.allowed) {
-      throw new Error('Rate limit exceeded');
+    if (rateError) {
+      console.error('Rate limit check error:', rateError);
+    } else if (rateLimitData && rateLimitData.length > 0 && !rateLimitData[0]?.allowed) {
+      console.log('Rate limit exceeded for user:', userId);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          reset_time: rateLimitData[0].reset_time
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Smart chunking for optimal AI context
@@ -153,13 +202,7 @@ For non-audio content, use estimated time segments based on reading pace or cont
     };
 
     // Extract total pages from metadata if available (for PDFs)
-    const { data: contentMeta } = await supabase
-      .from('content')
-      .select('metadata')
-      .eq('id', contentId)
-      .single();
-    
-    const totalPages = contentMeta?.metadata?.totalPages || contentMeta?.metadata?.pageCount || null;
+    const totalPages = content?.metadata?.totalPages || content?.metadata?.pageCount || null;
     console.log('PDF total pages:', totalPages);
 
     let response;
@@ -190,7 +233,7 @@ For non-audio content, use estimated time segments based on reading pace or cont
               content: userPrompt
             }
           ],
-          max_completion_tokens: 4000, // Increased for more chapters
+          max_completion_tokens: 4000,
           response_format: { type: "json_object" }
         }),
       });
@@ -261,6 +304,7 @@ For non-audio content, use estimated time segments based on reading pace or cont
         chapters: chapters,
         processing_status: 'completed',
         metadata: {
+          ...content.metadata,
           chunking: {
             totalChunks: chunkedContent.chunks.length,
             keyTopics: chunkedContent.keyTopics,
@@ -275,7 +319,7 @@ For non-audio content, use estimated time segments based on reading pace or cont
     await supabase
       .from('ai_usage_counters')
       .upsert({
-        user_id: content.user_id,
+        user_id: userId,
         date: new Date().toISOString().split('T')[0],
         chat_requests: 1
       }, {
@@ -283,7 +327,7 @@ For non-audio content, use estimated time segments based on reading pace or cont
         ignoreDuplicates: false
       });
 
-    console.log('Content enhanced successfully with', chapters.length, 'chapters');
+    console.log('Content enhanced successfully with', chapters.length, 'chapters for user:', userId);
 
     return new Response(
       JSON.stringify({ 
