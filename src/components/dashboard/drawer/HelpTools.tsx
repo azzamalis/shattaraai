@@ -20,7 +20,7 @@ export const HelpTools: React.FC<HelpToolsProps> = ({
 }) => {
   return (
     <div>
-      <h2 className="ml-2 mb-2 text-foreground text-sm font-semibold">Help & Tools</h2>
+      <h2 className="ml-2 mb-2 text-foreground text-sm font-medium">Help & Tools</h2>
       <div className="flex flex-col space-y-1 text-muted-foreground font-medium">
         <FeedbackPopover>
           <Button 
