@@ -99,3 +99,9 @@ verify_jwt = true
 
 [functions.generate-summary]
 verify_jwt = true
+
+[functions.generate-chapters]
+verify_jwt = false
+
+[functions.enhance-content-ai]
+verify_jwt = false
