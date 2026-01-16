@@ -63,20 +63,8 @@ export function useRealtimeContentStatus(contentId: string, enableNotifications:
             error: metadata?.error
           });
 
-          // Show notification when processing completes
-          if (enableNotifications && newStatus === 'completed') {
-            toast.success(`${payload.new.title} is ready!`, {
-              action: {
-                label: 'View',
-                onClick: () => navigate(`/content/${contentId}`)
-              },
-              duration: 10000
-            });
-          } else if (enableNotifications && newStatus === 'failed') {
-            toast.error(`Failed to process ${payload.new.title}`, {
-              description: metadata?.error || 'An error occurred during processing'
-            });
-          }
+          // Notifications are now handled by useProgressToast hook
+          // This hook only updates internal state for components that need status info
         }
       )
       .subscribe();

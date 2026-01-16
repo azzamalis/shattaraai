@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useContentContext } from '@/contexts/ContentContext';
 import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
+import { useProgressToast } from '@/hooks/useProgressToast';
 interface ActionCardsProps {
   onPasteClick: () => void;
 }
@@ -17,6 +18,7 @@ export function ActionCards({
     addContentWithFile
   } = useContentContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { startProgressToast } = useProgressToast();
   const handleUploadClick = () => {
     console.log('DEBUG: ActionCards - Upload button clicked');
     fileInputRef.current?.click();
@@ -59,10 +61,6 @@ export function ActionCards({
           timestamp: new Date().toISOString()
         });
 
-        // Show loading toast
-        const loadingToast = toast.loading(`Uploading ${file.name}...`);
-        console.log('DEBUG: ActionCards - Loading toast shown for file upload');
-
         // Use addContentWithFile for ALL file uploads to ensure proper storage handling
         console.log('DEBUG: ActionCards - Calling addContentWithFile with parameters:', {
           contentData: {
@@ -94,19 +92,13 @@ export function ActionCards({
           filename: file.name
         }, file);
 
-        // Dismiss loading toast
-        toast.dismiss(loadingToast);
         console.log('DEBUG: ActionCards - Upload completed, content ID received:', contentId);
         if (contentId) {
-          console.log('DEBUG: ActionCards - Content uploaded, processing in background');
-          // Keep user on dashboard, show success with background processing indicator
-          toast.success(`${file.name} uploaded! Processing in background...`, {
-            description: 'You\'ll be notified when it\'s ready',
-            duration: 5000
-          });
+          console.log('DEBUG: ActionCards - Content uploaded, starting progress toast');
+          // Start unified progress toast that will auto-navigate on completion
+          startProgressToast(contentId, file.name);
           // Emit onboarding event for content upload
           emitOnboardingEvent('content_added');
-          // Don't navigate - let user continue working on dashboard
         } else {
           console.error('DEBUG: ActionCards - Upload failed: No content ID returned');
           throw new Error('Failed to create content - no ID returned');

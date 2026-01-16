@@ -10,6 +10,7 @@ import { ContentItem } from '@/hooks/useContent';
 import { useContentContext } from '@/contexts/ContentContext';
 import { generateSmartTitle } from '@/utils/textProcessing';
 import { emitOnboardingEvent } from '@/hooks/useAutoCompleteOnboarding';
+import { useProgressToast } from '@/hooks/useProgressToast';
 
 interface DashboardModalsProps {
   isPasteModalOpen: boolean;
@@ -38,6 +39,7 @@ export function DashboardModals({
 }: DashboardModalsProps) {
   const navigate = useNavigate();
   const { onAddContent, onAddContentWithMetadata, onDeleteContent } = useContentContext();
+  const { startProgressToast } = useProgressToast();
 
   const handlePasteSubmit = async (data: { url?: string; text?: string; }) => {
     // Determine content type based on URL
@@ -76,18 +78,13 @@ export function DashboardModals({
       // Emit onboarding event for content added
       emitOnboardingEvent('content_added');
       
-      // Navigate to content page
-      const searchParams = new URLSearchParams({
-        type: contentType,
-        ...(data.url && { url: data.url }),
-        ...(data.text && { text: data.text })
-      });
-      navigate(`/content/${contentId}?${searchParams.toString()}`);
-      
-      if (data.url) {
-        toast.success("URL content added successfully");
-      } else if (data.text) {
-        toast.success("Text content added successfully");
+      // For text content, navigate directly (no processing needed)
+      // For YouTube/website, use progress toast (processing required)
+      if (contentType === 'text') {
+        navigate(`/content/${contentId}`);
+      } else {
+        // Start unified progress toast that will auto-navigate on completion
+        startProgressToast(contentId, title);
       }
     }
     

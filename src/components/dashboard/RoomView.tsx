@@ -96,17 +96,9 @@ export function RoomView({
     const contentId = await onAddContentWithMetadata(contentData, urlMetadata);
 
     if (contentId) {
-      const searchParams = new URLSearchParams({
-        type: contentType,
-        ...(data.url && { url: data.url }),
-        ...(data.text && { text: data.text })
-      });
-      navigate(`/content/${contentId}?${searchParams.toString()}`);
-      if (data.url) {
-        toast.success("URL content added successfully");
-      } else if (data.text) {
-        toast.success("Text content added successfully");
-      }
+      // For text content, navigate directly (no processing needed)
+      // For YouTube/website, navigate to content page (processing will show in toast)
+      navigate(`/content/${contentId}`);
     }
     setIsPasteModalOpen(false);
   };

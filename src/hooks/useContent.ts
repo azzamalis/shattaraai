@@ -535,7 +535,7 @@ export const useContent = () => {
                 throw new Error(`Failed to save extracted text: ${updateError.message}`);
               }
               
-              toast.success('PDF uploaded and text extracted successfully!');
+              console.log('DEBUG: useContent - PDF text extracted successfully');
               
               // Trigger AI enhancement for chapter generation
               setTimeout(async () => {
@@ -563,7 +563,7 @@ export const useContent = () => {
                     storagePath: contentData.storage_path || contentData.url
                   }
                 });
-                toast.success('PDF uploaded! Text extraction in progress...');
+                console.log('DEBUG: useContent - Server-side PDF extraction started');
                 
                 // Auto-retry with AI enhancement after successful extraction
                 setTimeout(async () => {
@@ -601,7 +601,7 @@ export const useContent = () => {
                   contentId: contentId
                 }
               });
-              toast.success('YouTube video data is being extracted...');
+              console.log('DEBUG: useContent - YouTube extraction started');
               
               // Auto-trigger AI enhancement after text extraction
               setTimeout(async () => {
@@ -638,7 +638,7 @@ export const useContent = () => {
                   contentId: contentId
                 }
               });
-              toast.success('Website content is being extracted...');
+              console.log('DEBUG: useContent - Website extraction started');
               
               // Auto-trigger AI enhancement after text extraction
               setTimeout(async () => {
@@ -675,7 +675,7 @@ export const useContent = () => {
                   contentId: contentId
                 }
               });
-              toast.success('Video uploaded! Audio extraction and transcription in progress...');
+              console.log('DEBUG: useContent - Video audio extraction started');
             } catch (extractionError) {
               console.error('DEBUG: useContent - Video audio extraction failed:', extractionError);
               toast.error('Video processing failed');
@@ -745,7 +745,7 @@ export const useContent = () => {
                 toast.error('Audio transcription failed');
               } else {
                 console.log('DEBUG: useContent - Audio-transcription function result:', data);
-                toast.success('Audio uploaded! Transcription in progress...');
+                console.log('DEBUG: useContent - Audio transcription in progress');
               }
             } catch (extractionError) {
               console.error('DEBUG: useContent - Audio transcription failed:', extractionError);
@@ -782,7 +782,7 @@ export const useContent = () => {
                     storageUrl: contentData.storage_path || contentData.url
                   }
                 });
-                toast.success('Word document uploaded! Text extraction in progress...');
+                console.log('DEBUG: useContent - Word document extraction started');
               } else {
                 console.log('DEBUG: useContent - Using general extract-document-text function');
                 await supabase.functions.invoke('extract-document-text', {
@@ -792,7 +792,7 @@ export const useContent = () => {
                     fileType: file.type
                   }
                 });
-                toast.success('Document uploaded! Text extraction in progress...');
+                console.log('DEBUG: useContent - Document extraction started');
               }
               
               // Auto-trigger AI enhancement after text extraction

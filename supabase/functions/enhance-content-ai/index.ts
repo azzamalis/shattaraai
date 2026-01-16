@@ -99,6 +99,19 @@ serve(async (req) => {
       );
     }
 
+    // Update progress: Starting AI enhancement
+    await supabase
+      .from('content')
+      .update({
+        processing_status: 'processing',
+        metadata: {
+          ...content.metadata,
+          currentStep: 'enhancing',
+          progress: 60
+        }
+      })
+      .eq('id', contentId);
+
     // Smart chunking for optimal AI context
     console.log('Applying smart chunking for content type:', contentType);
     const chunkedContent = chunkContent(textContent, contentType || 'text', {
@@ -204,6 +217,18 @@ For non-audio content, use estimated time segments based on reading pace or cont
     // Extract total pages from metadata if available (for PDFs)
     const totalPages = content?.metadata?.totalPages || content?.metadata?.pageCount || null;
     console.log('PDF total pages:', totalPages);
+
+    // Update progress: Generating chapters
+    await supabase
+      .from('content')
+      .update({
+        metadata: {
+          ...content.metadata,
+          currentStep: 'generating_chapters',
+          progress: 75
+        }
+      })
+      .eq('id', contentId);
 
     let response;
     let model = 'gpt-4.1-2025-04-14';

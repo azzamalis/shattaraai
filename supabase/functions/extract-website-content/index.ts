@@ -322,6 +322,18 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    // Update progress: Extracting
+    await supabase
+      .from('content')
+      .update({
+        processing_status: 'processing',
+        metadata: {
+          currentStep: 'extracting',
+          progress: 25
+        }
+      })
+      .eq('id', contentId);
+
     // Fetch the website content
     const response = await fetch(url, {
       headers: {
@@ -344,6 +356,17 @@ serve(async (req) => {
 
     console.log(`Extracted ${extractedText.length} characters from website`);
 
+    // Update progress: Analyzing
+    await supabase
+      .from('content')
+      .update({
+        metadata: {
+          currentStep: 'analyzing',
+          progress: 55
+        }
+      })
+      .eq('id', contentId);
+
     // Prepare content update data
     const contentTitle = websiteMetadata.title || websiteMetadata.ogTitle || 'Website Content';
     
@@ -353,12 +376,15 @@ serve(async (req) => {
       .update({
         title: contentTitle,
         text_content: extractedHtml, // Store structured HTML for reader mode
+        processing_status: 'completed',
         metadata: {
           ...websiteMetadata,
           extractedAt: new Date().toISOString(),
           contentLength: extractedText.length,
           hasContent: extractedText.length > 0,
-          plainText: extractedText // Keep plain text for search/processing
+          plainText: extractedText, // Keep plain text for search/processing
+          currentStep: 'completed',
+          progress: 100
         }
       })
       .eq('id', contentId);

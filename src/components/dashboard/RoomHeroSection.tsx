@@ -70,21 +70,8 @@ export function RoomHeroSection({
     const metadata = data.url ? { url: data.url, extractedAt: new Date().toISOString() } : undefined;
     const contentId = await onAddContentWithMetadata(contentData, metadata);
     if (contentId) {
-      const searchParams = new URLSearchParams({
-        type: contentType,
-        ...(data.url && {
-          url: data.url
-        }),
-        ...(data.text && {
-          text: data.text
-        })
-      });
-      navigate(`/content/${contentId}?${searchParams.toString()}`);
-      if (data.url) {
-        toast.success("URL content added successfully");
-      } else if (data.text) {
-        toast.success("Text content added successfully");
-      }
+      // Navigate to content page for all types
+      navigate(`/content/${contentId}`);
     }
     setIsPasteModalOpen(false);
   };
