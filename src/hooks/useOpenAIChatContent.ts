@@ -70,14 +70,20 @@ export function useOpenAIChatContent({
     onDone: () => void
   ): Promise<void> => {
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      
-      const response = await fetch(`${supabaseUrl}/functions/v1/openai-chat-content`, {
+      // SECURITY FIX: Get user's session token instead of using anon key
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('You must be logged in to use the AI chat');
+        onDone();
+        return;
+      }
+
+      const response = await fetch('https://trvuidenkjqqlwadlosh.supabase.co/functions/v1/openai-chat-content', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseKey}`,
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRydnVpZGVua2pxcWx3YWRsb3NoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc1NTMzNzIsImV4cCI6MjA2MzEyOTM3Mn0.V72-VE9VMW8a7XWiRxEbHznEBMn70yB6AvgqRc7yWFo',
         },
         body: JSON.stringify({
           message,
@@ -90,8 +96,22 @@ export function useOpenAIChatContent({
         }),
       });
 
-      if (!response.ok || !response.body) {
+      if (!response.ok) {
+        if (response.status === 401) {
+          toast.error('Session expired. Please log in again.');
+          onDone();
+          return;
+        }
+        if (response.status === 429) {
+          toast.error('Rate limit exceeded. Please try again later.');
+          onDone();
+          return;
+        }
         throw new Error('Failed to start stream');
+      }
+
+      if (!response.body) {
+        throw new Error('No response body');
       }
 
       const reader = response.body.getReader();

@@ -54,6 +54,65 @@ serve(async (req) => {
   }
 
   try {
+    // ========== SECURITY: JWT Authentication ==========
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.error('Missing or invalid Authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', response: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    // Create client with user's auth token to verify JWT
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+    
+    if (claimsError || !claimsData?.claims) {
+      console.error('JWT validation failed:', claimsError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', response: 'Invalid or expired token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = claimsData.claims.sub as string;
+    console.log('Authenticated user:', userId);
+
+    // ========== RATE LIMITING ==========
+    const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+    
+    const { data: rateCheck, error: rateError } = await supabaseService.rpc('check_rate_limit', {
+      user_uuid: userId,
+      request_type: 'chat',
+      estimated_tokens: 2000
+    });
+
+    if (rateError) {
+      console.error('Rate limit check error:', rateError);
+      // Continue anyway - don't block on rate limit errors
+    } else if (rateCheck && rateCheck.length > 0 && !rateCheck[0].allowed) {
+      console.log('Rate limit exceeded for user:', userId);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded', 
+          response: 'You have reached your daily chat limit. Please try again later or upgrade your plan.',
+          remaining: 0,
+          reset_time: rateCheck[0].reset_time
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ========== Parse Request ==========
     const { 
       message, 
       conversationId, 
@@ -65,6 +124,7 @@ serve(async (req) => {
     } = await req.json();
 
     console.log('Received request:', { 
+      userId,
       message: message?.slice(0, 100), 
       conversationId, 
       contextId,
@@ -105,18 +165,25 @@ serve(async (req) => {
         contextText = `${chapterInfo}\n\n${contextText}`;
       }
     } else if (contextId) {
-      // Fetch content from database if not provided
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      
-      const { data: content, error: contentError } = await supabase
+      // Fetch content from database - verify user owns the content
+      const { data: content, error: contentError } = await supabaseService
         .from('content')
-        .select('title, type, text_content, chapters, ai_summary')
+        .select('title, type, text_content, chapters, ai_summary, user_id')
         .eq('id', contextId)
         .single();
       
-      if (!contentError && content) {
+      if (contentError) {
+        console.error('Content fetch error:', contentError);
+      } else if (content) {
+        // Verify user owns this content
+        if (content.user_id !== userId) {
+          console.error('User does not own content:', { userId, contentUserId: content.user_id });
+          return new Response(
+            JSON.stringify({ error: 'Forbidden', response: 'You do not have access to this content' }),
+            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
         contentTitle = content.title || '';
         contentType = content.type || '';
         
@@ -228,7 +295,7 @@ Guidelines:
       const data = await response.json();
       const aiResponse = data.choices[0]?.message?.content || 'I apologize, but I was unable to generate a response.';
 
-      console.log('Successfully generated response');
+      console.log('Successfully generated response for user:', userId);
 
       return new Response(JSON.stringify({ response: aiResponse, success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
