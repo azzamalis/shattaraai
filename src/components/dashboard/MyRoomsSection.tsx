@@ -19,7 +19,7 @@ export function MyRoomsSection({
   } = useRoomContentCounts();
   return <section className="w-full py-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-foreground text-sm font-medium">My Rooms</h2>
+        <h2 className="text-foreground text-lg font-medium">My Rooms</h2>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {rooms.map(room => <RoomCard key={room.id} id={room.id} name={room.name} contentCount={getContentCountForRoom(room.id)} onDelete={onDeleteRoom} />)}
