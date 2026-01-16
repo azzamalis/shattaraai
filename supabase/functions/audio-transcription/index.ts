@@ -549,6 +549,43 @@ serve(async (req) => {
   }
 
   try {
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // ========== IP-BASED RATE LIMITING ==========
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+    
+    console.log('Audio transcription request from IP:', clientIP);
+
+    const { data: rateCheck, error: rateError } = await supabase.rpc('check_ip_rate_limit', {
+      p_ip_address: clientIP,
+      p_endpoint: 'audio-transcription',
+      p_max_requests: 30,  // 30 requests per hour
+      p_window_minutes: 60
+    });
+
+    if (rateError) {
+      console.error('Rate limit check error:', rateError);
+      // Continue anyway - don't block on rate limit errors
+    } else if (rateCheck && rateCheck.length > 0 && !rateCheck[0].allowed) {
+      console.log('Rate limit exceeded for IP:', clientIP);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded. Please try again later.',
+          reset_time: rateCheck[0].reset_time
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Retry-After': '3600'
+          } 
+        }
+      );
+    }
+
     const { 
       audioData, 
       audioFileUrl,
