@@ -42,7 +42,7 @@ export function ContinueLearningSection({
   if (content.length === 0) {
     return <section className="w-full py-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="font-semibold text-foreground text-lg">Continue Learning</h2>
+          <h2 className="text-foreground text-lg font-medium">Recents</h2>
         </div>
         <div className="text-muted-foreground text-center py-12 rounded-xl border border-border/5 bg-transparent">
           No content yet. Upload, paste, or record something to get started!
