@@ -238,8 +238,31 @@ serve(async (req) => {
     if (!videoId) {
       throw new Error('Invalid YouTube URL');
     }
+
+    // Update progress: Extracting
+    await supabase
+      .from('content')
+      .update({
+        processing_status: 'processing',
+        metadata: {
+          currentStep: 'extracting',
+          progress: 25
+        }
+      })
+      .eq('id', contentId);
     
     const youtubeData = await getYouTubeData(videoId);
+    
+    // Update progress: Analyzing
+    await supabase
+      .from('content')
+      .update({
+        metadata: {
+          currentStep: 'analyzing',
+          progress: 60
+        }
+      })
+      .eq('id', contentId);
     
     // Store YouTube URL in the youtube-content bucket
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -271,7 +294,9 @@ serve(async (req) => {
           extractedAt: new Date().toISOString(),
           hasTranscript: youtubeData.transcript.length > 0,
           hasChapters: youtubeData.chapters.length > 0,
-          hasRealTranscript: youtubeData.metadata.hasRealTranscript
+          hasRealTranscript: youtubeData.metadata.hasRealTranscript,
+          currentStep: 'completed',
+          progress: 100
         }
       })
       .eq('id', contentId);

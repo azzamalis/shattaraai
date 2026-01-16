@@ -73,11 +73,17 @@ async function processAudioFileFromUrl(
         .eq('id', recordingId);
     }
     
-    // Update content status
+    // Update content status with progress
     if (contentId) {
       await supabase
         .from('content')
-        .update({ processing_status: 'processing' })
+        .update({ 
+          processing_status: 'processing',
+          metadata: {
+            currentStep: 'transcribing',
+            progress: 35
+          }
+        })
         .eq('id', contentId);
     }
     
@@ -185,7 +191,11 @@ async function processAudioFileFromUrl(
           text_content: transcriptionText,
           processing_status: 'completed',
           transcription_confidence: 0.95,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          metadata: {
+            currentStep: 'completed',
+            progress: 100
+          }
         })
         .eq('id', contentId);
       
