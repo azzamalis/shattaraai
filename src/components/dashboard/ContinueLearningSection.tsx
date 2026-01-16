@@ -51,7 +51,7 @@ export function ContinueLearningSection({
   }
   return <section className="w-full mb-11">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-foreground text-lg font-medium">Continue Learning</h2>
+        <h2 className="text-foreground text-sm font-medium">Continue Learning</h2>
         <button onClick={handleViewAll} className="inline-flex items-center justify-center w-20 h-9 rounded-xl text-sm px-3 text-center cursor-pointer transition-colors hover:bg-accent/50">
           View all
         </button>
