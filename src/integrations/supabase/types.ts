@@ -571,6 +571,36 @@ export type Database = {
           },
         ]
       }
+      ip_rate_limits: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          ip_address: string
+          request_count: number
+          updated_at: string
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          ip_address: string
+          request_count?: number
+          updated_at?: string
+          window_start?: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          ip_address?: string
+          request_count?: number
+          updated_at?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           confirmation_token: string | null
@@ -980,6 +1010,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_ip_rate_limit: {
+        Args: {
+          p_endpoint: string
+          p_ip_address: string
+          p_max_requests?: number
+          p_window_minutes?: number
+        }
+        Returns: {
+          allowed: boolean
+          remaining_requests: number
+          reset_time: string
+        }[]
+      }
       check_rate_limit: {
         Args: {
           estimated_tokens?: number
@@ -994,6 +1037,7 @@ export type Database = {
         }[]
       }
       cleanup_expired_cache: { Args: never; Returns: undefined }
+      cleanup_old_ip_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       generate_invite_code: { Args: never; Returns: string }
       get_user_plan_quotas: {
