@@ -123,7 +123,7 @@ export function DashboardDrawer({
               
               {/* History Section */}
               <div className="w-full">
-                <h3 className="ml-2 mb-2 text-foreground text-sm font-semibold">Recents</h3>
+                <h3 className="ml-2 mb-2 text-foreground text-sm font-medium">Recents</h3>
                 <HistorySection rooms={rooms} />
               </div>
               
