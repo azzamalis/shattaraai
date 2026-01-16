@@ -21,23 +21,56 @@ serve(async (req) => {
       throw new Error('Either fileUrl OR (contentId and storagePath) are required')
     }
 
-    // Initialize Supabase client
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+
+    // ========== SECURITY: For fileUrl path, require authentication ==========
+    let userId: string | null = null
+    
+    if (fileUrl) {
+      const authHeader = req.headers.get('Authorization')
+      if (!authHeader?.startsWith('Bearer ')) {
+        console.error('Missing or invalid Authorization header for fileUrl request')
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized', success: false }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
       }
-    )
+
+      // Create client with user's auth token to verify JWT
+      const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } }
+      })
+
+      const token = authHeader.replace('Bearer ', '')
+      const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token)
+
+      if (claimsError || !claimsData?.claims) {
+        console.error('JWT validation failed:', claimsError?.message)
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized', success: false }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      userId = claimsData.claims.sub as string
+      console.log('Authenticated user for fileUrl extraction:', userId)
+    }
+
+    // Initialize service client for database operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
 
     let fileData: Blob | null = null;
 
-    // Handle fileUrl (new API for chat attachments)
+    // Handle fileUrl (new API for chat attachments - requires auth)
     if (fileUrl) {
-      console.log(`Fetching PDF from URL: ${fileUrl}`)
+      console.log(`Fetching PDF from URL for user ${userId}: ${fileUrl}`)
       
       // Extract bucket and path from public URL
       // Format: https://{project}.supabase.co/storage/v1/object/public/{bucket}/{path}
@@ -64,6 +97,38 @@ serve(async (req) => {
     } else {
       // Handle old API (contentId + storagePath)
       console.log(`Processing PDF extraction for contentId: ${contentId}, storagePath: ${storagePath}`)
+      
+      // Verify user owns the content if contentId is provided
+      const authHeader = req.headers.get('Authorization')
+      if (authHeader?.startsWith('Bearer ')) {
+        const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+          global: { headers: { Authorization: authHeader } }
+        })
+        
+        const token = authHeader.replace('Bearer ', '')
+        const { data: claimsData } = await supabaseAuth.auth.getClaims(token)
+        
+        if (claimsData?.claims) {
+          userId = claimsData.claims.sub as string
+          
+          // Verify ownership
+          const { data: contentData, error: contentError } = await supabase
+            .from('content')
+            .select('user_id')
+            .eq('id', contentId)
+            .single()
+          
+          if (contentError) {
+            console.error('Error fetching content:', contentError)
+          } else if (contentData && contentData.user_id !== userId) {
+            console.error('User does not own content:', { userId, contentUserId: contentData.user_id })
+            return new Response(
+              JSON.stringify({ error: 'Forbidden', success: false }),
+              { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+          }
+        }
+      }
       
       const { data, error: downloadError } = await supabase.storage
         .from('pdfs')
