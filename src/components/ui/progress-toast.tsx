@@ -23,43 +23,39 @@ export function ProgressToast({ message, progress, status }: ProgressToastProps)
   return (
     <div className="min-w-[360px] max-w-[420px] bg-white rounded-2xl shadow-lg border border-slate-200/60 p-5">
       <div className="flex items-start gap-3 mb-4">
-  <div className="mt-0.5">
-    {getIcon()}
-  </div>
-  <div className="flex-1 min-w-0">
-    <p className={cn(
-      "text-sm font-medium leading-relaxed",
-      status === 'completed' && "text-slate-900",
-      status === 'failed' && "text-slate-900",
-      (status === 'pending' || status === 'processing') && "text-slate-700"
-    )}>
-      {message}
-    </p>
-  </div>
-</div>
-<div className="flex items-center gap-3">
-  <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-    {/* progress bar */}
-  </div>
-  {status !== 'completed' && status !== 'failed' && (
-    <p className="text-xs text-slate-500 font-medium min-w-[38px] text-right">
-      {Math.round(progress)}%
-    </p>
-  )}
-</div>
+        <div className="mt-0.5">
+          {getIcon()}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className={cn(
+            "text-sm font-medium leading-relaxed",
+            status === 'completed' && "text-slate-900",
+            status === 'failed' && "text-slate-900",
+            (status === 'pending' || status === 'processing') && "text-slate-700"
+          )}>
+            {message}
+          </p>
+        </div>
       </div>
-      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-        <motion.div
-          className={cn(
-            "h-full rounded-full",
-            status === "completed" && "bg-green-600",
-            status === "failed" && "bg-red-600",
-            (status === "pending" || status === "processing") && "bg-slate-900",
-          )}
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        />
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+          <motion.div
+            className={cn(
+              "h-full rounded-full",
+              status === "completed" && "bg-green-600",
+              status === "failed" && "bg-red-600",
+              (status === "pending" || status === "processing") && "bg-slate-900",
+            )}
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+        </div>
+        {status !== 'completed' && status !== 'failed' && (
+          <p className="text-xs text-slate-500 font-medium min-w-[38px] text-right">
+            {Math.round(progress)}%
+          </p>
+        )}
       </div>
     </div>
   );
