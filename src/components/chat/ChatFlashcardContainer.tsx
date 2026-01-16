@@ -197,25 +197,6 @@ export function ChatFlashcardContainer({ messages }: ChatFlashcardContainerProps
   return (
     <ScrollArea className="h-full">
       <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-medium text-dashboard-text dark:text-dashboard-text">
-              Conversation Flashcards
-            </h3>
-            <p className="text-sm text-dashboard-text-secondary dark:text-dashboard-text-secondary">
-              {cards.length} flashcard{cards.length !== 1 ? 's' : ''} generated from your chat
-            </p>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleGenerateMore}
-            className="text-dashboard-text-secondary dark:text-dashboard-text-secondary hover:text-dashboard-text dark:hover:text-dashboard-text"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Generate More
-          </Button>
-        </div>
         
         <Flashcard 
           cards={filteredCards} 
