@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { fetchWithRetry, logRetryMetrics } from '../_shared/retryUtils.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -128,14 +129,28 @@ async function processAudioFileFromUrl(
     formData.append('response_format', 'verbose_json');
     formData.append('timestamp_granularities[]', 'word');
     formData.append('timestamp_granularities[]', 'segment');
+    // Note: language parameter removed to enable auto-detection for multilingual support
     
-    const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+    const startTime = Date.now();
+    const whisperResponse = await fetchWithRetry(
+      'https://api.openai.com/v1/audio/transcriptions',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiApiKey}`,
+        },
+        body: formData,
       },
-      body: formData,
-    });
+      {
+        maxRetries: 3,
+        timeoutMs: 180000, // 3 minutes for large audio files
+        onRetry: (attempt, error) => {
+          console.log(`Whisper API retry ${attempt}: ${error.message}`);
+        }
+      }
+    );
+    
+    logRetryMetrics('whisper_transcription', 1, whisperResponse.ok, Date.now() - startTime);
     
     if (!whisperResponse.ok) {
       const errorText = await whisperResponse.text();
@@ -143,6 +158,10 @@ async function processAudioFileFromUrl(
     }
     
     const transcriptionResult = await whisperResponse.json();
+    
+    // Store detected language in metadata (Whisper auto-detects when language param is not set)
+    const detectedLanguage = transcriptionResult.language || 'unknown';
+    console.log('Detected language:', detectedLanguage);
     console.log('Whisper API response:', {
       text: transcriptionResult.text,
       segments: transcriptionResult.segments ? 'segments included' : 'no segments'
@@ -185,6 +204,13 @@ async function processAudioFileFromUrl(
     
     // Update content with final transcript and trigger chapter generation
     if (contentId) {
+      // Get existing metadata to preserve it
+      const { data: existingContent } = await supabase
+        .from('content')
+        .select('metadata')
+        .eq('id', contentId)
+        .single();
+      
       await supabase
         .from('content')
         .update({
@@ -193,8 +219,12 @@ async function processAudioFileFromUrl(
           transcription_confidence: 0.95,
           updated_at: new Date().toISOString(),
           metadata: {
+            ...(existingContent?.metadata || {}),
             currentStep: 'completed',
-            progress: 100
+            progress: 100,
+            detectedLanguage,
+            transcriptionModel: 'whisper-1',
+            hasAutoLanguageDetection: true
           }
         })
         .eq('id', contentId);
@@ -327,17 +357,30 @@ async function processInBackground(
     formData.append('file', blob, fileName);
     formData.append('model', 'whisper-1');
     formData.append('response_format', 'verbose_json');
-    formData.append('language', 'en'); // Can be made dynamic if needed
+    // Note: language parameter removed to enable auto-detection for multilingual support
     formData.append('timestamp_granularities[]', 'word'); // Request word-level timestamps
 
-    // Send to OpenAI Whisper API
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+    // Send to OpenAI Whisper API with retry logic
+    const startTime = Date.now();
+    const response = await fetchWithRetry(
+      'https://api.openai.com/v1/audio/transcriptions',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+        },
+        body: formData,
       },
-      body: formData,
-    });
+      {
+        maxRetries: 3,
+        timeoutMs: 180000, // 3 minutes for large audio files
+        onRetry: (attempt, error) => {
+          console.log(`Whisper API retry ${attempt}: ${error.message}`);
+        }
+      }
+    );
+    
+    logRetryMetrics('whisper_transcription_legacy', 1, response.ok, Date.now() - startTime);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -346,7 +389,10 @@ async function processInBackground(
     }
 
     const result = await response.json();
-    console.log('Whisper API response:', { text: result.text?.substring(0, 100), segments: result.segments?.length });
+    
+    // Store detected language
+    const detectedLanguage = result.language || 'unknown';
+    console.log('Whisper API response:', { text: result.text?.substring(0, 100), segments: result.segments?.length, detectedLanguage });
 
     // Create transcription chunk object with word-level data
     const transcriptionChunk = {
@@ -520,7 +566,7 @@ async function transcribeSynchronously(
   
   console.log(`Processing ${isVideoContent ? 'video' : 'audio'} file: ${fileName} with MIME type: ${mimeType}`);
   
-  // Call OpenAI Whisper API
+  // Call OpenAI Whisper API with retry logic
   const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
   if (!openaiApiKey) {
     throw new Error('OpenAI API key not found');
@@ -530,14 +576,28 @@ async function transcribeSynchronously(
   formData.append('file', new Blob([audioBuffer], { type: mimeType }), fileName);
   formData.append('model', 'whisper-1');
   formData.append('response_format', 'verbose_json');
+  // Note: language parameter removed to enable auto-detection
   
-  const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${openaiApiKey}`,
+  const startTime = Date.now();
+  const whisperResponse = await fetchWithRetry(
+    'https://api.openai.com/v1/audio/transcriptions',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+      },
+      body: formData,
     },
-    body: formData,
-  });
+    {
+      maxRetries: 3,
+      timeoutMs: 180000, // 3 minutes for large audio files
+      onRetry: (attempt, error) => {
+        console.log(`Whisper API sync retry ${attempt}: ${error.message}`);
+      }
+    }
+  );
+  
+  logRetryMetrics('whisper_transcription_sync', 1, whisperResponse.ok, Date.now() - startTime);
   
   if (!whisperResponse.ok) {
     const errorText = await whisperResponse.text();
@@ -545,7 +605,7 @@ async function transcribeSynchronously(
   }
   
   const transcriptionResult = await whisperResponse.json();
-  console.log('Synchronous transcription completed, text length:', transcriptionResult.text?.length || 0);
+  console.log('Synchronous transcription completed, text length:', transcriptionResult.text?.length || 0, 'language:', transcriptionResult.language);
   
   return {
     text: transcriptionResult.text || '',

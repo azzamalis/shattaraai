@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 import { chunkContent, selectChunksForContext } from '../_shared/contentChunking.ts';
+import { fetchWithRetry, logRetryMetrics } from '../_shared/retryUtils.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -239,29 +240,42 @@ For non-audio content, use estimated time segments based on reading pace or cont
       : `Please analyze the following content (smart-chunked for relevance):\n\n${optimizedContent}`;
 
     try {
-      // Primary attempt with GPT-4.1
-      response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json',
+      // Primary attempt with GPT-4.1 using retry logic
+      const startTime = Date.now();
+      response = await fetchWithRetry(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openaiApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              {
+                role: 'system',
+                content: getSystemPrompt(contentType || 'text', totalPages)
+              },
+              {
+                role: 'user',
+                content: userPrompt
+              }
+            ],
+            max_completion_tokens: 4000,
+            response_format: { type: "json_object" }
+          }),
         },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            {
-              role: 'system',
-              content: getSystemPrompt(contentType || 'text', totalPages)
-            },
-            {
-              role: 'user',
-              content: userPrompt
-            }
-          ],
-          max_completion_tokens: 4000,
-          response_format: { type: "json_object" }
-        }),
-      });
+        {
+          maxRetries: 2,
+          timeoutMs: 90000, // 90 seconds for AI generation
+          onRetry: (attempt, error) => {
+            console.log(`OpenAI API retry ${attempt}: ${error.message}`);
+          }
+        }
+      );
+      
+      logRetryMetrics('openai_enhance_content', 1, response.ok, Date.now() - startTime);
 
       if (!response.ok) {
         throw new Error(`OpenAI API error: ${response.status}`);
@@ -270,30 +284,43 @@ For non-audio content, use estimated time segments based on reading pace or cont
     } catch (error) {
       console.log('Primary model failed, trying fallback model...', error.message);
       
-      // Fallback to GPT-4.1-mini
+      // Fallback to GPT-4.1-mini with retry logic
       model = 'gpt-4.1-mini-2025-04-14';
-      response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json',
+      const startTime = Date.now();
+      response = await fetchWithRetry(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openaiApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              {
+                role: 'system',
+                content: getSystemPrompt(contentType || 'text', totalPages)
+              },
+              {
+                role: 'user',
+                content: userPrompt
+              }
+            ],
+            max_completion_tokens: 3000,
+            response_format: { type: "json_object" }
+          }),
         },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            {
-              role: 'system',
-              content: getSystemPrompt(contentType || 'text', totalPages)
-            },
-            {
-              role: 'user',
-              content: userPrompt
-            }
-          ],
-          max_completion_tokens: 3000,
-          response_format: { type: "json_object" }
-        }),
-      });
+        {
+          maxRetries: 2,
+          timeoutMs: 60000, // 60 seconds for fallback
+          onRetry: (attempt, error) => {
+            console.log(`OpenAI fallback API retry ${attempt}: ${error.message}`);
+          }
+        }
+      );
+      
+      logRetryMetrics('openai_enhance_content_fallback', 1, response.ok, Date.now() - startTime);
 
       if (!response.ok) {
         throw new Error(`Fallback OpenAI API error: ${response.status}`);
