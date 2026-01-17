@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { fetchWithRetry, logRetryMetrics } from '../_shared/retryUtils.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -109,9 +110,21 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
     throw new Error('YouTube API key not configured');
   }
 
-  const videoResponse = await fetch(
-    `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${apiKey}`
+  // Fetch video metadata with retry logic
+  const startTime = Date.now();
+  const videoResponse = await fetchWithRetry(
+    `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${apiKey}`,
+    { method: 'GET' },
+    {
+      maxRetries: 3,
+      timeoutMs: 30000,
+      onRetry: (attempt, error) => {
+        console.log(`YouTube API retry ${attempt}: ${error.message}`);
+      }
+    }
   );
+  
+  logRetryMetrics('youtube_api_video', 1, videoResponse.ok, Date.now() - startTime);
   
   if (!videoResponse.ok) {
     throw new Error(`YouTube API error: ${videoResponse.status}`);
@@ -128,15 +141,33 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
   
   let transcript = '';
   try {
+    // Try to fetch transcript with retry logic
     const transcriptUrl = `https://www.youtube.com/api/timedtext?lang=en&v=${videoId}`;
-    const transcriptResponse = await fetch(transcriptUrl);
+    const transcriptResponse = await fetchWithRetry(
+      transcriptUrl,
+      { method: 'GET' },
+      {
+        maxRetries: 2,
+        timeoutMs: 15000,
+        retryableStatusCodes: [408, 429, 500, 502, 503, 504]
+      }
+    );
     
     if (transcriptResponse.ok) {
       const transcriptXml = await transcriptResponse.text();
       transcript = parseTranscriptXml(transcriptXml);
     } else {
+      // Try auto-generated transcript
       const autoTranscriptUrl = `https://www.youtube.com/api/timedtext?lang=en&v=${videoId}&tlang=en`;
-      const autoResponse = await fetch(autoTranscriptUrl);
+      const autoResponse = await fetchWithRetry(
+        autoTranscriptUrl,
+        { method: 'GET' },
+        {
+          maxRetries: 2,
+          timeoutMs: 15000,
+          retryableStatusCodes: [408, 429, 500, 502, 503, 504]
+        }
+      );
       
       if (autoResponse.ok) {
         const autoTranscriptXml = await autoResponse.text();
@@ -145,6 +176,7 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
     }
     
     if (!transcript.trim()) {
+      console.log('No transcript available, falling back to description');
       transcript = video.snippet.description;
     }
   } catch (error) {
