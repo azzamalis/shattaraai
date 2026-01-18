@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 import { fetchWithRetry, logRetryMetrics } from '../_shared/retryUtils.ts';
+import { normalizeTranscript } from '../_shared/transcriptNormalization.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -310,6 +311,10 @@ serve(async (req) => {
 
     const storagePath = uploadData?.path || url;
 
+    // Normalize transcript for cleaner AI processing
+    const normalizedResult = normalizeTranscript(youtubeData.transcript);
+    console.log(`YouTube transcript normalization: removed ${normalizedResult.fillerCount} fillers, fixed ${normalizedResult.repetitionCount} repetitions, ${normalizedResult.cleanupPercentage}% cleaned`);
+
     // Update content with extracted data and storage path
     const { error: contentError } = await supabase
       .from('content')
@@ -317,7 +322,7 @@ serve(async (req) => {
         title: youtubeData.title,
         filename: youtubeData.title,
         storage_path: storagePath,
-        text_content: youtubeData.transcript,
+        text_content: normalizedResult.cleaned, // Use normalized for AI features
         chapters: youtubeData.chapters,
         processing_status: 'completed',
         metadata: {
@@ -328,7 +333,15 @@ serve(async (req) => {
           hasChapters: youtubeData.chapters.length > 0,
           hasRealTranscript: youtubeData.metadata.hasRealTranscript,
           currentStep: 'completed',
-          progress: 100
+          progress: 100,
+          hasNormalizedTranscript: true,
+          normalization: {
+            fillerCount: normalizedResult.fillerCount,
+            repetitionCount: normalizedResult.repetitionCount,
+            cleanupPercentage: normalizedResult.cleanupPercentage,
+            originalLength: normalizedResult.metadata.originalLength,
+            cleanedLength: normalizedResult.metadata.cleanedLength
+          }
         }
       })
       .eq('id', contentId);
@@ -338,13 +351,13 @@ serve(async (req) => {
       throw new Error('Failed to update content');
     }
     
-    // Create or update recording entry
+    // Create or update recording entry with raw transcript
     const { error: recordingError } = await supabase
       .from('recordings')
       .upsert({
         content_id: contentId,
         duration: youtubeData.duration,
-        transcript: youtubeData.transcript,
+        transcript: youtubeData.transcript, // Store raw for reference
         chapters: youtubeData.chapters,
         processing_status: 'completed'
       });

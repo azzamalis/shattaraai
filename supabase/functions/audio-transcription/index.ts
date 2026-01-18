@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 import { fetchWithRetry, logRetryMetrics } from '../_shared/retryUtils.ts';
+import { normalizeTranscript, normalizeTranscriptSegments } from '../_shared/transcriptNormalization.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -171,24 +172,32 @@ async function processAudioFileFromUrl(
     const segments = transcriptionResult.segments || [];
     const words = transcriptionResult.words || [];
     
-    // Update recording with transcript and word-level data
+    // Normalize transcript for cleaner AI processing
+    const normalizedResult = normalizeTranscript(transcriptionText);
+    console.log(`Transcript normalization: removed ${normalizedResult.fillerCount} fillers, fixed ${normalizedResult.repetitionCount} repetitions, ${normalizedResult.cleanupPercentage}% cleaned`);
+    
+    // Normalize segments as well
+    const normalizedSegments = normalizeTranscriptSegments(segments);
+    
+    // Update recording with raw transcript (preserving original for reference)
     if (recordingId) {
       const updateData: any = {
-        transcript: transcriptionText,
+        transcript: transcriptionText, // Store raw for reference
         processing_status: 'completed',
         transcription_status: 'completed',
         transcription_confidence: 0.95,
         updated_at: new Date().toISOString()
       };
       
-      // Add word-level transcript data
+      // Add word-level transcript data with normalized text
       if (segments.length > 0 || words.length > 0) {
         updateData.real_time_transcript = [{
           chunkIndex: 0,
           timestamp: Date.now(),
           text: transcriptionText,
+          normalizedText: normalizedResult.cleaned,
           confidence: 0.95,
-          segments: segments,
+          segments: normalizedSegments,
           words: words,
           duration: segments.length > 0 ? segments[segments.length - 1]?.end || 0 : 0
         }];
@@ -202,7 +211,7 @@ async function processAudioFileFromUrl(
       console.log('Updated recording with transcript');
     }
     
-    // Update content with final transcript and trigger chapter generation
+    // Update content with normalized transcript for AI processing
     if (contentId) {
       // Get existing metadata to preserve it
       const { data: existingContent } = await supabase
@@ -214,7 +223,7 @@ async function processAudioFileFromUrl(
       await supabase
         .from('content')
         .update({
-          text_content: transcriptionText,
+          text_content: normalizedResult.cleaned, // Use normalized for AI features
           processing_status: 'completed',
           transcription_confidence: 0.95,
           updated_at: new Date().toISOString(),
@@ -224,18 +233,26 @@ async function processAudioFileFromUrl(
             progress: 100,
             detectedLanguage,
             transcriptionModel: 'whisper-1',
-            hasAutoLanguageDetection: true
+            hasAutoLanguageDetection: true,
+            hasNormalizedTranscript: true,
+            normalization: {
+              fillerCount: normalizedResult.fillerCount,
+              repetitionCount: normalizedResult.repetitionCount,
+              cleanupPercentage: normalizedResult.cleanupPercentage,
+              originalLength: normalizedResult.metadata.originalLength,
+              cleanedLength: normalizedResult.metadata.cleanedLength
+            }
           }
         })
         .eq('id', contentId);
       
-      console.log('Updated content with final transcript, triggering chapter generation');
+      console.log('Updated content with normalized transcript, triggering chapter generation');
       
-      // Trigger chapter generation
+      // Trigger chapter generation with normalized text
       const chapterResponse = await supabase.functions.invoke('generate-chapters', {
         body: { 
           contentId: contentId,
-          transcript: transcriptionText
+          transcript: normalizedResult.cleaned
         }
       });
       
@@ -445,17 +462,28 @@ async function processInBackground(
 
       console.log(`Updated recording ${recordingId} with chunk ${chunkIndex}, total chunks: ${chunksProcessed}`);
     } else {
-      // For final transcription, update the main transcript field
+      // For final transcription, normalize and update the main transcript field
       const fullTranscript = result.text || '';
+      const normalizedResult = normalizeTranscript(fullTranscript);
+      console.log(`Transcript normalization (legacy): removed ${normalizedResult.fillerCount} fillers, fixed ${normalizedResult.repetitionCount} repetitions`);
+      
       const confidence = transcriptionChunk.confidence;
 
       const { error: updateError } = await supabase
         .from('content')
         .update({
-          text_content: fullTranscript,
+          text_content: normalizedResult.cleaned, // Use normalized for AI processing
           transcription_confidence: Math.max(0, Math.min(1, confidence)),
           processing_status: 'completed',
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          metadata: {
+            hasNormalizedTranscript: true,
+            normalization: {
+              fillerCount: normalizedResult.fillerCount,
+              repetitionCount: normalizedResult.repetitionCount,
+              cleanupPercentage: normalizedResult.cleanupPercentage
+            }
+          }
         })
         .eq('id', recordingId);
 
@@ -464,14 +492,14 @@ async function processInBackground(
         throw new Error('Failed to update final transcript');
       }
 
-      console.log(`Updated content ${recordingId} with final transcript, triggering chapter generation`);
+      console.log(`Updated content ${recordingId} with normalized transcript, triggering chapter generation`);
       
-      // Trigger chapter generation after successful transcription
+      // Trigger chapter generation after successful transcription (use normalized text)
       try {
         const chapterResponse = await supabase.functions.invoke('generate-chapters', {
           body: {
             contentId: recordingId,
-            transcript: fullTranscript,
+            transcript: normalizedResult.cleaned,
             duration: result.duration || 0
           }
         });
