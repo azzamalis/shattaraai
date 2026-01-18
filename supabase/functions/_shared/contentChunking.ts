@@ -1,11 +1,33 @@
 // Shared content chunking utilities for edge functions
 // Optimized for AI context handling with large documents
+// Uses token-based limits for accurate GPT context management
+
+import { estimateTokens, countTokens, splitByTokens } from './tokenUtils.ts';
 
 export interface ChunkOptions {
+  /** Maximum tokens per chunk (default: 1000) - replaces character-based maxChunkSize */
+  maxChunkTokens?: number;
+  /** Overlap tokens between chunks for context continuity (default: 100) */
+  overlapTokens?: number;
+  /** Legacy: maximum characters per chunk (deprecated, use maxChunkTokens) */
   maxChunkSize?: number;
+  /** Legacy: overlap size in characters (deprecated, use overlapTokens) */
   overlapSize?: number;
+  /** Preserve document structure like headings and sections */
   preserveStructure?: boolean;
+  /** Sort chunks by relevance score */
   prioritizeRelevance?: boolean;
+}
+
+export interface TimestampRange {
+  /** Start time in seconds */
+  startSeconds: number;
+  /** End time in seconds */
+  endSeconds: number;
+  /** Original timestamp string (e.g., "1:23:45") */
+  startTimestamp?: string;
+  /** Original end timestamp string */
+  endTimestamp?: string;
 }
 
 export interface ContentChunk {
@@ -15,6 +37,10 @@ export interface ContentChunk {
   startOffset: number;
   endOffset: number;
   relevanceScore: number;
+  /** Token count for this chunk */
+  tokenCount: number;
+  /** Timestamp range for video/audio content */
+  timestampRange?: TimestampRange;
   metadata: {
     hasHeadings: boolean;
     hasLists: boolean;
@@ -22,6 +48,8 @@ export interface ContentChunk {
     hasMath: boolean;
     wordCount: number;
     keyTerms: string[];
+    /** Content type detection for token estimation */
+    contentType?: string;
   };
 }
 
@@ -29,17 +57,36 @@ export interface ChunkedContent {
   chunks: ContentChunk[];
   summary: string;
   totalLength: number;
+  /** Total tokens across all chunks */
+  totalTokens: number;
   optimalContextWindow: number;
   keyTopics: string[];
 }
 
-// Default chunking configuration
+// Default chunking configuration - now token-based
 const DEFAULT_OPTIONS: ChunkOptions = {
-  maxChunkSize: 3000,
-  overlapSize: 200,
+  maxChunkTokens: 1000,      // ~4000 characters for English
+  overlapTokens: 100,        // ~400 characters overlap
+  maxChunkSize: 4000,        // Legacy fallback
+  overlapSize: 400,          // Legacy fallback
   preserveStructure: true,
   prioritizeRelevance: true,
 };
+
+// Convert legacy character limits to token limits
+function normalizeOptions(options: ChunkOptions): ChunkOptions {
+  const opts = { ...DEFAULT_OPTIONS, ...options };
+  
+  // If only legacy options provided, convert to token-based
+  if (options.maxChunkSize && !options.maxChunkTokens) {
+    opts.maxChunkTokens = Math.floor(options.maxChunkSize / 4);
+  }
+  if (options.overlapSize && !options.overlapTokens) {
+    opts.overlapTokens = Math.floor(options.overlapSize / 4);
+  }
+  
+  return opts;
+}
 
 // Important keywords that boost chunk relevance
 const IMPORTANCE_KEYWORDS = [
@@ -56,13 +103,14 @@ const QUESTION_KEYWORDS = [
 
 /**
  * Smart content chunking with overlap and relevance scoring
+ * Now uses token-based limits for accurate GPT context management
  */
 export function chunkContent(
   content: string,
   contentType: string,
   options: ChunkOptions = {}
 ): ChunkedContent {
-  const opts = { ...DEFAULT_OPTIONS, ...options };
+  const opts = normalizeOptions(options);
   
   // Select chunking strategy based on content type
   let chunks: ContentChunk[];
@@ -99,10 +147,14 @@ export function chunkContent(
   // Calculate optimal context window
   const optimalContextWindow = calculateOptimalContext(chunks, contentType);
   
+  // Calculate total tokens
+  const totalTokens = chunks.reduce((sum, chunk) => sum + chunk.tokenCount, 0);
+  
   return {
     chunks,
     summary,
     totalLength: content.length,
+    totalTokens,
     optimalContextWindow,
     keyTopics,
   };
@@ -131,51 +183,195 @@ function chunkPDFContent(content: string, opts: ChunkOptions): ContentChunk[] {
     chunks.push(...chunkByStructure(content, opts, 'pdf', 0));
   }
   
-  return addOverlap(chunks, opts.overlapSize || 0);
+  return addOverlap(chunks, opts.overlapTokens || 100);
 }
 
 /**
- * Video/YouTube content chunking - respects timestamps
+ * Parse timestamp string to seconds
+ */
+function parseTimestampToSeconds(timestamp: string): number {
+  const cleanTimestamp = timestamp.replace(/[\[\]()]/g, '').trim();
+  const parts = cleanTimestamp.split(':').map(p => parseInt(p, 10) || 0);
+  
+  if (parts.length === 3) {
+    // HH:MM:SS
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  } else if (parts.length === 2) {
+    // MM:SS
+    return parts[0] * 60 + parts[1];
+  }
+  return 0;
+}
+
+/**
+ * Format seconds back to timestamp string
+ */
+function formatSecondsToTimestamp(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Video/YouTube content chunking - respects timestamps and preserves timing info
+ * Now uses token-based limits and captures timestamp ranges
  */
 function chunkVideoContent(content: string, opts: ChunkOptions): ContentChunk[] {
   const chunks: ContentChunk[] = [];
+  const maxTokens = opts.maxChunkTokens || 1000;
   
-  // Split by timestamp patterns [00:00], (00:00), 00:00 -
-  const timestampPattern = /(?:\[?\d{1,2}:\d{2}(?::\d{2})?\]?\s*[-:]?\s*)/g;
-  const segments = content.split(timestampPattern).filter(s => s.trim().length > 20);
+  // Enhanced timestamp pattern to capture the timestamp values
+  const timestampRegex = /\[?(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*[-:]?\s*/g;
   
-  let currentChunk = '';
-  let chunkIndex = 0;
-  let startOffset = 0;
+  // Parse content into timestamped segments
+  interface TimestampedSegment {
+    timestamp: string;
+    seconds: number;
+    text: string;
+    startIndex: number;
+  }
   
-  for (const segment of segments) {
-    const trimmed = segment.trim();
-    if (!trimmed) continue;
+  const segments: TimestampedSegment[] = [];
+  let lastIndex = 0;
+  let match;
+  
+  // Extract all timestamps and their positions
+  const timestamps: { timestamp: string; seconds: number; index: number }[] = [];
+  while ((match = timestampRegex.exec(content)) !== null) {
+    timestamps.push({
+      timestamp: match[1],
+      seconds: parseTimestampToSeconds(match[1]),
+      index: match.index + match[0].length
+    });
+  }
+  
+  // Create segments between timestamps
+  for (let i = 0; i < timestamps.length; i++) {
+    const startIndex = timestamps[i].index;
+    const endIndex = i < timestamps.length - 1 ? timestamps[i + 1].index - (content.slice(timestamps[i + 1].index - 20, timestamps[i + 1].index).match(/\[?\d{1,2}:\d{2}(?::\d{2})?\]?\s*[-:]?\s*$/)?.[0]?.length || 0) : content.length;
+    const text = content.slice(startIndex, endIndex).trim();
     
-    if (currentChunk.length + trimmed.length > (opts.maxChunkSize || 3000)) {
-      if (currentChunk) {
-        chunks.push(createChunk(currentChunk, `video_${chunkIndex}`, chunkIndex, startOffset, 'video'));
-        chunkIndex++;
-        startOffset += currentChunk.length;
-      }
-      currentChunk = trimmed;
-    } else {
-      currentChunk += (currentChunk ? ' ' : '') + trimmed;
+    if (text.length > 20) {
+      segments.push({
+        timestamp: timestamps[i].timestamp,
+        seconds: timestamps[i].seconds,
+        text,
+        startIndex
+      });
     }
   }
   
-  if (currentChunk.trim()) {
-    chunks.push(createChunk(currentChunk, `video_${chunkIndex}`, chunkIndex, startOffset, 'video'));
+  // If no timestamps found, fall back to simple chunking
+  if (segments.length === 0) {
+    const simpleSegments = content.split(/\n\s*\n/).filter(s => s.trim().length > 20);
+    let currentChunk = '';
+    let chunkIndex = 0;
+    let startOffset = 0;
+    
+    for (const segment of simpleSegments) {
+      const trimmed = segment.trim();
+      const currentTokens = estimateTokens(currentChunk);
+      const segmentTokens = estimateTokens(trimmed);
+      
+      if (currentTokens + segmentTokens > maxTokens && currentChunk) {
+        chunks.push(createChunk(currentChunk, `video_${chunkIndex}`, chunkIndex, startOffset, 'video'));
+        chunkIndex++;
+        startOffset += currentChunk.length;
+        currentChunk = trimmed;
+      } else {
+        currentChunk += (currentChunk ? ' ' : '') + trimmed;
+      }
+    }
+    
+    if (currentChunk.trim()) {
+      chunks.push(createChunk(currentChunk, `video_${chunkIndex}`, chunkIndex, startOffset, 'video'));
+    }
+    
+    return addOverlap(chunks, opts.overlapTokens || 100);
   }
   
-  return addOverlap(chunks, opts.overlapSize || 0);
+  // Group segments into chunks respecting token limits
+  let currentChunk = '';
+  let chunkIndex = 0;
+  let startOffset = 0;
+  let chunkStartSeconds: number | undefined;
+  let chunkEndSeconds: number | undefined;
+  let chunkStartTimestamp: string | undefined;
+  
+  for (let i = 0; i < segments.length; i++) {
+    const segment = segments[i];
+    const currentTokens = estimateTokens(currentChunk);
+    const segmentTokens = estimateTokens(segment.text);
+    
+    // Set start timestamp for new chunk
+    if (!chunkStartSeconds) {
+      chunkStartSeconds = segment.seconds;
+      chunkStartTimestamp = segment.timestamp;
+    }
+    
+    if (currentTokens + segmentTokens > maxTokens && currentChunk) {
+      // Finalize current chunk with timestamp range
+      const chunk = createChunk(currentChunk, `video_${chunkIndex}`, chunkIndex, startOffset, 'video');
+      chunk.timestampRange = {
+        startSeconds: chunkStartSeconds,
+        endSeconds: chunkEndSeconds || segment.seconds,
+        startTimestamp: chunkStartTimestamp,
+        endTimestamp: formatSecondsToTimestamp(chunkEndSeconds || segment.seconds)
+      };
+      chunks.push(chunk);
+      
+      chunkIndex++;
+      startOffset += currentChunk.length;
+      currentChunk = `[${segment.timestamp}] ${segment.text}`;
+      chunkStartSeconds = segment.seconds;
+      chunkStartTimestamp = segment.timestamp;
+    } else {
+      currentChunk += (currentChunk ? ' ' : '') + `[${segment.timestamp}] ${segment.text}`;
+    }
+    
+    chunkEndSeconds = segment.seconds + 30; // Estimate 30s per segment if no next timestamp
+    if (i < segments.length - 1) {
+      chunkEndSeconds = segments[i + 1].seconds;
+    }
+  }
+  
+  // Add final chunk
+  if (currentChunk.trim()) {
+    const chunk = createChunk(currentChunk, `video_${chunkIndex}`, chunkIndex, startOffset, 'video');
+    if (chunkStartSeconds !== undefined) {
+      chunk.timestampRange = {
+        startSeconds: chunkStartSeconds,
+        endSeconds: chunkEndSeconds || chunkStartSeconds + 60,
+        startTimestamp: chunkStartTimestamp,
+        endTimestamp: formatSecondsToTimestamp(chunkEndSeconds || chunkStartSeconds + 60)
+      };
+    }
+    chunks.push(chunk);
+  }
+  
+  return addOverlap(chunks, opts.overlapTokens || 100);
 }
 
 /**
- * Audio content chunking - respects speaker patterns and pauses
+ * Audio content chunking - respects speaker patterns and timestamps
+ * Now uses token-based limits and captures timing info when available
  */
 function chunkAudioContent(content: string, opts: ChunkOptions): ContentChunk[] {
   const chunks: ContentChunk[] = [];
+  const maxTokens = opts.maxChunkTokens || 1000;
+  
+  // Check for timestamps in audio content
+  const hasTimestamps = /\d{1,2}:\d{2}/.test(content);
+  
+  if (hasTimestamps) {
+    // Use video chunking logic for timestamped audio
+    return chunkVideoContent(content, opts);
+  }
   
   // Look for speaker indicators or pause markers
   const speakerPattern = /(?:Speaker\s*\d+|[A-Z][a-z]+:|^\s*[-•]\s*)/gm;
@@ -189,12 +385,13 @@ function chunkAudioContent(content: string, opts: ChunkOptions): ContentChunk[] 
     const trimmed = segment.trim();
     if (!trimmed) continue;
     
-    if (currentChunk.length + trimmed.length > (opts.maxChunkSize || 3000)) {
-      if (currentChunk) {
-        chunks.push(createChunk(currentChunk, `audio_${chunkIndex}`, chunkIndex, startOffset, 'audio'));
-        chunkIndex++;
-        startOffset += currentChunk.length;
-      }
+    const currentTokens = estimateTokens(currentChunk);
+    const segmentTokens = estimateTokens(trimmed);
+    
+    if (currentTokens + segmentTokens > maxTokens && currentChunk) {
+      chunks.push(createChunk(currentChunk, `audio_${chunkIndex}`, chunkIndex, startOffset, 'audio'));
+      chunkIndex++;
+      startOffset += currentChunk.length;
       currentChunk = trimmed;
     } else {
       currentChunk += (currentChunk ? '\n' : '') + trimmed;
@@ -205,7 +402,7 @@ function chunkAudioContent(content: string, opts: ChunkOptions): ContentChunk[] 
     chunks.push(createChunk(currentChunk, `audio_${chunkIndex}`, chunkIndex, startOffset, 'audio'));
   }
   
-  return addOverlap(chunks, opts.overlapSize || 0);
+  return addOverlap(chunks, opts.overlapTokens || 100);
 }
 
 /**
@@ -239,7 +436,7 @@ function chunkWebsiteContent(content: string, opts: ChunkOptions): ContentChunk[
     startOffset += section.length;
   }
   
-  return addOverlap(chunks, opts.overlapSize || 0);
+  return addOverlap(chunks, opts.overlapTokens || 100);
 }
 
 /**
@@ -250,7 +447,7 @@ function chunkTextContent(content: string, opts: ChunkOptions): ContentChunk[] {
 }
 
 /**
- * Structure-aware chunking helper
+ * Structure-aware chunking helper - now uses token-based limits
  */
 function chunkByStructure(
   content: string,
@@ -259,7 +456,8 @@ function chunkByStructure(
   globalOffset: number
 ): ContentChunk[] {
   const chunks: ContentChunk[] = [];
-  const maxSize = opts.maxChunkSize || 3000;
+  const maxTokens = opts.maxChunkTokens || 1000;
+  const maxSize = maxTokens * 4; // Approximate chars for fallback
   
   // Split by paragraphs first (double newlines)
   const paragraphs = content.split(/\n\s*\n/);
@@ -275,13 +473,17 @@ function chunkByStructure(
     // Check if this paragraph contains a heading (potential section break)
     const isHeading = /^#{1,6}\s/.test(trimmed) || /^[A-Z][A-Z\s]{5,}$/.test(trimmed.split('\n')[0]);
     
+    // Use token-based size checking
+    const currentTokens = estimateTokens(currentChunk);
+    const paragraphTokens = estimateTokens(trimmed);
+    
     // Start new chunk on heading if current chunk is reasonably sized
-    if (isHeading && currentChunk.length > maxSize * 0.3) {
+    if (isHeading && currentTokens > maxTokens * 0.3) {
       chunks.push(createChunk(currentChunk, `${prefix}_${chunkIndex}`, chunkIndex, globalOffset + localOffset, prefix.split('_')[0]));
       localOffset += currentChunk.length;
       chunkIndex++;
       currentChunk = trimmed;
-    } else if (currentChunk.length + trimmed.length > maxSize) {
+    } else if (currentTokens + paragraphTokens > maxTokens) {
       // Current chunk is full
       if (currentChunk) {
         chunks.push(createChunk(currentChunk, `${prefix}_${chunkIndex}`, chunkIndex, globalOffset + localOffset, prefix.split('_')[0]));
@@ -290,8 +492,8 @@ function chunkByStructure(
       }
       
       // Handle very long paragraphs
-      if (trimmed.length > maxSize) {
-        const sentenceChunks = chunkBySentences(trimmed, maxSize, prefix, chunkIndex, globalOffset + localOffset);
+      if (paragraphTokens > maxTokens) {
+        const sentenceChunks = chunkBySentences(trimmed, maxTokens, prefix, chunkIndex, globalOffset + localOffset);
         chunks.push(...sentenceChunks);
         chunkIndex += sentenceChunks.length;
         localOffset += trimmed.length;
@@ -313,11 +515,11 @@ function chunkByStructure(
 }
 
 /**
- * Sentence-level chunking for very long paragraphs
+ * Sentence-level chunking for very long paragraphs - token-based
  */
 function chunkBySentences(
   text: string,
-  maxSize: number,
+  maxTokens: number,
   prefix: string,
   startIndex: number,
   startOffset: number
@@ -330,7 +532,10 @@ function chunkBySentences(
   let localOffset = 0;
   
   for (const sentence of sentences) {
-    if (currentChunk.length + sentence.length > maxSize && currentChunk) {
+    const currentTokens = estimateTokens(currentChunk);
+    const sentenceTokens = estimateTokens(sentence);
+    
+    if (currentTokens + sentenceTokens > maxTokens && currentChunk) {
       chunks.push(createChunk(currentChunk, `${prefix}_${chunkIndex}`, chunkIndex, startOffset + localOffset, prefix.split('_')[0]));
       localOffset += currentChunk.length;
       chunkIndex++;
@@ -348,7 +553,7 @@ function chunkBySentences(
 }
 
 /**
- * Create a content chunk with metadata
+ * Create a content chunk with metadata and token count
  */
 function createChunk(
   content: string,
@@ -359,6 +564,9 @@ function createChunk(
 ): ContentChunk {
   const trimmedContent = content.trim();
   const contentLower = trimmedContent.toLowerCase();
+  
+  // Calculate token count using our token utilities
+  const tokenEstimate = countTokens(trimmedContent);
   
   // Analyze content characteristics
   const hasHeadings = /^#{1,6}\s|^[A-Z][A-Z\s]{5,}$/m.test(trimmedContent);
@@ -421,6 +629,7 @@ function createChunk(
     startOffset,
     endOffset: startOffset + trimmedContent.length,
     relevanceScore: Math.max(0, Math.min(1, relevanceScore)),
+    tokenCount: tokenEstimate.tokens,
     metadata: {
       hasHeadings,
       hasLists,
@@ -428,29 +637,37 @@ function createChunk(
       hasMath,
       wordCount,
       keyTerms,
+      contentType: tokenEstimate.contentType,
     },
   };
 }
 
 /**
  * Add overlap between chunks for better context continuity
+ * Now uses token-based overlap calculation
  */
-function addOverlap(chunks: ContentChunk[], overlapSize: number): ContentChunk[] {
-  if (overlapSize <= 0 || chunks.length <= 1) return chunks;
+function addOverlap(chunks: ContentChunk[], overlapTokens: number): ContentChunk[] {
+  if (overlapTokens <= 0 || chunks.length <= 1) return chunks;
+  
+  // Convert token overlap to approximate character overlap
+  const overlapChars = overlapTokens * 4;
   
   return chunks.map((chunk, index) => {
     if (index === 0) return chunk;
     
     const prevChunk = chunks[index - 1];
-    const overlapContent = prevChunk.content.slice(-overlapSize);
+    const overlapContent = prevChunk.content.slice(-overlapChars);
     
     // Find a clean break point (sentence or paragraph)
     const cleanBreak = overlapContent.lastIndexOf('. ');
     const overlap = cleanBreak > 0 ? overlapContent.slice(cleanBreak + 2) : overlapContent;
     
+    const newContent = `[...] ${overlap}\n\n${chunk.content}`;
+    
     return {
       ...chunk,
-      content: `[...] ${overlap}\n\n${chunk.content}`,
+      content: newContent,
+      tokenCount: estimateTokens(newContent), // Recalculate token count with overlap
     };
   });
 }
