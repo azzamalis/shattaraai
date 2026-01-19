@@ -2,6 +2,7 @@
 // Optimized for AI context handling with large documents
 // Uses token-based limits for accurate GPT context management
 // Enhanced timestamp preservation for media content (Phase 6)
+// Semantic boundary detection for topic-aware splitting (Phase 7)
 
 import { estimateTokens, countTokens, splitByTokens } from './tokenUtils.ts';
 import {
@@ -19,6 +20,19 @@ import {
   type PreservedTimestampChunk,
   type TimestampRange as TsRange,
 } from './timestampUtils.ts';
+import {
+  findSemanticBoundaries,
+  segmentBySemantics,
+  findOptimalSplitPoints,
+  detectTopicSignals,
+  extractKeywords,
+  calculateTopicSimilarity,
+  detectTimeBasedBoundaries,
+  analyzeSemantics,
+  type SemanticBoundary,
+  type SemanticSegment,
+  type TopicSignal,
+} from './semanticBoundary.ts';
 
 export interface ChunkOptions {
   /** Maximum tokens per chunk (default: 1000) - replaces character-based maxChunkSize */
@@ -33,6 +47,10 @@ export interface ChunkOptions {
   preserveStructure?: boolean;
   /** Sort chunks by relevance score */
   prioritizeRelevance?: boolean;
+  /** Enable semantic boundary detection (Phase 7) */
+  useSemanticBoundaries?: boolean;
+  /** Minimum semantic boundary score to consider (0-1, default: 0.3) */
+  minBoundaryScore?: number;
 }
 
 // Re-export timestamp types for convenience
@@ -186,25 +204,48 @@ export function chunkContent(
 
 /**
  * PDF-specific chunking - respects page breaks and sections
+ * Enhanced with semantic boundary detection for topic-aware splitting
  */
 function chunkPDFContent(content: string, opts: ChunkOptions): ContentChunk[] {
   const chunks: ContentChunk[] = [];
+  const useSemantics = opts.useSemanticBoundaries !== false;
   
   // Split by page markers first (Page X, --- Page X ---, or standalone numbers)
   const pagePattern = new RegExp('(?:Page\\s+\\d+|---\\s*Page\\s*\\d+\\s*---|^\\s*\\d+\\s*$)', 'gm');
   const pages = content.split(pagePattern).filter((p: string) => p.trim().length > 50);
   
   if (pages.length > 1) {
-    // Process page by page
+    // Process page by page with semantic awareness
     let globalOffset = 0;
     pages.forEach((page, pageIndex) => {
-      const pageChunks = chunkByStructure(page, opts, `pdf_p${pageIndex + 1}`, globalOffset);
+      const pageChunks = useSemantics 
+        ? chunkBySemantics(page, opts, `pdf_p${pageIndex + 1}`, globalOffset)
+        : chunkByStructure(page, opts, `pdf_p${pageIndex + 1}`, globalOffset);
+      
+      // Mark page boundaries
+      pageChunks.forEach(chunk => {
+        (chunk as any).pageIndex = pageIndex + 1;
+      });
+      
       chunks.push(...pageChunks);
       globalOffset += page.length;
     });
   } else {
-    // No page markers, use structural chunking
-    chunks.push(...chunkByStructure(content, opts, 'pdf', 0));
+    // No page markers, use semantic chunking on entire content
+    const contentChunks = useSemantics
+      ? chunkBySemantics(content, opts, 'pdf', 0)
+      : chunkByStructure(content, opts, 'pdf', 0);
+    chunks.push(...contentChunks);
+  }
+  
+  // Analyze overall document topics
+  if (chunks.length > 0) {
+    const analysis = analyzeSemantics(content);
+    (chunks[0] as any).documentAnalysis = {
+      topicKeywords: analysis.topicKeywords,
+      totalTopics: analysis.totalTopics,
+      averageSegmentLength: analysis.averageSegmentLength,
+    };
   }
   
   return addOverlap(chunks, opts.overlapTokens || 100);
@@ -629,14 +670,99 @@ function chunkWebsiteContent(content: string, opts: ChunkOptions): ContentChunk[
 }
 
 /**
- * Generic text content chunking - sentence-aware
+ * Generic text content chunking - now with semantic boundary detection (Phase 7)
  */
 function chunkTextContent(content: string, opts: ChunkOptions): ContentChunk[] {
+  const useSemantics = opts.useSemanticBoundaries !== false; // Default enabled
+  
+  if (useSemantics) {
+    return chunkBySemantics(content, opts, 'text', 0);
+  }
+  
   return chunkByStructure(content, opts, 'text', 0);
 }
 
 /**
- * Structure-aware chunking helper - now uses token-based limits
+ * Semantic-aware chunking - splits at natural topic boundaries (Phase 7)
+ * Uses topic transition detection, keyword analysis, and structural signals
+ */
+function chunkBySemantics(
+  content: string,
+  opts: ChunkOptions,
+  prefix: string,
+  globalOffset: number
+): ContentChunk[] {
+  const chunks: ContentChunk[] = [];
+  const maxTokens = opts.maxChunkTokens || 1000;
+  const minBoundaryScore = opts.minBoundaryScore || 0.3;
+  
+  console.log(`Semantic chunking: Analyzing ${content.length} chars for topic boundaries`);
+  
+  // Get semantic segments
+  const segments = segmentBySemantics(content, {
+    minSegmentTokens: Math.floor(maxTokens * 0.3),
+    maxSegmentTokens: Math.floor(maxTokens * 1.2),
+    targetSegmentTokens: maxTokens,
+  });
+  
+  console.log(`Semantic chunking: Found ${segments.length} semantic segments`);
+  
+  // Convert semantic segments to content chunks
+  segments.forEach((segment, index) => {
+    const chunk = createChunk(
+      segment.content,
+      `${prefix}_sem_${index}`,
+      index,
+      globalOffset + segment.startPosition,
+      prefix.split('_')[0]
+    );
+    
+    // Add semantic metadata
+    (chunk as any).semanticData = {
+      keywords: segment.keywords,
+      coherenceScore: segment.coherenceScore,
+      topic: segment.topic,
+      isSemanticChunk: true,
+    };
+    
+    chunks.push(chunk);
+  });
+  
+  // If semantic chunking produced too few or too many chunks, fall back
+  if (chunks.length === 0 || (chunks.length === 1 && estimateTokens(content) > maxTokens * 1.5)) {
+    console.log('Semantic chunking: Falling back to structural chunking');
+    return chunkByStructure(content, opts, prefix, globalOffset);
+  }
+  
+  // Add topic transition info between chunks
+  for (let i = 1; i < chunks.length; i++) {
+    const prevChunk = chunks[i - 1];
+    const currChunk = chunks[i];
+    
+    // Detect topic signals at chunk boundaries
+    const signals = detectTopicSignals(currChunk.content.slice(0, 100));
+    if (signals.length > 0) {
+      (currChunk as any).topicTransition = {
+        type: signals[0].type,
+        strength: signals[0].strength,
+        reason: signals[0].reason,
+      };
+    }
+    
+    // Calculate topic similarity with previous chunk
+    const similarity = calculateTopicSimilarity(
+      prevChunk.content.slice(-200),
+      currChunk.content.slice(0, 200)
+    );
+    (currChunk as any).topicSimilarityWithPrevious = similarity;
+  }
+  
+  return addOverlap(chunks, opts.overlapTokens || 100);
+}
+
+/**
+ * Structure-aware chunking helper - uses token-based limits
+ * Falls back when semantic chunking is disabled or fails
  */
 function chunkByStructure(
   content: string,
@@ -648,7 +774,38 @@ function chunkByStructure(
   const maxTokens = opts.maxChunkTokens || 1000;
   const maxSize = maxTokens * 4; // Approximate chars for fallback
   
-  // Split by paragraphs first (double newlines)
+  // First, find optimal split points using semantic analysis
+  const splitPoints = findOptimalSplitPoints(content, maxTokens, {
+    allowMidParagraph: false,
+    preferSentenceBoundary: true,
+  });
+  
+  // If we found good split points, use them
+  if (splitPoints.length > 0) {
+    let lastEnd = 0;
+    
+    for (let i = 0; i <= splitPoints.length; i++) {
+      const end = i < splitPoints.length ? splitPoints[i] : content.length;
+      const segmentContent = content.slice(lastEnd, end).trim();
+      
+      if (segmentContent.length > 0) {
+        const chunk = createChunk(
+          segmentContent,
+          `${prefix}_${i}`,
+          i,
+          globalOffset + lastEnd,
+          prefix.split('_')[0]
+        );
+        chunks.push(chunk);
+      }
+      
+      lastEnd = end;
+    }
+    
+    return addOverlap(chunks, opts.overlapTokens || 100);
+  }
+  
+  // Fallback: Split by paragraphs (original logic)
   const paragraphs = content.split(/\n\s*\n/);
   
   let currentChunk = '';
@@ -662,12 +819,18 @@ function chunkByStructure(
     // Check if this paragraph contains a heading (potential section break)
     const isHeading = /^#{1,6}\s/.test(trimmed) || /^[A-Z][A-Z\s]{5,}$/.test(trimmed.split('\n')[0]);
     
+    // Also check for topic transition signals
+    const signals = detectTopicSignals(trimmed.slice(0, 50));
+    const hasTopicTransition = signals.some(s => 
+      (s.type === 'new_topic' || s.type === 'transition') && s.strength >= 0.7
+    );
+    
     // Use token-based size checking
     const currentTokens = estimateTokens(currentChunk);
     const paragraphTokens = estimateTokens(trimmed);
     
-    // Start new chunk on heading if current chunk is reasonably sized
-    if (isHeading && currentTokens > maxTokens * 0.3) {
+    // Start new chunk on heading or strong topic transition
+    if ((isHeading || hasTopicTransition) && currentTokens > maxTokens * 0.3) {
       chunks.push(createChunk(currentChunk, `${prefix}_${chunkIndex}`, chunkIndex, globalOffset + localOffset, prefix.split('_')[0]));
       localOffset += currentChunk.length;
       chunkIndex++;
@@ -984,3 +1147,16 @@ export function getChunkPage(
     currentPage: Math.min(page, totalPages),
   };
 }
+
+// Re-export semantic boundary utilities for external use
+export {
+  findSemanticBoundaries,
+  segmentBySemantics,
+  findOptimalSplitPoints,
+  detectTopicSignals,
+  extractKeywords,
+  calculateTopicSimilarity,
+  detectTimeBasedBoundaries,
+  analyzeSemantics,
+};
+export type { SemanticBoundary, SemanticSegment, TopicSignal };
