@@ -1,8 +1,24 @@
 // Shared content chunking utilities for edge functions
 // Optimized for AI context handling with large documents
 // Uses token-based limits for accurate GPT context management
+// Enhanced timestamp preservation for media content (Phase 6)
 
 import { estimateTokens, countTokens, splitByTokens } from './tokenUtils.ts';
+import {
+  parseTimestampToSeconds as parseTs,
+  formatSecondsToTimestamp as formatTs,
+  extractTimestampsFromContent,
+  createTimestampAwareChunks,
+  mergeAdjacentSegments,
+  splitLongSegments,
+  validateTimestampContinuity,
+  calculateTimestampMetrics,
+  wordsToSegments,
+  type TimestampedSegment,
+  type TimestampedWord,
+  type PreservedTimestampChunk,
+  type TimestampRange as TsRange,
+} from './timestampUtils.ts';
 
 export interface ChunkOptions {
   /** Maximum tokens per chunk (default: 1000) - replaces character-based maxChunkSize */
@@ -19,6 +35,10 @@ export interface ChunkOptions {
   prioritizeRelevance?: boolean;
 }
 
+// Re-export timestamp types for convenience
+export type { TimestampedSegment, TimestampedWord, PreservedTimestampChunk };
+export type { TsRange as TimestampRangeExtended };
+
 export interface TimestampRange {
   /** Start time in seconds */
   startSeconds: number;
@@ -28,6 +48,10 @@ export interface TimestampRange {
   startTimestamp?: string;
   /** Original end timestamp string */
   endTimestamp?: string;
+  /** Duration in seconds */
+  duration?: number;
+  /** Source segments within this range */
+  sourceSegments?: TimestampedSegment[];
 }
 
 export interface ContentChunk {
@@ -187,57 +211,88 @@ function chunkPDFContent(content: string, opts: ChunkOptions): ContentChunk[] {
 }
 
 /**
- * Parse timestamp string to seconds
+ * Parse timestamp string to seconds (legacy wrapper)
+ * @deprecated Use parseTs from timestampUtils instead
  */
 function parseTimestampToSeconds(timestamp: string): number {
-  const cleanTimestamp = timestamp.replace(/[\[\]()]/g, '').trim();
-  const parts = cleanTimestamp.split(':').map(p => parseInt(p, 10) || 0);
-  
-  if (parts.length === 3) {
-    // HH:MM:SS
-    return parts[0] * 3600 + parts[1] * 60 + parts[2];
-  } else if (parts.length === 2) {
-    // MM:SS
-    return parts[0] * 60 + parts[1];
-  }
-  return 0;
+  return parseTs(timestamp);
 }
 
 /**
- * Format seconds back to timestamp string
+ * Format seconds back to timestamp string (legacy wrapper)
+ * @deprecated Use formatTs from timestampUtils instead
  */
 function formatSecondsToTimestamp(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-  
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  return formatTs(seconds);
 }
 
 /**
  * Video/YouTube content chunking - respects timestamps and preserves timing info
- * Now uses token-based limits and captures timestamp ranges
+ * Enhanced with Phase 6 timestamp preservation utilities
+ * Uses token-based limits and maintains full timestamp ranges with source segments
  */
 function chunkVideoContent(content: string, opts: ChunkOptions): ContentChunk[] {
   const chunks: ContentChunk[] = [];
   const maxTokens = opts.maxChunkTokens || 1000;
   
-  // Enhanced timestamp pattern to capture the timestamp values
+  // Use enhanced timestamp extraction
+  const extraction = extractTimestampsFromContent(content);
+  
+  // If timestamps found, use enhanced timestamp-aware chunking
+  if (extraction.hasTimestamps && extraction.segments.length > 0) {
+    console.log(`Video chunking: Found ${extraction.segments.length} timestamped segments (${extraction.format} format)`);
+    console.log(`Coverage: ${extraction.coveragePercentage.toFixed(1)}%, Duration: ${extraction.totalDuration}s`);
+    
+    // Process segments: merge very short ones, split very long ones
+    let processedSegments = validateTimestampContinuity(extraction.segments);
+    processedSegments = mergeAdjacentSegments(processedSegments, 2, 45); // Max 45s merged segments
+    processedSegments = splitLongSegments(processedSegments, 60); // Split segments > 60s
+    
+    // Create timestamp-aware chunks
+    const preservedChunks = createTimestampAwareChunks(processedSegments, maxTokens, 5);
+    
+    // Convert PreservedTimestampChunk to ContentChunk
+    preservedChunks.forEach((pc, index) => {
+      const chunk = createChunk(pc.content, `video_${index}`, index, 0, 'video');
+      chunk.timestampRange = {
+        startSeconds: pc.timestampRange.startSeconds,
+        endSeconds: pc.timestampRange.endSeconds,
+        startTimestamp: pc.timestampRange.startTimestamp,
+        endTimestamp: pc.timestampRange.endTimestamp,
+        duration: pc.timestampRange.duration,
+        sourceSegments: pc.segments,
+      };
+      // Store clean content for AI processing in metadata
+      chunk.metadata.contentType = 'video';
+      chunks.push(chunk);
+    });
+    
+    // Add metrics to first chunk metadata
+    if (chunks.length > 0) {
+      const metrics = calculateTimestampMetrics(processedSegments);
+      (chunks[0] as any).timestampMetrics = {
+        totalDuration: metrics.totalDuration,
+        segmentCount: metrics.segmentCount,
+        coveragePercentage: metrics.coveragePercentage,
+        averageSegmentDuration: metrics.averageSegmentDuration,
+        format: extraction.format,
+      };
+    }
+    
+    return chunks;
+  }
+  
+  // Legacy fallback: Parse using regex patterns
   const timestampRegex = /\[?(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*[-:]?\s*/g;
   
-  // Parse content into timestamped segments
-  interface TimestampedSegment {
+  interface LegacySegment {
     timestamp: string;
     seconds: number;
     text: string;
     startIndex: number;
   }
   
-  const segments: TimestampedSegment[] = [];
-  let lastIndex = 0;
+  const segments: LegacySegment[] = [];
   let match;
   
   // Extract all timestamps and their positions
@@ -295,13 +350,14 @@ function chunkVideoContent(content: string, opts: ChunkOptions): ContentChunk[] 
     return addOverlap(chunks, opts.overlapTokens || 100);
   }
   
-  // Group segments into chunks respecting token limits
+  // Group legacy segments into chunks respecting token limits
   let currentChunk = '';
   let chunkIndex = 0;
   let startOffset = 0;
   let chunkStartSeconds: number | undefined;
   let chunkEndSeconds: number | undefined;
   let chunkStartTimestamp: string | undefined;
+  let chunkSegments: TimestampedSegment[] = [];
   
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i];
@@ -314,6 +370,8 @@ function chunkVideoContent(content: string, opts: ChunkOptions): ContentChunk[] 
       chunkStartTimestamp = segment.timestamp;
     }
     
+    const nextSeconds = i < segments.length - 1 ? segments[i + 1].seconds : segment.seconds + 30;
+    
     if (currentTokens + segmentTokens > maxTokens && currentChunk) {
       // Finalize current chunk with timestamp range
       const chunk = createChunk(currentChunk, `video_${chunkIndex}`, chunkIndex, startOffset, 'video');
@@ -321,7 +379,9 @@ function chunkVideoContent(content: string, opts: ChunkOptions): ContentChunk[] 
         startSeconds: chunkStartSeconds,
         endSeconds: chunkEndSeconds || segment.seconds,
         startTimestamp: chunkStartTimestamp,
-        endTimestamp: formatSecondsToTimestamp(chunkEndSeconds || segment.seconds)
+        endTimestamp: formatSecondsToTimestamp(chunkEndSeconds || segment.seconds),
+        duration: (chunkEndSeconds || segment.seconds) - chunkStartSeconds,
+        sourceSegments: [...chunkSegments],
       };
       chunks.push(chunk);
       
@@ -330,14 +390,21 @@ function chunkVideoContent(content: string, opts: ChunkOptions): ContentChunk[] 
       currentChunk = `[${segment.timestamp}] ${segment.text}`;
       chunkStartSeconds = segment.seconds;
       chunkStartTimestamp = segment.timestamp;
+      chunkSegments = [{
+        text: segment.text,
+        startTime: segment.seconds,
+        endTime: nextSeconds,
+      }];
     } else {
       currentChunk += (currentChunk ? ' ' : '') + `[${segment.timestamp}] ${segment.text}`;
+      chunkSegments.push({
+        text: segment.text,
+        startTime: segment.seconds,
+        endTime: nextSeconds,
+      });
     }
     
-    chunkEndSeconds = segment.seconds + 30; // Estimate 30s per segment if no next timestamp
-    if (i < segments.length - 1) {
-      chunkEndSeconds = segments[i + 1].seconds;
-    }
+    chunkEndSeconds = nextSeconds;
   }
   
   // Add final chunk
@@ -348,7 +415,9 @@ function chunkVideoContent(content: string, opts: ChunkOptions): ContentChunk[] 
         startSeconds: chunkStartSeconds,
         endSeconds: chunkEndSeconds || chunkStartSeconds + 60,
         startTimestamp: chunkStartTimestamp,
-        endTimestamp: formatSecondsToTimestamp(chunkEndSeconds || chunkStartSeconds + 60)
+        endTimestamp: formatSecondsToTimestamp(chunkEndSeconds || chunkStartSeconds + 60),
+        duration: (chunkEndSeconds || chunkStartSeconds + 60) - chunkStartSeconds,
+        sourceSegments: chunkSegments,
       };
     }
     chunks.push(chunk);
@@ -359,23 +428,84 @@ function chunkVideoContent(content: string, opts: ChunkOptions): ContentChunk[] 
 
 /**
  * Audio content chunking - respects speaker patterns and timestamps
- * Now uses token-based limits and captures timing info when available
+ * Enhanced with Phase 6 timestamp preservation
+ * Uses token-based limits and captures timing info when available
  */
 function chunkAudioContent(content: string, opts: ChunkOptions): ContentChunk[] {
   const chunks: ContentChunk[] = [];
   const maxTokens = opts.maxChunkTokens || 1000;
   
-  // Check for timestamps in audio content
-  const hasTimestamps = /\d{1,2}:\d{2}/.test(content);
+  // Use enhanced timestamp extraction first
+  const extraction = extractTimestampsFromContent(content);
   
-  if (hasTimestamps) {
+  if (extraction.hasTimestamps && extraction.segments.length > 0) {
+    console.log(`Audio chunking: Found ${extraction.segments.length} timestamped segments`);
     // Use video chunking logic for timestamped audio
     return chunkVideoContent(content, opts);
   }
   
-  // Look for speaker indicators or pause markers
-  const speakerPattern = /(?:Speaker\s*\d+|[A-Z][a-z]+:|^\s*[-•]\s*)/gm;
-  const segments = content.split(speakerPattern).filter(s => s.trim().length > 30);
+  // Look for speaker indicators (diarization patterns)
+  const speakerMatches = [...content.matchAll(/(?:^|\n)(Speaker\s*\d+|[A-Z][a-z]+):\s*/gm)];
+  
+  if (speakerMatches.length > 1) {
+    // Speaker-based chunking for diarized transcripts
+    console.log(`Audio chunking: Found ${speakerMatches.length} speaker turns`);
+    
+    const speakerSegments: { speaker: string; text: string; index: number }[] = [];
+    
+    for (let i = 0; i < speakerMatches.length; i++) {
+      const match = speakerMatches[i];
+      const startIndex = match.index! + match[0].length;
+      const endIndex = i < speakerMatches.length - 1 ? speakerMatches[i + 1].index! : content.length;
+      const text = content.slice(startIndex, endIndex).trim();
+      
+      if (text.length > 10) {
+        speakerSegments.push({
+          speaker: match[1],
+          text,
+          index: match.index!,
+        });
+      }
+    }
+    
+    // Group speaker segments into chunks
+    let currentChunk = '';
+    let chunkIndex = 0;
+    let startOffset = 0;
+    let chunkSpeakers: string[] = [];
+    
+    for (const segment of speakerSegments) {
+      const segmentText = `${segment.speaker}: ${segment.text}`;
+      const currentTokens = estimateTokens(currentChunk);
+      const segmentTokens = estimateTokens(segmentText);
+      
+      if (currentTokens + segmentTokens > maxTokens && currentChunk) {
+        const chunk = createChunk(currentChunk, `audio_${chunkIndex}`, chunkIndex, startOffset, 'audio');
+        // Store speaker info in metadata
+        (chunk as any).speakers = [...new Set(chunkSpeakers)];
+        chunks.push(chunk);
+        
+        chunkIndex++;
+        startOffset += currentChunk.length;
+        currentChunk = segmentText;
+        chunkSpeakers = [segment.speaker];
+      } else {
+        currentChunk += (currentChunk ? '\n' : '') + segmentText;
+        chunkSpeakers.push(segment.speaker);
+      }
+    }
+    
+    if (currentChunk.trim()) {
+      const chunk = createChunk(currentChunk, `audio_${chunkIndex}`, chunkIndex, startOffset, 'audio');
+      (chunk as any).speakers = [...new Set(chunkSpeakers)];
+      chunks.push(chunk);
+    }
+    
+    return addOverlap(chunks, opts.overlapTokens || 100);
+  }
+  
+  // Fallback: Simple paragraph-based chunking
+  const segments = content.split(/\n\s*\n/).filter(s => s.trim().length > 30);
   
   let currentChunk = '';
   let chunkIndex = 0;
@@ -403,6 +533,65 @@ function chunkAudioContent(content: string, opts: ChunkOptions): ContentChunk[] 
   }
   
   return addOverlap(chunks, opts.overlapTokens || 100);
+}
+
+/**
+ * Chunk content with word-level timestamp preservation
+ * Designed for transcriptions with word-level timing from Whisper/similar APIs
+ */
+export function chunkWithWordTimestamps(
+  words: TimestampedWord[],
+  contentType: 'audio' | 'video' = 'audio',
+  opts: ChunkOptions = {}
+): ContentChunk[] {
+  const maxTokens = opts.maxChunkTokens || 1000;
+  const chunks: ContentChunk[] = [];
+  
+  if (words.length === 0) return chunks;
+  
+  // Convert words to segments (10-second intervals by default)
+  const segments = wordsToSegments(words, 10);
+  
+  // Validate and fix any timing issues
+  const validatedSegments = validateTimestampContinuity(segments);
+  
+  // Create timestamp-aware chunks
+  const preservedChunks = createTimestampAwareChunks(validatedSegments, maxTokens, 3);
+  
+  // Convert to ContentChunk format
+  preservedChunks.forEach((pc, index) => {
+    const chunk = createChunk(pc.content, `${contentType}_word_${index}`, index, 0, contentType);
+    chunk.timestampRange = {
+      startSeconds: pc.timestampRange.startSeconds,
+      endSeconds: pc.timestampRange.endSeconds,
+      startTimestamp: pc.timestampRange.startTimestamp,
+      endTimestamp: pc.timestampRange.endTimestamp,
+      duration: pc.timestampRange.duration,
+      sourceSegments: pc.segments,
+    };
+    
+    // Add word-level data to metadata
+    (chunk as any).wordLevelData = {
+      wordCount: pc.wordCount,
+      hasWordTimestamps: true,
+      segmentCount: pc.segments.length,
+    };
+    
+    chunks.push(chunk);
+  });
+  
+  // Calculate and store metrics
+  if (chunks.length > 0) {
+    const metrics = calculateTimestampMetrics(validatedSegments);
+    (chunks[0] as any).timestampMetrics = {
+      totalDuration: metrics.totalDuration,
+      segmentCount: metrics.segmentCount,
+      coveragePercentage: metrics.coveragePercentage,
+      wordCount: words.length,
+    };
+  }
+  
+  return chunks;
 }
 
 /**
