@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +14,61 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Authentication check
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    console.error('Missing or invalid authorization header');
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized - missing auth token' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    global: { headers: { Authorization: authHeader } }
+  });
+
+  // Verify the JWT token and get the user
+  const token = authHeader.replace('Bearer ', '');
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+
+  if (claimsError || !claimsData?.claims) {
+    console.error('Authentication failed:', claimsError?.message || 'Invalid token');
+    return new Response(
+      JSON.stringify({ error: 'Authentication failed' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const userId = claimsData.claims.sub;
+  console.log(`Authenticated user: ${userId}`);
+
+  // Rate limiting check
+  const { data: rateLimitData, error: rateLimitError } = await supabase
+    .rpc('check_rate_limit', {
+      user_uuid: userId,
+      request_type: 'exam',
+      estimated_tokens: 1500
+    });
+
+  if (rateLimitError) {
+    console.error('Rate limit check error:', rateLimitError);
+  } else if (rateLimitData && rateLimitData.length > 0) {
+    const rateLimit = rateLimitData[0];
+    if (!rateLimit.allowed) {
+      console.warn(`Rate limit exceeded for user ${userId}`);
+      return new Response(
+        JSON.stringify({ 
+          error: `Rate limit exceeded. Resets at: ${rateLimit.reset_time}`,
+          rateLimitInfo: rateLimit
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+  }
+
   if (!openAIApiKey) {
     console.error('OpenAI API key not found');
     return new Response(
@@ -22,7 +78,25 @@ serve(async (req) => {
   }
 
   try {
-    const { questions, answers, originalContent } = await req.json();
+    const { questions, answers, originalContent, examId } = await req.json();
+
+    // Verify exam ownership if examId is provided
+    if (examId) {
+      const { data: exam, error: examError } = await supabase
+        .from('exams')
+        .select('id, user_id')
+        .eq('id', examId)
+        .eq('user_id', userId)
+        .single();
+
+      if (examError || !exam) {
+        console.error('Exam access denied:', examError?.message || 'Not found');
+        return new Response(
+          JSON.stringify({ error: 'Exam not found or access denied' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
     
     console.log(`Evaluating exam with ${questions.length} questions`);
     
