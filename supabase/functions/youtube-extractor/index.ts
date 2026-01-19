@@ -8,6 +8,12 @@ import {
   extractChapterTranscripts as extractChapterTranscriptsFromSegments,
   TranscriptSegment 
 } from '../_shared/youtubeTranscript.ts';
+import {
+  parseChaptersFromDescription,
+  validateChapters,
+  analyzeChapterCoverage,
+  Chapter
+} from '../_shared/chapterParsing.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,11 +32,22 @@ interface YouTubeData {
   transcript: string;
   transcriptSegments: TranscriptSegment[];
   chapters: Array<{
+    id?: string;
     title: string;
     startTime: number;
     endTime?: number;
     transcript?: string;
+    source?: string;
   }>;
+  chapterMetadata: {
+    source: string;
+    parseMethod: string;
+    originalCount: number;
+    cleanedCount: number;
+    coverage: number;
+    hadDuplicates: boolean;
+    hadOverlaps: boolean;
+  };
   metadata: {
     videoId: string;
     publishedAt: string;
@@ -55,32 +72,6 @@ function extractVideoId(url: string): string | null {
     if (match) return match[1];
   }
   return null;
-}
-
-function parseChaptersFromDescription(description: string): Array<{title: string; startTime: number; endTime?: number}> {
-  const chapters = [];
-  const lines = description.split('\n');
-  
-  const timestampPattern = /^(\d{1,2}:)?(\d{1,2}):(\d{2})\s+(.+)/;
-  
-  for (const line of lines) {
-    const match = line.trim().match(timestampPattern);
-    if (match) {
-      const hours = match[1] ? parseInt(match[1].replace(':', '')) : 0;
-      const minutes = parseInt(match[2]);
-      const seconds = parseInt(match[3]);
-      const title = match[4].trim();
-      
-      const startTime = hours * 3600 + minutes * 60 + seconds;
-      chapters.push({ title, startTime });
-    }
-  }
-  
-  for (let i = 0; i < chapters.length - 1; i++) {
-    chapters[i].endTime = chapters[i + 1].startTime;
-  }
-  
-  return chapters;
 }
 
 function parseDuration(duration: string): number {
@@ -141,13 +132,29 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
   
   console.log(`Transcript extraction: source=${transcriptResult.source}, segments=${transcriptResult.segments.length}, chars=${transcriptResult.metadata.characterCount}`);
   
-  // Parse chapters from description
-  const rawChapters = parseChaptersFromDescription(video.snippet.description);
+  // Parse chapters from description using improved parser
+  console.log('Parsing chapters from description with improved parser...');
+  const chapterParseResult = parseChaptersFromDescription(video.snippet.description);
+  console.log(`Chapter parsing: found ${chapterParseResult.metadata.originalCount} raw, ${chapterParseResult.metadata.cleanedCount} cleaned, duplicates=${chapterParseResult.metadata.hadDuplicates}`);
+  
+  // Validate chapters against video duration
+  const { chapters: validatedChapters, corrections } = validateChapters(
+    chapterParseResult.chapters,
+    duration
+  );
+  
+  if (corrections.length > 0) {
+    console.log('Chapter corrections applied:', corrections);
+  }
+  
+  // Analyze chapter coverage
+  const coverageAnalysis = analyzeChapterCoverage(validatedChapters, duration);
+  console.log(`Chapter coverage: ${Math.round(coverageAnalysis.coverage * 100)}%, gaps: ${coverageAnalysis.gaps.length}`);
   
   // Extract chapter-specific transcripts from timestamped segments
-  const chapters = transcriptResult.segments.length > 0
-    ? extractChapterTranscriptsFromSegments(transcriptResult.segments, rawChapters)
-    : rawChapters.map(ch => ({ ...ch, transcript: '' }));
+  const chaptersWithTranscripts = transcriptResult.segments.length > 0
+    ? extractChapterTranscriptsFromSegments(transcriptResult.segments, validatedChapters)
+    : validatedChapters.map(ch => ({ ...ch, transcript: '' }));
   
   const hasRealTranscript = transcriptResult.source !== 'description' && 
                             transcriptResult.source !== 'none' &&
@@ -159,7 +166,16 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
     duration,
     transcript: transcriptResult.transcript,
     transcriptSegments: transcriptResult.segments,
-    chapters,
+    chapters: chaptersWithTranscripts,
+    chapterMetadata: {
+      source: chapterParseResult.metadata.source,
+      parseMethod: chapterParseResult.metadata.parseMethod,
+      originalCount: chapterParseResult.metadata.originalCount,
+      cleanedCount: chapterParseResult.metadata.cleanedCount,
+      coverage: coverageAnalysis.coverage,
+      hadDuplicates: chapterParseResult.metadata.hadDuplicates,
+      hadOverlaps: chapterParseResult.metadata.hadOverlaps
+    },
     metadata: {
       videoId,
       publishedAt: video.snippet.publishedAt,
@@ -267,7 +283,8 @@ serve(async (req) => {
         videoId,
         extractedAt: new Date().toISOString(),
         transcriptSource: youtubeData.metadata.transcriptSource,
-        segmentCount: youtubeData.transcriptSegments.length
+        segmentCount: youtubeData.transcriptSegments.length,
+        chapterMetadata: youtubeData.chapterMetadata
       }), {
         contentType: 'application/json',
         upsert: true
@@ -299,9 +316,12 @@ serve(async (req) => {
         metadata: {
           ...youtubeData.metadata,
           chapters: youtubeData.chapters,
+          chapterMetadata: youtubeData.chapterMetadata,
           extractedAt: new Date().toISOString(),
           hasTranscript: youtubeData.transcript.length > 0,
           hasChapters: youtubeData.chapters.length > 0,
+          chapterCount: youtubeData.chapters.length,
+          chapterCoverage: youtubeData.chapterMetadata.coverage,
           hasRealTranscript: youtubeData.metadata.hasRealTranscript,
           transcriptSource: youtubeData.metadata.transcriptSource,
           transcriptLanguage: youtubeData.metadata.transcriptLanguage,
