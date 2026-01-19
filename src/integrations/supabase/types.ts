@@ -244,9 +244,14 @@ export type Database = {
         Row: {
           ai_summary: string | null
           chapters: Json | null
+          chapters_attempts: number | null
+          chapters_error: string | null
+          chapters_status: string | null
           created_at: string
           filename: string | null
           id: string
+          last_chapters_attempt: string | null
+          last_transcript_attempt: string | null
           metadata: Json | null
           processing_status: string | null
           room_id: string | null
@@ -256,6 +261,9 @@ export type Database = {
           text_content: string | null
           thumbnail_url: string | null
           title: string
+          transcript_attempts: number | null
+          transcript_error: string | null
+          transcript_status: string | null
           transcription_confidence: number | null
           type: string
           updated_at: string
@@ -265,9 +273,14 @@ export type Database = {
         Insert: {
           ai_summary?: string | null
           chapters?: Json | null
+          chapters_attempts?: number | null
+          chapters_error?: string | null
+          chapters_status?: string | null
           created_at?: string
           filename?: string | null
           id?: string
+          last_chapters_attempt?: string | null
+          last_transcript_attempt?: string | null
           metadata?: Json | null
           processing_status?: string | null
           room_id?: string | null
@@ -277,6 +290,9 @@ export type Database = {
           text_content?: string | null
           thumbnail_url?: string | null
           title: string
+          transcript_attempts?: number | null
+          transcript_error?: string | null
+          transcript_status?: string | null
           transcription_confidence?: number | null
           type: string
           updated_at?: string
@@ -286,9 +302,14 @@ export type Database = {
         Update: {
           ai_summary?: string | null
           chapters?: Json | null
+          chapters_attempts?: number | null
+          chapters_error?: string | null
+          chapters_status?: string | null
           created_at?: string
           filename?: string | null
           id?: string
+          last_chapters_attempt?: string | null
+          last_transcript_attempt?: string | null
           metadata?: Json | null
           processing_status?: string | null
           room_id?: string | null
@@ -298,6 +319,9 @@ export type Database = {
           text_content?: string | null
           thumbnail_url?: string | null
           title?: string
+          transcript_attempts?: number | null
+          transcript_error?: string | null
+          transcript_status?: string | null
           transcription_confidence?: number | null
           type?: string
           updated_at?: string

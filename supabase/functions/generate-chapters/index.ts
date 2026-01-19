@@ -80,7 +80,7 @@ serve(async (req) => {
     // Verify user owns the content
     const { data: contentData, error: contentError } = await supabase
       .from('content')
-      .select('metadata, user_id')
+      .select('metadata, user_id, chapters_attempts')
       .eq('id', contentId)
       .single();
 
@@ -96,6 +96,17 @@ serve(async (req) => {
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Update chapters_status to processing and increment attempt counter
+    await supabase
+      .from('content')
+      .update({
+        chapters_status: 'processing',
+        last_chapters_attempt: new Date().toISOString(),
+        chapters_error: null, // Clear previous error
+        chapters_attempts: (contentData.chapters_attempts || 0) + 1
+      })
+      .eq('id', contentId);
 
     // Extract duration from metadata if available
     const actualDuration = duration || contentData?.metadata?.duration;
@@ -206,12 +217,14 @@ serve(async (req) => {
       });
     }
 
-    // Update content with generated chapters
+    // Update content with generated chapters and granular status
     const { error: updateError } = await supabase
       .from('content')
       .update({
         chapters: chapters,
         processing_status: 'completed',
+        chapters_status: 'completed', // Granular status
+        chapters_error: null, // Clear any previous error
         updated_at: new Date().toISOString()
       })
       .eq('id', contentId);
@@ -236,6 +249,27 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in generate-chapters function:', error);
+    
+    // Update chapters_status to failed with error details
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const { contentId } = await req.clone().json().catch(() => ({}));
+      
+      if (contentId) {
+        await supabase
+          .from('content')
+          .update({
+            chapters_status: 'failed',
+            chapters_error: error.message || 'Unknown chapter generation error'
+          })
+          .eq('id', contentId);
+      }
+    } catch (updateError) {
+      console.error('Failed to update chapters status:', updateError);
+    }
+    
     return new Response(
       JSON.stringify({ 
         error: error.message,

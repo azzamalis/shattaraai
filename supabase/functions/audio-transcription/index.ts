@@ -75,18 +75,30 @@ async function processAudioFileFromUrl(
         .eq('id', recordingId);
     }
     
-    // Update content status with progress
+    // Update content status with progress and granular transcript status
     if (contentId) {
       await supabase
         .from('content')
         .update({ 
           processing_status: 'processing',
+          transcript_status: 'processing',
+          last_transcript_attempt: new Date().toISOString(),
+          transcript_error: null, // Clear previous error
           metadata: {
             currentStep: 'transcribing',
             progress: 35
           }
         })
         .eq('id', contentId);
+      
+      // Increment attempt counter
+      await supabase.rpc('increment_transcript_attempts', { content_id: contentId }).catch(() => {
+        // RPC might not exist yet, use direct update as fallback
+        supabase.from('content')
+          .update({ transcript_attempts: 1 })
+          .eq('id', contentId)
+          .eq('transcript_attempts', 0);
+      });
     }
     
     // Determine file type and MIME type
@@ -225,6 +237,8 @@ async function processAudioFileFromUrl(
         .update({
           text_content: normalizedResult.cleaned, // Use normalized for AI features
           processing_status: 'completed',
+          transcript_status: 'completed', // Granular status
+          transcript_error: null, // Clear any previous error
           transcription_confidence: 0.95,
           updated_at: new Date().toISOString(),
           metadata: {
@@ -285,6 +299,8 @@ async function processAudioFileFromUrl(
         .from('content')
         .update({ 
           processing_status: 'failed',
+          transcript_status: 'failed', // Granular status
+          transcript_error: error.message || 'Unknown transcription error',
           text_content: `Transcription failed: ${error.message}`
         })
         .eq('id', contentId);
