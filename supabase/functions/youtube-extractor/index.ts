@@ -229,11 +229,16 @@ serve(async (req) => {
       throw new Error('Invalid YouTube URL');
     }
 
-    // Update progress: Extracting
+    // Update progress: Extracting with granular status tracking
     await supabase
       .from('content')
       .update({
         processing_status: 'processing',
+        transcript_status: 'processing',
+        chapters_status: 'pending',
+        last_transcript_attempt: new Date().toISOString(),
+        transcript_error: null, // Clear previous error
+        chapters_error: null,
         metadata: {
           currentStep: 'extracting',
           progress: 25
@@ -274,6 +279,9 @@ serve(async (req) => {
     const normalizedResult = normalizeTranscript(youtubeData.transcript);
     console.log(`YouTube transcript normalization: removed ${normalizedResult.fillerCount} fillers, fixed ${normalizedResult.repetitionCount} repetitions, ${normalizedResult.cleanupPercentage}% cleaned`);
 
+    // Determine chapter status based on extraction results
+    const chaptersStatus = youtubeData.chapters.length > 0 ? 'completed' : 'not_applicable';
+
     // Update content with extracted data and storage path
     const { error: contentError } = await supabase
       .from('content')
@@ -284,6 +292,10 @@ serve(async (req) => {
         text_content: normalizedResult.cleaned, // Use normalized for AI features
         chapters: youtubeData.chapters,
         processing_status: 'completed',
+        transcript_status: youtubeData.metadata.hasRealTranscript ? 'completed' : 'failed',
+        chapters_status: chaptersStatus,
+        transcript_error: youtubeData.metadata.hasRealTranscript ? null : 'No transcript available, using description as fallback',
+        last_chapters_attempt: youtubeData.chapters.length > 0 ? new Date().toISOString() : null,
         metadata: {
           ...youtubeData.metadata,
           chapters: youtubeData.chapters,
@@ -346,6 +358,28 @@ serve(async (req) => {
     
   } catch (error) {
     console.error('YouTube extraction error:', error);
+    
+    // Update content with failed status and error details
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const { contentId } = await req.clone().json().catch(() => ({}));
+      
+      if (contentId) {
+        await supabase
+          .from('content')
+          .update({
+            processing_status: 'failed',
+            transcript_status: 'failed',
+            transcript_error: error.message || 'Unknown extraction error'
+          })
+          .eq('id', contentId);
+      }
+    } catch (updateError) {
+      console.error('Failed to update content status:', updateError);
+    }
+    
     return new Response(JSON.stringify({
       success: false,
       error: error.message
