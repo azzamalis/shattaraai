@@ -2,12 +2,13 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useContent as useContentHook } from '@/hooks/useContent';
 import { ContentItem } from '@/hooks/useContent';
+import { UploadProgressCallback } from '@/lib/storage';
 
 interface ContentContextType {
   content: ContentItem[];
   loading: boolean;
   addContent: (content: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<string | null>;
-  addContentWithFile: (content: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>, file?: File) => Promise<string | null>;
+  addContentWithFile: (content: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>, file?: File, onUploadProgress?: UploadProgressCallback) => Promise<string | null>;
   addContentWithMetadata: (content: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>, metadata?: any) => Promise<string | null>;
   updateContent: (id: string, updates: Partial<ContentItem>) => Promise<void>;
   deleteContent: (id: string) => Promise<void>;
