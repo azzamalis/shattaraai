@@ -85,6 +85,109 @@ function parseDuration(duration: string): number {
   return hours * 3600 + minutes * 60 + seconds;
 }
 
+/**
+ * Generate chapters from transcript using OpenAI
+ */
+async function generateChaptersFromTranscript(
+  transcript: string,
+  duration: number,
+  openAIApiKey: string
+): Promise<Array<{ id: string; title: string; startTime: number; endTime: number; summary: string }>> {
+  const durationText = duration > 0 
+    ? ` (Total duration: ${Math.floor(duration / 60)}:${String(Math.floor(duration % 60)).padStart(2, '0')})` 
+    : '';
+  
+  // Truncate transcript if too long (keep first ~8000 chars for context)
+  const maxTranscriptLength = 8000;
+  const truncatedTranscript = transcript.length > maxTranscriptLength
+    ? transcript.substring(0, maxTranscriptLength) + '... [truncated]'
+    : transcript;
+  
+  console.log(`Generating chapters with AI for ${transcript.length} char transcript${durationText}`);
+  
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: `You are an expert content analyzer. Generate meaningful chapters for the provided YouTube transcript${durationText}. 
+          Return a JSON array of chapters with this exact structure:
+          [
+            {
+              "id": "chapter-1",
+              "title": "Chapter Title",
+              "startTime": 0,
+              "endTime": 120,
+              "summary": "Brief summary of this chapter content"
+            }
+          ]
+          
+          Guidelines:
+          - Create 3-8 chapters depending on content length
+          - Use descriptive titles that capture the main topic
+          - Ensure chapters don't overlap and cover the entire video
+          - Provide meaningful summaries (1-2 sentences)
+          - IMPORTANT: All timestamps must be within the actual duration${duration ? ` (${duration} seconds max)` : ''}
+          - Distribute chapters proportionally across the video duration
+          - Return only the JSON array, no additional text`
+        },
+        {
+          role: 'user',
+          content: `Please analyze this transcript and create chapters${durationText}:\n\n${truncatedTranscript}`
+        }
+      ],
+      max_tokens: 1000,
+      temperature: 0.3 // Lower temperature for more consistent output
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+  }
+
+  const result = await response.json();
+  let responseText = result.choices[0].message.content;
+  
+  // Remove markdown code blocks if present
+  if (responseText.includes('```json')) {
+    responseText = responseText.replace(/```json\s*|\s*```/g, '').trim();
+  } else if (responseText.includes('```')) {
+    responseText = responseText.replace(/```\s*|\s*```/g, '').trim();
+  }
+  
+  let chapters = JSON.parse(responseText);
+  
+  if (!Array.isArray(chapters)) {
+    chapters = chapters.chapters || [];
+  }
+  
+  // Validate and fix timestamps
+  if (duration > 0) {
+    chapters = chapters.map((chapter: any, index: number) => {
+      const adjustedStartTime = Math.max(0, Math.min(chapter.startTime || 0, duration));
+      const adjustedEndTime = Math.max(adjustedStartTime + 1, Math.min(chapter.endTime || duration, duration));
+      
+      return {
+        id: chapter.id || `chapter-${index + 1}`,
+        title: chapter.title || `Chapter ${index + 1}`,
+        startTime: adjustedStartTime,
+        endTime: adjustedEndTime,
+        summary: chapter.summary || '',
+        source: 'ai_generated'
+      };
+    });
+  }
+  
+  return chapters;
+}
+
 async function getYouTubeData(videoId: string): Promise<YouTubeData> {
   const apiKey = Deno.env.get('YOUTUBE_API_KEY');
   const supadataApiKey = Deno.env.get('SUPADATA_API_KEY');
@@ -138,13 +241,41 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
   console.log(`Chapter parsing: found ${chapterParseResult.metadata.originalCount} raw, ${chapterParseResult.metadata.cleanedCount} cleaned, duplicates=${chapterParseResult.metadata.hadDuplicates}`);
   
   // Validate chapters against video duration
-  const { chapters: validatedChapters, corrections } = validateChapters(
+  let { chapters: validatedChapters, corrections } = validateChapters(
     chapterParseResult.chapters,
     duration
   );
   
   if (corrections.length > 0) {
     console.log('Chapter corrections applied:', corrections);
+  }
+  
+  // If no chapters found in description and we have a transcript, generate chapters using AI
+  let chapterSource = chapterParseResult.metadata.source;
+  if (validatedChapters.length === 0 && transcriptResult.transcript.length > 100) {
+    console.log('No chapters in description, generating from transcript using AI...');
+    
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (openAIApiKey) {
+      try {
+        const aiChapters = await generateChaptersFromTranscript(
+          transcriptResult.transcript,
+          duration,
+          openAIApiKey
+        );
+        
+        if (aiChapters.length > 0) {
+          validatedChapters = aiChapters;
+          chapterSource = 'ai_generated';
+          console.log(`AI generated ${aiChapters.length} chapters from transcript`);
+        }
+      } catch (aiError) {
+        console.error('AI chapter generation failed:', aiError);
+        // Continue without chapters rather than failing
+      }
+    } else {
+      console.log('No OpenAI API key available for chapter generation');
+    }
   }
   
   // Analyze chapter coverage
@@ -167,11 +298,11 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
     transcript: transcriptResult.transcript,
     transcriptSegments: transcriptResult.segments,
     chapters: chaptersWithTranscripts,
-    chapterMetadata: {
-      source: chapterParseResult.metadata.source,
-      parseMethod: chapterParseResult.metadata.parseMethod,
-      originalCount: chapterParseResult.metadata.originalCount,
-      cleanedCount: chapterParseResult.metadata.cleanedCount,
+  chapterMetadata: {
+      source: chapterSource,
+      parseMethod: chapterSource === 'ai_generated' ? 'openai_gpt4o_mini' : chapterParseResult.metadata.parseMethod,
+      originalCount: chapterSource === 'ai_generated' ? validatedChapters.length : chapterParseResult.metadata.originalCount,
+      cleanedCount: validatedChapters.length,
       coverage: coverageAnalysis.coverage,
       hadDuplicates: chapterParseResult.metadata.hadDuplicates,
       hadOverlaps: chapterParseResult.metadata.hadOverlaps
