@@ -18,7 +18,7 @@ export function ActionCards({
     addContentWithFile
   } = useContentContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { startProgressToast, startImmediateUploadToast, transitionToContentTracking } = useProgressToast();
+  const { startProgressToast, startImmediateUploadToast, updateUploadProgress, transitionToContentTracking } = useProgressToast();
   
   const handleUploadClick = () => {
     console.log('DEBUG: ActionCards - Upload button clicked');
@@ -85,6 +85,11 @@ export function ActionCards({
           },
           fileSize: file.size
         });
+        // Create progress callback to update toast with real upload progress
+        const handleUploadProgress = (progress: number) => {
+          updateUploadProgress(tempUploadId, file.name, progress);
+        };
+
         const contentId = await addContentWithFile({
           title: file.name,
           type: contentType as any,
@@ -97,7 +102,7 @@ export function ActionCards({
             originalFileName: file.name
           },
           filename: file.name
-        }, file);
+        }, file, handleUploadProgress);
 
         console.log('DEBUG: ActionCards - Upload completed, content ID received:', contentId);
         if (contentId) {

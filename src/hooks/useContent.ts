@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { uploadFileToStorage, uploadPastedContentMetadata, deleteFileFromStorage, isStorageUrl, StorageContentType, getStorageBucket } from '@/lib/storage';
+import { uploadFileToStorage, uploadPastedContentMetadata, deleteFileFromStorage, isStorageUrl, StorageContentType, getStorageBucket, UploadProgressCallback } from '@/lib/storage';
 import * as pdfjsLib from 'pdfjs-dist';
 
 export interface ContentItem {
@@ -193,7 +193,8 @@ export const useContent = () => {
 
   const addContentWithFile = async (
     contentData: Omit<ContentItem, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
-    file?: File
+    file?: File,
+    onUploadProgress?: UploadProgressCallback
   ) => {
     console.log('DEBUG: useContent - addContentWithFile called with:', {
       contentTitle: contentData.title,
@@ -227,7 +228,7 @@ export const useContent = () => {
             userId: user.id
           });
           
-          const uploadedUrl = await uploadFileToStorage(file, storageContentType, user.id);
+          const uploadedUrl = await uploadFileToStorage(file, storageContentType, user.id, onUploadProgress);
           console.log('DEBUG: useContent - File uploaded successfully, received URL:', uploadedUrl);
           
           // Store the proper Supabase storage URL
