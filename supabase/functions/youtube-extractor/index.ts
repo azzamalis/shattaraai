@@ -9,10 +9,7 @@ import {
   TranscriptSegment 
 } from '../_shared/youtubeTranscript.ts';
 import {
-  parseChaptersFromDescription,
-  validateChapters,
-  analyzeChapterCoverage,
-  Chapter
+  analyzeChapterCoverage
 } from '../_shared/chapterParsing.ts';
 
 const corsHeaders = {
@@ -42,11 +39,8 @@ interface YouTubeData {
   chapterMetadata: {
     source: string;
     parseMethod: string;
-    originalCount: number;
-    cleanedCount: number;
+    chapterCount: number;
     coverage: number;
-    hadDuplicates: boolean;
-    hadOverlaps: boolean;
   };
   metadata: {
     videoId: string;
@@ -112,7 +106,7 @@ async function generateChaptersFromTranscript(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4.1-mini',
       messages: [
         {
           role: 'system',
@@ -235,39 +229,25 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
   
   console.log(`Transcript extraction: source=${transcriptResult.source}, segments=${transcriptResult.segments.length}, chars=${transcriptResult.metadata.characterCount}`);
   
-  // Parse chapters from description using improved parser
-  console.log('Parsing chapters from description with improved parser...');
-  const chapterParseResult = parseChaptersFromDescription(video.snippet.description);
-  console.log(`Chapter parsing: found ${chapterParseResult.metadata.originalCount} raw, ${chapterParseResult.metadata.cleanedCount} cleaned, duplicates=${chapterParseResult.metadata.hadDuplicates}`);
+  // Generate chapters from transcript using AI (GPT-4.1-mini)
+  let generatedChapters: Array<{ id: string; title: string; startTime: number; endTime: number; summary: string; source?: string }> = [];
+  let chapterSource = 'none';
   
-  // Validate chapters against video duration
-  let { chapters: validatedChapters, corrections } = validateChapters(
-    chapterParseResult.chapters,
-    duration
-  );
-  
-  if (corrections.length > 0) {
-    console.log('Chapter corrections applied:', corrections);
-  }
-  
-  // If no chapters found in description and we have a transcript, generate chapters using AI
-  let chapterSource = chapterParseResult.metadata.source;
-  if (validatedChapters.length === 0 && transcriptResult.transcript.length > 100) {
-    console.log('No chapters in description, generating from transcript using AI...');
+  if (transcriptResult.transcript.length > 100) {
+    console.log('Generating chapters from transcript using GPT-4.1-mini...');
     
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (openAIApiKey) {
       try {
-        const aiChapters = await generateChaptersFromTranscript(
+        generatedChapters = await generateChaptersFromTranscript(
           transcriptResult.transcript,
           duration,
           openAIApiKey
         );
         
-        if (aiChapters.length > 0) {
-          validatedChapters = aiChapters;
+        if (generatedChapters.length > 0) {
           chapterSource = 'ai_generated';
-          console.log(`AI generated ${aiChapters.length} chapters from transcript`);
+          console.log(`GPT-4.1-mini generated ${generatedChapters.length} chapters from transcript`);
         }
       } catch (aiError) {
         console.error('AI chapter generation failed:', aiError);
@@ -276,16 +256,18 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
     } else {
       console.log('No OpenAI API key available for chapter generation');
     }
+  } else {
+    console.log('Transcript too short for chapter generation');
   }
   
   // Analyze chapter coverage
-  const coverageAnalysis = analyzeChapterCoverage(validatedChapters, duration);
+  const coverageAnalysis = analyzeChapterCoverage(generatedChapters, duration);
   console.log(`Chapter coverage: ${Math.round(coverageAnalysis.coverage * 100)}%, gaps: ${coverageAnalysis.gaps.length}`);
   
   // Extract chapter-specific transcripts from timestamped segments
   const chaptersWithTranscripts = transcriptResult.segments.length > 0
-    ? extractChapterTranscriptsFromSegments(transcriptResult.segments, validatedChapters)
-    : validatedChapters.map(ch => ({ ...ch, transcript: '' }));
+    ? extractChapterTranscriptsFromSegments(transcriptResult.segments, generatedChapters)
+    : generatedChapters.map(ch => ({ ...ch, transcript: '' }));
   
   const hasRealTranscript = transcriptResult.source !== 'description' && 
                             transcriptResult.source !== 'none' &&
@@ -298,14 +280,11 @@ async function getYouTubeData(videoId: string): Promise<YouTubeData> {
     transcript: transcriptResult.transcript,
     transcriptSegments: transcriptResult.segments,
     chapters: chaptersWithTranscripts,
-  chapterMetadata: {
+    chapterMetadata: {
       source: chapterSource,
-      parseMethod: chapterSource === 'ai_generated' ? 'openai_gpt4o_mini' : chapterParseResult.metadata.parseMethod,
-      originalCount: chapterSource === 'ai_generated' ? validatedChapters.length : chapterParseResult.metadata.originalCount,
-      cleanedCount: validatedChapters.length,
-      coverage: coverageAnalysis.coverage,
-      hadDuplicates: chapterParseResult.metadata.hadDuplicates,
-      hadOverlaps: chapterParseResult.metadata.hadOverlaps
+      parseMethod: 'openai_gpt41_mini',
+      chapterCount: generatedChapters.length,
+      coverage: coverageAnalysis.coverage
     },
     metadata: {
       videoId,
