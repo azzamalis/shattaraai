@@ -18,7 +18,8 @@ export function ActionCards({
     addContentWithFile
   } = useContentContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { startProgressToast } = useProgressToast();
+  const { startProgressToast, startImmediateUploadToast, transitionToContentTracking } = useProgressToast();
+  
   const handleUploadClick = () => {
     console.log('DEBUG: ActionCards - Upload button clicked');
     fileInputRef.current?.click();
@@ -32,7 +33,13 @@ export function ActionCards({
       lastModified: file.lastModified
     } : 'No file selected');
     if (file) {
+      // Generate a temporary ID for immediate toast feedback
+      const tempUploadId = `temp-${Date.now()}`;
+      
       try {
+        // Show immediate upload feedback BEFORE the upload starts
+        startImmediateUploadToast(tempUploadId, file.name);
+        
         // Determine content type based on file type and extension
         let contentType = 'upload';
         const fileType = file.type.toLowerCase();
@@ -94,9 +101,9 @@ export function ActionCards({
 
         console.log('DEBUG: ActionCards - Upload completed, content ID received:', contentId);
         if (contentId) {
-          console.log('DEBUG: ActionCards - Content uploaded, starting progress toast');
-          // Start unified progress toast that will auto-navigate on completion
-          startProgressToast(contentId, file.name);
+          console.log('DEBUG: ActionCards - Content uploaded, transitioning to content tracking');
+          // Transition from temp upload toast to real content tracking
+          transitionToContentTracking(tempUploadId, contentId, file.name);
           // Emit onboarding event for content upload
           emitOnboardingEvent('content_added');
         } else {
