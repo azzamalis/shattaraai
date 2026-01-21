@@ -375,24 +375,7 @@ export function ContentLeftSidebar({
                           </p>}
                       </div>)}
                   </div>}
-                {contentData.type === 'youtube' && contentData.metadata?.chapters && Array.isArray(contentData.metadata.chapters) && contentData.metadata.chapters.length > 0 && <div className="space-y-8">
-                    {contentData.metadata.chapters.map((chapter: any, index: number) => <div key={index} className="group cursor-pointer" onClick={() => handleChapterClick(chapter.startTime)}>
-                        {/* Timestamp */}
-                        <div className="text-xs text-muted-foreground mb-2 font-mono">
-                          {Math.floor(chapter.startTime / 60).toString().padStart(2, '0')}:{(chapter.startTime % 60).toString().padStart(2, '0')}
-                        </div>
-                        
-                        {/* Title */}
-                        <h3 className="text-base font-bold text-foreground mb-3 group-hover:text-primary transition-colors leading-tight">
-                          {chapter.title}
-                        </h3>
-                        
-                        {/* Summary if available */}
-                        {chapter.summary && <p className="text-sm text-muted-foreground leading-relaxed">
-                            {chapter.summary}
-                          </p>}
-                      </div>)}
-                  </div>}
+                {/* Removed duplicate YouTube chapters display - chapters are already shown via RealtimeChaptersDisplay above using contentData.chapters */}
                 {contentData.type === 'website' && contentData.text && <div className="prose prose-sm max-w-none text-foreground">
                     <div className="bg-card p-4 rounded-lg border border-border relative">
                       <Button variant="ghost" size="sm" onClick={() => setIsTextExpanded(!isTextExpanded)} className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-muted">
