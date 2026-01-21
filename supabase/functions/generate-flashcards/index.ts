@@ -84,14 +84,56 @@ serve(async (req) => {
     // Step 2: Extracting data
     await updateProgress(supabase, contentId, 'extracting', 25);
 
-    // Prepare content for AI
+    // Prepare content for AI - try multiple sources
     let contentText = content.text_content || '';
+    
+    // Add chapter text if available
     if (content.chapters && Array.isArray(content.chapters)) {
-      contentText += '\n\n' + content.chapters.map((ch: any) => ch.text || '').join('\n');
+      const chapterText = content.chapters
+        .map((ch: any) => ch.text || ch.content || '')
+        .filter((t: string) => t.trim())
+        .join('\n\n');
+      if (chapterText) {
+        contentText += (contentText ? '\n\n' : '') + chapterText;
+      }
+    }
+
+    // If still no content, try fetching from storage for PDFs
+    if (!contentText.trim() && content.storage_path) {
+      console.log('No text_content found, attempting to fetch from storage...');
+      
+      try {
+        // For PDFs stored in Supabase, the storage_path might be a signed URL or a path
+        // We need to check if content was processed - if not, inform user
+        if (content.processing_status === 'pending' || content.processing_status === 'processing') {
+          throw new Error('Content is still being processed. Please wait for processing to complete before generating flashcards.');
+        }
+        
+        // Check metadata for any extracted text
+        const metadata = content.metadata as Record<string, any> | null;
+        if (metadata?.extractedText) {
+          contentText = metadata.extractedText;
+        } else if (metadata?.summary) {
+          // Use summary as fallback
+          contentText = metadata.summary;
+        }
+      } catch (storageError) {
+        console.error('Error fetching content from storage:', storageError);
+        if (storageError instanceof Error && storageError.message.includes('still being processed')) {
+          throw storageError;
+        }
+      }
     }
 
     if (!contentText.trim()) {
-      throw new Error('No content available for flashcard generation');
+      // Provide more helpful error message
+      const status = content.processing_status;
+      if (status === 'pending' || status === 'processing') {
+        throw new Error('Content is still being processed. Please wait for processing to complete before generating flashcards.');
+      } else if (status === 'failed') {
+        throw new Error('Content processing failed. Please try re-uploading the content or retry processing.');
+      }
+      throw new Error('No text content available for flashcard generation. Please ensure the content has been fully processed.');
     }
 
     // Build system prompt based on config
