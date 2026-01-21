@@ -61,7 +61,60 @@ export function useProgressToast() {
     }
   }, []);
 
-  const startProgressToast = useCallback((contentId: string, title: string) => {
+  // Start an immediate upload toast before content ID is known
+  const startImmediateUploadToast = useCallback((tempId: string, title: string) => {
+    // Create a temporary toast that shows immediately
+    const toastId = `upload-${tempId}`;
+    
+    toast.custom(
+      () => createElement(ProgressToast, { 
+        message: `Uploading... ${title}`, 
+        progress: 5, 
+        status: 'processing' as ProcessingStatus
+      }),
+      { 
+        duration: Infinity,
+        id: toastId
+      }
+    );
+    
+    activeToastsRef.current.set(tempId, toastId);
+    
+    return toastId;
+  }, []);
+
+  // Update the temporary upload toast with progress
+  const updateUploadProgress = useCallback((tempId: string, title: string, progress: number) => {
+    const toastId = activeToastsRef.current.get(tempId);
+    if (toastId) {
+      toast.custom(
+        () => createElement(ProgressToast, { 
+          message: `Uploading... ${title}`, 
+          progress, 
+          status: 'processing' as ProcessingStatus
+        }),
+        { 
+          id: toastId,
+          duration: Infinity
+        }
+      );
+    }
+  }, []);
+
+  // Transition from temp upload toast to real content tracking
+  const transitionToContentTracking = useCallback((tempId: string, contentId: string, title: string) => {
+    // Remove the temp toast tracking
+    const oldToastId = activeToastsRef.current.get(tempId);
+    if (oldToastId) {
+      toast.dismiss(oldToastId);
+      activeToastsRef.current.delete(tempId);
+    }
+    
+    // Start real content tracking
+    startProgressToastInternal(contentId, title);
+  }, []);
+
+  const startProgressToastInternal = useCallback((contentId: string, title: string) => {
     // Check if we already have a toast for this content
     if (activeToastsRef.current.has(contentId)) {
       return;
@@ -70,8 +123,8 @@ export function useProgressToast() {
     // Create initial toast
     const toastId = toast.custom(
       () => createElement(ProgressToast, { 
-        message: `Uploading... ${title}`, 
-        progress: 10, 
+        message: `Processing... ${title}`, 
+        progress: 15, 
         status: 'processing' as ProcessingStatus
       }),
       { 
@@ -152,6 +205,10 @@ export function useProgressToast() {
     setTimeout(fetchCurrentStatus, 500);
   }, [navigate, updateToast, dismissToast]);
 
+  const startProgressToast = useCallback((contentId: string, title: string) => {
+    startProgressToastInternal(contentId, title);
+  }, [startProgressToastInternal]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -163,5 +220,11 @@ export function useProgressToast() {
     };
   }, []);
 
-  return { startProgressToast, dismissToast };
+  return { 
+    startProgressToast, 
+    dismissToast, 
+    startImmediateUploadToast, 
+    updateUploadProgress,
+    transitionToContentTracking 
+  };
 }
