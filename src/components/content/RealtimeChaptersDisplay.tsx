@@ -170,7 +170,7 @@ export const RealtimeChaptersDisplay = ({
             
             {/* Title & Summary */}
             <div className="w-full">
-              <h3 className="mb-2 line-clamp-1 text-lg text-current">
+              <h3 className="mb-2 line-clamp-1 text-lg font-medium text-current">
                 <div>{chapter.title}</div>
               </h3>
               <div className="mt-2 text-sm leading-relaxed">
