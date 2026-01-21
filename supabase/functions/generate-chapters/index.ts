@@ -120,9 +120,9 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    console.log('OpenAI API key found, generating chapters with gpt-4o-mini');
+    console.log('OpenAI API key found, generating chapters with gpt-4.1-mini');
 
-    // Generate chapters using gpt-4o-mini for chat completions
+    // Generate chapters using gpt-4.1-mini for chat completions (consistent with YouTube chapter generation)
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -130,7 +130,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-mini',
         messages: [
           {
             role: 'system',
