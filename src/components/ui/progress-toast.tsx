@@ -62,14 +62,16 @@ export function ProgressToast({ message, progress, status }: ProgressToastProps)
 }
 
 // Step labels for user-friendly display
+// Progress breakdown: 0-50% = upload, 50-100% = backend processing
 export const PROCESSING_STEPS: Record<string, { label: string; progress: number }> = {
   pending: { label: "Starting", progress: 0 },
-  uploading: { label: "Uploading", progress: 10 },
-  extracting: { label: "Extracting content", progress: 25 },
-  transcribing: { label: "Transcribing audio", progress: 40 },
-  analyzing: { label: "Analyzing", progress: 55 },
-  generating_chapters: { label: "Generating chapters", progress: 70 },
-  enhancing: { label: "AI enhancement", progress: 85 },
+  uploading: { label: "Uploading", progress: 25 },
+  upload_complete: { label: "Upload complete", progress: 50 },
+  extracting: { label: "Extracting content", progress: 55 },
+  transcribing: { label: "Transcribing audio", progress: 60 },
+  analyzing: { label: "Analyzing", progress: 70 },
+  generating_chapters: { label: "Generating chapters", progress: 80 },
+  enhancing: { label: "AI enhancement", progress: 90 },
   saving: { label: "Saving", progress: 95 },
   completed: { label: "Complete!", progress: 100 },
   failed: { label: "Failed", progress: 0 },

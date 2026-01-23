@@ -62,6 +62,7 @@ export function useProgressToast() {
   }, []);
 
   // Start an immediate upload toast before content ID is known
+  // Progress is now scaled: 0-50% for upload phase
   const startImmediateUploadToast = useCallback((tempId: string, title: string) => {
     // Create a temporary toast that shows immediately
     const toastId = `upload-${tempId}`;
@@ -69,7 +70,7 @@ export function useProgressToast() {
     toast.custom(
       () => createElement(ProgressToast, { 
         message: `Uploading... ${title}`, 
-        progress: 5, 
+        progress: 2, // Start at 2% for immediate feedback 
         status: 'processing' as ProcessingStatus
       }),
       { 
@@ -84,13 +85,18 @@ export function useProgressToast() {
   }, []);
 
   // Update the temporary upload toast with progress
-  const updateUploadProgress = useCallback((tempId: string, title: string, progress: number) => {
+  // Scale raw upload progress (0-100) to display progress (0-50%)
+  const updateUploadProgress = useCallback((tempId: string, title: string, rawProgress: number) => {
     const toastId = activeToastsRef.current.get(tempId);
     if (toastId) {
+      // Scale upload progress: 0-100% raw → 2-50% displayed
+      // This leaves 50-100% for backend processing stages
+      const scaledProgress = Math.round(2 + (rawProgress * 0.48));
+      
       toast.custom(
         () => createElement(ProgressToast, { 
           message: `Uploading... ${title}`, 
-          progress, 
+          progress: scaledProgress, 
           status: 'processing' as ProcessingStatus
         }),
         { 
@@ -120,11 +126,11 @@ export function useProgressToast() {
       return;
     }
 
-    // Create initial toast
+    // Create initial toast - start at 52% since upload (0-50%) is complete
     const toastId = toast.custom(
       () => createElement(ProgressToast, { 
         message: `Processing... ${title}`, 
-        progress: 15, 
+        progress: 52, 
         status: 'processing' as ProcessingStatus
       }),
       { 
