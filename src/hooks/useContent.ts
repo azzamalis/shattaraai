@@ -689,15 +689,16 @@ export const useContent = () => {
           break;
 
         case 'audio_file':
-          if (file) {
-            console.log('DEBUG: useContent - Processing audio file, file details:', {
-              name: file.name,
-              size: file.size,
-              type: file.type
+          if (file || contentData.url) {
+            console.log('DEBUG: useContent - Processing audio file, details:', {
+              name: file?.name || contentData.filename,
+              size: file?.size,
+              type: file?.type,
+              url: contentData.url
             });
             
-            // Check file size (limit to 25MB for OpenAI)
-            if (file.size > 25 * 1024 * 1024) {
+            // Check file size (limit to 25MB for OpenAI) - only if we have the file object
+            if (file && file.size > 25 * 1024 * 1024) {
               console.error('DEBUG: useContent - File too large for transcription:', file.size);
               await supabase
                 .from('content')
@@ -713,40 +714,58 @@ export const useContent = () => {
             // Update status to processing first
             await supabase
               .from('content')
-              .update({ processing_status: 'processing' })
+              .update({ 
+                processing_status: 'processing',
+                metadata: {
+                  ...contentData.metadata,
+                  currentStep: 'transcribing',
+                  progress: 55
+                }
+              })
               .eq('id', contentId);
             
             try {
-              // Convert file to base64 in chunks to prevent stack overflow
-              console.log('DEBUG: useContent - Converting file to base64 in chunks...');
-              const base64Audio = await convertFileToBase64Chunked(file);
-              console.log('DEBUG: useContent - Base64 conversion complete, length:', base64Audio.length);
+              // OPTIMIZED: Use URL-based processing instead of base64 conversion
+              // This eliminates the double-transfer bottleneck (file already in storage)
+              const audioFileUrl = contentData.url || contentData.storage_path;
               
-              console.log('DEBUG: useContent - Calling audio-transcription function...');
-              const { data, error } = await supabase.functions.invoke('audio-transcription', {
-                body: {
-                  audioData: base64Audio,
-                  recordingId: contentId,
-                  chunkIndex: 0,
-                  isRealTime: false,
-                  timestamp: Date.now(),
-                  originalFileName: file.name
+              if (audioFileUrl) {
+                console.log('DEBUG: useContent - Using URL-based audio processing (optimized path)');
+                console.log('DEBUG: useContent - Audio file URL:', audioFileUrl);
+                
+                const { data, error } = await supabase.functions.invoke('audio-transcription', {
+                  body: {
+                    audioFileUrl: audioFileUrl,
+                    contentId: contentId,
+                    originalFileName: file?.name || contentData.filename || 'audio-file',
+                    isRealTime: false,
+                    timestamp: Date.now()
+                  }
+                });
+                
+                if (error) {
+                  console.error('DEBUG: useContent - Audio transcription function error:', error);
+                  await supabase
+                    .from('content')
+                    .update({ 
+                      processing_status: 'failed',
+                      text_content: `Transcription failed: ${error.message || 'Unknown error'}`
+                    })
+                    .eq('id', contentId);
+                  toast.error('Audio transcription failed');
+                } else {
+                  console.log('DEBUG: useContent - Audio-transcription function result:', data);
+                  console.log('DEBUG: useContent - Audio transcription started via URL-based processing');
                 }
-              });
-              
-              if (error) {
-                console.error('DEBUG: useContent - Audio transcription function error:', error);
+              } else {
+                console.error('DEBUG: useContent - No URL available for audio processing');
                 await supabase
                   .from('content')
                   .update({ 
                     processing_status: 'failed',
-                    text_content: `Transcription failed: ${error.message || 'Unknown error'}`
+                    text_content: 'No storage URL available for processing'
                   })
                   .eq('id', contentId);
-                toast.error('Audio transcription failed');
-              } else {
-                console.log('DEBUG: useContent - Audio-transcription function result:', data);
-                console.log('DEBUG: useContent - Audio transcription in progress');
               }
             } catch (extractionError) {
               console.error('DEBUG: useContent - Audio transcription failed:', extractionError);
@@ -760,7 +779,7 @@ export const useContent = () => {
               toast.error('Audio processing failed');
             }
           } else {
-            console.log('DEBUG: useContent - No file provided for audio processing');
+            console.log('DEBUG: useContent - No file or URL provided for audio processing');
           }
           break;
 
