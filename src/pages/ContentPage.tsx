@@ -104,6 +104,7 @@ export default function ContentPage() {
         } else {
           // Use fetched content from database
           console.log('ContentPage: Using fetched content from database');
+          const processingStatus = fetchedContent.processing_status;
           setContentData({
             id: fetchedContent.id,
             type: fetchedContent.type as ContentType,
@@ -116,8 +117,8 @@ export default function ContentPage() {
             metadata: fetchedContent.metadata,
             processing_status: fetchedContent.processing_status,
             transcription_confidence: fetchedContent.transcription_confidence,
-            isProcessing: false,
-            hasError: false
+            isProcessing: processingStatus === 'processing',
+            hasError: processingStatus === 'failed'
           });
         }
       } catch (err) {
@@ -148,11 +149,33 @@ export default function ContentPage() {
         },
         (payload) => {
           console.log('ContentPage: Real-time update received:', payload);
-          const updatedContent = payload.new;
+          const updatedContent = payload.new as any;
+          const processingStatus = updatedContent.processing_status as string | null | undefined;
           
           // Update content data with new values
           setContentData(prev => {
-            if (!prev) return prev;
+            // If we somehow received an update before initial fetch has set state,
+            // we can still populate the minimum viable shape.
+            if (!prev) {
+              return {
+                id: updatedContent.id,
+                type: (updatedContent.type as ContentType) ?? 'recording',
+                title: updatedContent.title ?? 'Content',
+                url: updatedContent.url ?? undefined,
+                filename: updatedContent.filename ?? undefined,
+                text: updatedContent.text_content ?? undefined,
+                text_content: updatedContent.text_content ?? undefined,
+                chapters: updatedContent.chapters ?? undefined,
+                processing_status: processingStatus ?? undefined,
+                transcription_confidence: updatedContent.transcription_confidence ?? undefined,
+                metadata: (updatedContent.metadata as Record<string, any>) ?? undefined,
+                ai_summary: updatedContent.ai_summary ?? undefined,
+                summary_key_points: updatedContent.summary_key_points ?? undefined,
+                summary_generated_at: updatedContent.summary_generated_at ?? undefined,
+                isProcessing: processingStatus === 'processing',
+                hasError: processingStatus === 'failed'
+              };
+            }
             
             return {
               ...prev,
@@ -165,8 +188,8 @@ export default function ContentPage() {
               ai_summary: updatedContent.ai_summary,
               summary_key_points: updatedContent.summary_key_points,
               summary_generated_at: updatedContent.summary_generated_at,
-              isProcessing: updatedContent.processing_status === 'processing',
-              hasError: updatedContent.processing_status === 'failed'
+              isProcessing: processingStatus === 'processing',
+              hasError: processingStatus === 'failed'
             };
           });
         }
@@ -177,7 +200,8 @@ export default function ContentPage() {
 
     return () => {
       console.log('ContentPage: Cleaning up real-time subscription');
-      channel.unsubscribe();
+      // Fully remove the channel to prevent orphaned subscriptions across route changes.
+      supabase.removeChannel(channel);
     };
   }, [contentId]);
   useEffect(() => {
@@ -192,29 +216,9 @@ export default function ContentPage() {
     };
   }, [isRecording]);
 
-  // Simulate content processing for non-recording types or modify for existing recordings
-  useEffect(() => {
-    if (!contentData) return;
-    if (recordingStateInfo?.isExistingRecording || contentData.type === 'audio_file') {
-      // For existing recordings or uploaded audio files, set processing to false immediately
-      setContentData(prev => prev ? {
-        ...prev,
-        isProcessing: false
-      } : null);
-    } else if (contentData.type !== 'live_recording' && (contentData.url || contentData.text)) {
-      setContentData(prev => prev ? {
-        ...prev,
-        isProcessing: true
-      } : null);
-      const timer = setTimeout(() => {
-        setContentData(prev => prev ? {
-          ...prev,
-          isProcessing: false
-        } : null);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [contentData?.type, contentData?.url, contentData?.text, recordingStateInfo?.isExistingRecording]);
+  // NOTE: We intentionally do not "simulate" processing states here.
+  // `isProcessing/hasError` should always reflect the database `processing_status`
+  // (kept up-to-date via the realtime subscription above).
   const toggleRecording = () => {
     if (!isRecording) {
       setRecordingTime(0);
