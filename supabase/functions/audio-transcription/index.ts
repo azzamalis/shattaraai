@@ -92,13 +92,19 @@ async function processAudioFileFromUrl(
         .eq('id', contentId);
       
       // Increment attempt counter
-      await supabase.rpc('increment_transcript_attempts', { content_id: contentId }).catch(() => {
-        // RPC might not exist yet, use direct update as fallback
-        supabase.from('content')
-          .update({ transcript_attempts: 1 })
-          .eq('id', contentId)
-          .eq('transcript_attempts', 0);
-      });
+      // Try to increment attempt counter, fallback to direct update
+      try {
+        const { error: rpcError } = await supabase.rpc('increment_transcript_attempts', { content_id: contentId });
+        if (rpcError) {
+          // RPC might not exist, use direct update as fallback
+          await supabase.from('content')
+            .update({ transcript_attempts: 1 })
+            .eq('id', contentId);
+        }
+      } catch {
+        // Silently fail - attempt tracking is non-critical
+        console.log('Attempt counter update skipped');
+      }
     }
     
     // Determine file type and MIME type
