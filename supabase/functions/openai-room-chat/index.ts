@@ -231,9 +231,22 @@ serve(async (req) => {
         estimated_tokens: 1500
       });
 
+    // SECURITY: Block request if rate limit check fails (function missing, DB error, etc.)
     if (rateLimitError) {
       console.error('Rate limit check error:', rateLimitError);
-    } else if (rateLimitData && rateLimitData.length > 0) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Unable to verify rate limits. Please try again later.'
+        }),
+        { 
+          status: 503, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
+    if (rateLimitData && rateLimitData.length > 0) {
       const rateLimit = rateLimitData[0];
       if (!rateLimit.allowed) {
         return new Response(
