@@ -63,7 +63,7 @@ serve(async (req) => {
     // ========== Verify User Owns Content ==========
     const { data: content, error: contentError } = await supabase
       .from('content')
-      .select('user_id, metadata')
+      .select('user_id, metadata, chapters, chapters_status, chapters_error, processing_status')
       .eq('id', contentId)
       .single();
 
@@ -76,6 +76,36 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Forbidden' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ========== Idempotency ==========
+    // PDFs can accidentally trigger this function multiple times (e.g. client extraction + fallback)
+    // which can cause processing_status to flip back to "processing". If chapters already exist,
+    // we treat this as completed and return early.
+    const hasExistingChapters = Array.isArray((content as any).chapters)
+      ? (content as any).chapters.length > 0
+      : !!(content as any).chapters;
+
+    if (hasExistingChapters) {
+      // Ensure granular status is consistent when legacy rows had chapters but pending status.
+      await supabase
+        .from('content')
+        .update({
+          processing_status: 'completed',
+          chapters_status: 'completed',
+          chapters_error: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', contentId);
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          skipped: true,
+          message: 'Chapters already exist; skipping AI enhancement.',
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -105,6 +135,8 @@ serve(async (req) => {
       .from('content')
       .update({
         processing_status: 'processing',
+        chapters_status: 'processing',
+        chapters_error: null,
         metadata: {
           ...content.metadata,
           currentStep: 'enhancing',
@@ -223,6 +255,7 @@ For non-audio content, use estimated time segments based on reading pace or cont
     await supabase
       .from('content')
       .update({
+        chapters_status: 'processing',
         metadata: {
           ...content.metadata,
           currentStep: 'generating_chapters',
@@ -355,8 +388,12 @@ For non-audio content, use estimated time segments based on reading pace or cont
       .update({
         chapters: chapters,
         processing_status: 'completed',
+        chapters_status: 'completed',
+        chapters_error: null,
         metadata: {
           ...content.metadata,
+          currentStep: 'completed',
+          progress: 100,
           chunking: {
             totalChunks: chunkedContent.chunks.length,
             keyTopics: chunkedContent.keyTopics,
@@ -395,6 +432,27 @@ For non-audio content, use estimated time segments based on reading pace or cont
 
   } catch (error) {
     console.error('Error in enhance-content-ai function:', error);
+
+    // Best-effort: mark chapters generation as failed so UI doesn't show perpetual processing.
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const { contentId } = await req.clone().json().catch(() => ({} as any));
+      if (contentId) {
+        await supabase
+          .from('content')
+          .update({
+            processing_status: 'failed',
+            chapters_status: 'failed',
+            chapters_error: error?.message || 'AI enhancement failed',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', contentId);
+      }
+    } catch (statusUpdateError) {
+      console.error('Failed to update content failure status:', statusUpdateError);
+    }
     
     return new Response(
       JSON.stringify({ 
