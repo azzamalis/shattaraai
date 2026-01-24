@@ -7,6 +7,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/componen
 import { ContentType } from '@/lib/types';
 import { useRecordingState } from '@/hooks/useRecordingState';
 import { useContentContext } from '@/contexts/ContentContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2, AlertTriangle } from 'lucide-react';
 export interface ContentData {
   id: string;
@@ -128,6 +129,57 @@ export default function ContentPage() {
     };
     fetchContent();
   }, [contentId, fetchContentById, searchParams, recordingStateInfo?.isExistingRecording]);
+
+  // Real-time subscription for content updates (chapters, transcript, etc.)
+  useEffect(() => {
+    if (!contentId) return;
+
+    console.log('ContentPage: Setting up real-time subscription for content:', contentId);
+    
+    const channel = supabase
+      .channel(`content-page:${contentId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'content',
+          filter: `id=eq.${contentId}`
+        },
+        (payload) => {
+          console.log('ContentPage: Real-time update received:', payload);
+          const updatedContent = payload.new;
+          
+          // Update content data with new values
+          setContentData(prev => {
+            if (!prev) return prev;
+            
+            return {
+              ...prev,
+              text: updatedContent.text_content,
+              text_content: updatedContent.text_content,
+              chapters: updatedContent.chapters,
+              processing_status: updatedContent.processing_status,
+              transcription_confidence: updatedContent.transcription_confidence,
+              metadata: updatedContent.metadata as Record<string, any>,
+              ai_summary: updatedContent.ai_summary,
+              summary_key_points: updatedContent.summary_key_points,
+              summary_generated_at: updatedContent.summary_generated_at,
+              isProcessing: updatedContent.processing_status === 'processing',
+              hasError: updatedContent.processing_status === 'failed'
+            };
+          });
+        }
+      )
+      .subscribe((status) => {
+        console.log('ContentPage: Real-time subscription status:', status);
+      });
+
+    return () => {
+      console.log('ContentPage: Cleaning up real-time subscription');
+      channel.unsubscribe();
+    };
+  }, [contentId]);
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isRecording) {
