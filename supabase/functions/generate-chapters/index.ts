@@ -13,61 +13,73 @@ serve(async (req) => {
   }
 
   try {
-    // ========== SECURITY: JWT Authentication ==========
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      console.error('Missing or invalid Authorization header');
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized', success: false }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
-    // Create client with user's auth token to verify JWT
-    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
-
-    if (claimsError || !claimsData?.claims) {
-      console.error('JWT validation failed:', claimsError?.message);
+    
+    // ========== SECURITY: Check for service role or JWT Authentication ==========
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | null = null;
+    let isServiceRoleCall = false;
+    
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '');
+      
+      // Check if this is a service role call (from another edge function)
+      if (token === supabaseServiceKey) {
+        isServiceRoleCall = true;
+        console.log('Service role call detected - bypassing JWT validation');
+      } else {
+        // Validate user JWT
+        const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+          global: { headers: { Authorization: authHeader } }
+        });
+        
+        const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+        
+        if (claimsError || !claimsData?.claims) {
+          console.error('JWT validation failed:', claimsError?.message);
+          return new Response(
+            JSON.stringify({ error: 'Unauthorized', success: false }),
+            { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        userId = claimsData.claims.sub as string;
+        console.log('Authenticated user:', userId);
+      }
+    } else {
+      console.error('Missing Authorization header');
       return new Response(
         JSON.stringify({ error: 'Unauthorized', success: false }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    const userId = claimsData.claims.sub as string;
-    console.log('Authenticated user:', userId);
 
     // Create service client for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // ========== RATE LIMITING ==========
-    const { data: rateCheck, error: rateError } = await supabase.rpc('check_rate_limit', {
-      user_uuid: userId,
-      request_type: 'chat',
-      estimated_tokens: 1000
-    });
+    // ========== RATE LIMITING (skip for service role calls) ==========
+    if (!isServiceRoleCall && userId) {
+      const { data: rateCheck, error: rateError } = await supabase.rpc('check_rate_limit', {
+        user_uuid: userId,
+        request_type: 'chat',
+        estimated_tokens: 1000
+      });
 
-    if (rateError) {
-      console.error('Rate limit check error:', rateError);
-    } else if (rateCheck && rateCheck.length > 0 && !rateCheck[0].allowed) {
-      console.log('Rate limit exceeded for user:', userId);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Rate limit exceeded',
-          success: false,
-          reset_time: rateCheck[0].reset_time
-        }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      if (rateError) {
+        console.error('Rate limit check error:', rateError);
+      } else if (rateCheck && rateCheck.length > 0 && !rateCheck[0].allowed) {
+        console.log('Rate limit exceeded for user:', userId);
+        return new Response(
+          JSON.stringify({ 
+            error: 'Rate limit exceeded',
+            success: false,
+            reset_time: rateCheck[0].reset_time
+          }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // ========== Parse Request ==========
@@ -77,7 +89,7 @@ serve(async (req) => {
       throw new Error('Missing content ID or transcript');
     }
 
-    // Verify user owns the content
+    // Verify content exists and get metadata
     const { data: contentData, error: contentError } = await supabase
       .from('content')
       .select('metadata, user_id, chapters_attempts')
@@ -89,12 +101,18 @@ serve(async (req) => {
       throw new Error('Content not found');
     }
 
-    if (contentData.user_id !== userId) {
+    // For non-service-role calls, verify user owns the content
+    if (!isServiceRoleCall && contentData.user_id !== userId) {
       console.error('User does not own content:', { userId, contentUserId: contentData.user_id });
       return new Response(
         JSON.stringify({ error: 'Forbidden', success: false }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+    
+    // For service role calls, set userId from content for logging
+    if (isServiceRoleCall) {
+      userId = contentData.user_id;
     }
 
     // Update chapters_status to processing and increment attempt counter
