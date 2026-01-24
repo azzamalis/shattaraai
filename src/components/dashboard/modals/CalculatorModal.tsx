@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Parser } from 'expr-eval';
 import * as math from 'mathjs';
 
 
@@ -128,11 +127,10 @@ export function CalculatorModal({ open, onOpenChange }: CalculatorModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [open, standardInput, scientificInput]);
 
-  // Standard Calculator Functions
+  // Standard Calculator Functions - using mathjs (secure alternative to expr-eval)
   const calculateStandard = () => {
     try {
-      const parser = new Parser();
-      const result = parser.evaluate(standardInput);
+      const result = math.evaluate(standardInput);
       setStandardResult(result.toString());
     } catch (error) {
       setStandardResult('Error');
