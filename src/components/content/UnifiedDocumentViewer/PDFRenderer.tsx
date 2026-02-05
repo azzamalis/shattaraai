@@ -126,7 +126,7 @@ export function PDFRenderer({ url }: PDFRendererProps) {
 
   return (
     <div className="h-full w-full bg-white dark:bg-neutral-800/50 flex justify-center overflow-auto">
-      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+      <Worker workerUrl="https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs">
         <div 
           className="h-full w-full max-w-4xl transition-transform duration-300"
           style={{
