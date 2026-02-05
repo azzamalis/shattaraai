@@ -98,7 +98,7 @@ export function DashboardDrawer({
         <SheetContent side="left" className={`${getDrawerWidth()} bg-background p-0 flex flex-col border-r-2 border-border`} closeButton={false}>
           {/* Header with Logo */}
           <div className="flex items-center justify-between px-4 py-4 mb-2">
-            <Logo className="h-8 w-auto" textColor="text-foreground" linkTo="/dashboard" />
+            <Logo className="h-8 w-auto" textColor="text-foreground" linkTo="/dashboard" onClick={() => onOpenChange(false)} />
             <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="text-foreground hover:text-foreground hover:bg-accent rounded-xl h-8 w-8">
               <ChevronsLeft className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
