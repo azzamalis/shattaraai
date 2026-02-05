@@ -64,13 +64,15 @@ export function DashboardLayout({
     }
   }, [user, profile, loading, navigate]);
 
-  // Don't render if user is not authenticated
-  if (!user) {
-    return null;
-  }
+  // Redirect to sign-in if not authenticated (after auth finishes initializing)
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/signin');
+    }
+  }, [loading, user, navigate]);
 
-  // Don't render if still loading or user needs to complete onboarding
-  if (loading || (user && profile && !profile.onboarding_completed)) {
+  // Don't render app chrome until auth resolves or onboarding is complete
+  if (loading || (user && profile && !profile.onboarding_completed) || (!user && !loading)) {
     return (
       <div className="flex min-h-screen bg-background items-center justify-center">
         <div className="text-foreground">Loading...</div>
