@@ -130,7 +130,7 @@ export function NewPDFViewer({
   return <div className="w-full h-full">
       <Card className="dashboard-card w-full hover-shadow transition-all duration-200">
         <CardContent className="p-2 w-full overflow-hidden h-[90vh] px-0 py-0 rounded-lg">
-          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs">
             <Viewer fileUrl={pdfUrl} plugins={[defaultLayoutPluginInstance]} theme={theme === 'dark' ? 'dark' : 'light'} />
           </Worker>
         </CardContent>
