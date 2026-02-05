@@ -107,7 +107,7 @@ const PDFThumbnailGeneratorComponent = ({ url, title, className, onClick }: PDFT
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-hidden="true" />
         </div>
       )}
-      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+      <Worker workerUrl="https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs">
         <div 
           className="w-full h-full pdf-thumbnail-container"
           style={{ overflow: 'hidden' }}
