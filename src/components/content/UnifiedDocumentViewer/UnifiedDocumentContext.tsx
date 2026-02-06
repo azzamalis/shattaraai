@@ -131,7 +131,7 @@ export function UnifiedDocumentProvider({ children }: { children: ReactNode }) {
       // For PDF documents, search through PDF content
       if (state.documentType === 'pdf' && state.pdfUrl) {
         const pdfjsLib = await import('pdfjs-dist');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
         
         const loadingTask = pdfjsLib.getDocument(state.pdfUrl);
         const pdf = await loadingTask.promise;

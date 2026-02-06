@@ -86,7 +86,7 @@ async function extractPDFContent(file: File): Promise<string> {
     const pdfjsLib = await import('pdfjs-dist');
     
     // Set worker source
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
     
     // Read file as array buffer
     const arrayBuffer = await file.arrayBuffer();
