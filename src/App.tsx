@@ -85,15 +85,17 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <LanguageProvider>
-            <ContentProvider>
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <div className="min-h-screen bg-background">
-                  <AppRoutes />
-                </div>
-              </BrowserRouter>
-            </ContentProvider>
+            <AuthProvider>
+              <ContentProvider>
+                <Sonner />
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <div className="min-h-screen bg-background">
+                    <AppRoutes />
+                  </div>
+                </BrowserRouter>
+              </ContentProvider>
+            </AuthProvider>
           </LanguageProvider>
         </TooltipProvider>
       </QueryClientProvider>
