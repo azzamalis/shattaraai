@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ContentProvider } from "@/contexts/ContentContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { OnboardingProvider } from "@/contexts/OnboardingContext";
 import { OnboardingChecklist } from "@/components/onboarding/checklist";
 import { useAuth } from "@/hooks/useAuth";
@@ -84,15 +85,17 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <LanguageProvider>
-            <ContentProvider>
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <div className="min-h-screen bg-background">
-                  <AppRoutes />
-                </div>
-              </BrowserRouter>
-            </ContentProvider>
+            <AuthProvider>
+              <ContentProvider>
+                <Sonner />
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <div className="min-h-screen bg-background">
+                    <AppRoutes />
+                  </div>
+                </BrowserRouter>
+              </ContentProvider>
+            </AuthProvider>
           </LanguageProvider>
         </TooltipProvider>
       </QueryClientProvider>
